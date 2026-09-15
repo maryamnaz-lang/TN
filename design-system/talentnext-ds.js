@@ -286,6 +286,15 @@ logout:'M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h240q17 0 28
 launch:'M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h240q17 0 28.5 11.5T480-800q0 17-11.5 28.5T440-760H200v560h560v-240q0-17 11.5-28.5T800-480q17 0 28.5 11.5T840-440v240q0 33-23.5 56.5T760-120H200Zm560-584L416-360q-11 11-28 11t-28-11q-11-11-11-28t11-28l344-344H600q-17 0-28.5-11.5T560-800q0-17 11.5-28.5T600-840h200q17 0 28.5 11.5T840-800v200q0 17-11.5 28.5T800-560q-17 0-28.5-11.5T760-600v-104Z',
 document:'M360-240h240q17 0 28.5-11.5T640-280q0-17-11.5-28.5T600-320H360q-17 0-28.5 11.5T320-280q0 17 11.5 28.5T360-240Zm0-160h240q17 0 28.5-11.5T640-440q0-17-11.5-28.5T600-480H360q-17 0-28.5 11.5T320-440q0 17 11.5 28.5T360-400ZM240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h287q16 0 30.5 6t25.5 17l194 194q11 11 17 25.5t6 30.5v447q0 33-23.5 56.5T720-80H240Zm280-560v-160H240v640h480v-440H560q-17 0-28.5-11.5T520-640ZM240-800v200-200 640-640Z',
 download:'M480-337q-8 0-15-2.5t-13-8.5L308-492q-12-12-11.5-28t11.5-28q12-12 28.5-12.5T365-549l75 75v-286q0-17 11.5-28.5T480-800q17 0 28.5 11.5T520-760v286l75-75q12-12 28.5-11.5T652-548q11 12 11.5 28T652-492L508-348q-6 6-13 8.5t-15 2.5ZM240-160q-33 0-56.5-23.5T160-240v-80q0-17 11.5-28.5T200-360q17 0 28.5 11.5T240-320v80h480v-80q0-17 11.5-28.5T760-360q17 0 28.5 11.5T800-320v80q0 33-23.5 56.5T720-160H240Z',
+/* `upload` — Material Symbols Rounded, FILL 0: `download`'s own tray with the
+   arrow reversed to point up. Added 14 Sep 2026 for the profile-photo picker's
+   "Upload Photo" leading mark (Maryam: "the upload icon should be the upload
+   icon not the + icon"). The tray half is byte-for-byte `download`'s. */
+upload:'M440-320v-326L336-542q-11 11-28 11t-28-11q-11-11-11-28t11-28l172-172q6-6 13-8.5t15-2.5q8 0 15 2.5t13 8.5l172 172q11 11 11 28t-11 28q-11 11-28 11t-28-11L520-646v326q0 17-11.5 28.5T480-280q-17 0-28.5-11.5T440-320ZM240-160q-33 0-56.5-23.5T160-240v-80q0-17 11.5-28.5T200-360q17 0 28.5 11.5T240-320v80h480v-80q0-17 11.5-28.5T760-360q17 0 28.5 11.5T800-320v80q0 33-23.5 56.5T720-160H240Z',
+/* `image` — Material Symbols Rounded, FILL 0: the frame-and-mountain picture
+   glyph. Added 14 Sep 2026 as the removed-photo placeholder mark inside the
+   picker's current-photo disc. */
+image:'M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm40-80h480q12 0 18-11t-2-21L618-459q-6-8-16-8t-16 8L465-306l-79-105q-6-8-16-8t-16 8l-70 93q-8 10-2 21t18 11Zm-40 80v-560 560Z',
 trophy:'M440-200v-124q-49-11-87.5-41.5T296-442q-75-9-125.5-65.5T120-640v-40q0-33 23.5-56.5T200-760h80q0-33 23.5-56.5T360-840h240q33 0 56.5 23.5T680-760h80q33 0 56.5 23.5T840-680v40q0 76-50.5 132.5T664-442q-18 46-56.5 76.5T520-324v124h120q17 0 28.5 11.5T680-160q0 17-11.5 28.5T640-120H320q-17 0-28.5-11.5T280-160q0-17 11.5-28.5T320-200h120ZM280-528v-152h-80v40q0 38 22 68.5t58 43.5Zm200 128q50 0 85-35t35-85v-240H360v240q0 50 35 85t85 35Zm200-128q36-13 58-43.5t22-68.5v-40h-80v152Zm-200-52Z',
 send:'M792-443 176-183q-20 8-38-3.5T120-220v-520q0-22 18-33.5t38-3.5l616 260q25 11 25 37t-25 37ZM200-280l474-200-474-200v140l240 60-240 60v140Zm0 0v-400 400Z',
 play:'M320-273v-414q0-17 12-28.5t28-11.5q5 0 10.5 1.5T381-721l326 207q9 6 13.5 15t4.5 19q0 10-4.5 19T707-446L381-239q-5 3-10.5 4.5T360-233q-16 0-28-11.5T320-273Zm80-207Zm0 134 210-134-210-134v268Z',
@@ -1132,6 +1141,10 @@ const RANKS = [
   {n:'3-Star', d:'Earn the Gold badge',                             v:1000}
 ];
 
+const SPLIT = [0.44,0.19,0.26,0.11];
+
+const SERIES = [['Video','var(--dv-1)'],['Reading','var(--dv-2)'],['Roleplay','var(--dv-3)'],['Assessment','var(--dv-4)']];
+
 
 /* ---- the builders ---- */
 
@@ -1401,6 +1414,209 @@ function dsPayForm(tab, open){
       <button data-paytab="bank" aria-label="Pay by US bank account" style="${z};top:${tabTop};height:${tabH};left:50.4%;width:46%"></button>
       <button data-payclose aria-label="Close" style="${z};top:${clsTop};height:${clsH};left:48%;width:50%"></button>
     </div>
+  </div>`;
+}
+
+function dsScenes(title, scenes, opts){
+  opts = opts || {};
+  const role = opts.role || 'Talent Agent';
+  return `<div class="sec">
+    <div class="sec-h"><h2>${title}</h2>
+      <div class="scv-nav">
+        <button class="scv-ch" data-scv="-1" aria-label="Previous scenes">${I.chevLeft}</button>
+        <button class="scv-ch" data-scv="1" aria-label="Next scenes">${I.chevRight}</button>
+      </div>
+    </div>
+    <div class="scv-row">
+      ${scenes.map(s => `<div class="scv">
+        <span class="scv-art">
+          <img src="${s.img}" alt="">
+          <span class="scv-play">${I.play}</span>
+          <span class="scv-at t-caption">${s.at}</span>
+        </span>
+        <span class="scv-b">
+          <span class="scv-h t-h4">${s.title}</span>
+        </span>
+        <p class="t-desc eo-lead">
+          <span class="av-ph eo-lead-ph"><i>${s.i || ''}</i><img src="${s.img}" alt="" loading="lazy" onerror="this.style.display='none'"></span>
+          ${role}: <b>${s.name}</b></p>
+      </div>`).join('')}
+    </div>
+    ${opts.foot || ''}
+  </div>`;
+}
+
+function dsScvScroll(btn){
+  const sec = btn.closest('.sec');
+  const row = sec && sec.querySelector('.scv-row');
+  const card = row && row.firstElementChild;
+  if(row && card) row.scrollBy({left:(card.offsetWidth + 16) * +btn.dataset.scv, behavior:'instant'});
+}
+
+const dsTwIc = (name, tone) => `<span class="tw-ic${tone ? ' ' + tone : ''}">${I[name] || ''}</span>`;
+
+const dsTw = (title,body,action) => `<span class="tw">
+  ${title?`<span class="tw-h">${title}</span>`:''}${body}
+  ${action?`<span class="tw-a">${action}</span>`:''}</span>`;
+
+const dsTwBtn = (label,go) => `<button class="tw-btn"${go?` data-go="${go}"`:''}>${label}${I.arrowRight}</button>`;
+
+const dsTwChips = (qs) => `<span class="tw-chips">${qs.map(q=>`<button class="chip-tal" data-ask="1"><span class="sk-mark xs"></span>${q}</button>`).join('')}</span>`;
+
+const dsQuickActions = (cards) => `<div class="sec sec-qa">
+  <div class="sec-h"><h2>Quick Actions</h2></div>
+  <div class="qa">${(cards || []).map(c => `
+    <button class="qa-c${c.mk ? ' qa-c-mk' : ''}" ${c.ask ? `data-tal-ask="${c.ask}"`
+      : c.peek ? `data-peek="${c.peek}"` : `data-go="${c.go}"`}${c.disc?` data-disc="${c.disc}"`:''}${
+      c.edit?` data-pfedit="${c.edit()}"`:''}>
+      ${''/* A WRAPPER ROUND THE MARK AND THE TEXT WAS BUILT AND TAKEN OUT.
+            `.qa-ring` has to be as tall as the block beside it, and the obvious
+            way to say that is §75.3's — a two-column grid holding exactly those
+            two, with `height:100%` and `aspect-ratio` on the mark. Measured, it
+            settles at 80x80: the ring's width feeds the `auto` track, narrowing
+            the text, wrapping it to a third line, growing the row, widening the
+            ring. §111.1 has the full working and the stated height that answers
+            it. The markup is therefore one flat row exactly as it was, and a
+            `mk` card differs from an `ic` card by one element. */}
+      ${c.mk ? c.mk() : `<span class="qa-ic ${c.hue}">${c.ic}</span>`}
+      <span class="qa-b"><b>${c.t}</b><span>${c.d}</span></span>
+      <span class="qa-go">${I.arrowRight}</span>
+    </button>`).join('')}
+  </div>
+</div>`;
+
+function dsScoreCard(g){
+  const nb = dsNextBadge(g.pts);
+  const prev = [0,2500,5000,10000].filter(x=>x<=g.pts).pop();
+  const pct = nb ? Math.round((g.pts-prev)/(nb.need-prev)*100) : 100;
+  return `<div class="score">
+    <div class="score-top">
+      <div class="score-pts"><div class="l">Points</div><div class="n">${g.pts.toLocaleString()}</div></div>
+      <div class="score-rank"><div class="n"><img class="rank-mk" src="${AWARD['rank'+g.rank]}" alt="">${RANKS[g.rank-1].n}</div><div class="l">${g.badges} of 4 badges</div></div>
+    </div>
+    ${nb?`<div class="score-next">
+      <div class="pb-track"><div class="pb-fill" style="width:${pct}%"></div></div>
+      <div class="score-meta"><span>${(nb.need-g.pts).toLocaleString()} points to ${nb.n}</span><span>${pct}%</span></div>
+    </div>`:''}
+  </div>`;
+}
+
+const dsSegsOf = t => { const a = SPLIT.map(s=>Math.round(t*s)); a[0] += t - a.reduce((x,y)=>x+y,0); return a; };
+
+function dsBarChart(id,{title,sub,data,labels,slots,target,targetLabel,unit}){
+  const n = slots || data.length;
+  const max = Math.max(...data, target||0) * 1.2 || 1;
+  const bars = Array.from({length:n},(_,i)=>{
+    const v = data[i];
+    const hasV = v!==undefined && v!==null && v>0;
+    return `<button class="chart-bar ${hasV?'':'none'}" data-chart="${id}" data-i="${i}" aria-label="${labels[i]}, ${hasV?v+' '+unit:'nothing yet'}">
+      <i style="height:${hasV?Math.max(3,Math.round(v/max*100)):1}%"></i></button>`;
+  }).join('');
+  const refTop = target ? (100 - target/max*100) : null;
+  const ticks = Array.from({length:n},(_,i)=>`<span>${(i%4===0||i===n-1)?(i+1):'&nbsp;'}</span>`).join('');
+  const last = data.length-1;
+  return `<div class="chart" id="${id}">
+    <div class="chart-head"><span class="t">${title}</span><span class="s">${sub}</span></div>
+    <div class="chart-plot">
+      ${target?`<div class="chart-ref" style="top:${refTop}%"><span>${targetLabel}</span></div>`:''}
+      ${bars}
+    </div>
+    <div class="chart-x">${ticks}</div>
+    <div class="chart-read" data-read="${id}">
+      <span class="k">${labels[last]}</span><span class="v">${data[last]} ${unit}</span></div>
+    <div class="chart-table">
+      ${data.map((v,i)=>`<div class="kv"><span class="k">${labels[i]}</span><span class="v n">${v} ${unit}</span></div>`).join('')}
+    </div>
+    <div class="mt4"><button class="btn btn-g btn-sm noic" data-tbl="${id}" style="padding-left:0">View as a table</button></div>
+  </div>`;
+}
+
+function dsLineChart(id,{title,sub,data,labels,slots,target,unit,min,max}){
+  const W=320,H=104;
+  const PAD=5, IW=W-PAD*2;
+  const x=i=> slots>1 ? (PAD + i*(IW/(slots-1))) : W/2;
+  const y=v=> H - ((v-min)/(max-min))*H;
+  const pts = data.map((v,i)=>[x(i),y(v)]);
+  const path = pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
+  const dots = pts.map((p,i)=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="4"
+      fill="url(#g-${id})" stroke="var(--background)" stroke-width="2"/>`).join('');
+  const hits = data.map((v,i)=>{
+    const w = IW/slots, x0 = Math.max(0, Math.min(W-w, x(i)-w/2));
+    return `<rect class="hit" data-chart="${id}" data-i="${i}" x="${x0.toFixed(1)}" y="0"
+      width="${w.toFixed(1)}" height="${H}" fill="transparent" aria-label="${labels[i]}, ${v}${unit}"/>`;
+  }).join('');
+  const ticks = Array.from({length:slots},(_,i)=>`<span>${(i%4===0||i===slots-1)?(i+1):'&nbsp;'}</span>`).join('');
+  return `<div class="chart" id="${id}">
+    <div class="chart-head"><span class="t">${title}</span><span class="s">${sub}</span></div>
+    <div class="chart-line">
+      <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="${title}">
+        <defs><linearGradient id="g-${id}" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="var(--dv-grad-a)"/>
+          <stop offset="1" stop-color="var(--dv-grad-b)"/>
+        </linearGradient></defs>
+        <line x1="0" x2="${W}" y1="${y(target).toFixed(1)}" y2="${y(target).toFixed(1)}"
+          stroke="var(--border-strong-01)" stroke-width="1" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"/>
+        <path d="${path}" fill="none" stroke="url(#g-${id})" stroke-width="2"
+          stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+        ${dots}${hits}
+      </svg>
+    </div>
+    <div class="chart-x">${ticks}</div>
+    <div class="chart-table ct-bars">${data.map((v,i)=>`<div class="kv" style="--p:${Math.round((v-min)/(max-min)*100)}%"><span class="k">${labels[i]}</span><span class="ct-bar"><i></i></span><span class="v n">${v}${unit}</span></div>`).join('')}</div>
+    <div class="mt4"><button class="btn btn-g btn-sm noic" data-tbl="${id}" style="padding-left:0">View as a table</button></div>
+  </div>`;
+}
+
+function dsStackChart(id,{title,sub,weeks,target,targetLabel}){
+  const n = 13;
+  const max = Math.max(...weeks, target||0) * 1.2 || 1;
+  const cols = Array.from({length:n},(_,i)=>{
+    const t = weeks[i];
+    if(!(t>0)) return `<button class="sc-col none" data-chart="${id}" data-i="${i}" aria-label="Week ${i+1}, nothing yet"><i></i></button>`;
+    const segs = dsSegsOf(t).map((v,k)=>`<u style="height:${(v/max*100).toFixed(2)}%;background:${SERIES[k][1]}"></u>`).reverse().join('');
+    return `<button class="sc-col" data-chart="${id}" data-i="${i}"
+      aria-label="Week ${i+1}, ${t} min">${segs}</button>`;
+  }).join('');
+  const refTop = target ? (100 - target/max*100) : null;
+  const ticks = Array.from({length:n},(_,i)=>`<span>${(i%4===0||i===n-1)?(i+1):'&nbsp;'}</span>`).join('');
+  const li = weeks.length-1;
+  return `<div class="chart chart-stacked" id="${id}">
+    <div class="chart-head"><span class="t">${title}</span><span class="s">${sub}</span></div>
+    <div class="sc-plot">
+      ${target?`<div class="chart-ref" style="top:${refTop}%"><span>${targetLabel}</span></div>`:''}
+      ${cols}
+    </div>
+    <div class="chart-x">${ticks}</div>
+    <div class="chart-read" data-read="${id}">
+      <span class="k">Week ${li+1}</span><span class="v">${weeks[li]} min</span></div>
+    <div class="legend">${SERIES.map(([nm,c])=>`<span><i style="background:${c}"></i>${nm}</span>`).join('')}</div>
+    <div class="chart-table sc-table">
+      <div class="sc-row sc-head">
+        <span>Week</span>${SERIES.map(([nm])=>`<span class="num">${nm}</span>`).join('')}<span class="num">Total</span>
+      </div>
+      ${weeks.map((t,i)=>`<div class="sc-row">
+        <span class="sc-w">Week ${i+1}</span>${
+        dsSegsOf(t).map(v=>`<span class="num">${v}</span>`).join('')}<span class="num sc-t">${t} min</span>
+      </div>`).join('')}
+    </div>
+    <div class="mt4"><button class="btn btn-g btn-sm noic" data-tbl="${id}" style="padding-left:0">View as a table</button></div>
+  </div>`;
+}
+
+const dsTalStar = (q) => `<button class="tal-star" data-tal-ask="${q}" aria-label="Ask Tal"><span class="lbl">Ask Tal</span><span class="sk-mark xs"></span></button>`;
+
+function dsAgentCard(a, key){
+  return `<div class="ag draw" role="button" tabindex="0" data-go="agent:${key}">
+    <span class="bd"><i></i><i></i><i></i><i></i></span>
+    ${dsTalStar('What is '+a.n.split(' ')[0]+' like to be interviewed by?')}
+    ${dsAvatar(a,48)}
+    <span class="ag-b">
+      <span class="ag-n">${a.n}</span>
+      <span class="ag-r">${dsStars(a.r)}<span class="num">${a.r.toFixed(1)}</span></span>
+      <span class="ag-m">${a.range} · ${a.ivs} interviews</span>
+      <span class="ag-foot"><span style="color:var(--text-secondary)">Next: ${a.slot}</span><span class="ag-price">${a.price}</span></span>
+    </span>
+    <svg class="card-go" viewBox="0 -960 960 960">${inner('arrowRight')}</svg>
   </div>`;
 }
 

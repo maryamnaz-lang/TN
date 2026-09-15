@@ -147,17 +147,17 @@ function wLeadStopped(){
     .sort((a, b) => +b.m.last.match(/(\d+)d/)[1] - +a.m.last.match(/(\d+)d/)[1]);
   const never = lmembers().filter(x => x.m.last === 'Never');
   if(!idle.length && !never.length)
-    return `Nobody in your three cohorts has gone quiet this week, and nobody has never signed in.`;
+    return `Nobody in your cohort has gone quiet this week, and nobody has never signed in.`;
   const top = idle[0];
   const rows = idle.map(x => ({m: x.m, detail: `last active ${x.m.last.toLowerCase()} &middot; ${lchDone(x.m)} of 13 chapters &middot; Cohort ${x.c.id}`}));
-  return `${idle.length ? `${idle.length === 1 ? 'One person has' : _W(idle.length) + ' people have'} gone quiet: ${top.m.name}, last active ${top.m.last.toLowerCase()}, ${lchDone(top.m)} ${lchDone(top.m) === 1 ? 'chapter' : 'chapters'} in. ` : ''}${never.length ? `${_W(never.length)} ${never.length === 1 ? 'has' : 'have'} never signed in. ` : `Nobody in your three cohorts has never signed in.`}`
+  return `${idle.length ? `${idle.length === 1 ? 'One person has' : _W(idle.length) + ' people have'} gone quiet: ${top.m.name}, last active ${top.m.last.toLowerCase()}, ${lchDone(top.m)} ${lchDone(top.m) === 1 ? 'chapter' : 'chapters'} in. ` : ''}${never.length ? `${_W(never.length)} ${never.length === 1 ? 'has' : 'have'} never signed in. ` : `Nobody in your cohort has never signed in.`}`
     + tw(twIc('time') + 'Gone quiet', lPeople(rows), lBtn('Open Course reports', `data-go="leadReports" data-ldrrep="${top.c.id}"`));
 }
 
 function wLeadBehind(){
   const be = lbehind().slice().sort((a, b) => lgap(a) - lgap(b));
   if(!be.length)
-    return `Nobody across your ${_w(LEAD_COHORTS.length)} cohorts is more than five points behind pace right now.`;
+    return `Nobody in your cohort is more than five points behind pace right now.`;
   const worst = be[0];
   const rows = be.map(x => ({m: x.m, detail: `${x.m.pc}% against ${lpace(x.c)}% expected &middot; Cohort ${x.c.id}`}));
   const cos = [...new Set(be.map(x => x.c.id))];
@@ -208,16 +208,25 @@ function wLeadDraftCheckin(){
 }
 
 /* ---- 4.3 cohorts -------------------------------------------------------- */
+/* ONE RUNNING COHORT, so "how are my cohorts / which needs me most" is answered
+   about the single active one — its pace, its flags, its call — with the
+   completed cohort named as history rather than a second live thing to compare.
+   The table row loop still maps `LEAD_COHORTS`, so a moderator build with several
+   live cohorts gets the comparison back for free. */
 function wLeadCohortsTable(){
   const rows = LEAD_COHORTS.map(c => {
     const g = lavg(c, 'pc') - lpace(c);
     const fl = c.members.filter(m => m.flag).length;
     return `<span><b>Cohort ${c.id}</b>week ${c.week} &middot; ${lavg(c, 'pc')}% vs ${lpace(c)}% &middot; ${fl} flagged</span>`;
   }).join('');
-  const worst = lattention()[0];
-  const needs = worst ? lcoOf(worst.c.id) : LEAD_COHORTS[0];
-  return `All ${_w(LEAD_COHORTS.length)} are within two points of pace. Cohort ${needs.id} needs you most: it holds the flagged names and its call is this week. The others are close, one a week old and ahead.`
-    + tw(twIc('chart') + 'Your cohorts', `<span class="tw-lines">${rows}</span>`, lBtn('Open Cohorts', 'data-go="leadCohorts"'));
+  const c = LEAD_COHORTS[0];
+  const fl = c.members.filter(m => m.flag).length;
+  const past = LEAD_PAST.length ? ` Cohort ${LEAD_PAST[0].id} is behind you, closed and awaiting its last summaries.` : '';
+  const lead = LEAD_COHORTS.length === 1
+    ? `You are leading one cohort right now, Cohort ${c.id}, in week ${c.week} of 13 at ${lavg(c, 'pc')}% against ${lpace(c)}% expected${fl ? `, with ${_w(fl)} flagged` : ' and nobody flagged'}.${past}`
+    : `All ${_w(LEAD_COHORTS.length)} are within two points of pace.`;
+  return lead
+    + tw(twIc('chart') + 'Your cohort', `<span class="tw-lines">${rows}</span>`, lBtn('Open Cohorts', 'data-go="leadCohorts"'));
 }
 
 function wLeadStuck(){

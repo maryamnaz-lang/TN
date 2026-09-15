@@ -187,8 +187,24 @@ const lbadge = pts => BDG.filter(b => b.need && pts >= b.need).pop() || null;
    IDENTIFIES the cohort and the course no longer does either: `lcourse` is off
    the identity line (see its note). One cohort per intent here so the demo shows
    the axis clearly. */
+/* ONE RUNNING COHORT AT A TIME (Maryam, 14 Sep 2026). A candidate who becomes a
+   cohort leader — which is who Priya is — leads ONE cohort at a time; only a
+   MODERATOR (a leader an admin added, the admin portal's `u.addedBy`) may run
+   several. So `LEAD_COHORTS` holds the single ACTIVE cohort, and every
+   current-work surface that reads it (the identity line, the dashboard figures,
+   the attention queue, the calls diary, "Your cohorts", the chat's counts) reads
+   as one cohort with no per-site filtering — hiding the multiple-cohort
+   functionality is one array being length 1.
+
+   "KEEP THE PREVIOUS LED COHORTS." A finished cohort is not deleted, it is done:
+   `LEAD_PAST` holds the completed ones, reachable through `lcoOf` / `LEAD_ALL()`
+   for the three surfaces that are HISTORY rather than current work — the
+   Evaluations queue (its 90-day summaries close a cohort that has finished), the
+   Course Reports selector, and the "Past cohorts" band on the Cohorts page. When
+   this leader finishes Cohort 41 they take the next one; the shape already
+   supports it, and a moderator build simply carries more than one entry here. */
 const LEAD_COHORTS = [
-  {id:41, level:'E3', intent:INTENTS[2], week:5, day:34, call:'Thursday 6:00 PM', callDay:'Today', callTime:'6:00 PM', callOrd:2, starts:'', members:[
+  {id:41, level:'E3', intent:INTENTS[2], week:5, day:34, call:'Thursday 6:00 PM', callDay:'Today', callTime:'6:00 PM', callOrd:2, starts:'', status:'active', members:[
     lmem('Maryam Naz','MN','hana',46,84,1.3,'Today',1760),
     lmem('Aisha Bello','AB','priya',71,94,1.0,'Today',2610),
     lmem('Daniel Kerr','DK','owen',58,88,1.2,'Today',2140),
@@ -198,13 +214,20 @@ const LEAD_COHORTS = [
     lmem('James Whitby','JW','owen',31,65,2.4,'Today',1120),
     lmem('Chloe Ferreira','CF','priya',28,77,1.0,'5d ago',1005),
     lmem('Tobias Mensah','TM','samuel',35,61,1.4,'2d ago',1240),
-    lmem('Yuki Tanaka','YT','hana',9,0,0,'12d ago',285)]},
-  {id:33, level:'E1', intent:INTENTS[0], week:11, day:76, call:'Friday 5:00 PM', callDay:'Tomorrow', callTime:'5:00 PM', callOrd:4, starts:'', members:[
-    /* COHORT 33 IS THE ONE THESE FIGURES ARE READ ON — week 11, and the two at
-       the top are the ones the Evaluations card draws. Owen clears Silver
-       (5,000) and Lena does not, which is deliberate: the card shows a badge per
-       candidate, and two identical badges would not show whether it was derived
-       or printed. */
+    lmem('Yuki Tanaka','YT','hana',9,0,0,'12d ago',285)]}
+];
+
+/* THE PREVIOUSLY LED COHORTS — completed, kept for the record. Cohort 33 is the
+   one the Evaluations screen closes: week 11, the two at the top are the ones the
+   Evaluations card draws (Owen clears Silver at 5,000, Lena does not — the card
+   shows a badge per candidate, and two identical badges would not show whether it
+   was derived or printed). It carries the same shape as an active cohort and its
+   numbers are unchanged from when it was live, so every historical surface reads
+   it exactly as before; only its `status` and the array it sits in are new. Its
+   call fields stay for the past-calls history (`LEAD_RUN`) but it never enters the
+   upcoming diary — `lcalls` reads `LEAD_COHORTS`, not this. */
+const LEAD_PAST = [
+  {id:33, level:'E1', intent:INTENTS[0], week:11, day:76, call:'Friday 5:00 PM', callDay:'Tomorrow', callTime:'5:00 PM', callOrd:4, starts:'', status:'completed', members:[
     lmem('Owen Clarke','OC','owen',92,87,1.3,'Today',5240),
     lmem('Lena Fischer','LF','lena',88,90,1.0,'Yesterday',4880),
     lmem('Samuel Adeyemi','SA','samuel',84,79,1.6,'Today',4510),
@@ -212,22 +235,14 @@ const LEAD_COHORTS = [
     lmem('Marco Rossi','MR','owen',80,75,1.9,'2d ago',3940),
     lmem('Grace Mwangi','GM','priya',80,88,1.0,'Today',4265),
     lmem('Ivan Petrov','IP','samuel',80,70,1.7,'3d ago',3780),
-    lmem('Zoe Bennett','ZB','lena',80,66,1.6,'2d ago',3410)]},
-  {id:47, level:'E2', intent:INTENTS[1], week:1, day:4, call:'Monday 6:00 PM', callDay:'Mon', callTime:'6:00 PM', callOrd:5, starts:'', members:[
-    /* COHORT 47 IS FOUR DAYS OLD, so every total here is one or two chapters'
-       worth at 25 a chapter plus a post or two — the four on 0% have signed in
-       and done nothing, which is 0 points earned rather than a missing figure. */
-    lmem('Ahmed Farouk','AF','owen',15,100,1.0,'Today',420),
-    lmem('Beatriz Lima','BL','lena',12,88,1.0,'Today',360),
-    lmem('Callum Reid','CR','samuel',8,0,0,'Yesterday',180),
-    lmem('Dilnoza Karimova','DK','priya',8,0,0,'Today',195),
-    lmem('Ines Duarte','ID','hana',8,75,1.0,'Today',240),
-    lmem('Hugo Bernard','HB','owen',4,0,0,'2d ago',120),
-    lmem('Emeka Obi','EO','samuel',0,0,0,'Yesterday',0),
-    lmem('Freya Olsen','FO','lena',0,0,0,'Today',0),
-    lmem('Gabriel Souza','GS','priya',0,0,0,'2d ago',0),
-    lmem('Jonas Weber','JW','hana',0,0,0,'Today',0)]}
+    lmem('Zoe Bennett','ZB','lena',80,66,1.6,'2d ago',3410)]}
 ];
+
+/* Active + past, for the lookups and the history surfaces. `lcoOf` searches
+   this so a completed cohort's id (an Evaluations record, a past `LEAD_RUN` row,
+   a Reports tab) still resolves; the current-work helpers stay on
+   `LEAD_COHORTS`. */
+const LEAD_ALL = () => LEAD_COHORTS.concat(LEAD_PAST);
 
 /* Expected progress is linear across the 90 days. It is deliberately the
    crudest possible model: the leader is not being asked to beat a forecast,
@@ -256,9 +271,19 @@ function lflag(m,c){
   if(idle >= 4)                   return {k:'wa',  t:'Slowing',                ic:'time'};
   return null;
 }
-LEAD_COHORTS.forEach(c => c.members.forEach(m => m.flag = lflag(m,c)));
+/* Flags are computed for every cohort, active or past, so a past cohort's roster
+   and its Course Report read exactly as they did when it was live. The current
+   dashboards never surface a past flag because `lattention`/`lbehind` walk
+   `lmembers()`, which is the active set only. */
+LEAD_ALL().forEach(c => c.members.forEach(m => m.flag = lflag(m,c)));
 
+/* `lmembers()` IS THE ACTIVE SET (the one running cohort). Every "who needs me
+   this week" reading is built on it, so with one active cohort they all speak of
+   one cohort. `lallmembers()` is active + past, for the two history readers that
+   want every candidate ever led — Course Reports' figure denominators and its
+   per-cohort rows. */
 const lmembers  = () => LEAD_COHORTS.flatMap(c => c.members.map(m => ({m, c})));
+const lallmembers = () => LEAD_ALL().flatMap(c => c.members.map(m => ({m, c})));
 /* WITHIN A SEVERITY, ORDER BY THE GAP, NOT BY RAW PROGRESS. Sorted on `pc` the
    queue opened with four people at 0% — and all four were in a cohort that
    started four days ago, where 0% is four points behind and nothing to act on.
@@ -601,13 +626,14 @@ var LEAD_TAL = {   /* `var` for the reason given above LEAD_NOTIF */
   where: {leadDash:'Dashboard', leadCalls:'Upcoming Sessions', leadEvals:'Evaluations',
           leadCohorts:'Cohorts', leadReports:'Course reports', leadMessages:'Messages',
           leadCerts:'Certifications', leadProfile:'Your profile'},
-  state: () => LEAD_COHORTS.length + ' cohorts, ' + lmembers().length + ' candidates, '
+  state: () => (LEAD_COHORTS.length===1 ? 'one cohort' : LEAD_COHORTS.length + ' cohorts')
+             + ', ' + lmembers().length + ' candidates, '
              + lpending() + ' summar' + (lpending()===1?'y':'ies') + ' waiting',
   ctx: {
     leadDash: ['Brief me for Thursday&rsquo;s call','Who should I worry about this week?','What is waiting on my signature?'],
     leadCalls: ['Brief me for tonight&rsquo;s call','Who missed the last one?'],
     leadEvals: ['Is Owen Clarke ready to be promoted?','What should the summary say?'],
-    leadCohorts: ['Where is Cohort 41 stuck?','Which cohort needs me most?'],
+    leadCohorts: ['Where is Cohort 41 stuck?','How is my cohort doing?'],
     leadReports: ['Who has stopped in the last week?','Which chapter is losing people?'],
     leadMessages: ['Draft a check-in to Yuki Tanaka','What came up on the board this week?'],
     leadCerts: ['What do I need for the next certification?'],
@@ -1172,7 +1198,7 @@ V.leadDash = () => {
         greetings for the same moment, in a product where the two portals are
         the same person's two roles and the switch between them is one click in
         the app bar. Whichever wording wins, it has to be one wording. */''}
-  ${ph('Welcome back, Priya',`Cohort leader &middot; ${LEAD_COHORTS.length} cohorts &middot; ${lmembers().length} candidates, all Explorer`)}
+  ${ph('Welcome back, Priya',`Cohort leader &middot; ${LEAD_COHORTS.length===1?'one active cohort':LEAD_COHORTS.length+' active cohorts'} &middot; ${lmembers().length} candidates, all Explorer`)}
   <div class="sec">
     <div class="ai-aura tile">
       <div class="ai-head">${talLabel()}<h3>${talRead.h}</h3></div>

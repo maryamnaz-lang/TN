@@ -33,7 +33,7 @@ const MEMO = [
    why:'Four separate moments where you played down something you had just described.',
    src:'Level interview', kind:'interview', iv:'level', at:'06:15', when:'20 Aug'},
   {k:'Delegation and hard conversations are your growth areas.',
-   why:'Written and signed by Priya Nair in your report.',
+   why:'From the analysis of your level interview, in your report.',
    src:'Your report', kind:'report', when:'21 Aug'},
   {k:'Chapter 4 is where you stalled — four opens, never finished.',
    why:'Course activity, not something you told me.',

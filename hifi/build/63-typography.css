@@ -1251,6 +1251,14 @@
   font-size:var(--t-sec-size);line-height:var(--t-sec-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-sec-ls)}
 
+/* THE RATING CARD'S HEADING IS A SECTION HEADING (Maryam, 13 Sep 2026: "the
+   heading of this section should be of other section headings sizes"). It shares
+   its row with the mark, so it is `.rev-head h2` rather than a `.sec-h` the rule
+   above could reach; same `--t-sec` token, (0,2,1) to clear the h2 default. */
+.app .rev-head h2{
+  font-size:var(--t-sec-size);line-height:var(--t-sec-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-sec-ls)}
+
 @container app (min-width:672px){
   .app .bhead > span{
     font-size:var(--t-eyebrow-size);line-height:var(--t-eyebrow-lh);
@@ -5488,3 +5496,17 @@
    is set here — `--accent-text`, the accent as ink, over §105's light-red pill.
    `.t-label` inked `--text-secondary`, and this (0,2,0, later) overrides it. */
 .app .rank-chip{color:var(--accent-text)}
+
+/* THE REVIEW CAPSULE LABEL IS THE ACCENT (Maryam, 14 Sep 2026: "the icon and text
+   needs to be in accent color", then again "i think you are not using the accent
+   color in capsules, please use accent color"). She means the vivid `--accent`
+   (#f9423a), not the muted `--accent-text` ink it wore first. That makes it a
+   STATED exception to §3's "accent on words is --accent-text, not --accent" — like
+   the selected rail label and `.jrn-pill` — and it is fine here: the pill is a
+   short CTA label, not body copy, on a white ground. The mark matches in §130 (a
+   `fill`). It is also the MEDIUM weight (Maryam, 14 Sep 2026, pointing at
+   `.scene-ask`: "the font weight of our capsule text should also be like this") —
+   `--t-w-strong` (500), the same weight that "Ask Tal why these scenes were
+   chosen" wears, over `.t-body`'s book. This rule (0,2,0, later) beats `.t-body`
+   on both. */
+.app .rev-cap-t{color:var(--accent);font-weight:var(--t-w-strong)}

@@ -325,7 +325,13 @@ const PAGESUM = {
        worse than no fallback. */
     booked: 'Welcome back, Maryam! Your <b data-sum="interview">levelling interview with Priya Nair</b> is confirmed for Thursday, August 20 at 6:30 PM ET (45 minutes, video-recorded). My analysis of Priya&rsquo;s historical evaluation patterns shows a heavy emphasis on delegation frameworks. Since your initial quiz score placed you on the <b data-sum="track">Explorer track</b>, spending just <b data-sum="prep">10 minutes practising your delegation talking points</b> before Thursday is your best strategy to secure an optimal levelling outcome.',
 
-    assessed: 'Welcome Back, Maryam! You are <b data-sum="level">Explorer &ndash; E3</b>, rung 3 of 15, signed by Priya on 21 August, with <b data-sum="growth">delegation and hard conversations</b> as your growth areas. <b data-sum="enrol">Enrolling</b> is the only thing left.',
+    /* THE 24-HOUR WAIT (17.1). No `data-sum` phrases: there is no next action to
+       point a popover at, and every clause here is settled. No em dash (Tal
+       voice). The card in the body is `.ai-aura` too, so this replaces it via
+       `placePageSummary` — trap 11 needs this entry to exist for the stage. */
+    held: 'Your interview with Priya Nair is done. It is being analysed now, and TalentNext sets your level from it within <b>24 hours</b>. There is nothing to do but wait.',
+
+    assessed: 'Welcome Back, Maryam! You are <b data-sum="level">Explorer &ndash; E3</b>, rung 3 of 15, set by TalentNext on 21 August after your interview, with <b data-sum="growth">delegation and hard conversations</b> as your growth areas. <b data-sum="enrol">Enrolling</b> is the only thing left.',
 
     /* ------------------------------------------------------------------
        THE THREE ENROLLED STAGES — Figma 599:7418, and the same three
@@ -759,8 +765,13 @@ const PAGESUM = {
 
   /* "Ten of you at E3 with Priya leading, week 5 of 13" was the page
      description verbatim. The description keeps it; this keeps the call,
-     which is the thing on the page that has a date on it. */
-  cohort: 'Thursday&rsquo;s call is at 6:00 PM ET on hard conversations, and Priya has asked everyone to bring a real one to talk through.',
+     which is the thing on the page that has a date on it — WHILE THE COHORT IS
+     RUNNING. Once the 90 days are over there is no next call, so the summary
+     reads the wrap instead (Maryam, 14 Sep 2026: "since the course has ended the
+     summary wont be this"). `f.finished` is day90, `f.complete` is promoted. */
+  cohort: (f) => (f.finished || f.complete)
+    ? 'Cohort 41 has finished all thirteen weeks with Priya leading. The discussion stays open for the ten of you to keep working through what changed.'
+    : 'Thursday&rsquo;s call is at 6:00 PM ET on hard conversations, and Priya has asked everyone to bring a real one to talk through.',
 
   /* PARKED — `.msg-page` is excluded, for the reason written at the pass
      below. Trimmed to match the rule anyway: the policy sentence about what
@@ -938,16 +949,15 @@ const PAGESUM = {
      roll-up and the one cohort that needs attention. */
   leadCohorts: () => {
     const flagged = lmembers().filter(x => x.m.flag);
-    const worst = LEAD_COHORTS.slice().sort((a,b) => (lavg(a,'pc') - lpace(a)) - (lavg(b,'pc') - lpace(b)))[0];
-    /* THREE FORMS, "one" SPELT (doc §7). The old string hard-coded "N points
-       behind pace", which printed "1 points behind" at the current data and
-       "0 points behind" / "-1 points behind" the moment a cohort caught up or
-       pulled ahead. `g` is signed (+ ahead), the word is spelt and "point" is
-       pluralised, and the "widest gap" tail only rides the behind case. */
-    const g = lavg(worst,'pc') - lpace(worst), gp = Math.abs(g);
+    /* ONE RUNNING COHORT (14 Sep 2026), so this reads the single active cohort
+       rather than the widest gap of several; the completed one rides a tail as
+       history. `g` is signed (+ ahead), the word is spelt and "point" is
+       pluralised so it never prints "1 points" or "0 points behind". */
+    const c = LEAD_COHORTS[0];
+    const g = lavg(c,'pc') - lpace(c), gp = Math.abs(g);
     const pace = g === 0 ? 'on pace' : `${_w(gp)} point${gp === 1 ? '' : 's'} ${g < 0 ? 'behind' : 'ahead of'} pace`;
-    const tail = g < 0 ? `, the widest gap of the ${_w(LEAD_COHORTS.length)}` : '';
-    return `Cohort ${worst.id} is ${pace}${tail}. ${flagged.length} of the ${lmembers().length} candidates are flagged, and every cohort has its call this week.`;
+    const past = LEAD_PAST.length ? ` Cohort ${LEAD_PAST[0].id} is closed behind you, its last summaries still to sign.` : '';
+    return `Cohort ${c.id} is ${pace} in week ${c.week} of 13, and <b>${flagged.length} of its ${lmembers().length} candidates are flagged</b>.${past}`;
   },
 
   /* "10 candidates at Explorer – E3, week 5 of 13" was the page description
@@ -988,7 +998,10 @@ const PAGESUM = {
        is false every time it is evaluated. The sentence always names the
        cohort, which is what the page is always showing. */
     const sel = S.ldrRep;
-    const rows = lmembers().filter(x => x.c.id === +sel);
+    /* `lallmembers()` — the selector can be a PAST cohort (14 Sep 2026), so the
+       summary reads the same active+past set the report table does; keyed on the
+       active-only `lmembers()` a completed cohort's tab summarised zero rows. */
+    const rows = lallmembers().filter(x => x.c.id === +sel);
     const behind = rows.filter(x => x.m.pc - lpace(x.c) <= -5);
     const never = rows.filter(x => x.m.last === 'Never');
     const worst = behind.slice().sort((a,b) => (a.m.pc - lpace(a.c)) - (b.m.pc - lpace(b.c)))[0];
@@ -1667,7 +1680,7 @@ const SUMDROP = {
 
   /* --- the assessed stage ------------------------------------------------ */
   level: () => ({
-    lead: 'Priya confirmed you at Explorer &ndash; E3 on 21 August, rung 3 of the fifteen-rung ladder.',
+    lead: 'You were confirmed at Explorer &ndash; E3 on 21 August after your interview, rung 3 of the fifteen-rung ladder.',
     label: 'What a level is:',
     read: 'Explorer is rungs 1 to 5 of 15, and the interview is the only thing that sets one. A quiz cannot. E3 opens the course built for E3, and 90 days later you re-interview.',
     next: 'The ladder shows all fifteen rungs and the three tracks they sit in.',

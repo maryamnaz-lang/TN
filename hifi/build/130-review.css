@@ -3,56 +3,189 @@
 
    One component on three surfaces (views.js): the interview report rates the
    talent agent, the finished cohort rates its leader, the finished course rates
-   itself. The reference is a plain white block — an icon disc and a title, a row
-   of stars, an optional note with a counter, then Submit and Maybe later. No
-   card chrome: it sits in its own `.sec` on the page ground.
+   itself. A star row, an optional note capped at 500, Submit and Maybe later.
 
-   TYPE AND INK ARE §63'S. Every string here wears a type role (`t-h2` on the
-   title, `t-desc` on the sub-line, `t-label` on the field labels, `t-caption` on
-   the counter), so this layer sets no size, weight or colour — only layout, the
-   two icon FILLS (the disc glyph and the stars, which are `fill` not `color`, the
-   same split §85's badge and §116's `.cl-ic` use) and the disc grounds.
+   NO BOX (Maryam, 13 Sep 2026: "remove the rating section out of box"). It is a
+   plain full-width section like the page's other bands, not a bordered card — an
+   earlier pass framed it and that was wrong. It spans the section (no measure
+   cap) and carries no ground, border or inset of ITS OWN.
+
+   A CENTRED HALF-MEASURE BOX THAT HUGS ITS CONTENT (Maryam, 14 Sep 2026, over
+   several corrections: "give the grey bg ... like grey sections. also mid align
+   the content"; then "the width should be half ... the bg should hug the content
+   it should not touch the sides and this section should have section gap from both
+   top and bottom"; then the capsule; then "the opened view should also have a
+   white bg. plus add bg light shadow"). `.review` is a centred panel at half the
+   column measure (`--rev-w` 600px, `margin-inline:auto`) on a WHITE ground
+   (`--background`, the final state — it was grey `--surface-2` for two turns)
+   inside a `--rule` hairline, with its own `--s06` inset so the ground hugs the
+   words and stops short of the section edges. Radius stays 0 (`--radius`), the
+   platform's. Below the box measure it is full width (a phone gets the whole
+   column). Floated (capsule mode) it also carries `--rev-shadow`. The 13 Sep "out
+   of box" note is superseded BY INSTRUCTION: the box she rejected then was a
+   full-width bordered card; this is a half-measure centred panel — corrections win
+   (keep the old argument, build the new shape).
+
+   CENTRED CONTENT: `text-align:center` on `.review` carries the sub-line, labels
+   and counter; the three flex rows (head, stars, actions) get
+   `justify-content:center`. The textarea keeps its text left (a centred caret
+   reads wrong) and stays full width of the box.
+
+   THE HEADING IS A SECTION HEADING and the mark is a plain one (Maryam, same
+   day: "the heading of this section should be of other section headings sizes"
+   and "the icon with heading needs be in black with no bg and smaller in size
+   like other icons we are using"). The heading size is §63's `--t-sec`, stated
+   there because §63 owns type; the mark is a bare 20px glyph in `--icon-primary`
+   ink — §29's rule for `.stat-ic` / `.qa-ic`, a decorative mark is ink and wears
+   no chip.
+
+   TYPE AND INK ARE §63'S. Every string wears a type role (the heading sized in
+   §63, `t-desc` on the sub-line, `t-label` on the field labels, `t-caption` on
+   the counter), so this layer sets no size, weight or colour — only layout and
+   the icon FILLS (the mark and the stars, which are `fill` not `color`, the same
+   split §85's badge and §116's `.cl-ic` use).
 
    THE STARS ARE THE ONE INTERACTION. `I.starOutline` at rest in a mid grey,
-   `I.star` gold (`--star`, the rating token, never the accent — §63 §14's rule
-   that a state colour is a set) once chosen. Click sets the score (ai3.js); there
-   is no hover preview, deliberately — the build disarms `:hover` (trap 6) and a
-   rating reads fine as a committed choice rather than a hover ghost.
+   `I.star` gold (`--star`, the rating token, never the accent) once chosen. No
+   hover preview — the build disarms `:hover` (trap 6) and a rating reads fine as
+   a committed choice.
    ========================================================================== */
-.app .review{max-width:var(--measure)}
 
-/* THE HEADER — a tinted disc, the title and the sub-line. The disc echoes the
-   reference's accent-tint circle and §105.1's photo-edit badge ground. */
-.app .rev-head{
-  display:flex;align-items:flex-start;gap:var(--s04);
-  margin-bottom:var(--s06)}
-.app .rev-ic{
-  flex:none;display:grid;place-items:center;
-  width:40px;height:40px;border-radius:999px;
-  background:color-mix(in srgb, var(--accent) 12%, var(--background))}
-.app .rev-ic svg{width:20px;height:20px;fill:var(--accent-text)}
-.app .rev-ic-ok{background:color-mix(in srgb, var(--support-success) 14%, var(--background))}
+/* A CENTRED HALF-MEASURE GREY BOX, its ground hugging the content and inset from
+   the section edges; the plain `.sec` around it carries the top/bottom gap. Text
+   centres from the root and the flex rows below justify to the middle (14 Sep).
+   `position:relative` anchors the capsule's close X (below). */
+.app .review{
+  --rev-w:700px;position:relative;
+  max-width:var(--rev-w);margin-inline:auto;
+  padding:var(--s06);
+  background:var(--background);border:1px solid var(--rule);border-radius:var(--radius);
+  text-align:center}
+
+/* THE FLOAT — capsule mode pins above the Tal dock (14 Sep 2026). ai4.js lifts
+   `.rev-float` into `.view-col`, the dock's own container, so this mirrors the
+   dock's box exactly (§21.1: `left:0;right:0;margin:0 auto` + the same content
+   measure and the 900 `--pad-x` step) and centres over the SAME content column,
+   not the frame. It sits one dock-height above the dock: the dock is `--s05` off
+   the floor and 66px tall, plus an `--s04` gap. The pill/card inside centres. */
+.app .rev-float{
+  position:absolute;left:0;right:0;margin:0 auto;
+  bottom:calc(var(--s05) + 66px + var(--s04));z-index:31;
+  display:flex;justify-content:center;
+  width:calc(min(100%, var(--content-max)) - 2 * var(--pad-x))}
+@container app (min-width:900px){.app .rev-float{--pad-x:var(--s07)}}
+/* on a page with no Tal dock there is nothing to sit above, so the float drops to
+   the floor gap (Maryam, 14 Sep 2026: cohort page "the capsule will come little
+   down"). ai4.js stamps `.rev-float-nodock` when `.view-col` has no `.askdock`. */
+.app .rev-float.rev-float-nodock{bottom:var(--s06)}
+
+/* THE CAPSULE<->MODAL SWAP ANIMATES (Maryam, 14 Sep 2026: "the current interaction
+   is sudden, can we make this smoother"). render() rebuilds the DOM, so the two are
+   different nodes and cannot tween into each other; instead the element that appears
+   on the toggle render plays a short entrance keyframe (fade + slight rise + scale),
+   which reads as a smooth convert both ways. `.rev-anim` is stamped only on that one
+   render (ai3.js `S.revMorph`), so it never replays on unrelated re-renders. */
+@keyframes revMorphIn{
+  from{opacity:0;transform:translateY(6px) scale(.98)}
+  to{opacity:1;transform:none}}
+.app .rev-anim{animation:revMorphIn 220ms cubic-bezier(.4,0,.2,1) both}
+/* floated, the card no longer needs to centre itself — the float does it, and it
+   carries the same soft elevation as the capsule (below). `width:100%` is
+   REQUIRED: as a flex item it would otherwise shrink to its content width (~314px)
+   and ignore `--rev-w` — max-width only caps, it does not fill — which read as the
+   modal getting narrower. It now fills the float up to `--rev-w` (700). */
+.app .rev-float .review{width:100%;margin-inline:0;box-shadow:var(--rev-shadow)}
+/* the thank-you state shrinks to its content instead of the review measure
+   (Maryam, 14 Sep 2026: "width of this thankyou modal should be required width for
+   the content, do not give it previous review modal width") — `width:auto` in the
+   flex float sizes it to the message, still capped by `--rev-w` and centred. */
+.app .rev-float .review-done{width:auto}
+
+/* THE FLOATING SHADOW (Maryam, 14 Sep 2026: "add bg light shadow on capsule and
+   this opened view as well", then "lighten the shadow color from both capsule and
+   this modal"). A stated exception to §01's elevation 0 — the capsule and the open
+   card float over live content, so they lift off it. Same three-layer geometry as
+   the dock but LIGHTER inks than `--dock-shadow-*` (.04/.05/.08 against the dock's
+   .06/.08/.16) so the lift reads soft, not heavy. */
+:root{--rev-shadow:
+  0 1px 2px rgba(17,17,17,.04),
+  0 8px 18px -2px rgba(17,17,17,.05),
+  0 20px 40px -12px rgba(17,17,17,.08)}
+
+/* THE CAPSULE — the collapsed state (14 Sep 2026). A centred pill carrying the
+   prompt; clicking it opens the card in place. The one radius-999 exception §56
+   lists for it. A WHITE ground (`--background`, Maryam 14 Sep 2026: "the capsule
+   bg needs to be white") inside a `--rule` hairline — it floats over live content
+   like the dock, which is white too, so the two read as one floating layer (the
+   card it opens into is white as well). §63 owns the text colour
+   (`.rev-cap-t`, accent ink).
+   The mark is accent ink too and sized to the text (Maryam, 14 Sep 2026: "the
+   icon and text needs to be in accent color ... the icon needs to be smaller,
+   like give it the height of the text") — 14px against the 13.5px label. */
+.app .rev-cap{
+  display:flex;align-items:center;gap:var(--s02);
+  width:max-content;max-width:100%;
+  padding:var(--s03) var(--s05);
+  background:var(--background);border:1px solid var(--rule);border-radius:999px;
+  box-shadow:var(--rev-shadow);cursor:pointer}
+.app .rev-cap-ic{flex:none;display:inline-flex;line-height:0}
+.app .rev-cap-ic svg{width:14px;height:14px;fill:var(--accent)}
+
+/* THE CLOSE X — top-right of the open card, in the header's inset; collapses back
+   to the capsule. A bare ink glyph, no chip, like every other close mark. */
+.app .rev-x{
+  position:absolute;top:var(--s04);right:var(--s04);
+  background:none;border:0;padding:var(--s02);cursor:pointer;line-height:0}
+.app .rev-x svg{width:20px;height:20px;fill:var(--icon-primary)}
+
+/* THE HEADER — a bare ink mark inline with the heading. The mark is 16px, one
+   step under §63's 20px marks (Maryam, 14 Sep 2026: "reduce the size of the icon
+   with how was this course") so it sits with the title rather than over it. */
+.app .rev-head{display:flex;align-items:center;justify-content:center;gap:var(--s03)}
+.app .rev-ic{flex:none;display:inline-flex;line-height:0}
+.app .rev-ic svg{width:16px;height:16px;fill:var(--icon-primary)}
 .app .rev-ic-ok svg{fill:var(--support-success)}
-.app .rev-head-b{display:flex;flex-direction:column;gap:var(--s02);min-width:0}
+.app .rev-sub{margin-top:var(--s02);margin-bottom:var(--s06)}
 
-/* THE STAR ROW. A bare button per star; the label sits above it. */
+/* THE STAR ROW. A bare button per star; no label above it any more (Maryam, 14
+   Sep 2026: "remove the line Rate your experience"). The stars are 26px — smaller
+   than the earlier 34, which also thins the outline glyph's stroke, the only lever
+   on a pasted Material Symbol's line weight (Maryam: "the stars borders needs to
+   be thin[ner]"). */
 .app .rev-rate{margin-bottom:var(--s06)}
-.app .rev-lbl{display:block;margin-bottom:var(--s03)}
-.app .rev-stars{display:flex;gap:var(--s03)}
+/* a gap between the heading and the stars when the stars sit straight under it —
+   i.e. no sub-line between them, the course modal's case (Maryam, 14 Sep 2026:
+   "give gap between the heading [and] the stars"). With a sub present the sub's
+   own bottom margin already spaces them, so this only matches the no-sub layout. */
+.app .rev-head + .rev-rate{margin-top:var(--s05)}
+.app .rev-stars{display:flex;justify-content:center;gap:var(--s03)}
 .app .rev-star{
   background:none;border:0;padding:0;cursor:pointer;
   line-height:0;display:inline-flex}
-.app .rev-star svg{width:34px;height:34px;fill:var(--border-strong-01);display:block}
-.app .rev-star.on svg{fill:var(--star)}
+.app .rev-star svg{width:26px;height:26px;fill:var(--border-strong-01);display:block}
+/* A LIT STAR IS THE ACCENT HERE (Maryam, 14 Sep 2026: "the filled stars colors
+   should be the accent color"). This is a SCOPED exception to DESIGN.md §3's "the
+   rating star is always --star gold, never the accent": that rule governs the
+   read-only `.stars` rating shown across the portals; this is the review widget's
+   own interactive picker, and only `.rev-star.on` is repointed. The global
+   `.stars` still reads `--star`. */
+.app .rev-star.on svg{fill:var(--accent)}
 
-/* THE NOTE — the shared `.inp` textarea, taller here, with a right-aligned
-   counter under it. */
+/* THE NOTE — the shared `.inp` textarea, taller here. No character counter
+   (Maryam, 14 Sep 2026: "remove 0/500") and no label (Maryam: "remove the Your
+   review text" — the field keeps an aria-label + placeholder); the `maxlength`
+   still caps it. */
 .app .rev-note{margin-bottom:var(--s05)}
-.app .rev-ta{width:100%;min-height:120px;resize:vertical}
-.app .rev-count{margin-top:var(--s02);text-align:right}
+.app .rev-ta{width:100%;min-height:120px;resize:vertical;text-align:left}
+/* FOCUS IS A THIN BLACK EDGE, not the field's default 2px accent (Maryam, 14 Sep
+   2026: "the active state ... should not have this border, instead use black
+   border but thinner than this"). 1px `--text-primary` at the same padding as
+   rest (so the box does not shift). `.app textarea.rev-ta:focus` (0,3,1) matches
+   §37's focus rule and, later in the cascade, wins. */
+.app textarea.rev-ta:focus{border:1px solid var(--text-primary);padding:var(--s04) var(--s05)}
 
 /* THE ACTIONS — Submit (accent fill) leads, Maybe later is a quiet button. */
-.app .rev-acts{display:flex;align-items:center;gap:var(--s04)}
+.app .rev-acts{display:flex;align-items:center;justify-content:center;gap:var(--s04)}
 
-/* THE SENT STATE — a green tick beside a line of thanks, the disc reused. */
-.app .review-done{display:flex;align-items:flex-start;gap:var(--s04)}
+/* THE SENT STATE — a green tick beside a line of thanks; no trailing gap. */
+.app .review-done .rev-sub{margin-bottom:0}

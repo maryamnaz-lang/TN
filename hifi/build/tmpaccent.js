@@ -58,6 +58,28 @@ render = function(){
        but this wrapper also runs on renders where the class must come OFF —
        navigating day34 -> messages is the same element being rewritten. */
     app.classList.toggle('tmp-accent', on);
+
+    /* THE §131 UI TRIAL'S ONE GLYPH SWAP. The "week N tasks" figure in the
+       "90 days" summary is `I.checkFilled` (a FILLED check_circle) in the shared
+       prog band (views.js), and §131's ask is a LINED mark like the book and
+       clock beside it. A pasted SVG path is not a CSS property, so it cannot go
+       in the layer; it lives HERE, gated to this stage, so day34 keeps the filled
+       glyph and the whole UI trial stays removable with §131 + this file.
+
+       It runs after `_baseTmpAccent()` above, which has already chained every
+       ai pass and built the modhead, so the mark is in the DOM; `ob.js`'s later
+       wrapper only toggles audio, so nothing rebuilds it after this. The path
+       signature `Zm56 328` is unique to `checkFilled`'s filled disc, so the swap
+       is idempotent and never touches an already-swapped mark.
+
+       `I.check` (a bare stroked checkmark), NOT `I.checkOutline`: the latter is an
+       empty ring — the "not-done" STATE glyph (trap 7) — which would read as an
+       unchecked box, not a tick. `check` is the lined tick the ask means. */
+    if(on){
+      app.querySelectorAll('.prog-figs .prog-ic').forEach(ic => {
+        if(/Zm56 328/.test(ic.innerHTML)) ic.innerHTML = I.check;
+      });
+    }
   } catch(e){ console.warn('tmp accent', e); }
 };
 

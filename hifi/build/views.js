@@ -24,6 +24,19 @@ const cfg = k => Object.assign({}, CFG_BASE, CFG[k]);
    leaves the stage untouched so you come back to where you were. */
 const S = {stage:'new', view:'dashboard', portal:'candidate', tal:false, talQ:null, nav:false, notif:false, acct:false, peek:null, read:[], rtab:'points', crtMenu:null, ctab:'discussion', hist:[], thread:[], typing:false,
   addCard:false, editPhoto:false, stg:0, notes:false, iv:'level',
+  /* STORY-GAP STATE (15 Sep 2026). `ivTopic` is what the candidate types at
+     booking ("what to talk about"); `ivCancel`/`ivCancelNote` drive the cancel
+     modal; `receipt` is the open receipt row index (null = closed); `legalTab`
+     is the open legal notice. All pure `S` (trap 9), all prototype-session. */
+  ivTopic:'', ivCancel:false, ivCancelNote:'', receipt:null, legalTab:'data',
+  /* THE PHOTO PICKER'S OWN STATE (14 Sep 2026). `photoTab` is the open tab —
+     'photo' (upload/remove your own picture) or 'avatar' (choose one of the
+     supplied discs). `photoPreview` is the Profile Image tab's shown picture:
+     null = the current photo, a data-URL = a just-uploaded one, 'removed' = the
+     image placeholder. `avatarPick` is the selected avatar key (default the one
+     the flip-card already shows, `av1`). A prototype that does not persist —
+     these live for the session, reset when the picker is opened. */
+  photoTab:'photo', photoPreview:null, avatarPick:'av1',
   /* THE STRIPE MODAL'S OPEN TAB — 'card' | 'bank' — shared by `payForm` (the
      add-a-card modal) and the booking card-picker's own Add-card. */
   payTab:'card',
@@ -149,7 +162,8 @@ function notifPanel(){
       </button>`;
     }).join('');
   const today = rows('today'), earlier = rows('earlier');
-  return `<div class="notif ${S.notif?'on':''}">
+  return `<div class="notif-scrim ${S.notif?'on':''}" data-toggle="notif" aria-hidden="true"></div>
+  <div class="notif ${S.notif?'on':''}">
     <div class="notif-h">
       <h2>Notifications</h2>
       ${unreadCount()?`<button class="notif-all" data-readall="1">Mark all read</button>`:''}
@@ -654,8 +668,12 @@ const agentsTable = () => `
   </div>`;
 
 /* row for the full list */
-function agentCard(key){
-  const a=AGENTS[key];
+/* SPLIT INTO A PURE BUILDER (14 Sep 2026) so the marketplace agent card ships to
+   the design system as `dsAgentCard`. `agentCardOf(a, key)` is a pure function of
+   the agent record and the routing key; `agentCard(key)` is the candidate
+   portal's caller, reading `AGENTS[key]`. The `key` is only the `data-go` target,
+   which a reusing portal supplies for itself. */
+function agentCardOf(a, key){
   return `<div class="ag draw" role="button" tabindex="0" data-go="agent:${key}">
     <span class="bd"><i></i><i></i><i></i><i></i></span>
     ${talStar('What is '+a.n.split(' ')[0]+' like to be interviewed by?')}
@@ -669,6 +687,7 @@ function agentCard(key){
     <svg class="card-go" viewBox="0 -960 960 960">${inner('arrowRight')}</svg>
   </div>`;
 }
+function agentCard(key){ return agentCardOf(AGENTS[key], key); }
 function mem(name,ini,meta,you,img){
   return `<div class="mem">
     <span class="mem-av mem-ph">${avatar({i:ini, img:AV[img||'priya']}, 36)}</span>
@@ -2115,39 +2134,53 @@ function certBanner(f, {close = false, key = 'cert'} = {}){
    so the typed note has to survive the paint: ai3.js's input handler writes the
    text into `S` on every keystroke WITHOUT a render, and the textarea is redrawn
    from `S` here. Submit reads the same `S` value. The note is escaped because it
-   is dropped back into `innerHTML`. No em dashes in the copy. */
+   is dropped back into `innerHTML`. No em dashes in the copy.
+
+   THE CAPSULE (Maryam, 14 Sep 2026, with a reference). When a `capsule` label is
+   passed, the card opens COLLAPSED: a centred pill carrying that label, sitting
+   at the page foot above the Tal dock. Clicking it (`data-revopen`) sets `r.open`
+   and the pill is replaced IN PLACE by the full card, which then carries a close
+   X top-right (`data-revclose`) that collapses back to the pill. Only Course
+   Progress passes `capsule`; the interview report and cohort still open the card
+   inline (no `capsule`, so no pill and no X, the 13 Sep behaviour). `r.open` is
+   just a toggle — the score and note it holds are untouched by collapsing. */
 S.reviews = S.reviews || {};
 const REV_MAX = 500;
-function reviewCard({key, title, sub}){
+function reviewCard({key, title, sub, capsule}){
   const r = S.reviews[key] || {};
-  if(r.later) return '';
-  if(r.sent) return `<div class="sec"><div class="review review-done">
-    <span class="rev-ic rev-ic-ok">${I.checkFilled}</span>
-    <div class="rev-head-b">
-      <h2 class="t-h2">Thanks for your review</h2>
-      <p class="rev-sub t-desc">${r.stars ? `You rated ${r.stars} out of 5. ` : ''}Your feedback helps us keep raising the bar.</p>
+  if(r.later || r.done) return '';
+  /* CAPSULE MODE floats the whole thing above the Tal dock: `.rev-float` is lifted
+     into `.view-col` (ai4.js `placeReviewFloat`) so §130 can pin it there, beside
+     the dock, which is where the dock's own containing block is. Non-capsule
+     surfaces stay a plain in-flow `.sec`. */
+  const wrap = capsule ? 'rev-float' : 'sec';
+  const anim = S.revMorph ? ' rev-anim' : '';
+  if(capsule && !r.sent && !r.open) return `<div class="${wrap}"><button type="button" class="rev-cap${anim}" data-revopen="${key}">
+    <span class="rev-cap-ic">${I.chat}</span><span class="rev-cap-t t-body">${capsule}</span>
+  </button></div>`;
+  if(r.sent) return `<div class="${wrap}"><div class="review review-done">
+    <div class="rev-head">
+      <span class="rev-ic rev-ic-ok">${I.checkFilled}</span>
+      <h2>Thanks for your review</h2>
     </div>
+    <p class="rev-sub t-desc">${r.stars ? `You rated ${r.stars} out of 5. ` : ''}Your feedback helps us keep raising the bar.</p>
   </div></div>`;
   const stars = r.stars || 0;
   const text = (r.text || '').replace(/&/g, '&amp;').replace(/</g, '&lt;');
-  return `<div class="sec"><div class="review">
+  return `<div class="${wrap}"><div class="review${anim}">
+    ${capsule ? `<button type="button" class="rev-x" data-revclose="${key}" aria-label="Close">${I.close}</button>` : ''}
     <div class="rev-head">
       <span class="rev-ic">${I.chat}</span>
-      <div class="rev-head-b">
-        <h2 class="t-h2">${title}</h2>
-        <p class="rev-sub t-desc">${sub}</p>
-      </div>
+      <h2>${title}</h2>
     </div>
+    ${sub ? `<p class="rev-sub t-desc">${sub}</p>` : ''}
     <div class="rev-rate">
-      <span class="rev-lbl t-label">Rate your experience</span>
       <div class="rev-stars" role="radiogroup" aria-label="Rate your experience">
         ${[1, 2, 3, 4, 5].map(n => `<button type="button" class="rev-star${n <= stars ? ' on' : ''}" data-rate="${key}:${n}" aria-label="${n} star${n > 1 ? 's' : ''}" aria-pressed="${n <= stars}">${n <= stars ? I.star : I.starOutline}</button>`).join('')}
       </div>
     </div>
     <div class="rev-note">
-      <label class="rev-lbl t-label" for="revta-${key}">Share a few words about your experience (optional)</label>
-      <textarea id="revta-${key}" class="inp rev-ta" data-revta="${key}" maxlength="${REV_MAX}" placeholder="Share a few words about your experience (optional)">${text}</textarea>
-      <div class="rev-count t-caption"><span data-revcount="${key}">${(r.text || '').length}</span>/${REV_MAX}</div>
+      <textarea id="revta-${key}" class="inp rev-ta" data-revta="${key}" maxlength="${REV_MAX}" aria-label="Your review" placeholder="Share a few words about your experience (optional)">${text}</textarea>
     </div>
     <div class="rev-acts">
       <button class="btn btn-p noic" data-review-submit="${key}"${stars ? '' : ' disabled'}>Submit review</button>
@@ -3301,7 +3334,7 @@ function trackBand(track, codes){
   const T = ['Explorer','Builder','Trailblazer'];
   const ti = Math.max(0, T.indexOf(track));
   const lo = ti * 5;
-  return `<div class="ladder ladder-track" role="img" aria-label="${track} track, levels ${lo+1} to ${lo+5} of 15. Your level is set at the interview.">
+  return `<div class="ladder ladder-track" role="img" aria-label="${track} track, levels ${lo+1} to ${lo+5} of 15. Your level is set after your interview.">
     ${Array.from({length:15},(_,i)=>`<i class="${i>=lo&&i<lo+5?'mine':''}">${codes?`<b>${LVL_CODES[i]}</b>`:''}</i>`).join('')}
   </div>
   <div class="ladder-lab">${T.map(n=>`<span${n===track?' class="on"':''}>${n}</span>`).join('')}</div>`;
@@ -4469,16 +4502,21 @@ function journey(){
   /* the two steps nobody on these four stages has reached yet */
   const AHEAD = ['Locks in your cohort and your price','13 chapters, one a week'];
   const LEVELLED = row(['done','done','on',''],
-    ['Explorer track &middot; Aug 12', 'E3 &middot; signed by Priya, Aug 21',
+    ['Explorer track &middot; Aug 12', 'E3 &middot; set by TalentNext, Aug 21',
      'Not enrolled yet', AHEAD[1]]);
   switch(S.stage){
     case 'consult': return row(['done','on','',''],
       ['Explorer track &middot; Aug 3',
-       'Jordan calls Thu, Aug 13 &middot; an agent sets your level', ...AHEAD]);
+       'Jordan calls Thu, Aug 13 &middot; your interview sets your level', ...AHEAD]);
     case 'new': return row(['done','on','',''],
       ['Explorer track &middot; Aug 12', 'Not booked yet &middot; 45 minutes', ...AHEAD]);
     case 'booked': return row(['done','on','',''],
       ['Explorer track', 'Priya Nair &middot; Thu, Aug 20', ...AHEAD]);
+    /* HELD — the call happened, the report is being written. The interview step
+       is still `on` (the level is not set until Priya signs), which reads "Step
+       2 of 4" beside the wait. (17.1) */
+    case 'held': return row(['done','on','',''],
+      ['Explorer track', 'Priya Nair &middot; report on its way', ...AHEAD]);
     case 'assessed': return LEVELLED;
     /* THIS STAGE IS THREE STEPS, NOT FOUR, AND IT IS THE ONE PLACE THE LIST IS
        NOT THE SAME LIST (Maryam, 1 Sep 2026: "this is not a component change,
@@ -4522,7 +4560,7 @@ function journey(){
        and this takes the majority rather than adding a third answer. */
     case 'promoted': return [
       {st:'done', lab:'Interview and level', ai:'Re-interview &amp; Levelling',
-       sec:'E4 &middot; signed by Priya, Nov 21'},
+       sec:'E4 &middot; set by TalentNext, Nov 21'},
       /* the same words `LEVELLED` gives this step in this state, so the two
          pre-course stages cannot describe one unstarted enrolment two ways */
       {st:'on',   lab:'Enrolled',            ai:'Course Enrollment',
@@ -5578,6 +5616,9 @@ function talRec(title){
   if(S.recBusy) return recSkeleton();
   const a = AGENTS[recKey()];
   const rec = REC[recKey()];
+  /* first interview complimentary, re-interview charged (client, 15 Sep 2026) —
+     the recommendation card is shown on `new` (first) and day 90 (re). */
+  const isRe = !!cfg(S.stage).reinterview;
   const first = a.n.split(' ')[0];
   return `<div class="${recWrap()}">
     ${''/* THE BLOCK NAMES ITSELF, AND THE LABEL BECOMES THE ATTRIBUTION UNDER
@@ -5722,7 +5763,7 @@ function talRec(title){
                 not get to be the fourth price on one journey, so the record
                 wins and the file's wording keeps it. Change `AGENTS.priya` if
                 $120 is the real fee and all four surfaces move together. */}
-          <p class="rec-f"><span>${I.wallet}${a.price} Interview Fee</span>
+          <p class="rec-f"><span>${I.wallet}${ivCharged(isRe)?a.price+' Interview Fee':'Complimentary'}</span>
             <span>${I.video}${rec.mins}</span>
             <span>${I.calendar}Next slot: ${a.slot}</span></p>
         </div>
@@ -5996,6 +6037,76 @@ const loginRoles = () => `
     </div>
   </div>`;
 
+/* escape a candidate-typed string for HTML — used where free text (the booking
+   topic, a cancellation note) is rendered back into the page. The prototype's
+   record fields are trusted copy and are not escaped; user input is. */
+const escHtml = s => String(s == null ? '' : s).replace(/[&<>"]/g,
+  c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ==========================================================================
+   THE LEGAL NOTICES — ONE SHARED COMPONENT (22.7 / 22.6, Maryam, 15 Sep 2026)
+
+   Four tabs, all authored, switched by `S.legalTab`. Drawn in two places from
+   this one source: the pre-auth `AUTH.terms` screen, and — for a signed-in
+   candidate — the Privacy Settings tab (`pfPrivacy`), which is where Maryam
+   asked the notices to live. The tabs used to be dead buttons with only "Data
+   use" authored; every tab has content now and `data-legaltab` switches them.
+
+   THE DATA USE NOTICE PROMISES ONLY CONTROLS THAT EXIST (item 9). The controls
+   removed from Profile on 4 Sep 2026 — pause Tal, ask for a level review,
+   download everything — are gone from the notice too, and the self-serve
+   "delete a recording" promise with them: recordings are kept for 24 months
+   then deleted, and the agent's level is final. The one control clause 6 names
+   is closing your account, which is what Profile actually holds. */
+const LEGAL_VER = 'Version 3.2 &middot; Effective September 15, 2026 &middot; 4 min read';
+const LEGAL_TABS = [['terms','Terms'],['privacy','Privacy'],['data','Data use'],['cookies','Cookies']];
+const legalHead = t => `<div class="ph" style="padding-bottom:var(--s05)">
+    <div class="ph-top"><h1 class="u-h2">${t}</h1></div>
+    <p class="t-helper-01" style="color:var(--text-helper);margin-top:var(--s03)">${LEGAL_VER}</p>
+  </div>`;
+const legalAcc = items => `<div class="acc">${items.map(([ttl,body],i)=>
+  `<div class="acc-i${i===0?' on':''}"><button class="acc-h"><span class="ttl">${ttl}</span><span class="chev">${I.chevDown}</span></button>
+    <div class="acc-b"><p>${body}</p></div></div>`).join('')}</div>`;
+const LEGAL_BODY = {
+  terms: () => `${legalHead('Terms of service')}
+    <div class="sec"><div class="note"><span>${I.info}</span><div class="nb"><b>The short version</b>TalentNext helps you get levelled, enrol on a course and track your progress. Use it as yourself, keep your sign-in safe, and these terms apply while you do.</div></div></div>
+    ${legalAcc([
+      ['1. Your account','You sign in through our identity provider and the account is yours to use. Keep your credentials safe. The email address you sign up with identifies your account for its whole life and cannot be changed.'],
+      ['2. Using the service','Use TalentNext for your own leadership development. Do not misuse it, reach for another person&rsquo;s records, or disrupt the service for others.'],
+      ['3. Payments','A first interview is complimentary. Later interviews and course enrolments are paid at the price shown before you pay, and your receipts are in Payments.'],
+      ['4. Changes','We may update these terms. When a version changes materially you are asked to accept the new one at your next sign-in.']
+    ])}`,
+  privacy: () => `${legalHead('Privacy notice')}
+    <div class="sec"><div class="note"><span>${I.info}</span><div class="nb"><b>The short version</b>We hold what you give us and what you do on the platform, use it to run your course and your level, and do not sell it.</div></div></div>
+    ${legalAcc([
+      ['1. What we hold','Your profile, your quiz result and band scores, your interviews and their reports, your course progress, and your payments. Card numbers are held by our payment processor, not by us.'],
+      ['2. Why we hold it','To level you, recommend a course, run the 90 days and show you your own record. Tal reads your progress to help you with the material.'],
+      ['3. How long','Interview recordings are kept for 24 months, then deleted. Payment records are kept for seven years to meet accounting obligations. The rest is held while your account is open.'],
+      ['4. Your rights','You can read and edit your profile, read your reports and transcripts, and close your account at any time from Privacy Settings.']
+    ])}`,
+  data: () => `${legalHead('Data use notice')}
+    <div class="sec"><div class="note"><span>${I.info}</span><div class="nb"><b>The short version</b>Your interview is recorded so your level can be set from it. TalentNext sets your level after the interview is analysed, and that decision is final.</div></div></div>
+    ${legalAcc([
+      ['1. What we record','Every interview and re-interview is recorded as video and audio, and transcribed so your level can be set from it. Recordings are stored for 24 months, then deleted. Your weekly cohort calls are not recorded.'],
+      ['2. Who sees your interview','The agent who interviewed you, and the cohort leader who runs your course. Nobody else, unless you share your report yourself.'],
+      ['3. Your level and who sets it','A talent agent interviews you. TalentNext then sets your level from that interview, after analysing it. At the end of each course a re-interview decides whether you move up, hold or drop back. That decision is final.'],
+      ['4. Tal, your assistant','Tal can see your course progress, your chapter notes and your points so that it can help you with the material. Tal cannot see your one-to-one messages, your cohort calls, your payment details, or other candidates&rsquo; data.'],
+      ['5. What we never do','We do not sell your data. We do not share your individual progress with an employer without your written instruction.'],
+      ['6. Your controls','You can close your account at any time from Privacy Settings. Closing it removes your profile, your notes and your interview recordings; certificates you have already earned stay valid.']
+    ])}`,
+  cookies: () => `${legalHead('Cookie notice')}
+    <div class="sec"><div class="note"><span>${I.info}</span><div class="nb"><b>The short version</b>We use only the cookies the platform needs to sign you in and keep you signed in. No advertising, and no third-party tracking.</div></div></div>
+    ${legalAcc([
+      ['1. Strictly necessary','These keep you signed in and remember your session. The platform does not work without them, so they are always on.'],
+      ['2. What we do not use','No advertising cookies, no cross-site trackers, and no selling of any signal to a third party.']
+    ])}`
+};
+function legalDoc(){
+  const tab = S.legalTab || 'data';
+  return `<div class="tabs">${LEGAL_TABS.map(([k,l])=>`<button class="${tab===k?'on':''}" data-legaltab="${k}">${l}</button>`).join('')}</div>
+    ${LEGAL_BODY[tab]()}`;
+}
+
 const AUTH = {
 login: () => `${authShell()}
 <main class="main"><div class="page form-page">
@@ -6121,26 +6232,11 @@ create: () => `${authShell()}
 
 terms: () => `${authShell('create')}
 <main class="main"><div class="page" style="padding-bottom:0">
-  <div class="tabs"><button>Terms</button><button>Privacy</button><button class="on">Data use</button><button>Cookies</button></div>
-  <div class="ph" style="padding-bottom:var(--s05)">
-    <div class="ph-top"><h1 class="u-h2">Data use notice</h1></div>
-    <p class="t-helper-01" style="color:var(--text-helper);margin-top:var(--s03)">Version 3.1 · Effective July 1, 2026 · 4 min read</p>
-  </div>
-  <div class="sec"><div class="note"><span>${I.info}</span><div class="nb"><b>The short version</b>Your interview is recorded so your agent can write your report. You can ask for your level to be reviewed, and you can delete a recording at any time.</div></div></div>
-  <div class="acc">
-    <div class="acc-i on"><button class="acc-h"><span class="ttl">1. What we record</span><span class="chev">${I.chevDown}</span></button>
-      <div class="acc-b"><p>Every interview and re-interview is recorded as video and audio, and transcribed so your agent can write your report. Recordings are stored for 24 months, then deleted. Your weekly cohort calls are not recorded.</p><p>You can request deletion of a specific recording at any time. Deleting the recording behind a confirmed level does not reverse the level.</p></div></div>
-    <div class="acc-i"><button class="acc-h"><span class="ttl">2. Who sees your interview</span><span class="chev">${I.chevDown}</span></button>
-      <div class="acc-b"><p>The agent who interviewed you, and the cohort leader who runs your course. Nobody else, unless you share your report yourself.</p></div></div>
-    <div class="acc-i"><button class="acc-h"><span class="ttl">3. Your level and who sets it</span><span class="chev">${I.chevDown}</span></button>
-      <div class="acc-b"><p>A talent agent sets your level from the interview and signs the report. At the end of each course your cohort leader decides whether you move up, hold or drop back, and records the reason.</p><p>You can ask for your level to be reviewed by a second agent.</p></div></div>
-    <div class="acc-i"><button class="acc-h"><span class="ttl">4. Tal, your assistant</span><span class="chev">${I.chevDown}</span></button>
-      <div class="acc-b"><p>Tal is the assistant inside your course. It can see your course progress, your chapter notes and your points so that it can help you with the material. Tal cannot see your one-to-one messages, your payment details, or other candidates' data.</p></div></div>
-    <div class="acc-i"><button class="acc-h"><span class="ttl">5. What we never do</span><span class="chev">${I.chevDown}</span></button>
-      <div class="acc-b"><p>We do not sell your data. We do not share your individual progress with an employer without your written instruction.</p></div></div>
-    <div class="acc-i"><button class="acc-h"><span class="ttl">6. Your controls</span><span class="chev">${I.chevDown}</span></button>
-      <div class="acc-b"><p>Profile holds every switch: pause Tal, ask for a level review, download everything we hold, delete a recording, or close your account.</p></div></div>
-  </div>
+  ${''/* ONE SOURCE — `legalDoc()`. The four tabs switch on `S.legalTab` and the
+        Data use notice is aligned to the product (no pause-Tal / level-review /
+        download-everything promises). The signed-in copy of this is in the
+        Privacy Settings tab (`pfPrivacy`). */}
+  ${legalDoc()}
   <div class="sec"><button class="btn btn-g noic" style="padding-left:var(--s04)">${I.download} Download as PDF</button></div>
 </div></main>
 <div style="flex:none;border-top:1px solid var(--border-subtle-01);display:flex;gap:1px">
@@ -6517,13 +6613,35 @@ V.dashboard = (f) => {
      were the last ~500px of this page and every one of them is settled
      somewhere above. `V.result` still holds all five bands. */
 
+  /* THE 24-HOUR WAIT (17.1). The interview happened; the report is being
+     written. No black interview card and no route to the agent — there is
+     nothing to join and nothing to chase (the story's rule). The `.ai-aura`
+     card is the placeholder `placePageSummary` replaces with
+     `PAGESUM.dashboard.held`; the two Quick Actions are the only moves. */
+  else if(S.stage==='held') body = `
+    ${dashPh('Welcome back, Maryam!','Explorer track &middot; interview held &middot; report within 24 hours')}
+    ${jrnList()}
+    <div class="sec">
+      <div class="ai-aura tile">
+        <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
+        <div class="ai-body"><p>Your interview with <b>Priya</b> is done. It is being analysed now, and <b>TalentNext sets your level</b> from it within 24 hours. There is nothing to do but wait.</p></div>
+      </div>
+    </div>
+    ${quickActions([
+      {ic:I.lightning, hue:'ic-prep', t:'What happens next',
+       d:'How your report and level are decided.',
+       ask:'What happens now that my interview is done?'},
+      {ic:I.video, hue:'ic-cover', t:'Your interview',
+       d:'The recording your report is built from.', go:'interviews'}
+    ])}`;
+
   else if(S.stage==='assessed') body = `
     ${dashPh('Welcome back, Maryam!','Explorer Track &ndash; E3 &middot; level 3 of 15 &middot; not enrolled yet')}
     ${jrnList()}
     <div class="sec">
       <div class="ai-aura tile">
         <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
-        <div class="ai-body"><p>Priya confirmed you at <b>E3, rung 3 of 15</b>. Your growth areas are chapters 4 and 12. The next cohort starts within two weeks; enrolling locks in your spot and your price.</p></div>
+        <div class="ai-body"><p>You were confirmed at <b>E3, rung 3 of 15</b> after your interview. Your growth areas are chapters 4 and 12. The next cohort starts within two weeks; enrolling locks in your spot and your price.</p></div>
       </div>
     </div>
     ${''/* THE CARD IN THE HEAD BAND'S COLUMN IS THE ENROLMENT, NOT THE LEVEL.
@@ -7018,8 +7136,8 @@ const lvlWing = f => {
                   separator; here it is one line under a headline, which is
                   prose, and ai6's note on `_slot` makes the same call. */}
             <div class="prog-l">${confirmed
-              ?(f.complete?'Promoted 21 November, signed by Priya Nair':'Confirmed 21 August, signed by Priya Nair')
-              :'Your level is set at the interview'}</div></div>
+              ?(f.complete?'Promoted 21 November, set by TalentNext':'Confirmed 21 August, set by TalentNext')
+              :(S.stage==='held'?'Your report is on its way':'Your level is set after your interview')}</div></div>
           ${''/* THE RIGHT-HAND FIGURE IS THE POSITION, AND BEFORE THE INTERVIEW
                 THE POSITION IS A RANGE. "4 of 15" is the reference's figure and
                 it needs a level; with none set, the honest answer is the five
@@ -7191,7 +7309,7 @@ V.level = (f) => {
       <div class="acc-i"><button class="acc-h"><span class="ttl">Moving up</span><span class="chev">${I.chevDown}</span></button>
         <div class="acc-b"><p>Every course is 90 days. Once the 90 days are up you re-interview, and you move up a level, hold where you are, or drop back one.</p></div></div>
       <div class="acc-i"><button class="acc-h"><span class="ttl">Who decides</span><span class="chev">${I.chevDown}</span></button>
-        <div class="acc-b"><p>A talent agent decides your level from the interview and signs the report. At the end of a course, your cohort leader decides whether you move up, hold or drop back, and writes the reason.</p></div></div>
+        <div class="acc-b"><p>A talent agent interviews you. TalentNext then sets your level from that interview, after analysing it. At the end of a course, a re-interview decides whether you move up, hold or drop back.</p></div></div>
     </div>
   </div>
 </div></main>`;
@@ -7714,7 +7832,7 @@ V.report = (f) => `<main class="main"><div class="page">
         review to the talent agent"). The subject is who assessed and signed the
         interview, named in `signedSummary` above — Priya. `reviewCard` carries
         its own `.sec`. */}
-  ${reviewCard({key:'agent', title:`How was your experience with ${COHORT_LEAD.n.split(' ')[0]}?`, sub:'Your feedback helps us improve every interview.'})}
+  ${reviewCard({key:'agent', title:`Rate your interview with ${COHORT_LEAD.n.split(' ')[0]}`, sub:'', capsule:`Rate your interview with ${COHORT_LEAD.n.split(' ')[0]}`})}
   ${''/* "DOWNLOAD REPORT AS PDF" IS GONE (Maryam, 2 Sep 2026) AND THE SECTION
         GOES WITH IT WHEN IT IS EMPTY. On `week1` and after, the enrol button is
         already suppressed, so what was left would have been a `.sec` holding an
@@ -7758,10 +7876,76 @@ V.report = (f) => `<main class="main"><div class="page">
    another conversation from those stages is Tal — "Book an interview with a
    top agent" is in the ask bar on every one of them.
    -------------------------------------------------------------------------- */
+/* "HOW IT WORKS" IS ONE HELPER ON TWO SURFACES (16.2, Maryam, 15 Sep 2026).
+   The four figures and four numbered steps were inline on `V.interviews`; the
+   All-agents page (`V.agents`) wanted the same reference, so it is a function
+   now, drawn from both. Still a §65 disclosure, closed to start, keyed `how`
+   (`discOpen`/`foundHead`), so opening it on either page is the same state. */
+function howItWorks(){
+  return `<div class="sec found${discOpen('how')?' on':''}">
+    ${foundHead('How it works','how')}
+    <div class="found-b">
+    <div class="facts">
+      <div><span class="l">Length</span><span class="v">45 minutes</span></div>
+      <div><span class="l">Format</span><span class="v">Video, recorded</span></div>
+      <div><span class="l">Your report</span><span class="v">Within 24 hours</span></div>
+      <div><span class="l">Fee</span><span class="v">First one free</span></div>
+    </div>
+    <ol class="steps">
+      <li><span class="s-n">1</span><span class="s-b"><b>You choose the agent</b>
+        Every agent who assesses your track is listed with their next free slot. You pick who you talk to.</span></li>
+      <li><span class="s-n">2</span><span class="s-b"><b>You have the conversation</b>
+        Forty-five minutes by video. Your agent walks you through real situations from your own answers and asks what you did and why. There is nothing to revise and no way to fail it.</span></li>
+      <li><span class="s-n">3</span><span class="s-b"><b>Your level is set</b>
+        Within 24 hours your interview is analysed and TalentNext sets your level: your strengths, your growth areas, and the level you have been confirmed at.</span></li>
+      <li><span class="s-n">4</span><span class="s-b"><b>The report is yours</b>
+        It stays in your account and you decide who ever sees it. Your level opens the course built for that level.</span></li>
+    </ol>
+    </div>
+  </div>`;
+}
+
+/* THE TOPIC THE CANDIDATE TYPED AT BOOKING (16.3), echoed where they can check
+   what their agent has: the scheduled card and the held/wait screen. Empty until
+   they type one. */
+function ivTopicBlock(){
+  if(!S.ivTopic) return '';
+  return `<div class="tile" style="margin-bottom:var(--s05)">
+    <div class="t-label" style="color:var(--text-secondary)">What you wanted to talk about</div>
+    <p class="t-body-01" style="margin:var(--s02) 0 0">${escHtml(S.ivTopic)}</p>
+  </div>`;
+}
+
+/* CANCEL AN INTERVIEW WITH A REASON (16.4, Maryam, 15 Sep 2026). A `.conf`
+   dialog with our dropdown for the reason (a note when "Other"), then Cancel
+   returns to the marketplace (`data-ivcanceldo` -> `setStage('new')`). `.dd-open`
+   on the body while the dropdown is open keeps its menu from being clipped
+   (§123.4). Reason lives in `S.ddVal.ivcancel`, note in `S.ivCancelNote`. */
+const IV_CANCEL_REASONS = ['Something came up','I want a different agent','I am not ready','Other'];
+function ivCancelModal(){
+  const reason = S.ddVal.ivcancel || IV_CANCEL_REASONS[0];
+  return `<div class="modal on" data-ivcancelclose="1">
+    <div class="sheet conf" role="dialog" aria-modal="true" aria-label="Cancel interview">
+      <div class="sheet-b conf-b${S.dd==='ivcancel'?' dd-open':''}">
+        <span class="conf-mk">${I.warning}</span>
+        <h2 class="conf-t">Cancel this interview?</h2>
+        <p class="conf-x">Your time with Priya Nair is given up and the slot goes back to the marketplace. You can book another interview whenever you like.</p>
+        <div class="f" style="text-align:left"><label>Why are you cancelling?</label>${dd('ivcancel', IV_CANCEL_REASONS, reason)}</div>
+        ${reason==='Other'?`<div class="f" style="text-align:left"><label for="ivcnote">Anything else</label><textarea class="inp" id="ivcnote" rows="3" maxlength="300" placeholder="Tell us what happened." data-ivcancelnote>${escHtml(S.ivCancelNote)}</textarea></div>`:''}
+      </div>
+      <div class="sheet-f conf-a">
+        <button class="btn btn-s noic" data-ivcancelclose="1">Keep it</button>
+        <button class="btn btn-t danger noic" data-ivcanceldo="1">Cancel interview ${I.close}</button>
+      </div>
+    </div>
+  </div>`;
+}
+
 V.interviews = (f) => {
   const booked = S.stage==='booked';
+  const held = S.stage==='held';
   const dueRe = !!f.reinterview;
-  const dueFirst = !!f.pred && !booked;
+  const dueFirst = !!f.pred && !booked && !held;
   const due = dueRe || dueFirst;
   return `<main class="main"><div class="page">
   ${crumb(['Dashboard','dashboard'],'Interviews')}
@@ -7932,6 +8116,26 @@ V.interviews = (f) => {
         <span class="dc-when">${I.time}${callLeft(CALL_ROW.iv().when)}</span></div>
     </div>
     ${crow('iv', {when:false})}
+  </div>
+  ${''/* WHAT YOU TOLD YOUR AGENT + CANCEL (16.3 / 16.4). The topic typed at
+        booking is echoed so the candidate can see what Priya has; Cancel opens
+        the reason modal and, confirmed, returns to the marketplace. Both sit on
+        the white page under the black card, not inside it: `.danger` ink is a
+        light red that does not read on the dark ground. */}
+  <div class="sec iv-manage">
+    ${ivTopicBlock()}
+    <button class="btn btn-t danger noic" data-ivcancel="1">${I.close}Cancel interview</button>
+  </div>`:''}
+  ${''/* THE 24-HOUR WAIT (17.1). No agent card, no Join, no cancel — the call
+        happened. The report is on its way and there is nothing to do; the topic
+        the candidate raised is echoed for reference. */}
+  ${held?`
+  <div class="sec">
+    <div class="tile">
+      <h3 class="t-h3">Interview held</h3>
+      <p class="t-body-01" style="color:var(--text-secondary);margin-top:var(--s02)">Your interview is being analysed and your level will be set by TalentNext within 24 hours. You will be notified then. There is nothing to do.</p>
+    </div>
+    ${ivTopicBlock()}
   </div>`:''}
   ${''/* "HOW IT WORKS" IS ON EVERY STAGE NOW, `booked` INCLUDED (Maryam,
         2 Sep 2026: "add the How It Works section we have on interview module
@@ -8004,27 +8208,7 @@ V.interviews = (f) => {
         "what IS a cohort" while shut; here every one of the four figures is
         answered again in the steps below it (the note under this one is the
         argument), so there is nothing that has to be legible closed. */}
-  <div class="sec found${discOpen('how')?' on':''}">
-    ${foundHead('How it works','how')}
-    <div class="found-b">
-    <div class="facts">
-      <div><span class="l">Length</span><span class="v">45 minutes</span></div>
-      <div><span class="l">Format</span><span class="v">Video, recorded</span></div>
-      <div><span class="l">Your report</span><span class="v">Within 24 hours</span></div>
-      <div><span class="l">Fee</span><span class="v">From $80</span></div>
-    </div>
-    <ol class="steps">
-      <li><span class="s-n">1</span><span class="s-b"><b>You choose the agent</b>
-        Every agent who assesses your track is listed with their next free slot. You pick who you talk to.</span></li>
-      <li><span class="s-n">2</span><span class="s-b"><b>You have the conversation</b>
-        Forty-five minutes by video. Your agent walks you through real situations from your own answers and asks what you did and why. There is nothing to revise and no way to fail it.</span></li>
-      <li><span class="s-n">3</span><span class="s-b"><b>Your agent writes your report</b>
-        Within 24 hours, signed by the person who interviewed you: your strengths, your growth areas, and the level they have confirmed you at.</span></li>
-      <li><span class="s-n">4</span><span class="s-b"><b>The report is yours</b>
-        It stays in your account and you decide who ever sees it. Your level opens the course built for that level.</span></li>
-    </ol>
-    </div>
-  </div>
+  ${howItWorks()}
 </div></main>`;
 };
 
@@ -8141,6 +8325,11 @@ V.agents = (f) => `<main class="main"><div class="page">
         result, and Tal's sentence in the band above names all three with their
         fees and says why. `agentCardH` keeps its other callers. */}
   ${allAgents()}
+  ${''/* "HOW IT WORKS" IS ON THIS PAGE TOO (16.2, Maryam, 15 Sep 2026). The
+        directory is where a candidate weighs agents, so the reference for what
+        an interview IS belongs here, not only on the Interviews module. Same
+        `howItWorks()` disclosure, closed to start. */}
+  ${howItWorks()}
 </div></main>`;
 
 /* ==========================================================================
@@ -8207,6 +8396,7 @@ V.agents = (f) => `<main class="main"><div class="page">
 V.agent = (f) => {
   const a = AGENTS[S.agent||'priya'];
   const rec = REC[S.agent||'priya'];
+  const isRe = !!f.reinterview;  /* first interview complimentary, re paid */
   /* THE SCHEDULER IS AN IFRAME, SO THIS VIEW COMPUTES NO AVAILABILITY.
      Calendly owns the month, the open days, the times, the timezone and the
      whole interaction; nothing here can style inside that frame and nothing
@@ -8328,7 +8518,7 @@ V.agent = (f) => {
                 <span class="rec-v">${I.verified}</span></span></p>
             <p class="rec-r">${I.star}${a.r.toFixed(1)} &middot; ${a.ivs} interviews</p>
           </div>
-          <p class="rec-f"><span>${I.wallet}${a.price} Interview Fee</span>
+          <p class="rec-f"><span>${I.wallet}${ivCharged(isRe)?a.price+' Interview Fee':'Complimentary'}</span>
             <span>${I.video}${(rec||{}).mins||'45 mins call'}</span></p>
         </div>
       </div>
@@ -8407,6 +8597,17 @@ V.agent = (f) => {
   <div class="bks-w">
     <img class="bkshot" src="build/calendly-booking.png"
       alt="Calendly booking for ${a.n} — select a date and time">
+  </div>
+
+  ${''/* WHAT DO YOU WANT TO TALK ABOUT (16.3, Maryam, 15 Sep 2026). Filled at
+        booking so it reaches the agent with the appointment. It is a plain form
+        field in the same 830px `.bks-w` measure as the calendar, its value bound
+        to `S.ivTopic` (trap 9, persisted by the `data-ivtopic` input handler),
+        and echoed on the scheduled and held cards. */}
+  <div class="bks-w">
+    <div class="f"><label for="ivtopic">What do you want to talk about?</label>
+      <textarea class="inp" id="ivtopic" rows="3" maxlength="300"
+        placeholder="A real leadership situation from the last few months works best." data-ivtopic>${escHtml(S.ivTopic)}</textarea></div>
   </div>
 
   ${''/* THE PAGE CLOSES ON ONE BUTTON, AND IT REPLACED A FIXED BAR
@@ -8498,7 +8699,7 @@ V.agent = (f) => {
         belongs in this row as a second line before the total does. */}
   <div class="bkc">
     <div class="bkc-fee"><span class="bkc-fl">Interview fee</span>
-      <span class="bkc-fv">${a.price}</span></div>
+      <span class="bkc-fv">${ivFeeLabel(isRe, a.price)}</span></div>
     ${''/* PAYING LANDS ON THE DASHBOARD, NOT ON A CONFIRMATION SCREEN (Maryam,
            31 Aug 2026: "rather than this screen after the payment, i would like
            to take the user directly on the dashboard where it now goes on
@@ -8528,7 +8729,7 @@ V.agent = (f) => {
            screen carries the card-picker and its own "Pay" button, which is what
            now carries `stage:booked` — so the commit point moved one screen on,
            and the destination did not. */}
-    <button class="btn btn-p" data-go="checkout">Proceed to pay ${a.price} ${I.arrowRight}</button>
+    <button class="btn btn-p" data-go="checkout">${ivCharged(isRe)?'Proceed to pay '+a.price:'Proceed to book'} ${I.arrowRight}</button>
   </div>
   </div>
 </div></main>`;
@@ -8544,6 +8745,8 @@ V.agent = (f) => {
 V.checkout = (f) => {
   const a = AGENTS[S.agent||'priya'];
   const rec = REC[S.agent||'priya'];
+  const isRe = !!f.reinterview;  /* first interview complimentary, re paid */
+  const charged = ivCharged(isRe);
   return `<main class="main"><div class="page">
   ${ph('Payment', null, null, 'agent')}
   ${''/* THE PAYMENT PAGE KEEPS THE BOOKING PAGE'S SHAPE — Maryam, 9 Sep 2026:
@@ -8572,15 +8775,20 @@ V.checkout = (f) => {
                 <span class="rec-v">${I.verified}</span></span></p>
             <p class="rec-r">${I.star}${a.r.toFixed(1)} &middot; ${a.ivs} interviews</p>
           </div>
-          <p class="rec-f"><span>${I.wallet}${a.price} Interview Fee</span>
+          <p class="rec-f"><span>${I.wallet}${ivCharged(isRe)?a.price+' Interview Fee':'Complimentary'}</span>
             <span>${I.video}${(rec||{}).mins||'45 mins call'}</span></p>
         </div>
       </div>
     </div>
+    ${''/* A COMPLIMENTARY FIRST INTERVIEW ASKS FOR NO CARD (16.3, 15 Sep 2026).
+          When there is nothing to charge the card picker is dropped and the page
+          just confirms the booking; a paid re-interview keeps the picker. */}
     <div class="bks-w bkpay">
-      <div class="sec-h"><h2>Pay with</h2>${addCardAct}</div>
-      ${cardPicker()}
-      <div class="bkpay-go"><button class="btn btn-p" data-go="stage:booked">Pay ${a.price} and book ${I.arrowRight}</button></div>
+      ${charged
+        ? `<div class="sec-h"><h2>Pay with</h2>${addCardAct}</div>
+      ${cardPicker()}`
+        : `<div class="tile"><p class="t-body-01">Your first interview is <b>complimentary</b>. There is nothing to pay. Confirm to book your time with ${a.n.split(' ')[0]}.</p></div>`}
+      <div class="bkpay-go"><button class="btn btn-p" data-go="stage:booked">${charged?'Pay '+a.price+' and book':'Confirm and book'} ${I.arrowRight}</button></div>
     </div>
   </div>
   </div></main>`;
@@ -10491,8 +10699,14 @@ V.transcript = (f) => {
         13 Sep 2026: "the course already finished ... we will remove the learning
         pulse black card from course progress page ... and we will show the rating
         section here"). `f.finished` is day90 only; `promoted` (`f.complete`) keeps
-        the enrolment offer, every running stage keeps the pulse. */}
-  ${f.complete ? enrolOffer('E4') : (f.finished ? reviewCard({key:'course', title:'How was this course?', sub:'Your feedback helps us improve every course.'}) : (g?pulseCols(f,g):''))}
+        the enrolment offer, every running stage keeps the pulse.
+
+        THE RATING MOVED TO THE FOOT OF THE PAGE (Maryam, 14 Sep 2026: "on this
+        page take this section to the bottom"). At day90 this slot draws nothing —
+        the pulse's old spot stays empty — and `reviewCard` is rendered last,
+        after the chapter list. Only the transcript's copy moves; the interview
+        report and cohort still rate in place. */}
+  ${f.complete ? enrolOffer('E4') : (f.finished ? '' : (g?pulseCols(f,g):''))}
   ${''/* THE FOUR FIGURES ARE THE ARCHIVE'S RECAP NOW, so at `promoted` they are
         inside `pastSec`'s panel rather than a section of their own. Same
         `courseStats` either way. */}
@@ -10590,6 +10804,11 @@ V.transcript = (f) => {
     <div class="tile-stack">${(S.chAll?CH:CH.slice(0,5)).map((_,i)=>chRow(i,f)).join('')}</div>
     <div class="mt4"><button class="btn btn-g" data-chall="1">${S.chAll?`Show the first five ${I.chevUp}`:`Show all 13 ${I.chevDown}`}</button></div>
   </div>`}
+  ${''/* THE COURSE RATING IS THE LAST THING ON THE PAGE (Maryam, 14 Sep 2026).
+        Day90 only (`f.finished`); moved here from the pulse's old slot near the
+        top. It is the one ask that outlives the record above it, so it reads
+        after the candidate has seen where they landed. */}
+  ${f.finished ? reviewCard({key:'course', title:'How would you rate this course?', sub:'', capsule:'How would you rate this course?'}) : ''}
   ${''/* AND THE WHOLE OF THE ABOVE COMES BACK AS ONE COLLAPSED BLOCK AT THE FOOT.
         `pastSec` is the note; it is last on the page because a closed cohort is
         the last thing a candidate enrolling on the next one needs. */}
@@ -10794,7 +11013,7 @@ V.cohort = (f) => `<main class="main"><div class="page">
         here"). `f.finished` is the day90 stage only; every earlier stage still
         has a next call, so it keeps the black card. */}
   ${f.finished
-    ? reviewCard({key:'leader', title:`How was your experience with ${COHORT_LEAD.n.split(' ')[0]}?`, sub:'Your feedback helps us improve every cohort.'})
+    ? reviewCard({key:'leader', title:`How was your experience with ${COHORT_LEAD.n.split(' ')[0]}?`, sub:'', capsule:`How was your experience with ${COHORT_LEAD.n.split(' ')[0]}?`})
     : `<div class="sec sec-call dark-card crow-dark">
     <div class="dc-hd">
       <div class="dc-hd-r"><h2 class="dc-t">Your Next Call</h2>
@@ -10937,12 +11156,57 @@ V.messages = (f) => {
    note false, so if either moves, move both. */
 const PAY_E2 = ['Explorer Track &ndash; E2','Feb 4, 2026','$490','Mastercard','8210'];
 
-V.billing = (f) => {
+/* THE LEDGER ROWS ARE A FUNCTION so `V.billing` and `receiptModal` read the
+   same list — a receipt opened from a row is that row, not a second copy. Each
+   row is `[what, when, amount, brand, last4]`; an empty brand/last4 means no
+   card was charged (a complimentary interview), which the table and the receipt
+   both render as "Complimentary". */
+function payRows(f){
   const rows = [];
   if(f.enrolled||f.complete) rows.push(['Explorer Track &ndash; E3','Aug 14, 2026','$595','Visa','4242']);
-  if(!f.pred) rows.push(['Interview · Priya Nair','Aug 13, 2026','$95','Visa','4242']);
-  if(S.stage==='booked') rows.push(['Interview · Priya Nair','Aug 13, 2026','$95','Visa','4242']);
+  /* THE FIRST INTERVIEW — complimentary while `IV_FIRST_FREE` (client, 15 Sep
+     2026). One row for the level interview, shown once it has been booked/held
+     or is behind the reader; the card cells are empty when it is not charged. */
+  if(!f.pred || S.stage==='booked' || S.stage==='held')
+    rows.push(ivCharged(false)
+      ? ['Interview &middot; Priya Nair','Aug 13, 2026','$95','Visa','4242']
+      : ['Interview &middot; Priya Nair','Aug 13, 2026','Complimentary','','']);
+  /* the re-interview after day 90 is charged at the agent's own fee */
+  if(f.complete) rows.push(['Re-interview &middot; Priya Nair','Nov 20, 2026','$95','Visa','4242']);
   rows.push(PAY_E2.slice());
+  return rows;
+}
+
+/* THE RECEIPT IS A MODAL, NOT A ROUTE (22.1, Maryam, 15 Sep 2026). Pressing
+   "Receipt" on a row sets `S.receipt` to that row's index; this draws the row
+   as a short receipt over the page. `.conf`/`.sheet` is the overlay every other
+   dialog uses; `payRows(cfg(S.stage))` is the same list the table drew, so the
+   two cannot disagree. */
+function receiptModal(){
+  if(S.receipt == null) return '';
+  const r = payRows(cfg(S.stage))[S.receipt];
+  if(!r) return '';
+  const [n,d,amt,br,last] = r;
+  return `<div class="modal on" data-receiptclose="1">
+    <div class="sheet" role="dialog" aria-modal="true" aria-label="Receipt">
+      <div class="sheet-b">
+        <div style="margin-bottom:var(--s05)">
+          <div class="t-label" style="color:var(--text-secondary)">TalentNext</div>
+          <h2 class="u-h2" style="margin:var(--s01) 0 0">Receipt</h2>
+        </div>
+        <div class="kv"><span class="k">Paid for</span><span class="v">${n}</span></div>
+        <div class="kv"><span class="k">Date</span><span class="v">${d}</span></div>
+        <div class="kv"><span class="k">Card</span><span class="v">${br?bmk(br)+'<span style="margin-left:var(--s02)">&bull;&bull;&bull;&bull; '+last+'</span>':'Complimentary'}</span></div>
+        <div class="kv"><span class="k">Amount</span><span class="v n">${amt}</span></div>
+        <div class="kv"><span class="k">Status</span><span class="v">Paid</span></div>
+      </div>
+      <div class="sheet-f"><button class="btn btn-s noic" data-receiptclose="1">Close</button></div>
+    </div>
+  </div>`;
+}
+
+V.billing = (f) => {
+  const rows = payRows(f);
   return `<main class="main"><div class="page">
   ${crumb(['Dashboard','dashboard'],'Payments')}
   ${''/* NO DESCRIPTION, AND THE SUMMARY IS BACK ABOVE IT (Maryam, 31 Aug
@@ -10989,12 +11253,12 @@ V.billing = (f) => {
         <span>Paid for</span><span>Paid on</span><span>Card</span>
         <span class="num">Amount</span><span></span>
       </div>
-      ${rows.map(([n,d,amt,br,last])=>`<div class="payrow">
+      ${rows.map(([n,d,amt,br,last],i)=>`<div class="payrow">
         <span class="pay-n">${n}</span>
         <span class="pay-d">${d}</span>
         <span class="pay-c">${br?bmk(br)+`<span class="n">&bull;&bull;&bull;&bull; ${last}</span>`:''}</span>
         <span class="pay-a num">${amt}</span>
-        <span class="pay-r"><button class="lnk">Receipt</button></span>
+        <span class="pay-r"><button class="lnk" data-receipt="${i}">Receipt</button></span>
       </div>`).join('')}
     </div>
   </div>
@@ -11120,29 +11384,77 @@ V.billing = (f) => {
    tab draws the `.idphoto` button in its read view, and the same button plus a
    "Change photo" control in its form, which is why the picker keeps
    two callers rather than dropping to one. */
+/* TWO TABS — Profile Image and Avatar (Maryam, 14 Sep 2026). The picker used to
+   be one grid of five stock faces; it is now the person's own photograph on one
+   tab and the ten supplied avatar discs on the other.
+
+   PROFILE IMAGE holds the current photo large and centred with Upload / Remove
+   below it. Upload is a real `<label for>` over a hidden `<input type=file>`, so
+   the click opens the OS file dialog with no JS; `pfPhotoUpload` reads the file
+   into `S.photoPreview` and re-renders (the preview cannot live in the DOM —
+   trap 9 wipes it on the next render). Remove swaps the disc for the `image`
+   placeholder (`photoPreview:'removed'`). Both marks LEAD their label (§02's
+   `.btn.noic` leading-icon rule), and the row is centred.
+
+   AVATAR is the ten discs from `AVATARS` (av1 + b1..b4 + g1..g5) at five per row,
+   the selected one carrying `.photopick.on`. Selection is `S.avatarPick`, not a
+   DOM class, for the same trap-9 reason.
+
+   A prototype: "Update Photo" / "Update Avatar" and Cancel all just close — the
+   General form does not persist either, so the pick lives in `S` for the session.
+   The label on the black button follows the open tab. */
 function photoSheet(){
-  const opts = ['hana','priya','lena','owen','samuel'];
+  const tab = S.photoTab === 'avatar' ? 'avatar' : 'photo';
+  const prev = S.photoPreview;               /* null | data-URL | 'removed' */
+  const curPhoto = AV.hana;
+  const avKeys = (typeof AVATARS !== 'undefined') ? Object.keys(AVATARS) : [];
+  const cur = S.avatarPick || avKeys[0];
+
+  const photoPane = `<div class="photopane">
+    ${prev === 'removed'
+      ? `<span class="photo-ph" aria-label="No photo">${I.image}</span>`
+      : `<span class="av-ph photo-cur" style="width:160px;height:160px"><img src="${prev || curPhoto}" alt=""></span>`}
+    <div class="btn-row photo-acts">
+      <input type="file" id="photoUp" accept="image/*" hidden onchange="pfPhotoUpload(this)">
+      <label class="btn btn-s noic photo-up" for="photoUp" role="button" tabindex="0">${I.upload} Upload Photo</label>
+      <button class="btn btn-t noic" data-photoremove>${I.close} Remove</button>
+    </div>
+  </div>`;
+
+  const avPane = `<div class="photogrid avgrid">
+    ${avKeys.map(k=>`<button class="photopick ${k===cur?'on':''}" data-avpick="${k}" aria-label="Avatar">
+      <span class="av-ph" style="width:100%;height:100%"><img src="${AVATARS[k]}" alt=""></span></button>`).join('')}
+  </div>`;
+
   return `<div class="modal ${S.editPhoto?'on':''}" data-close="editphoto">
-    <div class="sheet">
+    <div class="sheet photo-sheet">
       <div class="sheet-h"><h2>Your photo</h2>
         <button class="x" data-editphoto="0" aria-label="Close">${I.close}</button></div>
+      <div class="cs photo-cs">
+        <button class="${tab==='photo'?'on':''}" data-phototab="photo">Profile Image</button>
+        <button class="${tab==='avatar'?'on':''}" data-phototab="avatar">Avatar</button>
+      </div>
       <div class="sheet-b">
-        <div class="photogrid">
-          ${opts.map((k,i)=>`<button class="photopick ${i===0?'on':''}" data-pick="${k}">
-            <span class="av-ph" style="width:100%;height:100%"><img src="${AV[k]}" alt=""></span></button>`).join('')}
-        </div>
-        <div class="btn-row mt6">
-          <button class="btn btn-s" data-editphoto="0">Upload a photo ${I.add}</button>
-          <button class="btn btn-t" data-editphoto="0">Remove ${I.close}</button>
-        </div>
+        ${tab === 'avatar' ? avPane : photoPane}
       </div>
       <div class="sheet-f">
         <button class="btn btn-s noic" data-editphoto="0">Cancel</button>
-        <button class="btn btn-p noic" data-editphoto="0">Use this photo</button>
+        <button class="btn btn-p noic" data-editphoto="0">${tab==='avatar'?'Update Avatar':'Update Photo'}</button>
       </div>
     </div>
   </div>`;
 }
+/* READS THE UPLOADED FILE into `S.photoPreview` and re-renders. Global (a plain
+   top-level declaration in this classic `<script>`) so the inline `onchange`
+   resolves it; also pinned on `window` to survive any future bundle wrap. */
+function pfPhotoUpload(input){
+  const f = input && input.files && input.files[0];
+  if(!f) return;
+  const r = new FileReader();
+  r.onload = () => { S.photoPreview = r.result; S.photoTab = 'photo'; render(); };
+  r.readAsDataURL(f);
+}
+if(typeof window !== 'undefined') window.pfPhotoUpload = pfPhotoUpload;
 
 /* THE SHARED "ADD PAYMENT METHOD" MODAL (Maryam, 6 Sep 2026, "the same stripe
    images in the modal form" on every portal). Stripe's own hosted form is a
@@ -11929,7 +12241,13 @@ const pfFormGeneral = () => {
         mean two heads and only one of them carrying the pair. The photo row is
         the first thing inside the one section instead. */}
   <div class="sec" data-pfsec="general">
-    ${pfHead('general','General details')}
+    ${''/* NO "General details" HEADING IN THE EDIT VIEW (Maryam, 14 Sep 2026) —
+          the form opens straight on the photo row. The `.sec-h` stays as the
+          carrier for the Save / Discard pair, which `.pfe-acts{margin-left:auto}`
+          still floats to the far right of the label-column-free profile page
+          (§111 "this page has no label column"). The READ view keeps its
+          heading; only this form drops it. */}
+    <div class="sec-h">${pfActs('general')}</div>
     ${''/* THE PHOTO CARRIES ITS OWN EDIT CONTROL NOW — Maryam, 7 Sep 2026: "the
           change photo should not come on the right, an edit icon could appear on
           the image bottom right in edit view". The right-hand "Change photo"
@@ -12557,85 +12875,88 @@ const pfRow = (lead, t, d, x) => `<div class="cardrow pfe-row">
    of, so `data-scv` moves the row in place and does not render — which is also
    what stops the row jumping back to the start on every press.
    ========================================================================== */
-const pfScenes = () => {
-  const a = AGENTS[(S.booking && S.booking.agent) || S.agent || recKey()] || AGENTS.priya;
+/* THE INTERVIEW-SCENES CAROUSEL IS A SHARED BUILDER (Maryam, 14 Sep 2026: "save
+   components of sections so they could be utilized"). It was one inline block
+   only this page could draw; it is now `scenesCarousel`, a PURE function of its
+   arguments — a heading, the card records, and an optional foot — so it ships to
+   the design system as `dsScenes` (DS_BUILDERS) and ANY portal can call it. The
+   markup did not change; the state reads moved OUT to `pfScenes`, which is the DS
+   test ("needs the portal's STATE, or only the arguments you hand it?").
+
+   A CARD RECORD is `{img, i, name, at, title}`: the agent portrait (cropped 3:4
+   by the frame — there is no still from a scene in the build, so the person you
+   are watching is the honest stand-in), the initials behind it (§108.2's 404
+   fallback, kept), the attribution name, the timestamp, and the scene title.
+   `opts.role` labels the attribution ("Talent Agent" by default); `opts.foot` is
+   any trailing block (the candidate passes its "Ask Tal" line).
+
+   THE PAIR OF CHEVRONS IS ONE GROUP AT THE ROW'S RIGHT END: §24.132 gives
+   `.sec-h > h2` `flex:1 1 auto`, so two loose controls would be spaced by the
+   heading's slack. They SCROLL THE ROW AND ARE NOT STATE (trap 9's other side) —
+   `scvScroll` moves `.scv-row` in place and does not render, so the row does not
+   jump back to the start on every press. It ships as `dsScvScroll` for a
+   hand-authored portal's own click handler to call on a `[data-scv]` press. */
+function scenesCarousel(title, scenes, opts){
+  opts = opts || {};
+  const role = opts.role || 'Talent Agent';
   return `<div class="sec">
-    <div class="sec-h"><h2>Interview scenes</h2>
-      ${''/* THE PAIR IS ONE GROUP AT THE ROW'S RIGHT END, for `.pfe-acts`'s
-            reason: §24.132 gives `.sec-h > h2` `flex:1 1 auto`, so two loose
-            controls would be spaced by the heading's slack. */}
+    <div class="sec-h"><h2>${title}</h2>
       <div class="scv-nav">
         <button class="scv-ch" data-scv="-1" aria-label="Previous scenes">${I.chevLeft}</button>
         <button class="scv-ch" data-scv="1" aria-label="Next scenes">${I.chevRight}</button>
       </div>
     </div>
-    ${''/* THE LEDE IS GONE WITH EVERY OTHER SECTION DESCRIPTION ON THIS PAGE
-          (Maryam, 3 Sep 2026: "I do not need any section desc in the settings
-          page"). It read "Clips from your level interview, in the order they
-          happened", and both halves of it are now said by the cards: each one
-          names the agent it is from, and a row you scroll left to right IS an
-          order. §111.11 is the other half of the removal — `.all-desc` was also
-          this section's label-column opt-out, so the page now states one. */}
     <div class="scv-row">
-      ${''/* THE TITLE, THEN WHOSE INTERVIEW IT IS (Maryam, 3 Sep 2026, then 4
-            Sep 2026: "remove the desc of scene"). The attribution used to open
-            the card, which made all six cards start with the same six words and
-            pushed the one field that says what the clip is onto the second
-            line; the order it was reordered into — heading, description,
-            attribution — is now heading, attribution, because the middle line
-            has gone. §111.9a has the rest of that argument, including why the
-            last row is §108's `.eo-lead` verbatim rather than a class of its
-            own.
-
-            IT IS THE MOVE `scenePick` ALREADY MADE, ONE SURFACE OVER, AND
-            NOTHING IS LOST. The chooser dropped the same line on 1 Sep 2026:
-            `SCENES` holds `[title, why, from, length]` and `why` is the reading
-            of a scene — longer than the title it sits under, so six cards read
-            as six paragraphs rather than six pictures. `wScenes` (ai8) reads
-            all six of those sentences out of the same record, so the copy still
-            has one home and the ask under this row is where it is now said. */}
-      ${SCENES.level.map(([t, , at]) => `<div class="scv">
+      ${scenes.map(s => `<div class="scv">
         <span class="scv-art">
-          <img src="${a.img}" alt="">
+          <img src="${s.img}" alt="">
           <span class="scv-play">${I.play}</span>
-          <span class="scv-at t-caption">${at}</span>
+          <span class="scv-at t-caption">${s.at}</span>
         </span>
         <span class="scv-b">
-          <span class="scv-h t-h4">${t}</span>
+          <span class="scv-h t-h4">${s.title}</span>
         </span>
-        ${''/* `onerror` AND THE INITIALS BEHIND IT ARE §108.2's, KEPT — `crow`'s
-              rule is that a portrait that 404s is read as a broken screen, and
-              `AGENTS[k].img` is embedded at build time so the fallback should
-              never show. It is the shape that is right, not the case that is
-              expected. */}
         <p class="t-desc eo-lead">
-          <span class="av-ph eo-lead-ph"><i>${a.i}</i><img src="${a.img}" alt="" loading="lazy" onerror="this.style.display='none'"></span>
-          Talent Agent: <b>${a.n}</b></p>
+          <span class="av-ph eo-lead-ph"><i>${s.i || ''}</i><img src="${s.img}" alt="" loading="lazy" onerror="this.style.display='none'"></span>
+          ${role}: <b>${s.name}</b></p>
       </div>`).join('')}
     </div>
-    ${''/* THE SAME ASK THE INTERVIEW MODULE PUTS UNDER ITS OWN SCENE ROW
-          (Maryam, 4 Sep 2026: "Add the 'Ask Tal why these scenes were chosen
-          from your interview?' line we have on the interview module beneath
-          these scene here in the settings"). It is `scenePick`'s line verbatim
-          — the same class, the same `.aih-mk` star, the same question string —
-          which is what makes the two rows one component rather than two that
-          look alike, and it is why nothing was written in CSS: §38.1b states
-          `.app .scene-ask` unscoped and §63 §27 types it, so both crossed to
-          this page already. (Check that before borrowing a class out of a page
-          layer — §111.9a's rule, and it passed a second time.)
-
-          THE QUESTION STRING HAS TO BE BYTE-IDENTICAL, because it is the
-          ROUTE. `wScenes` (ai8) matches it and answers with all six `SCENES`
-          sentences — the descriptions this row has just stopped printing — so
-          the copy that came off the cards is exactly what the press brings
-          back. A reworded question here would fall to a different route.
-
-          AND IT IS THE PAGE'S SECOND STAR, WHICH IS THE SAME DEPARTURE
-          `scenePick` STATES. The band above carries "Summary by Tal"; this
-          labels a question you are about to ASK Tal. A third on this page would
-          make the sparkle its bullet style. */}
-    <button class="scene-ask" data-tal-ask="Why were these scenes chosen from my interview?"><i class="aih-mk"></i>Ask Tal why these scenes were chosen from your interview?</button>
+    ${opts.foot || ''}
   </div>`;
+}
+
+/* THE SCROLL, EXTRACTED so it ships (`dsScvScroll`). Pure DOM: finds the row in
+   the same `.sec` as the pressed chevron and scrolls it by one card width. */
+function scvScroll(btn){
+  const sec = btn.closest('.sec');
+  const row = sec && sec.querySelector('.scv-row');
+  const card = row && row.firstElementChild;
+  if(row && card) row.scrollBy({left:(card.offsetWidth + 16) * +btn.dataset.scv, behavior:'instant'});
+}
+
+/* THE CANDIDATE PORTAL'S CALLER. Reads the agent — `S.booking`/`S.agent`/
+   `recKey()`, the same three-in-order fallback `bkAgent`/`talRec` use — and the
+   six `SCENES.level` records, and hands them to the shared builder. The card art
+   is the agent's portrait; the lede is gone with every other section description
+   on this page (Maryam, 3 Sep 2026), both halves now said by the cards.
+
+   FLAGGED AND DELIBERATE: THE SECTION DRAWS ON EVERY STAGE, INCLUDING ONES WHERE
+   NO INTERVIEW HAS HAPPENED (on `new` the candidate has not been interviewed).
+   Drawn anyway because the ask is for the section on the profile rather than on a
+   stage, and the demo walks every screen; if it should be gated, the test is
+   `S.stage` past `assessed`, one line here.
+
+   THE ASK LINE IS THE CANDIDATE'S FOOT — the same one the interview module puts
+   under its own scene row (same class, same `.aih-mk` star, same question). The
+   string is BYTE-IDENTICAL because it is the ROUTE `wScenes` (ai8) matches; a
+   reword falls to a different route. It is the page's second star (`scenePick`'s
+   departure). It is NOT passed to a reused carousel on another portal — that is
+   candidate chat wiring, not part of the shape. */
+const pfScenes = () => {
+  const a = AGENTS[(S.booking && S.booking.agent) || S.agent || recKey()] || AGENTS.priya;
+  const scenes = SCENES.level.map(([t, , at]) => ({img:a.img, i:a.i, name:a.n, at, title:t}));
+  const foot = `<button class="scene-ask" data-tal-ask="Why were these scenes chosen from my interview?"><i class="aih-mk"></i>Ask Tal why these scenes were chosen from your interview?</button>`;
+  return scenesCarousel('Interview scenes', scenes, {foot});
 };
 
 /* ONE READ VIEW PER SECTION, KEYED THE SAME WAY THE FORMS ARE. Each returns
@@ -12961,6 +13282,16 @@ const pfPrivacy = () => `
         <button class="btn btn-t danger" data-del="1">Delete my account ${I.misuse}</button>
       </div>
     </div>
+  </div>
+  ${''/* LEGAL & DATA USE, IN THE PRIVACY SETTINGS TAB (22.7, Maryam, 15 Sep
+        2026: "for signed in users we just have to show it in the privacy
+        settings tab"). Same `legalDoc()` the pre-auth screen draws, so the
+        notices cannot diverge. The profile page opts the whole page out of
+        §10.15's label column (§111.11), so this `.sec-h` sits above its content
+        like the two sections over it rather than in a 184px gutter. */}
+  <div class="sec sec-legal">
+    <div class="sec-h"><h2>Legal &amp; data use</h2></div>
+    ${legalDoc()}
   </div>`;
 
 /* TAB 2 — NOTIFICATIONS, LIFTED OUT OF THE PAGE BODY UNCHANGED. Its own notes
@@ -12978,11 +13309,29 @@ const pfPrivacy = () => `
    applies: there is no pair to space. */
 const pfNotif = () => `
   <div class="sec">
-    <div class="sec-h"><h2>Notifications</h2></div>
+    <div class="sec-h"><h2>Email notifications</h2></div>
+    ${''/* EACH TOGGLE STATES ITS OWN TIMING (22.4). These govern EMAIL; the bell
+          is not a setting and always arrives. */}
     <div class="pf-tgs">
-      <label class="tg"><span class="tg-mk" style="--mk:var(--mk-1)">${I.calendar}</span><div class="tb"><b>Weekly call reminders</b><span>24 hours and 1 hour before</span></div><input type="checkbox" checked><span class="sw"></span></label>
+      <label class="tg"><span class="tg-mk" style="--mk:var(--mk-1)">${I.calendar}</span><div class="tb"><b>Weekly call reminders</b><span>24 hours and 1 hour before a cohort call</span></div><input type="checkbox" checked><span class="sw"></span></label>
       <label class="tg"><span class="tg-mk" style="--mk:var(--support-attention)">${I.hourglass}</span><div class="tb"><b>Task deadlines</b><span>The morning a task is due</span></div><input type="checkbox" checked><span class="sw"></span></label>
       <label class="tg"><span class="tg-mk" style="--mk:var(--mk-3)">${I.email}</span><div class="tb"><b>Product and course emails</b><span>Occasional, never more than monthly</span></div><input type="checkbox"><span class="sw"></span></label>
+    </div>
+  </div>
+  ${''/* ALWAYS ON — the service messages a candidate cannot switch off (22.4).
+        They tell you your money moved, your level changed or your booking
+        changed, so they are not marketing and carry no toggle. Drawn as plain
+        rows (no `.sw`), the same `.pf-sr` bare-glyph row the security tab uses;
+        §29/§70 ink the marks. In the bell these always arrive whatever the
+        toggles above say. */}
+  <div class="sec">
+    <div class="sec-h"><h2>Always on</h2></div>
+    <p class="t-desc" style="margin-bottom:var(--s04)">These tell you your money moved, your level changed or your booking changed. They cannot be switched off, and they always arrive in your notifications.</p>
+    <div class="tile-stack">
+      <div class="cardrow pf-sr"><span class="pf-sr-ic">${I.wallet}</span><span class="cardrow-b"><span class="cardrow-t">Payments</span><span class="cardrow-d">A payment taken, failed or refunded</span></span></div>
+      <div class="cardrow pf-sr"><span class="pf-sr-ic">${I.document}</span><span class="cardrow-b"><span class="cardrow-t">Your level</span><span class="cardrow-d">Your report is ready, or your level is set or changed</span></span></div>
+      <div class="cardrow pf-sr"><span class="pf-sr-ic">${I.calendar}</span><span class="cardrow-b"><span class="cardrow-t">Your booking</span><span class="cardrow-d">An interview confirmed, moved or cancelled</span></span></div>
+      <div class="cardrow pf-sr"><span class="pf-sr-ic">${I.group}</span><span class="cardrow-b"><span class="cardrow-t">Your cohort</span><span class="cardrow-d">Your cohort is cancelled, or your place in it changes</span></span></div>
     </div>
   </div>`;
 
@@ -14423,7 +14772,7 @@ function signedSummary(withNote, re, footAction){
              are two separate facts and the reference splits them. */}
       <div class="signed-h">
         <span class="av-ph" style="width:44px;height:44px;font-size:13px"><i>PN</i><img src="${AV.priya}" alt=""></span>
-        <span class="signed-b"><span class="sig-hl">Assessed and signed by</span><b>Priya Nair</b></span>
+        <span class="signed-b"><span class="sig-hl">Interviewed by</span><b>Priya Nair</b></span>
         <span class="signed-when">
           <i class="sig-ic sig-ic-sm" style="--mk:var(--mk-3)">${I.calendar}</i>
           <span class="signed-b"><span class="sig-hl">${re?'Re-interview':'Level interview'}</span><b>${re?'21 November 2026':'20 August 2026'}</b></span>
@@ -14774,7 +15123,12 @@ function render(){
             `S.enrolOk` alone would follow the reader to day 34 with a sentence
             saying chapter 1 opened today; the stage test is what stops it, and
             it costs nothing because the dialog covers the app while it is up. */
-         + (S.enrolOk && S.stage==='week1' ? enrolSheet() : '');
+         + (S.enrolOk && S.stage==='week1' ? enrolSheet() : '')
+         /* STORY-GAP MODALS: the receipt (Payments) and the cancel-interview
+            reason dialog (Interviews). Each is gated on its page and its own
+            state, the pattern the four sheets above use. */
+         + (S.view==='billing' && S.receipt!=null ? receiptModal() : '')
+         + (S.view==='interviews' && S.ivCancel ? ivCancelModal() : '');
   }
   /* THE CALL IS PART OF THE KEY, because it is a whole surface arriving and
      leaving: without it, joining a call is a repaint of the same stage and
@@ -14859,6 +15213,11 @@ document.getElementById('reset').onclick = () => setStage(S.stage);
 
 /* card number: group the digits and show the brand as it is recognised */
 device.addEventListener('input', e => {
+  /* THE BOOKING TOPIC AND THE CANCEL NOTE persist to `S` as they are typed, so
+     a re-render (opening the reason dropdown, say) keeps the words (trap 9). No
+     `render()` here — that would move the caret. */
+  if(e.target.dataset && e.target.dataset.ivtopic !== undefined){ S.ivTopic = e.target.value; return; }
+  if(e.target.dataset && e.target.dataset.ivcancelnote !== undefined){ S.ivCancelNote = e.target.value; return; }
   if(e.target.id !== 'nc') return;
   const el = e.target, dig = el.value.replace(/\D/g,'').slice(0,19);
   const amex = /^3[47]/.test(dig);
@@ -15004,12 +15363,49 @@ device.addEventListener('click', e => {
   if(scr){ S.scores = scr.dataset.scores === '1'; render(); return; }
   if(t.closest('[data-close="scores"]') && !t.closest('.sheet')){ S.scores=false; render(); return; }
 
-  const eph = t.closest('[data-editphoto]');
-  if(eph){ S.editPhoto = eph.dataset.editphoto==='1'; render(); return; }
+  /* THE LEGAL NOTICE TABS (22.7). Sets which notice is shown and repaints; the
+     one control shared by the pre-auth screen and the Privacy Settings tab. */
+  const lgt = t.closest('[data-legaltab]');
+  if(lgt){ S.legalTab = lgt.dataset.legaltab; render(); return; }
 
-  const pk = t.closest('[data-pick]');
-  if(pk){ device.querySelectorAll('.photopick').forEach(x=>x.classList.remove('on'));
-    pk.classList.add('on'); return; }
+  /* THE RECEIPT MODAL (22.1). A row's Receipt opens it on that row's index; the
+     backdrop and Close shut it (backdrop only when the backdrop is the target). */
+  const rcp = t.closest('[data-receipt]');
+  if(rcp){ S.receipt = +rcp.dataset.receipt; render(); return; }
+  const rcx = t.closest('[data-receiptclose]');
+  if(rcx){ if(rcx.classList.contains('modal') && e.target !== rcx) return; S.receipt = null; render(); return; }
+
+  /* CANCEL AN INTERVIEW (16.4). Open the reason modal; confirm (drops the
+     booking and returns to the marketplace, clearing the topic and reason); or
+     close it (Keep it, or a backdrop press). CONFIRM IS TESTED BEFORE CLOSE, and
+     that order is load-bearing: the confirm button sits inside the `.modal`,
+     which carries `data-ivcancelclose` for its backdrop, so the close branch's
+     "click inside the sheet is not a dismiss" guard would `return` on it first
+     and the confirm would never run. The open control (`data-ivcancel`) is not
+     on the modal, so its order does not matter. */
+  if(t.closest('[data-ivcancel]')){ S.ivCancel = true; render(); return; }
+  if(t.closest('[data-ivcanceldo]')){
+    S.ivCancel = false; S.dd = null; S.ivTopic = ''; S.ivCancelNote = ''; delete S.ddVal.ivcancel;
+    setStage('new'); return;
+  }
+  const ivx = t.closest('[data-ivcancelclose]');
+  if(ivx){ if(ivx.classList.contains('modal') && e.target !== ivx) return; S.ivCancel = false; S.dd = null; render(); return; }
+
+  const eph = t.closest('[data-editphoto]');
+  if(eph){ S.editPhoto = eph.dataset.editphoto==='1';
+    /* OPENING RESETS THE PICKER to the current photo on the Profile Image tab —
+       a fresh open should not show the last session's half-made choice. */
+    if(S.editPhoto){ S.photoTab='photo'; S.photoPreview=null; }
+    render(); return; }
+
+  /* THE PHOTO PICKER — tab switch, avatar pick, remove. Each keeps its state in
+     `S` (trap 9) and re-renders. Upload is handled by `pfPhotoUpload` off the
+     file input's own `change`, not here. */
+  const ptab = t.closest('[data-phototab]');
+  if(ptab){ S.photoTab = ptab.dataset.phototab; render(); return; }
+  const avp = t.closest('[data-avpick]');
+  if(avp){ S.avatarPick = avp.dataset.avpick; render(); return; }
+  if(t.closest('[data-photoremove]')){ S.photoPreview = 'removed'; render(); return; }
 
   const ac = t.closest('[data-addcard]');
   if(ac){ S.addCard = ac.dataset.addcard==='1'; if(S.addCard) S.payTab='card'; render(); return; }
@@ -15271,11 +15667,7 @@ device.addEventListener('click', e => {
      smooth scroll here does nothing at all and does it silently, so the
      chevron looked dead. */
   const scv = t.closest('[data-scv]');
-  if(scv){
-    const row = scv.closest('.sec').querySelector('.scv-row');
-    const card = row && row.firstElementChild;
-    if(row && card) row.scrollBy({left: (card.offsetWidth + 16) * +scv.dataset.scv, behavior:'instant'});
-    return; }
+  if(scv){ scvScroll(scv); return; }
 
   const pft = t.closest('[data-pftab]');
   if(pft){ S.pfTab = pft.dataset.pftab; S.pfEdit = null; render(); return; }

@@ -595,6 +595,27 @@ function placeAsk(){
 const _baseAsk = render;
 render = function(){ _baseAsk(); try { placeAsk(); } catch(e){ console.warn('ask', e); } };
 
+/* THE REVIEW CAPSULE FLOATS BESIDE THE DOCK (Maryam, 14 Sep 2026: "the capsule
+   should be fix above the tal floating field"). `reviewCard` (views.js) renders
+   `.rev-float` at the foot of `.main`, but a pin has to share the DOCK's
+   containing block or it centres over the whole frame (rail included) instead of
+   the content column. The dock lives in `.view-col` (placeAsk above), so this
+   lifts `.rev-float` up to `.view-col` too; §130 then pins it there, above the
+   dock. Runs after placeAsk so the dock exists; idempotent (the base render
+   rebuilds `.main` each paint, so the float is back inside it and re-lifted). */
+function placeReviewFloat(){
+  const col = device.querySelector('.view-col'); if(!col) return;
+  const rf = col.querySelector('.main .rev-float'); if(!rf) return;
+  col.appendChild(rf);
+  /* pages with no Tal dock (e.g. the cohort page) have nothing to clear, so the
+     capsule drops lower (Maryam, 14 Sep 2026: "since we do not have tal chat here
+     ... the capsule will come little down"). placeAsk has already added the dock
+     by now if this page has one. */
+  rf.classList.toggle('rev-float-nodock', !col.querySelector(':scope > .askdock'));
+}
+const _baseRevFloat = render;
+render = function(){ _baseRevFloat(); try { placeReviewFloat(); } catch(e){ console.warn('revfloat', e); } };
+
 /* append only what is new, and let only that animate */
 function askSync(pg){
   const th = pg.querySelector('#askThread');

@@ -157,10 +157,11 @@ function wSupport(askFor){
      </span>
      <span class="tw-k">They answer inside one working day. ${supportCohortLine()}</span>`);
 }
-/* THE COHORT LINE FOLLOWS THE READER (doc §7). A leader leads three cohorts, so
-   "Quote your cohort number — Cohort 41" was a candidate's line on the leader's
-   support card. A leader gets all three of their cohort ids; a candidate keeps
-   the one they are in. */
+/* THE COHORT LINE FOLLOWS THE READER (doc §7). A candidate-leader runs one
+   cohort at a time (14 Sep 2026), so "Quote your cohort number, Cohort 41" is
+   now literally right for the leader too; the list still pluralises so a
+   moderator leading several gets every id. A candidate keeps the one they are
+   in. */
 function supportCohortLine(){
   if(typeof isLead === 'function' && isLead() && typeof LEAD_COHORTS !== 'undefined'){
     const ids = LEAD_COHORTS.map(c => c.id);

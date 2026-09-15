@@ -719,29 +719,70 @@
    ========================================================================== */
 .app .notif-h{
   height:60px;padding-top:0;padding-bottom:0;
-  padding-right:var(--s04)}
+  padding-right:var(--s04);border-bottom:0;position:relative}
 @container app (min-width:900px){
   .app .notif-h{height:68px}
 }
+/* EVERY RULE IN THE PANEL PAYS THE GUTTER — Maryam, 15 Sep 2026: the header
+   rule and the rules between rows are separators inside the panel, not the
+   edges of the container, so they sit off the walls by `--pad-x` like every
+   other separator in the product (§18). Drawn as an inset `::after`, the way
+   the sheet header's rule is (DESIGN.md modal frame), rather than a wall-to-
+   wall `border-bottom`. */
+.app .notif-h::after{content:'';position:absolute;left:var(--pad-x);right:var(--pad-x);
+  bottom:0;height:1px;background:var(--rule)}
 .app .notif-h h2{margin-right:auto}
+/* mark-all read and the close sit together at the right, on one line */
 .app .notif-all{
   margin-left:0;flex:none;
   text-underline-offset:3px;text-decoration-thickness:1px}
 .app .notif-h .x{margin-left:0}
 
-/* the mark carries the state */
-.app .nrow .nrow-ic{
-  border:1px solid var(--rule);background-color:transparent}
-.app .nrow .nrow-ic svg{fill:var(--icon-secondary)}
-.app .nrow.un .nrow-ic{
-  border-color:transparent;background-color:var(--accent)}
-.app .nrow.un .nrow-ic svg{fill:var(--on-accent)}
-/* and a read row steps back rather than being marked absent */
+/* THE MARK CARRIES THE STATE ON THE GLYPH, WITH NO CHIP BEHIND IT — Maryam,
+   15 Sep 2026: "the icons ... should not have a bg". Unread reads in the
+   accent; a read row steps its mark back to the rail's own unselected grey
+   (`--text-secondary` #828282, the side-nav icon colour). `.nrow-ic` is the
+   notification icon and nothing else in any portal, so this needs no `.notif`
+   scope. */
+.app .nrow .nrow-ic{border:0;background-color:transparent}
+.app .nrow .nrow-ic svg{fill:var(--text-secondary)}
+.app .nrow.un .nrow-ic{background-color:transparent}
+.app .nrow.un .nrow-ic svg{fill:var(--accent)}
+/* and a read row steps its words back rather than being marked absent */
 .app .nrow:not(.un) .nrow-t{color:var(--text-secondary);font-weight:500}
 .app .nrow:not(.un) .nrow-d,.app .nrow:not(.un) .nrow-w{color:var(--text-helper)}
 .app .nrow.un .nrow-t{color:var(--text-primary);font-weight:600}
-/* the dot is redundant now */
-.app .nrow.un::after{display:none}
+
+/* the rules between one notification and the next pay the gutter too — the old
+   6px unread square is gone (§27), so `::after` is the row's inset divider now. */
+.app .notif .nrow{border-bottom:0;position:relative}
+.app .notif .nrow::after{content:'';position:absolute;left:var(--pad-x);right:var(--pad-x);
+  top:auto;bottom:-1px;height:1px;width:auto;background:var(--rule);pointer-events:none}
+.app .notif .nrow:last-child::after{display:none}
+
+/* THE PANEL DIMS THE FRAME BEHIND IT — Maryam, 15 Sep 2026: "when you open the
+   notification side slider then give overlay to the screen". Only on a wide
+   frame, where the panel is a 380px side panel with the app visible beside it;
+   on a phone the panel is the whole frame (§28), so there is nothing to dim and
+   the scrim stays off. Below the panel (z 50), above the page. */
+.app .notif-scrim{
+  position:absolute;inset:0;z-index:49;background:var(--overlay);
+  opacity:0;visibility:hidden;pointer-events:none;
+  transition:opacity var(--dur-standard) var(--ease-standard),visibility var(--dur-standard)}
+@container app (min-width:900px){
+  .app .notif-scrim.on{opacity:1;visibility:visible;pointer-events:auto}
+}
+
+/* THE PANEL FOOTER — "View all notifications", the admin's link to the full
+   record. Its rule pays the gutter like the others, and the link and its arrow
+   read in the accent as ink (Maryam, 15 Sep 2026). */
+.app .notif-f{padding:var(--s04) var(--pad-x) var(--s05);position:relative}
+.app .notif-f::before{content:'';position:absolute;left:var(--pad-x);right:var(--pad-x);
+  top:0;height:1px;background:var(--rule)}
+.app .notif-viewall{
+  display:flex;align-items:center;justify-content:center;gap:var(--s02);
+  width:100%;color:var(--accent-text);font-weight:var(--t-w-strong)}
+.app .notif-viewall svg{width:18px;height:18px;fill:var(--accent-text)}
 
 /* ==========================================================================
    AN ACTION IN THE PAGE HEADER

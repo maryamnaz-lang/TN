@@ -1,0 +1,329 @@
+/* ==========================================================================
+   §131 — THE UI TRIAL. TEMPORARY, AND MEANT TO BE DELETED.
+
+   Maryam asked to SEE two structural changes before deciding whether they go
+   platform-wide, and to see them on the `reddemo` stage first (14 Sep 2026):
+
+     1. THREE RADIUS TOKENS. Corners are `--radius:0px` everywhere today
+        (§01). This trial mints a small/medium/large ladder and applies it by
+        role: a BUTTON gets small, a CARD gets medium, a MODAL that opens over
+        the overlay gets large.
+
+     2. A FLATTER GROUND. The chrome is a white sheet on an #fcfcfc margin
+        today (§18). This trial paints the sheet, the top header and the side
+        nav all #fcfcfc — the margin's own colour — so the whole frame is one
+        tone and only the CARDS stay white, and it removes the two vertical
+        rails that bound the content column.
+
+   IT RIDES ON THE RED-ACCENT TRIAL's SCOPE AND NOTHING ELSE. `tmpaccent.js`
+   already puts `.tmp-accent` on `.app` for every page of the `reddemo` stage
+   and takes it off again on every other render; this layer keys on that one
+   class, so it dresses exactly the pages the accent trial dresses and no
+   others. It is a SEPARATE FILE from §67/§83 on purpose: those two are the
+   COLOUR trial and this is the SHAPE-and-GROUND trial, and Maryam judges and
+   keeps or drops the two independently. Deleting this one file plus its two
+   build entries reverts everything below with nothing else touched — the
+   accent trial is unaffected either way.
+
+   `tmp` IS ON `build-ds.py`'s EXCLUDE_PREFIXES, so none of this reaches the
+   design system: `keep_selector` drops a selector if ANY class in it is
+   excluded, and every selector here carries `.tmp-accent`.
+
+   IT LANDS LAST, for §83's reason. Every rule below either restates a base
+   rule at a higher specificity (which wins on weight, order-independent) or
+   answers a rule inside a container query (which needs to be LATER in the
+   file as well as heavier — trap 3). Being the final layer guarantees the
+   second condition for free, so a per-width restatement below cannot lose on
+   order the way §77.6a did.
+
+   AFTER §63 AND ALLOWED TO BE. §63 owns font size, weight, transform and
+   text colour; this layer states none of the four — only `border-radius`,
+   `background-color`, `border` and `content`. Nothing here is §63's to hold.
+
+   TO PROMOTE IT (if the trial is accepted): the three tokens move to §01's
+   `:root` beside `--radius`, the role rules move into the components' own
+   layers, the ground change moves into §18/§10/§14, and this file plus its
+   two build entries are deleted. TO DROP IT: delete this file, its entry in
+   `build.py`'s LAYERS and its entry in `build-ds.py`'s LAYERS, and rebuild.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------- 1 ---
+   THE RADIUS LADDER — three tokens, applied by role.
+
+   Small / medium / large is 2 / 3 / 4px, one point apart, so the hierarchy is
+   legible at a glance without any corner reading as "rounded". Stated on
+   `.tmp-accent` (0,1,0) so every rule below can read them by name; they
+   inherit only inside the trial's scope, so `--radius:0px` at `:root` is
+   untouched and the nine real stages keep their square corners.
+
+   THE ROLE IS NOT THE TOKEN. The system uses ONE `var(--radius)` for buttons,
+   cards, chips, inputs, rows and modals alike (it resolves to 0, so the
+   distinction never mattered), so re-pointing `--radius` alone would round
+   chips, inputs and clickable rows too — three things this trial was not
+   asked to touch. The tokens are therefore applied by explicit, per-role
+   selectors, not by moving the shared token. */
+.tmp-accent{
+  --radius-sm:2px;   /* a button */
+  --radius-md:3px;   /* any card */
+  --radius-lg:4px;   /* a modal over the overlay */
+}
+
+/* A BUTTON IS SMALL. `.btn` / `.btn-like` state `border-radius:var(--radius)`
+   (0,1,0); this is (0,3,0) and wins on weight. The deliberately-round buttons
+   are their own selectors at 999px (the Tal dock, the pagination pill) and are
+   not reached — none of them appears on the `reddemo` stage in any case. */
+.app.tmp-accent .btn,
+.app.tmp-accent .btn-like{border-radius:var(--radius-sm)}
+
+/* A CARD IS MEDIUM. The list is the product's discrete card containers — the
+   boxes that carry their own border-and-fill (or, for the dark cards, their
+   own ground), as opposed to figure grids (`.stats` / `.facts`, whose 1px gap
+   IS their hairline) and list rows (`.clk` / `.tile` / `.gcard`, a bottom rule
+   only). Every entry is (0,3,0)+, beating each card's own `var(--radius)`
+   (0,2,0). To widen or narrow the trial's idea of a card, edit this list. */
+.app.tmp-accent .qa-c,           /* quick-action card                     */
+.app.tmp-accent .sec.dark-card,  /* the black head/enrolment card         */
+.app.tmp-accent .plate,          /* the plate dark card                   */
+.app.tmp-accent .cert,           /* the certificate dark card             */
+.app.tmp-accent .sig-c,          /* a signed / interview-digest card      */
+.app.tmp-accent .cco,            /* a cohort card                         */
+.app.tmp-accent .crt-card,       /* a certificate-grid card               */
+.app.tmp-accent .crt-earn,       /* the "earn a certificate" card         */
+.app.tmp-accent .aw,             /* an award card                         */
+.app.tmp-accent .note-panel,     /* a note panel                         */
+.app.tmp-accent .note-fbox,      /* the note compose box                  */
+.app.tmp-accent .review,         /* the rating + review box               */
+.app.tmp-accent .lacc,           /* the leader-account card               */
+.app.tmp-accent .sumdrop{        /* the highlighted-phrase popover        */
+  border-radius:var(--radius-md)}
+
+/* A MODAL IS LARGE. Every `.sheet` is a dialog that opens over `.modal`'s
+   overlay — the confirm `.conf` is a `.sheet` too — so the one selector
+   covers them all. (0,2,0) beats `.sheet`'s own `var(--radius)` (0,1,0). No
+   `overflow:hidden`: the corners show against the sheet's transparent header
+   and footer already, and clipping would trap an open dropdown (§123.4). */
+.app.tmp-accent .sheet{border-radius:var(--radius-lg)}
+
+/* --------------------------------------------------------------------- 2 ---
+   THE FLATTER GROUND — the sheet, the header and the rail all #fcfcfc.
+
+   Today (§18) the frame is a WHITE sheet (`.page`, `--background`) on an
+   #fcfcfc MARGIN (`.main`, `--surface-3`), which is what reads as a document
+   lying on a desk. This trial removes that figure/ground split: the header,
+   the side nav, the content window and the sections all take the margin's
+   #fcfcfc, and only the cards keep white — so a card is the one thing that
+   lifts off the page.
+
+   #fcfcfc is written as the literal rather than as `var(--surface-3)` because
+   the point of the trial is the ONE value everywhere, and reading a token
+   would tie four surfaces to whatever `--surface-3` becomes next. If the
+   trial is promoted this collapses back to tokens.
+
+   `background-color`, NEVER the `background` SHORTHAND. The shorthand resets
+   `background-image` to none, which would wipe the head band's wash, the dark
+   card's haze and — the one that actually bites — the Tal chat's full-bleed
+   ground wash, which §53 paints as a `background-image` on this very `.main`.
+   Setting only the colour leaves every image in place. */
+
+/* the top header */
+.app.tmp-accent .shell{background-color:#fcfcfc}
+
+/* the side nav (rail and open drawer are one element, `.sidenav`) */
+.app.tmp-accent .sidenav{background-color:#fcfcfc}
+
+/* the margin behind the sheet. (0,4,0) beats §18.80's `--surface-3` and
+   §25's tal-shown white (both (0,4,0)) on order, being last; below 900 it
+   beats §10's `.main{--background}` on weight. Colour only, so §53's chat
+   wash image on the same element survives. */
+.app.tmp-accent .view-col > .main{background-color:#fcfcfc}
+
+/* the content window itself — the sheet that was white. (0,5,0) beats
+   §18.81's `--background` (0,4,0). `.ask-page` is excluded: it is deliberately
+   transparent (§53) so the chat wash on `.main` shows through, and painting it
+   would hide the wash. */
+.app.tmp-accent .view-col > .main > .page:not(.ask-page){background-color:#fcfcfc}
+
+/* NO SECTION PAINTS ITS OWN GROUND — a section is transparent, so the #fcfcfc
+   sheet below shows through, and only a CARD inside it is white (Maryam, 14 Sep
+   2026: "no section will have white bg, do this change overall, only if a section
+   has a card than that card could be white"). `transparent` rather than an
+   opaque `#fcfcfc` is the exact model the ask describes ("no section will have
+   bg") and it is strictly better than painting the value: a section that happens
+   to sit over the Tal band's accent wash (`.modhead::before`, §70 — the "90 days"
+   progress wing does) keeps showing it instead of covering it, and everywhere
+   else transparent-over-#fcfcfc is identical to #fcfcfc. So there is no
+   `.head-sec` exception to make and no wash to lose.
+
+   ONE blanket rule, not a list of the variants that paint white today, because
+   that is what "overall" asks: §10's canvas reset (`…,.sec,.sec.tint,.sec.warm,…
+   {background:var(--background)}`) makes a section white BY DEFAULT and leans on
+   later rules to turn most transparent, so which stay white is emergent (on the
+   dashboard, `.sec-qa` and the `.sec-prog` progress wing) — a list would miss the
+   next one. (0,4,0) beats the reset (0,1,0), `.sec.warm` (0,2,0) and §70's
+   `.sec-qa`/`.sec-prog` alike. The two DARK grounds are excluded so a black card
+   or on-dark band keeps its ground; the other dark features (`.lvl-hero`,
+   `.cert`, `.score`) are not `.sec`, so they are untouched by construction. */
+.app.tmp-accent .sec:not(.dark-card):not(.on-dark){background-color:transparent}
+
+/* CARDS AND FIGURE CELLS STAY WHITE — the one thing that may sit on the flat
+   ground. The canvas reset already whitens `.tile`, `.note`, `.stats > .stat`,
+   `.prog-figs > span` and the `.facts` cells, so they lift off #fcfcfc on their
+   own; the two that do not are the quick-action card (`.qa-c`, #fdfdfd) and a
+   `.facts` cell inside a `.tint` section (§12 gives it `--surface-2` #fcfcfc,
+   which would now vanish into the ground). Both are pinned to true white. */
+.app.tmp-accent .qa-c,
+.app.tmp-accent .sec.tint .facts > div{background-color:var(--background)}
+
+/* --------------------------------------------------------------------- 2b --
+   THE FIGURE-CELL MARKS ARE BARE BLACK GLYPHS — no tinted chip (Maryam, 14 Sep
+   2026, of the "90 days so far" facts: "remove the colored bg of [the] icons
+   and use lined black icons").
+
+   §65 gives `.prog-ic` a 28px square washed to 13% of the cell's category hue
+   (`--mk-1/2/3`, the blue/green/violet behind the chapters/tasks/time marks),
+   with the glyph itself already `--icon-primary` black. Removing the chip is all
+   the CSS this needs — the same shape §29 states for every other decorative mark
+   ("a bare 20px glyph, no tinted chip"), and `.prog-ic` is the one figure mark on
+   this stage that still carries the chip. (0,3,0) beats §65's `.app .prog-ic`
+   (0,2,0). The GLYPH cut is the one part CSS cannot reach: the "tasks" mark is
+   `I.checkFilled` (a FILLED check_circle) in the shared prog band, and the ask is
+   a lined mark like the book and clock beside it — that swap to `I.check` (a bare
+   stroked tick; `checkOutline` is an empty "not-done" ring, not a tick) is
+   `tmpaccent.js`'s job (a pasted SVG path is not a CSS property), gated to this
+   stage so day34 keeps its glyph. */
+.app.tmp-accent .prog-ic{background-color:transparent}
+
+/* THE "Day 34" READ-OUT IS BLACK, not link-blue (Maryam, 14 Sep 2026: "the blue
+   day 34 text should be in black"). §71's `.app .sec-prog .prog-day > .prog-dn`
+   paints it `--link` #0371a4 — a count, not a link — so it takes `--text-primary`.
+   The selector must match §71's shape to beat it: (0,5,0) over (0,4,0). §63 owns
+   text colour and states none here; this is a trial re-point on one stage, the
+   same licence §83.4 takes for the three highlight inks. */
+.app.tmp-accent .sec-prog .prog-day > .prog-dn{color:var(--text-primary)}
+
+/* --------------------------------------------------------------------- 3 ---
+   NO CONTENT-WINDOW RAILS — the two vertical hairlines bounding the column.
+
+   They are drawn in two tiers. From 760 to 900 the column is a bordered box:
+   §10 gives `.page` a `border-left` / `border-right` and draws the rails as
+   `.page::before` / `::after`. At 900+ §14 zeroes those borders and re-draws
+   the rails as the same two pseudo-elements pinned to the sheet edges. Both
+   tiers are answered, each inside its own container query so it lands later
+   than the rule it turns off (trap 3), and this file being last guarantees the
+   "later" half.
+
+   The tick marks where a rule used to cross a rail (§10's `.sec::before`) go
+   with them in the 760 tier; §14 already hides them at 900+. The horizontal
+   SECTION dividers (`.sec::after`) are left alone — the ask was the left and
+   right borders only. */
+@container app (min-width:760px){
+  .app.tmp-accent .page{border-left:0;border-right:0}
+  .app.tmp-accent .page::before,
+  .app.tmp-accent .page::after{content:none}
+  .app.tmp-accent .sec::before,
+  .app.tmp-accent .ph::before,
+  .app.tmp-accent .score::before{content:none}
+}
+@container app (min-width:900px){
+  .app.tmp-accent .page:not(.form-page)::before,
+  .app.tmp-accent .page:not(.form-page)::after{content:none}
+}
+
+/* --------------------------------------------------------------------- 4 ---
+   THE SUMMARY BAND IS A CARD, not a band welded to the top header (Maryam, 14
+   Sep 2026: "the summary row should not be attached with the top header but it
+   should be a card with the white bg and the gradient in tal summary that you
+   removed please take it back, also add a border of #efefef on this row").
+
+   §25 draws `.modhead` as a full-bleed band: no ground of its own, a wash on
+   `::before`, and a full-width 1px `::after` at its foot that is the "fill edge"
+   of a block paying no gutter. On the flat #fcfcfc page that band reads as part
+   of the header. This makes it a discrete card instead:
+
+     - a WHITE ground (`--background`), so it lifts off #fcfcfc like every other
+       card — this is also what "the gradient you removed" is about: the wash is
+       still on `::before` (`z-index:-1`), but a 3% red ellipse over #fcfcfc is
+       invisible, whereas over white it reads. Painting the card white brings the
+       gradient back with no change to the wash itself. Per CSS paint order the
+       card's own background lays down first and the negative-z `::before` paints
+       ON it, so the wash is not hidden behind the white.
+     - a `--rule` #efefef border all round, the "#efefef border on this row".
+     - the card radius (`--radius-md`), so it matches the black card below it.
+     - `overflow:hidden`, so the wash and the corners clip to the rounded edge.
+     - `margin:var(--s06) var(--pad-x)` — the top margin is the DETACH from the
+       header, and the side margins put the card's edge on the same `--pad-x`
+       line as the black card and the section dividers below it. The inner wings
+       keep their own padding as the card's inner padding.
+
+   AND ITS FOOT DIVIDER GOES. The card's border is now its boundary; §25.2's
+   full-width `::after` under it is the very "full bottom border which now looks
+   bad" the divider ask names, so it is switched off (`content:none`) rather than
+   left to draw a second line one row below the border. */
+.app.tmp-accent .modhead{
+  background-color:var(--background);
+  border:1px solid var(--rule);
+  border-radius:var(--radius-md);
+  margin:var(--s06) var(--pad-x);
+  overflow:hidden}
+.app.tmp-accent .modhead::after{content:none}
+
+/* THE WASH IS A TOP-LEFT GLOW ON THE SUMMARY SIDE, not a band across the whole
+   card top (Maryam, 14 Sep 2026: "the shadow needs to be on the tal summary side
+   not on the progress side ... change the gradient positioning to the top left of
+   the card so it will blur to the summary only rather than expanding to the
+   progress side"). The Figma (578:6047) states the ramp as a near-vertical LINEAR
+   fade, which was that node's whole width — the summary column alone. Applied to
+   the two-column card it washed across the top of BOTH columns, so the accent bled
+   over the progress wing. This keeps the Figma's hue and 5% strength but anchors it
+   at the card's top-left CORNER as a radial that fades out by ~60% of its ray —
+   before the ~58% column boundary — so the tint lives on Tal's summary and the
+   progress side stays clean white. The accent stop is a 5% mix of this stage's own
+   `--accent` (#ff584a → rgba(255,88,74,.05)), the node's exact value; §70 hardcodes
+   `--ai-wash`'s stop to the platform red so the token could not be reused. Overrides
+   §67's radial `background-image` (same (0,2,1), later layer wins). */
+.app.tmp-accent .modhead::before{
+  background-image:radial-gradient(70% 120% at 0% 0%,
+    color-mix(in srgb, var(--accent) 5%, transparent) 0%,
+    transparent 60%)}
+
+/* --------------------------------------------------------------------- 5 ---
+   A SECTION DIVIDER IS THE WIDTH OF ITS COMPONENT, never the frame (Maryam, 14
+   Sep 2026: "each and every section dividers should be equal to the width of the
+   component ... since it had the full bottom border which now looks bad").
+
+   §10 draws the closing `::after` full-bleed (`left:-50vw;right:-50vw`) so it
+   crosses the rails; §18 already pulls it back to `--pad-x` at desktop. With the
+   rails gone and the ground flat, a divider that runs wider than its section
+   reads as a stray line, so this insets EVERY closing rule to `--pad-x` — the
+   same line the section's own content and the cards sit on — at ALL widths, not
+   just desktop. (0,3,1) beats §10's `.sec::after` (0,1,1) and §18's `.app
+   .sec::after` (0,2,1); the modhead is already handled above. */
+.app.tmp-accent .sec::after,
+.app.tmp-accent .ph::after,
+.app.tmp-accent .score::after,
+.app.tmp-accent .crumb::after{left:var(--pad-x);right:var(--pad-x)}
+
+/* --------------------------------------------------------------------- 6 ---
+   THE COLUMN DIVIDER INSIDE THE SUMMARY CARD IS INSET TOP AND BOTTOM, not welded
+   to the card's walls (Maryam, 14 Sep 2026: "give top bottom padding to the
+   divider line as well, do not attach it to the walls").
+
+   §70.3 divides the two head-band columns with a `border-left` on the right
+   column (`.head-col`, the "90 days" wing) at desktop — a border spans the full
+   box edge, so it runs wall to wall. A line that stops short of the card's top
+   and bottom cannot be a border, so the border is dropped and the divider is
+   redrawn as an inset pseudo-element: `top`/`bottom` `var(--s06)` (24px, the
+   card's own inner vertical padding, so the line ends level with the content).
+   Desktop only, like §70.3's border — below 900 the columns stack and the wing's
+   `border-bottom` (§56) is the separator. `.head-col::before` is free here: §69's
+   top-hairline `::before` is `display:none` at both widths (§70.3a). Specificity:
+   the border reset is (0,5,0) over §70.3's (0,4,0); the pseudo is (0,5,1) over
+   §69's (0,4,1). */
+@container app (min-width:900px){
+  .app.tmp-accent .modhead > .sec-prog.head-col{
+    border-left:0;position:relative}
+  .app.tmp-accent .modhead > .sec-prog.head-col::before{
+    content:'';display:block;position:absolute;
+    left:0;top:var(--s06);bottom:var(--s06);width:1px;
+    background:var(--rule);pointer-events:none}
+}

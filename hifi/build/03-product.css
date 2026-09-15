@@ -288,8 +288,8 @@
 .notif-all{padding:var(--s04) var(--s06);border-top:1px solid var(--border-subtle-01)}
 .nrow{padding-left:var(--s06);padding-right:var(--s05);align-items:flex-start}
 .nrow-w{position:relative}
-.nrow.un::after{content:'';position:absolute;left:8px;top:26px;
-  width:6px;height:6px;background:var(--accent)}
+/* the unread 6px square is gone — read/unread is carried by the whole row
+   (the mark's ink and the text weight), not a dot (§15, Maryam 15 Sep 2026). */
 
 /* ==========================================================================
    28. TAL — the coach. Nothing black animates: the aura, the draw border,

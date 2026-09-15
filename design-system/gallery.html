@@ -6,7 +6,7 @@
 <title>TalentNext Design System — reference</title>
 
 <!-- THE WHOLE DEPENDENCY. Two files, and the fonts are inside the first. -->
-<link rel="stylesheet" href="talentnext-ds.css?b=e5f2c448">
+<link rel="stylesheet" href="talentnext-ds.css?b=a7e5e391">
 
 <style>
 /* ==========================================================================
@@ -202,7 +202,7 @@
   </div>
 </div>
 
-<script src="talentnext-ds.js?b=e5f2c448"></script>
+<script src="talentnext-ds.js?b=a7e5e391"></script>
 <script>
 /* ==========================================================================
    THE PAGE IS BUILT FROM A SPEC, so every example is written once and shows
@@ -1616,6 +1616,42 @@ SECTIONS.push({id:'rows', nav:'Rows', icon:'group', build: () => `
     <div style="display:flex;align-items:center;gap:var(--s05)">
       <span class="av xs">XS</span><span class="av sm">SM</span>
       <span class="av">MD</span><span class="av lg">LG</span>
+    </div>
+  `)}
+`});
+
+/* ------------------------------------------------------------------ scenes */
+SECTIONS.push({id:'scenes', nav:'Scenes', icon:'video', build: () => `
+  ${ex('Interview scenes carousel', 'A horizontally scrolling row of video-still cards under a heading whose right end carries the prev/next chevrons. <b>Ships as a builder:</b> <code>dsScenes(title, scenes, opts)</code> — each scene is <code>{img, i, name, at, title}</code> (the portrait, its initials fallback, the attribution name, the timestamp, the scene title); <code>opts.role</code> is the attribution label (default &ldquo;Talent Agent&rdquo;) and <code>opts.foot</code> a trailing block. <b>The chevrons scroll the row, they are not state:</b> a <code>[data-scv]</code> press calls <code>dsScvScroll(this)</code>, which finds <code>.scv-row</code> in the same <code>.sec</code> and scrolls it one card — no re-render, so the row keeps its place. Each card is <code>.scv-art</code> (the <code>&lt;img&gt;</code>, a <code>.scv-play</code> mark, the <code>.scv-at</code> timestamp), then <code>.scv-b &gt; .scv-h</code> for the title, then the <code>.eo-lead</code> attribution row. The still is the agent portrait cropped 3:4 — there is no scene thumbnail in the build.', `
+    <div class="sec">
+      <div class="sec-h"><h2>Interview scenes</h2>
+        <div class="scv-nav">
+          <button class="scv-ch" data-scv="-1" aria-label="Previous scenes" onclick="dsScvScroll(this)">{{chevLeft}}</button>
+          <button class="scv-ch" data-scv="1" aria-label="Next scenes" onclick="dsScvScroll(this)">{{chevRight}}</button>
+        </div>
+      </div>
+      <div class="scv-row">
+        <div class="scv">
+          <span class="scv-art"><img src="{{av:priya}}" alt=""><span class="scv-play">{{play}}</span><span class="scv-at t-caption">02:14</span></span>
+          <span class="scv-b"><span class="scv-h t-h4">The reorganization call</span></span>
+          <p class="t-desc eo-lead"><span class="av-ph eo-lead-ph"><i>PN</i><img src="{{av:priya}}" alt=""></span>Talent Agent: <b>Priya Nair</b></p>
+        </div>
+        <div class="scv">
+          <span class="scv-art"><img src="{{av:priya}}" alt=""><span class="scv-play">{{play}}</span><span class="scv-at t-caption">11:02</span></span>
+          <span class="scv-b"><span class="scv-h t-h4">Handing over the vendor review</span></span>
+          <p class="t-desc eo-lead"><span class="av-ph eo-lead-ph"><i>PN</i><img src="{{av:priya}}" alt=""></span>Talent Agent: <b>Priya Nair</b></p>
+        </div>
+        <div class="scv">
+          <span class="scv-art"><img src="{{av:priya}}" alt=""><span class="scv-play">{{play}}</span><span class="scv-at t-caption">19:37</span></span>
+          <span class="scv-b"><span class="scv-h t-h4">The Friday rhythm</span></span>
+          <p class="t-desc eo-lead"><span class="av-ph eo-lead-ph"><i>PN</i><img src="{{av:priya}}" alt=""></span>Talent Agent: <b>Priya Nair</b></p>
+        </div>
+        <div class="scv">
+          <span class="scv-art"><img src="{{av:priya}}" alt=""><span class="scv-play">{{play}}</span><span class="scv-at t-caption">24:50</span></span>
+          <span class="scv-b"><span class="scv-h t-h4">Managing up</span></span>
+          <p class="t-desc eo-lead"><span class="av-ph eo-lead-ph"><i>PN</i><img src="{{av:priya}}" alt=""></span>Talent Agent: <b>Priya Nair</b></p>
+        </div>
+      </div>
     </div>
   `)}
 `});

@@ -1361,7 +1361,18 @@ css = '\n'.join((here / f).read_text() for f in
                  # over, the course once it is finished. New classes only, type
                  # and ink left to §63, so it lands last. Crosses to the DS so a
                  # future portal can reuse the block.
-                 '130-review.css',])
+                 '130-review.css',
+                 # TEMPORARY — the UI trial (radius ladder + flat #fcfcfc ground
+                 # + no content rails), scoped to `.tmp-accent` so it dresses the
+                 # `reddemo` stage only, like the red-accent trial it rides on.
+                 # A SEPARATE file from §67/§83: those are the colour trial, this
+                 # is the shape/ground trial, judged and kept-or-dropped apart.
+                 # DEAD LAST for §83's reason — every rule restates a base rule at
+                 # higher weight or answers one inside a container query, and
+                 # being the final layer makes the "later in the file" half of
+                 # trap 3 free. Delete this entry with the file and `build-ds.py`'s
+                 # LAYERS entry to revert; the accent trial is untouched either way.
+                 '131-tmpui.css',])
 # ==========================================================================
 # NO HOVER
 # The state layer was fighting the layout everywhere it appeared: a wash on a

@@ -127,7 +127,10 @@ S.ldrNoteK = 'general';
    the point of it: someone who went round twice spent twice the time, and
    time-with-nothing-to-show-for-it is the signal a leader acts on.
    -------------------------------------------------------------------------- */
-const lcoOf   = id => LEAD_COHORTS.filter(c => c.id === +id)[0] || LEAD_COHORTS[0];
+/* SEARCHES ACTIVE + PAST (`LEAD_ALL()`) so a completed cohort's id still
+   resolves — an Evaluations record's `cohort`, a past `LEAD_RUN` row, a Course
+   Reports tab. The fallback is the one active cohort. */
+const lcoOf   = id => LEAD_ALL().filter(c => c.id === +id)[0] || LEAD_COHORTS[0];
 const lco     = () => lcoOf(S.ldrCo);
 const lmemOf  = (c,name) => (c.members.filter(m => m.name === name)[0] || c.members[0]);
 const lchDone = m => Math.round(m.pc / 100 * 13);
@@ -588,6 +591,31 @@ const cohortCard = c => {
     </span>
   </button>`;
 };
+/* A PAST (COMPLETED) COHORT'S CARD — the quiet version of `cohortCard`. A
+   finished cohort has no pace to run against, nobody to flag and no next call, so
+   the three data rows those draw would be noise (or, with progress read against a
+   full 90 days, actively wrong). It shows what a record keeps: the level, that it
+   is completed, and how many it carried — and it still opens the roster, so the
+   previous led cohort stays readable. */
+const pastCohortCard = c => `<button class="cco clk" data-go="leadCohort" data-ldrco="${c.id}">
+    <span class="cco-b">
+      <span class="cco-hd">
+        <span class="cco-hb">
+          <span class="cco-n">${lname(c)}</span>
+          <span class="cco-d">Level ${c.level} &middot; Completed</span>
+          <span class="cco-d">${c.members.length} candidates</span>
+        </span>
+      </span>
+      ${''/* one row, the fact a past card is for: how many it led. No ring,
+             no flag tags, no next-call — the reasons are in the note above. */}
+      <span class="cco-r" style="--mk:var(--support-success)">
+        <span class="cco-ic">${I.checkFilled}</span>
+        <span class="cco-l">Outcome</span>
+        <span class="cco-v">Led to completion</span>
+      </span>
+    </span>
+  </button>`;
+
 V.leadCohorts = () => {
   const flagged = lmembers().filter(x => x.m.flag);
   const severe = flagged.filter(x => x.m.flag.k === 'bad');
@@ -606,7 +634,7 @@ V.leadCohorts = () => {
         line with the numbers spelt instead of set, which also meant the page
         showed the same count in two notations. The spine keeps the figures in
         one notation and Tal keeps the finding. */}
-  ${ph('Cohorts',`${LEAD_COHORTS.length} cohorts &middot; ${lmembers().length} candidates &middot; all Explorer`)}
+  ${ph('Cohorts',`${LEAD_COHORTS.length===1?'one active cohort':LEAD_COHORTS.length+' active cohorts'}${LEAD_PAST.length?` &middot; ${LEAD_PAST.length} completed`:''} &middot; ${lmembers().length} candidates &middot; all Explorer`)}
   ${''/* ONE SECTION, ONE HEADING (Maryam, 2 Sep 2026: "take the All cohorts
          heading above the 4 cards row", and "remove the grey background of the
          3 cards section"). The figure band and the three cards were two
@@ -629,7 +657,7 @@ V.leadCohorts = () => {
            comparison now sits on each card as "of 38%" under its own ring,
            where the figure it qualifies is 20px away rather than 400. The
            heading row holds the heading alone. */}
-    <div class="sec-h"><h2>All cohorts</h2></div>
+    <div class="sec-h"><h2>${LEAD_COHORTS.length===1?'Current cohort':'Current cohorts'}</h2></div>
     <div class="stats">
       ${statCell(I.group,  'Cohorts',   LEAD_COHORTS.length, `${lmembers().length} candidates`)}
       ${statCell(I.growth, 'On pace',   LEAD_COHORTS.filter(c => lpaceGap(c) >= 0).length + ` <small>of ${LEAD_COHORTS.length}</small>`, 'against expected progress')}
@@ -648,6 +676,19 @@ V.leadCohorts = () => {
       ${LEAD_COHORTS.map(cohortCard).join('')}
     </div>
   </div>
+  ${''/* PAST COHORTS — the previous led cohorts, kept (Maryam, 14 Sep 2026).
+         A candidate-leader runs one at a time, so a finished cohort moves here
+         rather than out of existence: the roster, the reports and the 90-day
+         summaries it holds are all still reachable, but it is not a live cohort
+         and does not sit in the current band's counts. Drawn only when there is
+         one, so a first-time leader with nothing behind them sees just their
+         current cohort. */}
+  ${LEAD_PAST.length ? `<div class="sec">
+    <div class="sec-h"><h2>Past cohorts</h2></div>
+    <div class="cco-grid">
+      ${LEAD_PAST.map(pastCohortCard).join('')}
+    </div>
+  </div>` : ''}
   ${''/* "THIS WEEK'S CALLS" IS OFF THIS PAGE ENTIRELY, IN TWO STEPS.
          The LIST went to `V.leadCalls` on 1 Sep 2026 — three `.bk-row`s with a
          date chip and a Brief button, which is exactly the list the Calls page
@@ -1283,7 +1324,11 @@ const ldrAttention = x => {
 
 V.leadReports = () => {
   const sel = S.ldrRep;
-  const all = lmembers();
+  /* ACTIVE + PAST — Course Reports is a HISTORY surface, so its rows and its
+     figure-band denominators read every candidate ever led (`lallmembers`), and
+     the selector below lists past cohorts alongside the current one. This is the
+     one leader screen where a completed cohort is still first-class. */
+  const all = lallmembers();
   const rows = all.filter(x => x.c.id === +sel);
   const behind = rows.filter(x => x.m.pc - lpace(x.c) <= -5);
   const weak = rows.filter(x => x.m.avg > 0 && x.m.avg < 75);
@@ -1312,7 +1357,7 @@ V.leadReports = () => {
          the figure band's denominators. */}
   <div class="sec sec-cs">
     <div class="cs">
-      ${LEAD_COHORTS.map(c => `<button class="${sel === String(c.id) ? 'on' : ''}" data-ldrrep="${c.id}">${lname(c)}<span class="lf-n">${c.members.length}</span></button>`).join('')}
+      ${LEAD_ALL().map(c => `<button class="${sel === String(c.id) ? 'on' : ''}" data-ldrrep="${c.id}">${lname(c)}${c.status==='completed'?' <small>(completed)</small>':''}<span class="lf-n">${c.members.length}</span></button>`).join('')}
     </div>
   </div>
   ${ldrAttention(ldrAtt(rows))}

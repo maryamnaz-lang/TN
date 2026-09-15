@@ -95,13 +95,29 @@ S.ledApplied = false; S.delAsk = false;
    by the input listener below, so typing does not lose focus and a star click
    redraws the textarea from `S`. */
 device.addEventListener('click', e => {
+  /* THE CAPSULE toggle (views.js `reviewCard`): the pill opens the card in place,
+     the card's top-right X collapses it back. `open` is a pure toggle; the score
+     and note the review already holds are left as they are. */
+  /* `S.revMorph` is a ONE-RENDER marker (trap 5's pattern): set just before the
+     toggle render so reviewCard stamps `.rev-anim` on the element that appears,
+     then cleared so no later render re-animates. The element plays its entrance
+     keyframe once — a smooth capsule<->modal swap rather than a hard cut. */
+  const capOpen = e.target.closest('[data-revopen]');
+  if(capOpen){ const key = capOpen.dataset.revopen; (S.reviews[key] = S.reviews[key] || {}).open = true; S.revMorph = true; render(); S.revMorph = false; return; }
+  const capClose = e.target.closest('[data-revclose]');
+  if(capClose){ const key = capClose.dataset.revclose; (S.reviews[key] = S.reviews[key] || {}).open = false; S.revMorph = true; render(); S.revMorph = false; return; }
   const star = e.target.closest('[data-rate]');
   if(star){ const [key, n] = star.dataset.rate.split(':'); (S.reviews[key] = S.reviews[key] || {}).stars = +n; render(); return; }
   const sub = e.target.closest('[data-review-submit]');
   if(sub){ const key = sub.dataset.reviewSubmit; const r = S.reviews[key] = S.reviews[key] || {};
     if(!r.stars) return;
     const ta = device.querySelector(`[data-revta="${key}"]`); if(ta) r.text = ta.value;
-    r.sent = true; render(); return; }
+    r.sent = true; render();
+    /* the thank-you clears itself after a beat (Maryam, 14 Sep 2026: "the thankyou
+       state should disappear after 3-4 seconds"). setTimeout, not rAF — this often
+       runs in a hidden pane where rAF never fires (trap 17). `r.done` then makes
+       reviewCard return nothing, so the whole float goes away. */
+    setTimeout(() => { r.done = true; render(); }, 3500); return; }
   const later = e.target.closest('[data-review-later]');
   if(later){ const key = later.dataset.reviewLater; (S.reviews[key] = S.reviews[key] || {}).later = true; render(); return; }
 });

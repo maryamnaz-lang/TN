@@ -36,7 +36,7 @@
      rule sweep clean on 21 screens, 84 screen-width combos with no overflow,
      zero thrown errors.
      ========================================================================== -->
-<link rel="stylesheet" href="design-system/talentnext-ds.css?b=e5f2c448">
+<link rel="stylesheet" href="design-system/talentnext-ds.css?b=a7e5e391">
 
 <style>
 /* ==========================================================================
@@ -131,7 +131,7 @@
        somebody choosing a stage would want it. -->
 </div>
 
-<script src="design-system/talentnext-ds.js?b=e5f2c448"></script>
+<script src="design-system/talentnext-ds.js?b=a7e5e391"></script>
 <script>
 /* ==========================================================================
    THE TALENT AGENT PORTAL
@@ -415,15 +415,18 @@ const STAGES = [
      and Log out (`CONFIRMS.logout`) leaves for that login rather than for a
      screen of its own. It had been "first in the picker and last in the
      argument" because logging out had to land somewhere; it lands there now. */
-  ['setup',    'Approved, setting up',  'Stage 2. Approved 12 June, and the agent role is on the account Owen already had. Your public profile, your fee and a payout destination are what is left.'],
-  ['training', 'Training',              'Stage 3. Your public profile and your money are done. Three of four lessons are finished and the calibration interview is the last thing before the certification gate.'],
+  ['setup',    'Approved, setting up',  'Stage 2. The agent role is on the account Owen already had. Your public profile, your fee and a payout destination are what is left; training and certification run offline through LightSpeed.'],
+  /* NO 'training' STAGE (client, 15 Sep 2026). Agent onboarding and training run
+     through LightSpeed offline; the platform just creates the user with the agent
+     role. `V.training`, the lessons and the certification gate are gone;
+     certification survives as a read-only status. See DESIGN.md §3. */
   /* "LISTED, NOTHING BOOKED" IS HIDDEN FROM THE STAGE SELECTOR (Maryam, 7 Sep
      2026: "hide the Listed, nothing booked prototype"). The entry is dropped so
      the dropdown and `respcheck`'s sweep no longer offer it; `CFG.live` and its
      `live:` PAGESUM/copy stay in place (unused, flagged) in case it returns —
      removing them would be a second, larger edit for a stage that is only being
      taken off the menu. */
-  ['working',  'A working week',        'Stage 4. Two interviews ahead, one report due tonight, and $204 held for you in escrow. This is the portal as an agent actually uses it.'],
+  ['working',  'A working week',        'Stage 4. Two interviews ahead, one recording to confirm, and $204 held for you in escrow. This is the portal as an agent actually uses it.'],
   ['reviewed', 'After a review',        'Stage 4, step 13. The quarterly review widened the range Owen may assess to E1 – B2, and his follow-up score came up over the quarter.']
 ];
 
@@ -435,13 +438,13 @@ const CFG = {
                 the only stage that does not set `listing:true`, so this is that
                 flag said in enough detail for the black card to draw it. */
              cardGaps:['bio']},
-  training: {nav:'setup', approved:true, listed:false, listing:true, paid:true, lessonsDone:3,
+  /* NO `training` CFG (client, 15 Sep 2026) — the stage is gone. `lessonsDone`
+     came off every stage with it; `certified` stays as a read-only status. */
+  live:     {nav:'full',  approved:true, listing:true, paid:true, certified:true, listed:true,
              ivs:0, month:0, rating:null, escrow:0, earned:0},
-  live:     {nav:'full',  approved:true, listing:true, paid:true, lessonsDone:4, certified:true, listed:true,
-             ivs:0, month:0, rating:null, escrow:0, earned:0},
-  working:  {nav:'full',  approved:true, listing:true, paid:true, lessonsDone:4, certified:true, listed:true,
+  working:  {nav:'full',  approved:true, listing:true, paid:true, certified:true, listed:true,
              busy:true},
-  reviewed: {nav:'full',  approved:true, listing:true, paid:true, lessonsDone:4, certified:true, listed:true,
+  reviewed: {nav:'full',  approved:true, listing:true, paid:true, certified:true, listed:true,
              busy:true, reviewed:true,
              range:'Explorer E1 – Builder B2', rangeShort:'E1 – B2',
              rank:9, follow:4.6, ivs:171, month:7}
@@ -474,6 +477,14 @@ const S = {stage:'working', view:'dashboard', nav:false, tal:false, notif:false,
            payCards:[{brand:'Visa', last:'4417', exp:'08/28', def:true},
                      {brand:'Mastercard', last:'8210', exp:'04/27'},
                      {brand:'Visa', last:'5590', exp:'11/29'}],
+           /* THE PAYOUT DESTINATION (13.1) — a SINGLE reference held by Stripe,
+              not a card wallet. The platform never sees the account number; what
+              comes back is a description and a state. `state` is one of
+              none | pending | verified | failed; `reason` is Stripe's own word,
+              shown only on `failed`. Seeded verified; a reviewer can flip `state`
+              to see each treatment. FLAGGED authored demo data. */
+           payout:{state:'verified', bank:'Wells Fargo', last:'4417',
+                   verified:'12 Jun 2026', reason:'The account number could not be verified.'},
            /* `req` IS THE ANSWER TO EACH BOOKING REQUEST — id → 'yes' | 'no',
               and an id that is not in it has not been answered. A map rather
               than two arrays, because a request has exactly one answer and two
@@ -598,26 +609,17 @@ const f = () => ({...A, ...CFG[S.stage]});
    approval. A rail set no stage names is a set the render guard can never test.
    -------------------------------------------------------------------------- */
 const NAVSETS = {
-  setup: [['dashboard','Home','dashboard'],
-          ['training','Training','book'], ['earnings','Earnings','wallet']],
+  setup: [['dashboard','Home','dashboard'], ['earnings','Earnings','wallet']],
   full:  [['dashboard','Home','dashboard'], ['interviews','Interviews','calendar'],
           ['availability','Availability','time'],
           ['earnings','Earnings','wallet'], ['standing','Standing','chart']]
 };
 
 /* A sub-page's rail item is its parent's — `interview` is reached from
-   `interviews` and must not un-mark it.
-
-   AND TRAINING CHANGES PARENT WITH THE STAGE, because it changes job. While an
-   agent is being enabled it is the lessons they are working through and it has a
-   rail item of its own; once they are certified it is the certificate and the
-   date of the next re-check, which is reference material read twice a year —
-   so it moves under Standing and the rail keeps the six things a working agent
-   opens weekly. A stage-blind map would have marked a rail item that is not in
-   the set, and the render guard would have bounced the page. */
+   `interviews` and must not un-mark it. (The `training` branch was here and is
+   gone with the training flow — client, 15 Sep 2026.) */
 const parentOf = (view, nav) =>
   (view === 'interview' || view === 'transcript') ? 'interviews'
-  : (view === 'training' && nav === 'full') ? 'standing'
   : null;
 
 /* --------------------------------------------------------------------------
@@ -907,11 +909,18 @@ const iv = id => IVS.find(x => x.id === id) || IVS.find(x => x.st === 'next');
    `green` is settled, `quiet` is held or in transit and asks nothing of you.
    Four neutral greys would have made "Report due" just another row.
    -------------------------------------------------------------------------- */
+/* SIX SETTLEMENT STATES (13.7), in the order money moves through them: In escrow,
+   Recording to confirm (the one ON you), Releases [date], Paid [date], Returned
+   (escrow went back), On hold (an admin held it — no reason shown to the agent).
+   `pause` marks a hold, `close` a return; both `quiet` because neither asks
+   anything of the agent. */
 const PAYMENTS = [
   {n:'Rafael Ortiz', d:'19 Aug', s:'In escrow',       ic:'locked',      st:'quiet'},
-  {n:'Sofia Marek',  d:'18 Aug', s:'Report due',      ic:'edit',        st:'warn'},
+  {n:'Sofia Marek',  d:'18 Aug', s:'Recording to confirm', ic:'edit',   st:'warn'},
   {n:'Tom Whelan',   d:'17 Aug', s:'Releases 20 Aug', ic:'time',        st:'quiet'},
+  {n:'Leah Carr',    d:'15 Aug', s:'On hold',         ic:'pause',       st:'warn'},
   {n:'Nina Haddad',  d:'14 Aug', s:'Paid 19 Aug',     ic:'checkFilled', st:'green'},
+  {n:'Owen Pryce',   d:'13 Aug', s:'Returned',        ic:'close',       st:'quiet'},
   {n:'Marcus Bell',  d:'12 Aug', s:'Paid 17 Aug',     ic:'checkFilled', st:'green'}
 ];
 
@@ -965,12 +974,8 @@ const PHOTOS = {rafael: AV.lena, amara: AV.hana, sofia: AV.priya,
    minutes, Derek's three rubric lines, the 24-hour report window — so they are
    at least consistent with it. They are not a decision. Replace them the day
    there is real onboarding content, and only `LESSONS` changes. */
-const LESSONS = [
-  ['How the interview runs', '45 minutes, and what each part is for'],
-  ['Drawing out a story', 'Getting past the answer somebody rehearsed'],
-  ['Evidence, not impression', 'What a level has to be able to point at'],
-  ['Writing the report', 'The 24 hours after the call']
-];
+/* LESSONS DELETED (client, 15 Sep 2026) — training runs offline through
+   LightSpeed. `trainRows`, `CALIB`, `calWhen` and `calLeft` went with it. */
 
 /* THE FOUR LESSONS PLUS THE CALIBRATION, WHICH IS FIVE AND NOT FOUR — the rows
    behind the training meter, and it is TOP LEVEL because two screens draw it.
@@ -998,8 +1003,6 @@ const LESSONS = [
    and reads as a sentence rather than as a scale. `V.training` already numbers
    them this way, and the titles are one press away — on `V.training` itself,
    they are 400px down the same page. */
-const trainRows = v => LESSONS.map((_, n) => [n < (v.lessonsDone || 0), `Lesson ${n + 1}`])
-  .concat([[false, 'Calibration']]);
 
 /* THE CALIBRATION IS A PERSON AND A TIME, STATED ONCE — Maryam, 4 Sep 2026:
    "the calibration interview details should also be part of the card on the
@@ -1019,8 +1022,6 @@ const trainRows = v => LESSONS.map((_, n) => [n < (v.lessonsDone || 0), `Lesson 
    count, both callers get the same answer. **AND THE SENTENCE IS NOT A TIME** —
    §77's own rule for `.dc-when` — which is why it stays in the row's detail
    line where it is allowed to be prose. */
-const CALIB = {av: 'DH', photo: AV.samuel, name: 'Derek Hale',
-  role: 'Head of agent standards', mins: 45};
 
 /* --------------------------------------------------------------------------
    `PF_ACTIVITY` AND THE "RECENT ACTIVITY" BLOCK ARE DELETED — Maryam, 7 Sep
@@ -1123,12 +1124,9 @@ const PUB = {
   langs: 'English',
   expect: ['A conversation, not a quiz',
     'One thing to work on, named plainly',
-    'A signed report within 24 hours',
-    'A level you can point at the evidence for']
+    'A clean recording of the call',
+    'Your level and feedback, set by TalentNext after']
 };
-const calWhen = v => (v.lessonsDone || 0) === 0
-  ? 'Booked once the four lessons are done'
-  : 'Thursday 20 June, 4:00 PM';
 /* HOW LONG UNTIL IT — Maryam, 4 Sep 2026: "the time/days left in the call …
    aligned with the top right of the agent name and on the right end of the
    row." Stated HERE, beside the day it counts down to, so the two are one
@@ -1138,7 +1136,6 @@ const calWhen = v => (v.lessonsDone || 0) === 0
    booked — a countdown to "Booked once the four lessons are done" would be a
    clock on a sentence, which is §77's own argument for keeping `calWhen` off
    the `.dc-when` slot. */
-const calLeft = v => (v.lessonsDone || 0) === 0 ? '' : 'In 2 days';
 
 /* --------------------------------------------------------------------------
    AVAILABILITY, AS DATES RATHER THAN AS WEEK LABELS
@@ -1422,7 +1419,7 @@ const PAGESUM = {
     setup:   'Approved on 12 June, and the agent role sits on the account you already had. Your public profile, your fee and payouts are all still open.',
     training:'Three of four lessons done, and calibration is Thursday 20 June with Derek Hale. Certification is the last thing before you can be booked.',
     live:    'Listed since Monday and nothing booked yet. Six slots are open over the next fortnight, and Friday at 5:00 PM is the first.',
-    working: 'Sofia Marek’s report is due at 6:00 PM today, and Rafael Ortiz is Thursday at 3:00 PM. $204 is held for you in escrow.',
+    working: 'Sofia Marek’s recording is waiting for you to confirm, which releases her pay, and Rafael Ortiz is Thursday at 3:00 PM. $204 is held for you in escrow.',
     reviewed:'Nadia widened your range on 1 October, so you can assess E1 to B2 now. Two bookings arrived in the week since.'
   },
 
@@ -1456,12 +1453,11 @@ const PAGESUM = {
      first is always tomorrow. Both would need saying again if a stage ever
      drew this page with one interview ahead. */
   interviews: {
-    live:    'Nothing booked yet. Six slots are open over the next fortnight, and a request waits here for your answer the moment somebody takes one.',
+    live:    'Nothing booked yet. Six slots are open over the next fortnight, and a booking lands in your diary the moment somebody takes one.',
     _:       () => {
-      const n = reqOpen().length, up = IVS.filter(x => ivSt(x) === 'next').length;
-      return n
-        ? `${n === 1 ? 'One request is' : `${n} requests are`} waiting on you, and ${up} interviews are booked with the first tomorrow. Sofia’s report is due at 6:00 PM.`
-        : `${up} interviews are booked, the first tomorrow, and Sofia’s report is due at 6:00 PM. ${f().ivs} finished in total.`;
+      const up = IVS.filter(x => ivSt(x) === 'next').length;
+      const owed = IVS.filter(x => x.st === 'report').length;
+      return `${up} interviews are booked, the first tomorrow. ${owed} recording${owed === 1 ? '' : 's'} ${owed === 1 ? 'is' : 'are'} waiting to confirm, which is what releases your pay. ${f().ivs} finished in total.`;
     }
   },
 
@@ -1474,8 +1470,8 @@ const PAGESUM = {
        the fee sits at that moment is the one thing `S.req`'s note flags as not
        modelled, so the sentence states the half this portal can vouch for. */
     if(ivSt(v) === 'next') return `${v.n} is ${v.day.split(' ')[0]} at ${v.time}, confirmed and in your diary. ${v.summary ? 'It’s a re-interview, so their 90-day summary is on the brief.' : 'They’re straight off the quiz, so no level exists yet.'}`;
-    if(v.st === 'report') return `You interviewed ${v.n} yesterday and the write-up is due at ${v.due}. Tal has a draft off the transcript waiting for your edit.`;
-    return `${v.n}, ${v.day.replace(/^\w+ /,'')}, confirmed at ${v.level} and signed the same evening. Follow-up scored ${v.follow} and depth ${v.depth}.`;
+    if(v.st === 'report') return `You interviewed ${v.n} yesterday. Confirm the recording is clean to release your pay. Tal has a read off the transcript, and TalentNext sets the level after that.`;
+    return `${v.n}, ${v.day.replace(/^\w+ /,'')}, levelled at ${v.level} by TalentNext off the transcript. Follow-up scored ${v.follow} and depth ${v.depth}.`;
   },
 
   availability: () => `${openSlots().length} slots are open in the weeks ahead and ${SLOTS.filter(ivAt).length} are taken. ${
@@ -1483,8 +1479,8 @@ const PAGESUM = {
 
   earnings: {
     setup:   'Nothing can be booked until a payout destination exists. It’s a Stripe handoff. TalentNext never sees an account number, and it takes a minute.',
-    live:    'Nothing earned yet. Your $85 splits to $68 once a report is delivered, and it sits in escrow for three working days first.',
-    _:       '$612 earned this month across nine interviews, and $204 is still held for you in escrow. Tom’s $68 releases Thursday, three days after his report went out.'
+    live:    'Nothing earned yet. Your $85 splits to $68 once you confirm the recording, and it sits in escrow for three working days first.',
+    _:       '$612 earned this month across nine interviews, and $204 is still held for you in escrow. Tom’s $68 releases Thursday, three days after you confirmed his recording.'
   },
 
   standing: {
@@ -1521,15 +1517,15 @@ const PAGESUM = {
 const TALQ = {
   dashboard: [
     ['What’s on me today?',
-     'Sofia Marek’s report is the one with a clock on it, due at 6:00 PM. Five more evaluations are waiting behind it, and two interviews are still ahead: Rafael on Thursday, Amara on Monday, both paid for already.',
-     null, ['Open the report', 'interviews']],
+     'Sofia Marek’s recording is the one to confirm, which releases her pay. Five more recordings are waiting behind it, and two interviews are still ahead: Rafael on Thursday, Amara on Monday, both paid for already.',
+     null, ['Confirm recordings', 'interviews']],
     ['How are my scores moving?',
      'Follow-up is 4.4, up from 4.2 in July. Depth has sat at 4.7 since May. Both are read off your transcripts, not off candidate ratings.',
      [['Follow-up', '4.4 &middot; was 4.2'], ['Depth', '4.7 &middot; unchanged'], ['Rank', '12 of 38']],
      ['Open Standing', 'standing']],
     ['When does the escrow release?',
-     'Three working days after a report is delivered. Tom’s $68 releases Thursday; Sofia’s starts counting the moment you send hers tonight.',
-     [['Rafael Ortiz', '$68 &middot; held to the interview'], ['Sofia Marek', '$68 &middot; report due tonight'],
+     'Three working days after you confirm the recording. Tom’s $68 releases Thursday; Sofia’s starts counting the moment you confirm hers.',
+     [['Rafael Ortiz', '$68 &middot; held to the interview'], ['Sofia Marek', '$68 &middot; recording to confirm'],
       ['Tom Whelan', '$68 &middot; releases Thursday']],
      ['Open Earnings', 'earnings']]
   ],
@@ -1558,27 +1554,26 @@ const TALQ = {
      'Once a year the method is re-checked, and it’s two lessons rather than four. Yours is due next June.']
   ],
   interviews: [
-    /* THE ANSWER USED TO BE "No", and it is one of the five sites the New
-       Requests tab reverses — `IVS` keeps the whole argument. What survives of
-       the old one is its second half, which was always the better sentence:
-       the slot is still the lever, and closing one is how you stop being asked
-       in the first place. */
+    /* NO DECLINE (client, 15 Sep 2026). A candidate books an open slot and pays
+       at that moment; there is nothing to accept or decline. The slot is still
+       the lever — closing one is how you stop being booked in the first place —
+       and Cancel is the release valve for a booking you cannot make. */
     ['Can I decline a booking?',
-     'Yes. A request waits on the Interviews page until you answer it. Declining puts the slot back so somebody else can take it; closing the slot on Availability stops it being offered at all.'],
+     'No. Once a candidate has paid for a slot you published, it’s yours to show up to. If you genuinely cannot make it, cancel it with a reason: the candidate is refunded and the slot reopens. To stop being booked at all, close the slot on Availability.'],
     ['What if they don’t show?',
      'Wait fifteen minutes, then mark it. The fee stays with the candidate, the slot comes back to you, and it doesn’t touch your scores.'],
     ['What do I read beforehand?',
      'The brief on the interview page: their quiz result, what they asked to be assessed on, and, for a re-interview, their 90-day summary.']
   ],
   interview: [
-    ['How is the report written?',
-     'Tal drafts it off the transcript within the hour, you edit it, and it’s yours the moment you sign. The candidate reads what you sent.',
-     [['Draft ready', 'Within an hour of the call'], ['Yours to change', 'Every word of it'],
-      ['Due', '24 hours from the end']]],
-    ['Can I change a level afterwards?',
-     'Not once you’ve signed. The interview is what sets it; a change after that is a review decision and sits above you.'],
-    ['How long do I have?',
-     'Twenty-four hours from the end of the call. It’s the one promise made to the candidate before they pay.']
+    ['Do I set the candidate’s level?',
+     'No. You run the interview and confirm the recording. Tal proposes a read off the transcript, and TalentNext sets the final level after analysis. The proposal is not binding on anyone.',
+     [['Tal’s read', 'Off the transcript'], ['You confirm', 'The recording'],
+      ['Level set by', 'TalentNext']]],
+    ['What do I do after the call?',
+     'Confirm the recording is clean. That is what releases your pay, and it hands the transcript to TalentNext to set the level. There is no report for you to write.'],
+    ['When does my pay release?',
+     'Three working days after you confirm the recording. The clock starts at the call, not at the level decision.']
   ],
   availability: [
     ['How far ahead can I open?',
@@ -1588,7 +1583,7 @@ const TALQ = {
   ],
   earnings: [
     ['How does the split work?',
-     'The candidate pays $85. TalentNext keeps 20%, which is $17, and $68 comes to you three working days after the report is delivered.',
+     'The candidate pays $85. TalentNext keeps 20%, which is $17, and $68 comes to you three working days after you confirm the recording.',
      [['The candidate pays', '$85'], ['TalentNext keeps', '$17 &middot; 20%'], ['You are paid', '$68 &middot; 80%']]],
     ['Where do payouts land?',
      'Stripe, on the account ending 4417. TalentNext never holds your bank details. Stripe does, and Stripe is where you change them.'],
@@ -3760,60 +3755,13 @@ V.dashboard = v => {
           `<b>${readyCount(rows)} done.</b> Nobody can book you until there is somewhere
             to pay you.`, rows)
       });
-    }],
-    [v => v.lessonsDone !== 4, v => {
-      const rows = trainRows(v);
-      /* THE CALIBRATION IS THE FIFTH ITEM AND NOW ALSO A ROW (Maryam, 4 Sep
-         2026: "the calibration interview details should also be part of the
-         card on the dashboard"). The meter's last mark said the word and
-         nothing else — who it is with, when, and how long were on `V.training`
-         and nowhere on this page.
-
-         IT IS A `crow`, WHICH IS THE COMPONENT FOR EXACTLY THIS, and the card
-         takes `crow-dark` with it. Those two classes are `callCard`'s pair, and
-         this is the first card in either portal to hold a `crow` AND something
-         else — which works because every §77 rule is scoped to a `.crow*`
-         descendant, so the meter above it is untouched, and because a
-         `.dark-card` is a column flex at `gap:20px`, so the two are siblings
-         with the card's own step between them.
-
-         NO BUTTONS ON THE ROW. `V.training` gives it "Ask to move it" and
-         "Confirm the slot" because that page is where the appointment is
-         managed; here the head row already carries "Open Training", and three
-         controls in one card pointing at two places is §112's duplicate. The
-         row is the DETAILS, which is what was asked for.
-
-         IT SITS DIRECTLY UNDER THE DIVIDER, ABOVE THE METER (Maryam, 4 Sep
-         2026: "take the calibration interview details above right after the
-         divider"). It shipped below the meter for one build on the reasoning
-         that the meter's fifth item is what introduces it — read on the page,
-         that put a 78px portrait at the card's bottom edge with nothing under
-         it, and left the card opening on a bar. The person is the concrete
-         thing on this card and the meter is the reading of it. */
-      /* THE CARD HAS NO LEDE AT ALL (Maryam, 4 Sep 2026: "remove the 'Three of
-         five done…' text"), and it is the only one of the four that does not.
-
-         NOTHING IS LOST, WHICH IS WHY IT COULD GO. The count is the meter's own
-         caption 20px below it — "3 of 5 done · 60%", the same two figures — and
-         the clause it existed for ("the calibration cannot be booked until the
-         lessons are finished") was reconciling a bare count against Tal's "Three
-         of four lessons done" in the band above. With the crow row now stating
-         the calibration as a booked appointment with a day on it, that
-         reconciliation is drawn rather than argued.
-
-         SO THIS CALLS `readyBand` DIRECTLY AND NOT `stepBody`. That wrapper is a
-         `<p>` plus the band, and its whole job is the step between the two; with
-         no paragraph it would be a div holding one div. The other three cards
-         still have ledes and still use it. */
-      return darkCard({
-        title: 'Your Next Step - Training',
-        act: {label: 'Open Training', accent: true, attr: 'data-go="training"'},
-        cls: 'crow-dark',
-        body: crow({...CALIB, detail: `${calWhen(v)} &middot; ${CALIB.mins} minutes, recorded`,
-            due: calLeft(v), actions: '', one: true})
-          + readyBand('Training Progress', rows)
-      });
     }]
+    /* NO TRAINING STEP (client, 15 Sep 2026). Agent hiring, onboarding and
+       training run through LightSpeed offline; the platform just creates the
+       user with the agent role. The in-portal enablement journey is profile and
+       payouts only; certification arrives from outside as a read-only status.
+       `LESSONS`/`trainRows`/`CALIB`/`readyBand`-for-training all went with it.
+       See DESIGN.md §3 "Talent Agent — V1 model". */
   ];
   const nextStep = v => {
     const hit = NEXT_STEP.find(([test]) => test(v));
@@ -3870,16 +3818,15 @@ V.dashboard = v => {
      in the band, "nobody can book you until there is somewhere to pay you" is
      the black card's own paragraph, and the calibration date is on the page the
      card opens. */
+  /* TRAINING STEP REMOVED (client, 15 Sep 2026) — onboarding is offline via
+     LightSpeed. The in-portal setup is profile + payouts only. */
   const SETUP_STEPS = [
     {done: v => v.listing, ic: I.document, hue: 'ic-prep', go: 'profile',
      t: 'Write your public profile',
      d: 'Photo, bio, specialisms.'},
     {done: v => v.paid, ic: I.wallet, hue: 'ic-quiz', go: 'earnings',
      t: 'Connect a payout destination',
-     d: 'A Stripe handoff.'},
-    {done: v => v.lessonsDone === 4, ic: I.book, hue: 'ic-stand', go: 'training',
-     t: 'Finish training and calibration',
-     d: v => `${v.lessonsDone || 0} of four lessons done.`}
+     d: 'A Stripe handoff.'}
   ];
 
   if(!v.certified) return band(nextStep(v)) + quickActions(
@@ -4057,7 +4004,7 @@ V.dashboard = v => {
           bare title was thin on and exactly what a Quick Action wants. Kept short
           enough to stay on one line at the two-card row's ~386px per card. */''}
     ${quickActions([
-      {ic: I.certificate, hue: 'ic-stand', go: 'interviews', tab: 'next', t: 'Awaiting Decisions', d: 'Candidates yet to decide'},
+      {ic: I.checkFilled, hue: 'ic-stand', go: 'interviews', tab: 'eval', t: 'Recordings To Confirm', d: 'Confirm to release your pay'},
       {ic: I.video,       hue: 'ic-prep',  go: 'interviews', tab: 'next', t: 'Upcoming Interviews', d: 'Calls booked ahead'}
     ])}`;
 };
@@ -4104,328 +4051,6 @@ V.dashboard = v => {
    sending someone to a page to look at a preview of another page is the shape
    this removal exists to undo.
    -------------------------------------------------------------------------- */
-
-/* --------------------------------------------------------------------------
-   TRAINING — step 7 and the certification gate. Derek's rubric is three
-   things, so it is a `.kv` rather than a `.facts` band: three cells in an
-   auto-fit grid leaves one paying grey.
-   -------------------------------------------------------------------------- */
-V.training = v => {
-  /* THREE STATES, AND THE PAGE USED TO DRAW TWO. `done` was the only branch, so
-     an agent who had started nothing got the same page as one with three modules
-     behind them — and four things on it were wrong at once:
-
-       - Tal said the modules were finished (a missing `PAGESUM` key, fixed above)
-       - the black card offered "Confirm the slot" for a calibration interview,
-         before a single module had been opened
-       - the progress card said "Module 1 · in progress" over a 0% ring and
-         "Nothing finished yet"
-       - the one thing to actually do, "Open module 1", was a button at the very
-         bottom of the page, under the rubric and a warning note
-
-     `at` is the state, read off the same `lessonsDone` count the rest of the page uses:
-     0 is nothing started, 1–3 is under way, 4 is certified. Every branch below
-     names it rather than testing `lessonsDone` again, so the page cannot disagree with
-     itself the way it just did. */
-  const lessonsDone = v.lessonsDone || 0;
-  const at = lessonsDone === 4 ? 'certified' : lessonsDone === 0 ? 'unstarted' : 'underway';
-  const next = LESSONS[Math.min(lessonsDone, 3)];
-
-  /* AND CALIBRATION IS NOT BOOKED UNTIL THE LESSONS ARE. That is the fact the
-     old page was missing, and it is what made the plate absurd: a date and a
-     "confirm" for an appointment that cannot be scheduled yet. It is stated once
-     here and read in three places — the fact row, the hero, and the kv band. */
-  const calWhen = at === 'unstarted'
-    ? 'Booked once the four lessons are done'
-    : 'Thursday 20 June, 4:00 PM';
-
-  /* THE HERO IS THE NEXT THING TO DO, and which thing that is depends on the
-     state. Nothing started: the first lesson, with the button that opens it —
-     the page's primary action, at the top, where the candidate portal puts every
-     other one. Under way: the calibration, because the appointment is the thing
-     in the way and the remaining lesson has its own row below. Certified: the
-     certificate, because there is nothing left to do. */
-  /* THE CERTIFICATE STAYS IN THE BAND AND THE OTHER TWO HEROES COME OUT OF IT,
-     which is §56's own division rather than an inconsistency. A `.plate` is a
-     vertical card and gains from the band's 330px second column; `.cert`,
-     `.lvl-hero` and `.score` are WIDE objects — an award, a fifteen-rung
-     ladder, a table — and §56 leaves them full-width under the head. The gate
-     is `:has(> .sec-dark .plate)`, so a `.cert` in that slot does not open the
-     two-column band at all and lands exactly where §25.12 puts it. And §59's
-     list is the other half: `.cert` is not an ACTION, so it has no deadline to
-     be inside or outside of, and "a quiet certificate is a certificate with the
-     ceremony taken off it".
-
-     THE CALIBRATION IS THE ONE HERO ON THIS PAGE THAT IS A `crow`. It is an
-     appointment with Derek Hale — a portrait, a name, a role, and the two
-     things to do about that meeting — where the unstarted state's subject is a
-     LESSON with nobody in the room. The dashboard's step-3 card makes the same
-     split the other way round and its note is the argument. */
-  const heroBand = at === 'certified'
-    ? `<div class="cert">
-        <h3>Certified to interview</h3>
-        <p class="sub">Issued 20 June 2024 &middot; signed by Derek Hale &middot; Explorer and Builder</p>
-      </div>`
-    : '';
-  /* THE SAME SHAPE THE DASHBOARD'S CARDS TAKE — and that claim is why this card
-     moved with them (Maryam, 4 Sep 2026: "once you update the card use it in
-     other screens as well which is using the previous card layout").
-
-     This note has always said "the same shape one page over", and for two
-     builds it was the thing keeping the two in step: title, a paragraph, one
-     button at the bottom right. The dashboard's three took the meter and this
-     one did not, so for one build the sentence above it was false — the same
-     slot on two pages drawn two ways, which is the drift this file spends most
-     of its notes undoing. It is `stepBody` + `act.accent` now, exactly as they
-     are, and `trainRows` is the SAME function rather than a copy: it went to
-     top level for this.
-
-     THE LEDE IS THE ONLY THING THIS CARD STILL STATES FOR ITSELF, and it is
-     shorter than it was. The old paragraph's second half — "the four are
-     followed by a 45-minute calibration with Derek Hale" — is the meter's fifth
-     item now, so the sentence keeps the half the meter cannot draw: what lesson
-     1 is actually about, read off `LESSONS` through `next`. */
-  const heroBody = at === 'unstarted'
-    ? darkCard({
-        title: 'Your Next Step - Lesson 1',
-        act: {label: 'Open Lesson 1', accent: true},
-        /* THE CALIBRATION ROW, AS THE DASHBOARD DRAWS IT — Maryam, 4 Sep 2026:
-           "in the training module black card, I want you to show the
-           calibration call part like we have in the Training prototype
-           dashboard." So this is the dashboard's body to the argument: `crow`
-           directly under the divider, the meter under it, `crow-dark` on the
-           card. THE LEDE GOES WITH IT, and nothing is lost: its first half is
-           the meter's own caption ("0 of 5 done · 0%") and its second — what
-           lesson 1 covers — is the first row of "The four lessons" 200px below,
-           title and description both. The note above this card that argued for
-           keeping the lede is turned over here. */
-        cls: 'crow-dark',
-        /* `calWhen` here is THIS view's local string (declared above), not the
-           top-level function the dashboard calls — same words, already computed
-           for the stage. `calLeft` has no local twin and is the function. */
-        body: crow({...CALIB, detail: `${calWhen} &middot; ${CALIB.mins} minutes, recorded`,
-            due: calLeft(v), actions: '', one: true})
-          + readyBand('Training Progress', trainRows(v))
-      })
-    : at === 'underway'
-      /* NO `.dc-when` HERE, AND THAT IS THE DATA'S ANSWER RATHER THAN A STYLE
-         CHOICE. §77's countdown slot states one figure that moves by itself,
-         and `calWhen` is either a real Thursday or the sentence "Booked once
-         the four lessons are done" — which is not a time and would read as one
-         in a slot with a clock glyph in front of it. It is a `.crow-x` line
-         instead, where it can be a sentence. `urgent` is off with it: §71.2a's
-         state is about being inside the day, and this appointment cannot be
-         until the lessons are. */
-      ? callCard({
-          title: 'Calibration interview',
-          av: 'DH', photo: AV.samuel, name: 'Derek Hale',
-          role: 'Head of agent standards',
-          detail: `${calWhen} &middot; 45 minutes, recorded`,
-          /* NO BUTTONS, AND THE COUNTDOWN SITS BOTTOM-RIGHT (Maryam, 7 Sep 2026:
-             "remove confirm slot and ask to move button, take in 2 days at the
-             bottom right"). The two controls are gone; "In 2 days" moves off the
-             name line (`due`) into the crow's `actions` slot, which §77.6 /
-             `.crow-dark .crow-a{align-self:flex-end}` bottom-aligns to the right
-             edge of the row. It is a `.crow-due` pill (clock + text, on-dark ink),
-             not a button, so it takes none of `.crow-a > .btn`'s sizing. */
-          actions: `<span class="crow-due">${I.time}${calLeft(v)}</span>`
-        })
-      : '';
-
-  /* THE BACK BUTTON APPEARS ONLY WHERE THE PAGE IS A SUB-PAGE. In the enabling
-     stages Training is a rail item and a back arrow would point at nothing;
-     once certified it is reached from Standing, and it needs one. */
-  return head({
-    title: 'Training and calibration',
-    /* A `&middot;` ROW IS FIGURES, so the count is set rather than spelt — the
-       house rule is that a small number is spelt only when it opens a
-       sentence. */
-    sub: at === 'certified'
-      ? '4 of 4 lessons &middot; calibrated 20 June &middot; re-checked each June'
-      : `${lessonsDone} of 4 lessons &middot; ${at === 'unstarted' ? 'calibration once the four are done' : 'calibration Thursday 20 June'}`,
-    back: v.nav === 'full' ? 'standing' : '',
-    plate: heroBand
-  }) + heroBody + `
-
-  ${/* THE FIGURE BAND GOES STRAIGHT AFTER THE BLACK CARD, WHICH IS COURSE
-        PROGRESS'S LAYOUT (Maryam, 2 Sep 2026: "For the Training module of talent
-        agent, i want you to follow the course progress page layout, just do not
-        add the line graph in agent training"). That page reads band → black card
-        → four figures → the chapter list, and this page now reads band → black
-        card → four figures → the lesson list. Two things changed to get there.
-
-        THE `.wkc` CARD AND ITS RING ARE DELETED, and the ring is the reason
-        rather than a casualty. Course Progress has no week card — it is the
-        candidate's WEEK block, which that page does not draw — and everything
-        this one was carrying is a figure: the count, the percentage, which lesson
-        is next, and what is finished. The last of those is the lesson list forty
-        pixels below with a tick on every done row, which is where a reader looks
-        for it. So the card was a second progress idea stacked on the list, and
-        four cells say the same in one row. `ring()` keeps its definition and
-        loses its only caller here; `.wkc*` all still ship and `gallery.html`
-        documents them.
-
-        NO LINE GRAPH, WHICH IS THE INSTRUCTION AND ALSO THE DATA. Course
-        Progress's "Your performance" is an assessment score per chapter over
-        thirteen chapters; a lesson is finished or it is not, and there are four
-        of them — a chart of four booleans is a chart of nothing. The whole
-        section goes rather than being drawn empty, and the "Key insight" row
-        under it goes with the chart it was a reading of.
-
-        THE FOUR CELLS ABSORB THE CALIBRATION BAND, so the page still has ONE
-        figure row. Course Progress has one, and two on a page 400px apart read
-        as two attempts at the same job. `.stats` is a fixed 2/4-column grid
-        whose hairlines are the 1px gap, so it wants exactly four — and there are
-        exactly four readings here worth a cell: how far through, what is next,
-        when the calibration is, and whether it is passed. Derek moves into the
-        help line under the band, where the sentence about the mock interview
-        already names him. */''}
-  <section class="sec">
-    <div class="sec-h"><h2>Your progress</h2></div>
-    ${stats([
-      ['book', 'Lessons done', `${lessonsDone}<small>/4</small>`,
-        `${Math.round(lessonsDone / 4 * 100)}% complete`],
-      ['time', 'Next up',
-        at === 'certified' ? '&mdash;' : `Lesson ${lessonsDone + 1}`,
-        at === 'certified' ? 'All four are behind you' : next[0]],
-      ['calendar', 'Calibration',
-        at === 'unstarted' ? '&mdash;' : '20 June',
-        at === 'unstarted' ? 'Once the four lessons are done'
-        : at === 'certified' ? 'Thursday, and it is behind you' : 'Thursday, 4:00 PM'],
-      ['certificate', 'Certified',
-        at === 'certified' ? 'Passed' : 'Not yet',
-        at === 'certified' ? 'Signed off 20 June' : 'After the calibration']])}
-    ${/* THE HELP LINE IS GONE (Maryam, 4 Sep 2026: "remove the 'A recorded mock
-          interview...' text"). It carried two facts and both are said elsewhere
-          now: WHO watches is the black card's `crow` at the top of this page and
-          on the dashboard — his face, his name and his role, rather than his
-          name inside a sentence — and WHAT it is ("recorded", "45 minutes") is
-          that row's own detail line. It was written when the calibration had no
-          card of its own; the card arrived and this stayed. */''}
-    ${at === 'certified' ? '' : `
-    ${/* THE FOUR LESSONS ARE PART OF "YOUR PROGRESS" NOW (Maryam, 7 Sep 2026:
-          "remove the 'The four lessons' heading and the grey background of this
-          section, make the lessons part of the above Your progress section").
-          The list used to be its own `.sec.tint` block — a heading and a quiet
-          grey ground — 200px below. It was reference material sitting apart from
-          the figure row that summarises it; folded under the same heading it
-          reads as one thing: here is where you are, and here are the four rows
-          the "Lessons done" cell is counting. The `tint` ground goes with the
-          split (one section, one white ground) and the "The four lessons"
-          heading goes because "Your progress" already names the block. `mt6`
-          sets the list one `--s06` (24) below the stat cells.
-
-          §10.15 IS STILL SATISFIED: the section's `.sec-h` gets no 184px label
-          column because it holds `.stats` AND `.tile-stack`, both on the opt-out
-          list, so two opt-out blocks under one heading is still an opt-out.
-
-          The rows are unchanged from when they were their own section:
-            - A `Next` TAG IS NOT AN ACTION — the next lesson gets a button on
-              the row; the locked ones keep the "Locked" tag, because that IS a
-              status with nothing to press.
-            - NO NUMERAL ON THE ROW (Maryam, 4 Sep 2026): `.ch-num` replaced four
-              identical `book` glyphs on the grounds that what a mark owes a fixed
-              sequence is WHICH one — then the sequence ended up stated twice
-              above (the black card's meter and "Next up"), so the numeral was a
-              third count of the same four and went. `.ch-num` STILL SHIPS
-              (gallery.html) — one caller went, not the component. `.ckrow` stays:
-              it is what gives a numberless `.cardrow` its own left alignment. */''}
-    <div class="tile-stack mt6">
-      ${LESSONS.map((m, n) => `<div class="cardrow ckrow">
-        <span class="cardrow-b">
-          <span class="cardrow-t">${m[0]}${n < lessonsDone
-            ? `<span class="row-st done" role="img" aria-label="Finished">${I.checkFilled}</span>` : ''}</span>
-          <span class="cardrow-d">${m[1]}</span></span>
-        ${n < lessonsDone ? ''
-          : n === lessonsDone ? `<span class="cardrow-a"><button class="btn btn-g btn-sm noic">Open lesson ${n + 1}</button></span>`
-          : `<span class="cardrow-a"><span class="tag sm bordered" style="border-radius:999px">${I.locked}Locked</span></span>`}
-      </div>`).join('')}
-    </div>`}
-  </section>
-
-  ${/* THE CALIBRATION SECTION IS GONE AND ITS FOUR CELLS ARE THE PROGRESS BAND
-        (Maryam, 2 Sep 2026, with the Course Progress layout). That page has ONE
-        figure row and this page had two — the progress band above and this one
-        400px below it, four cells each, which reads as two attempts at the same
-        job rather than as two subjects.
-
-        WHAT MOVED AND WHAT WENT. `When` and `Result` are cells 3 and 4 of the
-        band above, unchanged in their branching. `With` is the help line under
-        it — Derek's name and his role, in the sentence that was already about
-        him. `Length` ("45 min, recorded and kept") is the one fact that went: it
-        is in the black card's own paragraph on the two stages that draw one, and
-        it is true of every calibration in the product rather than of this one.
-
-        THE `.stats`-OVER-`.kv` ARGUMENT IS WORTH KEEPING and it is why the band
-        above is a `.stats` rather than four rows. These four are short, they are
-        facts about one thing, and as `.kv` rows they were four lines of text
-        900px wide with 700px of nothing after the words. `.facts` would have
-        been the other mistake — its `auto-fit` columns leave a spare track
-        painting the rule colour at the widths where a cell wraps. And the FIGURE
-        stays short with the note carrying the rest, because `.stat` puts the
-        label and the figure on one line with the figure `nowrap` at the right
-        edge: "Thursday 20 June, 4:00 PM" as a figure truncates to "Thursday
-        20 J…" the moment the page narrows.
-
-        THE WARNING NOTE SURVIVES ON ITS OWN, directly under the lesson list. It
-        had been moved here once already, from the foot of the page where it read
-        as a warning about the rubric; what it is about is the GATE, and the
-        nearest thing to the gate is now the list of what has to be finished
-        first. */''}
-  ${/* THE WARNING BANNER IS GONE (Maryam, 4 Sep 2026: "remove the orange
-        banner"). `.note.warn` was the page's one full-width tinted block and it
-        stated the GATE — nothing goes into browse until the calibration is
-        passed, and it cannot be booked until the four lessons are.
-
-        BOTH HALVES SURVIVE AND THAT IS WHY IT COULD GO. The second clause is
-        the black card's own lede at the head of this page and on the dashboard,
-        word for word ("the calibration cannot be booked until the lessons are
-        finished"); the first is `PAGESUM.training` and the journey list's
-        "Training and calibration" step, which is what the rail's third row is
-        FOR. A banner repeating the card 600px above it is the same fact in two
-        registers, which is §62's argument against the green `.ach` band.
-
-        WHAT IS ACTUALLY LOST is the word "browse" on this page — the link
-        between finishing here and being listed. `V.profile`'s peek says it
-        ("your card is not in browse yet — it goes live the day you are
-        certified") and so does the profile black card. Flagged, not replaced. */''}
-
-  ${/* THE RUBRIC IS A §65 DISCLOSURE. Nothing in it is yours to do — it is the
-        standard you are being read against — and it is the same three sentences
-        every time the page is opened, which is the definition of a re-read. It
-        was permanently open at the foot of the page, so an agent coming back to
-        check which lesson is next scrolled past three rows they had read on
-        their first visit.
-
-        "THE RUBRIC" IS THE WORD FOR IT INSIDE THE COMPANY and the heading is
-        deliberately not that: the three rows are questions Derek is asking
-        himself about you, and §65's whole argument is that a closed
-        disclosure's heading has to BE the summary of what is behind it. "What
-        Derek watches for" is; "The rubric" would need a line under it to say so.
-
-        The certified footnote goes INSIDE the panel rather than beside the
-        heading — it is a fact about the re-check, which is what the three rows
-        are about, not a description of the block. */''}
-  ${/* AND "What Derek watches for" IS GONE WITH IT (Maryam, 4 Sep 2026: "remove
-        the what derek watched for section"). It was §65's disclosure holding
-        three rubric rows — Tenacity, Energy, Noticing — plus a certified-only
-        footnote about the June re-check.
-
-        THE ARGUMENT FOR IT IS KEPT BECAUSE IT WAS SOUND and is the thing to
-        read before a second attempt: nothing in it was the agent's to DO, it
-        was the standard they are read against, it was the same three sentences
-        on every visit, and that is exactly what a disclosure is for. The
-        heading was deliberately not "The rubric" — §65's rule is that a closed
-        disclosure's heading has to BE the summary of what is behind it.
-
-        WHAT IT COSTS IS REAL AND IS NOT SAID ANYWHERE ELSE. Those three rows
-        were the only place in the product that states what the calibration is
-        judged on, and the June re-check line was the only place that says the
-        method is re-checked at all — `V.standing`'s "Also held" row says
-        "the method re-checked each June" as a caption, which is the nearest
-        thing left. Both are one `foundSec` call to restore; `S.disc`'s 'rubric'
-        key is now unused and `foundSec` keeps its other callers. */''}`;
-};
 
 /* --------------------------------------------------------------------------
    INTERVIEWS — steps 9, 10 and 11. THREE tabs, because "what is asked of me",
@@ -4477,8 +4102,11 @@ V.interviews = v => {
      is what turns each tab's `length ? … : empty` branch to its empty section.
      The busy stages are unchanged. */
   const done = v.busy ? IVS.filter(x => x.st === 'done') : [];
+  /* `owed` IS "HELD, RECORDING NOT YET CONFIRMED" NOW, not "report not written"
+     (client, 15 Sep 2026). The `st:'report'` key is unchanged in the data — it
+     still means the same interviews — but the agent's outstanding action on them
+     is confirming the recording, not filing a level report. */
   const owed = v.busy ? IVS.filter(x => x.st === 'report') : [];
-  const reqs = v.busy ? reqOpen() : [];
 
   return head({title: 'Interviews',
     sub: v.busy
@@ -4497,37 +4125,22 @@ V.interviews = v => {
         and this file's own Profile all draw a tab row as §15's `.cs` inside a
         `.sec-cs` section, which §16 zeroes so the strip and the panel under it
         meet on one line. Same buttons, same `data-tab` router. */}
+  ${/* NO REQUESTS TAB (client, 15 Sep 2026). A candidate books an open slot and
+        pays at that moment; there is nothing for the agent to accept or decline,
+        so the tab and its accept/decline list are gone. Three tabs now: Upcoming,
+        To confirm (the recording), Past. The agent controls supply by which slots
+        they publish (Availability); the release valve is Cancel (13.5), not a
+        decline. `reqOpen`/`reqRow` stay defined (unused, flagged) in case the
+        model changes. See DESIGN.md §3 "Talent Agent — V1 model". */''}
   <section class="sec sec-cs">
     <div class="cs">
-      <button class="${S.tab === 'req' ? 'on' : ''}" data-tab="req">Requests${reqs.length ? ` (${reqs.length})` : ''}</button>
       <button class="${S.tab === 'next' ? 'on' : ''}" data-tab="next">Upcoming</button>
-      <button class="${S.tab === 'eval' ? 'on' : ''}" data-tab="eval">Evaluations${owed.length ? ` (${owed.length})` : ''}</button>
+      <button class="${S.tab === 'eval' ? 'on' : ''}" data-tab="eval">To Confirm${owed.length ? ` (${owed.length})` : ''}</button>
       <button class="${S.tab === 'done' ? 'on' : ''}" data-tab="done">Past Interviews</button>
     </div>
   </section>
 
-  ${S.tab === 'req' ? (reqs.length ? `
-  <section class="sec">
-    ${/* THE DESCRIPTION IS THE ONE LINE OF RULE LEFT ON THIS PAGE, and it is
-          here rather than in a panel of its own because it states what the two
-          buttons underneath it DO. Both halves are true of the model: accepting
-          writes the slot (`ivAt`), so the interview is in the diary and on the
-          calendar on the next paint, and declining leaves it open, so it is
-          back in "slots open" and offerable to somebody else. */''}
-    ${/* No description under the heading (Maryam, 6 Sep 2026) — `aiHead` renders
-          none when `desc` is empty. The action stays. */''}
-    ${aiHead('New requests from candidates', '',
-      `<button class="btn btn-g btn-sm noic" data-go="availability">Availability ${I.arrowRight}</button>`)}
-    <div class="rqc-list">
-      ${reqs.map(reqRow).join('<div class="rqc-sep" aria-hidden="true"></div>')}
-    </div>
-  </section>` : `
-  <section class="sec sec-fill">
-    <div class="empty">${I.checkFilled}<span class="t">Nothing waiting on you</span>
-      <span class="help">A request arrives when a candidate takes one of your open slots, with their brief attached, and waits here for your answer.</span>
-      <div class="btn-row"><button class="btn btn-g" data-tab="next">See what is booked ${I.arrowRight}</button></div></div>
-  </section>`)
-  : S.tab === 'next' ? (() => {
+  ${S.tab === 'next' ? (() => {
     /* THE SOONEST CALL LEADS AS A BLACK CARD — Maryam, 6 Sep 2026: "the most
        recent call should be shown in the black card." It is `callCard`, the §75
        dark-card + `crow` the dashboard's "Your next interview" and the leader's
@@ -4543,7 +4156,7 @@ V.interviews = v => {
     if(!dn.length) return `
   <section class="sec sec-fill">
     <div class="empty">${I.calendar}<span class="t">Nothing booked yet</span>
-      <span class="help">Calls you accept show up here, in the order they happen. Open more slots so a candidate can book you.</span>
+      <span class="help">Calls candidates book show up here, in the order they happen. Open more slots so a candidate can book you.</span>
       <div class="btn-row"><button class="btn btn-p" data-go="availability">Open more slots ${I.arrowRight}</button></div></div>
   </section>`;
     const soon = dn[0] ? iv(dn[0].id) : null;
@@ -4572,23 +4185,23 @@ V.interviews = v => {
   </section>`;
   })()
   : S.tab === 'eval' ? (owed.length ? `
-  ${/* AWAITING EVALUATIONS — Maryam, 6 Sep 2026: a tab for interviews the agent
-        has taken but whose level is not yet set. `owed` is `st:'report'`: the
-        call happened, the report is not written. Each row opens the interview's
-        evaluation page, where the level, the reasoning, the strengths and growth,
-        Tal's own read and the agent's extra notes all live. The row states that
-        the level is pending so the queue reads as work to do, not history. */''}
+  ${/* TO CONFIRM — interviews the agent has held whose recording is not yet
+        confirmed (client, 15 Sep 2026). `owed` is `st:'report'`: the call
+        happened, the recording is not confirmed. Each row opens the interview,
+        where the agent confirms the recording (which releases the payout) and Tal's
+        read sits read-only; TalentNext sets the level after analysis. The row says
+        "recording to confirm" so the queue reads as work to do, not history. */''}
   <section class="sec">
-    <div class="sec-h"><h2>Awaiting Evaluations</h2></div>
+    <div class="sec-h"><h2>Recordings To Confirm</h2></div>
     <div class="tile-stack">
       ${owed.map(x => faceRow(x,
-        `${x.kind} &middot; interviewed ${x.day.replace(/^\w+ /, '')} &middot; level pending`,
+        `${x.kind} &middot; interviewed ${x.day.replace(/^\w+ /, '')} &middot; recording to confirm`,
         'interview')).join('')}
     </div>
   </section>` : `
   <section class="sec sec-fill">
-    <div class="empty">${I.checkFilled}<span class="t">No evaluations waiting</span>
-      <span class="help">When you finish an interview it lands here for a level and a write-up, then goes to the candidate.</span>
+    <div class="empty">${I.checkFilled}<span class="t">Nothing to confirm</span>
+      <span class="help">When you finish an interview it lands here to confirm the recording, which releases your payout. TalentNext reads the transcript and sets the level.</span>
       <div class="btn-row"><button class="btn btn-g" data-tab="next">See what is booked ${I.arrowRight}</button></div></div>
   </section>`)
   : (owed.concat(done).length ? `
@@ -4612,11 +4225,11 @@ V.interviews = v => {
     <div class="sec-h"><h2>Past Interviews</h2></div>
     <div class="tbl-wrap">
       <table class="tbl">
-        <tr><th>Candidate</th><th>Interviewed</th><th>Decision</th><th class="num">Follow-up</th><th class="num">Depth</th></tr>
+        <tr><th>Candidate</th><th>Interviewed</th><th>Level</th><th class="num">Follow-up</th><th class="num">Depth</th></tr>
         ${owed.concat(done).map(x => `<tr class="clk" data-go="interview" data-iv="${x.id}">
           <td>${x.n}</td>
           <td>${x.day.replace(/^\w+ /, '')}</td>
-          <td>${x.st === 'done' ? x.level : `Report due ${x.due}`}</td>
+          <td>${x.st === 'done' ? x.level : 'Recording to confirm'}</td>
           <td class="num">${x.follow || '&mdash;'}</td>
           <td class="num">${x.depth || '&mdash;'}</td></tr>`).join('')}
       </table>
@@ -4708,7 +4321,12 @@ V.interview = v => {
       urgent: soon,
       av: x.i, photo: PHOTO[x.id], name: x.n, role: x.band,
       detail: `45 minutes &middot; video, recorded${when ? ` &middot; ${when}` : ''}`,
+      /* CANCEL INTERVIEW (13.5) is an action on an upcoming interview — the
+         release valve now that there is no accept/decline. `data-sheet="cancel"`
+         opens the reason panel on this interview (`S.iv`). Quiet danger button so
+         Join stays the primary. */
       actions: `<button class="btn btn-sm noic ic-l">${I.calendar}Add to calendar</button>
+        <button class="btn btn-sm noic danger" data-sheet="cancel">Cancel interview</button>
         <button class="btn btn-p btn-sm noic">Join the call ${I.video}</button>`
     }) + `
     ${/* THE SHEET IS ON THE BRIEF'S OWN HEADING ROW. "Add a note to the brief"
@@ -4738,110 +4356,98 @@ V.interview = v => {
           Two minutes. It is what they asked for, in their words.</span></li>
         <li><span class="s-n">2</span><span class="s-b"><b>Open the room early</b>
           The recording starts when you both join, and they are told that.</span></li>
-        <li><span class="s-n">3</span><span class="s-b"><b>Send the report within a day</b>
-          Tal drafts it off the transcript. The level is set by you and signed by you.</span></li>
-      </ol>`, 'Three things, and the last one has a clock on it &mdash; the report is due within a day of the call.')}`;
+        <li><span class="s-n">3</span><span class="s-b"><b>Confirm the recording after the call</b>
+          Tal drafts a read off the transcript. You confirm the recording is clean; TalentNext sets the level after analysis.</span></li>
+      </ol>`, 'Three things. The last one, confirming the recording, is what releases your payout.')}`;
   }
 
   if(x.st === 'report'){
-    /* THE EVALUATION — Maryam, 6 Sep 2026. The agent sets a level and says why,
-       names the candidate's strengths and growth areas, weighs TAL'S OWN read
-       (Tal was on the call in the background, unknown to the candidate — a
-       suggested level and the notes behind it), and can add anything else. The
-       level is the one live control: `levelPicker` (§124) writes `S.evalForm.level`
-       as a rung code, defaulting to Tal's suggestion. The write-ups are seeded,
-       editable prose — a demo does not round-trip a textarea through `S`. */
+    /* AFTER THE INTERVIEW — the agent's post-call surface, and it NO LONGER SETS
+       A LEVEL (client, 15 Sep 2026: "the agent shouldn't own that decision ...
+       their job is to show up, run the interview well, and make sure we have a
+       clean recording"). Tal PROPOSES the read; TalentNext sets the level
+       admin/moderator-side after analysis. So the fifteen-rung `levelPicker`, the
+       Why-this-level / Strengths / Growth-areas decision fields and "Send
+       Evaluation" are GONE — that whole write-up WAS the level decision, and it
+       moves off the agent.
+
+       WHAT THE AGENT DOES HERE is confirm the recording is clean. That is the
+       deliverable, and it is what RELEASES THE PAYOUT (client, 15 Sep 2026: the
+       three working days run from the call, gated on the recording, not on a
+       level report). The optional note feeds the level decision on TalentNext's
+       side; it is not a level and not a strengths/growth write-up.
+
+       Tal's read stays, read-only. `x.talEval` / `x.talLevel` and the
+       `seedWhy`/`seedStrength`/`seedGrowth` records still exist (Tal's own read
+       and the seeds a future admin-side surface will draw) but no control here
+       reads them as the agent's decision. See DESIGN.md §3 "Talent Agent — V1
+       model". */
     const first = x.n.split(' ')[0];
-    /* THE LEVEL IS PICKED ON THE FIFTEEN-RUNG LADDER, not a dropdown (Maryam, 6
-       Sep 2026). `talCode` is Tal's suggestion as a rung code ("E3"), read off
-       `x.talLevel`; `chosen` is the agent's pick (or Tal's, by default). Both are
-       codes now — `S.evalForm.level` holds "E3", not "Explorer – E3". */
-    const talCode = (x.talLevel.match(/[EBT]\d/) || [])[0] || 'E1';
-    const chosen = (S.evalForm && S.evalForm.level) || talCode;
     return band(null, true) + `
-    ${/* THE FACTS OF THE CALL ARE THE 4-BLOCK FIGURE ROW (Maryam, 6 Sep 2026),
-          not a kv band and not an orange banner: held, ran, transcript, and the
-          DUE time as the fourth cell — the deadline the removed banner carried,
-          now one figure among the four. `.stats` colours the four cells in the
-          four marks automatically. */''}
+    ${/* THE FACTS OF THE CALL — the 4-block figure row. The old fourth cell was
+          the 24-hour REPORT deadline; there is no report now, so it becomes the
+          recording state, which is the thing the agent confirms below. */''}
     <section class="sec">
-      <div class="sec-h"><h2>${x.n} Evaluation</h2></div>
-      ${/* THE FOUR FACTS ARE VALUE-ONLY NOW — no second line (Maryam, 6 Sep 2026:
-            "remove all the texts from the second line"). What the note carried
-            folds into the value: the time joins the date, "today" joins the due.
-            "Total Time" is Ran renamed, and Transcript's "Ready" gains a link to
-            the recording (`.stat-link` → the transcript sheet). `statCell` drops
-            an empty `.d`, so these are clean single-value cells. */''}
+      <div class="sec-h"><h2>The interview</h2></div>
       <div class="stats eval-stats">${[
         ['calendar', 'Held', `${x.day.replace(/^\w+ /, '').replace(/ (\w{3})\w*$/, ' $1')} &middot; ${x.time}`, ''],
         ['time', 'Total Time', '48 min', ''],
         ['document', 'Transcript', `<span class="stat-link" data-go="transcript" data-iv="${x.id}">Ready ${I.arrowRight}</span>`, ''],
-        ['warning', 'Due', `Today ${x.due.replace(/\s*today$/i, '')}`, '']
+        ['video', 'Recording', 'Ready to confirm', '']
       ].map(c => statCell(...c)).join('')}</div>
     </section>
 
-    ${/* EVALUATION BY TAL — no section heading; the card names itself in its own
-          label, like the module summaries. Tal sat in the interview in the
-          background (the candidate was not told), so this is Tal's own structured
-          read — a suggested level and the highlights behind it, the key phrases in
-          Tal's ramp. It is a suggestion; the level is the agent's to set below. */''}
+    ${/* TAL'S READ — READ-ONLY. Tal sat in the interview in the background and
+          proposes a level and the highlights behind it; it is NOT the agent's to
+          set. The note under the body says where the decision actually lands. */''}
     <section class="sec">
       <div class="ai-aura tal-eval">
-        <div class="ai-head"><span class="ai-label bare">Evaluation by Tal</span></div>
-        <div class="ai-body">${x.talEval}</div>
+        <div class="ai-head"><span class="ai-label bare">Tal's read</span></div>
+        <div class="ai-body">${x.talEval}
+          <p class="help mt5">Proposed only. TalentNext sets the level after analysis, so this is not a decision you make here.</p></div>
       </div>
     </section>
 
-    ${/* YOUR DECISION — the level, the reasoning, the strengths, the growth areas
-          and any extra notes, all one section. `.eval-form` opts the section out
-          of the label column (§10.15) so the fields read top-to-bottom under the
-          heading rather than in the right two-thirds. The level is the one live
-          control (`dd` → `S.evalForm.level`, defaulting to Tal's suggestion). */''}
+    ${/* CONFIRM THE RECORDING — the agent's one deliverable. Confirming it is
+          clean releases the payout after the three working days. `.eval-form`
+          opts the section out of the label column (§10.15) so the note field
+          reads full-width under the heading. */''}
     <section class="sec">
-      <div class="sec-h"><h2>Your Decision</h2></div>
+      <div class="sec-h"><h2>Confirm the recording</h2></div>
       <div class="eval-form">
-        <div class="f"><span class="lbl">Level you are setting</span>${levelPicker(chosen, talCode)}</div>
-        <label class="f mt5"><span class="lbl">Why this level</span>
-          ${/* SEEDED PER RECORD, not hardcoded to Sofia (7 Sep 2026, with the four
-                extra evaluations). This textarea held Sofia's vendor-review
-                reasoning as a literal, so every other candidate's report opened
-                with her words. It reads `x.seedWhy` now — each report seeds its
-                own "why", the same way Strengths and Growth already do. */''}
-          <textarea class="inp" rows="3">${x.seedWhy || ''}</textarea></label>
-        <label class="f mt5"><span class="lbl">Strengths</span>
-          <textarea class="inp" rows="3">${x.seedStrength}</textarea></label>
-        <label class="f mt5"><span class="lbl">Growth areas</span>
-          <textarea class="inp" rows="3">${x.seedGrowth}</textarea></label>
-        <label class="f mt5"><span class="lbl">Anything else about ${first}</span>
-          <textarea class="inp" rows="3" placeholder="Optional — context the level, the reasoning and the growth areas don’t capture."></textarea></label>
+        <p class="t-body-02">Confirm the interview happened and the recording is clean. This is what releases your payout. TalentNext reads the transcript and sets ${first}'s level after that.</p>
+        <label class="f mt5"><span class="lbl">Anything to flag for the level decision <span class="t-desc">(optional)</span></span>
+          <textarea class="inp" rows="3" placeholder="Anything about the call TalentNext should know when it sets the level — a connection that dropped, an off-topic detour, context the transcript won’t carry. Optional."></textarea></label>
       </div>
     </section>
 
     <section class="sec">
-      <div class="btn-row"><button class="btn btn-p noic" data-confirm="sign">Send Evaluation</button></div>
+      <div class="btn-row"><button class="btn btn-p noic ic-l" data-confirm="sign">${I.checkFilled}Confirm Recording</button></div>
     </section>`;
   }
 
   return band() + `
     <section class="sec">
-      <div class="sec-h"><h2>What you set</h2></div>
+      ${/* THE OUTCOME — the agent did NOT set the level (client, 15 Sep 2026);
+            TalentNext did, from the transcript. "Signed" (the agent signing a
+            report) becomes "Recording confirmed", the deliverable that actually
+            released the payout. Follow-up and depth stay — they are the review
+            scores that feed the Agent Score (13.8). */''}
+      <div class="sec-h"><h2>The outcome</h2></div>
       ${kv([
-        ['Level', x.level],
-        ['Signed', x.signed],
+        ['Level set by TalentNext', x.level],
+        ['Recording confirmed', x.signed],
         ['Follow-up scored', x.follow],
         ['Depth scored', x.depth]])}
     </section>
 
-    ${/* THE TWO DOWNLOADS ARE ON THE HEADING ROW. They are two ways to open the
-          same subject the section names, which is what §73's action slot is for
-          — and as a `.btn-row mt5` under the paragraph they read as two things
-          to do about the sentence above them. `.aih-a` is a flex row, so the
-          pair sits in it unchanged. */''}
+    ${/* THE RECORDING — the transcript is the agent's to read; there is no report
+          the agent writes now. `.aih-a` is a flex row, so the one download sits
+          in it unchanged. */''}
     <section class="sec">
-      ${aiHead('Your report', `Signed ${x.signed} &middot; ${x.level}`,
-        `<button class="btn btn-g btn-sm noic">Read the report</button>
-         <button class="btn btn-g btn-sm ic-l">${I.download}Transcript</button>`)}
-      <p class="t-body-02">${x.n} came in at ${x.level} on the evidence of two projects rather than on how they described themselves. The growth areas are written against the same two examples, so the candidate can see where they came from.</p>
+      ${aiHead('The recording', `Confirmed ${x.signed} &middot; ${x.level}`,
+        `<button class="btn btn-g btn-sm ic-l" data-go="transcript" data-iv="${x.id}">${I.document}Transcript</button>`)}
+      <p class="t-body-02">${x.n}'s level was set by TalentNext at ${x.level} from the transcript. You ran the interview and confirmed the recording; the level decision and the write-up to the candidate sit with TalentNext.</p>
     </section>
 
     <section class="sec">
@@ -5317,8 +4923,72 @@ V.availability = v => head({
      `S.payModal` opens it, `S.payTab` picks the Card / US-bank state, and the
      Earnings page opens it from a button rather than showing the form inline. */
 
+/* THE PAYOUT DESTINATION (13.1) — ONE Stripe reference, not a card wallet. Shown
+   as Stripe describes it (bank + last four) with its STATE, and, when verified,
+   the date. Four states; `failed` shows Stripe's own reason. "Update payout
+   destination" hands the agent back to Stripe (the shared modal). A change
+   returns it to Pending while Stripe re-confirms, and the agent stays listed and
+   bookable. See DESIGN.md §3. */
+const DEST_STATE = {
+  verified: ['Verified', 'green', 'checkFilled'],
+  pending:  ['Pending',  'warn',  'time'],
+  failed:   ['Failed',   'red',   'error'],
+  none:     ['Not set up','quiet', 'wallet']
+};
+function payoutDest(d){
+  const s = DEST_STATE[d.state] || DEST_STATE.none;
+  const detail = d.state === 'verified' ? `Verified ${d.verified}`
+    : d.state === 'pending' ? 'Stripe has the details and has not confirmed them yet'
+    : d.state === 'failed'  ? d.reason
+    : 'No destination on file';
+  return `<div class="tile-stack">
+    <div class="cardrow">
+      <span class="cardrow-ic">${I.wallet}</span>
+      <span class="cardrow-b">
+        <span class="cardrow-t">${d.bank} &bull;&bull;&bull;&bull; ${d.last}</span>
+        <span class="cardrow-d"><span class="flag-t ${s[1]}">${I[s[2]]}${s[0]}</span> &middot; ${detail}</span>
+      </span>
+      <span class="cardrow-a"><button class="btn btn-g btn-sm noic" data-addcard="1">Update payout destination</button></span>
+    </div>
+  </div>
+  <p class="help">Shown as Stripe describes it. TalentNext never sees your account number. Changing it returns the destination to Pending until Stripe confirms, and you stay listed and bookable while it does.</p>`;
+}
+/* WHY AN AGENT IS OR IS NOT LISTED (13.1/13.9). Listed needs a verified payout
+   destination AND certification AND a written public profile. Either missing is
+   Not listed; the line names the missing piece so it is never a mystery. */
+function listingLine(v){
+  const destOk = v.paid && S.payout.state === 'verified';
+  const certOk = !!v.certified;
+  const bioOk  = v.listing !== false && !(v.cardGaps && v.cardGaps.includes('bio'));
+  if(destOk && certOk && bioOk) return `<span class="flag-t green">${I.checkFilled}Listed and bookable</span>`;
+  const missing = [];
+  if(!bioOk)  missing.push('a written public profile');
+  if(!destOk) missing.push('a verified payout destination');
+  if(!certOk) missing.push('certification');
+  return `<span class="flag-t warn">${I.warning}Not listed</span> <span class="t-desc">You are not in browse and cannot be booked until you have ${missing.join(' and ')}.</span>`;
+}
+
+/* THE FEE'S NET, SHOWN AS THE CALCULATION (13.9) — "You keep $68 of $85", the
+   platform share (20%) named. `feeNetText` builds the line off a number;
+   `feeNet` is the inline `oninput` twin that recomputes it live as the agent
+   types, writing straight to the DOM (no render, so the caret is not lost). A
+   non-numeric or empty value falls back to a prompt rather than showing NaN. */
+function feeNetText(fee){
+  const n = +fee;
+  if(!n) return 'Set your fee for a 45-minute interview.';
+  const keep = Math.round(n * 0.8);
+  return `You keep ${money(keep)} of ${money(n)}. TalentNext keeps 20%.`;
+}
+function feeNet(val){
+  const el = document.getElementById('feeNetLine');
+  if(el) el.textContent = feeNetText((val || '').replace(/[^0-9.]/g, ''));
+}
+
 V.earnings = v => {
   const connected = v.paid;
+  /* WHAT IS HOLDING UP THE PAY (13.7) — every interview held whose recording is
+     not confirmed, since that is what releases the escrow now. */
+  const owed = v.busy ? IVS.filter(x => x.st === 'report') : [];
   return head({title: 'Earnings',
     sub: connected ? `80/20 split &middot; ${money(v.share)} an interview &middot; ${money(v.escrow)} held for you`
                    : '80/20 split &middot; no destination connected',
@@ -5339,6 +5009,25 @@ V.earnings = v => {
       ['creditCard', 'Held for you', money(v.escrow), `of ${money(held(v))} in escrow`],
       ['video',      'Interviews', String(v.month),  `${v.ivs} in total`],
       ['receipt',    'Each',       money(v.share),   `80% of ${money(v.fee)}`]])}
+  </section>` : ''}
+
+  ${/* WHAT IS BLOCKING PAYMENT (13.7) — every held interview whose recording is
+        not confirmed, with the share waiting on it and a route to confirm. It
+        leads the ledger because it is the only thing on the page that is ON the
+        agent; when nothing is outstanding the panel drops. */''}
+  ${connected && owed.length ? `
+  <section class="sec">
+    <div class="sec-h"><h2>What’s holding up your pay</h2></div>
+    <div class="tile-stack">
+      ${owed.map(x => `<div class="cardrow">
+        <span class="cardrow-ic">${I.warning}</span>
+        <span class="cardrow-b">
+          <span class="cardrow-t">${x.n}</span>
+          <span class="cardrow-d">Interviewed ${x.day.replace(/^\w+ /, '')} &middot; ${money(v.share)} waiting on the recording</span>
+        </span>
+        <span class="cardrow-a"><button class="btn btn-p btn-sm noic" data-go="interview" data-iv="${x.id}">Confirm recording ${I.arrowRight}</button></span>
+      </div>`).join('')}
+    </div>
   </section>` : ''}
 
   ${/* THE ORDER IS WHAT AN AGENT OPENS THE PAGE FOR, and it used to be the
@@ -5399,41 +5088,23 @@ V.earnings = v => {
         "Where it goes" heading, because the picture carries its own title. Once
         connected, the section returns as the destination row. */''}
   ${connected ? `
+  ${/* THE PAYOUT DESTINATION (13.1) — ONE Stripe reference with its state and
+        verification date, not a card wallet. "Update payout destination" hands
+        the agent back to Stripe; the listing line below states whether the agent
+        is bookable and, if not, what is missing. */''}
   <section class="sec">
-    ${/* SAVED PAYOUT CARDS — a list, not a single row (Maryam, 7 Sep 2026: "show
-          2 more saved cards … also give add card button"). The candidate portal's
-          saved-cards pattern ported: a `.card-rad` radio picks the default (one of
-          the three), a `.pill-def` names it, and Remove is the row's own control.
-          "Add a card" leads with a plus in the heading row (§64), the same quiet
-          control the candidate's Payments uses. The Stripe handoff is gone with
-          the single row — the destinations are managed inline now. */''}
-    <div class="sec-h"><h2>Your Cards</h2>
-      <button class="btn btn-t btn-sm noic ic-l sec-h-act" data-addcard="1">${I.add}Add a card</button></div>
-    <div class="tile-stack">
-      ${S.payCards.map((c, i) => `<div class="cardrow">
-        <label class="rad card-rad" data-setdef="${i}" title="Make this your default payout card">
-          <input type="radio" name="paydef"${c.def ? ' checked' : ''}><span class="box"></span></label>
-        <span class="cardrow-ic">${I.wallet}</span>
-        <span class="cardrow-b">
-          <span class="cardrow-t">${c.brand} ending ${c.last}${c.def ? ' <span class="pill-def">Default</span>' : ''}</span>
-          <span class="cardrow-d">Expires ${c.exp}</span>
-        </span>
-        <span class="cardrow-a"><button class="lnk card-del danger" data-delcard="${i}">Remove</button></span>
-      </div>`).join('')}
-    </div>
-    ${/* THE "TALENTNEXT NEVER HOLDS YOUR CARD DETAILS…" LINE IS REMOVED (Maryam,
-          7 Sep 2026). The Stripe-custody reassurance is already made where a card
-          is actually added — the shared "Add Payment Method" modal is Stripe's own
-          form — so repeating it under the saved-cards list was a second statement
-          of a fact the add flow already carries. */''}
+    <div class="sec-h"><h2>Where you get paid</h2></div>
+    ${payoutDest(S.payout)}
+    <p class="t-body-02 mt5">${listingLine(v)}</p>
   </section>` : `
-  ${/* NO DESTINATION YET → a prompt and one button that opens the shared Stripe
-        modal (Maryam, 6 Sep 2026, "the same stripe images in the modal form").
-        The inline `paySetup` form is gone; adding a method is the modal now. */''}
+  ${/* NO DESTINATION (state None) → the gate. Nobody can be booked until a
+        destination exists; "Set up payouts" hands the agent to Stripe (the shared
+        modal). TalentNext never sees an account number. */''}
   <section class="sec sec-fill">
     <div class="empty">${I.wallet}<span class="t">No destination yet</span>
       <span class="help">Nobody can book you until there is somewhere to pay you. TalentNext hands you to Stripe and never sees an account number.</span>
-      <div class="btn-row"><button class="btn btn-p noic ic-l" data-addcard="1">${I.add}Add a payout method</button></div></div>
+      <div class="btn-row"><button class="btn btn-p noic ic-l" data-addcard="1">${I.add}Set up payouts</button></div>
+      <p class="t-body-02 mt5">${listingLine(v)}</p></div>
   </section>`}
   ${/* "HOW A FEE SPLITS" REMOVED (Maryam, 6 Sep 2026: "remove the how a fee
         splits section"). It was the §65 disclosure that closed the page with the
@@ -5724,9 +5395,13 @@ V.profile = v => head({title: 'Profile'}) + `
   <section class="sec">
     ${S.pfEdit === 'details' ? `
       <div class="sec-h"><h2>General details</h2>
+        ${/* SAVE ROUTES THROUGH A FEE-CHANGE CONFIRM (13.9). `data-feesave` reads
+              the live fee input: if it differs from the current fee it opens the
+              confirmation ("booked interviews keep the old fee") before it
+              commits; unchanged, it just closes the edit. Discard leaves. */''}
         <div class="pfe-acts sec-h-act">
           <button class="btn btn-t btn-sm danger pfe-discard" data-pfedit="">${I.delete} Discard Changes</button>
-          <button class="btn btn-p btn-sm noic" data-pfedit="">Save Changes ${I.check}</button>
+          <button class="btn btn-p btn-sm noic" data-feesave="1">Save Changes ${I.check}</button>
         </div>
       </div>
       <div class="idhead pfe-id">
@@ -5749,7 +5424,9 @@ V.profile = v => head({title: 'Profile'}) + `
               ("a new fee applies to new bookings, escrow settles at its booked
               rate") is where that consequence is spelt, and it stays there rather
               than repeating under every field. */''}
-        <label class="f"><span class="lbl">Interview fee</span><input class="inp" value="${money(v.fee)}"></label>
+        <label class="f"><span class="lbl">Interview fee</span>
+          <input class="inp" id="feeInput" value="${money(v.fee)}" oninput="feeNet(this.value)">
+          <span class="help" id="feeNetLine">${feeNetText(v.fee)}</span></label>
       </div>
       <label class="f mt5"><span class="lbl">About</span><textarea class="inp" rows="4">${PUB.about}</textarea></label>
     ` : `
@@ -5931,8 +5608,8 @@ V.profile = v => head({title: 'Profile'}) + `
     <label class="tg"><div class="tb"><b>A candidate books you</b>
       <span>As soon as a slot is taken, with the brief attached</span></div>
       <input type="checkbox" data-pfn="booking"${S.pfNotif.booking ? ' checked' : ''}><span class="sw"></span></label>
-    <label class="tg"><div class="tb"><b>A report is due</b>
-      <span>Once at the call, and again four hours before the 24 is up</span></div>
+    <label class="tg"><div class="tb"><b>A recording is waiting to confirm</b>
+      <span>After a call, so your pay is not held up on it</span></div>
       <input type="checkbox" data-pfn="report"${S.pfNotif.report ? ' checked' : ''}><span class="sw"></span></label>
     <label class="tg"><div class="tb"><b>Money settles</b>
       <span>When escrow releases and when a payout lands</span></div>
@@ -6096,11 +5773,11 @@ const AGENT_NOTIF = {
        requests while any are open and to the diary once none are — which is the
        one place in the product where that default is doing the work it was
        written for rather than being overridden. */
-    {ic:'calendar',   t:'Nadia Brenner asked for Friday',  b:'21 August at 5:00 PM, and two more requests came in yesterday.',                       w:'2h ago',     go:'interviews',             unread:1},
-    {ic:'warning',    t:'Sofia Marek’s report is due',     b:'6:00 PM today. Tal has a draft off the transcript waiting for your edit.',                w:'2h ago',     go:'interview', iv:'sofia',  unread:1},
-    {ic:'calendar',   t:'Rafael Ortiz booked you',         b:'Thursday 20 August at 3:00 PM, and you accepted it the same afternoon.',                w:'5h ago',     go:'interview', iv:'rafael', unread:1},
+    {ic:'calendar',   t:'Nadia Brenner booked you',        b:'Friday 21 August at 5:00 PM, straight off one of your open slots.',                     w:'2h ago',     go:'interviews',             unread:1},
+    {ic:'warning',    t:'Sofia Marek’s recording is waiting',b:'Confirm it is clean to release her pay. Tal has a read off the transcript.',            w:'2h ago',     go:'interview', iv:'sofia',  unread:1},
+    {ic:'calendar',   t:'Rafael Ortiz booked you',         b:'Thursday 20 August at 3:00 PM. It is in your diary.',                                   w:'5h ago',     go:'interview', iv:'rafael', unread:1},
     {ic:'calendar',   t:'Amara Osei booked a re-interview',b:'Monday 24 August at 6:00 PM. Her 90-day summary is on the brief.',                     w:'Yesterday',  go:'interview', iv:'amara',  unread:1},
-    {ic:'wallet',     t:'Tom Whelan’s $68 releases Thursday',b:'Three working days after his report went out. $204 is held for you in total.',             w:'Yesterday',  go:'earnings',    unread:0},
+    {ic:'wallet',     t:'Tom Whelan’s $68 releases Thursday',b:'Three working days after you confirmed his recording. $204 is held for you in total.',    w:'Yesterday',  go:'earnings',    unread:0},
     {ic:'star',       t:'Nina Haddad rated the interview', b:'4.3 on follow-up and 4.7 on depth. Signed at Explorer – E4 on 15 August.',                w:'3 days ago', go:'standing',    unread:0}
   ],
   reviewed:[
@@ -6131,7 +5808,8 @@ function notifPanel(){
       </button>`;
     }).join('');
   const today = rows('today'), earlier = rows('earlier');
-  return `<div class="notif ${S.notif ? 'on' : ''}">
+  return `<div class="notif-scrim ${S.notif ? 'on' : ''}" data-toggle="notif" aria-hidden="true"></div>
+  <div class="notif ${S.notif ? 'on' : ''}">
     <div class="notif-h">
       <h2>Notifications</h2>
       ${unreadCount() ? `<button class="notif-all" data-readall="1">Mark all read</button>` : ''}
@@ -6546,12 +6224,17 @@ const CONFIRMS = {
      is `misuse` (the close/remove glyph the candidate's delete wears), not the
      generic warning. Copy matches the candidate's Closing your account block. */
   delacct: ['Delete your account?', 'This removes your profile, your notes and your interview recordings. Certificates you have already earned stay valid and stay downloadable. This cannot be undone.', 'Delete my account', CAND_DOC + '#signup/login', 'misuse'],
-  sign:   ['Send evaluation?', 'The level goes to the candidate as soon as you send this, and a change afterwards is a review decision.', 'Send evaluation', null, 'warning'],
+  sign:   ['Confirm the recording?', 'This confirms the interview happened and the recording is clean. It releases your payout after the three working days, and hands Tal’s read to TalentNext to set the level. It cannot be undone.', 'Confirm recording', null, 'checkFilled'],
   /* CLOSING A SLOT IS CONFIRMED, because it is the one thing on the Availability
      page that takes away something a candidate may be looking at right now. It
      is reversible — you can open the same time again — but not by undo, so it
      takes the same gate as signing. */
-  closeSlot: ['Close this slot?', 'It comes out of browse straight away. Nobody can book it, and you can open the same time again whenever you like.', 'Close it', null, 'warning']
+  closeSlot: ['Close this slot?', 'It comes out of browse straight away. Nobody can book it, and you can open the same time again whenever you like.', 'Close it', null, 'warning'],
+  /* CHANGE YOUR FEE (13.9). A fee change applies to NEW bookings only; anything
+     already in escrow settles at the rate it was booked at. The OK button carries
+     `data-feedone` (not the generic close) so it clears both the confirm and the
+     edit form; Cancel closes the prompt and keeps the edit. */
+  feechange: ['Change your fee?', 'Interviews already in escrow keep the rate they were booked at. Your new fee applies only to bookings made after this.', 'Change fee', null, 'warning']
 };
 /* THE CONFIRM DIALOG IS THE DESIGN SYSTEM'S `.conf`, NOT A PLAIN `.sheet`
    (Maryam, 7 Sep 2026: "the ui of logout modal should be more like the inspo" —
@@ -6579,7 +6262,10 @@ function confirmSheet(){
               and leaves. The stage branch is written above the close branch for
               exactly this — a second control would be a second thing to keep in
               step with the first. */''}
-        <button class="btn btn-p noic"${c && c[3] && c[3].includes('.html') ? ` data-portal="${c[3]}"` : ` data-close="confirm"${c && c[3] ? ` data-stage="${c[3]}"` : ''}`}>${c ? c[2] : ''}</button>
+        ${/* THE FEE-CHANGE OK CARRIES `data-feedone`, which clears the confirm AND
+              the edit form in one branch; every other confirm keeps the generic
+              close/stage/portal wiring. */''}
+        <button class="btn btn-p noic"${S.confirm === 'feechange' ? ' data-feedone="1"' : (c && c[3] && c[3].includes('.html') ? ` data-portal="${c[3]}"` : ` data-close="confirm"${c && c[3] ? ` data-stage="${c[3]}"` : ''}`)}>${c ? c[2] : ''}</button>
       </div>
     </div>
   </div>`;
@@ -6616,6 +6302,13 @@ const SLOT_TIMES = (() => {
   }
   return out;
 })();
+/* CANCEL-AN-INTERVIEW REASONS (13.5). No option is pre-selected, so the list
+   opens on a placeholder the picker cannot leave you no-wiser than — "Choose a
+   reason" reads back on the trigger until a real reason is picked. "Other" is the
+   one that makes the free-text note mandatory. The reason is shown to the
+   candidate in general terms; the note is internal. */
+const CANCEL_REASONS = ['Choose a reason', 'Unwell', 'Emergency', 'Double booked',
+  'Candidate asked me to', 'Other'];
 function dd(key, opts, val, cfg){
   cfg = cfg || {};
   const open = S.dd === key, cur = val || opts[0];
@@ -6635,24 +6328,12 @@ function dd(key, opts, val, cfg){
   </div>`;
 }
 
-/* THE FIFTEEN-RUNG LEVEL LADDER, AS A PICKER (§124, agent portal). The candidate
-   portal's `ladder()` DRAWS the fifteen levels as a read-only bar; the agent SETS
-   one, so this is the interactive twin: E1–T5 as blocks, filled up to the pick,
-   the pick itself a shade deeper, Tal's suggestion flagged "Tal recommends" above
-   its rung. `sel`/`rec` are level CODES ("E3"); `data-lvlset` writes the code to
-   `S.evalForm.level`. The codes are the same `['E','B','T'] × 1..5` the candidate
-   portal's `LVL_CODES` builds, restated here because this file parses on its own. */
-const LVL_LADDER = ['E', 'B', 'T'].flatMap(t => [1, 2, 3, 4, 5].map(n => t + n));
-function levelPicker(sel, rec){
-  const si = LVL_LADDER.indexOf(sel), ri = LVL_LADDER.indexOf(rec);
-  return `<div class="lvlpick">
-    <div class="lvl-lad">
-      ${LVL_LADDER.map((c, i) => `<button type="button" class="lvl-blk${i < si ? ' done' : ''}${i === si ? ' on' : ''}" data-lvlset="${c}" aria-pressed="${i === si}" aria-label="Level ${c}${i === ri ? ', Tal recommends' : ''}">
-        ${i === ri ? `<span class="lvl-rec">Tal recommends</span>` : ''}<b>${c}</b></button>`).join('')}
-    </div>
-    <div class="lvl-lab"><span>Explorer</span><span>Builder</span><span>Trailblazer</span></div>
-  </div>`;
-}
+/* THE FIFTEEN-RUNG LEVEL PICKER WAS HERE AND IS GONE (client, 15 Sep 2026). The
+   agent no longer SETS the level — TalentNext does, admin-side, after analysis —
+   so `LVL_LADDER`, `levelPicker`, `S.evalForm` and the `data-lvlset` router branch
+   were removed with it. The candidate portal keeps its read-only `ladder()`; the
+   admin/moderator build is where a picker like this now belongs. See DESIGN.md §3
+   "Talent Agent — V1 model". */
 
 const SHEETS = {
   listing: ['Your public profile', () => {
@@ -6701,7 +6382,35 @@ const SHEETS = {
   brief: ['A note to yourself', `
     <label class="f"><span class="lbl">Note</span>
       <textarea class="inp" rows="3" placeholder="Only you and Tal can see this"></textarea></label>
-    <p class="help">Kept with the brief and never sent to the candidate.</p>`]
+    <p class="help">Kept with the brief and never sent to the candidate.</p>`],
+  /* CANCEL AN INTERVIEW — 13.5, client 15 Sep 2026. This is the panel: the call's
+     facts read-only, how long until it starts (the closer it is, the more it
+     costs the candidate), a reason (mandatory, none pre-selected) and an internal
+     note. The 24-hour warning shows inline when the call is within a day. The
+     footer's "Cancel interview" is the commit (a prototype, so it closes); the
+     refund and the late-cancel consequence are stated here so the panel doubles as
+     the confirmation. `S.iv` is the interview; `S.slotForm.cancelreason` holds the
+     picked reason. See DESIGN.md §3 "Talent Agent — V1 model". */
+  cancel: ['Cancel this interview', () => {
+    const x = iv(S.iv), first = x.n.split(' ')[0];
+    const s = slotForIv(x.id), out = s ? daysOut(s) : null;
+    const within = out !== null && out <= 1;
+    const when = out === 0 ? 'today' : out === 1 ? 'tomorrow' : out === null ? 'soon' : `in ${out} days`;
+    const frm = S.slotForm || {};
+    const isOther = frm.cancelreason === 'Other';
+    return `
+    ${kv([
+      ['Candidate', x.n],
+      ['When', `${x.day.replace(/^\w+ /, '')} &middot; ${x.time}`],
+      ['Kind', x.kind],
+      ['Starts', when === 'soon' ? 'Soon' : `Starts ${when}`]])}
+    ${within ? `<p class="t-body-02 cancel-warn"><b>This is less than 24 hours away.</b> Late cancellations are counted against you and are seen at your review.</p>` : ''}
+    <label class="f mt5"><span class="lbl">Reason</span>
+      ${dd('cancelreason', CANCEL_REASONS, frm.cancelreason || CANCEL_REASONS[0])}</label>
+    <label class="f mt5"><span class="lbl">Anything else${isOther ? '' : ' <span class="t-desc">(optional)</span>'}</span>
+      <textarea class="inp" rows="3" placeholder="Only TalentNext sees this. The candidate is told the reason in general terms only."></textarea></label>
+    <p class="help">${first} is refunded in full and told straight away, and the slot reopens so someone else can take the time.</p>`;
+  }, 'Cancel interview']
   /* `profile: ['Your details', …]` WAS HERE AND IS GONE (Maryam, 7 Sep 2026:
      "let the user edit on the same screen instead in the modal"). Details are
      edited in place on My Profile now (`S.pfEdit === 'details'`), so this modal
@@ -6715,14 +6424,19 @@ function editSheet(){
      open dropdown escape its scroll and overlay the footer (§123.4) — set only
      while `S.dd` is truthy, which is only ever the slot sheet. */
   const saveLabel = (s && s[2]) ? s[2] : 'Save';
+  /* THE CANCEL-INTERVIEW SHEET (13.5) TAKES A DANGER PRIMARY AND A "Keep the
+     interview" SECONDARY, because both footer buttons are answers to "cancel
+     it?", and a plain "Cancel" beside "Cancel interview" would read as two ways
+     to do the same thing. Every other sheet keeps the Cancel / Save pair. */
+  const isCancel = S.sheet === 'cancel';
   return `<div class="modal ${S.sheet ? 'on' : ''}" data-close="sheet">
     <div class="sheet">
       <div class="sheet-h"><h2>${s ? s[0] : ''}</h2>
         <button class="x" data-close="sheet" aria-label="Close">${I.close}</button></div>
       <div class="sheet-b${S.dd ? ' dd-open' : ''}">${s ? (typeof s[1] === 'function' ? s[1]() : s[1]) : ''}</div>
       <div class="sheet-f">
-        <button class="btn btn-s noic" data-close="sheet">Cancel</button>
-        <button class="btn btn-p noic" data-close="sheet">${saveLabel}</button>
+        <button class="btn btn-s noic" data-close="sheet">${isCancel ? 'Keep the interview' : 'Cancel'}</button>
+        <button class="btn ${isCancel ? 'btn-p danger' : 'btn-p'} noic" data-close="sheet">${saveLabel}</button>
       </div>
     </div>
   </div>`;
@@ -7014,7 +6728,7 @@ function readHash(){
   if(p[2] && IVS.some(x => x.id === p[2])) S.iv = p[2];
   /* and the interviews tab, the mirror of `writeHash`'s third segment — so a
      reload lands on the tab you were reading, not the boot default */
-  if(p[1] === 'interviews' && ['req', 'next', 'eval', 'done'].includes(p[2])) S.tab = p[2];
+  if(p[1] === 'interviews' && ['next', 'eval', 'done'].includes(p[2])) S.tab = p[2];
   return true;
 }
 
@@ -7140,7 +6854,7 @@ device.addEventListener('click', e => {
      for it is written, the markup carries the attribute, and the click never
      reaches either because `closest` was not looking for it. `data-peek` cost
      exactly that. */
-  const t = e.target.closest('[data-go],[data-stage],[data-portal],[data-toggle],[data-close],[data-tab],[data-pftab],[data-pfedit],[data-pfpw],[data-specdel],[data-specadd],[data-specaddopen],[data-specaddclose],[data-specdiscard],[data-req],[data-confirm],[data-sheet],[data-peek],[data-readall],[data-cal],[data-calview],[data-cal-nav],[data-cal-today],[data-cal-day],[data-ddtoggle],[data-ddset],[data-lvlset],[data-txf],[data-paytab],[data-addcard],[data-setdef],[data-delcard],[data-payclose]');
+  const t = e.target.closest('[data-go],[data-stage],[data-portal],[data-toggle],[data-close],[data-tab],[data-pftab],[data-pfedit],[data-pfpw],[data-specdel],[data-specadd],[data-specaddopen],[data-specaddclose],[data-specdiscard],[data-req],[data-confirm],[data-sheet],[data-peek],[data-readall],[data-cal],[data-calview],[data-cal-nav],[data-cal-today],[data-cal-day],[data-ddtoggle],[data-ddset],[data-txf],[data-feesave],[data-feedone],[data-paytab],[data-addcard],[data-setdef],[data-delcard],[data-payclose]');
 
   /* A CLICK OUTSIDE THE ACCOUNT MENU SHUTS IT, AND IT IS ANSWERED BEFORE THE
      GUARD ABOVE RETURNS — that is the whole reason this sits here rather than
@@ -7249,6 +6963,17 @@ device.addEventListener('click', e => {
   if(d.toggle === 'tal'){ return S.tal ? askClose() : askOpen(); }
   if(d.toggle){ S[d.toggle] = !S[d.toggle]; return render(); }
   if(d.confirm){ S.confirm = d.confirm; return render(); }
+  /* SAVING THE GENERAL FORM ROUTES THROUGH THE FEE-CHANGE CONFIRM (13.9). Read the
+     live fee input: if it differs from the current fee, open the confirmation;
+     otherwise just close the edit. `feedone` is the confirm's OK — it clears both
+     the confirm and the edit. A non-numeric/empty fee is treated as unchanged. */
+  if(d.feesave !== undefined){
+    const el = document.getElementById('feeInput');
+    const cur = el ? +el.value.replace(/[^0-9.]/g, '') : 0;
+    if(cur && cur !== f().fee){ S.confirm = 'feechange'; return render(); }
+    S.pfEdit = null; return render();
+  }
+  if(d.feedone !== undefined){ S.confirm = false; S.pfEdit = null; return render(); }
   if(d.sheet){
     S.sheet = d.sheet; S.dd = null;
     /* THE ADD-SLOT SHEET OPENS ON A FRESH FORM. Defaults match the reference —
@@ -7306,10 +7031,8 @@ device.addEventListener('click', e => {
     S.dd = null;
     return render();
   }
-  /* THE LEVEL LADDER (§124). A rung is picked; the code goes into `S.evalForm`,
-     its own form so it never touches the add-slot state. Re-render fills the
-     ladder up to the new pick and moves the deeper block. */
-  if(d.lvlset !== undefined){ S.evalForm = Object.assign({}, S.evalForm, {level: d.lvlset}); return render(); }
+  /* THE LEVEL LADDER BRANCH IS GONE (client, 15 Sep 2026) — the agent no longer
+     sets the level, so there is no `data-lvlset` to handle. See DESIGN.md §3. */
   /* THE TRANSCRIPT'S TOPIC FILTER (§124). One chip on at a time; the search box
      is separate (the input listener below). */
   if(d.txf !== undefined){ S.txf = d.txf; return render(); }
@@ -7460,7 +7183,10 @@ device.addEventListener('click', e => {
        way out) still short-circuits there. A third card wanting the requests
        tab writes `data-tab="req"`; one wanting whatever is waiting writes no
        tab at all. */
-    if(d.go === 'interviews') S.tab = d.tab || (reqOpen().length ? 'req' : 'next');
+    /* NO 'req' DEFAULT (client, 15 Sep 2026): the Requests tab is gone, so a
+       `go:"interviews"` with no `data-tab` lands on Upcoming. `req` records still
+       exist in `IVS` (flagged, unused) but no tab reads them. */
+    if(d.go === 'interviews') S.tab = d.tab || 'next';
     render();
     device.querySelector('.main').scrollTop = 0;
   }

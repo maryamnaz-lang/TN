@@ -1053,6 +1053,13 @@ LAYERS = [
     # (report, cohort, course), but a plain feedback block any portal can reuse,
     # so it ships rather than being held back.
     '130-review.css',
+    # TEMPORARY — the UI trial (§131). In this list rather than NOT_IN_DS for
+    # §83's exact reason: `tmp` is on EXCLUDE_PREFIXES and every selector carries
+    # `.tmp-accent`, so `keep_selector` drops all of it by name and the output is
+    # unchanged either way — but listing it keeps `check_coverage()` honest, so a
+    # deliberately-dropped layer stays distinguishable from one nobody thought
+    # about. Delete this entry with the file and `build.py`'s LAYERS entry.
+    '131-tmpui.css',
 ]
 
 # ==========================================================================
@@ -1950,6 +1957,8 @@ DS_TABLES = [
     ('RUNG',       'data.js'),    # level code -> rung index
     ('BDG',        'data.js'),    # the badge ladder
     ('RANKS',      'data.js'),    # rank names
+    ('SPLIT',      'data.js'),    # stack-chart segment proportions (segsOf)
+    ('SERIES',     'data.js'),    # stack-chart category labels + data-viz colours
 ]
 
 # Already in `talentnext-ds.js`, so a builder may reference these freely.
@@ -1970,6 +1979,21 @@ DS_RENAME = {
     # the shared Stripe "Add Payment Method" modal (§payForm). A pure function
     # of (tab, open) over `PAY_ART` — the agent and admin portals open it.
     'payForm': 'dsPayForm',
+    # the interview-scenes carousel (§pfScenes was the caller). `scenesCarousel`
+    # is a pure function of (title, scenes, opts); `scvScroll` is its chevron
+    # handler, pure DOM, wired by a portal's own click router on `[data-scv]`.
+    'scenesCarousel': 'dsScenes', 'scvScroll': 'dsScvScroll',
+    # BACKLOG ROUND 1 (14 Sep 2026) — pure, self-contained components pulled out
+    # of the coverage backlog so a screenshot of them reproduces exactly.
+    'quickActions': 'dsQuickActions',   # the .qa-c row (takes the cards array)
+    'scoreCard': 'dsScoreCard',         # the points/rank card (nextBadge+RANKS+AWARD)
+    'tw': 'dsTw', 'twIc': 'dsTwIc', 'twBtn': 'dsTwBtn', 'twChips': 'dsTwChips',
+    # BACKLOG ROUND 2 — the candidate charts, pure functions of (id, opts).
+    'barChart': 'dsBarChart', 'lineChart': 'dsLineChart',
+    'stackChart': 'dsStackChart', 'segsOf': 'dsSegsOf',
+    # BACKLOG ROUND 3 — the marketplace agent card, split to a pure builder.
+    # `talStar` is its "Ask Tal" button, reusable on its own.
+    'agentCardOf': 'dsAgentCard', 'talStar': 'dsTalStar',
     # helpers the above reach for
     'joinLive': 'dsJoinLive', 'joinShut': 'dsJoinShut',
     'joinClock': 'dsJoinClock', 'nextBadge': 'dsNextBadge',
@@ -1985,6 +2009,10 @@ DS_BUILDERS = [
     'phSub', 'ph', 'avatar', 'stars', 'statCell', 'gcard', 'foundHead',
     'aiHead', 'stepIcon', 'stepper', 'rungOf', 'ladder', 'nextBadge',
     'standRow', 'joinClock', 'joinLive', 'joinShut', 'crow', 'payForm',
+    'scenesCarousel', 'scvScroll',
+    'twIc', 'tw', 'twBtn', 'twChips', 'quickActions', 'scoreCard',
+    'segsOf', 'barChart', 'lineChart', 'stackChart',
+    'talStar', 'agentCardOf',
 ]
 
 # THE TWO THAT NEEDED AN ARGUMENT, AND WHY EACH IS ONE LINE.
@@ -2025,6 +2053,10 @@ DS_PATCH = {
              # Rendering is unchanged wherever `second` is present — and
              # `{second:false}` was already the way to draw the row without it.
              (r'\bc\.second\.', '(c.second||{}).')],
+    # `quickActions` falls back to the candidate portal's own `QA_NEW` default
+    # deck when called with no argument. That default is content, not a table, so
+    # the DS version drops it — a hand-authored portal always passes its own cards.
+    'quickActions': [(r'cards \|\| QA_NEW', 'cards || []')],
 }
 
 
@@ -2236,6 +2268,62 @@ def js_decl(text, name):
                 return text[start:i + 1]
         i += 1
     return None
+
+
+# ==========================================================================
+# COMPONENT COVERAGE — "can a screenshot of this be reproduced EXACTLY?"
+#
+# THE PORTAL-LEVEL QUESTION, answered every build. A component reproduces
+# exactly on another portal ONLY when BOTH halves ship: its CSS (automatic, via
+# the layers) AND its MARKUP (a `ds*` builder in `DS_BUILDERS`/authored). This is
+# the parallel of `check_coverage()`'s layer check, one level up: it names every
+# reusable component and says whether its markup ships yet.
+#
+# THREE STATES, and a component is in exactly one:
+#   SHIPPED    — a `ds*` builder exists; hand a portal a screenshot and it is
+#                reproduced by calling the builder. Derived from `emitted`.
+#   BACKLOG    — a reusable component whose markup is still only inside the
+#                candidate portal's views.js. A screenshot of THIS still means
+#                hand-written markup, which drifts. Each needs a one-time port:
+#                split to a pure builder if it reads `S`, add to `DS_BUILDERS`,
+#                add a `gallery.html` recipe. THIS LIST IS THE WORK QUEUE.
+#   STATEFUL   — reusable in principle but the builder cannot ship until it is
+#                split from portal state (the `dsTypeSummary`/`pfScenes` move).
+#
+# It is a REPORT, never a build failure — a missing port is a backlog item, not
+# a broken stylesheet. Move a name out of BACKLOG the moment its builder ships.
+COMPONENT_BACKLOG = {
+    'reviewCard':   'the rating capsule/card (course, leader, agent) — reads S.rev*, split first',
+    'enrolOffer':   'the enrolment black card + eo-facts — reads the offer/agent, args it',
+    'pulseCard':    'the learning-pulse figure card + pulseCols',
+    'journey':      'the .jrn journey list (+ jrnList) that rides the head band',
+    'certBanner':   'the certification banner .certban (+ certHero / certGrid)',
+    'dd':           'the custom dropdown (.dd / .dd-menu) — reads S.dd, args it',
+    'cardPicker':   'the saved-cards payment picker — reads S.cards/S.payWith, args it',
+}
+COMPONENT_STATEFUL = {
+    # these are page assemblies, not components a screenshot asks for — listed so
+    # nobody mistakes them for a missing port.
+    'render':   'the renderer, not a component',
+    'photoSheet': 'the photo picker modal — reads S heavily; a portal opens its own',
+}
+
+
+def check_component_coverage(emitted):
+    """Print the SHIPPED / BACKLOG split so the reuse gap is visible every build.
+
+    A report, not a gate: it never changes the exit code. It answers the one
+    question a portal author actually has — "if I hand this a screenshot, will it
+    come out exactly?" — with a number and a named backlog.
+    """
+    shipped = sorted(e for e in emitted if e.startswith('ds'))
+    print(f'component coverage: {len(shipped)} components ship as builders '
+          f'(screenshot -> exact); {len(COMPONENT_BACKLOG)} in the backlog '
+          f'(still hand-written, will drift)')
+    if COMPONENT_BACKLOG:
+        print('  BACKLOG — port each to a ds* builder + a gallery recipe:')
+        for name, note in COMPONENT_BACKLOG.items():
+            print(f'    {name:14s} {note}')
 
 
 def build_builders():
@@ -3116,6 +3204,7 @@ function dsQuizRose(dims, score){
     print(f'markup builders: {len(emitted)} emitted '
           f'({sum(1 for e in emitted if e.startswith("ds"))} ds* functions, '
           f'{sum(1 for e in emitted if not e.startswith("ds"))} tables)')
+    check_component_coverage(emitted)
     print(f'{jsout.name}  {len(body)/1024:.0f} KB')
 
     # ======================================================================

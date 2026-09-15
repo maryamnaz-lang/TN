@@ -296,8 +296,16 @@ function callOpen(kind){
   render();
 }
 function callLeave(){
+  const kind = S.call && S.call.kind;
   callStop();
   S.call = null;
+  /* LEAVING THE LEVEL INTERVIEW ADVANCES THE JOURNEY TO `held` (17.1, Maryam,
+     15 Sep 2026). The call happened, so the reader does not return to the
+     "Interview booked" page — they land on the 24-hour wait for the report.
+     Scoped to the first interview (`kind==='iv'` from the `booked` stage); the
+     cohort call and the re-interview keep their existing paths. `setStage` is
+     the wrapped version by the time this runs, and it renders. */
+  if(kind === 'iv' && S.stage === 'booked'){ setStage('held'); return; }
   render();
 }
 

@@ -39,6 +39,15 @@ const STAGES = [
   ['consult', 'Consultant call',       'Account created and a 15-minute screening call booked. Quiz result carried over; no level and no agent interview yet.'],
   ['new',     'Just joined',           'Quiz result carried over. Nothing booked. Navigation at its smallest, four items.'],
   ['booked',  'Interview booked',      'Waiting for the interview, with preparation offered.'],
+  /* THE 24 HOURS AFTER THE CALL — interview held, report not yet signed (17.1,
+     Maryam, 15 Sep 2026). Leaving the level-interview call lands here rather
+     than dropping back to the booked page (ai10 `callLeave`); the dashboard,
+     Interviews and My Level all say a report is on its way, and there is no
+     route to the agent. It is `early` nav like `booked` and carries no level,
+     because the level is set the moment the agent signs — which is the next
+     stage, `assessed`. Scoped to the FIRST interview; the re-interview keeps
+     its existing path to `promoted`. */
+  ['held',    'Interview held, report pending','The call happened. The agent has 24 hours to sign the report; no level yet.'],
   ['assessed','Levelled, not enrolled','Report signed, level confirmed at E3. Enroll appears in the nav.'],
   ['week1',   'Week 1',                'Cohort 41 has started. Full navigation, eight items. Nothing done yet.'],
   ['day34',   'Day 34',                'Mid-course. Chapter 4 has stalled and one task is overdue.'],
@@ -170,6 +179,11 @@ const CFG = {
   consult: {nav:'early',  track:'Explorer', pred:true,  booked:false},
   new:     {nav:'early',  track:'Explorer', pred:true,  booked:false},
   booked:  {nav:'early',  track:'Explorer', pred:true,  booked:true},
+  /* interview held, report pending — `pred:true` still, because no level exists
+     until the agent signs (that is `assessed`). `held:true` is the flag the
+     three surfaces read; `booked:true` keeps the appointment "real" for any
+     shared reader. See the `held` row in STAGES for the argument. */
+  held:    {nav:'early',  track:'Explorer', pred:true,  booked:true, held:true},
   assessed:{nav:'assessed',track:'Explorer',level:'E3',pred:false},
   week1:   {nav:'full',   track:'Explorer', level:'E3', pred:false, enrolled:true, day:4,  week:1,  done:0,  open:0, avg:null, mins:0},
   day34:   {nav:'full',   track:'Explorer', level:'E3', pred:false, enrolled:true, day:34, week:5,  done:5,  open:3, avg:75,   mins:260},
@@ -181,6 +195,25 @@ const CFG = {
 };
 
 const CFG_BASE = {track:'Explorer', level:'E3', pred:true, day:1, week:1, done:0, open:0, avg:null, mins:0};
+
+/* ==========================================================================
+   FIRST-INTERVIEW PRICING IS A DEFAULT, NOT A HARDCODED "FREE" BRANCH
+   (Maryam + client, 15 Sep 2026.)
+
+   The client's decision: keep the FIRST interview complimentary for now, and
+   charge on the re-interview after a cohort — and keep the ability to charge
+   for the first interview later "once the system has more value behind it".
+   So this is one flag and one helper rather than a special-cased free path:
+   flip `IV_FIRST_FREE` to false and every first-interview surface charges the
+   agent's own fee again, with no other edit. `ivFee(isRe)` is the one place the
+   fee is decided; `isRe` is `!!cfg(S.stage).reinterview` (true only on day 90).
+   the call site renders "Complimentary" when it is not charged and the agent's
+   `a.price` when it is. */
+const IV_FIRST_FREE = true;
+const ivCharged = isRe => isRe || !IV_FIRST_FREE;   /* true = this interview is charged */
+/* the fee label a booking surface shows: the agent's price when charged, else
+   the complimentary word. `price` is `a.price` ($95 for Priya). */
+const ivFeeLabel = (isRe, price) => ivCharged(isRe) ? price : 'Complimentary';
 
 
 /* ==========================================================================
@@ -282,6 +315,13 @@ const NOTIF = {
     {ic:'calendar', t:'Interview confirmed',          b:'Priya Nair, Thursday, August 20 at 6:30 PM ET.',                 w:'1h ago', go:'interviews', unread:1},
     {ic:'email',    t:'Calendar invite sent',         b:'Check maryam.naz@tkxel.io for the joining link.',               w:'1h ago', go:'interviews', unread:1},
     {ic:'creditCard',t:'Payment received',            b:'$95 for your interview. Receipt in Payments.',                 w:'Yesterday', go:'billing',  unread:0}
+  ],
+  /* the wait — the call is done, the report is not. Nothing here asks the
+     candidate to do anything; the bell reports the state. */
+  held:[
+    {ic:'checkFilled',t:'Interview complete',         b:'Priya is writing up your report. It will be ready within 24 hours.', w:'Just now', go:'interviews', unread:1},
+    {ic:'document', t:'Your report is on its way',     b:'You will be told the moment Priya signs it. There is nothing to do.', w:'Just now', go:'level',     unread:1},
+    {ic:'video',    t:'Interview recorded',            b:'The recording and transcript are what your report is built from.',    w:'Just now', go:'interviews', unread:0}
   ],
   assessed:[
     {ic:'document', t:'Your report is ready',         b:'Priya confirmed you at Explorer – E3 and signed it off.',      w:'3h ago', go:'report',     unread:1},

@@ -325,6 +325,15 @@
 
   --text-primary:#111111;
   --text-secondary:#828282;
+  /* THE TAL SUMMARY DESCRIPTION IS ONE STEP DARKER THAN A PLAIN DESCRIPTION —
+     Maryam, 15 Sep 2026, platform-wide ("the tal summary desc needs to be a
+     little darker than what it is right now"). Every other description reads
+     --text-secondary #828282 (§63 §1); Tal's page-summary body took the same
+     grey (§33). It now takes this darker neutral step so the summary reads a
+     touch more present than the supporting lines under a section heading, while
+     still sitting behind the primary ink and its own <b> accent phrases. Only
+     the head-band summary body (§33) reads it; no other description moves. */
+  --tal-sum-desc:#6b6b6b;
   --text-helper:#666563;
   --text-placeholder:#a9a8a5;
   --text-disabled:#a9a8a5;

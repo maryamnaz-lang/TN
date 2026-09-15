@@ -240,6 +240,36 @@
   content:'';position:absolute;right:4px;bottom:4px;width:14px;height:14px;
   background:var(--accent)}
 
+/* PROFILE-PHOTO PICKER — the two-tab modal (Maryam, 14 Sep 2026: "there should
+   be tabs inside 'Profile Image' and 'Avatar'"). The `.cs` strip is the one line
+   under the title, so the sheet header drops its own inset divider; the two tabs
+   split the width evenly. Profile Image centres the current 120px photo (or, once
+   Removed, the `image` placeholder disc) over a CENTRED Upload / Remove row, each
+   with its mark LEADING the label. Avatar is the ten supplied discs at five per
+   row — two rows — reusing `.photopick`'s frame and `.on` selection ring. */
+.photo-sheet .sheet-h::after{content:none}
+.app .photo-cs{flex:none}
+/* (0,3,1) so it beats §15's `.app .cs button{flex:none}` (0,2,1), which lands in
+   a LATER layer — equal specificity there would lose on order. */
+.app .cs.photo-cs button{flex:1;text-align:center;padding:0 var(--s04)}
+.app .cs.photo-cs button:last-child{border-right:0}
+/* BOTH TABS ARE THE SAME HEIGHT so the modal does not resize when you switch
+   (Maryam, 14 Sep 2026: "keeping the same height for both tab views"). The body
+   holds a min-height and centres each pane in it; the enlarged 160px photo sets
+   the floor, and the shorter avatar grid centres in the same box. It still
+   scrolls if a narrow phone cannot fit it (`overflow-y:auto` on `.sheet-b`). */
+.photo-sheet .sheet-b{min-height:288px;
+  display:flex;flex-direction:column;justify-content:center}
+.photopane{display:flex;flex-direction:column;align-items:center;
+  gap:var(--s06)}
+.photo-acts{justify-content:center}
+.photo-up{cursor:pointer}
+.photo-ph{width:160px;height:160px;border-radius:999px;
+  display:grid;place-items:center;
+  background:var(--surface-2);border:1px solid var(--rule)}
+.photo-ph svg{width:56px;height:56px;fill:var(--border-strong-01)}
+.photogrid.avgrid{grid-template-columns:repeat(5,1fr);width:100%}
+
 /* the two remaining off-scale strings */
 .app .ch-num{line-height:15px}
 
