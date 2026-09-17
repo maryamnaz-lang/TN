@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TalentNext Loading State Component — Standalone Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* ==========================================================================
+       STANDALONE TALENTNEXT LOADING COMPONENT (CSS)
+       Extracted directly from orb.js & 132-orb.css loading relay state
+       Zero dependencies • Pure CSS • Big scale • No background orb
+       ========================================================================== */
+    .tn-loader {
+      --loader-size: 200px;
+      --loader-color: #111111;
+      --loader-duration: 2.4s;
+      --loader-ease: cubic-bezier(0.4, 0, 0.2, 1);
+
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: var(--loader-size);
+      height: var(--loader-size);
+      background: transparent;
+      aspect-ratio: 1 / 1;
+      contain: layout paint;
+    }
+
+    .tn-loader__blade {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background-color: var(--loader-color);
+      transform-origin: 50% 50%;
+      will-change: clip-path, opacity;
+      animation: tn-relay var(--loader-duration) var(--loader-ease) infinite;
+    }
+
+    .tn-loader__blade--a {
+      animation-delay: 0s;
+    }
+
+    .tn-loader__blade--b {
+      animation-delay: calc(var(--loader-duration) * -0.333333); /* -0.8s */
+    }
+
+    .tn-loader__blade--c {
+      animation-delay: calc(var(--loader-duration) * -0.666667); /* -1.6s */
+    }
+
+    @keyframes tn-relay {
+      0% {
+        clip-path: polygon(29.56% 22.88%, 18.77% 23.14%, 42.67% 49.87%, 2.57% 95.12%, 13.37% 95.12%, 53.21% 49.87%);
+        opacity: 1;
+      }
+      33% {
+        clip-path: polygon(62.21% 35.22%, 51.67% 35.48%, 64.52% 49.87%, 24.68% 95.12%, 35.22% 95.12%, 75.06% 50.13%);
+        opacity: 1;
+      }
+      66% {
+        clip-path: polygon(57.07% 4.37%, 46.79% 4.37%, 86.38% 49.87%, 64.78% 74.55%, 75.58% 74.55%, 96.92% 49.61%);
+        opacity: 1;
+      }
+      88% {
+        clip-path: polygon(57.07% 4.37%, 46.79% 4.37%, 86.38% 49.87%, 64.78% 74.55%, 75.58% 74.55%, 96.92% 49.61%);
+        opacity: 0;
+      }
+      89% {
+        clip-path: polygon(29.56% 22.88%, 18.77% 23.14%, 42.67% 49.87%, 2.57% 95.12%, 13.37% 95.12%, 53.21% 49.87%);
+        opacity: 0;
+      }
+      100% {
+        clip-path: polygon(29.56% 22.88%, 18.77% 23.14%, 42.67% 49.87%, 2.57% 95.12%, 13.37% 95.12%, 53.21% 49.87%);
+        opacity: 1;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .tn-loader__blade {
+        animation: none !important;
+      }
+      .tn-loader__blade--a {
+        clip-path: polygon(29.56% 22.88%, 18.77% 23.14%, 42.67% 49.87%, 2.57% 95.12%, 13.37% 95.12%, 53.21% 49.87%);
+        opacity: 1;
+      }
+      .tn-loader__blade--b {
+        clip-path: polygon(62.21% 35.22%, 51.67% 35.48%, 64.52% 49.87%, 24.68% 95.12%, 35.22% 95.12%, 75.06% 50.13%);
+        opacity: 1;
+      }
+      .tn-loader__blade--c {
+        clip-path: polygon(46.79% 4.37%, 86.38% 49.87%, 64.78% 74.55%, 75.58% 74.55%, 96.92% 49.61%, 57.07% 4.37%);
+        opacity: 1;
+      }
+    }
+
+    /* ==========================================================================
+       PREVIEW SHOWCASE STYLING (PAGE CHROME)
+       ========================================================================== */
+    :root {
+      --bg: #fafafa;
+      --card-bg: #ffffff;
+      --border: #eaeaea;
+      --text: #111827;
+      --text-muted: #6b7280;
+      --accent: #f9423a;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 40px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .header {
+      text-align: center;
+      max-width: 720px;
+      margin-bottom: 36px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      background: #f1f5f9;
+      color: #0f172a;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 6px #10b981;
+    }
+
+    h1 {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 8px;
+      color: #09090b;
+    }
+
+    .desc {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .main-stage {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: 0 20px 40px -15px rgba(0,0,0,0.05), 0 0 1px 1px rgba(0,0,0,0.02);
+      width: 100%;
+      max-width: 900px;
+      padding: 48px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+
+    .stage-canvas {
+      width: 100%;
+      min-height: 340px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      border-radius: 14px;
+      background: #ffffff;
+      border: 1px dashed #e2e8f0;
+      margin-bottom: 32px;
+      transition: background 0.25s ease;
+    }
+
+    .stage-canvas.checkerboard {
+      background-image: 
+        linear-gradient(45deg, #f8fafc 25%, transparent 25%), 
+        linear-gradient(-45deg, #f8fafc 25%, transparent 25%), 
+        linear-gradient(45deg, transparent 75%, #f8fafc 75%), 
+        linear-gradient(-45deg, transparent 75%, #f8fafc 75%);
+      background-size: 20px 20px;
+      background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    }
+
+    .stage-canvas.dark-mode {
+      background: #09090b;
+      border-color: #27272a;
+    }
+
+    .stage-canvas.dark-mode .tn-loader {
+      --loader-color: #ffffff;
+    }
+
+    /* Controls bar */
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding-top: 16px;
+      border-top: 1px solid #f1f5f9;
+    }
+
+    .control-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #4b5563;
+    }
+
+    .control-group label {
+      cursor: pointer;
+    }
+
+    input[type="range"] {
+      cursor: pointer;
+      accent-color: #09090b;
+    }
+
+    .btn-toggle {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #334155;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-toggle:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+
+    .btn-toggle.active {
+      background: #09090b;
+      color: #ffffff;
+      border-color: #09090b;
+    }
+
+    /* Size Comparison Grid */
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin: 48px 0 20px 0;
+      text-align: center;
+    }
+
+    .sizes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 20px;
+      width: 100%;
+      max-width: 900px;
+      margin-bottom: 40px;
+    }
+
+    .size-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+    }
+
+    .size-label {
+      font-size: 12px;
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+      color: #64748b;
+    }
+
+    /* Code Snippet Box */
+    .code-section {
+      width: 100%;
+      max-width: 900px;
+      background: #0f172a;
+      border-radius: 14px;
+      padding: 24px;
+      color: #e2e8f0;
+      margin-top: 12px;
+      position: relative;
+    }
+
+    .code-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #94a3b8;
+    }
+
+    pre {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+      line-height: 1.6;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      color: #f8fafc;
+    }
+
+    .copy-btn {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #cbd5e1;
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.15s;
+    }
+
+    .copy-btn:hover {
+      background: #334155;
+      color: #ffffff;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="badge">
+      <span class="badge-dot"></span>
+      Live Component Preview
+    </div>
+    <h1>Standalone Loading State</h1>
+    <p class="desc">
+      Isolated animated brand chevron loading relay copied from <code>orb.js</code> &amp; <code>132-orb.css</code>.<br>
+      Big scale, zero orb shell, pure black animating icon, zero external runtime dependencies.
+    </p>
+  </div>
+
+  <!-- Main Showcase Stage -->
+  <div class="main-stage">
+    <div class="stage-canvas" id="stageCanvas">
+      <!-- THE STANDALONE COMPONENT -->
+      <div class="tn-loader" id="mainLoader" role="status" aria-label="Loading content">
+        <span class="tn-loader__blade tn-loader__blade--a"></span>
+        <span class="tn-loader__blade tn-loader__blade--b"></span>
+        <span class="tn-loader__blade tn-loader__blade--c"></span>
+      </div>
+    </div>
+
+    <!-- Interactive Stage Controls -->
+    <div class="controls">
+      <div class="control-group">
+        <label for="sizeSlider">Size: <span id="sizeVal" style="font-family: 'JetBrains Mono';">200px</span></label>
+        <input type="range" id="sizeSlider" min="48" max="400" value="200" step="8">
+      </div>
+
+      <div class="control-group">
+        <label for="speedSlider">Speed: <span id="speedVal" style="font-family: 'JetBrains Mono';">2.4s</span></label>
+        <input type="range" id="speedSlider" min="1.0" max="4.0" value="2.4" step="0.2">
+      </div>
+
+      <div class="control-group">
+        <button class="btn-toggle" id="btnChecker" onclick="toggleChecker()">Checkerboard</button>
+        <button class="btn-toggle" id="btnDark" onclick="toggleDark()">Dark Canvas</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Size Scale Comparison -->
+  <h2 class="section-title">Scale Comparison</h2>
+  <div class="sizes-grid">
+    <div class="size-card">
+      <div class="size-label">Hero Size (160px)</div>
+      <div class="tn-loader" style="--loader-size: 160px;">
+        <span class="tn-loader__blade tn-loader__blade--a"></span>
+        <span class="tn-loader__blade tn-loader__blade--b"></span>
+        <span class="tn-loader__blade tn-loader__blade--c"></span>
+      </div>
+    </div>
+
+    <div class="size-card">
+      <div class="size-label">Modal / Card (96px)</div>
+      <div class="tn-loader" style="--loader-size: 96px;">
+        <span class="tn-loader__blade tn-loader__blade--a"></span>
+        <span class="tn-loader__blade tn-loader__blade--b"></span>
+        <span class="tn-loader__blade tn-loader__blade--c"></span>
+      </div>
+    </div>
+
+    <div class="size-card">
+      <div class="size-label">Button / Inline (48px)</div>
+      <div class="tn-loader" style="--loader-size: 48px;">
+        <span class="tn-loader__blade tn-loader__blade--a"></span>
+        <span class="tn-loader__blade tn-loader__blade--b"></span>
+        <span class="tn-loader__blade tn-loader__blade--c"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Implementation Snippet -->
+  <div class="code-section">
+    <div class="code-header">
+      <span>HTML + CSS Drop-in Snippet</span>
+      <button class="copy-btn" onclick="copyCode()">Copy Code</button>
+    </div>
+    <pre id="codeBlock">&lt;!-- HTML --&gt;
+&lt;div class="tn-loader" role="status" aria-label="Loading"&gt;
+  &lt;span class="tn-loader__blade tn-loader__blade--a"&gt;&lt;/span&gt;
+  &lt;span class="tn-loader__blade tn-loader__blade--b"&gt;&lt;/span&gt;
+  &lt;span class="tn-loader__blade tn-loader__blade--c"&gt;&lt;/span&gt;
+&lt;/div&gt;
+
+&lt;!-- CSS --&gt;
+.tn-loader {
+  --loader-size: 180px; /* Big size */
+  --loader-color: #000000; /* Pure black icon */
+  --loader-duration: 2.4s;
+  --loader-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  display: inline-flex;
+  width: var(--loader-size);
+  height: var(--loader-size);
+}
+
+.tn-loader__blade {
+  position: absolute;
+  inset: 0;
+  background-color: var(--loader-color);
+  animation: tn-relay var(--loader-duration) var(--loader-ease) infinite;
+}
+.tn-loader__blade--a { animation-delay: 0s; }
+.tn-loader__blade--b { animation-delay: calc(var(--loader-duration) * -0.333333); }
+.tn-loader__blade--c { animation-delay: calc(var(--loader-duration) * -0.666667); }
+
+@keyframes tn-relay {
+  0%   { clip-path: polygon(29.56% 22.88%, 18.77% 23.14%, 42.67% 49.87%, 2.57% 95.12%, 13.37% 95.12%, 53.21% 49.87%); opacity: 1; }
+  33%  { clip-path: polygon(62.21% 35.22%, 51.67% 35.48%, 64.52% 49.87%, 24.68% 95.12%, 35.22% 95.12%, 75.06% 50.13%); opacity: 1; }
+  66%  { clip-path: polygon(57.07% 4.37%, 46.79% 4.37%, 86.38% 49.87%, 64.78% 74.55%, 75.58% 74.55%, 96.92% 49.61%); opacity: 1; }
+  88%  { clip-path: polygon(57.07% 4.37%, 46.79% 4.37%, 86.38% 49.87%, 64.78% 74.55%, 75.58% 74.55%, 96.92% 49.61%); opacity: 0; }
+  89%  { clip-path: polygon(29.56% 22.88%, 18.77% 23.14%, 42.67% 49.87%, 2.57% 95.12%, 13.37% 95.12%, 53.21% 49.87%); opacity: 0; }
+  100% { clip-path: polygon(29.56% 22.88%, 18.77% 23.14%, 42.67% 49.87%, 2.57% 95.12%, 13.37% 95.12%, 53.21% 49.87%); opacity: 1; }
+}</pre>
+  </div>
+
+  <script>
+    const mainLoader = document.getElementById('mainLoader');
+    const sizeSlider = document.getElementById('sizeSlider');
+    const sizeVal = document.getElementById('sizeVal');
+    const speedSlider = document.getElementById('speedSlider');
+    const speedVal = document.getElementById('speedVal');
+    const stageCanvas = document.getElementById('stageCanvas');
+    const btnChecker = document.getElementById('btnChecker');
+    const btnDark = document.getElementById('btnDark');
+
+    sizeSlider.addEventListener('input', (e) => {
+      const val = e.target.value;
+      mainLoader.style.setProperty('--loader-size', val + 'px');
+      sizeVal.textContent = val + 'px';
+    });
+
+    speedSlider.addEventListener('input', (e) => {
+      const val = e.target.value;
+      mainLoader.style.setProperty('--loader-duration', val + 's');
+      speedVal.textContent = val + 's';
+    });
+
+    function toggleChecker() {
+      stageCanvas.classList.toggle('checkerboard');
+      btnChecker.classList.toggle('active');
+    }
+
+    function toggleDark() {
+      stageCanvas.classList.toggle('dark-mode');
+      btnDark.classList.toggle('active');
+    }
+
+    function copyCode() {
+      const text = document.getElementById('codeBlock').innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = 'Copy Code'; }, 1800);
+      });
+    }
+  </script>
+
+</body>
+</html>

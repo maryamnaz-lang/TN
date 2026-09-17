@@ -305,7 +305,7 @@ function callLeave(){
      Scoped to the first interview (`kind==='iv'` from the `booked` stage); the
      cohort call and the re-interview keep their existing paths. `setStage` is
      the wrapped version by the time this runs, and it renders. */
-  if(kind === 'iv' && S.stage === 'booked'){ setStage('held'); return; }
+  if(kind === 'iv' && isBooked(S.stage)){ setStage('held'); return; }
   render();
 }
 

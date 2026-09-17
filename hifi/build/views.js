@@ -2156,7 +2156,7 @@ function certBanner(f, {close = false, key = 'cert'} = {}){
         <span class="certban-m">Completed ${c.on} &middot; ${c.cohort}</span>
       </span>
       <span class="certban-a">
-        <button class="btn btn-p btn-sm" data-go="transcript">View</button>
+        <button class="btn btn-p btn-sm noic" data-go="transcript">View</button>
       </span>
       ${''/* THE CROSS IS ITS OWN CHILD, OUTSIDE `.certban-a`, so the action
              group's `margin-left:auto` still pins the pair to the right and the
@@ -4559,6 +4559,7 @@ function journey(){
        'Jordan calls Thu, Aug 13 &middot; your interview sets your level', ...AHEAD]);
     case 'new': return row(['done','on','',''],
       ['Explorer track &middot; Aug 12', 'Not booked yet &middot; 45 minutes', ...AHEAD]);
+    case RESCHED:
     case 'booked': return row(['done','on','',''],
       ['Explorer track', 'Priya Nair &middot; Thu, Aug 20', ...AHEAD]);
     /* HELD — the call happened, the report is being written. The interview step
@@ -6532,7 +6533,7 @@ V.dashboard = (f) => {
     ${talRec()}
     ${quickActions()}`;
 
-  else if(S.stage==='booked') body = `
+  else if(isBooked(S.stage)) body = `
     ${dashPh('Welcome back, Maryam!','Explorer track &middot; interview 20 August &middot; no level yet')}
     ${jrnList()}
     <div class="sec">
@@ -7991,7 +7992,7 @@ function ivCancelModal(){
 }
 
 V.interviews = (f) => {
-  const booked = S.stage==='booked';
+  const booked = isBooked(S.stage);
   const held = S.stage==='held';
   const dueRe = !!f.reinterview;
   const dueFirst = !!f.pred && !booked && !held;
@@ -11216,7 +11217,7 @@ function payRows(f){
   /* THE FIRST INTERVIEW — complimentary while `IV_FIRST_FREE` (client, 15 Sep
      2026). One row for the level interview, shown once it has been booked/held
      or is behind the reader; the card cells are empty when it is not charged. */
-  if(!f.pred || S.stage==='booked' || S.stage==='held')
+  if(!f.pred || isBooked(S.stage) || S.stage==='held')
     rows.push(ivCharged(false)
       ? ['Interview &middot; Priya Nair','Aug 13, 2026','$95','Visa','4242']
       : ['Interview &middot; Priya Nair','Aug 13, 2026','Complimentary','','']);

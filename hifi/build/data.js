@@ -39,6 +39,28 @@ const STAGES = [
   ['consult', 'Consultant call',       'Account created and a 15-minute screening call booked. Quiz result carried over; no level and no agent interview yet.'],
   ['new',     'Just joined',           'Quiz result carried over. Nothing booked. Navigation at its smallest, four items.'],
   ['booked',  'Interview booked',      'Waiting for the interview, with preparation offered.'],
+  /* A FORK OF `booked`, NOT AN ALIAS — Maryam, 17 Sep 2026: "create a copy for
+     this exact page prototype and add that in the navigation bar and name it as
+     interview reschedule". `reddemo` below is the worked precedent and this
+     follows it exactly: every stage-keyed record `booked` owns is COPIED to
+     this key rather than shared, so editing one leaves the other untouched.
+
+     IT SITS BESIDE `booked` RATHER THAN AFTER `promoted` — the opposite of
+     `reddemo`'s placement, and for `reddemo`'s own reason. That row is a demo
+     of a COLOUR and is not a step in anybody's ninety days, so it goes last;
+     rescheduling an interview is a real thing that happens at exactly this
+     point in the journey, so the list still reads top to bottom.
+
+     WHAT IS SHARED IS BEHAVIOUR, VIA `isBooked` — the stage renders the booked
+     page, so the dozen `S.stage === 'booked'` tests across views.js, ai7 and
+     ai10 have to answer true for it too. That is one helper rather than a dozen
+     copied strings; see `isBooked` further down this file.
+
+     TO DELETE IT COMPLETELY: this row, the four records below it (`CFG`,
+     `NOTIF`, and the two in ai6.js / ai8.js), `RESCHED` and `isBooked`, the
+     `PAGESUM.dashboard` alias at the foot of ai7.js, and revert the
+     `isBooked(S.stage)` call sites to `S.stage === 'booked'`. */
+  ['resched', 'Interview Reschedule',  'The booked page again, as the stage a candidate reaches it from to move the appointment.'],
   /* THE 24 HOURS AFTER THE CALL — interview held, report not yet signed (17.1,
      Maryam, 15 Sep 2026). Leaving the level-interview call lands here rather
      than dropping back to the booked page (ai10 `callLeave`); the dashboard,
@@ -154,6 +176,14 @@ const RED_DEMO = 'reddemo';
 /* the stage that draws mid-course-and-stalled. Two answer yes. */
 const isDay34 = s => s === 'day34' || s === RED_DEMO;
 
+/* THE RESCHEDULE FORK'S KEY AND ITS ONE SHARED TEST. `RED_DEMO` above is a bare
+   const because nothing but `isDay34` reads it; this is the same shape. The
+   helper exists because `reddemo` forks a stage nothing branches on, while
+   `booked` is branched on in views.js, ai7.js and ai10.js — a fork of it that
+   did not answer those tests would draw the `new` page under a booked label. */
+const RESCHED = 'resched';
+const isBooked = s => s === 'booked' || s === RESCHED;
+
 
 const CFG = {
   /* the run-up has no product chrome at all — no rail, no app bar — but
@@ -179,6 +209,10 @@ const CFG = {
   consult: {nav:'early',  track:'Explorer', pred:true,  booked:false},
   new:     {nav:'early',  track:'Explorer', pred:true,  booked:false},
   booked:  {nav:'early',  track:'Explorer', pred:true,  booked:true},
+  /* THE RESCHEDULE FORK — `booked`'s record, copied. Typed out rather than
+     spread from `CFG.booked` so the two can be edited apart, which is the
+     reason `reddemo` gives for doing the same to day 34's. */
+  resched: {nav:'early',  track:'Explorer', pred:true,  booked:true},
   /* interview held, report pending — `pred:true` still, because no level exists
      until the agent signs (that is `assessed`). `held:true` is the flag the
      three surfaces read; `booked:true` keeps the appointment "real" for any
@@ -312,6 +346,12 @@ const NOTIF = {
     {ic:'checkFilled',t:'Account created',            b:'Welcome to TalentNext, Maryam.',                               w:'Yesterday', go:'account', unread:1}
   ],
   booked:[
+    {ic:'calendar', t:'Interview confirmed',          b:'Priya Nair, Thursday, August 20 at 6:30 PM ET.',                 w:'1h ago', go:'interviews', unread:1},
+    {ic:'email',    t:'Calendar invite sent',         b:'Check maryam.naz@tkxel.io for the joining link.',               w:'1h ago', go:'interviews', unread:1},
+    {ic:'creditCard',t:'Payment received',            b:'$95 for your interview. Receipt in Payments.',                 w:'Yesterday', go:'billing',  unread:0}
+  ],
+  /* THE RESCHEDULE FORK — `booked`'s three, copied. See the row in STAGES. */
+  resched:[
     {ic:'calendar', t:'Interview confirmed',          b:'Priya Nair, Thursday, August 20 at 6:30 PM ET.',                 w:'1h ago', go:'interviews', unread:1},
     {ic:'email',    t:'Calendar invite sent',         b:'Check maryam.naz@tkxel.io for the joining link.',               w:'1h ago', go:'interviews', unread:1},
     {ic:'creditCard',t:'Payment received',            b:'$95 for your interview. Receipt in Payments.',                 w:'Yesterday', go:'billing',  unread:0}

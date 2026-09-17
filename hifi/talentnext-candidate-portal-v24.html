@@ -14881,6 +14881,7 @@ const STAGES = [
   ['consult', 'Consultant call',       'Account created and a 15-minute screening call booked. Quiz result carried over; no level and no agent interview yet.'],
   ['new',     'Just joined',           'Quiz result carried over. Nothing booked. Navigation at its smallest, four items.'],
   ['booked',  'Interview booked',      'Waiting for the interview, with preparation offered.'],
+  ['resched', 'Interview Reschedule',  'The booked page again, as the stage a candidate reaches it from to move the appointment.'],
   ['held',    'Interview held, report pending','The call happened. The agent has 24 hours to sign the report; no level yet.'],
   ['assessed','Levelled, not enrolled','Report signed, level confirmed at E3. Enroll appears in the nav.'],
   ['week1',   'Week 1',                'Cohort 41 has started. Full navigation, eight items. Nothing done yet.'],
@@ -14908,6 +14909,9 @@ const RED_DEMO = 'reddemo';
 
 const isDay34 = s => s === 'day34' || s === RED_DEMO;
 
+const RESCHED = 'resched';
+const isBooked = s => s === 'booked' || s === RESCHED;
+
 
 const CFG = {
   nil:     {nav:'early',  track:'Explorer', pred:true},
@@ -14916,6 +14920,7 @@ const CFG = {
   consult: {nav:'early',  track:'Explorer', pred:true,  booked:false},
   new:     {nav:'early',  track:'Explorer', pred:true,  booked:false},
   booked:  {nav:'early',  track:'Explorer', pred:true,  booked:true},
+  resched: {nav:'early',  track:'Explorer', pred:true,  booked:true},
   held:    {nav:'early',  track:'Explorer', pred:true,  booked:true, held:true},
   assessed:{nav:'assessed',track:'Explorer',level:'E3',pred:false},
   week1:   {nav:'full',   track:'Explorer', level:'E3', pred:false, enrolled:true, day:4,  week:1,  done:0,  open:0, avg:null, mins:0},
@@ -14961,6 +14966,11 @@ const NOTIF = {
     {ic:'checkFilled',t:'Account created',            b:'Welcome to TalentNext, Maryam.',                               w:'Yesterday', go:'account', unread:1}
   ],
   booked:[
+    {ic:'calendar', t:'Interview confirmed',          b:'Priya Nair, Thursday, August 20 at 6:30 PM ET.',                 w:'1h ago', go:'interviews', unread:1},
+    {ic:'email',    t:'Calendar invite sent',         b:'Check maryam.naz@tkxel.io for the joining link.',               w:'1h ago', go:'interviews', unread:1},
+    {ic:'creditCard',t:'Payment received',            b:'$95 for your interview. Receipt in Payments.',                 w:'Yesterday', go:'billing',  unread:0}
+  ],
+  resched:[
     {ic:'calendar', t:'Interview confirmed',          b:'Priya Nair, Thursday, August 20 at 6:30 PM ET.',                 w:'1h ago', go:'interviews', unread:1},
     {ic:'email',    t:'Calendar invite sent',         b:'Check maryam.naz@tkxel.io for the joining link.',               w:'1h ago', go:'interviews', unread:1},
     {ic:'creditCard',t:'Payment received',            b:'$95 for your interview. Receipt in Payments.',                 w:'Yesterday', go:'billing',  unread:0}
@@ -16156,7 +16166,7 @@ function certBanner(f, {close = false, key = 'cert'} = {}){
         <span class="certban-m">Completed ${c.on} &middot; ${c.cohort}</span>
       </span>
       <span class="certban-a">
-        <button class="btn btn-p btn-sm" data-go="transcript">View</button>
+        <button class="btn btn-p btn-sm noic" data-go="transcript">View</button>
       </span>
       ${''/* THE CROSS IS ITS OWN CHILD, OUTSIDE `.certban-a`, so the action
              group's `margin-left:auto` still pins the pair to the right and the
@@ -17106,6 +17116,7 @@ function journey(){
        'Jordan calls Thu, Aug 13 &middot; your interview sets your level', ...AHEAD]);
     case 'new': return row(['done','on','',''],
       ['Explorer track &middot; Aug 12', 'Not booked yet &middot; 45 minutes', ...AHEAD]);
+    case RESCHED:
     case 'booked': return row(['done','on','',''],
       ['Explorer track', 'Priya Nair &middot; Thu, Aug 20', ...AHEAD]);
     case 'held': return row(['done','on','',''],
@@ -18067,7 +18078,7 @@ V.dashboard = (f) => {
     ${talRec()}
     ${quickActions()}`;
 
-  else if(S.stage==='booked') body = `
+  else if(isBooked(S.stage)) body = `
     ${dashPh('Welcome back, Maryam!','Explorer track &middot; interview 20 August &middot; no level yet')}
     ${jrnList()}
     <div class="sec">
@@ -19205,7 +19216,7 @@ function ivCancelModal(){
 }
 
 V.interviews = (f) => {
-  const booked = S.stage==='booked';
+  const booked = isBooked(S.stage);
   const held = S.stage==='held';
   const dueRe = !!f.reinterview;
   const dueFirst = !!f.pred && !booked && !held;
@@ -21463,7 +21474,7 @@ const PAY_E2 = ['Explorer Track &ndash; E2','Feb 4, 2026','$490','Mastercard','8
 function payRows(f){
   const rows = [];
   if(f.enrolled||f.complete) rows.push(['Explorer Track &ndash; E3','Aug 14, 2026','$595','Visa','4242']);
-  if(!f.pred || S.stage==='booked' || S.stage==='held')
+  if(!f.pred || isBooked(S.stage) || S.stage==='held')
     rows.push(ivCharged(false)
       ? ['Interview &middot; Priya Nair','Aug 13, 2026','$95','Visa','4242']
       : ['Interview &middot; Priya Nair','Aug 13, 2026','Complimentary','','']);
@@ -25854,7 +25865,7 @@ const leadCertBanner = () => `<div class="sec">
       <span class="certban-m">Verified by TalentNext &middot; Volunteer cohort leader</span>
     </span>
     <span class="certban-a">
-      <button class="btn btn-p btn-sm" data-go="leadProfile">View</button>
+      <button class="btn btn-p btn-sm noic" data-go="leadProfile">View</button>
     </span>
   </div>
 </div>`;
@@ -28489,6 +28500,7 @@ const PAGESUM = {
     },
 
     booked: 'Welcome back, Maryam! Your <b data-sum="interview">levelling interview with Priya Nair</b> is confirmed for Thursday, August 20 at 6:30 PM ET (45 minutes, video-recorded). My analysis of Priya&rsquo;s historical evaluation patterns shows a heavy emphasis on delegation frameworks. Since your initial quiz score placed you on the <b data-sum="track">Explorer track</b>, spending just <b data-sum="prep">10 minutes practising your delegation talking points</b> before Thursday is your best strategy to secure an optimal levelling outcome.',
+    resched: 'Welcome back, Maryam! Your <b data-sum="interview">levelling interview with Priya Nair</b> is confirmed for Thursday, August 20 at 6:30 PM ET (45 minutes, video-recorded). My analysis of Priya&rsquo;s historical evaluation patterns shows a heavy emphasis on delegation frameworks. Since your initial quiz score placed you on the <b data-sum="track">Explorer track</b>, spending just <b data-sum="prep">10 minutes practising your delegation talking points</b> before Thursday is your best strategy to secure an optimal levelling outcome.',
 
     held: 'Your interview with Priya Nair is done. It is being analysed now, and TalentNext sets your level from it within <b>24 hours</b>. There is nothing to do but wait.',
 
@@ -28513,6 +28525,7 @@ const PAGESUM = {
       consult: pre,
       new: pre,
       booked: 'Your interview is booked for <b data-sum="interview">20 August</b>, but your exact level is still to be determined. Your quiz placed you on the <b data-sum="track">Explorer track (E1&ndash;E5)</b>, and the interview will establish where you land on the ladder.',
+      resched: 'Your interview is booked for <b data-sum="interview">20 August</b>, but your exact level is still to be determined. Your quiz placed you on the <b data-sum="track">Explorer track (E1&ndash;E5)</b>, and the interview will establish where you land on the ladder.',
       promoted: 'E4, level 4 of 15, signed on 21 November after your re-interview, one up from where the 90 days started. Another course and re-interview moves it again.',
       _: 'E3, level 3 of 15 on the Explorer track, confirmed by Priya on 21 August. Only a re-interview at the end of a course moves it.'
     };
@@ -29322,7 +29335,7 @@ function placeBook(){
 }
 
 function bkStamp(){
-  if(!S.booking || S.stage !== 'booked') return;
+  if(!S.booking || !isBooked(S.stage)) return;
   const a = AGENTS[S.booking.agent];
   const c = S.booking.card;
   const page = device.querySelector('.view-col .page');
@@ -29391,11 +29404,12 @@ PAGESUM.dashboard.booked = () => {
     + `<b data-sum="prep">10 minutes practising your delegation talking points</b> before `
     + `${bkWeekday()} is your best strategy to secure an optimal levelling outcome.`;
 };
+PAGESUM.dashboard[RESCHED] = PAGESUM.dashboard.booked;
 
 const _bkSum = pageSummary;
 pageSummary = function(){
   let text = _bkSum();
-  if(!text || !S.booking || S.stage !== 'booked') return text;
+  if(!text || !S.booking || !isBooked(S.stage)) return text;
   const a = AGENTS[S.booking.agent];
   if(!a || S.booking.agent === 'priya') return text;
   return text.split('Priya Nair').join(a.n).split('Priya').join(a.n.split(' ')[0]);
@@ -29667,6 +29681,7 @@ const NEXT = {
   consult:  ['Nothing, and that is the point', 'Your call with Jordan Blake is Thursday, August 13 at 2:00 PM ET. Fifteen minutes, nothing assessed, nothing to prepare. He points you at the agents whose range fits, and you book after that.', 'What happens on the consultant call?', 'interviews'],
   new:      ['Book the interview that sets your level', 'Your quiz put you on the Explorer track, and that is a title rather than a level. Forty-five minutes with an agent is what turns it into E1 to E5, and the course you can enroll on follows from it.', 'Book an interview with a top agent', 'agents'],
   booked:   ['Spend ten minutes preparing', 'Priya Nair, Thursday 20 August, 6:30 PM ET. She opens with a situation from your own answers, so the useful preparation is one story you can actually tell, not revision. I can run it with you now.', 'Run a mock interview with me', 'interviews'],
+  resched:  ['Spend ten minutes preparing', 'Priya Nair, Thursday 20 August, 6:30 PM ET. She opens with a situation from your own answers, so the useful preparation is one story you can actually tell, not revision. I can run it with you now.', 'Run a mock interview with me', 'interviews'],
   assessed: ['Enroll in the Explorer &ndash; E3 course', 'Your report is signed and E3 is confirmed. The cohort is assigned for you and the 90 days start when it does, $595 with your interview credited.', 'What do the 90 days ask of me?', 'enrol'],
   week1:    ['Finish chapter 1', 'Forty-five minutes, and nothing this week is assessed. Four of the ten in Cohort 41 have already done it, so the only thing between you and their pace is the chapter itself.', 'What is next week about?', 'coursework'],
   day34:    ['Finish chapter 4', 'You are 12 minutes into it after four opens, it is 70 minutes long, and it is the growth area Priya named in your report. It is the one place extra time changes your level rather than your average.', 'How do I catch up?', 'chapter:3'],
@@ -30541,7 +30556,7 @@ function callLeave(){
   const kind = S.call && S.call.kind;
   callStop();
   S.call = null;
-  if(kind === 'iv' && S.stage === 'booked'){ setStage('held'); return; }
+  if(kind === 'iv' && isBooked(S.stage)){ setStage('held'); return; }
   render();
 }
 
@@ -31837,5 +31852,109 @@ vpSet(vpFirst || 'mobile', true);
    stylesheet, so nothing here can outrank a rule §01 might want later. */
 device.style.visibility = '';
 </script>
+
+<!-- TEMPORARY STANDALONE LOADER PREVIEW COMPONENT -->
+<style id="tn-loader-temp-style">
+.tn-loader {
+  --loader-size: 180px;
+  --loader-color: #000000;
+  --loader-duration: 2.4s;
+  --loader-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--loader-size);
+  height: var(--loader-size);
+  background: transparent;
+  aspect-ratio: 1 / 1;
+}
+.tn-loader__blade {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--loader-color);
+  transform-origin: 50% 50%;
+  will-change: clip-path, opacity;
+  animation: tn-relay var(--loader-duration) var(--loader-ease) infinite;
+}
+.tn-loader__blade--a { animation-delay: 0s; }
+.tn-loader__blade--b { animation-delay: calc(var(--loader-duration) * -0.333333); }
+.tn-loader__blade--c { animation-delay: calc(var(--loader-duration) * -0.666667); }
+
+@keyframes tn-relay {
+  0%   { clip-path: polygon(29.56% 22.88%, 18.77% 23.14%, 42.67% 49.87%, 2.57% 95.12%, 13.37% 95.12%, 53.21% 49.87%); opacity: 1; }
+  33%  { clip-path: polygon(62.21% 35.22%, 51.67% 35.48%, 64.52% 49.87%, 24.68% 95.12%, 35.22% 95.12%, 75.06% 50.13%); opacity: 1; }
+  66%  { clip-path: polygon(57.07% 4.37%, 46.79% 4.37%, 86.38% 49.87%, 64.78% 74.55%, 75.58% 74.55%, 96.92% 49.61%); opacity: 1; }
+  88%  { clip-path: polygon(57.07% 4.37%, 46.79% 4.37%, 86.38% 49.87%, 64.78% 74.55%, 75.58% 74.55%, 96.92% 49.61%); opacity: 0; }
+  89%  { clip-path: polygon(29.56% 22.88%, 18.77% 23.14%, 42.67% 49.87%, 2.57% 95.12%, 13.37% 95.12%, 53.21% 49.87%); opacity: 0; }
+  100% { clip-path: polygon(29.56% 22.88%, 18.77% 23.14%, 42.67% 49.87%, 2.57% 95.12%, 13.37% 95.12%, 53.21% 49.87%); opacity: 1; }
+}
+
+#tn-temp-loader-banner {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 999999;
+  background: #09090b;
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 999px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.15);
+}
+#tn-temp-loader-banner:hover {
+  transform: translateY(-1px);
+  background: #18181b;
+}
+#tn-temp-loader-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(8px);
+  z-index: 1000000;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+#tn-temp-loader-modal.open {
+  display: flex;
+}
+</style>
+
+<div id="tn-temp-loader-banner" onclick="document.getElementById('tn-temp-loader-modal').classList.add('open')">
+  <span style="display:inline-block;width:8px;height:8px;background:#22c55e;border-radius:50%;"></span>
+  <span>Preview Standalone Loading State</span>
+</div>
+
+<div id="tn-temp-loader-modal" onclick="if(event.target === this) this.classList.remove('open')">
+  <div style="background:#fff;border:1px solid #e4e4e7;border-radius:24px;padding:44px;display:flex;flex-direction:column;align-items:center;box-shadow:0 25px 50px -12px rgba(0,0,0,0.15);max-width:540px;width:90%;position:relative;">
+    <button onclick="document.getElementById('tn-temp-loader-modal').classList.remove('open')" style="position:absolute;top:16px;right:16px;background:#f4f4f5;border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;">&times;</button>
+    <div style="font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#71717a;margin-bottom:8px;">Standalone Loading State</div>
+    <div style="font-size:20px;font-weight:700;color:#09090b;margin-bottom:28px;">Big Size • Black Icon • No Background</div>
+    
+    <!-- Big animated black loader -->
+    <div class="tn-loader" style="--loader-size: 200px; --loader-color: #000000; margin: 20px 0 32px 0;">
+      <span class="tn-loader__blade tn-loader__blade--a"></span>
+      <span class="tn-loader__blade tn-loader__blade--b"></span>
+      <span class="tn-loader__blade tn-loader__blade--c"></span>
+    </div>
+
+    <div style="display:flex;gap:12px;margin-top:12px;">
+      <a href="/preview-loader.html" target="_blank" style="padding:10px 18px;background:#09090b;color:#fff;border-radius:10px;text-decoration:none;font-size:13px;font-weight:600;">Open Full Playground &rarr;</a>
+      <button onclick="document.getElementById('tn-temp-loader-modal').classList.remove('open')" style="padding:10px 18px;background:#f4f4f5;color:#18181b;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;">Close</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>

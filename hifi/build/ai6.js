@@ -324,6 +324,8 @@ const PAGESUM = {
        together; a hard-coded fallback that disagrees with the live line is
        worse than no fallback. */
     booked: 'Welcome back, Maryam! Your <b data-sum="interview">levelling interview with Priya Nair</b> is confirmed for Thursday, August 20 at 6:30 PM ET (45 minutes, video-recorded). My analysis of Priya&rsquo;s historical evaluation patterns shows a heavy emphasis on delegation frameworks. Since your initial quiz score placed you on the <b data-sum="track">Explorer track</b>, spending just <b data-sum="prep">10 minutes practising your delegation talking points</b> before Thursday is your best strategy to secure an optimal levelling outcome.',
+    /* THE RESCHEDULE FORK — `booked`'s entry, copied. See its STAGES row. */
+    resched: 'Welcome back, Maryam! Your <b data-sum="interview">levelling interview with Priya Nair</b> is confirmed for Thursday, August 20 at 6:30 PM ET (45 minutes, video-recorded). My analysis of Priya&rsquo;s historical evaluation patterns shows a heavy emphasis on delegation frameworks. Since your initial quiz score placed you on the <b data-sum="track">Explorer track</b>, spending just <b data-sum="prep">10 minutes practising your delegation talking points</b> before Thursday is your best strategy to secure an optimal levelling outcome.',
 
     /* THE 24-HOUR WAIT (17.1). No `data-sum` phrases: there is no next action to
        point a popover at, and every clause here is settled. No em dash (Tal
@@ -509,6 +511,8 @@ const PAGESUM = {
          render time however much later ai7 parses. Not done here: it is a
          change to what the entry IS, not to what it says. */
       booked: 'Your interview is booked for <b data-sum="interview">20 August</b>, but your exact level is still to be determined. Your quiz placed you on the <b data-sum="track">Explorer track (E1&ndash;E5)</b>, and the interview will establish where you land on the ladder.',
+      /* THE RESCHEDULE FORK — `booked`'s entry, copied. See its STAGES row. */
+      resched: 'Your interview is booked for <b data-sum="interview">20 August</b>, but your exact level is still to be determined. Your quiz placed you on the <b data-sum="track">Explorer track (E1&ndash;E5)</b>, and the interview will establish where you land on the ladder.',
       promoted: 'E4, level 4 of 15, signed on 21 November after your re-interview, one up from where the 90 days started. Another course and re-interview moves it again.',
       _: 'E3, level 3 of 15 on the Explorer track, confirmed by Priya on 21 August. Only a re-interview at the end of a course moves it.'
     };

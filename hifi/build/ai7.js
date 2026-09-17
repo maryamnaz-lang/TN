@@ -487,7 +487,7 @@ function placeBook(){
    the hand-written stage is untouched until the flow has been through it.
    ========================================================================== */
 function bkStamp(){
-  if(!S.booking || S.stage !== 'booked') return;
+  if(!S.booking || !isBooked(S.stage)) return;
   const a = AGENTS[S.booking.agent];
   const c = S.booking.card;
   const page = device.querySelector('.view-col .page');
@@ -627,6 +627,18 @@ PAGESUM.dashboard.booked = () => {
     + `<b data-sum="prep">10 minutes practising your delegation talking points</b> before `
     + `${bkWeekday()} is your best strategy to secure an optimal levelling outcome.`;
 };
+/* THE RESCHEDULE FORK READS THE SAME LIVE SENTENCE. An ALIAS here, where every
+   other record `resched` owns is a copy — and the difference is what the two
+   things ARE. Those are CONTENT and the point of forking them is that they can
+   be edited apart. This is the mechanism that puts the real agent and the real
+   date into whichever sentence is drawn; a copy of it would be a second parser
+   of the same booking record, which is the "hard-coded fallback that disagrees
+   with the live line" ai6's own note calls worse than no fallback.
+
+   AFTER the assignment above rather than beside it, because it reads that
+   function object — and this file parses after ai6, so ai6's frozen string for
+   this key is replaced here exactly as `booked`'s is. */
+PAGESUM.dashboard[RESCHED] = PAGESUM.dashboard.booked;
 /* AND THIS PAGE HAS NO SUMMARY AT ALL NOW (Maryam, 31 Aug 2026).
    Two overrides stood here. The first stated the booking — "Booked — Priya
    Nair, Thursday 20 August, $95 on a Visa ending 4242" — and was cut on the
@@ -649,7 +661,7 @@ PAGESUM.dashboard.booked = () => {
 const _bkSum = pageSummary;
 pageSummary = function(){
   let text = _bkSum();
-  if(!text || !S.booking || S.stage !== 'booked') return text;
+  if(!text || !S.booking || !isBooked(S.stage)) return text;
   const a = AGENTS[S.booking.agent];
   if(!a || S.booking.agent === 'priya') return text;
   return text.split('Priya Nair').join(a.n).split('Priya').join(a.n.split(' ')[0]);
