@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TalentNext Loader</title>
+  <style>
+    /* Centering the loader on the screen */
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #ffffff;
+    }
+
+    /* STANDALONE TALENTNEXT LOADER */
+    .tn-loader {
+      --loader-size: 180px; /* Big size */
+      --loader-color: #000000; /* Pure black icon */
+      --loader-duration: 2.4s;
+      --loader-ease: cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      display: inline-flex;
+      width: var(--loader-size);
+      height: var(--loader-size);
+      aspect-ratio: 1 / 1;
+    }
+
+    .tn-loader__blade {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background-color: var(--loader-color);
+      transform-origin: 50% 50%;
+      will-change: clip-path, opacity;
+      animation: tn-relay var(--loader-duration) var(--loader-ease) infinite;
+    }
+
+    .tn-loader__blade--a { animation-delay: 0s; }
+    .tn-loader__blade--b { animation-delay: calc(var(--loader-duration) * -0.333333); }
+    .tn-loader__blade--c { animation-delay: calc(var(--loader-duration) * -0.666667); }
+
+    @keyframes tn-relay {
+      0%   { clip-path: polygon(29.56% 22.88%, 18.77% 23.14%, 42.67% 49.87%, 2.57% 95.12%, 13.37% 95.12%, 53.21% 49.87%); opacity: 1; }
+      33%  { clip-path: polygon(62.21% 35.22%, 51.67% 35.48%, 64.52% 49.87%, 24.68% 95.12%, 35.22% 95.12%, 75.06% 50.13%); opacity: 1; }
+      66%  { clip-path: polygon(57.07% 4.37%, 46.79% 4.37%, 86.38% 49.87%, 64.78% 74.55%, 75.58% 74.55%, 96.92% 49.61%); opacity: 1; }
+      88%  { clip-path: polygon(57.07% 4.37%, 46.79% 4.37%, 86.38% 49.87%, 64.78% 74.55%, 75.58% 74.55%, 96.92% 49.61%); opacity: 0; }
+      89%  { clip-path: polygon(29.56% 22.88%, 18.77% 23.14%, 42.67% 49.87%, 2.57% 95.12%, 13.37% 95.12%, 53.21% 49.87%); opacity: 0; }
+      100% { clip-path: polygon(29.56% 22.88%, 18.77% 23.14%, 42.67% 49.87%, 2.57% 95.12%, 13.37% 95.12%, 53.21% 49.87%); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HTML Component -->
+  <div class="tn-loader" role="status" aria-label="Loading">
+    <span class="tn-loader__blade tn-loader__blade--a"></span>
+    <span class="tn-loader__blade tn-loader__blade--b"></span>
+    <span class="tn-loader__blade tn-loader__blade--c"></span>
+  </div>
+
+</body>
+</html>

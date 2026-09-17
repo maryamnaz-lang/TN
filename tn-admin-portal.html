@@ -14,7 +14,7 @@
      The <style> block is PROTOTYPE CHROME AND NOTHING ELSE (the device frame,
      the viewport picker, the wordmark size, a toast host) — no product rule.
      ========================================================================== -->
-<link rel="stylesheet" href="design-system/talentnext-ds.css?b=f48021fe">
+<link rel="stylesheet" href="design-system/talentnext-ds.css?b=934ebb33">
 
 <style>
 /* ==========================================================================
@@ -227,25 +227,6 @@
 .app .sec:has(.perm-tbl){padding-top:var(--s06)}
 .app .sec:has(.perm-tbl) > .sec-h{margin-bottom:var(--s06)}
 
-/* TAL SUMMARY HIDDEN PORTAL-WIDE (Maryam, 17 Sep 2026, #admin-nosum). With the
-   "Summary by Tal" band gone from `head()`, a list-page head band is only an empty
-   breadcrumb (`.ph.ph-bare`) — hide it so no washed slab is left behind. The
-   element stays in the DOM, so the `.modhead + .sec` first-section spacing rules
-   still fire; a detail head keeps its back arrow and is untouched. */
-.app .modhead:not(:has(.ai-aura)):has(> .ph.ph-bare){display:none}
-
-/* A STRIP-ONLY TAB SECTION PAYS ONE TIGHT GAP TO ITS CONTENT (Maryam, 17 Sep 2026:
-   "remove the unnecessary gap between tabs and the content"). The DS's strip-only
-   `.sec-cs` zeroing did not resolve here (a `:has()` selector that matched but lost
-   to `.sec`'s padding shorthand at compute time), so the tabs sat 48px above the
-   content. `.iv-tabs` is a plain-class handle on the interview page's tab section:
-   zero its bottom padding and the strip's own margin, and pull the content up to a
-   single --s05 gap. */
-.app .sec.iv-tabs{padding-bottom:0}
-.app .sec.iv-tabs > .cs{margin-bottom:0}
-.app .sec.iv-tabs::after{content:none}
-.app .sec.iv-tabs + .sec{padding-top:var(--s05)}
-
 /* MODALS SIT TIGHTER (Maryam, 14 Sep 2026: "less padding from all sides").
    Admin-portal-local overrides of the DS modal frame (uniform --s06); the DS
    default is untouched for the other three portals. Reduce the sheet header,
@@ -442,61 +423,9 @@
 .app .cl-lead-ph{flex:none; width:24px; height:24px; border-radius:999px; overflow:hidden}
 .app .cl-lead-ph img{width:100%; height:100%; object-fit:cover; display:block}
 
-/* --- Levels page (Maryam, 17 Sep 2026): the three buckets are behind a tab
-   strip now (one bucket per view), and each bucket's levels are a row of BLOCKS
-   — the candidate profile's "Linked accounts" card proportions in our
-   components: a vertical tile on the one hairline, the level CODE ("E1") centred
-   and the candidate count below it. Built to fill the width at the level count
-   (`--lvl-cols`, capped at 5 so >5 wraps rather than pinching). §63 owns the
-   type, so the code carries `.t-h1` and the count `.t-desc` — this layer sets
-   only layout and the tile ground. --- */
-/* NO DIVIDER AFTER THE TABS ROW (Maryam, 17 Sep 2026) — kill the tab strip's own
-   hairline. The section's foot rule (drawn by the DS as a high-specificity
-   `::after`) is suppressed by giving the section `.sec-noline` in the markup,
-   whose `content:none` removes the pseudo outright. The active tab keeps its
-   accent underline. */
-.app .lvl-top .cs.lst-filt{border-bottom:0; margin-bottom:0}
-/* Pull the bucket content up into the space the divider left — the tab section
-   pays no bottom padding, so the only gap under the tabs is the content
-   section's own top padding (one --s06 step, the design-system tab-to-content
-   gap). */
-.app .lvl-top{padding-bottom:0}
-/* A little air between the bucket description and its level cards. */
-.app .lvl-body .lvl-blocks{margin-top:var(--s05)}
-.app .lvl-blocks{display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:var(--s04)}
-@container app (min-width:900px){
-  .app .lvl-blocks{grid-template-columns:repeat(var(--lvl-cols,5),minmax(0,1fr))}
-}
-.app .lvl-block{
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  gap:var(--s03); min-height:150px; padding:var(--s06) var(--s04);
-  background:var(--background); border:1px solid var(--rule); border-radius:var(--radius);
-  text-align:center}
-.app .lvl-block-code{line-height:1}
-
-/* --- Bucket Edit sheet: a clear gap under the description label, and a compact
-   "− N +" stepper sitting on the RIGHT of the "Number of levels" heading (Maryam,
-   17 Sep 2026 — plus/minus, on one row with the label). --- */
-.app .lvl-edit .lbl{margin-bottom:var(--s03)}
-.app .nstep-f{display:flex; align-items:center; justify-content:space-between; gap:var(--s05)}
-.app .nstep-f .lbl{margin-bottom:0}
-.app .nstep{display:inline-flex; align-items:center; gap:var(--s02)}
-.app .nstep-b{display:grid; place-items:center; width:30px; height:30px; padding:0;
-  border:1px solid var(--border-subtle-02); border-radius:var(--radius);
-  background:var(--background); color:var(--text-primary); cursor:pointer}
-.app .nstep-b:hover{border-color:var(--text-primary)}
-.app .nstep-b svg{width:16px; height:16px; display:block}
-.app .nstep-val{width:32px; min-height:0; padding:0; border:0; background:transparent;
-  text-align:center; color:var(--text-primary); font-size:14px; pointer-events:none;
-  -moz-appearance:textfield; appearance:textfield}
-.app .nstep-val::-webkit-outer-spin-button,
-.app .nstep-val::-webkit-inner-spin-button{-webkit-appearance:none; margin:0}
-
-/* --- Past-interview detail (agents/interview): a plain white card for Tal's
-   evaluation and for the candidate's rating + review. --- */
-.app .iv-card{background:var(--background); border:1px solid var(--rule); border-radius:var(--radius); padding:var(--s06)}
-.app .iv-review{display:flex; flex-direction:column; gap:var(--s04)}
-.app .iv-review-r{display:flex; align-items:center; font-size:var(--t-h3-size)}
+/* --- Levels page: each bucket reads as one clean list, one divider after the block --- */
+.app .lvl-bucket .kv > *{border-bottom:0}
+.app .lvl-bucket:not(:last-child){border-bottom:1px solid var(--rule); padding-bottom:var(--s05); margin-bottom:var(--s05)}
 
 /* --- A headed section's heading sits FLUSH with its content on both sides
    (Maryam 15 Sep 2026: padding:0, not the double-inset padding:0 var(--pad-x)) --- */
@@ -518,18 +447,8 @@
 .app .cv-row-x{display:block; margin-top:2px}
 
 /* Courses accordion + completion-certificate card (black, stripped) */
-/* FULL-WIDTH COURSE ROWS (Maryam, 17 Sep 2026: "the course section rows should
-   have full width"). The old `width:100%` PINNED the accordion to the section's
-   content box (642px) while the DS `.sec > .acc` bleed (talentnext-ds §—) shifts
-   it left by `--pad-x` — so every row sat 32px short on the RIGHT, under-running
-   the facts grid and Interviews list above it. Dropping the pin lets the DS bleed
-   do its job: `.acc-i` restores `--pad-x`, so the row CONTENT (thumb, title,
-   chevron) aligns to the content column like every other section, and the top/
-   bottom hairlines bleed to the full section width. */
+.app .acc.crs-list{width:100%}
 .app .crs-list .acc-b{max-width:none}
-/* The in-progress course's progress body (coursePerf + chapter list) — the chapter
-   block stands off the performance section's key-insight foot by `--s07`. */
-.app .crs-prog-ch{margin-top:var(--s07)}
 /* COMPACT course COVER on the accordion row — the candidate portal's My Courses
    layout (Maryam, 16 Sep 2026, reversing the same-day big-cover: "the courses
    section on super admin needs the reference layout from the candidate portal").
@@ -611,7 +530,7 @@
   </div>
 </div>
 
-<script src="design-system/talentnext-ds.js?b=f48021fe"></script>
+<script src="design-system/talentnext-ds.js?b=934ebb33"></script>
 <script>
 /* ==========================================================================
    THE SUPER ADMIN PORTAL
@@ -836,11 +755,11 @@ const grantOf = u => u.grant || (isAdmin(u) ? {since:'2026-01-02', until:null, a
 const grantState = u => { const g = grantOf(u); return !g ? null : !g.until ? 'permanent' : g.until < isoToday() ? 'expired' : 'time-boxed'; };
 
 const USERS=[
- {id:'u1', name:'Dana Whitfield', email:'dana@talentnext.io', roles:['agent'], level:'—', job:'Engineering Manager, Stripe', rating:4.9, interviewed:64, status:'active', joined:'03-12-2026', origin:'individual', last:'2h ago', fee:180, cohorts:['Cohort 1']},
+ {id:'u1', name:'Dana Whitfield', email:'dana@talentnext.io', roles:['agent'], level:'—', job:'Engineering Manager, Stripe', rating:4.9, interviewed:64, status:'active', joined:'03-12-2026', origin:'individual', last:'2h ago', fee:180, cohorts:['Explorer 12']},
  {id:'u2', name:'Marcus Ozoro', email:'marcus@northgate.health', roles:['agent'], level:'—', job:'Clinical Lead, Northgate Health', rating:4.6, interviewed:28, status:'active', joined:'02-04-2026', origin:'individual', last:'1d ago', fee:160},
  {id:'u3', name:'Priya Raman', email:'priya@talentnext.io', roles:['agent','reviewer'], level:'—', job:'Product Director, Atlassian', rating:4.8, interviewed:52, status:'active', joined:'01-21-2026', origin:'individual', last:'20m ago', fee:225},
- {id:'u4', name:'Maryam Naz', email:'maryam.naz@tkxel.io', roles:['candidate','leader'], level:'E2 · Explorer', status:'active', joined:'03-12-2026', origin:'individual', last:'just now', cohorts:['Cohort 1 (member)','Cohort 2 (leads)'], volunteer:true},
- {id:'u40', name:'Bruno Sella', email:'bruno@sella.io', roles:['candidate','leader'], level:'B3 · Builder', status:'active', joined:'02-20-2026', origin:'individual', last:'3h ago', cohorts:['Cohort 1 (leads)','Cohort 4 (leads)'], volunteer:false, addedBy:'u8'},
+ {id:'u4', name:'Maryam Naz', email:'maryam.naz@tkxel.io', roles:['candidate','leader'], level:'E2 · Explorer', status:'active', joined:'03-12-2026', origin:'individual', last:'just now', cohorts:['Explorer 12 (member)','Explorer 14 (leads)'], volunteer:true},
+ {id:'u40', name:'Bruno Sella', email:'bruno@sella.io', roles:['candidate','leader'], level:'B3 · Builder', status:'active', joined:'02-20-2026', origin:'individual', last:'3h ago', cohorts:['Explorer 12 (leads)','Explorer 15 (leads)'], volunteer:false, addedBy:'u8'},
  {id:'u5', name:'Jordan Vale', email:'jordan@vale.co', roles:['candidate'], level:'B1 · Builder', status:'active', joined:'04-02-2026', origin:'signal', last:'3d ago'},
  {id:'u6', name:'Amara Okafor', email:'amara@brightpath.io', roles:['employer'], level:'—', status:'ok', joined:'03-18-2026', origin:'individual', last:'5h ago', company:'BrightPath'},
  {id:'u7', name:'Tom Reeves', email:'tom@filtergo.com', roles:['candidate'], level:'Explorer', status:'active', joined:'03-29-2026', origin:'filtergo', last:'6d ago'},
@@ -973,26 +892,26 @@ EMPLOYERS.forEach(e => {
   e.placements = PLACEMENTS.filter(p => p.empId === e.id).length;
 });
 const CANDS=[
- {id:'u4', name:'Maryam Naz', bucket:'Explorer', level:'E2', cohort:'Cohort 1', agent:'Dana Whitfield', consent:{video:1,ai:1,scenes:1,vis:1}, status:'active', last:'just now'},
- {id:'u5', name:'Jordan Vale', bucket:'Builder', level:'B1', cohort:'Cohort 3', agent:'Priya Raman', consent:{video:1,ai:1,scenes:0,vis:1}, status:'active', last:'3d ago'},
- {id:'u7', name:'Tom Reeves', bucket:'Explorer', level:'E1', cohort:'Cohort 2', agent:'—', consent:{video:1,ai:1,scenes:0,vis:0}, status:'active', last:'6d ago'},
- {id:'u11', name:'Chris Boone', bucket:'Explorer', level:'E1', cohort:'Cohort 2', agent:'—', consent:{video:1,ai:1,scenes:0,vis:1}, status:'active', last:'12d ago'},
- {id:'u17', name:'Aisha Bello', bucket:'Explorer', level:'E1', cohort:'Cohort 2', agent:'Dana Whitfield', consent:{video:1,ai:1,scenes:1,vis:1}, status:'active', last:'2h ago'},
- {id:'u18', name:'Leo Martins', bucket:'Explorer', level:'E2', cohort:'Cohort 1', agent:'Priya Raman', consent:{video:1,ai:1,scenes:0,vis:1}, status:'active', last:'1d ago'},
- {id:'u19', name:'Hana Sato', bucket:'Builder', level:'B2', cohort:'Cohort 3', agent:'Marcus Ozoro', consent:{video:1,ai:1,scenes:1,vis:1}, status:'active', last:'5h ago'},
- {id:'u20', name:'Omar Haddad', bucket:'Explorer', level:'E1', cohort:'Cohort 2', agent:'—', consent:{video:1,ai:1,scenes:0,vis:0}, status:'active', last:'8d ago'},
- {id:'u21', name:'Grace Kim', bucket:'Explorer', level:'E3', cohort:'Cohort 1', agent:'Dana Whitfield', consent:{video:1,ai:1,scenes:1,vis:1}, status:'active', last:'30m ago'},
- {id:'u22', name:'Diego Alvarez', bucket:'Builder', level:'B1', cohort:'Cohort 3', agent:'Naomi Frost', consent:{video:1,ai:1,scenes:0,vis:1}, status:'active', last:'2d ago'},
- {id:'u23', name:'Fatima Noor', bucket:'Explorer', level:'E1', cohort:'Cohort 2', agent:'—', consent:{video:1,ai:1,scenes:0,vis:0}, status:'active', last:'9d ago'},
- {id:'u24', name:'Sam Whitfield', bucket:'Explorer', level:'E2', cohort:'Cohort 1', agent:'Owen Blake', consent:{video:1,ai:1,scenes:1,vis:1}, status:'active', last:'6h ago'},
+ {id:'u4', name:'Maryam Naz', bucket:'Explorer', level:'E2', cohort:'Explorer 12', agent:'Dana Whitfield', consent:{video:1,ai:1,scenes:1,vis:1}, status:'active', last:'just now'},
+ {id:'u5', name:'Jordan Vale', bucket:'Builder', level:'B1', cohort:'Builder 3', agent:'Priya Raman', consent:{video:1,ai:1,scenes:0,vis:1}, status:'active', last:'3d ago'},
+ {id:'u7', name:'Tom Reeves', bucket:'Explorer', level:'E1', cohort:'Explorer 14', agent:'—', consent:{video:1,ai:1,scenes:0,vis:0}, status:'active', last:'6d ago'},
+ {id:'u11', name:'Chris Boone', bucket:'Explorer', level:'E1', cohort:'Explorer 14', agent:'—', consent:{video:1,ai:1,scenes:0,vis:1}, status:'active', last:'12d ago'},
+ {id:'u17', name:'Aisha Bello', bucket:'Explorer', level:'E1', cohort:'Explorer 14', agent:'Dana Whitfield', consent:{video:1,ai:1,scenes:1,vis:1}, status:'active', last:'2h ago'},
+ {id:'u18', name:'Leo Martins', bucket:'Explorer', level:'E2', cohort:'Explorer 12', agent:'Priya Raman', consent:{video:1,ai:1,scenes:0,vis:1}, status:'active', last:'1d ago'},
+ {id:'u19', name:'Hana Sato', bucket:'Builder', level:'B2', cohort:'Builder 3', agent:'Marcus Ozoro', consent:{video:1,ai:1,scenes:1,vis:1}, status:'active', last:'5h ago'},
+ {id:'u20', name:'Omar Haddad', bucket:'Explorer', level:'E1', cohort:'Explorer 14', agent:'—', consent:{video:1,ai:1,scenes:0,vis:0}, status:'active', last:'8d ago'},
+ {id:'u21', name:'Grace Kim', bucket:'Explorer', level:'E3', cohort:'Explorer 12', agent:'Dana Whitfield', consent:{video:1,ai:1,scenes:1,vis:1}, status:'active', last:'30m ago'},
+ {id:'u22', name:'Diego Alvarez', bucket:'Builder', level:'B1', cohort:'Builder 3', agent:'Naomi Frost', consent:{video:1,ai:1,scenes:0,vis:1}, status:'active', last:'2d ago'},
+ {id:'u23', name:'Fatima Noor', bucket:'Explorer', level:'E1', cohort:'Explorer 14', agent:'—', consent:{video:1,ai:1,scenes:0,vis:0}, status:'active', last:'9d ago'},
+ {id:'u24', name:'Sam Whitfield', bucket:'Explorer', level:'E2', cohort:'Explorer 12', agent:'Owen Blake', consent:{video:1,ai:1,scenes:1,vis:1}, status:'active', last:'6h ago'},
  {id:'u25', name:'Yuki Tanaka', bucket:'Trailblazer', level:'T1', cohort:'—', agent:'Priya Raman', consent:{video:1,ai:1,scenes:1,vis:1}, status:'active', last:'1d ago'},
- {id:'u26', name:'Noah Bright', bucket:'Explorer', level:'E1', cohort:'Cohort 4', agent:'—', consent:{video:1,ai:1,scenes:0,vis:1}, status:'active', last:'just now'},
- {id:'u27', name:'Zara Ahmed', bucket:'Builder', level:'B2', cohort:'Cohort 3', agent:'Marcus Ozoro', consent:{video:1,ai:1,scenes:1,vis:1}, status:'active', last:'4d ago'},
- {id:'u28', name:'Ethan Cole', bucket:'Explorer', level:'E2', cohort:'Cohort 1', agent:'Dana Whitfield', consent:{video:1,ai:1,scenes:0,vis:0}, status:'inactive', last:'21d ago'},
- {id:'u29', name:'Mia Rossi', bucket:'Explorer', level:'E1', cohort:'Cohort 4', agent:'—', consent:{video:1,ai:1,scenes:0,vis:1}, status:'active', last:'3h ago'},
- {id:'u30', name:'Kofi Mensah', bucket:'Builder', level:'B1', cohort:'Cohort 5', agent:'Naomi Frost', consent:{video:1,ai:1,scenes:1,vis:1}, status:'active', last:'2d ago'},
- {id:'u31', name:'Lucia Moretti', bucket:'Explorer', level:'E2', cohort:'Cohort 2', agent:'Dana Whitfield', consent:{video:1,ai:1,scenes:1,vis:1}, status:'active', last:'5h ago'},
- {id:'u32', name:'Aaron Feld', bucket:'Explorer', level:'E1', cohort:'Cohort 4', agent:'—', consent:{video:1,ai:1,scenes:0,vis:0}, status:'active', last:'7d ago'}
+ {id:'u26', name:'Noah Bright', bucket:'Explorer', level:'E1', cohort:'Explorer 15', agent:'—', consent:{video:1,ai:1,scenes:0,vis:1}, status:'active', last:'just now'},
+ {id:'u27', name:'Zara Ahmed', bucket:'Builder', level:'B2', cohort:'Builder 3', agent:'Marcus Ozoro', consent:{video:1,ai:1,scenes:1,vis:1}, status:'active', last:'4d ago'},
+ {id:'u28', name:'Ethan Cole', bucket:'Explorer', level:'E2', cohort:'Explorer 12', agent:'Dana Whitfield', consent:{video:1,ai:1,scenes:0,vis:0}, status:'inactive', last:'21d ago'},
+ {id:'u29', name:'Mia Rossi', bucket:'Explorer', level:'E1', cohort:'Explorer 15', agent:'—', consent:{video:1,ai:1,scenes:0,vis:1}, status:'active', last:'3h ago'},
+ {id:'u30', name:'Kofi Mensah', bucket:'Builder', level:'B1', cohort:'Builder 4', agent:'Naomi Frost', consent:{video:1,ai:1,scenes:1,vis:1}, status:'active', last:'2d ago'},
+ {id:'u31', name:'Lucia Moretti', bucket:'Explorer', level:'E2', cohort:'Explorer 14', agent:'Dana Whitfield', consent:{video:1,ai:1,scenes:1,vis:1}, status:'active', last:'5h ago'},
+ {id:'u32', name:'Aaron Feld', bucket:'Explorer', level:'E1', cohort:'Explorer 15', agent:'—', consent:{video:1,ai:1,scenes:0,vis:0}, status:'active', last:'7d ago'}
 ];
 const CAND_BY_ID={}; CANDS.forEach(c => CAND_BY_ID[c.id]=c);
 /* NEW (flow review, 11 Sep 2026): the levelling chain is Tal (AI) -> agent -> admin.
@@ -1008,10 +927,10 @@ const LEVELQ=[
  {id:'l6', name:'Diego Alvarez', from:'B1', to:'B1', talTo:'B1', agent:'Naomi Frost', rec:'Hold at level', when:'3 days ago', status:'pending'}
 ];
 const COHORTS=[
- {id:'ch1', name:'Cohort 1', track:'Explorer', leader:'Bruno Sella (Builder)', size:10, week:12, day:84, start:'2026-05-19', status:'active', sessions:[{id:'ch1s1', title:'Kick-off and goals', week:1, dur:60, mode:'Live'}, {id:'ch1s2', title:'Mid-cycle levelling check-in', week:6, dur:45, mode:'Live'}, {id:'ch1s3', title:'Portfolio workshop', week:9, dur:90, mode:'Workshop'}]},
- {id:'ch2', name:'Cohort 2', track:'Explorer', leader:'Maryam Naz (Builder)', size:7, week:1, day:3, start:'2026-08-07', status:'active', sessions:[{id:'ch2s1', title:'Kick-off and goals', week:1, dur:60, mode:'Live'}, {id:'ch2s2', title:'Interview prep clinic', week:4, dur:60, mode:'Workshop'}]},
- {id:'ch3', name:'Cohort 3', track:'Builder', leader:'Dana Whitfield (Trailblazer)', size:6, week:5, day:32, start:'2026-07-08', status:'active', sessions:[{id:'ch3s1', title:'Kick-off and goals', week:1, dur:60, mode:'Live'}, {id:'ch3s2', title:'Systems design deep-dive', week:5, dur:90, mode:'Workshop'}, {id:'ch3s3', title:'Async retro', week:8, dur:30, mode:'Async'}]},
- {id:'ch4', name:'Cohort 4', track:'Explorer', leader:'Bruno Sella (Builder)', size:0, week:0, day:0, start:'2026-08-18', status:'draft', sessions:[]}
+ {id:'ch1', name:'Explorer 12', track:'Explorer', leader:'Bruno Sella (Builder)', size:10, week:12, day:84, start:'2026-05-19', status:'active', sessions:[{id:'ch1s1', title:'Kick-off and goals', week:1, dur:60, mode:'Live'}, {id:'ch1s2', title:'Mid-cycle levelling check-in', week:6, dur:45, mode:'Live'}, {id:'ch1s3', title:'Portfolio workshop', week:9, dur:90, mode:'Workshop'}]},
+ {id:'ch2', name:'Explorer 14', track:'Explorer', leader:'Maryam Naz (Builder)', size:7, week:1, day:3, start:'2026-08-07', status:'active', sessions:[{id:'ch2s1', title:'Kick-off and goals', week:1, dur:60, mode:'Live'}, {id:'ch2s2', title:'Interview prep clinic', week:4, dur:60, mode:'Workshop'}]},
+ {id:'ch3', name:'Builder 3', track:'Builder', leader:'Dana Whitfield (Trailblazer)', size:6, week:5, day:32, start:'2026-07-08', status:'active', sessions:[{id:'ch3s1', title:'Kick-off and goals', week:1, dur:60, mode:'Live'}, {id:'ch3s2', title:'Systems design deep-dive', week:5, dur:90, mode:'Workshop'}, {id:'ch3s3', title:'Async retro', week:8, dur:30, mode:'Async'}]},
+ {id:'ch4', name:'Explorer 15', track:'Explorer', leader:'Bruno Sella (Builder)', size:0, week:0, day:0, start:'2026-08-18', status:'draft', sessions:[]}
 ];
 function syncCohortSizes(){ COHORTS.forEach(c => { c.size = CANDS.filter(x => x.cohort === c.name).length; }); }
 syncCohortSizes();
@@ -1044,7 +963,7 @@ const COURSE_LIB=[
 /* REMOVED (flow review, 11 Sep 2026): CO_TEMPLATES / TPL_BY_ID — Cohort Templates is
    gone. Cohorts own their own `sessions` (see the COHORTS seed and KINDS.cohort). */
 const LEADER_REQS=[
- {id:'lr1', name:'Bruno Sella', bucket:'Builder', level:'B3', track:'Explorer', led:2, rating:4.8, when:'2 days ago', pitch:'Led a previous cohort to a 92% completion rate — I want to take another.', stage:'feedback', interview:{agent:'Priya Raman', date:'2026-08-08', time:'11:00'}, feedback:{rec:'recommend', agent:'Priya Raman', note:'Structured, calm answers on delegation and recovery. Ready to lead.'}},
+ {id:'lr1', name:'Bruno Sella', bucket:'Builder', level:'B3', track:'Explorer', led:2, rating:4.8, when:'2 days ago', pitch:'Led Explorer 9 to a 92% completion rate — I want to take another Explorer cohort.', stage:'feedback', interview:{agent:'Priya Raman', date:'2026-08-08', time:'11:00'}, feedback:{rec:'recommend', agent:'Priya Raman', note:'Structured, calm answers on delegation and recovery. Ready to lead.'}},
  {id:'lr2', name:'Dana Whitfield', bucket:'Trailblazer', level:'T3', track:'Builder', led:2, rating:4.9, when:'3 days ago', pitch:'Two Builder cohorts led already — happy to take another Builder group.', stage:'feedback', interview:{agent:'Priya Raman', date:'2026-08-07', time:'10:00'}, feedback:{rec:'recommend', agent:'Priya Raman', note:'Two cohorts led already; clear and steady. Recommend.'}},
  {id:'lr3', name:'Marcus Reyes', bucket:'Builder', level:'B2', track:'Explorer', led:1, rating:4.7, when:'4 days ago', pitch:'Strong on group dynamics; ready to mentor an Explorer cohort.', stage:'feedback', interview:{agent:'Marcus Ozoro', date:'2026-08-06', time:'14:00'}, feedback:{rec:'recommend', agent:'Marcus Ozoro', note:'Handles group dynamics well; a strong pick.'}},
  {id:'lr4', name:'Elena Fischer', bucket:'Trailblazer', level:'T2', track:'Builder', led:1, rating:4.6, when:'5 days ago', pitch:'Calm and structured — I want to lead a Builder cohort.', stage:'feedback', interview:{agent:'Priya Raman', date:'2026-08-05', time:'09:30'}, feedback:{rec:'recommend', agent:'Priya Raman', note:'Calm, structured and good with feedback.'}},
@@ -1064,7 +983,7 @@ const LEADER_REQS=[
  {id:'lr18', name:'Lucia Moretti', bucket:'Builder', level:'B2', track:'Explorer', led:0, when:'4 days ago', pitch:'Strong on decisive calls — I want to lead an Explorer cohort.', stage:'applied', interview:null, feedback:null},
  {id:'lr19', name:'Noah Bright', bucket:'Builder', level:'B1', track:'Explorer', led:0, when:'5 days ago', pitch:'Enthusiastic first-time leader, ready to put the work in.', stage:'applied', interview:null, feedback:null},
  {id:'lr20', name:'Zoe Park', bucket:'Trailblazer', level:'T1', track:'Builder', led:0, when:'6 days ago', pitch:'Recently a Trailblazer — ready to lead a Builder cohort.', stage:'applied', interview:null, feedback:null},
- {id:'lr21', name:'Sam Whitfield', bucket:'Builder', level:'B2', track:'Explorer', led:1, rating:4.5, when:'1 week ago', pitch:'Led a cohort last cycle; happy to take another.', stage:'applied', interview:null, feedback:null}
+ {id:'lr21', name:'Sam Whitfield', bucket:'Builder', level:'B2', track:'Explorer', led:1, rating:4.5, when:'1 week ago', pitch:'Led Explorer 7 last cycle; happy to take another.', stage:'applied', interview:null, feedback:null}
 ];
 const LR_BY_ID={}; LEADER_REQS.forEach(r => LR_BY_ID[r.id]=r);
 const BOOKINGS=[
@@ -1295,7 +1214,7 @@ const AUDIT=[
  {when:'Yest 16:10', who:'Derek Sole', role:'Super Admin', obj:'Marcus Ozoro — $160 released early', act:'Released payout', mod:'Finance', cat:'Payout', sev:'high', ip:'10.2.14.2'},
  {when:'Yest 14:03', who:'Derek Sole', role:'Super Admin', obj:'Marcus Ozoro → T3', act:'Adjusted agent level', mod:'Talent Agents', cat:'Level change', sev:'high', ip:'10.2.14.2'},
  {when:'Yest 12:39', who:'Priya Raman', role:'Admin', obj:'Learning platform', act:'Rotated API key', mod:'System', cat:'Security', sev:'high', ip:'10.2.14.19'},
- {when:'Yest 11:20', who:'Nadia Haddad', role:'Reviewer', obj:'Maryam Naz → Cohort 2', act:'Assigned cohort leader', mod:'Cohorts', cat:'Assignment', sev:'notice', ip:'10.2.14.7'},
+ {when:'Yest 11:20', who:'Nadia Haddad', role:'Reviewer', obj:'Maryam Naz → Explorer 14', act:'Assigned cohort leader', mod:'Cohorts', cat:'Assignment', sev:'notice', ip:'10.2.14.7'},
  {when:'Yest 09:05', who:'System', role:'Automated', obj:'Raul Mendez — enhanced check', act:'Background check cleared', mod:'Vetting', cat:'Safeguarding', sev:'notice', ip:'—'},
  {when:'10 Aug 17:44', who:'Sofia Marchetti', role:'Supervisor', obj:'Reviewer role — +AI raw score', act:'Edited role permissions', mod:'Users & Roles', cat:'Configuration', sev:'high', ip:'10.2.14.31'},
  {when:'10 Aug 15:02', who:'System', role:'Automated', obj:'Course refund — 14-day window ($100)', act:'Refund approved', mod:'Finance', cat:'Refund', sev:'notice', ip:'—'},
@@ -1416,7 +1335,7 @@ const MODULES=[
  {k:'candidates', t:'Candidates', ic:'candidates', subs:[
    {k:'candidates', t:'All Candidates'}, {k:'detail', t:'Candidate', hidden:true}]},
  {k:'agents', t:'Talent Agents', ic:'agents', subs:[
-   {k:'agents', t:'Talent Agents'}, {k:'detail', t:'Agent', hidden:true}, {k:'interview', t:'Interview', hidden:true}]},
+   {k:'agents', t:'Talent Agents'}, {k:'detail', t:'Agent', hidden:true}]},
  {k:'cohorts', t:'Cohort Management', ic:'cohorts', subs:[
    {k:'cohorts', t:'Cohorts'}, {k:'assign', t:'Cohort Leaders'}, {k:'detail', t:'Cohort', hidden:true}, {k:'levels', t:'Levels & Buckets'}]},
  /* COURSE CATALOGUE IS ITS OWN TOP-LEVEL MODULE below Cohort Management (Maryam,
@@ -1514,31 +1433,33 @@ const setFilter = (name, v) => { const k = pageKey(); (S.filter[k] = S.filter[k]
    COMPONENT HELPERS — every one is a design-system recipe from gallery.html
    ====================================================================== */
 
-/* THE HEAD BAND — §70/§78. A page opens with `.modhead` (a bare `.ph`; the
-   breadcrumb carries the page name now, §78).
-
-   THE TAL SUMMARY IS HIDDEN PORTAL-WIDE (Maryam, 17 Sep 2026: "hide tal summary
-   from the whole super admin portal"). Both head bands used to carry a "Summary
-   by Tal" `.talsum` block gated on `sum`; that block is gone from both. `sum` is
-   kept in the signature so not one of the ~19 call sites changes — the string is
-   simply no longer drawn (like `searchHead`'s ignored `ph`). A list-page head is
-   then only an empty breadcrumb, so an admin CSS rule (`#admin-nosum`) hides that
-   empty modhead; the `.modhead + .sec` first-section spacing still applies because
-   the element stays in the DOM. A detail head keeps its back arrow. */
+/* THE HEAD BAND — §70/§78. A page opens with `.modhead` (the warm-to-green
+   wash), a bare `.ph` (the breadcrumb carries the page name now, §78), and
+   Tal's page summary in the band. `dsTypeSummary` types the sentence. */
 function head(sum){
   return `<div class="modhead">
     <div class="ph ph-bare"></div>
+    ${sum ? `<div class="sec">
+      <div class="ai-aura tile tight talsum">
+        <div class="ai-head"><span class="ai-label">Summary by Tal</span></div>
+        <div class="ai-body"><p>${sum}</p></div>
+      </div>
+    </div>` : ''}
   </div>`;
 }
 
 /* A DETAIL PAGE HEAD — a real `.ph` with a back arrow to the list it came from.
-   The breadcrumb pass keeps the arrow and drops the (empty) heading, §78. The Tal
-   summary is hidden here too (see `head`); many detail pages already passed no
-   `sum`, so this makes every detail head read the same. */
+   The breadcrumb pass keeps the arrow and drops the (empty) heading, §78. */
 function detailHead(backTo, sum){
   return `<div class="modhead">
     <div class="ph"><div class="ph-main"><div class="ph-top">
       <button class="ph-back" data-go="${esc(backTo)}" aria-label="Back">${I.arrowLeft}</button></div></div></div>
+    ${sum ? `<div class="sec">
+      <div class="ai-aura tile tight talsum">
+        <div class="ai-head"><span class="ai-label">Summary by Tal</span></div>
+        <div class="ai-body"><p>${sum}</p></div>
+      </div>
+    </div>` : ''}
   </div>`;
 }
 
@@ -2872,8 +2793,8 @@ function homeOverview(){
      several. `u.addedBy` — the adding admin's id, the same field the Cohort Leader
      list's "Added by" column reads — is the one marker for both the split and the
      cap, so the two never disagree. u4 (Maryam) has none: a candidate-leader,
-     leading Cohort 2 alone. u40 (Bruno) carries one: a moderator, leading
-     Cohort 1 and Cohort 4. `u.volunteer` is kept in step but no longer the
+     leading Explorer 14 alone. u40 (Bruno) carries one: a moderator, leading
+     Explorer 12 and Explorer 15. `u.volunteer` is kept in step but no longer the
      signal. Authored placeholder split — read off the seed, not a signed-off KPI
      (SA-03 E1). */
   const leaders = USERS.filter(u => u.roles.includes('leader'));
@@ -5144,102 +5065,10 @@ function candCV(){
    band, full width. Not-started courses are hidden. Authored placeholder (§74). */
 const CAND_COURSE_LIST = [
   {name:'Foundations of Leadership', lvl:'e1', status:'Completed', on:'March 2026', chapters:'13 of 13', avg:'83%', time:'11h 40m', tasks:'12 of 13'},
-  {name:'Communicating with Impact', lvl:'e2', status:'In progress',
-   /* Per-chapter assessment %s for the assessed chapters, mirroring the candidate
-      portal's Course Progress page (Maryam, 17 Sep 2026: "show the course details
-      just like ... the course progress page ... the performance graph, the progress
-      by chapter"). Authored placeholder (§74) — the seed carries no per-candidate
-      chapter telemetry — matched to the candidate portal's own day-34 series so the
-      admin's read and the candidate's read agree. `assessed` chapters are marked
-      done; `growth` flags the growth-area chapters; `cohort` is the dashed rule. */
-   series:[75,80,78,50,92], assessed:5, avg:75, cohort:79, growth:[3],
-   insight:'Five chapters are assessed so far. Chapter 4, Delegation Without Drop-Off, is the lowest at 50%.'},
+  {name:'Communicating with Impact', lvl:'e2', status:'In progress'},
   {name:'Leading High-Performing Teams', lvl:'e3', status:'Not started'}
 ];
 const courseArtAdm = lvl => (typeof COHORT_ART !== 'undefined' && (COHORT_ART[lvl] || COHORT_ART.e3)) || '';
-
-/* THE COURSE-PROGRESS BODY — an IN-PROGRESS course opens to the candidate portal's
-   Course Progress content (Maryam, 17 Sep 2026: "show the course details just like
-   how we show on the course progress page on the candidate portal, the performance
-   graph, the progress by chapter"). The DS this portal links already ships the
-   `.perf-*` and `.ch-*` CSS the candidate portal draws with (`perfChart` /
-   `chRow`), so this is that markup, READ-ONLY: no Restart/Resume action and no
-   `.ch.open` state (the `Continue →` affordance is the candidate's, not the
-   admin's — the admin is viewing, not taking the course), no navigation. The one
-   green line, the red low point, the dashed cohort rule and the average-score ring
-   are all the DS classes; nothing here paints. Data is on the course record
-   (`series`/`assessed`/`avg`/`cohort`/`growth`/`insight`), authored §74. */
-function coursePerf(c){
-  const done = c.series || [], avg = c.avg, cohort = c.cohort, total = COURSE_CH.length;
-  const W = 900, H = 180, L = 40, R = 10, T = 12, B = 24, IW = W - L - R, IH = H - T - B;
-  const x = i => L + (total > 1 ? i * (IW / (total - 1)) : IW / 2);
-  const y = v => T + IH - (v / 100) * IH;
-  const lo = done.indexOf(Math.min(...done)), hi = done.indexOf(Math.max(...done));
-  const path = done.map((v, i) => (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(v).toFixed(1)).join(' ');
-  /* 80 KEEPS ITS LABEL AND LOSES ITS LINE — the cohort rule sits ~1 unit off it
-     (candidate portal's §—), so the two would paint a pixel apart as a smudge. */
-  const grid = [0, 20, 40, 60, 80, 100].map(v => `
-    ${v === 80 ? '' : `<line x1="${L}" x2="${W - R}" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}" stroke="var(--rule)" stroke-width="1" vector-effect="non-scaling-stroke"/>`}
-    <text class="perf-yl" x="${L - 8}" y="${(y(v) + 4).toFixed(1)}" text-anchor="end">${v}%</text>`).join('');
-  const dots = done.map((v, i) => { const call = i === lo ? ' perf-lo' : i === hi ? ' perf-hi' : '';
-    return `${call ? `<circle class="perf-halo${call}" cx="${x(i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="9"/>` : ''}<circle class="perf-dot${call}" cx="${x(i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="4"/>`; }).join('');
-  const xl = Array.from({ length: total }, (_, i) => `<text class="perf-xl" x="${x(i).toFixed(1)}" y="${H - 10}" text-anchor="middle">${i + 1}</text>`).join('');
-  /* THE AVERAGE HUNG UNDER THE HIGHEST POINT AS A FILLED BOX WITH A RING beside it
-     — the candidate portal's own callout, clamped to the plot so it never hangs
-     off the right edge. `--background` fills it so the gridlines don't strike
-     through the words; `rotate(-90)` starts the ring at twelve o'clock. */
-  const cal = (hi >= 0 && avg != null) ? (() => {
-    const bw = 104, bh = 34, gap = 12, r = 9;
-    let bx = x(hi) + gap; if (bx + bw > W - R) bx = x(hi) - gap - bw; bx = Math.max(L, Math.min(W - R - bw, bx));
-    const by = Math.max(T, Math.min(T + IH - bh, y(done[hi]) - bh / 2));
-    const cx = bx + 8 + r, cy = by + bh / 2, C = 2 * Math.PI * r, arc = (C * Math.min(100, Math.max(0, avg)) / 100).toFixed(1);
-    return `<g class="perf-cal"><rect x="${bx}" y="${by}" width="${bw}" height="${bh}"/>
-      <circle class="perf-cal-trk" cx="${cx}" cy="${cy}" r="${r}"/>
-      <circle class="perf-cal-arc" cx="${cx}" cy="${cy}" r="${r}" stroke-dasharray="${arc} ${(C - arc).toFixed(1)}" transform="rotate(-90 ${cx} ${cy})"/>
-      <text class="perf-cal-l" x="${bx + 34}" y="${by + 15}">Average score</text>
-      <text class="perf-cal-v" x="${bx + 34}" y="${by + 27}">${avg}%</text></g>`;
-  })() : '';
-  return `<div class="sec-h"><div class="perf-hb"><h2>Your performance</h2>
-      <p class="all-desc">Assessment average across ${total} chapters.</p></div>
-      <div class="perf-leg"><span class="perf-lg"><i class="perf-lg-l"></i>Your score</span>
-        <span class="perf-lg"><i class="perf-lg-d"></i>Cohort average ${cohort}%</span></div></div>
-    <div class="perf-b"><div class="perf-plot">
-      <svg class="perf-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Assessment score for each assessed chapter, against a cohort average of ${cohort}%">
-        ${grid}
-        <line class="perf-avg-line" x1="${L}" x2="${W - R}" y1="${y(cohort).toFixed(1)}" y2="${y(cohort).toFixed(1)}" stroke-dasharray="4 4" vector-effect="non-scaling-stroke"/>
-        <path class="perf-line" d="${path}" fill="none" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
-        ${dots}${xl}${cal}
-      </svg></div></div>
-    ${c.insight ? `<div class="perf-f"><div class="perf-ins"><span class="perf-ins-mk"></span>
-      <span class="perf-ins-b"><b>Key insight</b><span>${esc(c.insight)}</span></span></div></div>` : ''}`;
-}
-/* ONE CHAPTER ROW — `chRow`'s markup with the candidate's data, read-only. An
-   assessed chapter is `.done` with the green tick and its `min · %` meta; the rest
-   carry the not-started circle and meta. No trailing Restart/Resume, no `.ch.open`
-   (see coursePerf's note). Growth-area chapters keep the sparkle marker. */
-function candChRow(i, c){
-  const name = COURSE_CH[i][0], mins = COURSE_CH[i][1];
-  const assessed = c.assessed || 0, isDone = i < assessed;
-  const growth = (c.growth || []).includes(i);
-  const meta = isDone ? `${mins} min · ${(c.series || [])[i]}% assessment`
-    : i === assessed ? `In progress · ${mins} min`
-    : `Not started · ${mins} min`;
-  const trail = isDone ? '' : `<span class="ch-ic"><span style="fill:var(--gray-40)">${I.circle}</span></span>`;
-  return `<div class="ch${isDone ? ' done' : ''}">
-    <span class="ch-b"><span class="ch-n">${esc(name)}${isDone ? `<span class="ch-tick">${I.checkFilled}</span>` : ''}</span>
-      <span class="ch-m">${meta}${growth ? `<span class="sep">·</span><span class="ai-inline"><span class="sk"></span>Growth area</span>` : ''}</span></span>
-    ${trail}
-  </div>`;
-}
-function candCourseProgress(c){
-  return `<div class="crs-prog">
-    ${coursePerf(c)}
-    <div class="crs-prog-ch">
-      ${secHead('Progress by chapter')}
-      <div class="tile-stack">${COURSE_CH.map((_, i) => candChRow(i, c)).join('')}</div>
-    </div>
-  </div>`;
-}
 function candCourseRow(c, i){
   const open = String(S.crsOpen) === String(i);
   const done = c.status === 'Completed';
@@ -5265,8 +5094,7 @@ function candCourseRow(c, i){
         ${admFact(I.time, '--mk-3', 'Time invested', c.time)}
         ${admFact(I.flag, '--mk-4', 'Tasks on time', c.tasks)}
       </div>`
-      : c.status === 'In progress' ? candCourseProgress(c)
-      : `<p class="t-desc">This course has not been started yet.</p>`}
+      : `<p class="t-desc">${c.status === 'In progress' ? 'This course is under way.' : 'This course has not been started yet.'}</p>`}
     </div>
   </div>`;
 }
@@ -5523,31 +5351,27 @@ function agentsAll(){
 function agentsDetail(){
   const a = USER_BY_ID[S.id] || AGENTS()[0];
   DETAIL_LABEL = a.name;
-  /* PAYOUTS: only the ones still to release — held (pending settlement), not the
-     ones already released (Maryam, 17 Sep 2026). */
-  const pay = PAYOUTS.filter(p => p.agent === a.name && p.status === 'held');
+  const pay = PAYOUTS.filter(p => p.agent === a.name);
   const books = BOOKINGS.filter(b => b.agent === a.name);
-  const past = pastIvs(a);
-  const acct = a.status === 'active';
+  const st = agState(a);
+  const rankTxt = a.rank ? `Rank ${a.rank}` : AG_STATE[st][1];
   return `
   ${detailHead('agents/agents')}
   <section class="sec">
     ${''/* IDENTITY ROW — the agent's portrait on the LEFT of the name (Maryam, 15
-           Sep 2026), the candidate detail's own `.idhead`. The header actions are
-           Edit and Deactivate (Maryam, 17 Sep 2026 — the listing tag, Set
-           Assessment Range and Pause Listing came off); a deactivated agent shows
-           a Deactivated tag and Reactivate. */}
+           Sep 2026), the candidate detail's own `.idhead`; the state tag and the
+           listing actions ride the right. The Tal summary was removed from this
+           page (Maryam 15 Sep 2026), so `detailHead` keeps only the back arrow. */}
     <div class="idhead">
       <span class="idphoto"><img src="${agentFace(a.name)}" alt="" class="idhead-ph"></span>
       <div class="idhead-b">
         <span class="idname-row"><span class="idname">${esc(a.name)}</span></span>
         <span class="idmeta">${esc(a.job || 'Talent Agent')} &middot; ${esc(a.email)}</span>
       </div>
-      <span class="idhead-act" style="display:flex;align-items:center;gap:var(--s03)">${acct ? '' : tag('inactive', 'Deactivated')}
-        <button class="btn btn-g btn-sm noic" data-sheet="rec:agent:${a.id}">${I.edit} Edit</button>
-        ${acct
-          ? `<button class="btn btn-g btn-sm noic" data-sheet="deactext:${a.id}">${I.deactivate || I.close} Deactivate</button>`
-          : `<button class="btn btn-p btn-sm noic" data-sheet="reactext:${a.id}">Reactivate ${I.arrowRight}</button>`}</span>
+      <span class="idhead-act" style="display:flex;align-items:center;gap:var(--s03)">${agStateTag(a)}
+        <button class="btn btn-g btn-sm noic" data-sheet="agrange:${a.id}">${I.route} Set Assessment Range</button>
+        ${st === 'listed' ? `<button class="btn btn-g btn-sm noic" data-sheet="agpause:${a.id}">Pause Listing</button>` : ''}
+        ${st === 'paused' ? `<button class="btn btn-p btn-sm noic" data-sheet="agrestore:${a.id}">Restore Listing ${I.arrowRight}</button>` : ''}</span>
     </div>
     ${stats([
       ['starOutline', 'Rating', a.rating ? ratingCell(a.rating) : '—', 'candidate reviews'],
@@ -5558,173 +5382,25 @@ function agentsDetail(){
   </section>
 
   <section class="sec">
-    ${aiHead('Payouts to release', 'Amounts still to be released to this agent, settled weekly.',
+    ${aiHead('Payouts', 'This agent’s share per interview, settled weekly.',
       `<button class="btn btn-g btn-sm noic" data-go="finance/payouts">All Payouts</button>`)}
     ${pay.length ? table(
       [{label:'Reference'}, {label:'Period'}, {label:'Net', num:true}, {label:'Status'}, {label:'When'}, ACT_COL],
       pay.map(p => ({cells:[esc(p.ref), esc(p.period), p.net ? money(p.net) : '—', tag(p.status), esc(p.when),
-        p.net ? rowActs([['send', 'Release now', `data-act="askrelease:${p.id}"`]]) : '']})))
-      : emptyState('wallet', 'Nothing to release', 'This agent has no payouts awaiting release right now.')}
+        p.status === 'held' && p.net ? rowActs([['send', 'Release now', `data-act="askrelease:${p.id}"`]]) : '']})))
+      : emptyState('wallet', 'No payouts yet', 'This agent has no settled or held payouts in this window.')}
   </section>
 
   <section class="sec">
-    ${aiHead('Upcoming interviews', 'On this agent’s diary. Open one for the candidate and fee.')}
+    ${aiHead('Booked interviews', 'What is on this agent’s diary.')}
     ${books.length ? table(
       [{label:'Candidate'}, {label:'Kind'}, {label:'Fee', num:true}, {label:'When'}, {label:'Status'}],
-      books.map(b => ({id:b.id, go:'agents/interview/' + b.id, cells:[
-        personCell(b.cand), esc(b.kind), b.fee ? money(b.fee) : 'Complimentary', esc(b.slot), tag(b.status)]})))
+      books.map(b => ({cells:[esc(b.cand), esc(b.kind), b.fee ? money(b.fee) : '—', esc(b.slot), tag(b.status)]})))
       : emptyState('video', 'Nothing booked', 'No interviews are on this agent’s diary right now.')}
-  </section>
-
-  <section class="sec">
-    ${aiHead('Past interviews', 'Completed interviews. Open one for the transcript, evaluations and the candidate’s review.')}
-    ${past.length ? table(
-      [{label:'Candidate'}, {label:'Kind'}, {label:'Fee', num:true}, {label:'When'}, {label:'Candidate rating', num:true}],
-      past.map(p => ({id:p.id, go:'agents/interview/' + p.id, cells:[
-        personCell(p.cand), esc(p.kind), p.fee ? money(p.fee) : 'Complimentary', esc(p.when), p.rating ? ratingCell(p.rating) : '—']})))
-      : emptyState('video', 'No past interviews', 'This agent has no completed interviews on record yet.')}
   </section>`;
 }
 
-/* PAST INTERVIEWS — authored placeholder (§74): the seed has no interview history
-   or evaluations, so these stand in until real recordings/evaluations land. Each
-   carries the transcript source, Tal's read, the agent's own evaluation
-   (strengths / growth / note) and the candidate's rating + review of the agent.
-   No em dashes in Tal's or the agent's voice (DESIGN.md §5). */
-const PAST_IVS = [
-  {id:'piv1', agent:'Dana Whitfield', cand:'Maryam Naz', fee:180, kind:'Level interview', when:'20 Aug 2026', rating:5,
-   tal:'<p>Tal suggests <b>Explorer – E3</b>. On the transcript Maryam reads as someone who <b>reasons from consequence, not policy</b>: she starts from the people a decision lands on and works back.</p><p>What earns E3: three worked examples that each <b>carry a date and a name</b>, and a reorganization she can explain call by call rather than in outline.</p><p>What holds it below E4: the growth is <b>coaching rather than fixing</b>. She still solves a problem herself where developing someone else would be the E4 move.</p><p>Ask in the room: one time she coached a report through a hard call, and what changed. A real outcome there is what would put <b>E4</b> on the table.</p>',
-   strengths:'You reason from consequence to people, not policy. Three examples, each with a date and a name attached.',
-   growth:'Delegation, and coaching rather than fixing. Chapters 4 and 12 are built on exactly this.',
-   note:'She talks cautiously, but she has already run a reorganization and can explain every call she made in it. That is an E3, not an E2.',
-   review:'Dana was direct and fair. She pushed on the parts I was vague about and I left knowing exactly what to work on.'},
-  {id:'piv2', agent:'Dana Whitfield', cand:'Ava Stone', fee:180, kind:'Interview', when:'10 Aug 2026', rating:4,
-   tal:'<p>Tal suggests <b>Explorer – E2</b>, at the <b>E2 to E3 boundary</b>. Ava is <b>clear about the outcomes she owns</b> and honest about the ones she missed.</p><p>What earns the read: she <b>separates the decision from the result</b>, so a miss is examined rather than explained away.</p><p>What holds it at E2: almost every example is <b>her acting alone</b>. There is little evidence yet of coaching someone else through a hard call.</p><p>Ask in the room: one time she brought a second person into the work and developed them. That is the evidence that moves this to <b>E3</b>.</p>',
-   strengths:'Clear on the outcomes you own and honest about the ones you missed. You separate the decision from the result when you talk it through.',
-   growth:'Bring a second person into the story. Most examples are you acting alone rather than you developing someone else.',
-   note:'Solid and self-aware. I would want to see one example of her coaching a report before I called it above E2.',
-   review:'A calm, well-structured hour. Fair questions and useful pointers on where to focus next.'},
-  {id:'piv3', agent:'Priya Raman', cand:'Jordan Vale', fee:225, kind:'Interview', when:'12 Aug 2026', rating:5,
-   tal:'<p>Tal suggests <b>Explorer – E4</b>. Jordan reads as someone who can <b>frame a trade-off across teams</b> and name what each option costs.</p><p>What earns E4: he <b>holds two competing priorities in view</b> at once, and his examples span more than one team rather than one desk.</p><p>What keeps it at E4 rather than higher: he <b>leaves the ending open</b>. He explores a decision well but does not always close it.</p><p>Ask in the room: one decision he closed cleanly under pressure, and how it landed. A clean close is what confirms <b>E4</b> and hints at more.</p>',
-   strengths:'You hold two competing priorities in view and can say what each one costs. Examples span more than one team.',
-   growth:'Tighten how you close a decision. You explore well but the ending is sometimes left open.',
-   note:'Reads a room and a roadmap at the same time. Comfortable at E4.',
-   review:'Priya asked sharp questions and gave me a genuinely useful read on my blind spots.'},
-  {id:'piv4', agent:'Marcus Ozoro', cand:'Sophia Ali', fee:150, kind:'Interview', when:'9 Aug 2026', rating:4,
-   tal:'<p>Tal suggests <b>Explorer – E2</b>. Sophia reads as a <b>dependable, clear operator</b>: she keeps people informed without being asked and her handovers are clean.</p><p>What earns E2: <b>reliable delivery</b> and communication you do not have to chase, across a full cycle of work.</p><p>What holds it below E3: she tends to <b>absorb a problem before naming it</b>. She handles issues well once they land, but raises them late.</p><p>Ask in the room: one problem she named early, before it became urgent. The growth here is timing, not capability, and that is what moves it to <b>E3</b>.</p>',
-   strengths:'Dependable and clear. You keep people informed without being asked and your handovers are clean.',
-   growth:'Name a problem earlier. You handle issues well once they land but you tend to absorb them first.',
-   note:'Trustworthy operator. The growth is timing, not capability.',
-   review:'Marcus put me at ease and the feedback was specific and kind.'}
-];
-function pastIvs(a){ return PAST_IVS.filter(p => p.agent === a.name); }
-
-/* A ROW OF THE INTERVIEW EVALUATION CARDS (the candidate portal's signed-summary
-   look, in the design system this portal links) — one green Strengths, one violet
-   Growth areas, one blue agent note. */
-const ivEvalBlock = iv => `<div class="signed">
-    <div class="sig-pair">
-      <div class="sig-c" style="--mk:var(--mk-2)"><i class="sig-ic">${I.star}</i>
-        <div class="sig-b"><div class="sig-top"><span class="sig-t">Strengths</span><span class="sig-tag">Strong</span></div><p class="sig-p">${esc(iv.strengths)}</p></div></div>
-      <div class="sig-c" style="--mk:var(--mk-3)"><i class="sig-ic">${I.growth}</i>
-        <div class="sig-b"><div class="sig-top"><span class="sig-t">Growth areas</span><span class="sig-tag">Focus</span></div><p class="sig-p">${esc(iv.growth)}</p></div></div>
-    </div>
-    <div class="sig-c" style="--mk:var(--mk-1)"><i class="sig-ic">${I.chat}</i>
-      <div class="sig-b"><div class="sig-top"><span class="sig-t">${esc(String(iv.agent).split(' ')[0])}’s note</span></div><p class="sig-p">&ldquo;${esc(iv.note)}&rdquo;</p></div></div>
-  </div>`;
-
-/* The interview transcript as the styled `.tx-*` lines (authored placeholder,
-   §74) — the same source the Recordings register reads. */
-const ivTranscript = iv => { const A = String(iv.agent).split(' ')[0], C = String(iv.cand).split(' ')[0];
-  const who = w => w === 'agent' ? A : C;
-  return `<div class="tx-lines">${TX_LINES_ADM().map(([t, w, txt, tg, scene]) => `
-    <div class="tx-line${w === 'agent' ? ' me' : ''}">
-      <span class="tx-t">${t}</span>
-      <div class="tx-b"><span class="tx-w">${esc(who(w))}${scene ? `<span class="tx-scene">${I.video}Marked scene</span>` : ''}</span><p class="tx-x">${esc(txt)}</p></div>
-    </div>`).join('')}</div>`;
-};
-
-function agentsInterview(){
-  const piv = PAST_IVS.find(x => x.id === S.id), bk = BOOKINGS.find(x => x.id === S.id);
-  const iv = piv || bk;
-  const agent = iv ? AGENTS().find(x => x.name === iv.agent) : null;
-  const backTo = agent ? 'agents/detail/' + agent.id : 'agents/agents';
-  if(!iv) return `${detailHead('agents/agents')}
-    <section class="sec">${emptyState('video', 'Interview not found', 'This interview is no longer available.')}</section>`;
-  DETAIL_LABEL = `${iv.cand} — interview`;
-  const when = piv ? iv.when : iv.slot;
-  if(!piv){
-    /* UPCOMING — the candidate and the fee (Maryam, 17 Sep 2026), plus when and status for context. */
-    return `${detailHead(backTo)}
-    <section class="sec">
-      ${aiHead('Interview with ' + esc(iv.cand), `${esc(iv.agent)} &middot; ${esc(iv.kind)} &middot; ${esc(when)}`)}
-      ${kv([
-        ['Candidate', esc(iv.cand)],
-        ['Interview fee', iv.fee ? money(iv.fee) : 'Complimentary'],
-        ['Kind', esc(iv.kind)],
-        ['When', esc(when)],
-        ['Status', tag(iv.status)]
-      ])}
-    </section>`;
-  }
-  /* PAST — the full record, behind TWO TABS (Maryam, 17 Sep 2026: "i need two tabs
-     on this page, About Interview and Transcript, the transcript from this page will
-     be shown there"). The identity header (Interview with X · agent · kind · when)
-     stays above the strip; About Interview holds the facts + evaluations + review,
-     Transcript holds the transcript that used to sit at the foot. The strip reuses
-     `filterStrip`/`data-filter` (the audit/roles tab mechanism), state per page via
-     `getFilter`. The four facts are a HORIZONTAL `.facts pf-facts` block, and the
-     Kind row is dropped (Maryam 17 Sep 2026: "remove the kind row and show the other
-     4 in the horizontal blocks view"); the rating cell is hand-written because
-     `admFact` escapes its value and `ratingCell` is HTML. */
-  const ivTab = getFilter('ivtab', 'about');
-  return `${detailHead(backTo)}
-  <section class="sec">
-    ${aiHead('Interview with ' + esc(iv.cand), `${esc(iv.agent)} &middot; ${esc(iv.kind)} &middot; ${esc(when)}`)}
-  </section>
-  <section class="sec sec-cs iv-tabs">
-    ${filterStrip('ivtab', 'about', [['about', 'About Interview'], ['transcript', 'Transcript']])}
-  </section>
-  ${ivTab === 'transcript'
-    ? `<section class="sec">
-    ${aiHead('Transcript', 'The full interview transcript.')}
-    ${ivTranscript(iv)}
-  </section>`
-    : `<section class="sec">
-    <div class="facts pf-facts">
-      ${admFact(I.user, '--mk-4', 'Candidate', iv.cand)}
-      ${admFact(I.wallet, '--mk-3', 'Interview fee', iv.fee ? money(iv.fee) : 'Complimentary')}
-      <div style="--mk:var(--mk-2)"><span class="l pf-l">${ic('starOutline')}Candidate rating</span><span class="v">${iv.rating ? ratingCell(iv.rating) : '—'}</span></div>
-      ${admFact(I.calendar, '--mk-1', 'When', when)}
-    </div>
-  </section>
-  ${''/* TAL'S READ — the Talent Agent portal's exact component (Maryam, 17 Sep 2026:
-        "i need the tal evaluation just like it is on the talent agent portal"): the
-        `.ai-aura.tal-eval` band with the blob mark + "Tal's read" label, the read as
-        highlighted `<b>` phrases (`.tal-eval .ai-body p b`, both ship in the DS this
-        portal links), and the "Proposed only" note under it. `iv.tal` is rich HTML
-        now, so it is NOT escaped. */}
-  <section class="sec">
-    <div class="ai-aura tal-eval">
-      <div class="ai-head"><span class="ai-label bare">Tal's read</span></div>
-      <div class="ai-body">${iv.tal}
-        <p class="help mt5">Proposed only. TalentNext sets the level after analysis, so this is not a decision you make here.</p></div>
-    </div>
-  </section>
-  <section class="sec">
-    ${aiHead(esc(iv.agent) + '’s evaluation', 'What the agent recorded after the interview.')}
-    ${ivEvalBlock(iv)}
-  </section>
-  <section class="sec">
-    ${aiHead('Candidate’s rating and review', `What ${esc(String(iv.cand).split(' ')[0])} said about this interview.`)}
-    <div class="iv-card iv-review">
-      <div class="iv-review-r">${ratingCell(iv.rating)}</div>
-      <p class="sig-p">&ldquo;${esc(iv.review)}&rdquo;</p>
-    </div>
-  </section>`}`;
-}
-
-V.agents = () => modView({agents:agentsAll, detail:agentsDetail, interview:agentsInterview});
+V.agents = () => modView({agents:agentsAll, detail:agentsDetail});
 
 /* ---- MARKETPLACE ACTIONS (Epic 6) --------------------------------------------
    Set an agent's assessment range (6.3) and pause / restore a listing with a
@@ -5822,7 +5498,7 @@ KINDS.cohort = {
      with a leader and its own `sessions` outline, empty on create and built on the
      detail. (The `track` key lingers in the seed data, unread by the UI.) */
   fields: c => [
-    {k:'name', l:'Cohort name', t:'text', req:1, ph:'e.g. Cohort 6'},
+    {k:'name', l:'Cohort name', t:'text', req:1, ph:'e.g. Explorer 16'},
     {k:'leader', l:'Leader', t:'select', opts:leaderOpts(), def:'Unassigned'},
     {k:'cap', l:'Maximum members', t:'number', req:1, def:10, ph:'e.g. 10'},
     {k:'start', l:'Cohort starts on', t:'date', req:1}
@@ -5923,32 +5599,17 @@ function cohortsAssign(){
    cohortsDetail). The add/remove-session sheet below now targets the COHORT. */
 SHEETS.addsess = () => {
   const c = COHORT_BY_ID[S.id];
-  /* A SESSION IS SCHEDULED BY A CONCRETE DATE AND TIME, not an abstract "week"
-     (Maryam, 17 Sep 2026: "instead of week selection we need to give date and time
-     fields to logically set when this session will happen"). The Mode field and the
-     "added to this cohort's outline" note were removed the same day. Date is our
-     month-grid picker (`t:'date'`, never a native input, §admin); Time is our
-     dropdown (`t:'select'`, business hours). `sessionWeek` still derives a week from
-     the cohort start so the roster table can sort and label a seed session. */
   return {title:`Add a session to ${c ? c.name : 'the cohort'}`,
     body:`${fieldHtml({k:'title', l:'Session title', t:'text', ph:'e.g. Mid-cycle levelling check-in'})}
-      ${fieldHtml({k:'date', l:'Date', t:'date', ph:'Select a date'})}
-      ${fieldHtml({k:'time', l:'Time', t:'select', opts:['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00']}, '10:00')}
-      ${fieldHtml({k:'dur', l:'Length (minutes)', t:'number', def:60})}`,
+      ${fieldHtml({k:'week', l:'Week', t:'number', def:1})}
+      ${fieldHtml({k:'dur', l:'Length (minutes)', t:'number', def:60})}
+      ${fieldHtml({k:'mode', l:'Mode', t:'select', opts:['Live', 'Workshop', 'Async']}, 'Live')}
+      <p class="t-desc">The session is added to this cohort’s outline.</p>`,
     ok:'Add Session', act:'doaddsess:' + (c ? c.id : '')};
 };
 ACTIONS.addsess = key => { S.id = key.split(':')[1]; S.sheet = 'addsess'; };
-/* the week the chosen date falls in, counted from the cohort's start; 0 when the
-   cohort has no start or the date is blank, so the caller can fall back. */
-function sessionWeek(c, iso){
-  if(!c || !c.start || !/^\d{4}-\d{2}-\d{2}$/.test(iso || '')) return 0;
-  const diff = Math.floor((new Date(iso) - new Date(c.start)) / (864e5 * 7));
-  return Math.max(1, diff + 1);
-}
 ACTIONS.doaddsess = key => { const c = COHORT_BY_ID[key.split(':')[1]]; if(!c) return; const v = readForm(); if(!v.title){ toast('Give the session a title', 'warn'); return 'keep'; }
-  if(!c.sessions) c.sessions = [];
-  const week = sessionWeek(c, v.date) || (c.sessions.length + 1);
-  c.sessions.push({id:c.id + 's' + (c.sessions.length + 1), title:v.title, week, date:v.date || '', time:v.time || '', dur:Number(v.dur) || 60}); c.sessions.sort((a, b) => a.week - b.week);
+  if(!c.sessions) c.sessions = []; c.sessions.push({id:c.id + 's' + (c.sessions.length + 1), title:v.title, week:Number(v.week) || 1, dur:Number(v.dur) || 60, mode:v.mode}); c.sessions.sort((a, b) => a.week - b.week);
   audit('Added session to cohort', `${c.name} — ${v.title}`, 'Cohort Management', 'info'); toast('Session added'); };
 ACTIONS.delsess = key => { const [, cid, sid] = key.split(':'); const c = COHORT_BY_ID[cid]; if(!c || !c.sessions) return; const i = c.sessions.findIndex(s => s.id === sid); if(i >= 0){ const nm = c.sessions[i].title; c.sessions.splice(i, 1); audit('Removed session', `${c.name} — ${nm}`, 'Cohort Management', 'info'); toast('Session removed'); } };
 
@@ -5991,7 +5652,7 @@ function cohortsDetail(){
 
   <section class="sec">
     ${aiHead('Cohort Members', full ? `Cohort full · ${cap} / ${cap}.` : `${roster.length} of ${cap} members.`,
-      full ? '' : `<button class="btn acc-link btn-sm noic" data-sheet="addmember">${I.add} Add Member</button>`)}
+      full ? '' : `<button class="btn btn-p btn-sm noic" data-sheet="addmember">${I.add} Add Member</button>`)}
     ${roster.length ? `<div class="tile-stack">
       ${roster.map(m => memRow(m.name, `${esc(m.level)} · ${esc(m.bucket)} · ${esc(memCourse(m))} · last active ${esc(m.last)}`,
         rowActs([['launch', 'Open record', `data-go="candidates/detail/${m.id}"`], ['renew', 'Move', `data-sheet="moveco:${c.id}:${m.id}"`], ['delete', 'Remove from cohort', `data-act="askremove:${c.id}:${m.id}"`]]), null, agentFace(m.name))).join('')}
@@ -5999,21 +5660,11 @@ function cohortsDetail(){
   </section>
 
   <section class="sec">
-    ${''/* Add Session is an ACCENT LINK (Maryam, 17 Sep 2026: "give add session
-          text and icon accent color") — `.acc-link` (transparent, --accent-text
-          label + accent icon, no fill/padding), not the black ghost. */}
     ${aiHead('Sessions', 'The group sessions this cohort runs across the 90-day cycle. Add or remove one at any time.',
-      `<button class="btn acc-link btn-sm noic" data-act="addsess:${c.id}">${I.add} Add Session</button>`)}
-    ${''/* NO ROW-SELECT CHECKBOXES on this table (Maryam, 17 Sep 2026: "remove the
-          checkboxes from this table") — `{select:false}`. The "When" column shows
-          the scheduled date + time a session now carries (§addsess); a seed session
-          with only a week falls back to "Week N". */}
+      `<button class="btn btn-g btn-sm noic" data-act="addsess:${c.id}">${I.add} Add Session</button>`)}
     ${(c.sessions && c.sessions.length) ? table(
-      [{label:'Session'}, {label:'When'}, {label:'Length', num:true}, {label:'Mode'}, ACT_COL],
-      c.sessions.map(s => ({cells:[esc(s.title),
-        s.date ? esc(dpFmt(s.date) + (s.time ? ' · ' + s.time : '')) : (s.week ? 'Week ' + s.week : '—'),
-        s.dur + ' min', esc(s.mode || '—'), rowActs([['delete', 'Remove session', `data-act="delsess:${c.id}:${s.id}"`]])]})),
-      {select:false})
+      [{label:'Session'}, {label:'Week', num:true}, {label:'Length', num:true}, {label:'Mode'}, ACT_COL],
+      c.sessions.map(s => ({cells:[esc(s.title), String(s.week), s.dur + ' min', esc(s.mode), rowActs([['delete', 'Remove session', `data-act="delsess:${c.id}:${s.id}"`]])]})))
       : emptyState('calendar', 'No sessions yet', draft ? 'Build the session outline before you start the cohort.' : 'Add the first session to this cohort.')}
   </section>`;
 }
@@ -6241,71 +5892,29 @@ function cohortsCourseDetail(){
 const courseLevels = c => c.levels || LEVELS_MVP.filter(l => l[0] === (c.track || 'Explorer')[0]);
 const BUCKETS = [
   {name:'Explorer', pfx:'E', desc:'The entry bucket. Everyone starts here and levels up by re-interviewing.', can:'Can lead nothing yet.'},
-  {name:'Builder', pfx:'B', desc:'Reached by finishing an Explorer cohort.', can:'A Builder can lead an Explorer cohort.'},
-  {name:'Trailblazer', pfx:'T', desc:'The top bucket. Deep experience across the loop.', can:'A Trailblazer can lead an Explorer and Builder cohort.'}
+  {name:'Builder', pfx:'B', desc:'Reached by finishing an Explorer cohort and levelling through the interviews.', can:'A Builder can lead an Explorer cohort.'},
+  {name:'Trailblazer', pfx:'T', desc:'The top bucket. Deep experience across the loop.', can:'A Trailblazer can lead a Builder cohort.'}
 ];
-/* THE LEVELS PAGE IS TABBED (Maryam, 17 Sep 2026): the three buckets sit behind
-   a `.cs` tab strip (`lvlb`), one bucket per view. The selected bucket shows its
-   heading with a right-aligned Edit action (the heading is a direct `.sec >
-   .sec-h.aih`, so `.aih-a{margin-left:auto}` pushes Edit to the row's right end),
-   and its levels as a row of `.lvl-block` tiles — the level CODE only ("E1", not
-   "Explorer E1") centred with the candidate count below. The number of levels is
-   editable from the bucket's Edit sheet (`b.levels`), so a bucket can gain or
-   lose levels. */
 function cohortsLevels(){
   const countAt = lvl => CANDS.filter(c => c.level === lvl).length;
-  /* Count by level PREFIX, not the bucket's name — a bucket the admin renamed
-     keeps its true candidate count (a candidate's level code carries the bucket). */
-  const countBucket = x => CANDS.filter(c => c.level && c.level[0] === x.pfx).length;
-  const cur = getFilter('lvlb', BUCKETS[0].name);
-  const b = BUCKETS.find(x => x.name === cur) || BUCKETS[0];
-  const i = BUCKETS.indexOf(b);
-  const levels = b.levels || 5;
   return `
-  <section class="sec lvl-top sec-noline">
-    ${aiHead('Levels & buckets', 'The levelling system every candidate moves through, and what each bucket may lead.')}
-    ${filterStrip('lvlb', BUCKETS[0].name, BUCKETS.map(x => [x.name, x.name, countBucket(x)]))}
-  </section>
-  <section class="sec lvl-body">
-    ${aiHead(esc(b.name), esc(b.desc) + ' ' + esc(b.can),
-      `<button class="btn btn-g btn-sm noic" data-sheet="editbucket:${i}">${I.edit} Edit</button>`)}
-    <div class="lvl-blocks" style="--lvl-cols:${Math.min(levels, 5)}">
-      ${Array.from({length: levels}, (_, n) => {
-        const code = b.pfx + (n + 1), c = countAt(code);
-        return `<div class="lvl-block">
-          <span class="lvl-block-code t-h1">${code}</span>
-          <span class="lvl-block-n t-desc">${c} candidate${c === 1 ? '' : 's'}</span>
-        </div>`;
-      }).join('')}
-    </div>
+  <section class="sec">
+    ${aiHead('Levels & buckets', 'The levelling system every candidate moves through, and what each bucket may lead.',
+      `<button class="btn btn-g btn-sm noic" data-sheet="editbuckets">${I.edit} Edit Descriptions</button>`)}
+    ${''/* FIVE LEVELS PER BUCKET (E1–E5 etc.), and the divider goes AFTER each
+           bucket, not between its level rows (Maryam, 15 Sep 2026): `.lvl-bucket`
+           drops the per-row `.kv` hairline and carries one rule under the block. */}
+    ${BUCKETS.map(b => `
+      <div class="lvl-bucket">
+        ${aiHead(esc(b.name), esc(b.desc) + ' ' + esc(b.can))}
+        ${kv([1, 2, 3, 4, 5].map(n => [`${b.name} ${b.pfx}${n}`, `${countAt(b.pfx + n)} candidate${countAt(b.pfx + n) === 1 ? '' : 's'}`, 'n']))}
+      </div>`).join('')}
   </section>`;
 }
-/* THE NUMBER-OF-LEVELS FIELD is a stepper with our own up/down chevrons on the
-   RIGHT (Maryam, 17 Sep 2026: the native spinner reads broken and off-brand).
-   The native spinner is hidden in CSS and `data-nstep` adjusts the input value
-   DOM-only (no render, so the description textarea's in-progress text survives —
-   the sheet is read back from the DOM on Save). */
-function numStep(key, val, min, max){
-  return `<div class="f nstep-f"><span class="lbl">Number of levels</span>
-    <div class="nstep">
-      <button type="button" class="nstep-b" data-nstep="${key}:down" aria-label="Remove a level"><svg viewBox="0 0 24 24" aria-hidden="true">${inner('subtract')}</svg></button>
-      <input class="nstep-val" data-f="${key}" type="number" min="${min}" max="${max}" value="${val}" readonly aria-label="Number of levels">
-      <button type="button" class="nstep-b" data-nstep="${key}:up" aria-label="Add a level"><svg viewBox="0 0 24 24" aria-hidden="true">${inner('add')}</svg></button>
-    </div></div>`;
-}
-SHEETS.editbucket = (arg) => { const i = +arg, b = BUCKETS[i]; if(!b) return null; return {title:`Edit ${b.name}`,
-  body: `<div class="lvl-edit">${fieldHtml({k:'n' + i, l:'Bucket name', t:'text'}, b.name)}${fieldHtml({k:'d' + i, l:'Description', t:'textarea'}, b.desc)}${numStep('lv' + i, b.levels || 5, 1, 12)}</div>`,
-  ok:'Save', act:'dobuckets'}; };
-ACTIONS.dobuckets = () => { const v = readForm(); BUCKETS.forEach((b, i) => {
-  const nm = v['n' + i] != null ? v['n' + i].trim() : '';
-  if(nm && nm !== b.name){
-    /* keep the selected tab on the renamed bucket (the tab filter holds the name). */
-    if(getFilter('lvlb', BUCKETS[0].name) === b.name) setFilter('lvlb', nm);
-    b.name = nm;
-  }
-  if(v['d' + i] != null) b.desc = v['d' + i];
-  if(v['lv' + i] != null && v['lv' + i] !== '') b.levels = Math.max(1, Math.min(12, parseInt(v['lv' + i], 10) || 1));
-}); audit('Edited bucket', 'Levels & buckets', 'Cohort Management', 'info'); toast('Bucket saved'); };
+SHEETS.editbuckets = () => ({title:'Bucket descriptions',
+  body: BUCKETS.map((b, i) => fieldHtml({k:'d' + i, l:b.name, t:'textarea'}, b.desc)).join('') + '<p class="t-desc">What each bucket may lead is a platform rule and is not edited here.</p>',
+  ok:'Save', act:'dobuckets'});
+ACTIONS.dobuckets = () => { const v = readForm(); BUCKETS.forEach((b, i) => { if(v['d' + i]) b.desc = v['d' + i]; }); audit('Edited bucket descriptions', 'Levels & buckets', 'Cohort Management', 'info'); toast('Descriptions saved'); };
 
 V.cohorts = () => modView({cohorts:cohortsList, assign:cohortsAssign,
   detail:cohortsDetail, levels:cohortsLevels});
@@ -9048,11 +8657,8 @@ function render(){
   }
 
   try {
-    /* the Tal summary band is hidden portal-wide now (see `head`), so this is
-       usually absent — only type it when a page still draws one */
-    const talP = device.querySelector('.modhead .ai-aura.talsum > .ai-body > p');
-    if(talP && typeof dsTypeSummary === 'function'){
-      dsTypeSummary(talP, key);
+    if(typeof dsTypeSummary === 'function'){
+      dsTypeSummary(device.querySelector('.modhead .ai-aura.talsum > .ai-body > p'), key);
     }
   } catch(e){ console.warn('talsum', e); }
 
@@ -9111,21 +8717,6 @@ device.addEventListener('click', e => {
      a scroll position is where the reader is looking, not view state). */
   const scv = e.target.closest('[data-scv]');
   if(scv){ dsScvScroll(scv); return; }
-  /* THE NUMBER STEPPER (bucket Edit sheet) — adjust the input value in place, no
-     render, so the description textarea's in-progress text survives (the sheet is
-     read back from the DOM on Save). Clamped to the field's min/max. */
-  const nst = e.target.closest('[data-nstep]');
-  if(nst){
-    const [key, dir] = nst.dataset.nstep.split(':');
-    const inp = device.querySelector(`[data-f="${key}"]`);
-    if(inp){
-      const lo = +inp.min || 1, hi = +inp.max || 99;
-      let n = parseInt(inp.value, 10); if(isNaN(n)) n = lo;
-      n = Math.max(lo, Math.min(hi, n + (dir === 'up' ? 1 : -1)));
-      inp.value = n;
-    }
-    return;
-  }
   /* OUR form dropdown (formDd) — DOM-only, no render (the form is read from the
      DOM on save). Toggle the menu, set the hidden [data-f] input and the trigger
      label; a pick never rebuilds the sheet, so other in-progress fields survive. */

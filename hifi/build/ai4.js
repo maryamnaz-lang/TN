@@ -154,59 +154,21 @@ const SPEECH_OK = !!SPEECH;
 /* the live recogniser lives with the recorder now — see `_vrec` over
    `askRecStart`, which replaced the dictation this const used to hold. */
 
-const AI_RUN = `<span class="ai-run" aria-hidden="true">
-    <svg preserveAspectRatio="none">
-      <defs>
-        ${''/* THE COMET'S FIVE STOPS — Maryam, 9 Sep 2026, off Figma 875:6598,
-              given as the exact CSS to follow:
-              `linear-gradient(90.13deg, rgba(255,255,255,0.7) 0%,
-              rgba(213,81,215,0.7) 22.6%, rgba(255,110,36,0.7) 49.04%,
-              rgba(255,55,51,0.7) 75%, rgba(255,255,255,0.7) 100%)`.
-
-              WHITE INTO MAGENTA, ORANGE, RED AND BACK TO WHITE. The offsets are
-              unchanged from the 4 Sep set (0 / .226 / .4904 / .75 / 1); the
-              THREE middle colours are new — #d551d7 (magenta), #ff6e24 (orange)
-              and #ff3733 (red), where the ramp had been red / pale-green / red.
-              So the light is no longer symmetric: it warms across rather than
-              mirroring, which is the node's own gradient.
-
-              90.13deg IS HORIZONTAL, so the SVG gradient is `x2=1 y2=0` now,
-              not the corner-to-corner `y2=1` §70.3a's note argued for. On a wide,
-              short field the ramp lives on the top and bottom edges and the white
-              ends fall on the short sides — which is where the file draws them —
-              so the comet fades through the corners rather than at mid-edge.
-
-              THE .7 IS `stop-opacity`, NOT A COLOUR. SVG has no `rgba()` in
-              `stop-color`, and baking the alpha into the hex would need it
-              composited against whatever is behind — the dock's own border, not
-              white. Stated as the attribute the stop is genuinely 70% and the
-              border shows through it, which is what the spec's `rgba` means on a
-              `filter:blur(1px)` line lying over a coloured edge. The white ends
-              at 70% are what make the dash fade in and out of its travel; §70.1's
-              note has the long version, including why the loop has no seam. */}
-        ${''/* THE MAGENTA STOP IS DROPPED (Maryam, 9 Sep 2026): the comet is now
-              white → orange → red → white, four stops, off the updated node —
-              `linear-gradient(90.13deg, rgba(255,255,255,.7) 0%,
-              rgba(255,110,36,.7) 49.04%, rgba(255,55,51,.7) 75%,
-              rgba(255,255,255,.7) 100%)`. The offsets that remain are unchanged
-              (0 / .4904 / .75 / 1); only #d551d7 at .226 came out, so the light
-              warms straight from white into orange with no purple lead-in. */}
-        <linearGradient id="aiRunGrad" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stop-color="#ffffff" stop-opacity=".7"/>
-          <stop offset="0.4904" stop-color="#ff6e24" stop-opacity=".7"/>
-          <stop offset="0.75" stop-color="#ff3733" stop-opacity=".7"/>
-          <stop offset="1" stop-color="#ffffff" stop-opacity=".7"/>
-        </linearGradient>
-      </defs>
-      <rect pathLength="1000"/>
-    </svg>
-  </span>`;
+/* `AI_RUN` MOVED TO views.js — Maryam, 17 Sep 2026, when the Tal side panel's
+   composer was asked for the same comet as the dock and the chat field.
+   `talPanel` lives in views.js, which build.py concatenates BEFORE this file
+   and which calls `render()` at its own foot; a `const` declared here is still
+   in its temporal dead zone at that first render, so reading it from there
+   would throw before the app drew anything. One declaration, in the earliest
+   file that needs it, rather than a `typeof` guard or a second copy of the
+   gradient — the point of the constant is that every comet in the build is the
+   same five stops and the same lap. */
 
 function askBar(){
   const q = askQ();
   return `<button class="askline" data-askopen="1" aria-label="Ask Tal anything">
     ${AI_RUN}
-    <span class="askline-mark"><span class="tal-mk"></span></span>
+    <span class="askline-mark">${borbMark('tal-mk')}</span>
     ${''/* "Ask Tal", not "Ask Tal anything" — Figma 875:6598, 9 Sep 2026. The
           example question beside it carries the "…anything" sense; the label is
           the shorter of the two now. The aria-label keeps the full phrase. */}
@@ -315,10 +277,10 @@ function askRotate(){
    and a thread that changes shape when it changes surface is two threads.
    Kept identical to `bubble()` in the panel, deliberately: the two are one
    component and the moment they drift they stop being one. */
-function askBubble(who, html){
+function askBubble(who, html, live){
   return who === 'me'
     ? `<div class="tal-msg me"><span class="tal-who"><span class="tal-who-n">You</span><span class="av"><img src="${isLead()?AV.priya:AV.hana}" alt=""><i>${isLead()?'PN':'MN'}</i></span></span><div class="bb">${html}</div></div>`
-    : `<div class="tal-msg"><span class="tal-who"><span class="tal-mk sm"></span><span class="tal-who-n">Tal</span></span><div class="bb">${html}</div></div>`;
+    : `<div class="tal-msg"><span class="tal-who">${borbMark('tal-mk sm', live)}<span class="tal-who-n">Tal</span></span><div class="bb">${html}</div></div>`;
 }
 
 function askView(f){
@@ -391,13 +353,13 @@ function askView(f){
     + ` poster="${TAL_BLOB_POSTER}"${reduce() ? '' : ' autoplay'}`
     + ` loop muted playsinline preload="auto" aria-hidden="true"></video>`;
   const hero = `<div class="tal-hero">
-      <span class="tal-mk lg orb tnlogo">${blob}${TN_CHEVRONS}</span>
+      ${borbMark('tal-mk lg', true)}
       <h2>Hey, ${isLead()?'Priya':'Maryam'}! <span class="askv-q">${isLead()?'What do you need?':'What&rsquo;s going on?'}</span></h2>
       <p>${isLead()?'I can read your cohorts, your evaluations and where people are stuck.':'I am here to assist you with anything you need help with.'}</p>
     </div>`;
   const thread = (opened ? '' : hero)
     + S.thread.map(m => askBubble(m.who, m.html)).join('')
-    + (S.typing ? askBubble('tal', `<div class="ai-stream"><i></i><i></i><i></i></div>`) : '');
+    + (S.typing ? askBubble('tal', `<div class="ai-stream"><i></i><i></i><i></i></div>`, true) : '');
 
   /* THE BAND IS `← ◍ Tal`, from Figma 439:512, and the back control keeps its
      destination in `aria-label` rather than on screen. The words "Back to
@@ -422,7 +384,7 @@ function askView(f){
     <div class="ask-top">
       <button class="ph-back" data-askback="1" aria-label="Back to ${where}">${I.arrowLeft}</button>
       <span class="ask-top-id">
-        <span class="tal-mk"></span>
+        ${borbMark('tal-mk')}
         <span class="ask-top-t">Tal</span>
       </span>
     </div>
@@ -431,6 +393,16 @@ function askView(f){
       ${opened ? '' : `<div class="ask-sugg">${ctx.map(s =>
         `<button class="chip-tal" data-ask="1"><span class="sk-mark xs"></span>${s}</button>`).join('')}</div>`}
       <div class="askfield">
+        ${''/* THE COMET COMES BACK (Maryam, 17 Sep 2026: "in the internal chat
+               screens make sure the ui of chat bar is almost same in terms of
+               shadows and this running strobe effect"). §118's note records the
+               4 Sep ask this reverses — "do not add the moving line on the
+               border" — so the field was built as the dock MINUS `.ai-run` and
+               minus the lift. Both come back here and in §118; the walking
+               `::before` stroke §53 drew stays off, because the comet is now
+               the moving line and two of them on one edge is the thing §118
+               took the first one off to avoid. */}
+        ${AI_RUN}
         <span class="askv-clip">${I.attachFile}</span>
         <input class="inp" id="askIn" placeholder="What can I help you with?" autocomplete="off">
         ${''/* THE MIC IS DRAWN ONLY WHERE IT CAN WORK — §60's rule, applied to a

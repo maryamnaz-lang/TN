@@ -1,0 +1,79 @@
+/* ============================================================================
+   133. THE ORB IN THE SLOTS THE FLAT MARK HELD
+
+   §132 sizes the orb from `--borb-size` and from nothing else. §27.1 sizes
+   `.tal-mk` with `width`/`height`, and six later layers restate that per
+   context — 15px in a thread label, 18 on the ask bar, 20 in the field, 24
+   standing alone, 28 in the ask page's top row, 32 in the dock, 72 on a
+   narrow onboarding card, 132 in an empty state. This layer is the joint
+   between those two facts, and it is the whole of the joint.
+
+   WHY --borb-size IS NOT THE BOX. §132 draws the glass body at 0.80556 of
+   `--borb-size`; the rest of the box is the shadow and the ripple, which are
+   meant to bleed. Setting `--borb-size` to the slot would therefore land a
+   sphere a fifth smaller than the flat mark it replaces, on every surface at
+   once. Every value below is the slot DIVIDED by 0.80556, so the glass body
+   lands exactly on the diameter §27.1 asked for and the bleed falls outside
+   the box — which is what `width`/`height` staying at the slot is for. The
+   children all centre on `inset:0;margin:auto`, so a box smaller than
+   `--borb-size` does not shift anything, it only lets the glow out.
+
+   WHY THE BACKGROUND IS TURNED OFF. §27.1's `.tal-mk` paints `--tal-mark` as
+   its own `background-image`. The orb is not opaque to its own corners, so
+   the flat blob would show around the sphere rather than behind it.
+
+   `display:flex` because §27.1 says `block` at `.app .tal-mk` — two classes,
+   which outranks §132's single-class `.borb`. It is the only property §132
+   loses on specificity, so it is the only one restated.
+
+   LAST IN THE CASCADE for §132's own reason: every selector here is gated on
+   `.borb`, which no layer before §132 mentions.
+   ========================================================================== */
+
+/* the joint, and the default box (§27.1's 24) ------------------------------ */
+.app .borb.tal-mk{
+  display:flex;
+  background-image:none;
+  width:24px;height:24px;
+  --borb-size:29.8px}
+
+/* §27.1's two named boxes ------------------------------------------------- */
+.app .borb.tal-mk.sm{width:15px;height:15px;--borb-size:18.6px}
+.app .borb.tal-mk.lg{width:132px;height:132px;--borb-size:163.9px}
+
+/* the ask bar, the field and the dock (§115.32, §115.336, §119.1640) ------- */
+.app .askline-mark .borb.tal-mk{width:18px;height:18px;--borb-size:22.3px}
+.app .ask-page .askfield .askline-mark .borb.tal-mk{width:20px;height:20px;--borb-size:24.8px}
+.app .askdock .askline-mark .borb.tal-mk{width:32px;height:32px;--borb-size:39.7px}
+
+/* the ask page's top row and its thread labels (§115.136, §115.235) -------- */
+.app .ask-page .ask-top-id .borb.tal-mk{width:28px;height:28px;--borb-size:34.8px}
+.app .ask-page .ask-thread .tal-msg .borb.tal-mk.sm{width:28px;height:28px;--borb-size:34.8px}
+
+/* the onboarding card's hero, inside §107's own container query ------------ */
+@container app (max-width:899px){
+  .app .ob-card .ob-brand .tal-hero .borb.tal-mk.lg{
+    width:72px;height:72px;--borb-size:89.4px}
+}
+
+/* THE SUMMARY BAND'S MARK (§70.632, §33.186) ------------------------------
+   The head band's "Summary by Tal" mark was `--tal-mark` painted as a 28px
+   `background-image` on `.ai-label::before` — a still picture of the orb
+   standing in the one place the orb itself belongs. It is the real component
+   now, at the same 28px so nothing around it moves, and it is an IDENTITY
+   mark: `placePageSummary` emits it without `live`, so orb-wire pins it to
+   idle and a page summary never thinks, listens or speaks. The band reports
+   what a page says, not what Tal is doing this second.
+
+   The `::before` is switched off rather than deleted, and gated on the label
+   actually HOLDING an orb (`:has(> .borb)`), so the four hand-written portals
+   — which write their own `.talsum` band and do not run `placePageSummary` —
+   keep the artwork until they emit one. §70's rule is (0,6,1); the `:has()`
+   argument lifts this to (0,7,1), so it wins on weight as well as on order. */
+.app .modhead .ai-aura.talsum > .ai-head > .ai-label:has(> .borb)::before{
+  content:none}
+.app .modhead .ai-aura.talsum > .ai-head > .ai-label > .borb.tal-mk{
+  width:28px;height:28px;--borb-size:34.8px}
+
+/* THE GAP UNDER THE HERO. §115.73 hangs it off `.tal-mk.lg` and §27.169 off
+   `.tal-mk`, and both still match — the class is kept. Nothing to restate. */

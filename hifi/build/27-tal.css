@@ -624,3 +624,36 @@
   .app .tal-fab,
   .app .tal-panel{display:none}
 }
+
+/* --------------------------------------------------------------------- 9 ---
+   THE PANEL'S COMPOSER TAKES THE DOCK'S LIFT AND THE DOCK'S COMET
+   Maryam, 17 Sep 2026: "in the internal chat screens make sure the ui of chat
+   bar is almost same in terms of shadows and this running strobe effect."
+   §118 answers it for the ask page's field; this is the other in-app Tal bar,
+   so it answers it here in the same two terms.
+
+   ONLY THOSE TWO TERMS. The ask names shadows and the strobe, so the shape is
+   untouched: §5 above draws this as a 53px SQUARE-cornered bar with a flush
+   51px send, not the dock's 999px pill, and turning it into one is a redesign
+   nobody asked for. "Almost same" is the instruction and this is the almost.
+
+   `rx:0` IS LOAD-BEARING. §117.78 states `.app .ai-run rect{rx:31px}` with no
+   host in front of it, so it reaches EVERY comet in the build — including this
+   one, where a 31px rounded path inside a square 53px box would run visibly
+   inside the corners with the border still square outside it. The dock keeps
+   its 31 and §118 its 32; this box has no radius, so its comet has none.
+
+   `position:relative` IS THE OTHER HALF, as §70.358 states for the dock:
+   `.ai-run` is `position:absolute; inset:-1px` and needs a positioned host.
+   NOTE §6 BELOW REFUSES `position:relative` ON `.tal-panel` ITSELF and says
+   why — it drops the overlay back into the app's flex column. This is the
+   COMPOSER inside it, not the panel, so that hazard does not apply here; the
+   comet finding the panel is exactly what this prevents.
+   -------------------------------------------------------------------------- */
+.app .tal-panel .composer{
+  position:relative;
+  box-shadow:
+    0 1px 2px var(--dock-shadow-1),
+    0 8px 18px -2px var(--dock-shadow-2),
+    0 26px 54px -12px var(--dock-shadow-3)}
+.app .tal-panel .composer .ai-run rect{rx:0}

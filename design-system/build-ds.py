@@ -1060,6 +1060,21 @@ LAYERS = [
     # deliberately-dropped layer stays distinguishable from one nobody thought
     # about. Delete this entry with the file and `build.py`'s LAYERS entry.
     '131-tmpui.css',
+    # §132/§133 are the orb. Moved here from NOT_IN_DS on 17 Sep 2026: the
+    # agent portal's own chat (`askView`/`askBubble`/`askDock` in
+    # tn-agent-portal.html) already keeps exactly the state orb-wire.js
+    # expects — a global `render()` and `S.typing` — so the CSS and the
+    # behaviour both cross now, and the entry that used to decline this layer
+    # moves here per its own note ("if the orb is ever wired into the
+    # hand-written portals' own chat, this entry moves to LAYERS"). The JS
+    # half (`orb.js` + `orb-wire.js`) is NOT bundled into `talentnext-ds.js`
+    # for this reason: it wraps `window.render`/`window.S` by name at load
+    # time, so it has to run in the portal's own script, after those are
+    # declared, not in a shared file loaded before the portal's script runs.
+    # It is appended to tn-agent-portal.html's own script instead, the same
+    # place hifi's build appends it after every other JS layer.
+    '132-orb.css',
+    '133-orb-fit.css',
 ]
 
 # ==========================================================================

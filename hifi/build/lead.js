@@ -1135,7 +1135,7 @@ const leadCertBanner = () => `<div class="sec">
       <span class="certban-m">Verified by TalentNext &middot; Volunteer cohort leader</span>
     </span>
     <span class="certban-a">
-      <button class="btn btn-p btn-sm" data-go="leadProfile">View</button>
+      <button class="btn btn-p btn-sm noic" data-go="leadProfile">View</button>
     </span>
   </div>
 </div>`;
