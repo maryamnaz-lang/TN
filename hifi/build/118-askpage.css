@@ -15,9 +15,17 @@
    the suggestion row: the agent portal writes the same `askChip`, so it moves
    with this; `.chip-tal` elsewhere is untouched.
 
-   THE FIELD IS THE DOCK WITHOUT THE COMET. "The tal field should follow the
+   THE FIELD IS THE DOCK WITHOUT THE COMET — AND THAT WAS REVERSED ON 17 SEP
+   2026. Maryam, that day: "in the internal chat screens make sure the ui of
+   chat bar is almost same in terms of shadows and this running strobe effect",
+   which asks back BOTH of the two things this section and the one below it
+   took off. The original ask is kept in full below rather than edited away,
+   because it is the argument the reversal has to beat and the note at the foot
+   of this layer is where the new state is written. Read the two together.
+
+   "The tal field should follow the
    floating component we have on each page, but do not add the moving line on
-   the border." So it takes §117 exactly — pill, the ramp as a two-layer
+   the border." So it took §117 exactly — pill, the ramp as a two-layer
    background because `border-image` ignores radius, bare glyphs 16 apart — and
    NOT §70's `.ai-run`, which `askView` does not emit anyway. What it gives up
    is §53's OWN moving stroke: that layer painted a walking hot spot round the
@@ -79,7 +87,7 @@
   background-color:transparent;
   background-image:
     linear-gradient(var(--background), var(--background)),
-    linear-gradient(var(--accent), var(--accent));
+    linear-gradient(var(--rule), var(--rule));
   background-origin:padding-box, border-box;
   background-clip:padding-box, border-box}
 /* TYPING (focus) SWAPS THE EDGE TO THE GRADIENT (Maryam, 9 Sep 2026, off Figma
@@ -88,10 +96,24 @@
    hairline above; on `:focus-within` it becomes `--ai-grad-line`, the ask ramp
    — the one moment the chat field wears the colour. The send disc (the "accent
    color frame") is armed separately by `askSendArm` (`:not(:disabled)` above). */
+/* AND THE FOCUS EDGE GOES NEUTRAL TOO — Maryam, 17 Sep 2026, "get rid of these
+   red borders". Setting only the resting edge to the hairline would have
+   changed nothing she can see: `askOpen`'s `go2` (ai4.js) calls `.focus()` on
+   `#askIn` the moment the screen opens, so `:focus-within` is true on ARRIVAL
+   and this rule, not the resting one, is what the red was.
+
+   FIRST CUT WAS `--text-primary` (§117's own `:active` ink) AND SHE CALLED IT
+   BACK THE SAME DAY: "when focus the field should not have black background it
+   should be subtle." §117's ink is right for a PRESS, which is momentary; this
+   edge is live for as long as someone is typing, and full black read as a
+   filled bar rather than a ring. `--border-strong-01` (#8e8d8a) is the
+   platform's own quiet-engaged edge — §10 already uses it for a plain input's
+   `:hover` — so focus here steps to the same place hover does elsewhere
+   instead of to ink. The comet still carries the field's one loud colour. */
 .app .ask-page .askfield:focus-within{
   background-image:
     linear-gradient(var(--background), var(--background)),
-    var(--ai-grad-line)}
+    linear-gradient(var(--border-strong-01), var(--border-strong-01))}
 .app .ask-page .askfield::before,
 .app .ask-page .askfield:focus-within::before{content:none}
 
@@ -173,3 +195,96 @@
   background:transparent;background-image:none}
 .app .ob-send svg{color:var(--text-primary)}
 .app .ob-send[disabled] svg{color:var(--text-helper)}
+
+/* ------------------------------------------------------------------------
+   THE COMPOSER IS THE DOCK'S WIDTH, AND THAT IS ITS CEILING
+
+   Maryam, 17 Sep 2026: "the ask field is too small now, it should be max 976
+   on biggest screen and responsive way down screen size" — the correction to
+   the first cut of this block, which read
+   `calc(min(100%, var(--content-max)) - 2 * var(--pad-x))`, lifted verbatim
+   off §21.80's dock.
+
+   THE EXPRESSION DOES NOT TRANSPLANT, BECAUSE THE TWO BOXES ARE NOT THE SAME
+   BOX. The dock is `position:absolute; left:0; right:0` on the view column, so
+   ITS `100%` is the full column with no gutter taken off yet and `- 2 *
+   --pad-x` is what puts the gutter there. The field is an ordinary child of
+   `.ask-foot`, which is `padding:24px 32px` — a percentage here resolves
+   against the CONTENT box, so the gutter is already gone and subtracting it
+   again takes it off twice. Measured: at a 1440 frame the foot's content box
+   is 958.4 and the field came out 894.4, and it kept shrinking from there.
+
+   SO ONLY THE CEILING IS A CALC NOW. `--content-max` (1040, §10.50) less the
+   two gutters is 976 — the dock's widest, which is what "max 976 on biggest
+   screen" names — and it is a CONSTANT, with no percentage in it to double up.
+   `width:100%` under it fills the foot's content box at every width below,
+   which is the "responsive way down" half: the foot's own padding is the
+   gutter on the way down, and it only ever had to be counted once.
+
+   `width:100%` IS ALSO LOAD-BEARING FOR A SECOND REASON. `.ask-foot` is a
+   COLUMN flex container, so these are cross-axis items and an auto margin on
+   the cross axis beats `align-items:stretch` — the two auto margins alone
+   stopped the stretch and collapsed each row onto its content (the field
+   measured 294px, the chips 585). The explicit 100% gives that stretch back as
+   a size `max-width` can cap.
+
+   THE CHIPS COME WITH IT. `.ask-sugg` is the field's other foot row and sits
+   flush to its left edge; centring the field alone would leave the suggestions
+   hanging off to one side of it. Drop this selector if the chips should
+   instead stay pinned to the foot's padding edge.
+   ------------------------------------------------------------------------ */
+.app .ask-page .ask-sugg,
+.app .ask-page .askfield{
+  width:100%;
+  max-width:calc(var(--content-max) - 2 * var(--pad-x));
+  margin-left:auto;
+  margin-right:auto}
+
+/* ------------------------------------------------------------------------
+   THE SHADOW AND THE COMET COME BACK — Maryam, 17 Sep 2026
+
+   "In the internal chat screens make sure the ui of chat bar is almost same in
+   terms of shadows and this running strobe effect." The dock is the reference,
+   so this is §21.140's three-layer shadow and §70.360's `.ai-run` — the two
+   things the head of this layer took off on 4 Sep, restored by name.
+
+   THE SHADOW IS THE RECIPE THIS LAYER ALREADY WROTE DOWN. Its "NO SHADOW"
+   note ends "if the two should match in that too, it is the three
+   `--dock-shadow-*` layers on `.ask-page .askfield` and nothing else" — so
+   that is exactly what this is, tokens and offsets untouched from §21 rather
+   than re-tasted at this size. The argument that note makes against it still
+   stands on its own terms (this field ends the page on the page's own ground
+   and nothing moves under it); it is overruled, not refuted, and "almost same"
+   is the instruction.
+
+   THE COMET NEEDS THREE THINGS AND MARKUP IS THE FIRST. §70 says plainly that
+   `askView` does not emit `.ai-run`, so no rule here could have shown one —
+   `ai4.js` now prints `AI_RUN` as the field's first child, the same constant
+   the dock's `askBar` uses, so the two are one gradient and one lap length by
+   construction rather than by two copies agreeing.
+
+   `position:relative` IS THE SECOND. §70.358 states it for `.askdock >
+   .askline` alone and `.ai-run` is `position:absolute; inset:-1px` — without a
+   positioned host the comet would escape to the nearest one and ring the wrong
+   box. §53 gives `.ask-page` relative, which is exactly the wrong box and is
+   what it would have found.
+
+   `rx` IS THE THIRD, AND §117.78's 31 IS NOT THIS FIELD'S. That rule is
+   `.app .ai-run rect` unscoped, so it reaches any comet in the build: 31 is the
+   dock's 56px-tall pill inset by its 1px. This field is 64 tall, so the same
+   arithmetic gives 32 — a 1px difference that reads as a flat spot against a
+   999px edge, which is why it is worth a rule rather than a shrug. Scoped to
+   this field so the dock keeps its own.
+
+   THE WALKING `::before` STAYS OFF. The head of this layer turned §53's
+   `askv-stroke-walk` off because the 4 Sep ask named it as "the moving line".
+   The comet is now that line; running both would put two lit points on one
+   edge at two speeds, which is the thing the first removal was avoiding.
+   ------------------------------------------------------------------------ */
+.app .ask-page .askfield{
+  position:relative;
+  box-shadow:
+    0 1px 2px var(--dock-shadow-1),
+    0 8px 18px -2px var(--dock-shadow-2),
+    0 26px 54px -12px var(--dock-shadow-3)}
+.app .ask-page .askfield .ai-run rect{rx:32px}

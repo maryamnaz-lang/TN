@@ -4935,8 +4935,26 @@
    now the smallest role in the scale, which is the honest end of this: a third
    step would need a size, and the paragraph above already says what to do
    instead — `--ring-box` and a bigger circle. */
+/* AND ONE MORE STEP, WHICH THE SCALE CANNOT PAY FOR (Maryam, 17 Sep 2026:
+   "the 80% written here should be a bit smaller text, its too compact in the
+   progress bar"). The note above ends by saying this is the smallest role in
+   the scale and that a third step "would need a size" — this is that step, so
+   the size is written out rather than dressed as a role it does not have.
+
+   WHY THE FIGURE DID NOT GET WIDER AND STILL READS TIGHTER. `.ring-n` is
+   `font-variant-numeric:tabular-nums` (§32.85), so "80%" sets to the same ~21px
+   the note measured for "50%" — the reading did not change because the digits
+   changed, it changed because 6.5px of air on a 4.5px stroke curving past the
+   figure's corners is simply not much, and it is being looked at rather than
+   calculated. 10.5/14 puts the figure near 19 and the clearance near 7.5.
+
+   THE HONEST ALTERNATIVE IS STILL THE OTHER ONE. §46a and §111 both say the
+   right fix for a ring this small is `--ring-box` and a larger circle, not a
+   smaller figure; this was asked for as a type change and is made as one. If
+   the figure is ever asked to shrink a fourth time, build the box instead —
+   there is no fifth step after this one either. */
 .app .ring.qa-ring .ring-n{
-  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
+  font-size:9.5px;line-height:13px;
   letter-spacing:var(--t-caption-ls)}
 
 /* --- 46b. AN INTEREST'S FOLLOWER COUNT IS DELETED WITH ITS SECTION -------

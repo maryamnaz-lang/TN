@@ -366,7 +366,7 @@ function obPanel(){
 
   return `<div class="auth-brand ob-brand">
     <div class="tal-hero">
-      <span class="tal-mk lg orb"></span>
+      ${borbMark('tal-mk lg', true)}
       <h2>Hello <b>Maryam</b>, I am Tal &#128075;</h2>
       <p>${tal}</p>
     </div>

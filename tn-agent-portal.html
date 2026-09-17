@@ -36,7 +36,7 @@
      rule sweep clean on 21 screens, 84 screen-width combos with no overflow,
      zero thrown errors.
      ========================================================================== -->
-<link rel="stylesheet" href="design-system/talentnext-ds.css?b=6586cd25">
+<link rel="stylesheet" href="design-system/talentnext-ds.css?b=385f11c4">
 
 <style>
 /* ==========================================================================
@@ -131,7 +131,7 @@
        somebody choosing a stage would want it. -->
 </div>
 
-<script src="design-system/talentnext-ds.js?b=6586cd25"></script>
+<script src="design-system/talentnext-ds.js?b=385f11c4"></script>
 <script>
 /* ==========================================================================
    THE TALENT AGENT PORTAL
@@ -1825,7 +1825,7 @@ function head({title, sub, back, col, plate, noSum}){
           the bare name, as it is Tal offering something further down the page. */''}
     ${text ? `<div class="sec">
       <div class="ai-aura tile tight talsum">
-        <div class="ai-head"><span class="ai-label">Summary by Tal</span></div>
+        <div class="ai-head"><span class="ai-label">${borbMark('tal-mk')}Summary by Tal</span></div>
         <div class="ai-body"><p>${text}</p></div>
       </div>
     </div>` : ''}
@@ -3038,9 +3038,14 @@ const JRN_ROWS = v => {
    one column on its own the way §70 handles a missing `.head-col`.
    ========================================================================== */
 const moneyCol = v => {
-  /* THE STATE IS READ OFF THE LEDGER ROW, NOT COUNTED. `st === 'green'` is
-     `PAYMENTS`' own settled hue — the same field the Earnings table draws its
-     `.flag-t` from — so a row that settles moves on both surfaces at once. */
+  /* THE FIRST FOUR SEGMENTS ARE FORCED `.done`, NOT READ OFF THE LEDGER
+     (Maryam, 17 Sep 2026: "the first 4 bars should read done"). This reverses
+     the rule the note here used to state — `st === 'green'` counted, whatever
+     that came to on a given week — because a real month only has 2 of 7 rows
+     settled and the rail read as mostly empty. The four lead segments are
+     cosmetic now: they say "the month is under way", not "this interview was
+     paid", and `title` still names the real row underneath each one, so a
+     hover does not lie about what actually happened to that payment. */
   const rail = PAYMENTS.slice().reverse();
   return `<div class="sec head-sec head-col sec-prog">
     <div class="stp stp-open stp-titled wing-prog">
@@ -3052,8 +3057,8 @@ const moneyCol = v => {
           <div class="prog-day"><div class="prog-dn">${money(v.escrow)}</div>
             <div class="prog-l">held for you</div></div>
         </div>
-        <div class="prog-seg">${rail.map(p =>
-          `<i class="${p.st === 'green' ? 'done' : 'now'}" title="${p.n} &middot; ${p.s}"></i>`).join('')}</div>
+        <div class="prog-seg">${rail.map((p, i) =>
+          `<i class="${i < 4 ? 'done' : 'now'}" title="${p.n} &middot; ${p.s}"></i>`).join('')}</div>
         ${/* THE MARK IS A COLUMN AND THE FIGURE NEEDS `.prog-fb` — §65's
               correction, and it is markup rather than CSS: the label under a
               figure is a bare text node until it is wrapped, and a bare text
@@ -3237,7 +3242,7 @@ function askDock(){
   return `<div class="askdock">
     <button class="askline" data-askopen="1" aria-label="Ask Tal anything">
       ${AI_RUN}
-      <span class="askline-mark"><span class="tal-mk"></span></span>
+      <span class="askline-mark">${borbMark('tal-mk')}</span>
       <span class="askline-t">Ask Tal</span>
       <span class="askline-q" aria-hidden="true">${q ? '&ldquo;' + q + '&rdquo;' : ''}</span>
       ${''/* ARROW-RIGHT, NOT ARROW-UP — hifi's askBar and Figma 581:6589: the
@@ -6095,11 +6100,11 @@ const talReply = q => {
 /* ONE BUBBLE COMPONENT, TWO SPEAKERS — `hifi/`'s `askBubble`, unchanged except
    for whose face it is. The speaker is named above what they said rather than
    beside it, so a long answer does not indent under a label. */
-const askBubble = (who, html) => who === 'me'
+const askBubble = (who, html, live) => who === 'me'
   ? `<div class="tal-msg me"><span class="tal-who"><span class="tal-who-n">You</span>
       <span class="av"><img src="${AV.owen}" alt=""><i>${A.i}</i></span></span>
       <div class="bb">${html}</div></div>`
-  : `<div class="tal-msg"><span class="tal-who"><span class="tal-mk sm"></span>
+  : `<div class="tal-msg"><span class="tal-who">${borbMark('tal-mk sm', live)}
       <span class="tal-who-n">Tal</span></span><div class="bb">${html}</div></div>`;
 
 /* "BACK TO …" NAMES THE PAGE, AND THE RAIL ALREADY NAMES EVERY PAGE. Reading it
@@ -6131,13 +6136,13 @@ function askView(v){
   const opened = S.thread.length > 0;
   const qs = (TALQ[S.askFrom] || TALQ.dashboard).map(q => q[0]);
   const hero = `<div class="tal-hero">
-      <span class="tal-mk lg orb"></span>
+      ${borbMark('tal-mk lg', true)}
       <h2>Hello <b>${A.n.split(' ')[0]}</b>, I am Tal &#128075;</h2>
       <p>I can read your public profile, your interviews, your scores and the money. What do you need?</p>
     </div>`;
   const thread = (opened ? '' : hero)
     + S.thread.map(m => askBubble(m.who, m.html)).join('')
-    + (S.typing ? askBubble('tal', '<div class="ai-stream"><i></i><i></i><i></i></div>') : '');
+    + (S.typing ? askBubble('tal', '<div class="ai-stream"><i></i><i></i><i></i></div>', true) : '');
 
   return `<div class="page ask-page">
     <div class="ask-top">
@@ -6148,7 +6153,7 @@ function askView(v){
     <div class="ask-foot">
       ${opened ? '' : `<div class="ask-sugg">${qs.map(q => askChip(q)).join('')}</div>`}
       <div class="askfield">
-        <span class="askline-mark"><span class="tal-mk sm"></span></span>
+        <span class="askline-mark">${borbMark('tal-mk sm')}</span>
         <input class="inp" id="askIn" placeholder="Ask anything" autocomplete="off">
         <button class="askfield-send" data-asksend="1" aria-label="Send">${I.arrowRight}</button>
       </div>
@@ -7462,6 +7467,327 @@ fitFrame();
    there is something for it to edit. It looks the span up every tick and does
    nothing when an overlay has taken the dock away — see `askRotate`. */
 if(!ASK_ON){ ASK_ON = true; setInterval(askRotate, ASK_ROT_MS); }
+
+/* ============================================================================
+   THE ORB, WIRED IN. §132/§133's CSS now ships in talentnext-ds.css (moved
+   there from build-ds.py's NOT_IN_DS on 17 Sep 2026); this is the behaviour
+   half, appended here rather than to the shared design-system bundle because
+   it wraps `window.render` and reads the bare `S` by name at LOAD TIME —
+   it has to run after this script has declared both, in this script's own
+   scope, the same reason `hifi/build/build.py` appends it after every other
+   JS layer instead of shipping it earlier in the bundle. `askView`/
+   `askBubble`/`askDock` above already emit `borbMark(cls, live)` at the same
+   five slots hifi does (dock, composer, head-band summary, hero, thread
+   byline), live only on the hero and the streaming reply — everything else
+   is chrome and orb-wire pins it to idle. `hifi/build/orb.js` and
+   `hifi/build/orb-wire.js`, verbatim below.
+   ========================================================================== */
+
+(function () {
+  'use strict';
+
+  var BORB_SELECTOR = '.borb';
+  var BORB_SPEAKING = 'speaking';
+  var BORB_SAMPLES = 64;          // points along each band
+  var BORB_MORPH_MS = 460;        // chevron -> thread transition
+  var BORB_THIN = 2.05;           // thread half-width, in viewBox units
+  var BORB_WAVE_X0 = -16;
+  var BORB_WAVE_W = 132;
+  var BORB_WAVE_Y = 50;
+  var BORB_SEED_W = 13;
+  var BORB_SEED_HALF = 2.9;
+
+  var BORB_CHEV = [
+    { pts: [[7.97, 95.12], [47.94, 49.87], [24.16, 23.01]], half: 3.82 },
+    { pts: [[29.95, 95.12], [69.79, 50.00], [56.94, 35.35]], half: 3.73 },
+    { pts: [[70.18, 74.55], [91.65, 49.74], [51.93, 4.37]], half: 3.63 }
+  ];
+
+  function borbSmooth(v) { return v * v * v * (v * (v * 6 - 15) + 10); }
+  function borbClamp01(v) { return v < 0 ? 0 : (v > 1 ? 1 : v); }
+  function borbWin(v, a, b) { return borbSmooth(borbClamp01((v - a) / (b - a))); }
+  function borbMagnetic(v) { return 1 - Math.pow(1 - v, 3.4); }
+
+  function borbResample(poly, n) {
+    var segs = [];
+    var total = 0;
+    var i;
+    for (i = 0; i < poly.length - 1; i++) {
+      var d = Math.sqrt(
+        Math.pow(poly[i + 1][0] - poly[i][0], 2) +
+        Math.pow(poly[i + 1][1] - poly[i][1], 2)
+      );
+      segs.push(d);
+      total += d;
+    }
+    var out = [];
+    for (i = 0; i < n; i++) {
+      var target = (i / (n - 1)) * total;
+      var acc = 0;
+      var k = 0;
+      while (k < segs.length - 1 && acc + segs[k] < target) { acc += segs[k]; k++; }
+      var t = segs[k] === 0 ? 0 : (target - acc) / segs[k];
+      out.push([
+        poly[k][0] + (poly[k + 1][0] - poly[k][0]) * t,
+        poly[k][1] + (poly[k + 1][1] - poly[k][1]) * t
+      ]);
+    }
+    return out;
+  }
+
+  var BORB_CHEV_PTS = [];
+  (function () {
+    for (var i = 0; i < BORB_CHEV.length; i++) {
+      BORB_CHEV_PTS.push(borbResample(BORB_CHEV[i].pts, BORB_SAMPLES));
+    }
+  }());
+
+  function borbRelax(pts, strength) {
+    if (strength <= 0.001) { return pts; }
+    var cur = pts;
+    for (var pass = 0; pass < 2; pass++) {
+      var next = cur.slice();
+      for (var i = 1; i < cur.length - 1; i++) {
+        var ax = (cur[i - 1][0] + cur[i + 1][0]) / 2;
+        var ay = (cur[i - 1][1] + cur[i + 1][1]) / 2;
+        next[i] = [
+          cur[i][0] + (ax - cur[i][0]) * strength,
+          cur[i][1] + (ay - cur[i][1]) * strength
+        ];
+      }
+      cur = next;
+    }
+    return cur;
+  }
+
+  function borbBuildBand(centre, half) {
+    var top = [];
+    var bot = [];
+    var i;
+    for (i = 0; i < centre.length; i++) {
+      var p = centre[i];
+      var a = centre[Math.max(0, i - 1)];
+      var b = centre[Math.min(centre.length - 1, i + 1)];
+      var nx = -(b[1] - a[1]);
+      var ny = (b[0] - a[0]);
+      var len = Math.sqrt(nx * nx + ny * ny) || 1;
+      nx /= len; ny /= len;
+      top.push([p[0] + nx * half, p[1] + ny * half]);
+      bot.push([p[0] - nx * half, p[1] - ny * half]);
+    }
+    function fmt(q) { return q[0].toFixed(2) + ' ' + q[1].toFixed(2); }
+    var d = 'M ' + fmt(top[0]);
+    for (i = 1; i < top.length; i++) { d += ' L ' + fmt(top[i]); }
+    for (i = bot.length - 1; i >= 0; i--) { d += ' L ' + fmt(bot[i]); }
+    return d + ' Z';
+  }
+
+  function borbStringPoint(i, band, t, amp) {
+    var u = i / (BORB_SAMPLES - 1);
+    var x = BORB_WAVE_X0 + u * BORB_WAVE_W;
+    var env = Math.sin(Math.PI * u);
+    var ph = band * 2.3;
+    var swell = 0.6 + 0.4 * Math.sin(t * 1.4 + ph);
+    var f1 = 2.0 + band * 0.6;
+    var f2 = 3.4 + band * 0.9;
+    var w =
+      0.70 * Math.sin(u * Math.PI * f1 - t * 2.4 + ph) +
+      0.42 * Math.sin(u * Math.PI * f2 + t * 1.7 - ph * 1.4) +
+      0.20 * Math.sin(u * Math.PI * 6.2 + t * 3.1 + ph);
+    return [x, BORB_WAVE_Y + amp * env * swell * w * 20];
+  }
+
+  function borbCreate(root) {
+    if (!root || root.getAttribute('data-borb-bound') === '1') { return null; }
+    root.setAttribute('data-borb-bound', '1');
+
+    var svg = root.querySelector('.borb__waves');
+    var blades = root.querySelectorAll('.borb__blade');
+    if (!svg) { return null; }
+    var paths = svg.querySelectorAll('path');
+    if (paths.length < 3) { return null; }
+
+    var reduced = false;
+    if (window.matchMedia) {
+      reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    }
+
+    var softenPeak = 0.55 + 0.25 * Math.min(1, 900 / BORB_MORPH_MS - 1);
+
+    var morph = 0;
+    var target = 0;
+    var raf = null;
+    var last = null;
+
+    function frame(now) {
+      if (last === null) { last = now; }
+      var dt = Math.min(BORB_MORPH_MS * 0.06, now - last);
+      last = now;
+      var step = dt / BORB_MORPH_MS;
+      morph = target > morph ? Math.min(target, morph + step) : Math.max(target, morph - step);
+
+      var t = now / 1000;
+
+      var fade = borbWin(morph, 0.01, 0.20);
+      svg.style.opacity = String(fade);
+      for (var bi = 0; bi < blades.length; bi++) {
+        blades[bi].style.opacity = morph > 0 ? String(1 - fade) : '';
+      }
+
+      var k = borbMagnetic(morph);
+      var k1 = 1 - k;
+      var wC = k1 * k1 * k1;
+      var wS = 3 * k1 * k * (k1 + k);
+      var wW = k * k * k;
+      var amp = reduced ? 0 : borbWin(morph, 0.62, 1.00);
+      var soften = Math.sin(Math.PI * morph) * softenPeak;
+
+      for (var b = 0; b < 3; b++) {
+        var centre = [];
+        for (var i = 0; i < BORB_SAMPLES; i++) {
+          var u = i / (BORB_SAMPLES - 1);
+          var c = BORB_CHEV_PTS[b][i];
+          var sx = 50 + (u - 0.5) * BORB_SEED_W;
+          var s = borbStringPoint(i, b, t, amp);
+          centre.push([
+            wC * c[0] + wS * sx + wW * s[0],
+            wC * c[1] + wS * BORB_WAVE_Y + wW * s[1]
+          ]);
+        }
+        var half = wC * BORB_CHEV[b].half + wS * BORB_SEED_HALF + wW * BORB_THIN;
+        paths[b].setAttribute('d', borbBuildBand(borbRelax(centre, soften), half));
+      }
+
+      if (morph === 0 && target === 0) { raf = null; last = null; return; }
+      raf = window.requestAnimationFrame(frame);
+    }
+
+    function setSpeaking(on) {
+      target = on ? 1 : 0;
+      if (raf === null) {
+        last = null;
+        raf = window.requestAnimationFrame(frame);
+      }
+    }
+
+    function sync() {
+      setSpeaking(root.getAttribute('data-state') === BORB_SPEAKING);
+    }
+
+    var observer = null;
+    if (window.MutationObserver) {
+      observer = new window.MutationObserver(sync);
+      observer.observe(root, { attributes: true, attributeFilter: ['data-state'] });
+    }
+
+    sync();
+
+    return {
+      el: root,
+      refresh: sync,
+      destroy: function () {
+        if (observer) { observer.disconnect(); }
+        if (raf !== null) { window.cancelAnimationFrame(raf); raf = null; }
+        root.removeAttribute('data-borb-bound');
+      }
+    };
+  }
+
+  var borbInstances = [];
+
+  function borbMount(root) {
+    var made = borbCreate(root);
+    if (made) { borbInstances.push(made); }
+    return made;
+  }
+
+  function borbMountAll(scope) {
+    var host = scope || document;
+    var found = host.querySelectorAll(BORB_SELECTOR);
+    for (var i = 0; i < found.length; i++) { borbMount(found[i]); }
+    return borbInstances.length;
+  }
+
+  function borbDestroyAll() {
+    for (var i = 0; i < borbInstances.length; i++) { borbInstances[i].destroy(); }
+    borbInstances = [];
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () { borbMountAll(); });
+  } else {
+    borbMountAll();
+  }
+
+  window.BorbOrb = {
+    mount: borbMount,
+    mountAll: borbMountAll,
+    destroyAll: borbDestroyAll
+  };
+}());
+
+(function () {
+  'use strict';
+
+  var orbSpeaking = false;
+  var orbListening = false;
+
+  function orbWanted() {
+    if (orbListening) { return 'listening'; }
+    if (orbSpeaking) { return 'speaking'; }
+    if (typeof S !== 'undefined' && S && S.typing) { return 'thinking'; }
+    return 'idle';
+  }
+
+  function orbSync() {
+    var want = orbWanted();
+    var all = document.querySelectorAll('.borb');
+    for (var i = 0; i < all.length; i++) {
+      var el = all[i];
+      var state = el.hasAttribute('data-borb-live') ? want : 'idle';
+      if (el.getAttribute('data-state') !== state) {
+        el.setAttribute('data-state', state);
+      }
+    }
+  }
+
+  function orbRefresh() {
+    if (window.BorbOrb) { window.BorbOrb.mountAll(); }
+    orbSync();
+  }
+
+  function orbWrap(name, after) {
+    var prev = window[name];
+    if (typeof prev !== 'function') { return false; }
+    window[name] = function () {
+      var out = prev.apply(this, arguments);
+      try { after.apply(this, arguments); } catch (e) { /* never fatal */ }
+      return out;
+    };
+    return true;
+  }
+
+  orbWrap('render', orbRefresh);
+  orbWrap('obBars', function (on) { orbSpeaking = !!on; orbSync(); });
+  orbWrap('askRecStart', function () { orbListening = true; orbSync(); });
+  orbWrap('askRecClear', function () { orbListening = false; orbSync(); });
+  orbWrap('askRecFinish', function () { orbListening = false; orbSync(); });
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', orbRefresh);
+  } else {
+    orbRefresh();
+  }
+
+  window.BorbWire = {
+    sync: orbSync,
+    refresh: orbRefresh,
+    hold: function (state) {
+      var all = document.querySelectorAll('.borb');
+      for (var i = 0; i < all.length; i++) { all[i].setAttribute('data-state', state); }
+    }
+  };
+}());
 </script>
 </body>
 </html>

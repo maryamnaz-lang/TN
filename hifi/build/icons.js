@@ -364,3 +364,56 @@ const P = new Proxy({}, {
       + `<path d="${PHP[k][0]}" opacity=".2"/><path d="${PHP[k][1]}"/></svg>`
     : ''
 });
+
+/* ============================================================================
+   THE BRAND ORB, AS MARKUP. §132 is the whole of its appearance and orb.js is
+   the whole of its behaviour; this is only the shape of the element they both
+   expect, in one place rather than in the nine call sites that print it.
+
+   IT IS SPANS, NOT DIVS, and that is not a style preference: `askBar` prints
+   the mark inside a <button> and the thread bubbles print it inside a
+   <span class="tal-who">, and a <div> in either is invalid nesting that the
+   parser silently reshuffles — which moves the element out of the box §133
+   sized for it. Nothing in §132 selects on tag.
+
+   THE CLASSES COME FROM THE CALL SITE. Every slot keeps the `.tal-mk` class it
+   already had, because the frames size and space those slots by it; §133 is
+   what stops §27.1 painting the flat mark underneath and states --borb-size
+   for each. What the call sites DROP is `.orb` — §40's sphere is drawn from
+   `.tal-mk.orb::before/::after`, and keeping the class would draw the old
+   sphere underneath the new one. */
+/* THE SECOND ARGUMENT IS THE WHOLE OF THE STATE MODEL, so it is worth the
+   paragraph. An orb is either LIVE — it reports what Tal is doing, and
+   orb-wire.js drives it — or it is an IDENTITY MARK that says "Tal" and
+   holds `idle` forever. Before this every `.borb` on the page was the first
+   kind, because orb-wire.js drove them all off one `querySelectorAll('.borb')`:
+   ask Tal a question and the chat header, the floating dock, the composer and
+   every byline in the thread all started thinking at once. A mark that sits
+   in the chrome of every page is a logo, and a logo that animates whenever
+   the product is busy is noise — the state belongs to the ONE orb the reader
+   is actually talking to.
+   Pass `live` at a call site only if that orb is the subject of the exchange:
+   the chat hero and the streaming reply's byline. Everything else is chrome
+   and takes the default. */
+function borbMark(cls, live){
+  return `<span class="borb ${cls || ''}" data-state="idle"`
+    + (live ? ' data-borb-live="1"' : '')
+    + ` aria-hidden="true">`
+    + `<span class="borb__ripple"></span>`
+    + `<span class="borb__ripple borb__ripple--2"></span>`
+    + `<span class="borb__field">`
+    +   `<span class="borb__cloud borb__cloud--1"></span>`
+    +   `<span class="borb__cloud borb__cloud--2"></span>`
+    +   `<span class="borb__cloud borb__cloud--3"></span>`
+    +   `<span class="borb__cloud borb__cloud--4"></span>`
+    + `</span>`
+    + `<span class="borb__mark">`
+    +   `<span class="borb__blade borb__blade--a"></span>`
+    +   `<span class="borb__blade borb__blade--b"></span>`
+    +   `<span class="borb__blade borb__blade--c"></span>`
+    +   `<svg class="borb__waves" viewBox="0 0 100 100" aria-hidden="true">`
+    +     `<path d=""/><path d=""/><path d=""/>`
+    +   `</svg>`
+    + `</span>`
+    + `</span>`;
+}

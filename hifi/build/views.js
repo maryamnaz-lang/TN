@@ -1241,21 +1241,21 @@ function talPanel(f){
   const opener = S.view==='chapter' && S.ch===3
     ? `You are 12 minutes into chapter 4. Want the short version before you go back in?`
     : `You are on <b>${where.toLowerCase()}</b>, ${state.toLowerCase()}. Ask me anything, or start with one of these.`;
-  const bubble = (who,html) => who==='me'
+  const bubble = (who,html,live) => who==='me'
     ? `<div class="tal-msg me"><span class="tal-who"><span class="tal-who-n">You</span><span class="av"><img src="${isLead()?AV.priya:AV.hana}" alt=""><i>${isLead()?'PN':'MN'}</i></span></span><div class="bb">${html}</div></div>`
-    : `<div class="tal-msg"><span class="tal-who"><span class="tal-mk sm"></span><span class="tal-who-n">Tal</span></span><div class="bb">${html}</div></div>`;
+    : `<div class="tal-msg"><span class="tal-who">${borbMark('tal-mk sm', live)}<span class="tal-who-n">Tal</span></span><div class="bb">${html}</div></div>`;
   const hero = `<div class="tal-hero">
-      <span class="tal-mk lg orb"></span>
+      ${borbMark('tal-mk lg', true)}
       <h2>Hello <b>${isLead()?'Priya':'Maryam'}</b>, I am Tal &#128075;</h2>
       <p>${isLead()?'I can read your cohorts, your evaluations and where people are stuck. What do you need?':'I am here to assist you with anything you need help with. What&rsquo;s going on?'}</p>
     </div>`;
   const thread = (S.thread.length ? '' : hero)
     + S.thread.map(m=>bubble(m.who,m.html)).join('')
-    + (S.typing?bubble('tal',`<div class="ai-stream"><i></i><i></i><i></i></div>`):'');
+    + (S.typing?bubble('tal',`<div class="ai-stream"><i></i><i></i><i></i></div>`,true):'');
 
   return `<div class="tal-panel ${S.tal?'on':''}" id="talPanel">
     <div class="tal-h">
-      <span class="tal-mk"></span>
+      ${borbMark('tal-mk')}
       <span class="nm"><b>Tal</b></span>
       <button class="shell-act tal-x" data-toggle="tal" aria-label="Close Tal" style="color:var(--icon-primary)">${I.close}</button>
     </div>
@@ -1263,12 +1263,61 @@ function talPanel(f){
     ${S.thread.length?'':`<div class="tal-sugg">${ctx.map(s=>`<button class="chip-tal" data-ask="1"><span class="sk-mark xs"></span>${s}</button>`).join('')}</div>`}
     
     <div class="composer">
-      <span class="tal-mk sm composer-mk"></span>
+      ${AI_RUN}
+      ${borbMark('tal-mk sm composer-mk')}
       <input class="inp ai-field" placeholder="Ask Tal anything" aria-label="Ask Tal">
       <button aria-label="Send">${I.send}</button>
     </div>
   </div>`;
 }
+
+const AI_RUN = `<span class="ai-run" aria-hidden="true">
+    <svg preserveAspectRatio="none">
+      <defs>
+        ${''/* THE COMET'S FIVE STOPS — Maryam, 9 Sep 2026, off Figma 875:6598,
+              given as the exact CSS to follow:
+              `linear-gradient(90.13deg, rgba(255,255,255,0.7) 0%,
+              rgba(213,81,215,0.7) 22.6%, rgba(255,110,36,0.7) 49.04%,
+              rgba(255,55,51,0.7) 75%, rgba(255,255,255,0.7) 100%)`.
+
+              WHITE INTO MAGENTA, ORANGE, RED AND BACK TO WHITE. The offsets are
+              unchanged from the 4 Sep set (0 / .226 / .4904 / .75 / 1); the
+              THREE middle colours are new — #d551d7 (magenta), #ff6e24 (orange)
+              and #ff3733 (red), where the ramp had been red / pale-green / red.
+              So the light is no longer symmetric: it warms across rather than
+              mirroring, which is the node's own gradient.
+
+              90.13deg IS HORIZONTAL, so the SVG gradient is `x2=1 y2=0` now,
+              not the corner-to-corner `y2=1` §70.3a's note argued for. On a wide,
+              short field the ramp lives on the top and bottom edges and the white
+              ends fall on the short sides — which is where the file draws them —
+              so the comet fades through the corners rather than at mid-edge.
+
+              THE .7 IS `stop-opacity`, NOT A COLOUR. SVG has no `rgba()` in
+              `stop-color`, and baking the alpha into the hex would need it
+              composited against whatever is behind — the dock's own border, not
+              white. Stated as the attribute the stop is genuinely 70% and the
+              border shows through it, which is what the spec's `rgba` means on a
+              `filter:blur(1px)` line lying over a coloured edge. The white ends
+              at 70% are what make the dash fade in and out of its travel; §70.1's
+              note has the long version, including why the loop has no seam. */}
+        ${''/* THE MAGENTA STOP IS DROPPED (Maryam, 9 Sep 2026): the comet is now
+              white → orange → red → white, four stops, off the updated node —
+              `linear-gradient(90.13deg, rgba(255,255,255,.7) 0%,
+              rgba(255,110,36,.7) 49.04%, rgba(255,55,51,.7) 75%,
+              rgba(255,255,255,.7) 100%)`. The offsets that remain are unchanged
+              (0 / .4904 / .75 / 1); only #d551d7 at .226 came out, so the light
+              warms straight from white into orange with no purple lead-in. */}
+        <linearGradient id="aiRunGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#ffffff" stop-opacity=".7"/>
+          <stop offset="0.4904" stop-color="#ff6e24" stop-opacity=".7"/>
+          <stop offset="0.75" stop-color="#ff3733" stop-opacity=".7"/>
+          <stop offset="1" stop-color="#ffffff" stop-opacity=".7"/>
+        </linearGradient>
+      </defs>
+      <rect pathLength="1000"/>
+    </svg>
+  </span>`;
 
 const askChip = (q,label) => `<button class="chip-tal" data-tal-ask="${q}"><span class="sk-mark xs"></span>${label||'Ask Tal'}</button>`;
 /* THE FAB WEARS TAL'S MARK AND A CHAT ICON. The button used to be a black

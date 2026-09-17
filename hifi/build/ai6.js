@@ -1471,6 +1471,19 @@ function placeSummaryPass(){
      §70 gives the words the gradient the file paints them in. */
   const lab = head && head.querySelector(':scope > .ai-label');
   if(lab && lab.textContent.trim() === 'Tal') lab.textContent = 'Summary by Tal';
+  /* AND THE MARK IS THE ORB ITSELF, not a picture of it. §70.632 painted
+     `--tal-mark` as a 28px background on this label's `::before`; §133 turns
+     that off once a real `.borb` is in here and sizes this one to the same
+     28px, so the band's geometry is unchanged and only the mark is live
+     artwork. It is emitted WITHOUT `live`, which is the point: orb-wire pins
+     every orb that did not ask for a state to idle, and a page summary is an
+     attribution, not a status — it must not start thinking because the reader
+     happens to be asking Tal something elsewhere on the page.
+     Text first, then the orb: the assignment above is `textContent`, which
+     would wipe a child element written before it. */
+  if(lab && !lab.querySelector(':scope > .borb')){
+    lab.insertAdjacentHTML('afterbegin', borbMark('tal-mk'));
+  }
 
   let body = aura.querySelector(':scope > .ai-body');
   if(!body){

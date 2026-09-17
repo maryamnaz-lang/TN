@@ -6108,6 +6108,13 @@ button.btn-p:active,
   .app .tal-fab,
   .app .tal-panel{display:none}
 }
+.app .tal-panel .composer{
+  position:relative;
+  box-shadow:
+    0 1px 2px var(--dock-shadow-1),
+    0 8px 18px -2px var(--dock-shadow-2),
+    0 26px 54px -12px var(--dock-shadow-3)}
+.app .tal-panel .composer .ai-run rect{rx:0}
 .device[data-vp="mobile"] .ios-top,
 .device[data-vp="mobile"] .ios-home{display:none}
 .device[data-vp="mobile"] .app{top:0;bottom:0}
@@ -8257,9 +8264,7 @@ button.btn-p:active,
 :root{
   --askv-wash:245,75,135;         
   
-  --askv-ground-wash:
-    linear-gradient(186.615deg, rgba(189,42,42,.05) 11.018%, rgba(255,255,255,.05) 52.274%),
-    linear-gradient(353.385deg, rgba(189,42,42,.05) 11.018%, rgba(255,255,255,.05) 52.274%);
+  --askv-ground-wash:none;
   
   --askv-stroke:var(--accent);
   --askv-stroke-hot:var(--accent-2);
@@ -8269,14 +8274,16 @@ button.btn-p:active,
   
   --askv-chip-glow:.5;
 }
-:root{--askv-ground:#ffffff}
+:root{
+  --askv-ground:#fcfcfc;
+  --askv-column:#ffffff}
 .app:has(.ask-page) .view-col > .main{
   background-color:var(--askv-ground);
   background-image:var(--askv-ground-wash);
   background-position:top,bottom;
   background-size:100% 590px;
   background-repeat:no-repeat}
-.app .ask-page{background:transparent}
+.app .ask-page{background-color:var(--askv-column);background-image:none}
 @container app (min-width:900px){
   .app:has(.ask-page) .view-col > .main{
     background-color:var(--askv-ground);
@@ -8284,7 +8291,8 @@ button.btn-p:active,
     background-position:top,bottom;
     background-size:100% 590px;
     background-repeat:no-repeat}
-  .app .view-col > .main > .page.ask-page{background:transparent}
+  .app .view-col > .main > .page.ask-page{
+    background-color:var(--askv-column);background-image:none}
 }
 .app .ask-page .ask-foot{
   background:transparent;
@@ -8445,6 +8453,17 @@ button.btn-p:active,
 .app .ask-page .ask-top .ph-back svg{
   width:20px;height:20px;
   fill:currentColor}
+.app .ask-page .ask-sugg .chip-tal,
+.app .ask-page .ask-thread .tal-msg > .bb .chip-tal{
+  border-color:transparent;
+  background-color:var(--layer-02);
+  background-image:none;
+  color:var(--askv-ink)}
+.app .ask-page .ask-sugg .chip-tal::before,
+.app .ask-page .ask-thread .tal-msg > .bb .chip-tal::before{content:none}
+.app .ask-page .ask-sugg .chip-tal:hover:where(.__nh),
+.app .ask-page .ask-thread .tal-msg > .bb .chip-tal:hover:where(.__nh){
+  background-color:#ededed}
 .app .page > .rail-wrap:has(+ .sec.tint)::after{display:none}
 .app .sec.tint.cards .stats > .stat,
 .app .sec.tint.cards .facts > div,
@@ -10268,7 +10287,7 @@ button.btn-p:active,
   font-weight:var(--t-w-strong);letter-spacing:var(--t-body-ls);
   text-transform:none;color:var(--accent-text)}
 .app .ring.qa-ring .ring-n{
-  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
+  font-size:9.5px;line-height:13px;
   letter-spacing:var(--t-caption-ls)}
 .app .ob-q-tal{
   font-size:var(--t-h4-size);line-height:22px;
@@ -10429,19 +10448,14 @@ button.btn-p:active,
 .app .prog-figs > span{
   flex-direction:row;align-items:flex-start;gap:var(--s04)}
 .app .prog-fb{display:flex;flex-direction:column;min-width:0}
-.app .prog-ic{align-self:flex-start}
 .app .prog-ic{
-  display:grid;place-items:center;flex:none;
-  width:28px;height:28px;
-  background-color:color-mix(in srgb, var(--mk) 13%, var(--background))}
+  align-self:flex-start;flex:none;
+  display:grid;place-items:center;
+  width:18px;height:18px}
 .app .prog-ic svg{width:18px;height:18px;color:var(--icon-primary)}
 .app .prog-figs > span:nth-child(1){--mk:var(--mk-1)}
 .app .prog-figs > span:nth-child(2){--mk:var(--mk-2)}
 .app .prog-figs > span:nth-child(3){--mk:var(--mk-3)}
-.app .prog-ic{
-  background-color:color-mix(in srgb, var(--mk) 13%, var(--surface-mix, var(--background)))}
-.app .wing-prog{--surface-mix:var(--layer-01)}
-.app .sec.tint .prog-figs > span{--surface-mix:var(--layer-01)}
 .app .plate-d{margin-top:var(--s05)}
 .app .plate-b.plate-lines:has(.plate-v){gap:0;align-items:stretch}
 .app .plate-b.plate-lines:has(.plate-v) > .plate-bi{
@@ -13352,13 +13366,13 @@ button.btn-p:active,
   background-color:transparent;
   background-image:
     linear-gradient(var(--background), var(--background)),
-    linear-gradient(var(--accent), var(--accent));
+    linear-gradient(var(--rule), var(--rule));
   background-origin:padding-box, border-box;
   background-clip:padding-box, border-box}
 .app .ask-page .askfield:focus-within{
   background-image:
     linear-gradient(var(--background), var(--background)),
-    var(--ai-grad-line)}
+    linear-gradient(var(--border-strong-01), var(--border-strong-01))}
 .app .ask-page .askfield::before,
 .app .ask-page .askfield:focus-within::before{content:none}
 .app .ask-page .askfield-send,
@@ -13404,6 +13418,19 @@ button.btn-p:active,
   background:transparent;background-image:none}
 .app .ob-send svg{color:var(--text-primary)}
 .app .ob-send[disabled] svg{color:var(--text-helper)}
+.app .ask-page .ask-sugg,
+.app .ask-page .askfield{
+  width:100%;
+  max-width:calc(var(--content-max) - 2 * var(--pad-x));
+  margin-left:auto;
+  margin-right:auto}
+.app .ask-page .askfield{
+  position:relative;
+  box-shadow:
+    0 1px 2px var(--dock-shadow-1),
+    0 8px 18px -2px var(--dock-shadow-2),
+    0 26px 54px -12px var(--dock-shadow-3)}
+.app .ask-page .askfield .ai-run rect{rx:32px}
 .app .crow-dark .crow-b{flex:1 1 auto}
 .app .crow-due{
   flex:none;margin-left:auto;
@@ -13950,6 +13977,552 @@ button.btn-p:active,
     left:0;top:var(--s06);bottom:var(--s06);width:1px;
     background:var(--rule);pointer-events:none}
 }
+.borb {
+  --borb-size: 288px;
+  
+  --borb-accent: 249, 66, 58;
+  --borb-t1: 214, 57, 50;
+  --borb-t2: 249, 66, 58;
+  --borb-t3: 253, 108, 88;
+  --borb-t4: 255, 150, 124;
+  
+  --borb-int: 0.52;          
+  --borb-core: 1;            
+  --borb-rim: 0;             
+  --borb-travel: 1;          
+  --borb-glass: 0.24;        
+  --borb-shadow: 0.44;       
+  --borb-falloff: 58%;       
+  --borb-blur: calc(var(--borb-size) * 0.10417);
+  
+  --borb-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --borb-snap: cubic-bezier(0.22, 1, 0.30, 1);
+  
+  --borb-dx: 0px;
+  --borb-dy: 0px;
+  --borb-r: 0px;
+  --borb-a: 0deg;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--borb-size);
+  height: var(--borb-size);
+  container-type: inline-size;
+  container-name: borb;
+  isolation: isolate;
+}
+.borb::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(var(--borb-size) * 0.81944);
+  height: calc(var(--borb-size) * 0.81944);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) translateY(calc(var(--borb-size) * 0.1875)) scaleY(0.92);
+  background: radial-gradient(circle at 50% 50%,
+    rgba(var(--borb-accent), calc(0.42 * var(--borb-shadow))) 0%,
+    rgba(var(--borb-accent), calc(0.30 * var(--borb-shadow))) 42%,
+    rgba(250, 138, 104, calc(0.14 * var(--borb-shadow))) 68%,
+    rgba(252, 196, 172, 0) 88%);
+  filter: blur(calc(var(--borb-size) * 0.09028));
+  animation: borb-sphere-shadow 7.5s var(--borb-ease) infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+@keyframes borb-sphere-shadow {
+  0%, 100% { transform: translate(-50%, -50%) translateY(calc(var(--borb-size) * 0.1875)) scaleY(0.92) scale(1);    opacity: 0.95; }
+  50%      { transform: translate(-50%, -50%) translateY(calc(var(--borb-size) * 0.2014)) scaleY(0.88) scale(1.06); opacity: 0.78; }
+}
+.borb::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: calc(var(--borb-size) * 0.80556);
+  height: calc(var(--borb-size) * 0.80556);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%,
+      rgba(255, 255, 255, 0) 44%,
+      rgba(255, 255, 255, calc(0.34 * var(--borb-rim))) 68%,
+      rgba(255, 255, 255, calc(0.72 * var(--borb-rim))) 86%,
+      rgba(255, 255, 255, calc(0.94 * var(--borb-rim))) 100%),
+    radial-gradient(ellipse 78% 42% at 50% 99%,
+      rgba(255, 255, 255, 0.92) 0%,
+      rgba(255, 255, 255, 0.48) 38%,
+      rgba(255, 255, 255, 0.12) 62%,
+      rgba(255, 255, 255, 0) 80%),
+    radial-gradient(circle at 36% 26%, rgba(255, 255, 255, calc(0.62 * var(--borb-glass))) 0%, rgba(255, 255, 255, 0) 58%),
+    radial-gradient(circle at 66% 74%, rgba(255, 255, 255, calc(0.26 * var(--borb-glass))) 0%, rgba(255, 255, 255, 0) 52%);
+  pointer-events: none;
+  z-index: 3;
+}
+.borb__field {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--borb-size) * 0.80556);
+  height: calc(var(--borb-size) * 0.80556);
+  border-radius: 50%;
+  overflow: hidden;
+  background:
+    linear-gradient(150deg, rgba(255, 255, 255, 0.52) 0%, rgba(255, 255, 255, 0.10) 54%, rgba(255, 255, 255, 0.40) 100%),
+    radial-gradient(circle at 44% 38%, #FFFFFF 0%, #FFFAF9 55%, #FEF4F2 82%, #FDEDEA 100%);
+  box-shadow:
+    inset 0 calc(var(--borb-size) * -0.08333) calc(var(--borb-size) * 0.11806) calc(var(--borb-size) * -0.04861) rgba(255, 255, 255, 0.92),
+    inset 0 calc(var(--borb-size) * -0.02083) calc(var(--borb-size) * 0.04861) calc(var(--borb-size) * -0.02778) rgba(255, 255, 255, 0.75),
+    inset 0 calc(var(--borb-size) * 0.02778) calc(var(--borb-size) * 0.06944) calc(var(--borb-size) * -0.04167) rgba(255, 255, 255, 0.90),
+    inset 0 0 0 calc(var(--borb-size) * 0.00347) rgba(255, 255, 255, 0.75),
+    0 calc(var(--borb-size) * 0.03472) calc(var(--borb-size) * 0.07639) calc(var(--borb-size) * -0.04167) rgba(198, 112, 88, 0.28),
+    0 calc(var(--borb-size) * 0.10417) calc(var(--borb-size) * 0.19444) calc(var(--borb-size) * -0.10417) rgba(198, 112, 88, 0.42);
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 90%, rgba(0, 0, 0, 0.96) 95%, rgba(0, 0, 0, 0.55) 98%, transparent 100%);
+          mask-image: radial-gradient(circle at 50% 50%, #000 90%, rgba(0, 0, 0, 0.96) 95%, rgba(0, 0, 0, 0.55) 98%, transparent 100%);
+  z-index: 2;
+}
+.borb__field::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 88%;
+  height: 88%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%,
+    rgba(var(--borb-t1), calc(0.70 * var(--borb-core))) 0%,
+    rgba(var(--borb-t2), calc(0.66 * var(--borb-core))) 18%,
+    rgba(var(--borb-t3), calc(0.42 * var(--borb-core))) 42%,
+    rgba(var(--borb-t4), calc(0.20 * var(--borb-core))) 68%,
+    rgba(var(--borb-t4), calc(0.07 * var(--borb-core))) 88%,
+    rgba(var(--borb-t4), 0) 100%);
+  filter: blur(calc(var(--borb-blur) * 0.62));
+  animation: borb-core 13s var(--borb-ease) infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+@keyframes borb-core {
+  0%, 100% { transform: translate(0, 0) scale(1);       opacity: 0.88; }
+  33%      { transform: translate(4%, -3%) scale(1.12); opacity: 1; }
+  66%      { transform: translate(-3%, 4%) scale(0.94); opacity: 0.82; }
+}
+.borb__field::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.42'/%3E%3C/svg%3E");
+  background-size: calc(var(--borb-size) * 0.55556) calc(var(--borb-size) * 0.55556);
+  mix-blend-mode: overlay;
+  opacity: 0.30;
+  pointer-events: none;
+  z-index: 2;
+}
+.borb__cloud {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(var(--borb-blur));
+  pointer-events: none;
+  z-index: 1;
+}
+.borb__cloud--1 {
+  width: calc(var(--borb-size) * 0.47917);
+  height: calc(var(--borb-size) * 0.47917);
+  background: radial-gradient(circle, rgba(var(--borb-t1), calc(0.92 * var(--borb-int))) 0%, rgba(var(--borb-t1), 0) var(--borb-falloff));
+  --borb-dx: calc(var(--borb-size) * -0.09028);
+  --borb-dy: calc(var(--borb-size) * -0.0625);
+  --borb-r: calc(var(--borb-size) * 0.10417);
+  --borb-a: 0deg;
+}
+.borb__cloud--2 {
+  width: calc(var(--borb-size) * 0.52778);
+  height: calc(var(--borb-size) * 0.52778);
+  background: radial-gradient(circle, rgba(var(--borb-t2), calc(0.86 * var(--borb-int))) 0%, rgba(var(--borb-t2), 0) var(--borb-falloff));
+  --borb-dx: calc(var(--borb-size) * 0.07639);
+  --borb-dy: calc(var(--borb-size) * -0.08333);
+  --borb-r: calc(var(--borb-size) * 0.125);
+  --borb-a: 95deg;
+}
+.borb__cloud--3 {
+  width: calc(var(--borb-size) * 0.4375);
+  height: calc(var(--borb-size) * 0.4375);
+  background: radial-gradient(circle, rgba(var(--borb-t3), calc(0.88 * var(--borb-int))) 0%, rgba(var(--borb-t3), 0) var(--borb-falloff));
+  --borb-dx: calc(var(--borb-size) * -0.06944);
+  --borb-dy: calc(var(--borb-size) * 0.08333);
+  --borb-r: calc(var(--borb-size) * 0.09375);
+  --borb-a: 190deg;
+}
+.borb__cloud--4 {
+  width: calc(var(--borb-size) * 0.48611);
+  height: calc(var(--borb-size) * 0.48611);
+  background: radial-gradient(circle, rgba(var(--borb-t4), calc(0.82 * var(--borb-int))) 0%, rgba(var(--borb-t4), 0) var(--borb-falloff));
+  --borb-dx: calc(var(--borb-size) * 0.08681);
+  --borb-dy: calc(var(--borb-size) * 0.06597);
+  --borb-r: calc(var(--borb-size) * 0.11458);
+  --borb-a: 285deg;
+}
+.borb__mark {
+  position: relative;
+  width: calc(var(--borb-size) * 0.29167);
+  height: calc(var(--borb-size) * 0.29167);
+  z-index: 4;
+  filter:
+    drop-shadow(0 calc(var(--borb-size) * 0.00694) calc(var(--borb-size) * 0.01736) rgba(186, 96, 74, 0.26))
+    drop-shadow(0 0 calc(var(--borb-size) * 0.00347) rgba(186, 96, 74, 0.18));
+}
+.borb__blade {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 50%;
+  transition:
+    clip-path 0.34s var(--borb-snap),
+    opacity 0.2s var(--borb-snap);
+  background:
+    radial-gradient(circle at 50% 50%,
+      rgba(255, 255, 255, 0.80) 0%,
+      rgba(255, 255, 255, 0.86) 34%,
+      rgba(255, 255, 255, 0.93) 62%,
+      rgba(255, 255, 255, 0.99) 84%,
+      rgba(255, 255, 255, 1) 100%),
+    linear-gradient(150deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0) 58%);
+  box-shadow: inset 0 0 0 calc(var(--borb-size) * 0.00174) rgba(255, 255, 255, 1);
+}
+.borb__blade--a { clip-path: polygon(29.56% 22.88%, 18.77% 23.14%, 42.67% 49.87%, 2.57% 95.12%, 13.37% 95.12%, 53.21% 49.87%); }
+.borb__blade--b { clip-path: polygon(62.21% 35.22%, 51.67% 35.48%, 64.52% 49.87%, 24.68% 95.12%, 35.22% 95.12%, 75.06% 50.13%); }
+.borb__blade--c { clip-path: polygon(46.79% 4.37%, 86.38% 49.87%, 64.78% 74.55%, 75.58% 74.55%, 96.92% 49.61%, 57.07% 4.37%); }
+.borb__waves {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  opacity: 0;
+  pointer-events: none;
+}
+.borb__waves > path {
+  fill: rgba(255, 255, 255, 0.94);
+  stroke: none;
+}
+.borb__ripple {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: calc(var(--borb-size) * 0.80556);
+  height: calc(var(--borb-size) * 0.80556);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: radial-gradient(circle at 50% 50%,
+    rgba(var(--borb-accent), 0) 66%,
+    rgba(var(--borb-accent), 0.04) 70%,
+    rgba(var(--borb-accent), 0.30) 74.5%,
+    rgba(var(--borb-accent), 0.34) 76%,
+    rgba(var(--borb-accent), 0.14) 79%,
+    rgba(var(--borb-accent), 0.05) 84%,
+    rgba(var(--borb-accent), 0) 90%);
+  filter: blur(calc(var(--borb-size) * 0.00208));
+}
+@keyframes borb-drift {
+  0%   { transform: rotate(var(--borb-a))               translateX(calc(var(--borb-r) * var(--borb-travel) * 1.00)) scale(1.00); opacity: 1; }
+  14%  { transform: rotate(calc(var(--borb-a) +  51deg)) translateX(calc(var(--borb-r) * var(--borb-travel) * 1.46)) scale(1.12); opacity: 0.92; }
+  29%  { transform: rotate(calc(var(--borb-a) + 103deg)) translateX(calc(var(--borb-r) * var(--borb-travel) * 0.70)) scale(0.90); opacity: 1; }
+  43%  { transform: rotate(calc(var(--borb-a) + 154deg)) translateX(calc(var(--borb-r) * var(--borb-travel) * 1.34)) scale(1.16); opacity: 0.94; }
+  57%  { transform: rotate(calc(var(--borb-a) + 206deg)) translateX(calc(var(--borb-r) * var(--borb-travel) * 0.82)) scale(0.94); opacity: 1; }
+  71%  { transform: rotate(calc(var(--borb-a) + 257deg)) translateX(calc(var(--borb-r) * var(--borb-travel) * 1.52)) scale(1.09); opacity: 0.90; }
+  86%  { transform: rotate(calc(var(--borb-a) + 309deg)) translateX(calc(var(--borb-r) * var(--borb-travel) * 0.76)) scale(0.88); opacity: 1; }
+  100% { transform: rotate(calc(var(--borb-a) + 360deg)) translateX(calc(var(--borb-r) * var(--borb-travel) * 1.00)) scale(1.00); opacity: 1; }
+}
+@keyframes borb-core-idle {
+  0%, 100% { transform: translate(0, 0) scale(1);          opacity: 0.90; }
+  18%      { transform: translate(5%, -4%) scale(1.15);     opacity: 1; }
+  36%      { transform: translate(3%, 5%) scale(0.94);      opacity: 0.82; }
+  54%      { transform: translate(-5%, 3%) scale(1.12);     opacity: 0.98; }
+  72%      { transform: translate(-4%, -5%) scale(0.87);    opacity: 0.78; }
+  88%      { transform: translate(2%, -2%) scale(1.07);     opacity: 0.96; }
+}
+@keyframes borb-gather {
+  0%, 100% { transform: translate(calc(var(--borb-dx) * 1.08), calc(var(--borb-dy) * 1.08)) scale(1.02); }
+  55%      { transform: translate(calc(var(--borb-dx) * 0.22), calc(var(--borb-dy) * 0.22)) scale(0.90); }
+}
+@keyframes borb-arc {
+  0%   { transform: translate(var(--borb-dx), var(--borb-dy)) scale(1); }
+  9%   { transform: translate(calc(var(--borb-dy) * 0.9), calc(var(--borb-dx) * 0.7)) scale(1.14); }
+  21%  { transform: translate(calc(var(--borb-dx) * -0.5), calc(var(--borb-dy) * 1.1)) scale(0.92); }
+  34%  { transform: translate(calc(var(--borb-dy) * -1.0), calc(var(--borb-dx) * -0.6)) scale(1.10); }
+  48%  { transform: translate(calc(var(--borb-dx) * 1.2), calc(var(--borb-dy) * -0.4)) scale(0.96); }
+  61%  { transform: translate(calc(var(--borb-dy) * 0.6), calc(var(--borb-dx) * 1.1)) scale(1.16); }
+  76%  { transform: translate(calc(var(--borb-dx) * -1.1), calc(var(--borb-dy) * 0.3)) scale(0.94); }
+  89%  { transform: translate(calc(var(--borb-dy) * -0.7), calc(var(--borb-dx) * -1.0)) scale(1.08); }
+  100% { transform: translate(var(--borb-dx), var(--borb-dy)) scale(1); }
+}
+@keyframes borb-current {
+  0%, 62%, 100% { filter: none; }
+  68%           { filter: brightness(1.05) saturate(1.12); }
+  74%           { filter: none; }
+  80%           { filter: brightness(1.08) saturate(1.18); }
+  86%           { filter: none; }
+}
+@keyframes borb-radiate {
+  0%, 100% { transform: translate(calc(var(--borb-dx) * 0.35), calc(var(--borb-dy) * 0.35)) scale(0.88); }
+  50%      { transform: translate(calc(var(--borb-dx) * 1.5), calc(var(--borb-dy) * 1.5)) scale(1.2); }
+}
+@keyframes borb-revolve {
+  from { transform: rotate(var(--borb-a)) translateX(var(--borb-r)) scale(1); }
+  50%  { transform: rotate(calc(var(--borb-a) + 180deg)) translateX(var(--borb-r)) scale(1.08); }
+  to   { transform: rotate(calc(var(--borb-a) + 360deg)) translateX(var(--borb-r)) scale(1); }
+}
+@keyframes borb-scan {
+  0%, 100% { transform: translate(calc(var(--borb-dx) * 1.1), var(--borb-dy)) scale(1); }
+  50%      { transform: translate(calc(var(--borb-dx) * -1.1), var(--borb-dy)) scale(1.06); }
+}
+@keyframes borb-falter {
+  0%, 44%, 100% { transform: translate(var(--borb-dx), var(--borb-dy)) scale(1); }
+  50%           { transform: translate(calc(var(--borb-dx) + var(--borb-size) * 0.0243), calc(var(--borb-dy) - var(--borb-size) * 0.0208)) scale(1.04); }
+  56%           { transform: translate(calc(var(--borb-dx) - var(--borb-size) * 0.0208), calc(var(--borb-dy) + var(--borb-size) * 0.0174)) scale(0.97); }
+  62%           { transform: translate(calc(var(--borb-dx) + var(--borb-size) * 0.0139), var(--borb-dy)) scale(1.02); }
+  68%           { transform: translate(var(--borb-dx), var(--borb-dy)) scale(1); }
+}
+@keyframes borb-bar-wave {
+  0%, 100% { transform: scaleY(0.55); }
+  50%      { transform: scaleY(1.35); }
+}
+@keyframes borb-load-step {
+  0%, 60%, 100% { opacity: 0.22; transform: translateX(0); }
+  25%           { opacity: 1;    transform: translateX(calc(var(--borb-size) * 0.01736)); }
+}
+@keyframes borb-relay {
+  0%   { clip-path: polygon(29.56% 22.88%, 18.77% 23.14%, 42.67% 49.87%, 2.57% 95.12%, 13.37% 95.12%, 53.21% 49.87%); opacity: 1; }
+  33%  { clip-path: polygon(62.21% 35.22%, 51.67% 35.48%, 64.52% 49.87%, 24.68% 95.12%, 35.22% 95.12%, 75.06% 50.13%); opacity: 1; }
+  66%  { clip-path: polygon(57.07% 4.37%, 46.79% 4.37%, 86.38% 49.87%, 64.78% 74.55%, 75.58% 74.55%, 96.92% 49.61%); opacity: 1; }
+  88%  { clip-path: polygon(57.07% 4.37%, 46.79% 4.37%, 86.38% 49.87%, 64.78% 74.55%, 75.58% 74.55%, 96.92% 49.61%); opacity: 0; }
+  89%  { clip-path: polygon(29.56% 22.88%, 18.77% 23.14%, 42.67% 49.87%, 2.57% 95.12%, 13.37% 95.12%, 53.21% 49.87%); opacity: 0; }
+  100% { clip-path: polygon(29.56% 22.88%, 18.77% 23.14%, 42.67% 49.87%, 2.57% 95.12%, 13.37% 95.12%, 53.21% 49.87%); opacity: 1; }
+}
+@keyframes borb-shuffle {
+  0%   { clip-path: polygon(29.56% 22.88%, 18.77% 23.14%, 42.67% 49.87%, 2.57% 95.12%, 13.37% 95.12%, 53.21% 49.87%); transform: translate(0, 0) scale(1); opacity: 1; }
+  33%  { clip-path: polygon(62.21% 35.22%, 51.67% 35.48%, 64.52% 49.87%, 24.68% 95.12%, 35.22% 95.12%, 75.06% 50.13%); transform: translate(0, 0) scale(1); opacity: 1; }
+  66%  { clip-path: polygon(57.07% 4.37%, 46.79% 4.37%, 86.38% 49.87%, 64.78% 74.55%, 75.58% 74.55%, 96.92% 49.61%); transform: translate(0, 0) scale(1); opacity: 1; }
+  75%  { clip-path: polygon(57.07% 4.37%, 46.79% 4.37%, 86.38% 49.87%, 64.78% 74.55%, 75.58% 74.55%, 96.92% 49.61%); transform: translate(calc(var(--borb-size) * 0.00694), calc(var(--borb-size) * -0.02083)) scale(0.97); opacity: 0.55; }
+  83%  { transform: translate(0, calc(var(--borb-size) * -0.02778)) scale(0.96); opacity: 0.45; }
+  91%  { clip-path: polygon(29.56% 22.88%, 18.77% 23.14%, 42.67% 49.87%, 2.57% 95.12%, 13.37% 95.12%, 53.21% 49.87%); transform: translate(calc(var(--borb-size) * -0.00694), calc(var(--borb-size) * -0.01736)) scale(0.97); opacity: 0.6; }
+  100% { clip-path: polygon(29.56% 22.88%, 18.77% 23.14%, 42.67% 49.87%, 2.57% 95.12%, 13.37% 95.12%, 53.21% 49.87%); transform: translate(0, 0) scale(1); opacity: 1; }
+}
+@keyframes borb-piano {
+  0%, 100% { opacity: 1;    transform: translate(0, 0) scale(1); }
+  16%      { opacity: 0.62; transform: translate(calc(var(--borb-size) * 0.01215), calc(var(--borb-size) * 0.00903)) scale(0.965); }
+  34%      { opacity: 0.86; transform: translate(calc(var(--borb-size) * 0.00417), calc(var(--borb-size) * -0.00278)) scale(1.015); }
+  52%      { opacity: 1;    transform: translate(0, 0) scale(1); }
+}
+@keyframes borb-excl-pulse {
+  0%, 100% { opacity: 1;    transform: scale(1); }
+  50%      { opacity: 0.90; transform: scale(0.98); }
+}
+@keyframes borb-ripple-out {
+  0%   { transform: scale(0.94); opacity: 0; }
+  18%  { opacity: 0.85; }
+  100% { transform: scale(1.62); opacity: 0; }
+}
+.borb .borb__cloud,
+.borb[data-state="idle"] .borb__cloud {
+  animation-name: borb-drift;
+  animation-timing-function: cubic-bezier(0.42, 0.06, 0.58, 0.94);
+  animation-iteration-count: infinite;
+}
+.borb .borb__cloud--1, .borb[data-state="idle"] .borb__cloud--1 { animation-duration: 7.5s; }
+.borb .borb__cloud--2, .borb[data-state="idle"] .borb__cloud--2 { animation-duration: 9.5s; }
+.borb .borb__cloud--3, .borb[data-state="idle"] .borb__cloud--3 { animation-duration: 11.5s; }
+.borb .borb__cloud--4, .borb[data-state="idle"] .borb__cloud--4 { animation-duration: 8.5s; }
+.borb .borb__field::after,
+.borb[data-state="idle"] .borb__field::after {
+  animation-name: borb-core-idle;
+  animation-duration: 6.5s;
+}
+.borb[data-state="listening"] .borb__cloud {
+  animation-name: borb-arc;
+  animation-timing-function: linear;
+}
+.borb[data-state="listening"] .borb__cloud--1 { animation-duration: 2.3s; }
+.borb[data-state="listening"] .borb__cloud--2 { animation-duration: 2.9s; }
+.borb[data-state="listening"] .borb__cloud--3 { animation-duration: 2.6s; }
+.borb[data-state="listening"] .borb__cloud--4 { animation-duration: 3.1s; }
+.borb[data-state="listening"] .borb__field {
+  animation: borb-current 1.7s steps(1, end) infinite;
+}
+.borb[data-state="listening"] .borb__blade--a {
+  clip-path: polygon(23.5% 28%, 28% 28%, 32.5% 28%, 32.5% 72%, 28% 72%, 23.5% 72%);
+  animation: borb-bar-wave 1s var(--borb-ease) infinite;
+}
+.borb[data-state="listening"] .borb__blade--b {
+  clip-path: polygon(45.5% 28%, 50% 28%, 54.5% 28%, 54.5% 72%, 50% 72%, 45.5% 72%);
+  animation: borb-bar-wave 1s var(--borb-ease) infinite;
+  animation-delay: 0.12s;
+}
+.borb[data-state="listening"] .borb__blade--c {
+  clip-path: polygon(67.5% 28%, 72% 28%, 76.5% 28%, 76.5% 72%, 72% 72%, 67.5% 72%);
+  animation: borb-bar-wave 1s var(--borb-ease) infinite;
+  animation-delay: 0.24s;
+}
+.borb[data-state="thinking"] .borb__cloud {
+  animation-name: borb-gather;
+  animation-timing-function: cubic-bezier(0.45, 0, 0.35, 1);
+}
+.borb[data-state="thinking"] .borb__cloud--1 { animation-duration: 6s; }
+.borb[data-state="thinking"] .borb__cloud--2 { animation-duration: 6.8s; }
+.borb[data-state="thinking"] .borb__cloud--3 { animation-duration: 7.6s; }
+.borb[data-state="thinking"] .borb__cloud--4 { animation-duration: 6.4s; }
+.borb[data-state="thinking"] .borb__blade--a { animation: borb-load-step 1.5s var(--borb-ease) infinite; }
+.borb[data-state="thinking"] .borb__blade--b { animation: borb-load-step 1.5s var(--borb-ease) infinite; animation-delay: 0.2s; }
+.borb[data-state="thinking"] .borb__blade--c { animation: borb-load-step 1.5s var(--borb-ease) infinite; animation-delay: 0.4s; }
+.borb[data-state="thinking"]::after { animation-duration: 7.2s; }
+.borb[data-state="thinking2"] .borb__cloud {
+  animation-name: borb-scan;
+  animation-timing-function: cubic-bezier(0.45, 0, 0.25, 1);
+}
+.borb[data-state="thinking2"] .borb__cloud--1 { animation-duration: 5.8s; }
+.borb[data-state="thinking2"] .borb__cloud--2 { animation-duration: 6.4s; }
+.borb[data-state="thinking2"] .borb__cloud--3 { animation-duration: 7s; }
+.borb[data-state="thinking2"] .borb__cloud--4 { animation-duration: 6.1s; }
+.borb[data-state="thinking2"] .borb__blade--a { animation: borb-shuffle 2.85s var(--borb-ease) infinite; animation-delay: 0s; }
+.borb[data-state="thinking2"] .borb__blade--b { animation: borb-shuffle 2.85s var(--borb-ease) infinite; animation-delay: -0.95s; }
+.borb[data-state="thinking2"] .borb__blade--c { animation: borb-shuffle 2.85s var(--borb-ease) infinite; animation-delay: -1.9s; }
+.borb[data-state="thinking2"]::after { animation-duration: 6.2s; }
+.borb[data-state="thinking3"] .borb__cloud {
+  animation-name: borb-scan;
+  animation-timing-function: cubic-bezier(0.37, 0, 0.28, 1);
+}
+.borb[data-state="thinking3"] .borb__cloud--1 { animation-duration: 5.2s; }
+.borb[data-state="thinking3"] .borb__cloud--2 { animation-duration: 6s; }
+.borb[data-state="thinking3"] .borb__cloud--3 { animation-duration: 6.6s; }
+.borb[data-state="thinking3"] .borb__cloud--4 { animation-duration: 5.6s; }
+.borb[data-state="thinking3"] .borb__blade--a { animation: borb-piano 0.95s cubic-bezier(0.37, 0, 0.28, 1) infinite; animation-delay: 0s; }
+.borb[data-state="thinking3"] .borb__blade--b { animation: borb-piano 0.95s cubic-bezier(0.37, 0, 0.28, 1) infinite; animation-delay: -0.6333s; }
+.borb[data-state="thinking3"] .borb__blade--c { animation: borb-piano 0.95s cubic-bezier(0.37, 0, 0.28, 1) infinite; animation-delay: -0.3167s; }
+.borb[data-state="thinking3"]::after { animation-duration: 5.2s; }
+.borb[data-state="speaking"] .borb__cloud {
+  animation-name: borb-radiate;
+  animation-timing-function: cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+.borb[data-state="speaking"] .borb__cloud--1 { animation-duration: 2.2s; }
+.borb[data-state="speaking"] .borb__cloud--2 { animation-duration: 2.6s; }
+.borb[data-state="speaking"] .borb__cloud--3 { animation-duration: 3s; }
+.borb[data-state="speaking"] .borb__cloud--4 { animation-duration: 2.4s; }
+.borb[data-state="speaking"] .borb__blade { animation: none; }
+.borb[data-state="speaking"] .borb__ripple { animation: borb-ripple-out 3.4s var(--borb-ease) infinite; }
+.borb[data-state="speaking"] .borb__ripple--2 { animation-delay: -1.7s; }
+.borb[data-state="speaking"]::after { animation-duration: 2.6s; }
+.borb[data-state="loading"] .borb__cloud {
+  animation-name: borb-revolve;
+  animation-timing-function: linear;
+}
+.borb[data-state="loading"] .borb__cloud--1 { animation-duration: 7s; }
+.borb[data-state="loading"] .borb__cloud--2 { animation-duration: 8.4s; }
+.borb[data-state="loading"] .borb__cloud--3 { animation-duration: 6.2s; }
+.borb[data-state="loading"] .borb__cloud--4 { animation-duration: 9s; }
+.borb[data-state="loading"] .borb__blade--a { animation: borb-relay 2.4s var(--borb-ease) infinite; animation-delay: 0s; }
+.borb[data-state="loading"] .borb__blade--b { animation: borb-relay 2.4s var(--borb-ease) infinite; animation-delay: -0.8s; }
+.borb[data-state="loading"] .borb__blade--c { animation: borb-relay 2.4s var(--borb-ease) infinite; animation-delay: -1.6s; }
+.borb[data-state="loading"]::after { animation-duration: 5.4s; }
+.borb[data-state="error"] .borb__cloud {
+  animation-name: borb-falter;
+  animation-timing-function: var(--borb-ease);
+  animation-duration: 2.4s;
+}
+.borb[data-state="error"] .borb__blade--a {
+  clip-path: polygon(43.5% 17%, 50% 17%, 56.5% 17%, 54.5% 63%, 50% 63%, 45.5% 63%);
+  opacity: 0;
+  animation: none;
+}
+.borb[data-state="error"] .borb__blade--b {
+  clip-path: polygon(43.5% 17%, 50% 17%, 56.5% 17%, 54.5% 63%, 50% 63%, 45.5% 63%);
+  opacity: 1;
+  animation: none;
+}
+.borb[data-state="error"] .borb__blade--c {
+  clip-path: polygon(46.3% 73.5%, 50% 72.4%, 53.7% 73.5%, 53.7% 85.6%, 50% 86.7%, 46.3% 85.6%);
+  opacity: 1;
+  animation: none;
+}
+.borb[data-state="error"] .borb__mark { animation: borb-excl-pulse 1.9s var(--borb-ease) infinite; }
+.borb[data-state="error"]::after { animation-duration: 2.2s; }
+@container borb (max-width: 140px) {
+  .borb__field::before { opacity: 0.16; }
+  .borb::after { opacity: 0.55; }
+  .borb__ripple { filter: none; }
+  .borb__cloud { --borb-int: 0.62; --borb-falloff: 66%; }
+  .borb__field::after { width: 76%; height: 76%; --borb-core: 1.24; }
+  .borb::before { --borb-rim: 0.5; }
+  .borb .borb__cloud, .borb[data-state="idle"] .borb__cloud { --borb-travel: 1.3; }
+  .borb .borb__cloud--1, .borb[data-state="idle"] .borb__cloud--1 { animation-duration: 6.2s; }
+  .borb .borb__cloud--2, .borb[data-state="idle"] .borb__cloud--2 { animation-duration: 7.8s; }
+  .borb .borb__cloud--3, .borb[data-state="idle"] .borb__cloud--3 { animation-duration: 9.4s; }
+  .borb .borb__cloud--4, .borb[data-state="idle"] .borb__cloud--4 { animation-duration: 7s; }
+  .borb .borb__field::after, .borb[data-state="idle"] .borb__field::after { animation-duration: 5.4s; }
+}
+@container borb (max-width: 72px) {
+  .borb__field::before { display: none; }
+  .borb::after { display: none; }
+  .borb__cloud { --borb-int: 0.72; --borb-falloff: 70%; }
+  .borb__field::after {
+    width: 66%; height: 66%;
+    --borb-core: 1.55;
+    filter: blur(calc(var(--borb-blur) * 0.5));
+  }
+  .borb::before { --borb-rim: 0.86; }
+  .borb .borb__cloud, .borb[data-state="idle"] .borb__cloud { --borb-travel: 1.55; }
+  .borb .borb__cloud--1, .borb[data-state="idle"] .borb__cloud--1 { animation-duration: 5.4s; }
+  .borb .borb__cloud--2, .borb[data-state="idle"] .borb__cloud--2 { animation-duration: 6.8s; }
+  .borb .borb__cloud--3, .borb[data-state="idle"] .borb__cloud--3 { animation-duration: 8.2s; }
+  .borb .borb__cloud--4, .borb[data-state="idle"] .borb__cloud--4 { animation-duration: 6.1s; }
+  .borb .borb__field::after, .borb[data-state="idle"] .borb__field::after { animation-duration: 4.6s; }
+  .borb__field {
+    background:
+      linear-gradient(150deg, rgba(255, 255, 255, 0.52) 0%, rgba(255, 255, 255, 0.10) 54%, rgba(255, 255, 255, 0.40) 100%),
+      radial-gradient(circle at 44% 38%, #FFFDFC 0%, #FEF6F4 48%, #FDECE8 80%, #FBE0DB 100%);
+  }
+}
+@container borb (min-width: 420px) {
+  .borb__field::before {
+    background-size: calc(var(--borb-size) * 0.28) calc(var(--borb-size) * 0.28);
+    opacity: 0.24;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .borb .borb__cloud,
+  .borb .borb__blade,
+  .borb .borb__mark,
+  .borb .borb__field,
+  .borb .borb__field::after,
+  .borb .borb__ripple,
+  .borb::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  .borb .borb__ripple { opacity: 0 !important; }
+}
+.app .borb.tal-mk{
+  display:flex;
+  background-image:none;
+  width:24px;height:24px;
+  --borb-size:29.8px}
+.app .borb.tal-mk.sm{width:15px;height:15px;--borb-size:18.6px}
+.app .borb.tal-mk.lg{width:132px;height:132px;--borb-size:163.9px}
+.app .askline-mark .borb.tal-mk{width:18px;height:18px;--borb-size:22.3px}
+.app .ask-page .askfield .askline-mark .borb.tal-mk{width:20px;height:20px;--borb-size:24.8px}
+.app .askdock .askline-mark .borb.tal-mk{width:32px;height:32px;--borb-size:39.7px}
+.app .ask-page .ask-top-id .borb.tal-mk{width:28px;height:28px;--borb-size:34.8px}
+.app .ask-page .ask-thread .tal-msg .borb.tal-mk.sm{width:28px;height:28px;--borb-size:34.8px}
+@container app (max-width:899px){
+  .app .ob-card .ob-brand .tal-hero .borb.tal-mk.lg{
+    width:72px;height:72px;--borb-size:89.4px}
+}
+.app .modhead .ai-aura.talsum > .ai-head > .ai-label:has(> .borb)::before{
+  content:none}
+.app .modhead .ai-aura.talsum > .ai-head > .ai-label > .borb.tal-mk{
+  width:28px;height:28px;--borb-size:34.8px}
 
 </style>
 </head>
@@ -14269,6 +14842,29 @@ const P = new Proxy({}, {
       + `<path d="${PHP[k][0]}" opacity=".2"/><path d="${PHP[k][1]}"/></svg>`
     : ''
 });
+
+function borbMark(cls, live){
+  return `<span class="borb ${cls || ''}" data-state="idle"`
+    + (live ? ' data-borb-live="1"' : '')
+    + ` aria-hidden="true">`
+    + `<span class="borb__ripple"></span>`
+    + `<span class="borb__ripple borb__ripple--2"></span>`
+    + `<span class="borb__field">`
+    +   `<span class="borb__cloud borb__cloud--1"></span>`
+    +   `<span class="borb__cloud borb__cloud--2"></span>`
+    +   `<span class="borb__cloud borb__cloud--3"></span>`
+    +   `<span class="borb__cloud borb__cloud--4"></span>`
+    + `</span>`
+    + `<span class="borb__mark">`
+    +   `<span class="borb__blade borb__blade--a"></span>`
+    +   `<span class="borb__blade borb__blade--b"></span>`
+    +   `<span class="borb__blade borb__blade--c"></span>`
+    +   `<svg class="borb__waves" viewBox="0 0 100 100" aria-hidden="true">`
+    +     `<path d=""/><path d=""/><path d=""/>`
+    +   `</svg>`
+    + `</span>`
+    + `</span>`;
+}
 
 
 
@@ -15217,21 +15813,21 @@ function talPanel(f){
   const opener = S.view==='chapter' && S.ch===3
     ? `You are 12 minutes into chapter 4. Want the short version before you go back in?`
     : `You are on <b>${where.toLowerCase()}</b>, ${state.toLowerCase()}. Ask me anything, or start with one of these.`;
-  const bubble = (who,html) => who==='me'
+  const bubble = (who,html,live) => who==='me'
     ? `<div class="tal-msg me"><span class="tal-who"><span class="tal-who-n">You</span><span class="av"><img src="${isLead()?AV.priya:AV.hana}" alt=""><i>${isLead()?'PN':'MN'}</i></span></span><div class="bb">${html}</div></div>`
-    : `<div class="tal-msg"><span class="tal-who"><span class="tal-mk sm"></span><span class="tal-who-n">Tal</span></span><div class="bb">${html}</div></div>`;
+    : `<div class="tal-msg"><span class="tal-who">${borbMark('tal-mk sm', live)}<span class="tal-who-n">Tal</span></span><div class="bb">${html}</div></div>`;
   const hero = `<div class="tal-hero">
-      <span class="tal-mk lg orb"></span>
+      ${borbMark('tal-mk lg', true)}
       <h2>Hello <b>${isLead()?'Priya':'Maryam'}</b>, I am Tal &#128075;</h2>
       <p>${isLead()?'I can read your cohorts, your evaluations and where people are stuck. What do you need?':'I am here to assist you with anything you need help with. What&rsquo;s going on?'}</p>
     </div>`;
   const thread = (S.thread.length ? '' : hero)
     + S.thread.map(m=>bubble(m.who,m.html)).join('')
-    + (S.typing?bubble('tal',`<div class="ai-stream"><i></i><i></i><i></i></div>`):'');
+    + (S.typing?bubble('tal',`<div class="ai-stream"><i></i><i></i><i></i></div>`,true):'');
 
   return `<div class="tal-panel ${S.tal?'on':''}" id="talPanel">
     <div class="tal-h">
-      <span class="tal-mk"></span>
+      ${borbMark('tal-mk')}
       <span class="nm"><b>Tal</b></span>
       <button class="shell-act tal-x" data-toggle="tal" aria-label="Close Tal" style="color:var(--icon-primary)">${I.close}</button>
     </div>
@@ -15239,12 +15835,61 @@ function talPanel(f){
     ${S.thread.length?'':`<div class="tal-sugg">${ctx.map(s=>`<button class="chip-tal" data-ask="1"><span class="sk-mark xs"></span>${s}</button>`).join('')}</div>`}
     
     <div class="composer">
-      <span class="tal-mk sm composer-mk"></span>
+      ${AI_RUN}
+      ${borbMark('tal-mk sm composer-mk')}
       <input class="inp ai-field" placeholder="Ask Tal anything" aria-label="Ask Tal">
       <button aria-label="Send">${I.send}</button>
     </div>
   </div>`;
 }
+
+const AI_RUN = `<span class="ai-run" aria-hidden="true">
+    <svg preserveAspectRatio="none">
+      <defs>
+        ${''/* THE COMET'S FIVE STOPS — Maryam, 9 Sep 2026, off Figma 875:6598,
+              given as the exact CSS to follow:
+              `linear-gradient(90.13deg, rgba(255,255,255,0.7) 0%,
+              rgba(213,81,215,0.7) 22.6%, rgba(255,110,36,0.7) 49.04%,
+              rgba(255,55,51,0.7) 75%, rgba(255,255,255,0.7) 100%)`.
+
+              WHITE INTO MAGENTA, ORANGE, RED AND BACK TO WHITE. The offsets are
+              unchanged from the 4 Sep set (0 / .226 / .4904 / .75 / 1); the
+              THREE middle colours are new — #d551d7 (magenta), #ff6e24 (orange)
+              and #ff3733 (red), where the ramp had been red / pale-green / red.
+              So the light is no longer symmetric: it warms across rather than
+              mirroring, which is the node's own gradient.
+
+              90.13deg IS HORIZONTAL, so the SVG gradient is `x2=1 y2=0` now,
+              not the corner-to-corner `y2=1` §70.3a's note argued for. On a wide,
+              short field the ramp lives on the top and bottom edges and the white
+              ends fall on the short sides — which is where the file draws them —
+              so the comet fades through the corners rather than at mid-edge.
+
+              THE .7 IS `stop-opacity`, NOT A COLOUR. SVG has no `rgba()` in
+              `stop-color`, and baking the alpha into the hex would need it
+              composited against whatever is behind — the dock's own border, not
+              white. Stated as the attribute the stop is genuinely 70% and the
+              border shows through it, which is what the spec's `rgba` means on a
+              `filter:blur(1px)` line lying over a coloured edge. The white ends
+              at 70% are what make the dash fade in and out of its travel; §70.1's
+              note has the long version, including why the loop has no seam. */}
+        ${''/* THE MAGENTA STOP IS DROPPED (Maryam, 9 Sep 2026): the comet is now
+              white → orange → red → white, four stops, off the updated node —
+              `linear-gradient(90.13deg, rgba(255,255,255,.7) 0%,
+              rgba(255,110,36,.7) 49.04%, rgba(255,55,51,.7) 75%,
+              rgba(255,255,255,.7) 100%)`. The offsets that remain are unchanged
+              (0 / .4904 / .75 / 1); only #d551d7 at .226 came out, so the light
+              warms straight from white into orange with no purple lead-in. */}
+        <linearGradient id="aiRunGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#ffffff" stop-opacity=".7"/>
+          <stop offset="0.4904" stop-color="#ff6e24" stop-opacity=".7"/>
+          <stop offset="0.75" stop-color="#ff3733" stop-opacity=".7"/>
+          <stop offset="1" stop-color="#ffffff" stop-opacity=".7"/>
+        </linearGradient>
+      </defs>
+      <rect pathLength="1000"/>
+    </svg>
+  </span>`;
 
 const askChip = (q,label) => `<button class="chip-tal" data-tal-ask="${q}"><span class="sk-mark xs"></span>${label||'Ask Tal'}</button>`;
 const talFab = () => `<button class="tal-fab" data-toggle="tal" aria-label="Ask Tal"><svg viewBox="0 0 559 559" aria-hidden="true"><path d="M104.015 128.327H166.308L299.699 279.673L75.2133 533.824H14.0996L238.586 279.673L104.015 128.327Z"/><path d="M350.022 197.67L422.299 279.673L197.813 533.824H136.699L361.185 279.673L288.275 197.67H350.022Z"/><path d="M362.423 418.329H424.716L544.872 280.191L321.278 25.2051H260.164L483.758 280.191L362.423 418.329Z"/></svg><span class="tal-fab-t">Tal</span></button>`;
@@ -23869,59 +24514,12 @@ let ASK_FRESH = false;
 const SPEECH = window.SpeechRecognition || window.webkitSpeechRecognition;
 const SPEECH_OK = !!SPEECH;
 
-const AI_RUN = `<span class="ai-run" aria-hidden="true">
-    <svg preserveAspectRatio="none">
-      <defs>
-        ${''/* THE COMET'S FIVE STOPS — Maryam, 9 Sep 2026, off Figma 875:6598,
-              given as the exact CSS to follow:
-              `linear-gradient(90.13deg, rgba(255,255,255,0.7) 0%,
-              rgba(213,81,215,0.7) 22.6%, rgba(255,110,36,0.7) 49.04%,
-              rgba(255,55,51,0.7) 75%, rgba(255,255,255,0.7) 100%)`.
-
-              WHITE INTO MAGENTA, ORANGE, RED AND BACK TO WHITE. The offsets are
-              unchanged from the 4 Sep set (0 / .226 / .4904 / .75 / 1); the
-              THREE middle colours are new — #d551d7 (magenta), #ff6e24 (orange)
-              and #ff3733 (red), where the ramp had been red / pale-green / red.
-              So the light is no longer symmetric: it warms across rather than
-              mirroring, which is the node's own gradient.
-
-              90.13deg IS HORIZONTAL, so the SVG gradient is `x2=1 y2=0` now,
-              not the corner-to-corner `y2=1` §70.3a's note argued for. On a wide,
-              short field the ramp lives on the top and bottom edges and the white
-              ends fall on the short sides — which is where the file draws them —
-              so the comet fades through the corners rather than at mid-edge.
-
-              THE .7 IS `stop-opacity`, NOT A COLOUR. SVG has no `rgba()` in
-              `stop-color`, and baking the alpha into the hex would need it
-              composited against whatever is behind — the dock's own border, not
-              white. Stated as the attribute the stop is genuinely 70% and the
-              border shows through it, which is what the spec's `rgba` means on a
-              `filter:blur(1px)` line lying over a coloured edge. The white ends
-              at 70% are what make the dash fade in and out of its travel; §70.1's
-              note has the long version, including why the loop has no seam. */}
-        ${''/* THE MAGENTA STOP IS DROPPED (Maryam, 9 Sep 2026): the comet is now
-              white → orange → red → white, four stops, off the updated node —
-              `linear-gradient(90.13deg, rgba(255,255,255,.7) 0%,
-              rgba(255,110,36,.7) 49.04%, rgba(255,55,51,.7) 75%,
-              rgba(255,255,255,.7) 100%)`. The offsets that remain are unchanged
-              (0 / .4904 / .75 / 1); only #d551d7 at .226 came out, so the light
-              warms straight from white into orange with no purple lead-in. */}
-        <linearGradient id="aiRunGrad" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stop-color="#ffffff" stop-opacity=".7"/>
-          <stop offset="0.4904" stop-color="#ff6e24" stop-opacity=".7"/>
-          <stop offset="0.75" stop-color="#ff3733" stop-opacity=".7"/>
-          <stop offset="1" stop-color="#ffffff" stop-opacity=".7"/>
-        </linearGradient>
-      </defs>
-      <rect pathLength="1000"/>
-    </svg>
-  </span>`;
 
 function askBar(){
   const q = askQ();
   return `<button class="askline" data-askopen="1" aria-label="Ask Tal anything">
     ${AI_RUN}
-    <span class="askline-mark"><span class="tal-mk"></span></span>
+    <span class="askline-mark">${borbMark('tal-mk')}</span>
     ${''/* "Ask Tal", not "Ask Tal anything" — Figma 875:6598, 9 Sep 2026. The
           example question beside it carries the "…anything" sense; the label is
           the shorter of the two now. The aria-label keeps the full phrase. */}
@@ -23993,10 +24591,10 @@ function askRotate(){
   }, 200);
 }
 
-function askBubble(who, html){
+function askBubble(who, html, live){
   return who === 'me'
     ? `<div class="tal-msg me"><span class="tal-who"><span class="tal-who-n">You</span><span class="av"><img src="${isLead()?AV.priya:AV.hana}" alt=""><i>${isLead()?'PN':'MN'}</i></span></span><div class="bb">${html}</div></div>`
-    : `<div class="tal-msg"><span class="tal-who"><span class="tal-mk sm"></span><span class="tal-who-n">Tal</span></span><div class="bb">${html}</div></div>`;
+    : `<div class="tal-msg"><span class="tal-who">${borbMark('tal-mk sm', live)}<span class="tal-who-n">Tal</span></span><div class="bb">${html}</div></div>`;
 }
 
 function askView(f){
@@ -24009,19 +24607,19 @@ function askView(f){
     + ` poster="${TAL_BLOB_POSTER}"${reduce() ? '' : ' autoplay'}`
     + ` loop muted playsinline preload="auto" aria-hidden="true"></video>`;
   const hero = `<div class="tal-hero">
-      <span class="tal-mk lg orb tnlogo">${blob}${TN_CHEVRONS}</span>
+      ${borbMark('tal-mk lg', true)}
       <h2>Hey, ${isLead()?'Priya':'Maryam'}! <span class="askv-q">${isLead()?'What do you need?':'What&rsquo;s going on?'}</span></h2>
       <p>${isLead()?'I can read your cohorts, your evaluations and where people are stuck.':'I am here to assist you with anything you need help with.'}</p>
     </div>`;
   const thread = (opened ? '' : hero)
     + S.thread.map(m => askBubble(m.who, m.html)).join('')
-    + (S.typing ? askBubble('tal', `<div class="ai-stream"><i></i><i></i><i></i></div>`) : '');
+    + (S.typing ? askBubble('tal', `<div class="ai-stream"><i></i><i></i><i></i></div>`, true) : '');
 
   return `<div class="page ask-page">
     <div class="ask-top">
       <button class="ph-back" data-askback="1" aria-label="Back to ${where}">${I.arrowLeft}</button>
       <span class="ask-top-id">
-        <span class="tal-mk"></span>
+        ${borbMark('tal-mk')}
         <span class="ask-top-t">Tal</span>
       </span>
     </div>
@@ -24030,6 +24628,16 @@ function askView(f){
       ${opened ? '' : `<div class="ask-sugg">${ctx.map(s =>
         `<button class="chip-tal" data-ask="1"><span class="sk-mark xs"></span>${s}</button>`).join('')}</div>`}
       <div class="askfield">
+        ${''/* THE COMET COMES BACK (Maryam, 17 Sep 2026: "in the internal chat
+               screens make sure the ui of chat bar is almost same in terms of
+               shadows and this running strobe effect"). §118's note records the
+               4 Sep ask this reverses — "do not add the moving line on the
+               border" — so the field was built as the dock MINUS `.ai-run` and
+               minus the lift. Both come back here and in §118; the walking
+               `::before` stroke §53 drew stays off, because the comet is now
+               the moving line and two of them on one edge is the thing §118
+               took the first one off to avoid. */}
+        ${AI_RUN}
         <span class="askv-clip">${I.attachFile}</span>
         <input class="inp" id="askIn" placeholder="What can I help you with?" autocomplete="off">
         ${''/* THE MIC IS DRAWN ONLY WHERE IT CAN WORK — §60's rule, applied to a
@@ -28235,6 +28843,9 @@ function placeSummaryPass(){
 
   const lab = head && head.querySelector(':scope > .ai-label');
   if(lab && lab.textContent.trim() === 'Tal') lab.textContent = 'Summary by Tal';
+  if(lab && !lab.querySelector(':scope > .borb')){
+    lab.insertAdjacentHTML('afterbegin', borbMark('tal-mk'));
+  }
 
   let body = aura.querySelector(':scope > .ai-body');
   if(!body){
@@ -30280,7 +30891,7 @@ function obPanel(){
 
   return `<div class="auth-brand ob-brand">
     <div class="tal-hero">
-      <span class="tal-mk lg orb"></span>
+      ${borbMark('tal-mk lg', true)}
       <h2>Hello <b>Maryam</b>, I am Tal &#128075;</h2>
       <p>${tal}</p>
     </div>
@@ -30813,6 +31424,316 @@ render = function(){
 
 S.obReady = true;
 render();
+
+
+
+(function () {
+  'use strict';
+
+  var BORB_SELECTOR = '.borb';
+  var BORB_SPEAKING = 'speaking';
+  var BORB_SAMPLES = 64;          // points along each band
+  var BORB_MORPH_MS = 460;        // chevron -> thread transition
+  var BORB_THIN = 2.05;           // thread half-width, in viewBox units
+  var BORB_WAVE_X0 = -16;
+  var BORB_WAVE_W = 132;
+  var BORB_WAVE_Y = 50;
+  var BORB_SEED_W = 13;
+  var BORB_SEED_HALF = 2.9;
+
+  var BORB_CHEV = [
+    { pts: [[7.97, 95.12], [47.94, 49.87], [24.16, 23.01]], half: 3.82 },
+    { pts: [[29.95, 95.12], [69.79, 50.00], [56.94, 35.35]], half: 3.73 },
+    { pts: [[70.18, 74.55], [91.65, 49.74], [51.93, 4.37]], half: 3.63 }
+  ];
+
+  function borbSmooth(v) { return v * v * v * (v * (v * 6 - 15) + 10); }
+  function borbClamp01(v) { return v < 0 ? 0 : (v > 1 ? 1 : v); }
+  function borbWin(v, a, b) { return borbSmooth(borbClamp01((v - a) / (b - a))); }
+  function borbMagnetic(v) { return 1 - Math.pow(1 - v, 3.4); }
+
+  function borbResample(poly, n) {
+    var segs = [];
+    var total = 0;
+    var i;
+    for (i = 0; i < poly.length - 1; i++) {
+      var d = Math.sqrt(
+        Math.pow(poly[i + 1][0] - poly[i][0], 2) +
+        Math.pow(poly[i + 1][1] - poly[i][1], 2)
+      );
+      segs.push(d);
+      total += d;
+    }
+    var out = [];
+    for (i = 0; i < n; i++) {
+      var target = (i / (n - 1)) * total;
+      var acc = 0;
+      var k = 0;
+      while (k < segs.length - 1 && acc + segs[k] < target) { acc += segs[k]; k++; }
+      var t = segs[k] === 0 ? 0 : (target - acc) / segs[k];
+      out.push([
+        poly[k][0] + (poly[k + 1][0] - poly[k][0]) * t,
+        poly[k][1] + (poly[k + 1][1] - poly[k][1]) * t
+      ]);
+    }
+    return out;
+  }
+
+  var BORB_CHEV_PTS = [];
+  (function () {
+    for (var i = 0; i < BORB_CHEV.length; i++) {
+      BORB_CHEV_PTS.push(borbResample(BORB_CHEV[i].pts, BORB_SAMPLES));
+    }
+  }());
+
+  function borbRelax(pts, strength) {
+    if (strength <= 0.001) { return pts; }
+    var cur = pts;
+    for (var pass = 0; pass < 2; pass++) {
+      var next = cur.slice();
+      for (var i = 1; i < cur.length - 1; i++) {
+        var ax = (cur[i - 1][0] + cur[i + 1][0]) / 2;
+        var ay = (cur[i - 1][1] + cur[i + 1][1]) / 2;
+        next[i] = [
+          cur[i][0] + (ax - cur[i][0]) * strength,
+          cur[i][1] + (ay - cur[i][1]) * strength
+        ];
+      }
+      cur = next;
+    }
+    return cur;
+  }
+
+  function borbBuildBand(centre, half) {
+    var top = [];
+    var bot = [];
+    var i;
+    for (i = 0; i < centre.length; i++) {
+      var p = centre[i];
+      var a = centre[Math.max(0, i - 1)];
+      var b = centre[Math.min(centre.length - 1, i + 1)];
+      var nx = -(b[1] - a[1]);
+      var ny = (b[0] - a[0]);
+      var len = Math.sqrt(nx * nx + ny * ny) || 1;
+      nx /= len; ny /= len;
+      top.push([p[0] + nx * half, p[1] + ny * half]);
+      bot.push([p[0] - nx * half, p[1] - ny * half]);
+    }
+    function fmt(q) { return q[0].toFixed(2) + ' ' + q[1].toFixed(2); }
+    var d = 'M ' + fmt(top[0]);
+    for (i = 1; i < top.length; i++) { d += ' L ' + fmt(top[i]); }
+    for (i = bot.length - 1; i >= 0; i--) { d += ' L ' + fmt(bot[i]); }
+    return d + ' Z';
+  }
+
+  function borbStringPoint(i, band, t, amp) {
+    var u = i / (BORB_SAMPLES - 1);
+    var x = BORB_WAVE_X0 + u * BORB_WAVE_W;
+    var env = Math.sin(Math.PI * u);
+    var ph = band * 2.3;
+    var swell = 0.6 + 0.4 * Math.sin(t * 1.4 + ph);
+    var f1 = 2.0 + band * 0.6;
+    var f2 = 3.4 + band * 0.9;
+    var w =
+      0.70 * Math.sin(u * Math.PI * f1 - t * 2.4 + ph) +
+      0.42 * Math.sin(u * Math.PI * f2 + t * 1.7 - ph * 1.4) +
+      0.20 * Math.sin(u * Math.PI * 6.2 + t * 3.1 + ph);
+    return [x, BORB_WAVE_Y + amp * env * swell * w * 20];
+  }
+
+  function borbCreate(root) {
+    if (!root || root.getAttribute('data-borb-bound') === '1') { return null; }
+    root.setAttribute('data-borb-bound', '1');
+
+    var svg = root.querySelector('.borb__waves');
+    var blades = root.querySelectorAll('.borb__blade');
+    if (!svg) { return null; }
+    var paths = svg.querySelectorAll('path');
+    if (paths.length < 3) { return null; }
+
+    var reduced = false;
+    if (window.matchMedia) {
+      reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    }
+
+    var softenPeak = 0.55 + 0.25 * Math.min(1, 900 / BORB_MORPH_MS - 1);
+
+    var morph = 0;
+    var target = 0;
+    var raf = null;
+    var last = null;
+
+    function frame(now) {
+      if (last === null) { last = now; }
+      var dt = Math.min(BORB_MORPH_MS * 0.06, now - last);
+      last = now;
+      var step = dt / BORB_MORPH_MS;
+      morph = target > morph ? Math.min(target, morph + step) : Math.max(target, morph - step);
+
+      var t = now / 1000;
+
+      var fade = borbWin(morph, 0.01, 0.20);
+      svg.style.opacity = String(fade);
+      for (var bi = 0; bi < blades.length; bi++) {
+        blades[bi].style.opacity = morph > 0 ? String(1 - fade) : '';
+      }
+
+      var k = borbMagnetic(morph);
+      var k1 = 1 - k;
+      var wC = k1 * k1 * k1;
+      var wS = 3 * k1 * k * (k1 + k);
+      var wW = k * k * k;
+      var amp = reduced ? 0 : borbWin(morph, 0.62, 1.00);
+      var soften = Math.sin(Math.PI * morph) * softenPeak;
+
+      for (var b = 0; b < 3; b++) {
+        var centre = [];
+        for (var i = 0; i < BORB_SAMPLES; i++) {
+          var u = i / (BORB_SAMPLES - 1);
+          var c = BORB_CHEV_PTS[b][i];
+          var sx = 50 + (u - 0.5) * BORB_SEED_W;
+          var s = borbStringPoint(i, b, t, amp);
+          centre.push([
+            wC * c[0] + wS * sx + wW * s[0],
+            wC * c[1] + wS * BORB_WAVE_Y + wW * s[1]
+          ]);
+        }
+        var half = wC * BORB_CHEV[b].half + wS * BORB_SEED_HALF + wW * BORB_THIN;
+        paths[b].setAttribute('d', borbBuildBand(borbRelax(centre, soften), half));
+      }
+
+      if (morph === 0 && target === 0) { raf = null; last = null; return; }
+      raf = window.requestAnimationFrame(frame);
+    }
+
+    function setSpeaking(on) {
+      target = on ? 1 : 0;
+      if (raf === null) {
+        last = null;
+        raf = window.requestAnimationFrame(frame);
+      }
+    }
+
+    function sync() {
+      setSpeaking(root.getAttribute('data-state') === BORB_SPEAKING);
+    }
+
+    var observer = null;
+    if (window.MutationObserver) {
+      observer = new window.MutationObserver(sync);
+      observer.observe(root, { attributes: true, attributeFilter: ['data-state'] });
+    }
+
+    sync();
+
+    return {
+      el: root,
+      refresh: sync,
+      destroy: function () {
+        if (observer) { observer.disconnect(); }
+        if (raf !== null) { window.cancelAnimationFrame(raf); raf = null; }
+        root.removeAttribute('data-borb-bound');
+      }
+    };
+  }
+
+  var borbInstances = [];
+
+  function borbMount(root) {
+    var made = borbCreate(root);
+    if (made) { borbInstances.push(made); }
+    return made;
+  }
+
+  function borbMountAll(scope) {
+    var host = scope || document;
+    var found = host.querySelectorAll(BORB_SELECTOR);
+    for (var i = 0; i < found.length; i++) { borbMount(found[i]); }
+    return borbInstances.length;
+  }
+
+  function borbDestroyAll() {
+    for (var i = 0; i < borbInstances.length; i++) { borbInstances[i].destroy(); }
+    borbInstances = [];
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () { borbMountAll(); });
+  } else {
+    borbMountAll();
+  }
+
+  window.BorbOrb = {
+    mount: borbMount,
+    mountAll: borbMountAll,
+    destroyAll: borbDestroyAll
+  };
+}());
+
+
+
+(function () {
+  'use strict';
+
+  var orbSpeaking = false;
+  var orbListening = false;
+
+  function orbWanted() {
+    if (orbListening) { return 'listening'; }
+    if (orbSpeaking) { return 'speaking'; }
+    if (typeof S !== 'undefined' && S && S.typing) { return 'thinking'; }
+    return 'idle';
+  }
+
+  function orbSync() {
+    var want = orbWanted();
+    var all = document.querySelectorAll('.borb');
+    for (var i = 0; i < all.length; i++) {
+      var el = all[i];
+      var state = el.hasAttribute('data-borb-live') ? want : 'idle';
+      if (el.getAttribute('data-state') !== state) {
+        el.setAttribute('data-state', state);
+      }
+    }
+  }
+
+  function orbRefresh() {
+    if (window.BorbOrb) { window.BorbOrb.mountAll(); }
+    orbSync();
+  }
+
+  function orbWrap(name, after) {
+    var prev = window[name];
+    if (typeof prev !== 'function') { return false; }
+    window[name] = function () {
+      var out = prev.apply(this, arguments);
+      try { after.apply(this, arguments); } catch (e) { /* never fatal */ }
+      return out;
+    };
+    return true;
+  }
+
+  orbWrap('render', orbRefresh);
+  orbWrap('obBars', function (on) { orbSpeaking = !!on; orbSync(); });
+  orbWrap('askRecStart', function () { orbListening = true; orbSync(); });
+  orbWrap('askRecClear', function () { orbListening = false; orbSync(); });
+  orbWrap('askRecFinish', function () { orbListening = false; orbSync(); });
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', orbRefresh);
+  } else {
+    orbRefresh();
+  }
+
+  window.BorbWire = {
+    sync: orbSync,
+    refresh: orbRefresh,
+    hold: function (state) {
+      var all = document.querySelectorAll('.borb');
+      for (var i = 0; i < all.length; i++) { all[i].setAttribute('data-state', state); }
+    }
+  };
+}());
 
 
 /* ============================================================

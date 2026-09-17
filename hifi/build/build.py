@@ -1372,7 +1372,17 @@ css = '\n'.join((here / f).read_text() for f in
                  # being the final layer makes the "later in the file" half of
                  # trap 3 free. Delete this entry with the file and `build-ds.py`'s
                  # LAYERS entry to revert; the accent trial is untouched either way.
-                 '131-tmpui.css',])
+                 '131-tmpui.css',
+                 # The brand orb. Last, on the same argument every layer above
+                 # makes for itself: every selector in it is under `.borb`, a
+                 # class no earlier layer mentions, so its place in the cascade
+                 # is the one thing about it that cannot be argued with.
+                 '132-orb.css',
+                 # The joint between §132's --borb-size and the per-context
+                 # boxes §27.1 and five later layers give `.tal-mk`. After
+                 # §132 because it corrects §132, and after §115/§119/§107
+                 # because it corrects those too.
+                 '133-orb-fit.css',])
 # ==========================================================================
 # NO HOVER
 # The state layer was fighting the layout everywhere it appeared: a wash on a
@@ -2182,7 +2192,21 @@ js = award_js + '\n\n' + payart_js + '\n\n' + call_js + '\n\n' + cohort_js + '\n
                                                         # `AGENTS`, `avatar` and `setStage` from views.js and
                                                         # data.js, and declares `S.ob` / `S.obStep` — the
                                                         # second of which `setStage` resets on arrival.
-                                                        'ob.js'])
+                                                        'ob.js',
+                                                        # THE BRAND ORB, and it is last because it is the one
+                                                        # file in the bundle that declares nothing anything else
+                                                        # reads. It is an IIFE whose only export is
+                                                        # `window.BorbOrb`, it mounts itself on DOMContentLoaded,
+                                                        # and every state but `speaking` is CSS in §132 — so a
+                                                        # render that happens before this parses still draws the
+                                                        # orb, it just does not vibrate the chevrons yet.
+                                                        'orb.js',
+                                                        # The orb's states, and the only file that decides which
+                                                        # one is true. After orb.js because it reads
+                                                        # `window.BorbOrb`, and last overall because it wraps
+                                                        # `render`, `obBars` and the three askRec* functions —
+                                                        # all of which have to be declared to be wrapped.
+                                                        'orb-wire.js'])
 # same argument as the stylesheet: the reasoning lives in build/*.js, which is
 # where it is written and where it survives. Verified safe by scan — no `/*`
 # or `*/` appears inside a string or a regex literal anywhere in the sources.
