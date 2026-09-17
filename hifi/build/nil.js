@@ -39,12 +39,13 @@
    24px canvas and same one-path-each shape as icons.js.
    -------------------------------------------------------------------------- */
 const NILP = {
-  truck:'M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9 1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z',
-  verified:'m23 12-2.44-2.79.34-3.69-3.61-.82-1.89-3.2L12 2.96 8.6 1.5 6.71 4.69 3.1 5.5l.34 3.7L1 12l2.44 2.79-.34 3.7 3.61.82L8.6 22.5l3.4-1.47 3.4 1.46 1.89-3.19 3.61-.82-.34-3.69L23 12zm-12.91 4.72-3.8-3.81 1.48-1.48 2.32 2.33 5.85-5.87 1.48 1.48-7.33 7.35z',
-  person:'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z',
-  work:'M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z',
-  /* the three share marks. Not Material — they are the platforms' own
-     glyphs, redrawn simply enough to read at 16px and no smaller. */
+  /* The result page's category + next-step marks moved to the platform's
+     HugeIcons STROKE family (`I.truck` / `I.verified` / `I.user` / `I.work`)
+     so they read as one set with `book` / `chat` / `lightning` (Maryam,
+     17 Sep 2026) — the old filled Material *Icons* cut is gone from here.
+     Only the three brand logos stay: they are the platforms' own glyphs,
+     redrawn simply enough to read at 16px and no smaller, and are drawn
+     FILLED on purpose (a logo is not a UI mark). */
   ig:'M12 2.2c3.2 0 3.6 0 4.85.07 1.17.05 1.8.25 2.23.42.55.21.95.47 1.37.89.42.42.68.82.89 1.37.17.42.37 1.06.42 2.23C21.83 8.4 21.85 8.8 21.85 12s0 3.6-.07 4.85c-.05 1.17-.25 1.8-.42 2.23-.21.55-.47.95-.89 1.37-.42.42-.82.68-1.37.89-.42.17-1.06.37-2.23.42-1.25.06-1.65.07-4.85.07s-3.6 0-4.85-.07c-1.17-.05-1.8-.25-2.23-.42a3.7 3.7 0 0 1-1.37-.89 3.7 3.7 0 0 1-.89-1.37c-.17-.42-.37-1.06-.42-2.23C2.17 15.6 2.15 15.2 2.15 12s0-3.6.07-4.85c.05-1.17.25-1.8.42-2.23.21-.55.47-.95.89-1.37.42-.42.82-.68 1.37-.89.42-.17 1.06-.37 2.23-.42C8.4 2.17 8.8 2.15 12 2.15zM12 7.1a4.9 4.9 0 1 0 0 9.8 4.9 4.9 0 0 0 0-9.8zm0 8.08a3.18 3.18 0 1 1 0-6.36 3.18 3.18 0 0 1 0 6.36zM18.35 6.9a1.15 1.15 0 1 1-2.3 0 1.15 1.15 0 0 1 2.3 0z',
   li:'M4.98 3.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM3 9h4v12H3V9zm6.5 0h3.8v1.7h.05c.53-.95 1.83-1.95 3.77-1.95 4.03 0 4.78 2.5 4.78 5.75V21h-4v-5.9c0-1.4-.03-3.2-1.98-3.2-1.98 0-2.28 1.52-2.28 3.1V21h-4V9z',
   yt:'M21.6 7.2a2.5 2.5 0 0 0-1.76-1.77C18.28 5 12 5 12 5s-6.28 0-7.84.43A2.5 2.5 0 0 0 2.4 7.2C2 8.77 2 12 2 12s0 3.23.4 4.8a2.5 2.5 0 0 0 1.76 1.77C5.72 19 12 19 12 19s6.28 0 7.84-.43a2.5 2.5 0 0 0 1.76-1.77C22 15.23 22 12 22 12s0-3.23-.4-4.8zM9.98 15.02V8.98L15.2 12l-5.22 3.02z'
@@ -98,7 +99,41 @@ function nilField(id, label, type, ph, span){
   </div>`;
 }
 
-const NIL = {
+/* THE "CHECK YOUR EMAIL" MODAL shown when Continue is pressed on the result page.
+   Centred content: the Gmail mark, a heading, the confirmation line and a Close.
+   The address is the one the rest of the prototype uses (`PF.general.email`, in
+   views.js which loads before this) rather than retyped; the quiz's own email
+   field is a prototype input that does not persist. Authored placeholder (§74). */
+const NIL_EMAIL = (typeof PF !== 'undefined' && PF.general && PF.general.email) || 'you@example.com';
+/* The classic Gmail mark (the red "M" envelope Maryam attached), reproduced as
+   inline SVG so it needs no asset — a BRAND LOGO in its own colours, exempt from
+   the stroke family. For a pixel-exact match to her file, drop the PNG in
+   `hifi/build/` and embed it in build.py; this is the vector stand-in. */
+const GMAIL_MARK = `<svg viewBox="0 0 48 36" role="img" aria-label="Gmail" xmlns="http://www.w3.org/2000/svg">
+  <path fill="#ffffff" stroke="#e6e6e6" stroke-width=".6" d="M3.4 1.8h41.2c.9 0 1.6.7 1.6 1.6v29.2c0 .9-.7 1.6-1.6 1.6H3.4c-.9 0-1.6-.7-1.6-1.6V3.4c0-.9.7-1.6 1.6-1.6z"/>
+  <path fill="#ececec" d="M2 4.2 12 12v22H3.4c-.9 0-1.4-.7-1.4-1.6z"/>
+  <path fill="#ececec" d="M46 4.2 36 12v22h8.6c.9 0 1.4-.7 1.4-1.6z"/>
+  <path fill="#dd4b39" d="M7.5 34V5.2c0-1.4 1.6-2.2 2.7-1.3L24 15 37.8 3.9c1.1-.9 2.7-.1 2.7 1.3V34h-5.2V13.1L24 21.6 12.7 13.1V34z"/>
+</svg>`;
+function nilResultModal(){
+  return `<div class="nil-modal-scrim" data-nilclose="scrim">
+    <div class="nil-modal" role="dialog" aria-modal="true" aria-labelledby="nil-modal-h">
+      <button class="nil-modal-x" data-nilclose="x" aria-label="Close">${I.close}</button>
+      <span class="nil-modal-logo">${GMAIL_MARK}</span>
+      <h2 id="nil-modal-h" class="nil-modal-h">Check your email</h2>
+      <p class="nil-modal-d">We sent a confirmation link to <b>${NIL_EMAIL}</b>. Click the link in the email to finish setting up your account.</p>
+      <button class="nil-modal-btn" data-nilclose="btn">Close</button>
+    </div>
+  </div>`;
+}
+
+/* `var`, not `const`, ON PURPOSE: views.js's boot render() reads `NIL` before
+   this file is parsed, and a `const` in its temporal dead zone throws a hard
+   ReferenceError there (even `typeof` throws) that halts the whole bundle. A
+   `var` is hoisted to `undefined`, so views.js's `NIL ? …` guard can skip the
+   nil branch safely at boot; the render() at the foot of this file then paints
+   the screen once the table exists. (Maryam, 17 Sep 2026 — the blank-on-reload.) */
+var NIL = {
 
 /* ==========================================================================
    1 · THE QUIZ'S LAST STEP
@@ -189,9 +224,9 @@ result: () => nilPage('wide', `
         <div class="nil-side-box">
           <h2>Career ideas</h2>
           <ul class="nil-ideas">
-            ${[[NI.truck,'Supply Chain Manager','Streamlines logistics and operations flow.'],
-               [NI.verified,'Quality Assurance Manager','Ensures product standards and quality.'],
-               [NI.person,'Product Owner','Drives product vision and priorities.'],
+            ${[[I.truck,'Supply Chain Manager','Streamlines logistics and operations flow.'],
+               [I.verified,'Quality Assurance Manager','Ensures product standards and quality.'],
+               [I.user,'Product Owner','Drives product vision and priorities.'],
                [I.lightning,'Electrician Business Owner','Runs electrical services company operations.'],
                [I.dashboard,'Process Improvement Specialist','Optimizes workflows and reduces costs.']]
               .map(([ic,role,what])=>`<li>${ic}<span>${role} &ndash; ${what}</span></li>`).join('')}
@@ -203,17 +238,16 @@ result: () => nilPage('wide', `
             with a TALENT Next Agent.</p>
         </div>
         <div class="nil-steps">
-          <span class="nil-step">${I.book}<span>Builder<br>Playbook</span></span>
-          <span class="nil-step">${NI.work}<span>Builder<br>Toolkit</span></span>
-          ${''/* CONNECT GOES STRAIGHT TO ACCOUNT CREATION (Maryam, 16 Sep 2026:
-                "hide these two screens ... the screen before these with button
-                Connect with a Talent Agent will take them to the account creation
-                prototype"). The two consultant-form steps (`consult1`, `consult2`)
-                and the "You're in" hand-off (`done`) are skipped — the button now
-                targets the same `stage:signup/create` that `done` used to. The
-                three views stay defined and deep-link reachable, so restoring the
-                questionnaire is a one-line revert back to `data-go="consult1"`. */}
-          <button class="nil-step live" data-go="stage:signup/create">${I.chat}<span>Connect with<br>Talent Next Agent</span></button>
+          <span class="nil-step"><span class="nil-step-l">${I.book}<span>Builder Playbook</span></span>${I.arrowRight}</span>
+          <span class="nil-step"><span class="nil-step-l">${I.work}<span>Builder Toolkit</span></span>${I.arrowRight}</span>
+          ${''/* CONTINUE OPENS THE "CHECK YOUR EMAIL" MODAL (Maryam, 17 Sep 2026):
+                the confirmation-email step of sign-up, drawn as a centred dialog
+                (`nilResultModal`) over the result page rather than a navigation.
+                It supersedes the 16 Sep `data-go="stage:signup/create"` jump. The
+                consultant-form steps (`consult1`, `consult2`) and the "You're in"
+                hand-off (`done`) stay defined and deep-link reachable, so the old
+                path is a one-line revert (`data-go="stage:signup/create"`). */}
+          <button class="nil-step live nil-step-cta" data-nilmodal="1"><span class="nil-step-l">${I.chat}<span>Continue your journey on TALENTnext</span></span>${I.arrowRight}</button>
         </div>
       </div>
     </div>
@@ -227,7 +261,7 @@ result: () => nilPage('wide', `
      effect. 18 copies is more than fits at 1440 and that is the point. */
   `<div class="nil-band" aria-hidden="true">
     ${Array.from({length:18},()=>'<span>Builder</span>').join('')}
-  </div>`),
+  </div>`) + (S.nilModal ? nilResultModal() : ''),
 
 /* ==========================================================================
    4 · THE CONSULTANT FORM, STEP 1 OF 3

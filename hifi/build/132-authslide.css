@@ -1,0 +1,186 @@
+/* ==========================================================================
+   132 — THE FRONT DOOR IS A SLIDER
+   Maryam, 17 Sep 2026: "on this page i want an image slider on the left side …
+   As for the dots or bars for sliding count i want them above the welcome
+   heading … three rounder bars that fills in with accent color and for the
+   other two bars use white bars with 20% opacity."
+
+   §57 draws the front door as a split — an artwork panel on the left, the form
+   on the right — and paints ONE picture on `.auth-brand` via `__AUTHART__`.
+   This layer turns that one picture into three that cross-fade, and adds the
+   position bars above the welcome copy.
+
+   PURE CSS, NO JS, AND THAT IS THE WHOLE REASON THIS IS AN ANIMATION AND NOT A
+   TIMER. The obvious slider keeps an index in `S` and advances it on an
+   interval — but every advance is a `render()`, and `render()` on the sign-up
+   screen replaces the password field the reader is part-way through typing.
+   So the slide is animation PHASE, not state: three stacked `.auth-slide`
+   layers, one `authSlide` keyframe, offset by negative delays so each is up for
+   a third of the cycle. The bars run the same keyframe geometry, so exactly one
+   is accent at any moment and it is the one whose slide is showing.
+
+   THE BASE `__AUTHART__` STAYS. §57 still paints its gradient on `.auth-brand`,
+   behind the slides (they are `z-index:0`, the background is further back), so
+   the panel is never blank before the first WebP decodes and the crossfade seam
+   lands on a gradient rather than on white.
+
+   NOT IN THE DESIGN SYSTEM. The three photographs are the candidate portal's
+   own onboarding art and only hifi's `AUTH_ART` emits the `.auth-slide` /
+   `.auth-bar` markup; the agent and admin front doors are hand-written and
+   single-image, so shipping ~200 KB of these photos into `talentnext-ds.css`
+   would be dead weight on portals that can never draw them. `build-ds.py` names
+   this file in `NOT_IN_DS` for that reason. Delete this entry, this file and
+   `build.py`'s three `__SLIDE*__` replacements to revert.
+
+   BELOW 900 none of this exists: §17 sets `.auth-brand{display:none}` on the
+   phone, so the whole block is inside the same `@container app (min-width:900px)`
+   query the split uses.
+   ========================================================================== */
+
+@container app (min-width:900px){
+
+  /* ------------------------------------------------------------------ 1 ---
+     THE SLIDES
+     Absolute over the panel, `cover` and `center` so a photograph is cropped
+     rather than stretched (the panel's ratio drifts from the asset's at any
+     width that is not the file's). Resting `opacity:0`; the first slide rests
+     VISIBLE so that with motion disabled the panel still shows a picture and
+     one bar is accent — the exact still Maryam described. When the animation
+     runs it takes over from frame one.
+     ------------------------------------------------------------------------ */
+  .auth-card > .auth-brand > .auth-slide{
+    position:absolute;inset:0;z-index:1;pointer-events:none;
+    background-size:cover;background-position:center;background-repeat:no-repeat;
+    opacity:0;
+    animation:authSlide 15s linear infinite}
+  .auth-card > .auth-brand > .auth-slide-1{
+    background-image:url('__SLIDE1__');opacity:1;animation-delay:0s}
+  .auth-card > .auth-brand > .auth-slide-2{
+    background-image:url('__SLIDE2__');animation-delay:-10s}
+  .auth-card > .auth-brand > .auth-slide-3{
+    background-image:url('__SLIDE3__');animation-delay:-5s}
+
+  /* THE LOGO SITS HIGHER. §57 gives the panel `padding:133px 88px 79px` — the
+     Figma inset for a full-bleed gradient. On the slider Maryam asked to pull
+     the wordmark up from the top; the top inset drops to 64. Scoped to the
+     slider so the design-system front door keeps §57's spec (a layout property,
+     free in this layer). */
+  .auth-card > .auth-brand:has(> .auth-slide){padding-top:64px}
+
+  /* THE WORDMARK IS A VECTOR AND SMALLER. `AUTH_ART` prints `LOGO_SVG` (the
+     wordmark traced to paths) instead of the 176px raster, so it is crisp at
+     any DPI rather than an upscaled blur; §57's `.auth-logo img` width no longer
+     matches. It fills white on the photo (`fill`, not `color` — this is icon
+     fill, not §63's text colour) and drops from 291 to 150 (Maryam, 17 Sep
+     2026: "reduce the size of the logo ... use high resolution or an svg"). */
+  .auth-card > .auth-brand:has(> .auth-slide) .auth-logo svg{
+    display:block;width:150px;height:auto;fill:var(--on-dark)}
+
+  /* THE BACKDROP, RISING FROM THE BOTTOM so the copy and the bars read on a
+     PHOTOGRAPH (Maryam, 17 Sep 2026: "add image backdrop from the bottom so the
+     text above it is visible"). §57 set the welcome copy `--text-primary`
+     because it sat on a soft gradient that stayed light; these are photographs,
+     with bright windows and busy detail behind the words, and black copy is
+     lost on them. The bars are white at 20% — Maryam's own spec — a dark-ground
+     affordance. So the lower panel is a near-solid dark gradient anchored at the
+     foot and fading to nothing by mid-panel, and §57's copy flips to `--on-dark`
+     over it (scoped to the slider). Above the slides, below the words. It is a
+     background, not a text property, so it is free to live in this late layer;
+     the colour flip is §57's, before §63. */
+  .auth-card > .auth-brand::after{
+    content:'';position:absolute;left:0;right:0;bottom:0;top:18%;
+    z-index:2;pointer-events:none;
+    background:linear-gradient(to top,
+      rgba(17,17,17,.78) 0%, rgba(17,17,17,.66) 20%,
+      rgba(17,17,17,.48) 40%, rgba(17,17,17,.28) 62%,
+      rgba(17,17,17,.10) 82%, rgba(17,17,17,0) 100%)}
+
+  /* A LIGHTER TOP WASH SEATS THE WHITE WORDMARK. The logo is `LOGO_W` now, and
+     white washes out on the brighter slides (the desk shot's window, the
+     planning wall). A gentle dark gradient at the very top — fading to nothing
+     by a quarter down — gives it a ground on every photo without reading as a
+     bar. Same layer as the foot backdrop: above the slides, below the copy. */
+  .auth-card > .auth-brand::before{
+    content:'';position:absolute;left:0;right:0;top:0;height:26%;
+    z-index:2;pointer-events:none;
+    background:linear-gradient(to bottom,
+      rgba(17,17,17,.44) 0%, rgba(17,17,17,.20) 45%, rgba(17,17,17,0) 100%)}
+
+  /* the logo, copy and foot ride ABOVE the slides and the scrim. They are in
+     flow with no position of their own, and an absolutely-positioned sibling
+     paints over in-flow content by default — so they are lifted explicitly. */
+  .auth-card > .auth-brand > .auth-logo,
+  .auth-card > .auth-brand > .auth-intro,
+  .auth-card > .auth-brand > .auth-foot-row{position:relative;z-index:3}
+
+  /* THE LEDE IS HALF WIDTH AND BREATHES. Its copy is short now, so it holds a
+     narrow measure rather than the intro's full 719, and takes a touch more
+     line height than the auth 14/20 (line-height is not one of §63's four, so
+     it is free here). */
+  /* the lede breaks after "leadership," (a `<br>` in the copy), so the measure
+     is sized to hold that first line rather than the old 320 that wrapped it. */
+  .auth-card > .auth-brand:has(> .auth-slide) .auth-intro .auth-lede{
+    max-width:none;line-height:23px}
+
+  /* KEEP THE WELCOME WHERE IT WAS. `.auth-intro` is bottom-anchored
+     (`margin-top:auto`), so trimming the copy to two lines dropped it to the
+     foot. A bottom margin lifts the block back up its old distance while the
+     copyright row stays pinned to the bottom. */
+  .auth-card > .auth-brand:has(> .auth-slide) .auth-intro{margin-bottom:60px}
+
+  /* THE COPYRIGHT ROW CARRIES THE BARS at its right end. */
+  .auth-card > .auth-brand:has(> .auth-slide) .auth-foot-row{
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    margin-top:24px}
+  .auth-card > .auth-brand:has(> .auth-slide) .auth-foot-row .auth-foot{margin:0}
+
+  /* 15s cycle, three slides: up for a third with a ~0.6s crossfade either
+     side. The hold runs to 34% and the fade-out to 40% (6.0s) so the next
+     slide — full by 5.6s on its own timeline — has landed before this one is
+     gone, and the seam never drops to the base gradient. */
+  @keyframes authSlide{
+    0%{opacity:0}
+    4%{opacity:1}
+    34%{opacity:1}
+    40%{opacity:0}
+    100%{opacity:0}}
+
+  /* ------------------------------------------------------------------ 2 ---
+     THE POSITION BARS
+     Above the welcome heading (first child of `.auth-intro`), rounded, one
+     accent and the other two white at 20%. The fill tracks the slide: the same
+     three delays, and a crisp switch at a third of the cycle so exactly one bar
+     is ever accent.
+     ------------------------------------------------------------------------ */
+  .auth-brand .auth-bars{
+    display:flex;gap:8px;margin:0;padding:0;flex:none}
+  /* the TRACK is always the white-20% bar; the ACCENT fill is a `::before` that
+     wipes across it. */
+  .auth-brand .auth-bar{
+    position:relative;overflow:hidden;
+    width:32px;height:5px;flex:none;border-radius:999px;
+    background-color:rgba(255,255,255,.20)}
+  .auth-brand .auth-bar::before{
+    content:'';position:absolute;inset:0;border-radius:inherit;
+    background-color:var(--accent);
+    /* rest hidden — clipped away from the left, so it can enter FROM the left */
+    clip-path:inset(0 100% 0 0);
+    animation:authBarFill 15s linear infinite}
+  /* motion-off fallback (and the very first frame): bar 1 is the filled one,
+     matching the still reference. */
+  .auth-brand .auth-bar-1::before{clip-path:inset(0 0 0 0);animation-delay:0s}
+  .auth-brand .auth-bar-2::before{animation-delay:-10s}
+  .auth-brand .auth-bar-3::before{animation-delay:-5s}
+  /* The fill MOVES IN FROM THE LEFT (reveal grows from the left edge), holds
+     while its slide is up, then GOES OUT TO THE RIGHT (the visible band shrinks
+     toward the right edge and leaves). The three delays are the slides' delays,
+     so bar N fills exactly while slide N shows — and because the exit of one bar
+     and the entry of the next both land on the 33% boundary, the accent reads as
+     one fill travelling bar to bar. */
+  @keyframes authBarFill{
+    0%{clip-path:inset(0 100% 0 0)}    /* waiting, hidden to the left */
+    7%{clip-path:inset(0 0 0 0)}       /* in from the left */
+    30%{clip-path:inset(0 0 0 0)}      /* hold */
+    38%{clip-path:inset(0 0 0 100%)}   /* out to the right */
+    100%{clip-path:inset(0 0 0 100%)}} /* stay gone until next cycle */
+}

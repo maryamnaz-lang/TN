@@ -1846,6 +1846,14 @@ NOT_IN_DS = {
     # is the one case that argues for OUT. If the recording behaviour is ever
     # ported into talentnext-ds.js, this entry moves to LAYERS.
     '121-askvoice.css': "the recorder is ai4.js behaviour; the agent/admin portals have no mic — see the layer's note",
+    # §132 turns the candidate front door into a photo slider. The three images
+    # are that portal's own onboarding art (~200 KB), and only hifi's `AUTH_ART`
+    # emits the `.auth-slide` / `.auth-bar` markup the layer keys on. The agent
+    # and admin front doors are hand-written and single-image, so the CSS would
+    # never draw and the photos would be dead weight in every DS-linked portal —
+    # exactly the "a family the box never writes" case. The base `__AUTHART__`
+    # panel still crosses (§57), so the design-system front door is unchanged.
+    '132-authslide.css': "one portal's onboarding-photo slider; only hifi emits the markup — see the layer's note",
 }
 
 

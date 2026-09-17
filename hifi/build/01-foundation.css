@@ -614,32 +614,51 @@ body,.app{
    ========================================================================== */
 body{background:var(--surround);color:var(--text-primary);
   font-family:var(--font-sans)}
-.pt-bar{
-  position:sticky;top:0;z-index:60;display:flex;align-items:center;gap:var(--s05);
-  height:52px;padding:0 var(--s05);background:var(--surface-dark);color:var(--on-dark);
-  border-bottom:1px solid var(--pt-bar-bg)}
-.pt-bar .dot{width:3px;height:3px;background:var(--on-dark-2);flex:none}
-.pt-meta{font-size:12px;letter-spacing:.2px;color:var(--on-dark-2);
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pt-lab{margin-left:auto;font-size:10.5px;font-weight:600;letter-spacing:.9px;
-  text-transform:uppercase;color:var(--on-dark-2);flex:none}
-.pt-sel{
-  height:32px;padding:0 var(--s04);background:var(--surface-dark-2);color:var(--on-dark);
-  border:1px solid var(--pt-line);border-radius:var(--radius);font-size:12.5px;flex:none;cursor:pointer}
-.pt-sel:hover{background:var(--pt-hover)}
-.pt-nav{display:flex;gap:var(--s02);flex:none}
-.pt-nav button,.pt-vp button{
-  width:32px;height:32px;display:grid;place-items:center;
-  border:1px solid var(--pt-line);background:var(--surface-dark-2);border-radius:var(--radius)}
-.pt-nav button svg{width:16px;height:16px;color:var(--on-dark)}
-.pt-nav button:hover,.pt-vp button:hover{background:var(--pt-hover)}
-/* viewport switcher — the one piece of chrome v15 adds */
-.pt-vp{display:flex;gap:var(--s02);flex:none;
-  border-left:1px solid var(--pt-line);padding-left:var(--s05);margin-left:var(--s02)}
-.pt-vp button{width:auto;padding:0 var(--s04);font-size:11.5px;font-weight:500;
-  letter-spacing:.3px;color:var(--on-dark-2)}
-.pt-vp button.on{background:var(--on-dark);color:var(--surface-dark);border-color:var(--on-dark)}
-.pt-vp button.on:hover{background:var(--on-dark)}
+/* THE CHROME IS A FLOATING MENU, TOP-RIGHT (Maryam, 16 Sep 2026: "exclude the
+   top black bar ... add a menu icon on the right of the profile ... that menu
+   will have all those options"). The old full-width sticky `.pt-bar` is gone so
+   the app fills the page height; the same controls (kept by id) live in a
+   dropdown behind a kebab that sits beside the app's profile corner. */
+/* IN THE PRODUCT'S OWN UI, not the dark chrome (Maryam, 16 Sep 2026: "this
+   should be in our ui language and the dropdown as well ... mid align the menu
+   icon with the left side chevron ... remove talent next logo row ... remove
+   bottom two icon buttons ... show all the prototypes in this menu in this
+   view"). A light kebab, vertically centred on the app bar's 34px midline, opens
+   a white card that lists the stages and the device INLINE — no nested dropdown,
+   no logo row, no back/reset. */
+/* a bottom-right FAB in the corner, with equal bottom and right insets (Maryam,
+   16 Sep 2026: "take it to the bottom, the bottom padding should be equal to the
+   right side padding"). The panel opens upward. */
+.pt-menu{position:fixed;bottom:20px;right:20px;z-index:2000}
+.pt-toggle{width:38px;height:38px;display:grid;place-items:center;cursor:pointer;
+  background:var(--background);color:var(--icon-primary);
+  border:1px solid var(--rule);border-radius:999px;
+  box-shadow:0 2px 6px rgba(17,17,17,.10),0 8px 22px rgba(17,17,17,.14)}
+.pt-toggle svg{width:20px;height:20px;fill:var(--icon-primary)}
+.pt-toggle:hover{background:var(--surface-2)}
+.pt-panel{position:absolute;bottom:calc(100% + 8px);right:0;display:none;
+  flex-direction:column;gap:var(--s03);width:264px;padding:var(--s05);
+  background:var(--background);color:var(--text-primary);border:1px solid var(--rule);
+  border-radius:8px;box-shadow:0 10px 34px rgba(17,17,17,.14)}
+.pt-menu.open .pt-panel{display:flex}
+.pt-lab{font-size:10.5px;font-weight:600;letter-spacing:.9px;
+  text-transform:uppercase;color:var(--text-helper);flex:none;margin-top:var(--s02)}
+.pt-lab:first-child{margin-top:0}
+/* THE STAGE LIST — every stage a light row, the current one accent; shown inline
+   so there is no second dropdown to open. */
+.pt-stages{display:flex;flex-direction:column;gap:2px;max-height:260px;overflow-y:auto}
+.pt-stage-opt{text-align:left;padding:var(--s03) var(--s04);border:0;border-radius:6px;
+  background:transparent;color:var(--text-secondary);font-size:13px;cursor:pointer;white-space:nowrap}
+.pt-stage-opt:hover{background:var(--surface-2)}
+.pt-stage-opt.on{background:var(--overlay-selected);color:var(--accent-text);font-weight:500}
+/* THE DEVICE SWITCHER — light pill buttons, the selected one accent. */
+.pt-vp{display:flex;gap:var(--s02);flex:none;flex-wrap:wrap;align-items:center}
+.pt-vp button{width:auto;padding:0 var(--s04);height:32px;font-size:11.5px;font-weight:500;
+  letter-spacing:.3px;color:var(--text-secondary);background:var(--background);
+  border:1px solid var(--rule);border-radius:var(--radius);cursor:pointer}
+.pt-vp button:hover{background:var(--surface-2)}
+.pt-vp button.on{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.pt-vp button.on:hover{background:var(--accent)}
 
 .pt-stage{padding:var(--s06) var(--s05) var(--s10);display:flex;flex-direction:column;
   align-items:center;gap:var(--s05)}

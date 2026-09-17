@@ -5,10 +5,9 @@
    Every value the sweep found is now declared in section 1 and referenced
    here, so the next palette change is a single-file edit.
    ========================================================================== */
-.pt-bar{background:var(--pt-bar-bg);border-bottom-color:var(--pt-bar-bg)}
-.pt-sel,.pt-nav button,.pt-vp button{border-color:var(--pt-line)}
-.pt-sel:hover,.pt-nav button:hover,.pt-vp button:hover{background:var(--pt-hover)}
-.pt-vp{border-left-color:var(--pt-line)}
+/* The prototype chrome is a light in-product menu now (§01, 16 Sep 2026), so the
+   old dark `--pt-line`/`--pt-hover` overrides are gone; the surviving `.pt-vp`
+   buttons take the product hairline and hover from §01. */
 /* controls are outlined on the canvas, not filled white — see the white
    audit in verify.mjs. --pure-white survives only as ink on dark grounds. */
 .btn-d{color:var(--pure-white)}

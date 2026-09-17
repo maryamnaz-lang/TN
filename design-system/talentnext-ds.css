@@ -14,7 +14,7 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 5954.  Rules dropped as product-specific: 208.
+   Rules kept: 5964.  Rules dropped as product-specific: 222.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
@@ -72,22 +72,23 @@ h1.ttl{font-size:26px; line-height:32px; font-weight:600; letter-spacing:-.6px}
 .lg{font-size:34px; line-height:42px; font-weight:600; letter-spacing:-.8px}
 .mono{font-variant-numeric:tabular-nums; letter-spacing:0}
 body{background:var(--surround); color:var(--text-primary); font-family:var(--font-sans)}
-.pt-bar{position:sticky; top:0; z-index:60; display:flex; align-items:center; gap:var(--s05); height:52px; padding:0 var(--s05); background:var(--surface-dark); color:var(--on-dark); border-bottom:1px solid var(--pt-bar-bg)}
-.pt-bar .dot{width:3px; height:3px; background:var(--on-dark-2); flex:none}
-.pt-meta{font-size:12px; letter-spacing:.2px; color:var(--on-dark-2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-.pt-lab{margin-left:auto; font-size:10.5px; font-weight:600; letter-spacing:.9px; text-transform:uppercase; color:var(--on-dark-2); flex:none}
-.pt-sel{height:32px; padding:0 var(--s04); background:var(--surface-dark-2); color:var(--on-dark); border:1px solid var(--pt-line); border-radius:var(--radius); font-size:12.5px; flex:none; cursor:pointer}
-.pt-sel:hover:where(.__nh){background:var(--pt-hover)}
-.pt-nav{display:flex; gap:var(--s02); flex:none}
-.pt-nav button,
-.pt-vp button{width:32px; height:32px; display:grid; place-items:center; border:1px solid var(--pt-line); background:var(--surface-dark-2); border-radius:var(--radius)}
-.pt-nav button svg{width:16px; height:16px; color:var(--on-dark)}
-.pt-nav button:hover:where(.__nh),
-.pt-vp button:hover:where(.__nh){background:var(--pt-hover)}
-.pt-vp{display:flex; gap:var(--s02); flex:none; border-left:1px solid var(--pt-line); padding-left:var(--s05); margin-left:var(--s02)}
-.pt-vp button{width:auto; padding:0 var(--s04); font-size:11.5px; font-weight:500; letter-spacing:.3px; color:var(--on-dark-2)}
-.pt-vp button.on{background:var(--on-dark); color:var(--surface-dark); border-color:var(--on-dark)}
-.pt-vp button.on:hover:where(.__nh){background:var(--on-dark)}
+.pt-menu{position:fixed; bottom:20px; right:20px; z-index:2000}
+.pt-toggle{width:38px; height:38px; display:grid; place-items:center; cursor:pointer; background:var(--background); color:var(--icon-primary); border:1px solid var(--rule); border-radius:999px; box-shadow:0 2px 6px rgba(17,17,17,.10),0 8px 22px rgba(17,17,17,.14)}
+.pt-toggle svg{width:20px; height:20px; fill:var(--icon-primary)}
+.pt-toggle:hover:where(.__nh){background:var(--surface-2)}
+.pt-panel{position:absolute; bottom:calc(100% + 8px); right:0; display:none; flex-direction:column; gap:var(--s03); width:264px; padding:var(--s05); background:var(--background); color:var(--text-primary); border:1px solid var(--rule); border-radius:8px; box-shadow:0 10px 34px rgba(17,17,17,.14)}
+.pt-menu.open .pt-panel{display:flex}
+.pt-lab{font-size:10.5px; font-weight:600; letter-spacing:.9px; text-transform:uppercase; color:var(--text-helper); flex:none; margin-top:var(--s02)}
+.pt-lab:first-child{margin-top:0}
+.pt-stages{display:flex; flex-direction:column; gap:2px; max-height:260px; overflow-y:auto}
+.pt-stage-opt{text-align:left; padding:var(--s03) var(--s04); border:0; border-radius:6px; background:transparent; color:var(--text-secondary); font-size:13px; cursor:pointer; white-space:nowrap}
+.pt-stage-opt:hover:where(.__nh){background:var(--surface-2)}
+.pt-stage-opt.on{background:var(--overlay-selected); color:var(--accent-text); font-weight:500}
+.pt-vp{display:flex; gap:var(--s02); flex:none; flex-wrap:wrap; align-items:center}
+.pt-vp button{width:auto; padding:0 var(--s04); height:32px; font-size:11.5px; font-weight:500; letter-spacing:.3px; color:var(--text-secondary); background:var(--background); border:1px solid var(--rule); border-radius:var(--radius); cursor:pointer}
+.pt-vp button:hover:where(.__nh){background:var(--surface-2)}
+.pt-vp button.on{background:var(--accent); color:var(--on-accent); border-color:var(--accent)}
+.pt-vp button.on:hover:where(.__nh){background:var(--accent)}
 .pt-stage{padding:var(--s06) var(--s05) var(--s10); display:flex; flex-direction:column; align-items:center; gap:var(--s05)}
 .pt-cap{max-width:640px; text-align:center; font-size:12.5px; line-height:18px; color:var(--gray-70); letter-spacing:.2px}
 .pt-cap b{color:var(--text-primary); font-weight:600}
@@ -1094,14 +1095,6 @@ svg.arrow,
 .ai-pop{box-shadow:0 2px 12px var(--accent-shadow)}
 
 /* ---- 07-final.css ---- */
-.pt-bar{background:var(--pt-bar-bg); border-bottom-color:var(--pt-bar-bg)}
-.pt-sel,
-.pt-nav button,
-.pt-vp button{border-color:var(--pt-line)}
-.pt-sel:hover:where(.__nh),
-.pt-nav button:hover:where(.__nh),
-.pt-vp button:hover:where(.__nh){background:var(--pt-hover)}
-.pt-vp{border-left-color:var(--pt-line)}
 .btn-d{color:var(--pure-white)}
 .btn-d:hover:where(.__nh){background:var(--error-hover)}
 .tag.green,
@@ -2783,7 +2776,7 @@ button{font-family:var(--font-sans)}
 .pt-fit{position:relative; margin:0 auto; overflow:visible}
 .device{width:390px; max-width:none; transform-origin:top center; transition:none}
 .pt-stage{padding-left:var(--s03); padding-right:var(--s03)}
-.pt-scale{display:inline-grid; place-items:center; height:32px; padding:0 var(--s03); margin-left:var(--s02); font-size:11px; letter-spacing:.4px; color:var(--on-dark-2); font-variant-numeric:tabular-nums}
+.pt-scale{display:inline-grid; place-items:center; height:32px; padding:0 var(--s03); margin-left:var(--s02); font-size:11px; letter-spacing:.4px; color:var(--text-helper); font-variant-numeric:tabular-nums}
 .app .tal-fab:hover,
 .app .tal-fab:focus-visible{background-color:var(--accent)}
 .app .tal-fab:active{background-color:var(--accent-hover)}
@@ -4410,16 +4403,18 @@ button{font-family:var(--font-sans)}
 .app .auth-card .page > .sec.sec-rule{padding-top:24px; padding-bottom:24px; border-top:1px solid var(--rule)}
 .auth-card .sec-rule > .sec-h{margin-bottom:var(--sec-h-gap); min-height:0; padding:0}
 .auth-card .sec-rule > .sec-h h2{margin:0}
-.auth-card .f-row{display:flex; flex-direction:column; gap:24px}
+.auth-card .f-row{display:flex; flex-direction:column; gap:32px}
 .auth-card .form-page .f{margin-bottom:24px}
 .auth-card .form-page .f.last{margin-bottom:0}
 .app .auth-card .form-page .f-row > .f{margin:0}
-.auth-card .f > label{display:block; margin:0; color:var(--text-secondary)}
+.auth-card .f > label{display:block; margin:0 0 6px; color:var(--text-secondary)}
 .auth-card .inp,
-.auth-card .inp.fill{background:transparent; border:0; border-bottom:1px solid var(--auth-rule); padding:8px 16px; height:auto; min-height:0; width:100%; color:var(--text-primary); font-weight:600}
+.auth-card .inp.fill{background:transparent; border:0; border-bottom:1px solid var(--auth-rule); padding:8px 16px 8px 0; height:auto; min-height:0; width:100%; color:var(--text-primary); font-weight:600}
 .auth-card .inp::placeholder{color:var(--text-placeholder); font-weight:400}
-.auth-card .inp:focus,
-.auth-card .inp:focus-visible{outline:0; border-bottom-color:var(--text-primary)}
+.app .auth-card .inp:focus,
+.app .auth-card .inp:focus-visible,
+.app .auth-card .inp.fill:focus,
+.app .auth-card .inp.fill:focus-visible{outline:0; border:0; border-bottom:1px solid var(--text-primary); padding-bottom:8px}
 .auth-card .pw-wrap{position:relative}
 .auth-card .pw-eye{position:absolute; right:16px; top:50%; transform:translateY(-50%); width:16px; height:16px; display:grid; place-items:center; background:transparent}
 .auth-card .pw-eye svg{width:16px; height:16px}
@@ -4430,9 +4425,10 @@ button{font-family:var(--font-sans)}
 .app .auth-card .page > .sec.sec-cbx{padding-top:16px; padding-bottom:16px}
 .auth-card .cbx-list{display:flex; flex-direction:column; gap:6px}
 .auth-card .cbx{gap:8px; align-items:flex-start; padding:0; min-height:0}
-.auth-card .cbx .box{width:16px; height:16px; flex:none; margin-top:0}
+.auth-card .cbx .box{width:16px; height:16px; flex:none; margin-top:0; border-radius:4px}
 .auth-card .cbx .box svg{width:16px; height:16px}
 .auth-card .cbx .txt{color:var(--text-secondary); font-size:11.5px; line-height:16px; font-weight:400; letter-spacing:.15px}
+.app .auth-card .form-page:has(.cbx-req input:not(:checked)) .sec-act .btn-p{background-color:var(--layer-02); background-image:none; color:var(--text-disabled); border-color:transparent; pointer-events:none}
 .app .auth-card .page > .sec.sec-act{padding-top:24px; padding-bottom:0}
 .auth-card .foot-row{gap:16px}
 .auth-card .foot-row .mt6,
@@ -5990,8 +5986,8 @@ button.btn-p:active,
 .app .scene-still{position:relative; display:block; width:100%; aspect-ratio:16 / 9; background-color:var(--surface-dark); background-size:cover; background-position:center var(--still-y, 22%); overflow:hidden}
 .app .scene-still::before{content:''; position:absolute; inset:0; background:linear-gradient(180deg,
     rgba(0,0,0,.28) 0%, rgba(0,0,0,.34) 55%, rgba(0,0,0,.62) 100%)}
-.app .scene-play{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); display:grid; place-items:center; width:44px; height:44px; background-color:rgba(255,255,255,.92)}
-.app .scene-play svg{width:20px; height:20px; color:var(--gray-100); display:block; margin-left:2px}
+.app .scene-play{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); display:grid; place-items:center; width:44px; height:44px; border-radius:50%; background-color:rgba(0,0,0,.44)}
+.app .scene-play svg{width:20px; height:20px; color:#fff; display:block; margin-left:2px}
 .app .scene-len{position:absolute; right:var(--s03); bottom:var(--s03); padding:2px var(--s03); background-color:rgba(0,0,0,.62); color:#fff; font-size:11px; line-height:15px; font-weight:600; letter-spacing:.4px; font-variant-numeric:tabular-nums}
 .app .scene-b{display:flex; flex-direction:column; gap:2px; min-width:0}
 .app .scene-t{font-size:14px; line-height:19px; font-weight:600; letter-spacing:-.1px; color:var(--text-primary)}
@@ -6029,7 +6025,7 @@ button.btn-p:active,
 .app .scene-sel.on .scene-t{color:var(--accent-text)}
 .app .scene-full .scene-still::before{background:linear-gradient(180deg,
     rgba(255,255,255,.62) 0%, rgba(255,255,255,.62) 100%)}
-.app .scene-full .scene-play{background-color:rgba(255,255,255,.72)}
+.app .scene-full .scene-play{background-color:rgba(0,0,0,.2)}
 .app .scene-full .scene-box{border-color:var(--rule); background-color:transparent}
 @container app (min-width:900px){
   .app .sec:has(> .scene-row),
@@ -6599,17 +6595,21 @@ button.btn-p:active,
   .auth-brand .auth-intro p:last-child{margin-bottom:0}
   .auth-brand .auth-intro p.auth-begin{font-weight:600; color:var(--auth-o-ink)}
   .auth-brand .auth-foot{margin:24px 0 0; color:var(--text-secondary)}
+  .app .auth-card > .auth-brand:has(> .auth-slide) .auth-intro h2{color:var(--on-dark)}
+  .app .auth-card > .auth-brand:has(> .auth-slide) .auth-intro p{color:var(--on-dark)}
+  .app .auth-card > .auth-brand:has(> .auth-slide) .auth-intro p.auth-begin{color:var(--accent)}
+  .app .auth-card > .auth-brand:has(> .auth-slide) .auth-foot{color:var(--on-dark-2)}
   .auth-card > .auth-col{flex:1 1 auto; width:auto; min-width:0; margin:0; display:grid; grid-template-columns:minmax(0,1fr); justify-items:center; align-content:safe center; padding:48px 24px; border-left:0; border-right:0}
   .auth-card > .auth-col > .main{flex:none; width:100%; display:block; min-height:0}
-  .auth-card > .auth-col .page{box-sizing:border-box; width:100%; max-width:608px; margin:0 auto; padding:33px 41px 41px; background-color:var(--auth-card-bg); border:1px solid var(--auth-card-line); border-radius:var(--auth-r)}
+  .auth-card > .auth-col .page{box-sizing:border-box; width:100%; max-width:588px; margin:0 auto; padding:24px 28px 28px; background-color:var(--auth-card-bg); border:1px solid var(--auth-card-line); border-radius:var(--auth-r)}
   .auth-card .form-page > .sec:last-child{margin-top:0}
   .app .auth-card .page .tile::after,
   .app .auth-card .page .ai-aura::after{left:0; right:0; width:auto}
 }
-.app .form-page .auth-id{box-sizing:border-box; padding:20px; background-color:var(--auth-o-1); border-radius:var(--auth-r); color:#fff}
-.app .form-page .auth-id-l{display:block; font-size:13.5px; line-height:20px; letter-spacing:.16px; color:rgba(255,255,255,.9)}
+.app .form-page .auth-id{box-sizing:border-box; padding:20px; background-color:color-mix(in srgb, var(--accent) 12%, #fff); border-radius:var(--auth-r); color:var(--accent-text)}
+.app .form-page .auth-id-l{display:block; font-size:13.5px; line-height:20px; letter-spacing:.16px; color:var(--accent-text)}
 .app .form-page .auth-id-v{display:flex; align-items:baseline; flex-wrap:wrap; gap:8px; margin-top:4px; font-size:16px; line-height:24px; font-weight:600; letter-spacing:0}
-.app .form-page .auth-id-v a{font-size:13.5px; line-height:20px; font-weight:400; color:#fff; text-decoration:underline; text-underline-offset:2px}
+.app .form-page .auth-id-v a{font-size:13.5px; line-height:20px; font-weight:400; color:var(--accent-text); text-decoration:underline; text-underline-offset:2px}
 .app .form-page .sec.sec-id{padding-top:12px; padding-bottom:20px}
 .app .form-page .sec.sec-id::after{display:none; content:none}
 .app .auth-card .page > .sec.sec-id + .sec,
@@ -6625,6 +6625,14 @@ button.btn-p:active,
   .app .auth-card .form-page .btn.btn-full{width:fit-content; min-width:0; display:inline-flex; gap:32px; padding-left:24px; padding-right:24px}
   .app .auth-card .foot-row{flex-wrap:wrap}
   .app .auth-card .foot-row > div{flex:none}
+}
+@container app (min-width:900px){
+  .app .auth-card .page.form-page.authtight > .ph,
+  .app .auth-card .page.form-page.authtight > .sec{padding-top:0 !important; padding-bottom:0 !important; margin-top:32px}
+  .app .auth-card .page.form-page.authtight > :first-child{margin-top:0}
+  .app .auth-card .page.form-page.authtight > .sec{border-top:0}
+  .app .auth-card .page.form-page.authtight > .sec-rule > .f{margin-bottom:32px}
+  .app .auth-card .page.form-page.authtight > .sec-rule > .f.last{margin-bottom:0}
 }
 
 /* ---- 58-finding.css ---- */
@@ -6857,6 +6865,7 @@ button.btn-p:active,
 .app .big,
 .app .lvl-hero .big,
 .app .wing-lvl .prog-pct{font-size:var(--t-h2-size); line-height:var(--t-h2-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h2-ls)}
+.app .auth-card > .auth-brand:has(> .auth-slide) .auth-intro h2{font-weight:600}
 .app .stats .n,
 .app .facts .v,
 .app .path-facts .v,

@@ -1372,7 +1372,17 @@ css = '\n'.join((here / f).read_text() for f in
                  # being the final layer makes the "later in the file" half of
                  # trap 3 free. Delete this entry with the file and `build-ds.py`'s
                  # LAYERS entry to revert; the accent trial is untouched either way.
-                 '131-tmpui.css',])
+                 '131-tmpui.css',
+                 # THE SIGN-UP ARTWORK IS A SLIDER now — three photographs
+                 # cross-faded behind the welcome copy, with the position bars
+                 # above the heading. Pure CSS (no timer, so it never repaints
+                 # the password field), additive over §57's `.auth-brand`, so it
+                 # sits last. NOT in the design system: the photos are the
+                 # candidate portal's own onboarding art and only hifi emits the
+                 # markup — `build-ds.py` names it in `NOT_IN_DS`. Delete this
+                 # entry, the file and the three `__SLIDE*__` replacements below
+                 # to revert.
+                 '132-authslide.css',])
 # ==========================================================================
 # NO HOVER
 # The state layer was fighting the layout everywhere it appeared: a wash on a
@@ -1718,6 +1728,21 @@ print(f'auth split artwork embedded: {(here / "auth-split.webp").stat().st_size/
 # is neither redrawn nor re-scaled.
 mark = base64.b64encode((here / 'auth-mark.webp').read_bytes()).decode()
 css = css.replace('__AUTHMARK__', f'data:image/webp;base64,{mark}')
+
+# THE THREE SLIDER PHOTOGRAPHS — §132. Maryam's supplied onboarding images
+# (person at a desk / a handshake / a planning wall), resized to 1080 wide and
+# encoded WebP q80 so three of them cost ~200 KB rather than ~6 MB of source
+# PNG. §132 paints them as cross-fading `.auth-slide` layers; the base
+# `__AUTHART__` gradient stays behind. Portal-only — `build-ds.py` declines
+# §132 in `NOT_IN_DS`, so these tokens never reach the design system CSS.
+_slide_kb = 0
+for _i in (1, 2, 3):
+    _sl = here / f'welcome-slide-{_i}.webp'
+    css = css.replace(f'__SLIDE{_i}__',
+                      'data:image/webp;base64,' +
+                      base64.b64encode(_sl.read_bytes()).decode())
+    _slide_kb += _sl.stat().st_size / 1024
+print(f'welcome slider embedded: 3 slides, {_slide_kb:.0f} KB')
 
 # the client's award artwork — the coin stack, the four shields and the three
 # star medallions — embedded as one table so nothing on this page reaches the
@@ -2201,22 +2226,26 @@ HTML = f"""<!DOCTYPE html>
 </style>
 </head>
 <body>
-<!-- prototype chrome — not part of the product -->
-<div class="pt-bar">
-  <img id="ptLogo" alt="TalentNext" style="height:18px;width:auto">
-  <span class="dot"></span>
-  <span class="pt-meta">Candidate portal · v24 · Material UI · Next in Leadership</span>
-  <span class="pt-lab">Stage</span>
-  <select class="pt-sel" id="pick" aria-label="Candidate stage"></select>
-  <div class="pt-vp" id="vp" role="group" aria-label="Viewport">
-    <button data-vp="mobile" class="on">Mobile</button>
-    <button data-vp="tablet">Tablet</button>
-    <button data-vp="fluid">Desktop</button>
-    <span class="pt-scale" id="vpscale">100%</span>
-  </div>
-  <div class="pt-nav">
-    <button id="back" title="Back" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15.4 7.4 14 6l-6 6 6 6 1.4-1.4-4.6-4.6z"/></svg></button>
-    <button id="reset" title="Reset this stage" aria-label="Reset"><svg viewBox="0 0 24 24"><path d="M12 5V2L8 6l4 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7Z"/></svg></button>
+<!-- prototype chrome — not part of the product. A FLOATING MENU at the top-right
+     (Maryam, 16 Sep 2026: "exclude the top black bar of switching prototypes and
+     devices ... add a menu icon on the right of the profile ... that menu will
+     have all those options"), so the app fills the full page height instead of
+     sitting under a full-width bar. The controls keep their ids (#pick / #vp /
+     #back / #reset / #vpscale) — views.js and fitFrame wire them by id. -->
+<div class="pt-menu" id="ptMenu">
+  <button class="pt-toggle" id="ptToggle" aria-label="Prototype controls" aria-haspopup="true" aria-expanded="false">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="12" cy="19" r="1.7"/></svg>
+  </button>
+  <div class="pt-panel" id="ptPanel">
+    <span class="pt-lab">Stage</span>
+    <div class="pt-stages" id="pick" role="group" aria-label="Candidate stage"></div>
+    <span class="pt-lab">Device</span>
+    <div class="pt-vp" id="vp" role="group" aria-label="Viewport">
+      <button data-vp="mobile" class="on">Mobile</button>
+      <button data-vp="tablet">Tablet</button>
+      <button data-vp="fluid">Desktop</button>
+      <span class="pt-scale" id="vpscale">100%</span>
+    </div>
   </div>
 </div>
 
@@ -2278,12 +2307,30 @@ HTML = f"""<!DOCTYPE html>
      §01's `max-width`, so the box would still be 844 tall on a desktop
      frame until the bundle got round to it. */
   if(v === 'fluid'){{
+    /* the black bar is gone, so the desktop frame is the full viewport height
+       (fitFrame refines this to innerHeight - stage.top once it runs). */
     d.style.width = '100%';
-    d.style.height = Math.max(520, window.innerHeight - 160) + 'px';
+    d.style.height = Math.max(520, window.innerHeight - 8) + 'px';
   }} else {{
     d.style.width = SIZE[v][0] + 'px';
     d.style.height = Math.min(SIZE[v][1], Math.round(window.innerHeight * 0.82)) + 'px';
   }}
+}})();
+</script>
+
+<!-- the floating chrome menu opens/closes; a click outside it closes it. -->
+<script>
+(function(){{
+  var menu = document.getElementById('ptMenu'), tog = document.getElementById('ptToggle');
+  if(!menu || !tog) return;
+  tog.addEventListener('click', function(e){{
+    e.stopPropagation();
+    var open = menu.classList.toggle('open');
+    tog.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }});
+  document.addEventListener('click', function(e){{
+    if(!menu.contains(e.target)){{ menu.classList.remove('open'); tog.setAttribute('aria-expanded', 'false'); }}
+  }});
 }})();
 </script>
 

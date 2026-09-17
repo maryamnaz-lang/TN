@@ -423,7 +423,13 @@ function shell(){
     <button class="shell-logo" data-go="${isLead()?'leadDash':'dashboard'}" aria-label="TalentNext home"><img src="${LOGO_K}" alt="TalentNext"></button>
     ${crumbBar()}
     <div class="shell-right">
-      <span class="shell-name">${name}</span>
+      ${''/* THE TRACK/ROLE TEXT IS REMOVED from the top bar (Maryam, 16 Sep 2026:
+             "remove the Explorer track text from the top nav, all the portals have
+             something in place of Explorer track so remove them all"). The candidate
+             showed "Explorer track" and the leader "Cohort Leader · …"; the agent
+             portal already dropped its `.shell-name` and the admin never had one, so
+             all four bars now carry only the notification bell and the account menu.
+             `name`/`who(f)` stay computed and unused — a one-line revert. */}
       <button class="shell-act ${S.notif?'on':''}" data-toggle="notif" aria-label="Notifications">${I.notification}${unreadCount()?`<span class="shell-badge">${unreadCount()}</span>`:''}</button>
       ${/* THE FACE IS A MENU NOW, NOT A LINK, and the chevron is what says so.
             Pressed, it used to go straight to Profile; that destination is the
@@ -5929,16 +5935,28 @@ const quickActions = (cards) => `<div class="sec sec-qa">
 /* ============================================================
    AUTH — stage: signup
    ============================================================ */
+/* THE ARTWORK IS A SLIDER — §132. Three photographs cross-fade behind the
+   copy, cycled by pure CSS (no JS, no `render()` on a timer: a timer that
+   repainted the app would blow away the password the reader is typing), so the
+   slide state is animation phase, not `S`. The base `__AUTHART__` gradient §57
+   paints on `.auth-brand` stays behind them as the pre-decode ground. The
+   position bars sit above the welcome heading: one is `--accent`, the other two
+   white at 20%, and which one is filled tracks the visible slide. All three
+   layers are `display:none` below 900 with the rest of the brand column. */
 const AUTH_ART = `
 <div class="auth-brand">
-  <span class="auth-logo"><img src="${LOGO_K}" alt="TalentNext"></span>
+  <i class="auth-slide auth-slide-1" aria-hidden="true"></i>
+  <i class="auth-slide auth-slide-2" aria-hidden="true"></i>
+  <i class="auth-slide auth-slide-3" aria-hidden="true"></i>
+  <span class="auth-logo" role="img" aria-label="TalentNext">${LOGO_SVG}</span>
   <div class="auth-intro">
     <h2 class="t-heading-01">Welcome to TALENTnext</h2>
-    <p class="t-body-02">TalentNext is the AI-native leadership platform that assesses you in real conversation, compounds every interview, chapter and call into a live picture of where you stand, then moves you up the ladder a level at a time.</p>
-    <p class="t-body-02">From here, growth stops being guesswork.</p>
-    <p class="t-body-02 auth-begin">Let&rsquo;s begin.</p>
+    <p class="t-body-02 auth-lede">An AI-native platform that grows your leadership,<br>one level at a time.</p>
   </div>
-  <p class="t-helper-01 auth-foot">&copy; 2026 TALENTnext Limited</p>
+  <div class="auth-foot-row">
+    <p class="t-helper-01 auth-foot">&copy; 2026 TALENTnext Limited</p>
+    <div class="auth-bars" aria-hidden="true"><span class="auth-bar auth-bar-1"></span><span class="auth-bar auth-bar-2"></span><span class="auth-bar auth-bar-3"></span></div>
+  </div>
 </div>
 <i class="auth-mark" aria-hidden="true"></i>`;
 
@@ -6109,25 +6127,32 @@ function legalDoc(){
 
 const AUTH = {
 login: () => `${authShell()}
-<main class="main"><div class="page form-page">
-  ${ph('Log in','Enter the email address and password on your TalentNext account.')}
-  ${''/* THE ROLE COMES BEFORE THE CREDENTIALS because it decides what the two
-        fields under it are for, and because §57.4b's argument for the create
-        screen applies here word for word: the block with a ground of its own is
-        what separates the description from the form, so the hairline §17.6 drew
-        there is the "second boundary for one join" that layer removed. §104
-        takes the line off, keyed on what PRECEDES the fields. */}
-  ${loginRoles()}
+<main class="main"><div class="page form-page authtight">
+  ${''/* THE LOG-IN SCREEN, per Maryam's content (17 Sep 2026): a clean
+        email + password sign-in reached from the Set Password CTA. It drops the
+        role picker (`loginRoles()`) and the "Sign up" row that the older login
+        carried — neither is in the supplied content — for a title, a sub-line,
+        the two fields (placeholders, not pre-filled), a "Forgot Password?" link
+        under the password, a "Remember me" box and one Log In button. `Log In`
+        is the supplied casing (kept exactly). The button logs into the
+        candidate dashboard (`data-loginas`). */}
+  ${ph('Log In','Enter your details to sign in to your account.')}
   <div class="sec sec-rule">
-    <div class="f"><label for="lem">Email address</label>
-      <input class="inp fill" id="lem" type="email" value="maryam.naz@tkxel.io"></div>
+    <div class="f"><label for="lem">Email Address</label>
+      <input class="inp fill" id="lem" type="email" placeholder="Enter your email address"></div>
     <div class="f last"><label for="lpw">Password</label>
-      <div class="pw-wrap"><input class="inp fill" id="lpw" type="password" value="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022">
-        <button class="pw-eye" data-eye="lpw" aria-label="Show password">${I.view}</button></div></div>
-    <p class="t-body-02 aux"><a data-go="forgot">Forgotten your password?</a></p>
+      <div class="pw-wrap"><input class="inp fill" id="lpw" type="password" placeholder="Enter your password">
+        <button class="pw-eye" data-eye="lpw" aria-label="Show password">${I.view}</button></div>
+      <p class="t-body-02 aux"><a data-go="forgot">Forgot Password?</a></p></div>
+  </div>
+  <div class="sec sec-cbx">
+    <div class="cbx-list">
+      <label class="cbx"><input type="checkbox"><span class="box">${I.check}</span>
+        <span class="txt">Remember me</span></label>
+    </div>
   </div>
   <div class="sec sec-act">
-    <div class="foot-row foot-stack"><div><button class="btn btn-p btn-full" data-loginas="${S.role||'candidate'}">Log in ${I.arrowRight}</button></div><p class="t-body-02 mt5" style="color:var(--text-secondary)">Don&rsquo;t have an account? <a data-go="create">Sign up</a></p></div>
+    <div class="foot-row foot-stack"><div><button class="btn btn-p btn-full" data-loginas="candidate">Log in ${I.arrowRight}</button></div></div>
   </div>
 </div></main>`,
 
@@ -6192,8 +6217,8 @@ reset: () => `${authShell('login')}
 </div></main>`,
 
 create: () => `${authShell()}
-<main class="main"><div class="page form-page">
-  ${ph('Create your account','You&rsquo;re one step away. Create your password to continue.')}
+<main class="main"><div class="page form-page authtight">
+  ${ph('Set New Password','Create a strong password for your account.')}
   ${authId('Your Email Address', 'maryam.naz@tkxel.io', 'login')}
   <div class="sec sec-rule">
     <div class="f-row"><div class="f"><label for="pw">Password</label>
@@ -6217,16 +6242,22 @@ create: () => `${authShell()}
         <button class="pw-eye" data-eye="pw2" aria-label="Show password">${I.view}</button></div></div></div>
   </div>
   <div class="sec sec-cbx">
+    ${''/* THE TWO REQUIRED CONSENTS START UNCHECKED and gate the CTA: §17's
+          `.form-page:has(.cbx-req input:not(:checked)) … .btn-p` greys and
+          disables Set Password until BOTH `.cbx-req` boxes are ticked. Native
+          checkboxes, so `:has()` re-reads live on each toggle with no render —
+          nothing here keeps state in the DOM (trap 9), the checkbox IS the
+          state. The third (marketing) is optional and not a `.cbx-req`. */}
     <div class="cbx-list">
-      <label class="cbx"><input type="checkbox" checked><span class="box">${I.check}</span>
+      <label class="cbx cbx-req"><input type="checkbox"><span class="box">${I.check}</span>
         <span class="txt">I accept the <a data-go="terms">Terms of Service</a> and <a data-go="terms">Privacy Policy</a>.</span></label>
-      <label class="cbx"><input type="checkbox" checked><span class="box">${I.check}</span>
+      <label class="cbx cbx-req"><input type="checkbox"><span class="box">${I.check}</span>
         <span class="txt">I consent to my interviews being recorded and transcribed.</span></label>
       <label class="cbx"><input type="checkbox"><span class="box">${I.check}</span>
         <span class="txt">Send me occasional product and course emails.</span></label>
     </div>
     </div>
-  <div class="sec sec-act"><div class="foot-row foot-stack"><div class="mt6"><button class="btn btn-p btn-full" data-go="verify">Create Account ${I.arrowRight}</button></div><p class="t-body-02 mt5" style="color:var(--text-secondary)">Already have an account? <a data-go="login">Log in</a></p></div>
+  <div class="sec sec-act"><div class="foot-row foot-stack"><div class="mt6"><button class="btn btn-p btn-full" data-go="login">Set Password ${I.arrowRight}</button></div></div>
   </div>
 </div></main>`,
 
@@ -13757,8 +13788,13 @@ device.addEventListener('click', e => {
 const pick   = document.getElementById('pick');
 const cap    = document.getElementById('cap');
 
-document.getElementById('ptLogo').src = LOGO_W;
-pick.innerHTML = stagesShown().map(([k,l])=>`<option value="${k}">${l}</option>`).join('');
+/* THE STAGE PICKER IS AN INLINE LIST, not a nested <select> (Maryam, 16 Sep
+   2026: "show all the prototypes in this menu in this view, user do not have to
+   go and open the prototype dropdown"). `#pick` is a div of stage buttons; the
+   current one is marked `.on` in render() and a click sets the stage. The logo
+   row and the back/reset buttons were removed, so `#ptLogo`/`#back`/`#reset` are
+   gone and their wiring below is dropped. */
+pick.innerHTML = stagesShown().map(([k,l])=>`<button type="button" class="pt-stage-opt" data-stage="${k}">${l}</button>`).join('');
 
 /* A STAGE WITH ITS OWN FRONT DOOR IS NOT REACHED THROUGH THE NAVIGATION.
    `signup` was the only one, so the two lines below said "signup" by name.
@@ -15033,7 +15069,19 @@ function render(){
      render before it is parsed is on some other stage, and this branch is
      never taken until a stage change brings you here. */
   if(S.stage==='nil'){
-    html = '<div class="nil">' + (NIL[S.view] || NIL.quiz)() + '</div>';
+    /* THE BOOT RENDER MUST NOT THROW WHEN `NIL` ISN'T READY (Maryam, 17 Sep 2026:
+       "whenever i reload my page on this prototype everything vanishes ... this
+       should not happen"). `render()` runs as the last line of views.js — BEFORE
+       nil.js, where `NIL` lives — so a reload that lands on the `nil` stage (the
+       hash is `#nil/…`) reached this line with `NIL` still undefined and threw a
+       hard ReferenceError, halting the rest of the bundle: nil.js and every later
+       pass never ran, so `NIL` never got defined and no foot render() could
+       recover it. The page stayed blank until a reload on some OTHER stage let
+       the bundle finish. `NIL` is a `var` (hoisted to undefined, not a TDZ const)
+       so this bare check is safe; when it is not yet the table, the early render
+       draws nothing and nil.js's own closing render() paints the screen once it
+       is. Same shape as the `typeof callScreen === 'function'` guard above. */
+    html = NIL ? '<div class="nil">' + (NIL[S.view] || NIL.quiz)() + '</div>' : '';
   } else if(S.stage==='signup'){
     const inner = (AUTH[S.view]||AUTH.create)();
     html = S.view === 'terms' ? inner
@@ -15169,7 +15217,7 @@ function render(){
            + (shown.length ? ` data-shown="${shown.join(' ')}"` : '')
            + (grew ? ' data-said' : '');
   device.innerHTML = IOS_TOP + `<div class="app"${at}>${html}</div>` + IOS_BOTTOM;
-  pick.value = S.stage;
+  [...pick.children].forEach(b => b.classList.toggle('on', b.dataset.stage === S.stage));
   const st = STAGES.find(s=>s[0]===S.stage);
   /* THE LEADER'S HASH CARRIES THE STAGE TOO, and that third segment is the
      whole of what makes a reload land where you were. `#leader/<view>` was
@@ -15205,11 +15253,10 @@ function render(){
      will walk into, and this is where it was found. */
 }
 
-pick.onchange = e => setStage(e.target.value);
-document.getElementById('back').onclick = back;
-/* the browser and hardware back buttons drive the same stack */
+pick.onclick = e => { const b = e.target.closest('[data-stage]'); if(b) setStage(b.dataset.stage); };
+/* the browser and hardware back buttons drive the same stack (the chrome's own
+   Back/Reset buttons were removed — Maryam, 16 Sep 2026) */
 window.addEventListener('popstate', () => { if(S.hist.length) back(); });
-document.getElementById('reset').onclick = () => setStage(S.stage);
 
 /* card number: group the digits and show the brand as it is recognised */
 device.addEventListener('input', e => {
@@ -15326,6 +15373,21 @@ device.addEventListener('click', e => {
      in this build — a fresh render of the page is what brings it back. */
   const cb = t.closest('[data-certban]');
   if(cb){ S.certBan[cb.dataset.certban] = true; render(); return; }
+
+  /* THE NEXT-IN-LEADERSHIP "CHECK YOUR EMAIL" MODAL (Maryam, 17 Sep 2026). The
+     result page's "Continue your journey" button opens it instead of jumping to
+     account creation; the state is a plain flag the `result` view is a pure
+     function of (trap 9), and both closes re-render with it off. The scrim
+     carries `data-nilclose` too, but a click that BUBBLED from inside the dialog
+     must not close it — `closest` walks up and would find the scrim — so a scrim
+     match only closes when the click did NOT land inside `.nil-modal`. */
+  const nmo = t.closest('[data-nilmodal]');
+  if(nmo){ S.nilModal = true; render(); return; }
+  const nmc = t.closest('[data-nilclose]');
+  if(nmc){
+    if(!(nmc.classList.contains('nil-modal-scrim') && t.closest('.nil-modal'))){ S.nilModal = false; render(); }
+    return;
+  }
 
   /* THE SKILLS MODAL'S BRANCH WAS HERE and is deleted with the dialog — the
      note over `outlineSec` is the argument. What is worth keeping from this

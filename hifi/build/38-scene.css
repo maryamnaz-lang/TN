@@ -53,12 +53,20 @@
   background:linear-gradient(180deg,
     rgba(0,0,0,.28) 0%, rgba(0,0,0,.34) 55%, rgba(0,0,0,.62) 100%)}
 
+/* THE PLAY MARK IS THE PROFILE-SETTINGS DISC (Maryam, 17 Sep 2026: "on candidate
+   portal interview detail page scenes use the play icons we are using on the
+   profile settings scenes"). §111's `.scv-play` is a round translucent-black wash
+   with a white glyph; this was a white square with a dark glyph. The two now read
+   as one play mark — a white triangle in a dark circle — across both surfaces.
+   Only the treatment matches; the SIZE stays tuned to these cards (44px here, 32px
+   for the desktop chooser below), because the interview-detail cards are larger
+   than the 240px profile scroll cards. */
 .app .scene-play{
   position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
   display:grid;place-items:center;width:44px;height:44px;
-  background-color:rgba(255,255,255,.92)}
+  border-radius:50%;background-color:rgba(0,0,0,.44)}
 .app .scene-play svg{
-  width:20px;height:20px;color:var(--gray-100);display:block;
+  width:20px;height:20px;color:#fff;display:block;
   /* the glyph is a triangle and a triangle centred on its bounding box reads
      left of centre, because its mass is not where its box is */
   margin-left:2px}
@@ -340,7 +348,9 @@
 .app .scene-full .scene-still::before{
   background:linear-gradient(180deg,
     rgba(255,255,255,.62) 0%, rgba(255,255,255,.62) 100%)}
-.app .scene-full .scene-play{background-color:rgba(255,255,255,.72)}
+/* the disc fades to a fainter dark wash on the whitened card, so it reads
+   unavailable rather than pressable (was a dimmed white square) */
+.app .scene-full .scene-play{background-color:rgba(0,0,0,.2)}
 .app .scene-full .scene-box{border-color:var(--rule);background-color:transparent}
 
 /* NOTHING HERE FOR `.scene-bar` OR `.scene-count` ANY MORE — Maryam, 1 Sep

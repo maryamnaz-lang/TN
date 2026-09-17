@@ -281,7 +281,7 @@
 .pt-scale{
   display:inline-grid;place-items:center;height:32px;padding:0 var(--s03);
   margin-left:var(--s02);font-size:11px;letter-spacing:.4px;
-  color:var(--on-dark-2);font-variant-numeric:tabular-nums}
+  color:var(--text-helper);font-variant-numeric:tabular-nums}
 
 /* ==========================================================================
    THE TAL BUTTON
@@ -558,6 +558,10 @@
    it runs to the edge.
    ========================================================================== */
 .device[data-vp="fluid"]{border:0}
+/* The desktop app fills the full width — the chrome menu is a FLOATING overlay
+   above the UI, not a reserved column (Maryam, 16 Sep 2026: "make it floating
+   icon above the ui, do not disturb my product ui"; this reverts the 54px gutter
+   that read as a dead column). */
 .pt-stage:has(.device[data-vp="fluid"]){padding:0}
 .pt-fit:has(.device[data-vp="fluid"]){margin:0}
 

@@ -151,6 +151,20 @@
   .auth-brand .auth-foot{
     margin:24px 0 0;color:var(--text-secondary)}
 
+  /* AND WHITE WHEN THE PANEL IS A PHOTO SLIDER (§132). The rules above set the
+     copy dark for the painterly gradient — light and even — but §132 puts three
+     photographs behind it with a dark scrim at the foot, and there the same
+     copy has to be `--on-dark`. Scoped to `:has(> .auth-slide)`, which only
+     hifi's `AUTH_ART` emits: the design-system front door has no slide layers,
+     so it keeps the dark copy this block sets. The colour flip belongs here,
+     with the rest of the auth copy colours and before §63, not in §132 (§63
+     owns text colour and nothing after it may set one). The begin line takes
+     the bright `--accent` so it reads on the scrim, not the deep `--auth-o-ink`. */
+  .app .auth-card > .auth-brand:has(> .auth-slide) .auth-intro h2{color:var(--on-dark)}
+  .app .auth-card > .auth-brand:has(> .auth-slide) .auth-intro p{color:var(--on-dark)}
+  .app .auth-card > .auth-brand:has(> .auth-slide) .auth-intro p.auth-begin{color:var(--accent)}
+  .app .auth-card > .auth-brand:has(> .auth-slide) .auth-foot{color:var(--on-dark-2)}
+
   /* ------------------------------------------------------------------ 3 ---
      THE FORM SIDE, AND THE CARD IN IT
      The column is the other 47.4% and it does one thing: centre the card.
@@ -180,8 +194,10 @@
     flex:none;width:100%;display:block;min-height:0}
   .auth-card > .auth-col .page{
     box-sizing:border-box;
-    width:100%;max-width:608px;margin:0 auto;
-    padding:33px 41px 41px;
+    width:100%;max-width:588px;margin:0 auto;
+    /* Card 20px narrower (Maryam, 17 Sep 2026, was 608). Tighter inset the
+       same day (was 33/41/41). */
+    padding:24px 28px 28px;
     background-color:var(--auth-card-bg);
     border:1px solid var(--auth-card-line);
     border-radius:var(--auth-r)}
@@ -251,14 +267,22 @@
 .app .form-page .auth-id{
   box-sizing:border-box;
   padding:20px;
-  background-color:var(--auth-o-1);
+  /* A TINTED ACCENT CHIP, NOT A SOLID RED BLOCK. It read solid `--accent`
+     (#f9423a) with white text (Maryam, 17 Sep 2026, earlier the same day);
+     she then asked for "the inner text to be in accent color and the bg color
+     to be in lightest accent color tone" — the rank-chip pattern. So the
+     ground is the lightest accent tint (`--accent` at 12% over white) and the
+     ink is `--accent-text` (#c2332d, the accent as INK, 5.5:1 on white and
+     tuned for AA on a near-white ground — plain `--accent` fails AA on this
+     tint). The address, the label and the "Not you?" link all read it. */
+  background-color:color-mix(in srgb, var(--accent) 12%, #fff);
   border-radius:var(--auth-r);
-  color:#fff}
+  color:var(--accent-text)}
 
 .app .form-page .auth-id-l{
   display:block;
   font-size:13.5px;line-height:20px;letter-spacing:.16px;
-  color:rgba(255,255,255,.9)}
+  color:var(--accent-text)}
 
 /* THE VALUE AND THE WAY OUT ON ONE BASELINE. `align-items:baseline` and not
    `center`: the two are different sizes, and centring them on the box puts the
@@ -269,14 +293,13 @@
   margin-top:4px;
   font-size:16px;line-height:24px;font-weight:600;letter-spacing:0}
 
-/* THE LINK IS WHITE AND UNDERLINED, and it is the one link in the product
-   that is not `--link` blue. §12's decision is that links are blue because
-   blue is the only blue on the screen; on an orange panel it is the only blue
-   AND unreadable — 1.9:1. Underlined white is how a link says it is a link
-   with no colour available, which is the oldest answer there is. */
+/* THE LINK RIDES THE SAME ACCENT INK, UNDERLINED. On the old solid-red panel
+   it was white (the only readable non-blue there); on the tinted chip it takes
+   `--accent-text` like the rest of the panel and stays underlined so it still
+   reads as a link with no second colour in play. */
 .app .form-page .auth-id-v a{
   font-size:13.5px;line-height:20px;font-weight:400;
-  color:#fff;text-decoration:underline;text-underline-offset:2px}
+  color:var(--accent-text);text-decoration:underline;text-underline-offset:2px}
 
 /* the section holding it pays the vertical only — the sides belong to the
    card's padding at desktop and to `--pad-x` on the phone, which is §17's
@@ -459,4 +482,48 @@
      the Resend drops to its own line where it does not. */
   .app .auth-card .foot-row{flex-wrap:wrap}
   .app .auth-card .foot-row > div{flex:none}
+}
+
+/* ==========================================================================
+   THE AUTH CARDS THAT OPT IN SIT ON ONE EQUAL 32px RHYTHM
+   (Maryam, 17 Sep 2026). The mixed per-section paddings gave uneven joins —
+   28 desc→banner but 48 everywhere else. She asked for one equal gap across
+   the card: 32 between every row, the same value the password↔confirm pair
+   already uses (its `.f-row` 32 flex gap, INSIDE `.sec-rule`, left untouched).
+   So every section's OWN vertical padding is zeroed and a single 32px top
+   margin carries every join. The set-password AND the log-in cards both opt in
+   with `.authtight` on their `.page` (a marker only those two screens write, so
+   no other auth screen or the DS is touched); `.page.form-page` + the section
+   class lift it high enough to beat every per-section padding rule, and it
+   lands last in §57 so order never bites. Desktop card only — below 900 the
+   screen is full-bleed and keeps §17's mobile spacing.
+   ========================================================================== */
+@container app (min-width:900px){
+  /* One 32px top margin on every section carries the join; the section's own
+     vertical padding is zeroed so the margin IS the whole gap. The zeroing
+     carries `!important` ON PURPOSE: the platform's section rhythm (the
+     1 Sep 2026 "48px" rule and §101's block-gap rules) sets `.app .page > .sec`
+     padding through a ~30-class `:not()`/`:has()` chain — (0,30,0)-plus — so no
+     plainly-scoped selector can outweigh it, and reproducing that chain to add
+     an exception would be far worse to read. Bound to `.authtight`, the marker
+     the two opted-in screens write, so it touches nothing else; the margin-top
+     (which the rhythm does NOT set) wins without help. Desktop card only. */
+  .app .auth-card .page.form-page.authtight > .ph,
+  .app .auth-card .page.form-page.authtight > .sec{
+    padding-top:0 !important;padding-bottom:0 !important;margin-top:32px}
+  .app .auth-card .page.form-page.authtight > :first-child{margin-top:0}
+  /* No dividers inside an authtight card — the 32px margin is the whole
+     separation. §17.6 gives `.sec-rule` a `border-top` (the "one rule in the
+     column"); on the log-in card, where the fields follow the desc directly
+     with no banner between, that line read as a divider under the sub-text.
+     The card's rhythm is spacing, not rules, so it comes off. */
+  .app .auth-card .page.form-page.authtight > .sec{border-top:0}
+  /* The log-in card stacks Email and Password as bare `.f` children of
+     `.sec-rule` (not a `.f-row`), so they miss the 32 `.f-row` gap the
+     set-password card's password↔confirm pair gets. Give the same 32 between
+     them here so every gap on the card is one value. Matches only the log-in
+     shape (`.sec-rule > .f`); the set-password fields are `.sec-rule > .f-row
+     > .f` and keep their own 32. */
+  .app .auth-card .page.form-page.authtight > .sec-rule > .f{margin-bottom:32px}
+  .app .auth-card .page.form-page.authtight > .sec-rule > .f.last{margin-bottom:0}
 }

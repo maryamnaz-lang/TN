@@ -358,6 +358,13 @@
   font-size:var(--t-h2-size);line-height:var(--t-h2-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-h2-ls)}
 
+/* THE SLIDER FRONT DOOR'S WELCOME IS SEMIBOLD — a second stated 600 exception
+   after §10's "Summary by Tal" (Maryam, 17 Sep 2026: "semibold the welcome
+   heading"). Scoped to hifi's photo slider (`:has(> .auth-slide)`), so the
+   design-system front door keeps the Medium role; §63 owns weight, so it lives
+   here rather than in §132. */
+.app .auth-card > .auth-brand:has(> .auth-slide) .auth-intro h2{font-weight:600}
+
 /* `.wing-lvl .prog-pct` IS THE SAME ARGUMENT AS `.big`, ONE CLASS FURTHER ON.
    `ladderWing` borrows `progressStrip`'s shape — CLAUDE.md's note says so —
    and that means it borrows `.prog-pct`, the class that holds "38%" on the

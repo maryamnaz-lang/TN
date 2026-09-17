@@ -272,7 +272,7 @@
      they are two steps of one decision, and the file reads them top to
      bottom at this width.
      ------------------------------------------------------------------------ */
-  .auth-card .f-row{display:flex;flex-direction:column;gap:24px}
+  .auth-card .f-row{display:flex;flex-direction:column;gap:32px}
   .auth-card .form-page .f{margin-bottom:24px}
   .auth-card .form-page .f.last{margin-bottom:0}
   /* THE STACK OWNS THE GAP. `.f-row` is a 24 flex gap and `.f` carries a 24
@@ -283,14 +283,26 @@
      `.form-page .f` because the two have the same specificity and the file
      is read top to bottom. */
   .app .auth-card .form-page .f-row > .f{margin:0}
-  .auth-card .f > label{display:block;margin:0;color:var(--text-secondary)}
+  .auth-card .f > label{display:block;margin:0 0 6px;color:var(--text-secondary)}
+  /* The field pays NO left padding — its text and dots align to the label's
+     left edge, not 16px in from it (Maryam, 17 Sep 2026). Right padding stays
+     for the eye button (`.app .pw-wrap .inp` sets 52px over the 16 here). */
   .auth-card .inp,.auth-card .inp.fill{
     background:transparent;border:0;border-bottom:1px solid var(--auth-rule);
-    padding:8px 16px;height:auto;min-height:0;width:100%;
+    padding:8px 16px 8px 0;height:auto;min-height:0;width:100%;
     color:var(--text-primary);font-weight:600}
   .auth-card .inp::placeholder{color:var(--text-placeholder);font-weight:400}
-  .auth-card .inp:focus,.auth-card .inp:focus-visible{
-    outline:0;border-bottom-color:var(--text-primary)}
+  /* FOCUS DARKENS THE 1px UNDERLINE, IT DOES NOT THICKEN IT. The generic
+     `.app .inp.fill:focus` (§12) swaps to a 2px rule AND yanks padding-bottom
+     to 0 to keep ITS box the same height — but the card's field pads 8/16 and
+     carries no compensation, so that rule made every auth field shrink 7px the
+     instant it was clicked (1px more border, 8px less padding). This card's
+     focus is a colour change only; matching `.app` + `.fill` here lifts it to
+     (0,5,0) so it beats the §12 fill rule and the geometry holds. */
+  .app .auth-card .inp:focus,.app .auth-card .inp:focus-visible,
+  .app .auth-card .inp.fill:focus,.app .auth-card .inp.fill:focus-visible{
+    outline:0;border:0;border-bottom:1px solid var(--text-primary);
+    padding-bottom:8px}
   .auth-card .pw-wrap{position:relative}
   .auth-card .pw-eye{
     position:absolute;right:16px;top:50%;transform:translateY(-50%);
@@ -309,11 +321,26 @@
   .app .auth-card .page > .sec.sec-cbx{padding-top:16px;padding-bottom:16px}
   .auth-card .cbx-list{display:flex;flex-direction:column;gap:6px}
   .auth-card .cbx{gap:8px;align-items:flex-start;padding:0;min-height:0}
-  .auth-card .cbx .box{width:16px;height:16px;flex:none;margin-top:0}
+  /* The card's consent boxes carry a soft 4px corner (Maryam, 17 Sep 2026) —
+     a stated exception to the platform's radius-0, like the admin select
+     boxes. §02's `.cbx .box` is square; this is scoped to the auth card. */
+  .auth-card .cbx .box{width:16px;height:16px;flex:none;margin-top:0;border-radius:4px}
   .auth-card .cbx .box svg{width:16px;height:16px}
   .auth-card .cbx .txt{
     color:var(--text-secondary);
     font-size:11.5px;line-height:16px;font-weight:400;letter-spacing:.15px}
+
+  /* THE CTA WAITS FOR THE TWO REQUIRED CONSENTS (Maryam, 17 Sep 2026). Both
+     `.cbx-req` boxes start unchecked (views.js), and Set Password stays in the
+     platform's `.btn[disabled]` look with `pointer-events:none` — so the click
+     never reaches the router — while EITHER required box is `:not(:checked)`.
+     Native checkboxes, so `:has()` re-reads on every toggle with no render
+     (trap 9: the checkbox is the state). Inert on the other auth screens —
+     none of them writes `.cbx-req`, so the `:has()` is false and the button is
+     never gated. `background-image:none` clears §57's accent gradient too. */
+  .app .auth-card .form-page:has(.cbx-req input:not(:checked)) .sec-act .btn-p{
+    background-color:var(--layer-02);background-image:none;
+    color:var(--text-disabled);border-color:transparent;pointer-events:none}
 
   /* ------------------------------------------------------------------ 9 ---
      THE CLOSING ROW
