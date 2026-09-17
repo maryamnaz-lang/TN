@@ -1021,7 +1021,7 @@
    glyph's own note in icons.js is the argument; the box and the green are
    unchanged, because neither was ever about which mark sat inside them. */
 .app .rec-v{display:inline-grid;place-items:center;width:20px;height:20px}
-.app .rec-v svg{width:20px;height:20px;fill:#00a43c}
+.app .rec-v svg{width:20px;height:20px;color:#00a43c}
 .app .rec-r{display:inline-flex;align-items:center;gap:var(--s02)}
 /* THE RATING STAR IS ALWAYS YELLOW (Maryam, 4 Sep 2026: "the rating star will
    always be yellow"), so it is `--star` and not an accent value at all.
@@ -1039,7 +1039,7 @@
    not re-pointed. That rule existed to keep the star following the accent
    through the red demo, and a star that never follows the accent has nothing
    for a demo to re-point. */
-.app .rec-r svg{width:16px;height:16px;fill:var(--star)}
+.app .rec-r svg{width:16px;height:16px;color:var(--star)}
 
 /* THE THREE FACTS — 581:6476. A wrapping row rather than a grid: the three are
    independent and of very different lengths, and `.facts` would draw its
@@ -1129,7 +1129,7 @@
      `--accent-on-dark` (7.53:1) and not `--accent-text` (3.19:1 there). */
   color:var(--accent-on-dark);
   border-color:var(--accent)}
-.app .rec-a > .btn.rec-see svg{fill:var(--accent-on-dark)}
+.app .rec-a > .btn.rec-see svg{color:var(--accent-on-dark)}
 
 /* THE WAY TO DISAGREE — 583:6677. A button drawn as a line of text: the ramp
    clipped to the glyphs, underlined, in italics because it is quoted speech —
@@ -1343,8 +1343,8 @@
   text-align:left;cursor:pointer;
   background-image:var(--ai-grad-alt);
   -webkit-background-clip:text;background-clip:text}
-.app .sumdrop .sd-ic{flex:none;display:grid;place-items:center;width:16px;height:16px}
-.app .sumdrop .sd-ic svg{width:16px;height:16px;fill:var(--icon-primary)}
+.app .sumdrop .sd-ic{flex:none;display:grid;place-items:center;width:18px;height:18px}
+.app .sumdrop .sd-ic svg{width:18px;height:18px;color:var(--icon-primary)}
 
 /* THE PHRASE IS A CONTROL NOW. `<b data-sum>` keeps §70.2's ground and ink and
    gains a pointer and a focus ring; `all:unset` is not used because the ground,
@@ -1504,7 +1504,7 @@
    above the cap height, so the same correction is now 1. `align-self` stays
    `flex-start` — the card is 74 tall and the mark belongs on the title's line,
    not in the middle of the two. */
-.app .qa-ic{flex:none;display:grid;place-items:center;width:20px;height:20px;
+.app .qa-ic{flex:none;display:grid;place-items:center;width:18px;height:18px;
   align-self:flex-start;margin-top:1px}
 /* A HUE PER CARD, NAMED RATHER THAN CYCLED (Maryam, 30 Aug 2026). Both cards
    carried the accent, which made the two marks one mark drawn twice; the file
@@ -1529,17 +1529,17 @@
    exception and keep their colour (the green done tick, the star, the journey
    states) — those signal, they do not categorise. All hue variants below fold
    to the same ink; the class stays so the markup and the recipe are unchanged. */
-.app .qa-ic svg{width:20px;height:20px;fill:var(--icon-primary);
-  transition:fill 140ms var(--mo-standard, cubic-bezier(.4,0,.2,1))}
-.app .qa-ic.ic-quiz svg{fill:var(--icon-primary)}
-.app .qa-ic.ic-prep svg{fill:var(--icon-primary)}
+.app .qa-ic svg{width:18px;height:18px;color:var(--icon-primary);
+  transition:color 140ms var(--mo-standard, cubic-bezier(.4,0,.2,1))}
+.app .qa-ic.ic-quiz svg{color:var(--icon-primary)}
+.app .qa-ic.ic-prep svg{color:var(--icon-primary)}
 /* A CLICKABLE block lights its MARK — and only its mark — on hover (Maryam, same
    day: "if it is a quick action block or something that has a click then turn
    the black icon colour to #bd2a2a on hover", and "do not make the border black
    on hover"). The card is the control, so the hover is on `.qa-c`; `qa-c` is
    armed in HOVER_KEEP. The card's old border-darken hover was deleted above so
    nothing but the mark changes. */
-.app .qa-c:hover .qa-ic svg{fill:var(--accent)}
+.app .qa-c:hover .qa-ic svg{color:var(--accent)}
 
 .app .qa-b{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:var(--s02)}
 /* THE ARROW IS RIGHT AND MIDDLE OF THE CARD — Maryam, 1 Sep 2026: "the arrow
@@ -1792,7 +1792,7 @@
   width:36px;height:36px;min-height:0;padding:0;
   display:grid;place-items:center;
   background-color:color-mix(in srgb, var(--mk-1) 12%, #fff)}
-.app .sec-lead .row-lead > .btn svg{width:20px;height:20px;fill:var(--mk-1)}
+.app .sec-lead .row-lead > .btn svg{width:20px;height:20px;color:var(--mk-1)}
 
 /* --------------------------------------------------------------------- 3d ---
    THE LEADER COLUMN IS WIDER AND PAYS THE PLAIN INSET

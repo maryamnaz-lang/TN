@@ -14,9 +14,9 @@
   position:relative}
 .chev-row:last-child{border-bottom:0}
 .chev-mark{display:flex;gap:2px;flex:none;width:64px}
-.chev-mark svg{width:18px;height:22px;fill:var(--gray-30)}
-.chev-row.on .chev-mark svg{fill:var(--accent)}
-.chev-row.past .chev-mark svg{fill:var(--gray-40)}
+.chev-mark svg{width:18px;height:22px;color:var(--gray-30)}
+.chev-row.on .chev-mark svg{color:var(--accent)}
+.chev-row.past .chev-mark svg{color:var(--gray-40)}
 .chev-b{flex:1;min-width:0}
 .chev-n{display:block;font-size:15px;line-height:20px;font-weight:600;letter-spacing:-.05px}
 .chev-row.on .chev-n{font-weight:700}
@@ -30,9 +30,9 @@
   line-height:17px;color:var(--text-helper)}
 /* inline chevron, used as a section device and beside the level name */
 .chev{display:inline-flex;gap:1px;vertical-align:middle}
-.chev svg{width:12px;height:15px;fill:var(--accent)}
-.chev.k svg{fill:var(--text-primary)}
-.chev.q svg{fill:var(--text-placeholder)}
+.chev svg{width:12px;height:15px;color:var(--accent)}
+.chev.k svg{color:var(--text-primary)}
+.chev.q svg{color:var(--text-placeholder)}
 
 /* ==========================================================================
    19. LEVEL HERO — an inverted band, not a card.
@@ -46,7 +46,7 @@
 .lvl-hero .nm{font-size:32px;line-height:40px;font-weight:600;letter-spacing:-.8px;
   color:var(--on-dark);display:block}
 .lvl-hero .sub{color:var(--on-dark-2);margin-top:var(--s03)}
-.lvl-hero .chev svg{fill:var(--accent)}
+.lvl-hero .chev svg{color:var(--accent)}
 .lvl-hero .kv{border-bottom-color:var(--on-dark-rule)}
 .lvl-hero .kv .k{color:var(--on-dark-2)}
 .lvl-hero .kv .v{color:var(--on-dark)}
@@ -79,7 +79,7 @@
   width:24px;height:24px;flex:none;display:grid;place-items:center;
   border:1.5px solid var(--border-strong-01);background:var(--layer-01);
   font-size:11.5px;font-weight:600;color:var(--text-secondary)}
-.stp-c svg{width:14px;height:14px;fill:var(--on-brand)}
+.stp-c svg{width:14px;height:14px;color:var(--on-brand)}
 .stp .done .stp-c{background:var(--brand-primary);border-color:var(--brand-primary);color:var(--on-brand)}
 .stp .on .stp-c,.stp-now .stp-c{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
 .stp-t{flex:1;min-width:0}
@@ -101,8 +101,8 @@
 .ag-r .num{font-size:12.5px;font-weight:600;color:var(--text-secondary);
   font-variant-numeric:tabular-nums}
 .stars{display:inline-flex;gap:1px}
-.stars svg{width:13px;height:13px;fill:var(--gray-30)}
-.stars svg.f{fill:var(--text-primary)}
+.stars svg{width:13px;height:13px;color:var(--gray-30)}
+.stars svg.f{color:var(--text-primary)}
 .ag-foot{display:flex!important;align-items:baseline;gap:var(--s04);margin-top:var(--s03);
   font-size:12.5px;letter-spacing:.2px;flex-wrap:wrap}
 .ag-price{margin-left:auto;font-weight:600;color:var(--text-primary);
@@ -203,7 +203,7 @@
   font-variant-numeric:tabular-nums}
 .score-rank{display:inline-flex;align-items:center;gap:var(--s02);
   font-size:13px;font-weight:600;color:var(--text-secondary)}
-.score-rank svg{width:16px;height:16px;fill:var(--accent)}
+.score-rank svg{width:16px;height:16px;color:var(--accent)}
 .score-meta{display:block;margin-top:var(--s02);font-size:12.5px;color:var(--text-secondary)}
 .score-next{margin-top:var(--s05)}
 .score.on-dark{background:var(--surface-dark);color:var(--on-dark)}
@@ -212,7 +212,7 @@
 .aw-r{gap:var(--s05);align-items:center}
 .aw-ic{background:var(--layer-02)}
 .aw-r.got .aw-ic{background:var(--accent)}
-.aw-r.got .aw-ic svg{fill:var(--on-accent)}
+.aw-r.got .aw-ic svg{color:var(--on-accent)}
 .aw-v{margin-left:auto;flex:none;font-size:14px;font-weight:600;
   font-variant-numeric:tabular-nums;text-align:right}
 .aw-v.neg{color:var(--support-error)}
@@ -226,9 +226,9 @@
   padding:var(--s05) var(--gutter);
   background:var(--brand-tint-2);border-bottom:1px solid var(--border-subtle-01)}
 .ach-ic{background:var(--accent)}
-.ach-ic svg{fill:var(--on-accent)}
+.ach-ic svg{color:var(--on-accent)}
 .ach-x{flex:none;width:40px;height:40px;display:grid;place-items:center;margin-left:auto}
-.ach-x svg{width:20px;height:20px;fill:var(--icon-secondary)}
+.ach-x svg{width:20px;height:20px;color:var(--icon-secondary)}
 .ach-x:hover{background:var(--overlay-hover)}
 
 /* ==========================================================================
@@ -270,7 +270,7 @@
    27. NOTIFICATION PANEL
    ========================================================================== */
 .notif{
-  position:absolute;top:0;right:0;bottom:0;width:100%;max-width:380px;z-index:50;
+  position:absolute;top:0;right:0;bottom:0;width:100%;max-width:450px;z-index:50;
   background:var(--layer-01);border-left:1px solid var(--border-subtle-01);
   display:flex;flex-direction:column;
   transform:translateX(100%);visibility:hidden;
@@ -281,7 +281,7 @@
   border-bottom:1px solid var(--border-subtle-01)}
 .notif-h h2{font-size:16px;font-weight:600;letter-spacing:-.1px}
 .notif-h .x{margin-left:auto;width:44px;height:44px;display:grid;place-items:center}
-.notif-h .x svg{width:22px;height:22px;fill:var(--icon-primary)}
+.notif-h .x svg{width:22px;height:22px;color:var(--icon-primary)}
 .notif-b{flex:1;overflow-y:auto}
 .notif-g{padding:var(--s05) var(--s06) var(--s03);font-size:11.5px;font-weight:600;
   letter-spacing:.8px;text-transform:uppercase;color:var(--text-helper)}
@@ -300,7 +300,7 @@
   width:56px;height:56px;display:grid;place-items:center;
   background:var(--brand-primary);color:var(--on-brand);border-radius:var(--radius);
   transition:background var(--dur-short) var(--ease-standard)}
-.tal-fab svg{width:24px;height:24px;fill:var(--on-brand)}
+.tal-fab svg{width:24px;height:24px;color:var(--on-brand)}
 .tal-fab:hover{background:var(--brand-primary-hover)}
 .tal-fab::before{
   content:'';position:absolute;inset:-3px;border:1px solid var(--accent);
@@ -323,7 +323,7 @@
   padding:var(--s05) var(--s04) var(--s05) var(--s06);
   border-bottom:1px solid var(--border-subtle-01)}
 .tal-h .x{margin-left:auto;width:44px;height:44px;display:grid;place-items:center}
-.tal-h .x svg{width:22px;height:22px;fill:var(--icon-primary)}
+.tal-h .x svg{width:22px;height:22px;color:var(--icon-primary)}
 .ai-label{
   display:inline-flex;align-items:center;gap:var(--s02);height:24px;padding:0 var(--s03);
   border:1px solid var(--accent);color:var(--accent-text);
@@ -350,7 +350,7 @@
 .tal-star,.ai-inline{
   display:inline-flex;align-items:center;gap:var(--s02);height:28px;padding:0 var(--s03);
   font-size:11.5px;color:var(--accent-text);flex:none}
-.tal-star svg,.ai-inline svg{width:14px;height:14px;fill:var(--accent-text)}
+.tal-star svg,.ai-inline svg{width:14px;height:14px;color:var(--accent-text)}
 .tal-star:hover{background:var(--brand-tint-2)}
 /* Tal's in-chat widgets */
 .tw{display:flex;flex-direction:column;gap:var(--s03);
@@ -450,7 +450,7 @@
 .thumb{
   width:56px;height:40px;flex:none;position:relative;display:grid;place-items:center;
   background:var(--gray-80);color:var(--on-dark)}
-.thumb svg{width:18px;height:18px;fill:var(--on-dark)}
+.thumb svg{width:18px;height:18px;color:var(--on-dark)}
 .thumb .t{position:absolute;right:2px;bottom:2px;font-size:9.5px;
   background:var(--thumb-scrim);color:var(--pure-white);padding:0 3px;font-variant-numeric:tabular-nums}
 .clip{gap:var(--s04)}
@@ -458,7 +458,7 @@
 .ct{display:block;font-size:14px;font-weight:600;line-height:19px}
 .cq{display:block;margin-top:2px;font-size:12px;color:var(--text-secondary)}
 .conf{padding:var(--s07) var(--gutter);text-align:center}
-.conf svg{width:40px;height:40px;fill:var(--support-success);margin:0 auto var(--s05)}
+.conf svg{width:40px;height:40px;color:var(--support-success);margin:0 auto var(--s05)}
 .box{}
 .w3{min-width:3ch}
 .eb{display:block}

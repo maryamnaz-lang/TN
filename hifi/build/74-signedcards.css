@@ -131,7 +131,7 @@
   flex:none;display:grid;place-items:center;align-self:start;
   width:20px;height:20px;
   color:var(--mk)}
-.app .sig-ic svg{width:20px;height:20px;fill:currentColor}
+.app .sig-ic svg{width:18px;height:18px;fill:currentColor}
 
 .app .sig-b{display:flex;flex-direction:column;gap:var(--s03);min-width:0;flex:1}
 /* the title and its tag share a line, the tag held to the right edge */

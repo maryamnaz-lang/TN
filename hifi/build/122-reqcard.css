@@ -81,7 +81,7 @@
   border-radius:999px;
   background:var(--ai-hl-bg)}
 .rqc-ic{flex:none; width:16px; height:16px; display:grid; place-items:center}
-.rqc-ic svg{width:16px; height:16px; fill:var(--text-secondary); display:block}
+.rqc-ic svg{width:16px; height:16px; color:var(--text-secondary); display:block}
 
 /* THE QUOTE'S MARK IS THE SUMMARY'S STAR — Maryam, 6 Sep 2026: "the star with
    the tal summary … in place of the call card star, same size same colors". The
@@ -116,7 +116,7 @@
    untouched. `.ok` is the green counterpart to `.danger`, scoped to this card. */
 .rqc .btn.danger{background:transparent; border-color:transparent}
 .rqc .btn-p.ok{background:var(--support-success); background-image:none}
-.rqc .btn-p.ok svg{fill:var(--on-brand)}
+.rqc .btn-p.ok svg{color:var(--on-brand)}
 
 /* ---- desktop: three columns divided by the hairline ---- */
 @container app (min-width:900px){

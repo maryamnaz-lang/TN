@@ -123,7 +123,7 @@
 .app .wkc-did > li{display:flex;align-items:flex-start;gap:var(--s04)}
 .app .wkc-tick{flex:none;display:grid;place-items:center;
   width:18px;height:18px;margin-top:1px}
-.app .wkc-tick svg{width:18px;height:18px;fill:var(--support-success-ink)}
+.app .wkc-tick svg{width:18px;height:18px;color:var(--support-success-ink)}
 .app .wkc-db{display:flex;flex-direction:column;min-width:0}
 .app .wkc-db > .u-caption{color:var(--text-helper)}
 /* the empty week reads as a sentence, not as a missing list */

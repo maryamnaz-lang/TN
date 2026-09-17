@@ -16,9 +16,9 @@
 .aw-ic{
   width:36px;height:36px;flex:none;display:grid;place-items:center;
   background:var(--layer-02);margin-top:2px}
-.aw-ic svg{width:20px;height:20px;fill:var(--text-placeholder)}
+.aw-ic svg{width:20px;height:20px;color:var(--text-placeholder)}
 .aw.got .aw-ic{background:var(--accent)}
-.aw.got .aw-ic svg{fill:var(--on-accent)}
+.aw.got .aw-ic svg{color:var(--on-accent)}
 .aw-b{flex:1;min-width:0}
 .aw-n{display:block;font-size:14px;line-height:20px;font-weight:600;letter-spacing:.1px}
 .aw-d{display:block;margin-top:2px;font-size:12.5px;line-height:17px;

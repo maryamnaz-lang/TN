@@ -21,8 +21,8 @@
 .lvl-hero .chev-row{border-bottom-color:var(--on-dark-rule)}
 .lvl-hero .chev-n{color:var(--on-dark)}
 .lvl-hero .chev-d{color:var(--on-dark-2)}
-.lvl-hero .chev-mark svg{fill:var(--on-dark-dim)}
-.lvl-hero .chev-row.on .chev-mark svg,.lvl-hero .chev-row.past .chev-mark svg{fill:var(--accent)}
+.lvl-hero .chev-mark svg{color:var(--on-dark-dim)}
+.lvl-hero .chev-row.on .chev-mark svg,.lvl-hero .chev-row.past .chev-mark svg{color:var(--accent)}
 .lvl-hero .chev-row.past .chev-mark svg{opacity:.5}
 .lvl-hero .bands-note{color:var(--on-dark-2)}
 @container app (min-width:900px){.lvl-hero .big{font-size:48px;line-height:54px;letter-spacing:-1.4px}}
@@ -111,6 +111,6 @@
   .ch{padding-top:var(--s03);padding-bottom:var(--s03)}
   .btn{min-height:44px}
   .tal-panel{left:auto;width:min(480px,100%);border-left:1px solid var(--border-subtle-01)}
-  .notif{max-width:400px}
+  .notif{max-width:450px}
   .sec-h h2{font-size:18px;line-height:24px}
 }

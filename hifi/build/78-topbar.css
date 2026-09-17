@@ -250,7 +250,7 @@
 .app .acct-i-mk{
   flex:none;width:24px;height:24px;
   display:grid;place-items:center;position:relative;overflow:hidden}
-.app .acct-i-mk svg{width:20px;height:20px;fill:var(--icon-primary)}
+.app .acct-i-mk svg{width:20px;height:20px;color:var(--icon-primary)}
 
 /* THE SWITCH ROW'S MARK IS THE OTHER PERSON'S FACE, and it is square because
    `.shell-avatar` two inches above it is square. §56 lets a mark curve — the

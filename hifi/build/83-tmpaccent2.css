@@ -253,7 +253,7 @@
 .app.tmp-accent .rec-a > .btn.rec-see{
   color:var(--accent-text);
   border-color:var(--accent)}
-.app.tmp-accent .rec-a > .btn.rec-see svg{fill:var(--accent-text)}
+.app.tmp-accent .rec-a > .btn.rec-see svg{color:var(--accent-text)}
 
 /* WHAT IS STILL NOT RED, AND IT IS NOW ONLY THE ARTWORK:
      - the award WebPs and the auth photograph. Images cannot follow a token,

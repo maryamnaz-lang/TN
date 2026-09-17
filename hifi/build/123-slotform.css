@@ -63,13 +63,13 @@
    as a static CSS triangle; here it is the real `chevDown` mark, and it turns
    over when the list is open so the field says its own state. 20px to match
    `.btn svg` and `.dd-ic`. */
-.dd-cx{flex:none; width:20px; height:20px; fill:var(--icon-primary);
+.dd-cx{flex:none; width:20px; height:20px; color:var(--icon-primary);
   transition:transform var(--dur-short) var(--ease-standard)}
 .dd.on .dd-cx{transform:rotate(180deg)}
 
 /* THE LEADING CLOCK on the time variant, one step quieter than the chevron
    because it is a label for the field, not a control. */
-.dd-ic{flex:none; width:20px; height:20px; fill:var(--icon-secondary)}
+.dd-ic{flex:none; width:20px; height:20px; color:var(--icon-secondary)}
 
 /* ------------------------------------------------------------------ 123.2 ---
    THE POPUP — .acct-menu's recipe, spanning the field it hangs from. */
@@ -103,7 +103,7 @@
    the tick matches the row's accent WORDS, which §63 §7 colours the same, rather
    than the hotter `--accent` mark red sitting next to a deeper-red word. */
 .dd-opt .dd-tick{flex:none; width:18px; height:18px;
-  fill:var(--accent-text); visibility:hidden}
+  color:var(--accent-text); visibility:hidden}
 .dd-opt.on .dd-tick{visibility:visible}
 /* THE SELECTED ROW HOLDS A GROUND under the accent text — the same overlay the
    rail's selected item takes. The ink is §63 §7's, not this layer's. */

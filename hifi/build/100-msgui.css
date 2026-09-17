@@ -91,7 +91,7 @@
 .app .m-w{display:flex;align-items:center;gap:var(--s02)}
 .app .m.me .m-w{justify-content:flex-end}
 .app .m-tick{display:inline-flex;flex:none}
-.app .m-tick svg{width:15px;height:15px;fill:var(--accent);display:block}
+.app .m-tick svg{width:15px;height:15px;color:var(--accent);display:block}
 
 /* ---- 3. the day marker ---- */
 .app .m-day::before{content:none}

@@ -1141,7 +1141,7 @@
 .app .ob-jr-ic{
   flex:none;display:grid;place-items:center;
   width:22px;height:22px;margin-top:1px}
-.app .ob-jr-ic svg{width:20px;height:20px;fill:currentColor}
+.app .ob-jr-ic svg{width:18px;height:18px;fill:currentColor}
 
 /* >>> `.ob-qp-skip` IS DELETED WITH QUESTION 5 (3 Sep 2026) — a rule keyed on
    a class nothing writes is the "gate nothing writes" tell. Its one line is

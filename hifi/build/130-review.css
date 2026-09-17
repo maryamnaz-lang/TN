@@ -129,22 +129,22 @@
   background:var(--background);border:1px solid var(--rule);border-radius:999px;
   box-shadow:var(--rev-shadow);cursor:pointer}
 .app .rev-cap-ic{flex:none;display:inline-flex;line-height:0}
-.app .rev-cap-ic svg{width:14px;height:14px;fill:var(--accent)}
+.app .rev-cap-ic svg{width:14px;height:14px;color:var(--accent)}
 
 /* THE CLOSE X — top-right of the open card, in the header's inset; collapses back
    to the capsule. A bare ink glyph, no chip, like every other close mark. */
 .app .rev-x{
   position:absolute;top:var(--s04);right:var(--s04);
   background:none;border:0;padding:var(--s02);cursor:pointer;line-height:0}
-.app .rev-x svg{width:20px;height:20px;fill:var(--icon-primary)}
+.app .rev-x svg{width:20px;height:20px;color:var(--icon-primary)}
 
 /* THE HEADER — a bare ink mark inline with the heading. The mark is 16px, one
    step under §63's 20px marks (Maryam, 14 Sep 2026: "reduce the size of the icon
    with how was this course") so it sits with the title rather than over it. */
 .app .rev-head{display:flex;align-items:center;justify-content:center;gap:var(--s03)}
 .app .rev-ic{flex:none;display:inline-flex;line-height:0}
-.app .rev-ic svg{width:16px;height:16px;fill:var(--icon-primary)}
-.app .rev-ic-ok svg{fill:var(--support-success)}
+.app .rev-ic svg{width:16px;height:16px;color:var(--icon-primary)}
+.app .rev-ic-ok svg{color:var(--support-success)}
 .app .rev-sub{margin-top:var(--s02);margin-bottom:var(--s06)}
 
 /* THE STAR ROW. A bare button per star; no label above it any more (Maryam, 14
@@ -162,14 +162,14 @@
 .app .rev-star{
   background:none;border:0;padding:0;cursor:pointer;
   line-height:0;display:inline-flex}
-.app .rev-star svg{width:26px;height:26px;fill:var(--border-strong-01);display:block}
+.app .rev-star svg{width:26px;height:26px;color:var(--border-strong-01);display:block}
 /* A LIT STAR IS THE ACCENT HERE (Maryam, 14 Sep 2026: "the filled stars colors
    should be the accent color"). This is a SCOPED exception to DESIGN.md §3's "the
    rating star is always --star gold, never the accent": that rule governs the
    read-only `.stars` rating shown across the portals; this is the review widget's
    own interactive picker, and only `.rev-star.on` is repointed. The global
    `.stars` still reads `--star`. */
-.app .rev-star.on svg{fill:var(--accent)}
+.app .rev-star.on svg{color:var(--accent)}
 
 /* THE NOTE — the shared `.inp` textarea, taller here. No character counter
    (Maryam, 14 Sep 2026: "remove 0/500") and no label (Maryam: "remove the Your

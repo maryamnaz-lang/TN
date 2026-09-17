@@ -85,7 +85,7 @@
    but `.app .sn-item.on` is stated at (0,3,0) anyway so a later `.sn-item.on`
    rule cannot take it back on order.
    -------------------------------------------------------------------------- */
-.app .sn-item.on svg{fill:var(--accent)}
+.app .sn-item.on svg{color:var(--accent)}
 
 /* --------------------------------------------------------------------------
    3. THE MARK IS THE MENU
@@ -158,7 +158,7 @@
      the two at the same optical weight. */
   .app .nav-t-mark,
   .app .nav-t-menu{display:grid;place-items:center;grid-area:1 / 1}
-  .app .nav-t-mark svg{width:21px;height:21px;fill:var(--icon-primary)}
+  .app .nav-t-mark svg{width:21px;height:21px;color:var(--icon-primary)}
   .app .nav-t-menu{display:none}
   .app .shell-act.nav-t:hover .nav-t-mark{display:none}
   .app .shell-act.nav-t:hover .nav-t-menu{display:grid}

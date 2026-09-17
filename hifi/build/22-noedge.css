@@ -76,21 +76,21 @@ button.btn-p:active,
 .app .tal-fab:hover,.app .tal-fab:focus-visible{
   background-color:var(--accent);
   background-image:var(--accent-grad);
-  color:var(--on-accent);border-color:transparent;--on-brand-fill:1}
+  color:var(--on-accent);border-color:transparent;--on-brand-color:1}
 
 /* the sign-up button already WEARS the gradient at rest, so its hover has
    to go somewhere: one stop deeper, which is where pressed used to be. */
 .auth-card .btn-p:hover{
   background-color:var(--accent-2);
   background-image:var(--accent-grad-hover);
-  color:var(--on-accent);border-color:transparent;--on-brand-fill:1}
+  color:var(--on-accent);border-color:transparent;--on-brand-color:1}
 
 .btn.btn-p:active,button.btn-p:active,.btn-p:active,
 .auth-card .btn-p:active,
 .app .tal-fab:active{
   background-color:var(--accent-2);
   background-image:var(--accent-grad-hover);
-  border-color:transparent;--on-brand-fill:1}
+  border-color:transparent;--on-brand-color:1}
 
 /* ==========================================================================
    THE TAL CHIP IS FILLED

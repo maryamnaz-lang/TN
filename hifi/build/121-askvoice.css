@@ -63,7 +63,7 @@
   background:var(--surface-2);cursor:pointer}
 .app .ask-page .askrec-x:active,
 .app .ask-page .askrec-stop:active{background:var(--surface-3)}
-.app .ask-page .askrec-x svg{width:20px;height:20px;fill:var(--text-secondary);display:block}
+.app .ask-page .askrec-x svg{width:20px;height:20px;color:var(--text-secondary);display:block}
 .app .ask-page .askrec-stop .askrec-sq{
   width:13px;height:13px;border-radius:3px;background:var(--text-primary)}
 
@@ -73,9 +73,9 @@
   display:grid;place-items:center;
   border:0;border-radius:999px;
   background-image:var(--accent-grad);background-color:var(--accent);
-  cursor:pointer;--on-brand-fill:1}
+  cursor:pointer;--on-brand-color:1}
 .app .ask-page .askrec-send:active{background-color:var(--accent-2)}
-.app .ask-page .askrec-send svg{width:22px;height:22px;fill:var(--on-accent);display:block}
+.app .ask-page .askrec-send svg{width:22px;height:22px;color:var(--on-accent);display:block}
 
 /* while transcribing, the send disc is busy — a quiet spinner over the arrow,
    the reference's own "working" state; the arrow is hidden under it */

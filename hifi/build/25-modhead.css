@@ -149,7 +149,7 @@
   grid-column:3;grid-row:1;justify-self:end;align-self:center;
   flex:none;min-height:36px;padding:0 var(--s05);
   background-color:var(--accent);background-image:var(--accent-grad);
-  color:var(--on-accent);border-color:transparent;--on-brand-fill:1}
+  color:var(--on-accent);border-color:transparent;--on-brand-color:1}
 /* the body and everything under it still belong to column two: the action
    is beside the heading, not above the sentence */
 .app .ai-aura.ai-act-top > .ai-body,

@@ -503,7 +503,7 @@
     color:transparent;
     -webkit-text-fill-color:transparent;
     /* the flag §19 and §01.40 explain — the contrast sweep reads it */
-    --on-brand-fill:1}
+    --on-brand-color:1}
 }
 
 /* THE DARK-BUBBLE GUARD IS GONE WITH THE DARK BUBBLE. This used to paint a
@@ -551,8 +551,8 @@
   display:inline-flex;flex:none;line-height:0}
 .app :is(.tal-msg > .bb, .ob-m-t) .tw-ic svg{
   width:16px;height:16px;display:block;
-  fill:var(--icon-secondary)}
-.app :is(.tal-msg > .bb, .ob-m-t) .tw-ic.acc svg{fill:var(--accent-text)}
+  color:var(--icon-secondary)}
+.app :is(.tal-msg > .bb, .ob-m-t) .tw-ic.acc svg{color:var(--accent-text)}
 
 /* ------------------------------------------------------------------ 14 ---
    THE LEVEL LADDER IS TALLER AND HAS THREE STATES — Maryam, 9 Sep 2026, off

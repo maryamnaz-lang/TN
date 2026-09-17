@@ -63,5 +63,5 @@
   flex:none;display:grid;place-items:center;
   width:36px;height:36px;border-radius:999px;
   background:color-mix(in srgb, var(--mk) 12%, var(--layer-01))}
-.app .aw-ph svg{width:20px;height:20px;fill:var(--icon-primary)}
+.app .aw-ph svg{width:18px;height:18px;color:var(--icon-primary)}
 .app .aw:has(> .aw-ph){align-items:center}

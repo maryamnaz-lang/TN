@@ -67,7 +67,7 @@
   background:var(--support-success-bg);
   box-shadow:0 0 0 12px color-mix(in srgb, var(--support-success) 12%, transparent),
              0 0 0 13px color-mix(in srgb, var(--support-success) 24%, transparent)}
-.app .conf.conf-ok .conf-mk svg{fill:var(--support-success)}
+.app .conf.conf-ok .conf-mk svg{color:var(--support-success)}
 
 /* ------------------------------------------------------------------ 109.2 ---
    IT ARRIVES WITH THE PAGE, SO IT NEEDS AN ENTRANCE OF ITS OWN

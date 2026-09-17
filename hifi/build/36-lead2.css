@@ -67,7 +67,7 @@
 .app .ldr-tr{cursor:pointer}
 .app .ldr-tr .ldr-go{width:24px;vertical-align:middle}
 .app .ldr-tr .ldr-go svg{
-  width:18px;height:18px;display:inline-block;fill:var(--icon-secondary)}
+  width:18px;height:18px;display:inline-block;color:var(--icon-secondary)}
 
 /* The keyboard gets the same affordance as the mouse. A `tr` cannot be a
    `button`, so it carries `role` and `tabindex` in the markup and its focus
@@ -238,7 +238,7 @@
    -------------------------------------------------------------------------- */
 .app .ldr-on{
   background-color:color-mix(in srgb, var(--accent) 8%, transparent)}
-.app .ldr-on .tile-arrow{fill:var(--accent)}
+.app .ldr-on .tile-arrow{color:var(--accent)}
 
 /* --------------------------------------------------------------------------
    §36.7 A NOTE, AND THE ONE CONTROL THAT DELETES SOMETHING
@@ -266,9 +266,9 @@
 .app .ldr-note-x{
   width:36px;height:36px;display:grid;place-items:center;flex:none;
   border-radius:var(--radius-sm)}
-.app .ldr-note-x svg{width:18px;height:18px;fill:var(--icon-secondary)}
+.app .ldr-note-x svg{width:18px;height:18px;color:var(--icon-secondary)}
 .app .ldr-note-x:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
-.app .ldr-note-x:focus-visible svg{fill:var(--danger-ink)}
+.app .ldr-note-x:focus-visible svg{color:var(--danger-ink)}
 
 /* --------------------------------------------------------------------------
    §36.8 THE STEPS LIST TAKES A TICK
@@ -280,7 +280,7 @@
    everything else about the row is `.steps`.
    -------------------------------------------------------------------------- */
 .app .steps .s-n svg{
-  width:18px;height:18px;display:block;fill:var(--support-success)}
+  width:18px;height:18px;display:block;color:var(--support-success)}
 
 /* --------------------------------------------------------------------------
    §36.9 TWO MORE WRAPPERS JOIN §10.15's OPT-OUT LIST

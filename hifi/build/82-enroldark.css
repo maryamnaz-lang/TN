@@ -118,7 +118,7 @@
    card's supporting ink and is what §63 §20 gives the labels beside them, so
    the mark and its words are one colour. A `fill` is not one of §63's four
    properties, which is why it is stated here and the text is stated there. */
-.app .dark-card .eo-fi svg{fill:var(--on-dark-2)}
+.app .dark-card .eo-fi svg{color:var(--on-dark-2)}
 
 /* ------------------------------------------------------------------ 82.3 ---
    THE DATE CHIP KEEPS ITS SHAPE AND CHANGES ITS GROUND
@@ -187,8 +187,8 @@
    for "Curated for your growth" and its note explains why the course preview is
    not allowed the accent. Blue is §74's third finding card, Priya's own note,
    which is the half of "what the interview found" a reader remembers. */
-.app .qa-ic.ic-cover svg{fill:var(--icon-primary)}
-.app .qa-ic.ic-found svg{fill:var(--icon-primary)}
+.app .qa-ic.ic-cover svg{color:var(--icon-primary)}
+.app .qa-ic.ic-found svg{color:var(--icon-primary)}
 
 /* ------------------------------------------------------------------ 82.5 ---
    THE `.keep-place` CLOSING-RULE FIX IS DELETED, AND THE NOTE IS THE POINT

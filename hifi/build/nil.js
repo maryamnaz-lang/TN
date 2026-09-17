@@ -205,7 +205,15 @@ result: () => nilPage('wide', `
         <div class="nil-steps">
           <span class="nil-step">${I.book}<span>Builder<br>Playbook</span></span>
           <span class="nil-step">${NI.work}<span>Builder<br>Toolkit</span></span>
-          <button class="nil-step live" data-go="consult1">${I.chat}<span>Connect with<br>Talent Next Agent</span></button>
+          ${''/* CONNECT GOES STRAIGHT TO ACCOUNT CREATION (Maryam, 16 Sep 2026:
+                "hide these two screens ... the screen before these with button
+                Connect with a Talent Agent will take them to the account creation
+                prototype"). The two consultant-form steps (`consult1`, `consult2`)
+                and the "You're in" hand-off (`done`) are skipped — the button now
+                targets the same `stage:signup/create` that `done` used to. The
+                three views stay defined and deep-link reachable, so restoring the
+                questionnaire is a one-line revert back to `data-go="consult1"`. */}
+          <button class="nil-step live" data-go="stage:signup/create">${I.chat}<span>Connect with<br>Talent Next Agent</span></button>
         </div>
       </div>
     </div>

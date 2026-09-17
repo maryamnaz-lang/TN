@@ -105,7 +105,7 @@
 .tx-srch{position:relative;display:flex;align-items:center;margin-bottom:var(--s05)}
 .tx-srch svg{
   position:absolute;left:var(--s04);width:18px;height:18px;
-  fill:var(--text-helper);pointer-events:none}
+  color:var(--text-helper);pointer-events:none}
 .tx-srch .inp{padding-left:var(--s08)}
 .tx-filters{display:flex;flex-wrap:wrap;gap:var(--s03);margin-bottom:var(--s05)}
 .tx-f{
@@ -124,7 +124,7 @@
 .tx-b{display:flex;flex-direction:column;gap:var(--s02);min-width:0}
 .tx-w{display:flex;align-items:center;gap:var(--s03)}
 .tx-scene{display:inline-flex;align-items:center;gap:var(--s02)}
-.tx-scene svg{width:14px;height:14px;fill:var(--support-attention);display:block}
+.tx-scene svg{width:14px;height:14px;color:var(--support-attention);display:block}
 .tx-x{overflow-wrap:anywhere}
 .tx-x mark{background-color:var(--accent-tint);color:inherit}
 

@@ -99,7 +99,7 @@
 .app .fdd-t{display:inline-flex; align-items:center; gap:var(--s02);
   min-height:36px; padding:0 var(--s04); background:var(--layer-01);
   border:1px solid var(--rule); cursor:pointer; white-space:nowrap}
-.app .fdd-cx{flex:none; width:16px; height:16px; fill:var(--icon-secondary);
+.app .fdd-cx{flex:none; width:16px; height:16px; color:var(--icon-secondary);
   transition:transform var(--dur-short) var(--ease-standard)}
 .app .fdd.on .fdd-cx{transform:rotate(180deg)}
 .app .fdd-menu{

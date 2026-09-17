@@ -55,7 +55,7 @@
 .chev{display:inline-flex;flex:none;align-items:center;justify-content:center;
   width:24px;height:24px;
   transition:transform var(--dur-short) var(--ease-standard)}
-.chev svg{width:22px;height:22px;fill:var(--icon-secondary)}
+.chev svg{width:22px;height:22px;color:var(--icon-secondary)}
 .acc-i.on .chev{transform:rotate(180deg)}
 .acc-b{
   display:none;padding:0 var(--gutter) var(--s05);
@@ -110,7 +110,7 @@
 .stp-t{
   margin-left:auto;display:inline-flex;align-items:center;gap:var(--s02);flex:none;
   min-height:32px;font-size:12.5px;font-weight:500;color:var(--text-primary)}
-.stp-t svg{width:18px;height:18px;fill:var(--icon-secondary)}
+.stp-t svg{width:18px;height:18px;color:var(--icon-secondary)}
 .stp.open .stp-t svg{transform:rotate(180deg)}
 .stp-now{margin-top:var(--s03)}
 .stp-now .pi-lab{font-size:15px;font-weight:600;line-height:21px}
@@ -140,11 +140,11 @@
    38. ODDS AND ENDS
    ========================================================================== */
 .cert-mark{display:grid;place-items:center;width:48px;height:48px;margin:0 auto var(--s05)}
-.cert-mark svg{width:40px;height:40px;fill:var(--accent)}
+.cert-mark svg{width:40px;height:40px;color:var(--accent)}
 .cert{text-align:center;background:var(--surface-dark);color:var(--on-dark)}
 .cert h3,.cert .t-heading-02{color:var(--on-dark)}
 .cert .sub,.cert .help{color:var(--on-dark-2)}
-.empty svg{width:32px;height:32px;fill:var(--text-placeholder);margin:0 auto var(--s04)}
+.empty svg{width:32px;height:32px;color:var(--text-placeholder);margin:0 auto var(--s04)}
 .empty h3{font-size:16px;font-weight:600;margin-bottom:var(--s02);color:var(--text-primary)}
 .empty p{font-size:13px;line-height:19px;color:var(--text-secondary)}
 .ttl{font-weight:600}

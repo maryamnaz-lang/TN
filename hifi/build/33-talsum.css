@@ -111,9 +111,9 @@
    own wash runs the whole column. `p` is named as well as the wrapper
    because §05 caps `.ai-body` and `.ai-body p` separately.
 
-   THE DESCRIPTION IS --tal-sum-desc (#6b6b6b), A GREY DESCRIPTION ONE STEP
-   DARKER THAN THE REST — Maryam, 15 Sep 2026, platform-wide ("the tal summary
-   desc needs to be a little darker than what it is right now"). It was set to
+   THE DESCRIPTION IS --tal-sum-desc (#414141), A DARK GREY WELL AHEAD OF THE
+   REST — Maryam, 15 Sep 2026, platform-wide ("the tal summary desc needs to be
+   a little darker", then set to #414141). It was set to
    the plain --text-secondary #828282 (9 Sep 2026, Figma 871:6425: "the
    description color to be #828282") — the same grey every other description
    takes — which in turn REVERSED an earlier flat #000. The body is now one
@@ -478,9 +478,9 @@
   display:grid;place-items:center;
   background-color:var(--layer-01);
   border:0}
-.app .stp .stp-pop .pi-ic svg{width:19px;height:19px;fill:var(--gray-40)}
-.app .stp .stp-pop .pi-step.done .pi-ic svg{fill:var(--support-success)}
-.app .stp .stp-pop .pi-step.on   .pi-ic svg{fill:var(--support-attention)}
+.app .stp .stp-pop .pi-ic svg{width:19px;height:19px;color:var(--gray-40)}
+.app .stp .stp-pop .pi-step.done .pi-ic svg{color:var(--support-success)}
+.app .stp .stp-pop .pi-step.on   .pi-ic svg{color:var(--support-attention)}
 
 /* THE TEXT COLUMN, AND THE ONE ROW THAT IS SET IN FULL INK. A panel where
    every label is `--text-primary` is five equal rows and the reader has to

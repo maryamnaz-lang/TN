@@ -160,7 +160,7 @@
 .app .lvl-hero .ladder-track i.mine{
   background-color:var(--accent);
   background-image:var(--accent-grad);
-  --on-brand-fill:1}
+  --on-brand-color:1}
 
 /* A LEVEL YOU HAVE CLIMBED IS NOT A LEVEL YOU HAVE HALF CLIMBED.
    `.done` had the same `opacity` treatment as `.mine` above — §15 sets .42
@@ -297,8 +297,8 @@
   background-image:var(--accent-grad);
   color:var(--on-accent);
   border-color:transparent;
-  --on-brand-fill:1}
-.app .lead-b .lead-a .btn svg{fill:var(--on-accent)}
+  --on-brand-color:1}
+.app .lead-b .lead-a .btn svg{color:var(--on-accent)}
 
 @container app (min-width:900px){
   .app .lead-b{
@@ -516,7 +516,7 @@
    1.1:1, an empty box. It takes `--icon-primary`, which is what every other
    mark in that family already uses. Only the promotion band draws this, so
    it was one glyph on one stage, invisible in plain sight. */
-.app .ach > .ach-ic svg{fill:var(--icon-primary)}
+.app .ach > .ach-ic svg{color:var(--icon-primary)}
 
 /* the two lines. A band is not a list row, so the title carries a step more
    size than `.ach-t` inherits from §02's shared list-text definition. */
@@ -1042,7 +1042,7 @@
   background-color:transparent;
   background-image:none}
 .app .page .stats > .stat > .stat-ic svg{
-  width:20px;height:20px;fill:var(--icon-primary)}
+  width:18px;height:18px;color:var(--icon-primary)}
 
 /* one hue per cell, by position. `--mk` is inherited by the chip and the
    glyph from the cell, so the wash and the mark can only ever agree. */

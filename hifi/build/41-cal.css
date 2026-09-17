@@ -88,7 +88,7 @@
 .app .cal-b{
   display:grid;place-items:center;width:36px;height:36px;
   background:transparent;border:0;border-radius:999px}
-.app .cal-b svg{width:22px;height:22px;fill:var(--icon-primary);display:block}
+.app .cal-b svg{width:22px;height:22px;color:var(--icon-primary);display:block}
 /* one chevron glyph, flipped for the previous control */
 .app .cal-b-prev svg{transform:scaleX(-1)}
 .app .cal-b:hover{background:var(--overlay-hover);cursor:pointer}
@@ -166,14 +166,14 @@
    block's 8px because a ~20px chip reads over-rounded at 8. No border, no
    button; the row opens the card. */
 .app .cal-slot{
-  --cal-fill:var(--cal-open);
+  --cal-color:var(--cal-open);
   display:flex;align-items:center;gap:var(--s02);
   width:100%;text-align:left;
   padding:2px var(--s03);
   background-color:var(--cal-fill);border:0;border-radius:6px}
 .app .cal-slot:hover{cursor:pointer}
-.app .cal-slot.k-iv{--cal-fill:var(--cal-iv)}
-.app .cal-slot.k-reiv{--cal-fill:var(--cal-reiv)}
+.app .cal-slot.k-iv{--cal-color:var(--cal-iv)}
+.app .cal-slot.k-reiv{--cal-color:var(--cal-reiv)}
 .app .cal-el{
   min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
   font-size:var(--t-label-size);line-height:var(--t-label-lh);color:var(--text-primary)}
@@ -230,7 +230,7 @@
 .app .cal-pop-x{
   flex:none;display:grid;place-items:center;width:24px;height:24px;
   margin:-4px -6px 0 0;background:transparent}
-.app .cal-pop-x svg{width:16px;height:16px;fill:var(--icon-secondary);display:block}
+.app .cal-pop-x svg{width:16px;height:16px;color:var(--icon-secondary);display:block}
 .app .cal-pop-x:hover{cursor:pointer}
 .app .cal-pop-t{
   margin:0 0 var(--s05);
@@ -407,15 +407,15 @@
    it. The nudge is small enough that the block still lands unmistakably on its
    own hour line. */
 .app .calw-ev{
-  --cal-fill:var(--cal-open);
+  --cal-color:var(--cal-open);
   position:absolute;left:4px;right:4px;
   top:calc(var(--top) * var(--row) + 3px);
   min-height:calc(var(--dur) * var(--row) - 6px);
   display:flex;flex-direction:column;gap:2px;
   padding:var(--s03);text-align:left;overflow:hidden;
   background-color:var(--cal-fill);border:0;border-radius:8px}
-.app .calw-ev.k-iv{--cal-fill:var(--cal-iv)}
-.app .calw-ev.k-reiv{--cal-fill:var(--cal-reiv)}
+.app .calw-ev.k-iv{--cal-color:var(--cal-iv)}
+.app .calw-ev.k-reiv{--cal-color:var(--cal-reiv)}
 .app .calw-ev.on{box-shadow:inset 0 0 0 1.5px var(--text-primary)}
 .app .calw-ev:hover{cursor:pointer}
 .app .calw-ev-t{

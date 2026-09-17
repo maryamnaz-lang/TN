@@ -84,7 +84,7 @@
 .app .lrn-tk{
   flex:none;display:grid;place-items:center;
   width:20px;height:20px;margin-top:1px}
-.app .lrn-tk svg{width:20px;height:20px;fill:var(--accent)}
+.app .lrn-tk svg{width:20px;height:20px;color:var(--accent)}
 .app .lrn-t{min-width:0}
 
 /* ------------------------------------------------------------------ 87.1a ---

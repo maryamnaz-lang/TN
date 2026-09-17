@@ -220,7 +220,7 @@
 .app .lvl-hero .lvl-foot .eb{
   display:flex;align-items:center;gap:var(--s03);margin:0;flex:1 1 auto}
 .app .lvl-hero .lvl-foot .eb-ok{display:inline-flex;flex:none}
-.app .lvl-hero .lvl-foot .eb-ok svg{width:16px;height:16px;fill:var(--support-success)}
+.app .lvl-hero .lvl-foot .eb-ok svg{width:16px;height:16px;color:var(--support-success)}
 .app .lvl-hero .lvl-foot-a{display:flex;align-items:center;gap:var(--s04);flex:none}
 .app .lvl-hero .lvl-foot-a .btn{width:auto;flex:none}
 
@@ -335,7 +335,7 @@
    the card's own hairline with the card's own ink.
    ========================================================================== */
 .app .lvl-hero .lvl-foot-a .btn{color:var(--on-dark);border-color:var(--on-dark-rule)}
-.app .lvl-hero .lvl-foot-a .btn svg{fill:var(--on-dark)}
+.app .lvl-hero .lvl-foot-a .btn svg{color:var(--on-dark)}
 .app .lvl-hero .lvl-foot-a .btn.btn-p{
   background:var(--on-dark);color:var(--surface-dark);border-color:transparent}
-.app .lvl-hero .lvl-foot-a .btn.btn-p svg{fill:var(--surface-dark)}
+.app .lvl-hero .lvl-foot-a .btn.btn-p svg{color:var(--surface-dark)}

@@ -58,7 +58,7 @@
   display:grid;place-items:center;width:44px;height:44px;
   background-color:rgba(255,255,255,.92)}
 .app .scene-play svg{
-  width:20px;height:20px;fill:var(--gray-100);display:block;
+  width:20px;height:20px;color:var(--gray-100);display:block;
   /* the glyph is a triangle and a triangle centred on its bounding box reads
      left of centre, because its mass is not where its box is */
   margin-left:2px}
@@ -309,7 +309,7 @@
   display:grid;place-items:center;
   border:1.5px solid var(--border-strong-01);
   background-color:var(--layer-01)}
-.app .scene-box svg{width:16px;height:16px;fill:var(--on-brand);opacity:0;display:block}
+.app .scene-box svg{width:16px;height:16px;color:var(--on-brand);opacity:0;display:block}
 .app .scene-sel.on .scene-box{
   background-color:var(--accent);
   background-image:var(--accent-grad);

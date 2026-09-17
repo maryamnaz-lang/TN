@@ -47,7 +47,7 @@
   display:grid;place-items:center;
   width:40px;height:40px;
   background:var(--note-bg,var(--layer-02))}
-.app .note-mk svg{width:20px;height:20px;fill:var(--note-ink,var(--text-secondary))}
+.app .note-mk svg{width:18px;height:18px;color:var(--note-ink,var(--text-secondary))}
 .app .note-dot{
   position:absolute;right:-3px;bottom:-3px;
   width:8px;height:8px;border-radius:999px;
@@ -67,7 +67,7 @@
   display:flex;flex-direction:column;align-items:center;text-align:center;
   gap:var(--s04);padding:var(--s08) var(--s06)}
 .app .note-mk-lg{width:56px;height:56px;background:var(--layer-02)}
-.app .note-mk-lg svg{width:28px;height:28px;fill:var(--text-helper)}
+.app .note-mk-lg svg{width:28px;height:28px;color:var(--text-helper)}
 /* The measure is the reason this is stated at all: centred prose with no cap
    runs the panel's full width and the two lines break at different places on
    every screen. 46ch is §63's reading measure for a short block. */
@@ -94,7 +94,7 @@
   position:relative;display:flex;align-items:center}
 .app .note-srch svg{
   position:absolute;left:var(--s03);width:16px;height:16px;
-  fill:var(--icon-secondary);pointer-events:none}
+  color:var(--icon-secondary);pointer-events:none}
 .app .note-srch .inp{width:180px;padding-left:calc(var(--s03) * 2 + 16px)}
 .app .note-sel{width:auto}
 /* THE LIST IS THE SECTION'S OWN WIDTH AND HAS NO FRAME. `.note-panel` keeps its
@@ -146,7 +146,7 @@
   display:grid;grid-template-columns:auto minmax(0,1fr);
   gap:var(--s05);align-items:start;padding:var(--s05) 0}
 .app .note-mk-w{background:var(--layer-02)}
-.app .note-mk-w svg{fill:var(--text-secondary)}
+.app .note-mk-w svg{color:var(--text-secondary)}
 /* THE TITLE STANDS OFF THE BOX (Maryam, 2 Sep 2026: "give add a title row and
    the note block some space, they are too attached right now"). It was `--s03`,
    which is the gap BETWEEN two fields of one form — right when the two were a
@@ -247,7 +247,7 @@
   position:absolute;inset:0;width:100%;height:100%;
   opacity:0;border:0;padding:0;cursor:pointer}
 .app .note-sel-ch{display:inline-flex;pointer-events:none}
-.app .note-sel-ch svg{width:16px;height:16px;fill:var(--icon-secondary)}
+.app .note-sel-ch svg{width:16px;height:16px;color:var(--icon-secondary)}
 /* THE CANCEL'S ARROW NEEDED (0,4,0). §64 draws it as a `mask-image` on an
    `::after` with `content:''`, and its selector carries `:not(:has(svg))` —
    `:not()` and `:has()` both take their argument's specificity, so that rule is

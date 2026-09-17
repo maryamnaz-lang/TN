@@ -220,7 +220,7 @@
   position:absolute;right:2px;bottom:2px;z-index:2;width:26px;height:26px;
   display:grid;place-items:center;border-radius:999px;background:var(--link);
   box-shadow:0 0 0 2px var(--background)}
-.idphoto-edit svg{width:14px;height:14px;fill:var(--on-brand)}
+.idphoto-edit svg{width:14px;height:14px;color:var(--on-brand)}
 .idphoto:hover .idphoto-edit{background:var(--link-hover)}
 .idhead-b{display:flex;flex-direction:column;gap:3px;min-width:0;align-items:flex-start}
 .app .idname{font-size:17px;line-height:23px;font-weight:600;letter-spacing:-.2px}
@@ -267,7 +267,7 @@
 .photo-ph{width:160px;height:160px;border-radius:999px;
   display:grid;place-items:center;
   background:var(--surface-2);border:1px solid var(--rule)}
-.photo-ph svg{width:56px;height:56px;fill:var(--border-strong-01)}
+.photo-ph svg{width:56px;height:56px;color:var(--border-strong-01)}
 .photogrid.avgrid{grid-template-columns:repeat(5,1fr);width:100%}
 
 /* the two remaining off-scale strings */

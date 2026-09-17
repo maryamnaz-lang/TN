@@ -486,8 +486,8 @@
   background-image:var(--accent-grad);
   color:var(--on-accent);
   border-color:transparent;
-  --on-brand-fill:1}
-.app .dark-card .btn.btn-p svg{fill:var(--on-accent)}
+  --on-brand-color:1}
+.app .dark-card .btn.btn-p svg{color:var(--on-accent)}
 
 /* ------------------------------------------------------------------ 75.4 ---
    THE SKELETON'S BARS ON A BLACK GROUND

@@ -33,7 +33,7 @@
 .app .pgn-dd-t{display:inline-flex; align-items:center; gap:var(--s02);
   min-height:32px; padding:0 var(--s03); background:var(--layer-01);
   border:1px solid var(--rule); cursor:pointer}
-.app .pgn-dd-cx{flex:none; width:16px; height:16px; fill:var(--icon-secondary);
+.app .pgn-dd-cx{flex:none; width:16px; height:16px; color:var(--icon-secondary);
   transition:transform var(--dur-short) var(--ease-standard)}
 .app .pgn-dd.on .pgn-dd-cx{transform:rotate(180deg)}
 .app .pgn-dd-menu{

@@ -170,7 +170,7 @@
   font-variant-numeric:tabular-nums;
   color:var(--text-secondary)}
 .app .wing-lvl .ladder i > b{font-weight:600;font-style:normal;display:block}
-.app .wing-lvl .ladder i.done{color:var(--on-accent);--on-brand-fill:1}
+.app .wing-lvl .ladder i.done{color:var(--on-accent);--on-brand-color:1}
 .app .wing-lvl .ladder i.on{color:var(--text-primary)}
 
 /* --------------------------------------------------------------------- 2c ---
@@ -386,7 +386,7 @@
   --on-dark-rule:var(--rule);
   /* verify.mjs reads this flag to allow white-on-accent as a stated
      exception; there is no accent ground on this card any more. */
-  --on-brand-fill:0}
+  --on-brand-color:0}
 
 /* THE HAZE GOES WITH THE GROUND. `.dark-glow` is the warm light off the
    top-right corner and §21 gives it `opacity:.22` of `--accent` — over black

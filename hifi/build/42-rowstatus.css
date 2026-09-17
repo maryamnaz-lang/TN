@@ -70,14 +70,14 @@
   display:inline-flex;align-items:center;gap:var(--s03)}
 
 .app .row-st{display:inline-flex;flex:none}
-.app .row-st svg{display:block;width:15px;height:15px;fill:var(--gray-40)}
-.app .row-st.done svg{fill:var(--support-success)}
-.app .row-st.now  svg{fill:var(--support-attention)}
+.app .row-st svg{display:block;width:15px;height:15px;color:var(--gray-40)}
+.app .row-st.done svg{color:var(--support-success)}
+.app .row-st.now  svg{color:var(--support-attention)}
 
 /* the subject mark takes the row's own colour, and keeps the family's box */
 .app .rst-done .cardrow-ic svg,
 .app .rst-now  .cardrow-ic svg,
-.app .rst-wait .cardrow-ic svg{fill:var(--rsi, var(--icon-primary))}
+.app .rst-wait .cardrow-ic svg{color:var(--rsi, var(--icon-primary))}
 
 /* NOTHING HERE HIDES THE TRAILING `.tag`. The pill was the old home of this
    status, and a row carrying both had "Done" at the right edge and a green tick

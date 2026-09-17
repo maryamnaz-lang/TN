@@ -85,7 +85,7 @@ button.btn-p:active,
      remove. The border stays in the box model so nothing shifts by a pixel;
      it just stops being drawn. */
   border-color:transparent;
-  --on-brand-fill:1}
+  --on-brand-color:1}
 
 /* Tal's chip already spends its background-image on the sheen that makes it
    the one live thing on the page. Both layers fit: the sheen rides on top,
@@ -98,7 +98,7 @@ button.btn-p:active,
   background-repeat:no-repeat, no-repeat;
   animation:tal-sheen-grad 3.6s var(--mo-standard) infinite;
   border-color:transparent;
-  --on-brand-fill:1}
+  --on-brand-color:1}
 /* the sheen slides; the ground does not. With two layers, one
    `background-position` moves BOTH — which slid the gradient out of the chip
    and left the flat colour behind it. The keyframes now name a position per
@@ -111,4 +111,4 @@ button.btn-p:active,
 }
 
 /* the sign-up button is the same fill, said the same way */
-.auth-card .btn-p{--on-brand-fill:1}
+.auth-card .btn-p{--on-brand-color:1}

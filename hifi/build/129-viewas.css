@@ -43,7 +43,7 @@
   flex:none; min-height:44px; padding:var(--s03) var(--s05);
   background:var(--brand-tint-2); border-bottom:1px solid var(--rule)}
 .app .viewas-mk{display:inline-flex; flex:none; width:20px; height:20px}
-.app .viewas-mk svg{display:block; width:20px; height:20px; fill:var(--accent-text)}
+.app .viewas-mk svg{display:block; width:20px; height:20px; color:var(--accent-text)}
 .app .viewas-t{flex:1 1 240px; min-width:0}
 .app .viewas-end{flex:none; margin-left:auto; white-space:nowrap}
 

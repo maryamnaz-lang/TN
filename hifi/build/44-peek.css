@@ -93,7 +93,7 @@
 .app .peek-x{
   flex:none;width:32px;height:32px;display:grid;place-items:center;
   background:transparent;border:0;cursor:pointer}
-.app .peek-x svg{width:20px;height:20px;fill:var(--icon-secondary)}
+.app .peek-x svg{width:20px;height:20px;color:var(--icon-secondary)}
 
 .app .peek-b{
   flex:1;min-height:0;overflow-y:auto;
@@ -154,7 +154,7 @@
    land after all of them, and this is the last layer. It belongs with `.stars`
    the day `.stars` gets a layer of its own.
    -------------------------------------------------------------------------- */
-.app .stars svg.f{fill:var(--star)}
+.app .stars svg.f{color:var(--star)}
 
 /* AND THE LAST SECTION DRAWS NO CLOSING RULE. The separator between sections is
    a `::after` hairline on each one, which is right BETWEEN two and wrong under

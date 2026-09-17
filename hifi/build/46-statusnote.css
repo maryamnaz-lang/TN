@@ -60,7 +60,7 @@
 .app .note.succ{background-color:var(--support-success-bg)}
 
 /* the mark takes the ink that was tuned to sit on this ground */
-.app .note.warn svg{fill:var(--support-attention)}
+.app .note.warn svg{color:var(--support-attention)}
 
 /* --------------------------------------------------------------------------
    AND THE LEFT PADDING HAS TO BE SAID AGAIN, INSIDE THE QUERY

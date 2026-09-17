@@ -404,11 +404,11 @@
 .app .auth-card .btn-p:hover{
   background-color:var(--accent);
   background-image:var(--accent-grad);
-  color:var(--on-accent);border-color:transparent;--on-brand-fill:1}
+  color:var(--on-accent);border-color:transparent;--on-brand-color:1}
 .app .auth-card .btn-p:active{
   background-color:var(--accent-2);
   background-image:var(--accent-grad-hover);
-  color:var(--on-accent);border-color:transparent;--on-brand-fill:1}
+  color:var(--on-accent);border-color:transparent;--on-brand-color:1}
 .app .auth-card .btn-p:focus-visible{outline-color:var(--accent)}
 
 @container app (min-width:900px){

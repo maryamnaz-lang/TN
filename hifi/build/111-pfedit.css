@@ -294,7 +294,7 @@
   display:grid;place-items:center;
   width:16px;height:16px;margin:0 calc(var(--s02) * -1) 0 var(--s02);
   padding:0;border:0;background:none;cursor:pointer}
-.app .pfe-chip-x svg{width:14px;height:14px;fill:var(--icon-secondary)}
+.app .pfe-chip-x svg{width:14px;height:14px;color:var(--icon-secondary)}
 .app .pfe-chip-x:focus-visible{outline:2px solid var(--brand-primary);outline-offset:1px}
 /* THE ADD CONTROL IS ON THE ROW, AS ITS LAST ITEM. Under the row it would be a
    third block in a section that is a heading and a list; on the end of it, it
@@ -531,7 +531,7 @@
   flex:none;display:grid;place-items:center;
   align-self:flex-start;
   width:20px;height:20px;margin-top:1px}
-.app .pf-sr-ic svg{width:20px;height:20px;fill:var(--icon-primary)}
+.app .pf-sr-ic svg{width:18px;height:18px;color:var(--icon-primary)}
 
 /* -------------------------------------------------------------------- 15 ---
    THE CONFIRMATION'S TICK IS GREEN — §116's tab, `.note.cl-ok`
@@ -546,7 +546,7 @@
    THE MARK ONLY — the sentence stays in the note's own ink. A green sentence
    would make the block a status banner, which is §74's argument against three
    coloured cards at one-line scale. */
-.app .note.cl-ok > span svg{fill:var(--support-success)}
+.app .note.cl-ok > span svg{color:var(--support-success)}
 
 /* -------------------------------------------------------------------- 12 ---
    THE HEADING ROW'S CONTROLS ARE MARKS
@@ -722,7 +722,7 @@
   display:grid;place-items:center;
   width:32px;height:32px;padding:0;
   border:1px solid var(--rule);background:var(--layer-01);cursor:pointer}
-.app .scv-ch svg{width:18px;height:18px;fill:var(--icon-primary)}
+.app .scv-ch svg{width:18px;height:18px;color:var(--icon-primary)}
 .app .scv-ch:focus-visible{outline:2px solid var(--brand-primary);outline-offset:2px}
 
 /* THE ROW STOPS ON THE PAGE'S OWN RIGHT EDGE AT FULL SCROLL — Maryam, 4 Sep
@@ -776,7 +776,7 @@
   display:grid;place-items:center;
   width:36px;height:36px;border-radius:50%;
   background:rgba(0,0,0,.44)}
-.app .scv-play svg{width:20px;height:20px;fill:#fff}
+.app .scv-play svg{width:20px;height:20px;color:#fff}
 .app .scv-at{
   position:absolute;right:var(--s03);bottom:var(--s03);
   padding:2px var(--s02);

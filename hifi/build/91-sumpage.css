@@ -119,8 +119,8 @@
    taking it here would be re-introducing it on one page.
    `fill:var(--mk)` rather than `currentColor`, per §29's note: the row sets no
    `color` of its own, so there is nothing for the glyph to inherit. */
-.app .sump-fi{flex:none;width:20px;height:20px;display:grid;place-items:center}
-.app .sump-fi svg{width:20px;height:20px;fill:var(--icon-primary)}
+.app .sump-fi{flex:none;width:18px;height:18px;display:grid;place-items:center}
+.app .sump-fi svg{width:18px;height:18px;color:var(--icon-primary)}
 .app .sump-fl{flex:1;min-width:0}
 .app .sump-fv{flex:none;font-variant-numeric:tabular-nums}
 /* the button closes the column and is the width of its words — a 280px
@@ -185,8 +185,8 @@
    cell shouting. */
 .app .sump-r.on{background:var(--support-success-bg)}
 .app .sump-rm{flex:none;width:20px;height:20px;display:grid;place-items:center;margin-top:1px}
-.app .sump-rm svg{width:20px;height:20px;fill:var(--icon-secondary)}
-.app .sump-r.on .sump-rm svg{fill:#00a43c}
+.app .sump-rm svg{width:20px;height:20px;color:var(--icon-secondary)}
+.app .sump-r.on .sump-rm svg{color:#00a43c}
 .app .sump-rb2{display:flex;flex-direction:column;gap:1px;min-width:0}
 
 /* ------------------------------------------------------------------- 91.4 ---
@@ -252,7 +252,7 @@
    `#00a43c` is the product's one green — §71.2, §72, §79, §90 — rather than
    `--support-success` (#24a148), which is the FILL those two tokens split; §01's
    own note makes that distinction where they are declared. */
-.app .note.succ svg{fill:#00a43c}
+.app .note.succ svg{color:#00a43c}
 
 /* ------------------------------------------------------------------- 91.6 ---
    THE CANDIDATE COLUMN IS CENTRED ON ITS OWN COLUMN — Maryam, 2 Sep 2026

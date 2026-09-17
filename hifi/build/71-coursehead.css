@@ -428,7 +428,7 @@
 /* the tick is the same 20px green mark `.rec-v` carries on the recommendation,
    so the one verified badge in the product is one drawing of it */
 .app .crow-v{display:inline-grid;place-items:center;width:20px;height:20px}
-.app .crow-v svg{width:20px;height:20px;fill:#00a43c}
+.app .crow-v svg{width:20px;height:20px;color:#00a43c}
 
 /* 185 x 40 AND 8 BETWEEN — 600:7760/7750/7737 and 608:7790/7791/7794, which are
    the same pair in both states and also §70.5's box, so the two AI-native heads
@@ -489,7 +489,7 @@
 .app .crow-a > .btn-p{
   background-image:var(--accent-grad);
   border-color:transparent;
-  --on-brand-fill:1}
+  --on-brand-color:1}
 
 /* -------------------------------------------------------------------- 2a ---
    INSIDE THE DAY THE CELL IS THE ACCENT — 608:7774
@@ -509,7 +509,7 @@
 .app .crow.urgent .crow-when{
   background-color:var(--accent);
   background-image:var(--accent-grad);
-  --on-brand-fill:1}
+  --on-brand-color:1}
 
 /* -------------------------------------------------------------------- 2b ---
    WHERE THE ROW SITS, AND IT IS THE SAME GEOMETRY IN BOTH PLACES

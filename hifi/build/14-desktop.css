@@ -71,7 +71,7 @@
   .app .sn-item{
     min-height:48px;padding:0;gap:0;justify-content:center;
     border-top:0;position:relative}
-  .app .sn-item svg{display:block;width:22px;height:22px}
+  .app .sn-item svg{display:block;width:20px;height:20px}
   .app .sn-item > span:not(.badge){
     position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
   .app .sn-item .badge{

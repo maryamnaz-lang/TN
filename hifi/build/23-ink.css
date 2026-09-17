@@ -33,11 +33,11 @@
 .app .note .nb b{color:var(--text-primary)}
 
 /* information is blue. It is the default note, and the most common one. */
-.app .note svg{fill:var(--support-info-ic)}
-.app .note.succ svg{fill:var(--support-success-ink)}
-.app .note.warn svg{fill:var(--support-attention)}
-.app .note.err svg{fill:var(--danger-ink)}
-.app .note.acc svg{fill:var(--accent)}
+.app .note svg{color:var(--support-info-ic)}
+.app .note.succ svg{color:var(--support-success-ink)}
+.app .note.warn svg{color:var(--support-attention)}
+.app .note.err svg{color:var(--danger-ink)}
+.app .note.acc svg{color:var(--accent)}
 
 /* ------------------------------------------------------------------ 2 ---
    THE CHIP
@@ -96,7 +96,7 @@
    ------------------------------------------------------------------------ */
 /* a source you can open is a link, and links are blue everywhere else */
 .app .memo-src{color:var(--link)}
-.app .memo-src svg{fill:var(--link)}
+.app .memo-src svg{color:var(--link)}
 /* an outcome that went your way is a success */
 .app .ivrow-out{color:var(--support-success-ink)}
 /* something in flight is attention, and stays amber */
@@ -111,7 +111,7 @@
 .app .chip-tal .sk-mark,.app .ask-sugg .chip-tal .sk-mark,
 .app .tal-sugg .chip-tal .sk-mark{background-color:var(--accent)}
 .app .tq-scene{color:var(--text-secondary)}
-.app .tq-scene svg{fill:var(--accent)}
+.app .tq-scene svg{color:var(--accent)}
 
 /* ------------------------------------------------------------------ 6 ---
    THE ONE PIECE OF ORANGE TEXT
@@ -124,4 +124,4 @@
    contrast sweep counts it rather than passing it silently.
    ------------------------------------------------------------------------ */
 .app .auth-brand .auth-intro p.auth-begin{
-  color:var(--accent);--on-brand-fill:1}
+  color:var(--accent);--on-brand-color:1}

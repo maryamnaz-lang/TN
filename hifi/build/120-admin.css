@@ -86,7 +86,7 @@
    hides every `.sn-item svg` (labels only) with a rule that carries the `svg`
    type (0,2,1) — the chevron is the exception and must outweigh it to show
    wherever the labels do. */
-.app .sn-item .sn-chev{display:block; width:18px; height:18px; flex:none; fill:var(--icon-secondary);
+.app .sn-item .sn-chev{display:block; width:18px; height:18px; flex:none; color:var(--icon-secondary);
   transition:transform var(--dur-short) var(--ease-standard)}
 .app .sn-chev.open{transform:rotate(180deg)}
 @container app (min-width:900px){

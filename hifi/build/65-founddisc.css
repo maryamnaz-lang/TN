@@ -112,7 +112,7 @@
 .app .found-chev{
   display:grid;place-items:center;flex:none;width:20px;height:20px;
   transition:transform var(--dur-short) var(--ease-standard)}
-.app .found-chev svg{width:20px;height:20px;fill:var(--text-secondary)}
+.app .found-chev svg{width:20px;height:20px;color:var(--text-secondary)}
 .app .found.on .found-chev{transform:rotate(90deg)}
 
 /* the panel. `display:none` rather than a height animation: the block
@@ -182,7 +182,7 @@
   display:grid;place-items:center;flex:none;
   width:28px;height:28px;
   background-color:color-mix(in srgb, var(--mk) 13%, var(--background))}
-.app .prog-ic svg{width:16px;height:16px;fill:var(--icon-primary)}
+.app .prog-ic svg{width:18px;height:18px;color:var(--icon-primary)}
 .app .prog-figs > span:nth-child(1){--mk:var(--mk-1)}
 .app .prog-figs > span:nth-child(2){--mk:var(--mk-2)}
 .app .prog-figs > span:nth-child(3){--mk:var(--mk-3)}

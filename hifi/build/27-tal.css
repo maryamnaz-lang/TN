@@ -225,7 +225,7 @@
   flex:none;width:51px;height:auto;align-self:stretch;
   display:grid;place-items:center;
   background:var(--text-primary);color:var(--on-brand);border:0}
-.app .tal-panel .composer > button svg{width:20px;height:20px;fill:var(--on-brand)}
+.app .tal-panel .composer > button svg{width:20px;height:20px;color:var(--on-brand)}
 
 /* --------------------------------------------------------------------- 6 ---
    THE WASH
@@ -313,8 +313,8 @@
    two inches from Tal's own mark and made the two read as one control. */
 .app .askfield-send{
   background-image:none;background-color:var(--text-primary);
-  --on-brand-fill:0}
-.app .askfield-send svg{fill:var(--on-brand)}
+  --on-brand-color:0}
+.app .askfield-send svg{color:var(--on-brand)}
 
 /* --------------------------------------------------------------------------
    THE AGENT CARD KEEPS THE STAR
@@ -447,7 +447,7 @@
   border:0;border-radius:50%;box-shadow:none;
   color:var(--on-accent);
   /* white mark on the brand disc — the flag the contrast sweep reads */
-  --on-brand-fill:1;
+  --on-brand-color:1;
   /* the resting drop-shadow is transparent rather than absent so the hover
      glow has something to interpolate FROM; `none` to a shadow snaps */
   filter:drop-shadow(0 0 0 rgb(0 0 0 / 0));
@@ -507,7 +507,7 @@
    and dark rather than soft. */
 .app .tal-fab svg{
   position:relative;z-index:2;
-  width:22px;height:22px;fill:var(--on-accent);
+  width:22px;height:22px;color:var(--on-accent);
   filter:drop-shadow(0 1px 2px rgb(0 0 0 / .32));
   animation:tal-orb-breathe 6.4s ease-in-out infinite,
             tal-orb-track 14s linear infinite}

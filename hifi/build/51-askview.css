@@ -344,7 +344,7 @@
 .app .ask-page .askfield-send{
   width:20px;height:20px;flex:none;
   background:none;background-image:none;border:0;
-  color:var(--text-primary);--on-brand-fill:0}
+  color:var(--text-primary);--on-brand-color:0}
 .app .ask-page .askfield-send svg{
   width:20px;height:20px;fill:none;display:block}
 

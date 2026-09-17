@@ -120,7 +120,7 @@
   font-family:var(--nil-display);font-weight:800;text-transform:uppercase;
   font-size:12.5px;line-height:1.2;letter-spacing:.05em;border-radius:3px;
 }
-.nil .nil-cta svg{width:15px;height:15px;fill:var(--nil-lime)}
+.nil .nil-cta svg{width:15px;height:15px;color:var(--nil-lime)}
 
 /* the bar collapses to mark + CTA long before the links would wrap onto a
    second row: a two-row navy bar is a different design, not this one */
@@ -315,7 +315,7 @@
   display:flex;flex-direction:column;gap:var(--s04)}
 .nil .nil-ticks li{display:flex;gap:var(--s04);align-items:flex-start;
   font-size:15px;line-height:23px;font-weight:400}
-.nil .nil-ticks svg{width:19px;height:19px;flex:none;margin-top:2px;fill:var(--nil-navy)}
+.nil .nil-ticks svg{width:19px;height:19px;flex:none;margin-top:2px;color:var(--nil-navy)}
 
 /* --- the right stack ---------------------------------------------------- */
 .nil .nil-side{display:flex;flex-direction:column;
@@ -335,7 +335,7 @@
   display:flex;flex-direction:column;gap:var(--s04)}
 .nil .nil-ideas li{display:flex;gap:var(--s04);align-items:flex-start;
   font-size:14.5px;line-height:21px;font-weight:400;color:var(--nil-ink)}
-.nil .nil-ideas svg{width:19px;height:19px;flex:none;margin-top:1px;fill:var(--nil-navy)}
+.nil .nil-ideas svg{width:19px;height:19px;flex:none;margin-top:1px;color:var(--nil-navy)}
 /* THE GAP UNDER THE HEADING IS ON THE PARAGRAPH, NOT ON `h2 + *`.
    It was written as `.nil .nil-side-box h2+*{margin-top:var(--s05)}` — two
    classes and a type, 0,2,1 — and lost to `.nil .nil-side-box p{margin:0}`,
@@ -357,7 +357,7 @@
   color:var(--nil-ink);background:#fff;cursor:default;
 }
 .nil .nil-step+.nil-step{border-left:1px solid var(--nil-navy)}
-.nil .nil-step svg{width:26px;height:26px;fill:var(--nil-navy);flex:none}
+.nil .nil-step svg{width:26px;height:26px;color:var(--nil-navy);flex:none}
 /* only one of the three is wired, so only one is drawn as a control. The
    other two are in the screenshot and stay in it — an affordance on a tile
    that does nothing is worse than a tile that never offered. */
@@ -379,7 +379,7 @@
   background:var(--nil-lime);border-radius:999px;padding:7px var(--s05);
   font-size:13px;line-height:1.4;font-weight:400;color:var(--nil-navy);
 }
-.nil .nil-share-pill svg{width:16px;height:16px;fill:var(--nil-navy);flex:none}
+.nil .nil-share-pill svg{width:16px;height:16px;color:var(--nil-navy);flex:none}
 /* THE BAND IS A RULE MADE OF A WORD.
    It bleeds the full width of the frame and is clipped, not wrapped: the
    partial word at each end is what makes it read as a strip running past the
@@ -424,7 +424,7 @@
   width:18px;height:18px;flex:none;border:2px solid var(--nil-cbx);
   border-radius:2px;background:#fff;display:grid;place-items:center;
 }
-.nil .nil-opt .bx svg{width:16px;height:16px;fill:var(--nil-navy);opacity:0}
+.nil .nil-opt .bx svg{width:16px;height:16px;color:var(--nil-navy);opacity:0}
 .nil .nil-opt input:checked+.bx svg{opacity:1}
 .nil .nil-opt input:focus-visible+.bx{
   outline:2px solid var(--nil-lime);outline-offset:2px;

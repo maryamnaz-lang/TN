@@ -945,7 +945,7 @@ const lcalCard = (k, lead) => {
   const act = lead
     ? `<button class="btn btn-p btn-sm noic" data-call="cohort" data-joinwhen="${k.when}" data-joinmins="${k.mins}"${
         joinLive(k.when, k.mins) ? '' : ` disabled title="${joinShut(k.when)}"`}>Join call ${I.arrowRight}</button>`
-    : `<svg class="tile-arrow" viewBox="0 -960 960 960">${inner('arrowRight')}</svg>`;
+    : `<svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg>`;
   /* A `<div>` FOR THE BLACK ONE AND A `<button>` FOR THE REST, because the
      black card holds a control and a `<button>` inside a `<button>` is invalid
      markup with two targets doing one job — §112's rule for `.row-cta`. It also
@@ -962,19 +962,18 @@ const lcalCard = (k, lead) => {
            wider of "Tomorrow" and "5:00 PM" rather than their sum, so the header
            does not wrap. §113.3's dead `.gcard-art` ground rule went with it. */}
     <span class="lcal-h">
-      <span class="lcal-t t-h4">${lcTitle(k)}</span>
+      <span class="lcal-t t-h3">${lcTitle(k)}</span>
       <span class="lcal-when">
         <span class="lcal-day t-desc">${k.day}</span>
         <span class="lcal-tm t-h4">${k.time}</span>
       </span>
     </span>
-    <span class="lcal-b">
-      ${''/* THE CANDIDATE COUNT CAME OFF (Maryam, 9 Sep 2026: "remove the
-             candidate count from each card like '10 Candidates'"). `k.seats` is
-             still on the record and the figure bar above still counts it; the
-             card's line is now just the track and the week. */}
-      <span class="lcal-d t-desc">Explorer &ndash; ${k.level} &middot; week ${k.week} of 13</span>
-    </span>
+    ${''/* THE TRACK/WEEK SUB-LINE IS REMOVED and the title enlarged to `t-h3`
+           (Maryam, 16 Sep 2026: "remove explorer row and make the heading bigger
+           of cohort call"). The card is now the title + date header, then the
+           duration + Join foot; `.lcal-b`/`.lcal-d` went with the line, and the
+           enlarged title is the card's one heading. `k.level`/`k.week` stay on
+           the record. Restore the line by re-adding a `.lcal-b > .lcal-d`. */}
     ${''/* THE FOOT IS THE DURATION AND ONE CONTROL, WHICH IS THE REFERENCE'S
            OWN ROW AND ALSO WHAT FITS. `lcDetail`'s three facts — minutes, week
            and chapter — were here first and the row wrapped: at the 268px cell
@@ -1052,7 +1051,7 @@ function faceRow(p, detail, go, at, cta){
     <span class="mem-av mem-ph">${avatar({i:p.i, img:AV[p.img]}, 36)}</span>
     <span class="gcard-b"><h3>${p.name}</h3><span class="sub">${detail}</span></span>
     ${cta ? `<span class="row-cta">${cta}</span>` : ''}
-    <svg class="tile-arrow" viewBox="0 -960 960 960">${inner('arrowRight')}</svg>
+    <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg>
   </button>`;
 }
 

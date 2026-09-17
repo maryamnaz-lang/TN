@@ -162,7 +162,7 @@
    mark in the product is one drawing of it. §63 leaves its hue alone: #00a43c
    measures 6.2:1 on this card, which §63 §17 already checked for `.crow-v`. */
 .app .pnc-v{display:inline-flex}
-.app .pnc-v svg{width:20px;height:20px;fill:#00a43c;display:block}
+.app .pnc-v svg{width:20px;height:20px;color:#00a43c;display:block}
 
 /* THE TIME IS TEXT WITH A MARK, NOT A CELL (Maryam: "at the right end add the
    'In 2 days' text with icon not in block"). §71.1's `.crow-when` is a 182px
@@ -206,9 +206,9 @@
    absent and the other two keep their hues, which is the failure a cycle would
    have.
    ------------------------------------------------------------------------ */
-.app .qa-ic.ic-focus svg{fill:var(--icon-primary)}
-.app .qa-ic.ic-pace  svg{fill:var(--icon-primary)}
-.app .qa-ic.ic-stand svg{fill:var(--icon-primary)}
+.app .qa-ic.ic-focus svg{color:var(--icon-primary)}
+.app .qa-ic.ic-pace  svg{color:var(--icon-primary)}
+.app .qa-ic.ic-stand svg{color:var(--icon-primary)}
 
 /* THE PULSE MARK IS INK ON DARK TOO — §72 blackened `.pulse-ic` (color, driving
    its `currentColor` fill) to `--icon-primary`, which is #111. The dashboard

@@ -201,7 +201,7 @@
   font-size:13px;line-height:18px;font-weight:600;letter-spacing:.15px;
   color:var(--support-success-ink)}
 .app .bkw .bk-flag svg{
-  width:18px;height:18px;flex:none;fill:var(--support-success-ink);display:block}
+  width:18px;height:18px;flex:none;color:var(--support-success-ink);display:block}
 
 .app .bkw .bk-note{
   margin:0;font-size:11.5px;line-height:16px;color:var(--text-helper)}

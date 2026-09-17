@@ -172,7 +172,7 @@
 .app .sec.eo .aih-a > .btn-p{
   background-image:var(--accent-grad);
   border-color:transparent;
-  --on-brand-fill:1}
+  --on-brand-color:1}
 /* 185 x 40 — 613:7990, which is also §71.2's box for `.crow-a`, so the two
    AI-native surfaces put their actions in one rectangle.
 
@@ -298,7 +298,7 @@
 .app .aih-b > .eo-when{
   align-self:flex-start;min-height:0;padding:0;background:none}
 .app .page .sec.eo > .sec-h.aih > .aih-a{align-self:flex-start}
-.app .eo-when svg{flex:none;width:16px;height:16px;fill:var(--accent-text)}
+.app .eo-when svg{flex:none;width:16px;height:16px;color:var(--accent-text)}
 
 /* -------------------------------------------------------------------- 1a ---
    THE FIGURE CELLS — a mark column and a three-row stack
@@ -413,7 +413,7 @@
    four are one subject — what enrolling costs and buys — and four colours would
    claim they are four unrelated measurements. */
 .app .eo-fi{flex:none;display:grid;place-items:center;width:24px;height:24px}
-.app .eo-fi svg{width:24px;height:24px;fill:var(--text-secondary)}
+.app .eo-fi svg{width:24px;height:24px;color:var(--text-secondary)}
 /* 4 BETWEEN THE TWO LINES — 613:8078 ends at 21 and 613:8079 opens at 25. */
 .app .eo-fb{display:flex;flex-direction:column;gap:4px;min-width:0}
 

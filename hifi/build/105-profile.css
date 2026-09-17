@@ -36,7 +36,7 @@
 .app .page .pf-facts .pf-l{
   display:flex;align-items:center;gap:var(--s03)}
 .app .page .pf-facts .pf-l svg{
-  flex:none;width:20px;height:20px;fill:var(--icon-primary)}
+  flex:none;width:18px;height:18px;color:var(--icon-primary)}
 /* THE VALUE SITS `--s03` UNDER ITS LABEL — a heading over a value, not two
    lines of one statement, which is §01's `--sec-desc-gap` argument at the scale
    of a cell.
@@ -237,7 +237,7 @@
 .app .page .pf-tgs .tg-mk{
   flex:none;display:grid;place-items:center;
   width:20px;height:20px;margin-top:1px}
-.app .page .pf-tgs .tg-mk svg{width:20px;height:20px;fill:var(--icon-primary)}
+.app .page .pf-tgs .tg-mk svg{width:18px;height:18px;color:var(--icon-primary)}
 
 /* ------------------------------------------------------------------ 105.5 ---
    THE SAVED CARD ROW — a radio on the spine and a red Remove
@@ -331,7 +331,7 @@
   background:var(--support-error-bg);border-radius:999px;
   box-shadow:0 0 0 12px color-mix(in srgb, var(--danger-ink) 12%, transparent),
              0 0 0 13px color-mix(in srgb, var(--danger-ink) 24%, transparent)}
-.app .conf .conf-mk svg{width:24px;height:24px;fill:var(--danger-ink);margin:0}
+.app .conf .conf-mk svg{width:24px;height:24px;color:var(--danger-ink);margin:0}
 /* THE TITLE AND ITS DESCRIPTION ARE ONE OBJECT — `--sec-desc-gap`, §01's token
    for exactly this pair, against the `--s05` the column gives everything else.
    A heading and the sentence about it are closer to each other than either is
@@ -470,10 +470,10 @@
   flex:none;width:40px;height:40px;display:grid;place-items:center;
   border:0;border-radius:999px;
   background:var(--accent);background-image:none;
-  --on-brand-fill:1}
+  --on-brand-color:1}
 .app .ask-page .askfield-send svg,
 .app .askfield-send svg{
-  width:18px;height:18px;fill:var(--on-accent);display:block}
+  width:18px;height:18px;color:var(--on-accent);display:block}
 .app .ask-page .askfield-mic,
 .app .askfield-mic{
   flex:none;width:40px;height:40px;display:grid;place-items:center;
@@ -481,7 +481,7 @@
   cursor:pointer}
 .app .ask-page .askfield-mic svg,
 .app .askfield-mic svg{
-  width:18px;height:18px;fill:var(--icon-secondary);display:block}
+  width:18px;height:18px;color:var(--icon-secondary);display:block}
 /* LISTENING IS THE DANGER HUE, WHICH IS THE ONE PLACE IN THIS BUILD IT MEANS
    "live" RATHER THAN "wrong" — the convention every recorder on every platform
    uses, and the same reading §60 gives the call bar's leave control. The ring
@@ -491,7 +491,7 @@
 .app .askfield-mic.on{
   background:var(--danger-ink);border-color:var(--danger-ink)}
 .app .ask-page .askfield-mic.on svg,
-.app .askfield-mic.on svg{fill:var(--on-brand)}
+.app .askfield-mic.on svg{color:var(--on-brand)}
 
 /* THE SEND IS OFF UNTIL THE FIELD HAS WORDS IN IT (Maryam, 2 Sep 2026), and the
    disabled register is §21's own for this control: `--layer-accent-01`, the 20%
@@ -514,7 +514,7 @@
 .app .askfield-send:disabled{
   background:var(--layer-accent-01);background-image:none;cursor:default}
 .app .ask-page .askfield-send:disabled svg,
-.app .askfield-send:disabled svg{fill:var(--text-placeholder)}
+.app .askfield-send:disabled svg{color:var(--text-placeholder)}
 
 /* ---- and the dock's pair, which is the same shape one register quieter ----
    THE ROW IS ONE `<button>`, so these two are `<span>`s and the mic's press is
@@ -538,7 +538,7 @@
    would split and the mic would sit mid-row beside the prompt. */
 .app .askdock .askline-mic + .askline-send{margin-left:var(--s03)}
 .app .askdock .askline-mic svg{
-  width:16px;height:16px;fill:var(--icon-secondary);display:block}
+  width:16px;height:16px;color:var(--icon-secondary);display:block}
 
 /* ------------------------------------------------------------------ 105.4 ---
    THE INVITATION'S CONDITIONS ARE MARKS, NOT CHIPS
@@ -563,7 +563,7 @@
   min-height:0;display:inline-flex;align-items:center;gap:var(--s03);
   padding:0;border:0}
 .app .lead-b .lead-tags > span svg{
-  flex:none;width:20px;height:20px;fill:var(--on-dark)}
+  flex:none;width:20px;height:20px;color:var(--on-dark)}
 
 /* ------------------------------------------------------------------ 105.8 ---
    NO CLOSING RULE UNDER THE SWITCH ROW OR THE FACT BAND — THE NARROW TIER

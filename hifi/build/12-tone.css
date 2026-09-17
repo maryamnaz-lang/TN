@@ -235,7 +235,7 @@
 .app .sec:has(> .tile-stack) .ch.done .ch-num,
 .app .sec:has(> .tile-stack) .ch.open .ch-num,
 .app .sec.flat.bleed .ch.done .ch-num,.app .sec.flat.bleed .ch.open .ch-num,
-.app .aw.got .aw-ic svg{color:var(--on-accent);fill:var(--on-accent)}
+.app .aw.got .aw-ic svg{color:var(--on-accent);color:var(--on-accent)}
 
 /* the reserved scrollbar gutter left a strip of base colour down the right
    edge of every panel; the frame hides its scrollbar instead */
@@ -262,7 +262,7 @@
 .app .tg input:checked ~ .sw::after{background-color:var(--accent);border-color:var(--accent)}
 .app .cbx .box,.app .rad .box{background-color:transparent}
 .app .rad input:checked + .box::after{background-color:var(--background)}
-.app .cbx input:checked + .box svg{fill:var(--on-brand)}
+.app .cbx input:checked + .box svg{color:var(--on-brand)}
 
 /* ==========================================================================
    PREVIEW FIT
@@ -578,7 +578,7 @@
    A disclosure caret and a selected tab are both that, and both were reading
    as ink — indistinguishable from the text they sit beside.
    ========================================================================== */
-.app .acc-h .chev svg,.app .chev svg{fill:var(--accent)}
+.app .acc-h .chev svg,.app .chev svg{color:var(--accent)}
 .app .tabs button.on,.app .tb.on{border-bottom-color:var(--accent)}
 
 /* ==========================================================================
@@ -661,10 +661,10 @@
 .app .tile.clk:hover .tile-arrow,.app .gcard:hover .tile-arrow,
 .app .cardrow:hover .tile-arrow,.app .nrow.clk:hover .tile-arrow,
 .app .ag:hover .tile-arrow,.app .signed.clk:hover .tile-arrow{
-  fill:var(--accent);transform:translateX(3px)}
+  color:var(--accent);transform:translateX(3px)}
 .app .tile-arrow{transition:transform var(--mo-quick) var(--mo-standard),
                             fill var(--mo-quick) var(--mo-standard)}
-.app .acc-h:hover .chev svg{fill:var(--accent-hover)}
+.app .acc-h:hover .chev svg{color:var(--accent-hover)}
 /* No left rule. A bar down the side of a row is a fourth kind of edge on a
    page that already has rails, section rules and row separators, and on
    hover it reads as the row having been selected rather than pointed at. */
@@ -691,7 +691,7 @@
 .app .note{display:block}
 .app .note > span:first-child{
   float:left;width:17px;height:17px;margin:1px var(--s03) 0 0;display:block}
-.app .note svg{width:17px;height:17px;fill:var(--accent)}
+.app .note svg{width:17px;height:17px;color:var(--accent)}
 .app .note .nb{display:block}
 .app .note .nb b{display:block;color:var(--accent-on-2)}
 
@@ -735,7 +735,7 @@
    already carries.
    ========================================================================== */
 .app .acc-i.on .acc-h .ttl,.app .acc-i.on .acc-h{color:var(--accent-text)}
-.app .acc-i.on .acc-h .chev svg{fill:var(--accent)}
+.app .acc-i.on .acc-h .chev svg{color:var(--accent)}
 
 /* ==========================================================================
    HOVER RUNS TO THE EDGE
@@ -946,8 +946,8 @@
   background-color:transparent}
 .app .sec.flat.bleed .ch{border-bottom-color:var(--rule)}
 .app .ch-ic,.app .ch-ic span{background-color:transparent}
-.app .ch.done .ch-ic svg{fill:var(--support-success)}
-.app .ch.open .ch-ic svg{fill:var(--in-progress)}
+.app .ch.done .ch-ic svg{color:var(--support-success)}
+.app .ch.open .ch-ic svg{color:var(--in-progress)}
 
 /* the cohort note is one sentence and it belongs on one line — the 68ch
    measure is for paragraphs, and this is a caption on the bar above it */

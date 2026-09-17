@@ -203,7 +203,7 @@
      page's action; this one is the assistant's, and the difference is the
      point of having both. */
   background-color:var(--accent);background-image:var(--accent-grad);
-  color:var(--on-accent);border-color:transparent;--on-brand-fill:1}
+  color:var(--on-accent);border-color:transparent;--on-brand-color:1}
 .app .ai-foot .sp{margin-left:auto}
 
 /* ----------------------------------------------------------------- 10 ---
@@ -376,7 +376,7 @@
   gap:var(--s07);align-items:end}
 .app .lvl-split .eb{display:flex;align-items:center;gap:var(--s03)}
 .app .lvl-split .eb-ok{display:inline-flex;flex:none}
-.app .lvl-split .eb-ok svg{width:16px;height:16px;fill:var(--support-success)}
+.app .lvl-split .eb-ok svg{width:16px;height:16px;color:var(--support-success)}
 .app .lvl-split .lvl-split-a{display:flex;flex-direction:column;gap:var(--s04)}
 .app .lvl-split .lvl-split-a .btn{width:100%}
 
@@ -448,8 +448,8 @@
 .app .stats > .stat > .stat-ic{grid-area:ic;align-self:start;
   flex:none;display:grid;place-items:center;width:32px;height:32px;
   margin-top:1px}
-.app .stats > .stat > .stat-ic svg{width:17px;height:17px;
-  fill:var(--icon-secondary);display:block}
+.app .stats > .stat > .stat-ic svg{width:18px;height:18px;
+  color:var(--icon-secondary);display:block}
 .app .stats > .stat > .l{grid-area:l}
 .app .stats > .stat > .n{grid-area:n}
 .app .stats > .stat > .d{grid-area:d}

@@ -830,7 +830,7 @@
    without a word. The BORDER is not here: it is not one of this layer's four
    properties and §75 states it with the rest of the card's geometry. */
 .app .dark-card .btn:not(.btn-p){color:var(--on-dark)}
-.app .dark-card .btn:not(.btn-p) svg{fill:var(--on-dark)}
+.app .dark-card .btn:not(.btn-p) svg{color:var(--on-dark)}
 .app .dark-card a[data-go],.app .dark-card .lk,.app .dark-card .lnk{
   color:var(--on-dark)}
 /* AND SO IS THE CHEVRON ON A ROW YOU PRESS. `.tile-arrow` is `--text-disabled`
@@ -843,7 +843,7 @@
    line it belongs to rather than quieter than the card allows. Found converting
    the leader's Evaluations queue (1 Sep 2026), which is the first `.dark-card`
    to hold a `.tile` row rather than a `.crow` or a `.btn-row`. */
-.app .dark-card .tile-arrow{fill:var(--on-dark-2)}
+.app .dark-card .tile-arrow{color:var(--on-dark-2)}
 
 /* AND THE FIGURE AT THE END OF A FACT ROW IS THE ACCENT, ON A QUIET CARD ONLY.
    `.plate-v` is the value `splitPlateBody` lifts out of "Course price
@@ -2677,7 +2677,7 @@
 
    The same classes on the other three call sites are §11's and are untouched. */
 .app .crow-dark .crow-a > .btn:not(.btn-p){color:var(--on-dark)}
-.app .crow-dark .crow-a > .btn:not(.btn-p) svg{fill:var(--on-dark)}
+.app .crow-dark .crow-a > .btn:not(.btn-p) svg{color:var(--on-dark)}
 
 /* THE MARK CAN BE A LABEL, AND A LABEL HAS TYPE (1 Sep 2026). The leader's card
    is the next COHORT CALL, and a cohort is not a person: `crow` puts the
@@ -4440,7 +4440,7 @@
   font-weight:var(--t-w-strong);color:var(--text-primary)}
 /* the tick is white on the accent disc — `--on-accent`, not `currentColor`,
    because §107 sets no `color` on the mark and the label beside it is grey */
-.app .ob-brand .ob-sp .ob-sp-m svg{fill:var(--on-accent)}
+.app .ob-brand .ob-sp .ob-sp-m svg{color:var(--on-accent)}
 
 /* c — the two lowest bands, marked in the row. §74's violet is the product's
    hue for a growth area ("what you are not good at yet"), which is exactly
@@ -4494,7 +4494,7 @@
    question. `--text-helper` IS right here where §3 would normally refuse it:
    this is not a tier of content, it is a control that is off. */
 .app .auth-card .ob-page .btn-p[disabled]{color:var(--text-helper)}
-.app .auth-card .ob-page .btn-p[disabled] svg{fill:var(--text-helper)}
+.app .auth-card .ob-page .btn-p[disabled] svg{color:var(--text-helper)}
 
 /* =========================================================================
    43. THE ONBOARDING'S OPENING LINE (§107 §0b)
@@ -4707,9 +4707,9 @@
   font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-compact-ls);
   text-transform:none;color:var(--text-primary)}
-.app .ob-mode svg{fill:var(--icon-primary)}
+.app .ob-mode svg{color:var(--icon-primary)}
 .app .ob-mode.on{color:var(--on-dark)}
-.app .ob-mode.on svg{fill:var(--on-dark)}
+.app .ob-mode.on svg{color:var(--on-dark)}
 
 /* =========================================================================
    45. THE GATE'S CHAT MODE AND ITS MUTE CONTROL (§107 §0c / §0e)
@@ -4824,8 +4824,8 @@
    there is one rule for one control. The deleted block is the shape of the
    problem it solved — two selectors kept in step by hand. */
 
-.app .ob-mute svg{fill:var(--icon-primary)}
-.app .ob-mute.off svg{fill:var(--text-helper)}
+.app .ob-mute svg{color:var(--icon-primary)}
+.app .ob-mute.off svg{color:var(--text-helper)}
 
 /* THE SEND ARROW WAS BLACK ON BLACK — Maryam, 3 Sep 2026: "the send arrow is
    missing on chat field." It was not missing; it was `--icon-primary` on
@@ -4840,8 +4840,8 @@
    rules rather than one, because the two states have opposite grounds: white
    on the black live disc, and the helper tier on the grey shut one, which is
    §3's floor and what a control waiting its turn should read as. */
-.app .ob-send svg{fill:var(--on-dark)}
-.app .ob-send[disabled] svg{fill:var(--text-helper)}
+.app .ob-send svg{color:var(--on-dark)}
+.app .ob-send[disabled] svg{color:var(--text-helper)}
 
 /* ==========================================================================
    45a — THE COURSE OUTLINE'S HOVER LABEL — `.ol-cd`

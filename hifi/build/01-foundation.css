@@ -50,7 +50,7 @@
      once and applied everywhere rather than left as a one-off. verify.mjs
      counts these pairs and reports them as a stated exception rather than
      passing them silently — anything filled with the gradient carries
-     --on-brand-fill:1 and the contrast sweep reads that flag.
+     --on-brand-color:1 and the contrast sweep reads that flag.
 
      Accent INK is a different value and stays AA-safe: --accent-text and
      --accent-on-2 are the gradient's hue at a luminance that passes, and
@@ -325,15 +325,15 @@
 
   --text-primary:#111111;
   --text-secondary:#828282;
-  /* THE TAL SUMMARY DESCRIPTION IS ONE STEP DARKER THAN A PLAIN DESCRIPTION —
-     Maryam, 15 Sep 2026, platform-wide ("the tal summary desc needs to be a
-     little darker than what it is right now"). Every other description reads
-     --text-secondary #828282 (§63 §1); Tal's page-summary body took the same
-     grey (§33). It now takes this darker neutral step so the summary reads a
-     touch more present than the supporting lines under a section heading, while
-     still sitting behind the primary ink and its own <b> accent phrases. Only
+  /* THE TAL SUMMARY DESCRIPTION IS A DARK GREY, WELL AHEAD OF A PLAIN
+     DESCRIPTION — Maryam, 15 Sep 2026, platform-wide ("the tal summary desc
+     needs to be a little darker", then set to #414141). Every other description
+     reads --text-secondary #828282 (§63 §1); Tal's page-summary body took the
+     same grey (§33). It now takes this dark neutral so the summary reads clearly
+     more present than the supporting lines under a section heading, while still
+     sitting behind the primary #111 ink and its own <b> accent phrases. Only
      the head-band summary body (§33) reads it; no other description moves. */
-  --tal-sum-desc:#6b6b6b;
+  --tal-sum-desc:#414141;
   --text-helper:#666563;
   --text-placeholder:#a9a8a5;
   --text-disabled:#a9a8a5;
@@ -494,7 +494,7 @@
   --on-dark-border:rgba(255,255,255,.42);
   --on-dark-track:rgba(255,255,255,.24);
   --on-dark-rule:rgba(255,255,255,.16);
-  --on-dark-fill:rgba(255,255,255,.12);
+  --on-dark-color:rgba(255,255,255,.12);
   --on-dark-fill-2:rgba(255,255,255,.28);
   --on-dark-dim:rgba(255,255,255,.3);
 
@@ -631,7 +631,7 @@ body{background:var(--surround);color:var(--text-primary);
 .pt-nav button,.pt-vp button{
   width:32px;height:32px;display:grid;place-items:center;
   border:1px solid var(--pt-line);background:var(--surface-dark-2);border-radius:var(--radius)}
-.pt-nav button svg{width:16px;height:16px;fill:var(--on-dark)}
+.pt-nav button svg{width:16px;height:16px;color:var(--on-dark)}
 .pt-nav button:hover,.pt-vp button:hover{background:var(--pt-hover)}
 /* viewport switcher — the one piece of chrome v15 adds */
 .pt-vp{display:flex;gap:var(--s02);flex:none;
@@ -681,7 +681,7 @@ body{background:var(--surround);color:var(--text-primary);
   width:48px;height:48px;flex:none;display:grid;place-items:center;
   border-radius:var(--radius);position:relative;
   transition:background var(--dur-short) var(--ease-standard)}
-.shell-act svg{width:24px;height:24px;fill:var(--icon-primary)}
+.shell-act svg{width:24px;height:24px;color:var(--icon-primary)}
 .shell-act:hover{background:var(--overlay-hover)}
 .shell-act:active{background:var(--overlay-pressed)}
 .shell-act.on{background:var(--overlay-selected)}
@@ -720,12 +720,12 @@ body{background:var(--surround);color:var(--text-primary);
   position:relative;color:#828282;
   font-size:14px;font-weight:400;letter-spacing:.1px;
   transition:background var(--dur-short) var(--ease-standard)}
-.sn-item svg{width:22px;height:22px;fill:#828282;flex:none;
-  transition:fill var(--dur-short) var(--ease-standard)}
+.sn-item svg{width:20px;height:20px;color:#828282;flex:none;
+  transition:color var(--dur-short) var(--ease-standard)}
 .sn-item:hover{background:var(--overlay-hover)}
 .sn-item:active{background:var(--overlay-pressed)}
 .sn-item.on{background:var(--overlay-selected);font-weight:600}
-.sn-item.on svg{fill:var(--icon-primary)}
+.sn-item.on svg{color:var(--icon-primary)}
 /* the accent marks what belongs to the candidate — here, where they are */
 .sn-item.on::before{
   content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent)}

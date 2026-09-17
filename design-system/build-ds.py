@@ -1967,7 +1967,7 @@ DS_TABLES = [
 DS_HAVE = {'I', 'inner', 'IP', 'PHP', 'P', 'AWARD', 'AV', 'LOGO_K', 'LOGO_W',
            'LOGO_D', 'TAL_MARK', 'CALL_ART', 'CHEV', 'TN_MARK', 'ARROW_LINE',
            'TN_CHEVRONS', 'DS_PLATE_SOON', 'dsCallLeft', 'dsCallUrgent',
-           'PAY_ART'}
+           'PAY_ART', 'PF_ART', 'COHORT_ART', 'CERT_ART'}
 
 # source name -> the name it is emitted under. Applied to the DECLARATION and
 # to every call site inside every extracted body, so the closure stays wired.
@@ -3126,6 +3126,49 @@ function dsQuizRose(dims, score){
             n_img += 1
     if pa_pairs:
         assets.append('const PAY_ART = {\n  ' + ',\n  '.join(pa_pairs) + '\n};')
+
+    # THE PROFILE ISSUER MARKS — education and certification logos (COMSATS, the
+    # two IBM badges), embedded off the SAME files build.py reads from
+    # hifi/build/logos/, so the Super Admin candidate detail can draw them via
+    # PF_ART exactly as the candidate portal's `pfArt` does. NOT re-encoded (the
+    # issuer's own format), matching build.py. In DS_HAVE so a call site may name it.
+    PF_ART_KEYS = ['ibmco', 'ibmpr', 'comsats']
+    PF_MIME = {'.png': 'image/png', '.webp': 'image/webp', '.jpg': 'image/jpeg',
+               '.jpeg': 'image/jpeg', '.svg': 'image/svg+xml'}
+    pf_pairs = []
+    for k in PF_ART_KEYS:
+        hit = next((p for e in ('.png', '.webp', '.jpg', '.jpeg', '.svg')
+                    for p in [SRC / 'logos' / (k + e)] if p.exists()), None)
+        if hit:
+            pf_pairs.append("%s:'data:%s;base64,%s'"
+                            % (k, PF_MIME[hit.suffix.lower()],
+                               base64.b64encode(hit.read_bytes()).decode()))
+            n_img += 1
+    if pf_pairs:
+        assets.append('const PF_ART = {\n  ' + ',\n  '.join(pf_pairs) + '\n};')
+
+    # COURSE COVERS + COMPLETION-CERTIFICATE BADGES — the same files build.py
+    # embeds (hifi/build/cohorts + /certs), so the Super Admin candidate detail
+    # can draw a course's cover and its completion certificate exactly as the
+    # candidate portal's My Courses does (Maryam, 15 Sep 2026). In DS_HAVE.
+    COHORT_ART_KEYS = ['e1', 'e2', 'e3']
+    co_pairs = []
+    for k in COHORT_ART_KEYS:
+        f = SRC / 'cohorts' / ('cohort-' + k + '.webp')
+        if f.exists():
+            co_pairs.append("%s:'data:image/webp;base64,%s'" % (k, base64.b64encode(f.read_bytes()).decode()))
+            n_img += 1
+    if co_pairs:
+        assets.append('const COHORT_ART = {\n  ' + ',\n  '.join(co_pairs) + '\n};')
+    CERT_ART_KEYS = ['explorer', 'course', 'assess', 'cohort', 'pace', 'top']
+    ct_pairs = []
+    for k in CERT_ART_KEYS:
+        f = SRC / 'certs' / (k + '.webp')
+        if f.exists():
+            ct_pairs.append("%s:'data:image/webp;base64,%s'" % (k, base64.b64encode(f.read_bytes()).decode()))
+            n_img += 1
+    if ct_pairs:
+        assets.append('const CERT_ART = {\n  ' + ',\n  '.join(ct_pairs) + '\n};')
 
     assets.append("""
 /* ==========================================================================

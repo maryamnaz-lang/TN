@@ -86,7 +86,7 @@
   border:1px solid var(--accent);background-color:var(--background)}
 .app .askbar-mk{
   flex:none;display:grid;place-items:center;width:44px;height:48px}
-.app .askbar-mk svg{width:18px;height:18px;fill:var(--accent);display:block}
+.app .askbar-mk svg{width:18px;height:18px;color:var(--accent);display:block}
 .app .askbar .inp{
   flex:1;min-width:0;height:48px;
   border:0;background:transparent;padding-left:0;padding-right:var(--s05)}
@@ -139,7 +139,7 @@
 .app .tq-scene{
   display:inline-flex;align-items:center;gap:var(--s02);
   letter-spacing:.6px;color:var(--support-attention)}
-.app .tq-scene svg{width:13px;height:13px;fill:var(--support-attention);display:block}
+.app .tq-scene svg{width:13px;height:13px;color:var(--support-attention);display:block}
 /* the line an answer sent you to */
 .app .tq.at{background-color:var(--accent-tint)}
 .app .tq.at .tq-x{color:var(--accent-on-2)}
@@ -196,7 +196,7 @@
   font-size:13px;line-height:23px;color:var(--text-secondary)}
 .app .never li:last-child{border-bottom:0}
 .app .never svg{
-  flex:none;width:17px;height:17px;fill:var(--icon-secondary);margin-top:2px}
+  flex:none;width:17px;height:17px;color:var(--icon-secondary);margin-top:2px}
 
 /* ==========================================================================
    AN ASSISTANT THAT ACTS
@@ -210,7 +210,7 @@
   margin-left:calc(var(--pad-x) * -1);margin-right:calc(var(--pad-x) * -1);
   padding:var(--s04) var(--pad-x)}
 .app .did-mk{flex:none;display:grid;place-items:center}
-.app .did-mk svg{width:16px;height:16px;fill:var(--accent-on-2);display:block}
+.app .did-mk svg{width:16px;height:16px;color:var(--accent-on-2);display:block}
 .app .did-t{
   flex:1;min-width:0;font-size:12.5px;line-height:17px;font-weight:600;
   color:var(--accent-on-2)}
@@ -295,7 +295,7 @@
   margin-left:calc(var(--pad-x) * -1);margin-right:calc(var(--pad-x) * -1);
   padding:var(--s06) var(--pad-x)}
 .app .cap-mk{flex:none;display:grid;place-items:center;width:22px;height:22px}
-.app .cap-mk svg{width:18px;height:18px;fill:var(--accent-on-2);display:block}
+.app .cap-mk svg{width:18px;height:18px;color:var(--accent-on-2);display:block}
 .app .cap-b{flex:1;min-width:0}
 .app .cap-t{
   font-size:14px;line-height:19px;font-weight:600;color:var(--accent-on-2)}
@@ -311,7 +311,7 @@
   background-color:var(--pure-white);
   border:1px solid var(--accent);
   padding-left:var(--s05);padding-right:var(--s05)}
-.app .cap-in .composer-act svg{fill:var(--accent-on-2)}
+.app .cap-in .composer-act svg{color:var(--accent-on-2)}
 .app .cap.done .cap-x{
   margin-top:var(--s04);font-size:13.5px;line-height:20px;font-style:italic}
 .app .cap-f{
@@ -628,7 +628,7 @@
 .app .lead-ok{
   display:flex;align-items:flex-start;gap:var(--s04);margin-top:var(--s05);
   font-size:12.5px;line-height:18px;color:var(--support-success-ink)}
-.app .lead-ok svg{flex:none;width:16px;height:16px;fill:var(--support-success-ink);margin-top:1px}
+.app .lead-ok svg{flex:none;width:16px;height:16px;color:var(--support-success-ink);margin-top:1px}
 @container app (min-width:900px){
   .app .lead-b{
     display:grid;grid-template-columns:minmax(0,1fr) auto;
@@ -671,11 +671,11 @@
 
 /* deleting an account is the one destructive action in the product */
 .app .btn.danger{color:var(--danger-ink);border-color:var(--danger-ink)}
-.app .btn.danger svg,.app .btn.danger span svg{fill:var(--danger-ink)}
+.app .btn.danger svg,.app .btn.danger span svg{color:var(--danger-ink)}
 .app .btn.btn-p.danger{
   background-color:var(--danger-ink);border-color:var(--danger-ink);
   color:var(--on-brand)}
-.app .btn.btn-p.danger svg{fill:var(--on-brand)}
+.app .btn.btn-p.danger svg{color:var(--on-brand)}
 
 /* ==========================================================================
    THE CONVERSATION SCROLLS, THE FIELD DOES NOT

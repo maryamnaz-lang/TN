@@ -232,7 +232,7 @@
   padding:5px var(--s04);
   background:rgba(17,17,17,.82);color:var(--on-dark);
   font-size:12.5px;line-height:18px;font-weight:600;letter-spacing:.2px}
-.app .call-flag svg{width:16px;height:16px;flex:none;fill:var(--accent)}
+.app .call-flag svg{width:16px;height:16px;flex:none;color:var(--accent)}
 
 /* --------------------------------------------------------------------------
    5. THE PICTURE-IN-PICTURE — interviews only
@@ -270,7 +270,7 @@
   position:absolute;right:5px;top:5px;z-index:2;
   display:flex;gap:4px}
 .app .call-selfmk svg{
-  width:17px;height:17px;display:block;fill:var(--accent);
+  width:17px;height:17px;display:block;color:var(--accent);
   filter:drop-shadow(0 1px 3px rgba(17,17,17,.6))}
 
 /* --------------------------------------------------------------------------
@@ -318,7 +318,7 @@
 .app .call-p-mk{
   position:absolute;top:var(--s03);right:var(--s03);
   display:flex;gap:3px}
-.app .call-p-mk svg{width:16px;height:16px;display:block;fill:var(--accent)}
+.app .call-p-mk svg{width:16px;height:16px;display:block;color:var(--accent)}
 
 /* WHO IS TALKING. The tile takes the accent tint and the disc takes a ring of
    the accent with a gap of the tile's own ground inside it — §56's construction

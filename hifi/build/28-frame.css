@@ -90,7 +90,7 @@
   margin-top:var(--s07)}
 .app .lead-b .lead-a .btn{
   background:var(--on-dark);color:var(--surface-dark);border-color:transparent}
-.app .lead-b .lead-a .btn svg{fill:var(--surface-dark)}
+.app .lead-b .lead-a .btn svg{color:var(--surface-dark)}
 @container app (max-width:599.98px){
   .app .lead-b .lead-a{justify-content:stretch}
   .app .lead-b .lead-a .btn{width:100%}

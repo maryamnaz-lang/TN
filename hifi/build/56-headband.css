@@ -126,7 +126,7 @@
 .app .ph-f{display:inline-flex;align-items:center;gap:var(--s03);min-width:0}
 .app .ph-f > svg{
   width:15px;height:15px;flex:none;display:block;
-  fill:var(--icon-secondary)}
+  color:var(--icon-secondary)}
 .app .ph-f:not(:last-child)::after{
   content:'';width:3px;height:3px;flex:none;
   margin-left:var(--s03);
@@ -329,14 +329,14 @@
   width:var(--stps-m);height:var(--stps-m);flex:none;
   display:grid;place-items:center;border-radius:50%;
   background-color:rgba(0,0,0,.05);border:0}
-.app .stps-m > svg{width:20px;height:20px;fill:var(--icon-primary);display:block}
+.app .stps-m > svg{width:20px;height:20px;color:var(--icon-primary);display:block}
 
 .app .stps-i.done > .stps-m{
-  background-color:var(--accent);--on-brand-fill:1}
-.app .stps-i.done > .stps-m > svg{fill:var(--on-accent)}
+  background-color:var(--accent);--on-brand-color:1}
+.app .stps-i.done > .stps-m > svg{color:var(--on-accent)}
 
 .app .stps-i.on > .stps-m{background-color:var(--brand-tint-2)}
-.app .stps-i.on > .stps-m > svg{fill:var(--accent-text)}
+.app .stps-i.on > .stps-m > svg{color:var(--accent-text)}
 
 /* EVERY LABEL IS IN FULL INK, INCLUDING THE ONES AHEAD. §33.7b keeps only the
    current step at `--text-primary`, which is right in a dropdown where the
@@ -668,7 +668,7 @@
 .app .plate-bi{
   display:flex;align-items:center;gap:var(--s03);min-width:0}
 .app .plate-bi > svg{
-  width:16px;height:16px;flex:none;display:block;fill:var(--on-dark-2)}
+  width:16px;height:16px;flex:none;display:block;color:var(--on-dark-2)}
 /* a figure inside a detail row takes the card's full ink — the row is set in
    `--on-dark-2` like the rest of §15's detail line, and a price that is the
    reason the row exists should not be the quietest thing in it */

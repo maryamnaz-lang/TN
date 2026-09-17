@@ -46,7 +46,7 @@
 .ph-back{
   width:40px;height:40px;margin-left:calc(var(--s04) * -1);
   display:grid;place-items:center;border-radius:var(--radius)}
-.ph-back svg{width:22px;height:22px;fill:var(--icon-primary)}
+.ph-back svg{width:22px;height:22px;color:var(--icon-primary)}
 .ph-back:hover{background:var(--overlay-hover)}
 .ph h1{font-size:26px;line-height:32px;font-weight:600;letter-spacing:-.6px}
 .ph .lead{margin-top:var(--s03);max-width:60ch}
@@ -55,7 +55,7 @@
   font-size:12.5px;letter-spacing:.2px;color:var(--text-helper);margin-bottom:var(--s03)}
 .crumb a{color:var(--text-helper);text-decoration:none;border-bottom:1px solid transparent}
 .crumb a:hover{color:var(--text-primary);border-bottom-color:var(--text-primary)}
-.crumb svg{width:14px;height:14px;fill:var(--text-placeholder);flex:none}
+.crumb svg{width:14px;height:14px;color:var(--text-placeholder);flex:none}
 .crumb .last{color:var(--text-primary)}
 
 @container app (min-width:900px){
@@ -189,14 +189,14 @@ select.inp{appearance:none;cursor:pointer;
 .pw-wrap{position:relative}
 .pw-wrap .inp{padding-right:52px}
 .pw-eye{position:absolute;right:0;top:0;width:48px;height:48px;display:grid;place-items:center}
-.pw-eye svg{width:20px;height:20px;fill:var(--icon-secondary)}
+.pw-eye svg{width:20px;height:20px;color:var(--icon-secondary)}
 .pw-eye:hover{background:var(--overlay-hover)}
 .pw-rules{margin-top:var(--s03);display:flex;flex-direction:column;gap:var(--s02)}
 .pw-rules li{display:flex;align-items:center;gap:var(--s03);
   font-size:12.5px;letter-spacing:.2px;color:var(--text-helper)}
-.pw-rules li svg{width:16px;height:16px;fill:var(--text-placeholder);flex:none}
+.pw-rules li svg{width:16px;height:16px;color:var(--text-placeholder);flex:none}
 .pw-rules li.ok{color:var(--text-secondary)}
-.pw-rules li.ok svg{fill:var(--support-success)}
+.pw-rules li.ok svg{color:var(--support-success)}
 .inp-mk{position:relative}
 .inp-mk .inp{padding-right:64px}
 .inp-mk .bmk{position:absolute;right:var(--s04);top:11px}
@@ -222,7 +222,7 @@ select.inp{appearance:none;cursor:pointer;
   transition:background var(--dur-short) var(--ease-standard),
              border-color var(--dur-short) var(--ease-standard)}
 .rad .box{border-radius:50%}
-.cbx .box svg,.rad .box svg{width:16px;height:16px;fill:var(--on-brand);opacity:0}
+.cbx .box svg,.rad .box svg{width:16px;height:16px;color:var(--on-brand);opacity:0}
 .cbx input:checked + .box,.rad input:checked + .box{
   background:var(--brand-primary);border-color:var(--brand-primary)}
 .cbx input:checked + .box svg{opacity:1}
@@ -244,7 +244,7 @@ select.inp{appearance:none;cursor:pointer;
 .srch{position:relative}
 .srch .inp{padding-left:48px}
 .srch > svg{position:absolute;left:var(--s05);top:14px;width:20px;height:20px;
-  fill:var(--icon-secondary);pointer-events:none}
+  color:var(--icon-secondary);pointer-events:none}
 
 /* ==========================================================================
    10. MUI LIST — the replacement for every card in the build
@@ -275,7 +275,7 @@ select.inp{appearance:none;cursor:pointer;
   width:40px;height:40px;flex:none;display:grid;place-items:center;
   background:var(--layer-02)}
 .ch-ic svg,.nrow-ic svg,.cardrow-ic svg,.ach-ic svg,.aw-ic svg,.pi-ic svg{
-  width:22px;height:22px;fill:var(--icon-primary)}
+  width:22px;height:22px;color:var(--icon-primary)}
 
 /* body — MUI ListItemText */
 .gcard-b,.ag-b,.ch-b,.cardrow-b,.nrow-b,.mem-b,.aw-b,.ach-b,.sheet-b > .f{min-width:0;flex:1}
@@ -298,11 +298,11 @@ select.inp{appearance:none;cursor:pointer;
    real button now — §29.11 draws it — so it comes out of all three of the
    groups that treated it as a glyph (here, and twice in §10). */
 svg.arrow,.tile-arrow,.card-go{
-  width:20px;height:20px;flex:none;fill:var(--text-placeholder);
-  transition:fill var(--dur-short) var(--ease-standard),
+  width:20px;height:20px;flex:none;color:var(--text-placeholder);
+  transition:color var(--dur-short) var(--ease-standard),
              transform var(--dur-short) var(--ease-standard)}
 .tile:hover .tile-arrow,.gcard:hover .tile-arrow,.ag:hover .card-go,
-.cardrow:hover .arrow{fill:var(--text-primary);transform:translateX(2px)}
+.cardrow:hover .arrow{color:var(--text-primary);transform:translateX(2px)}
 .tile-stack{display:flex;flex-direction:column}
 .cardrow-a{margin-left:auto;flex:none;display:flex;align-items:center;gap:var(--s04)}
 
@@ -362,7 +362,7 @@ svg.arrow,.tile-arrow,.card-go{
   transition:background var(--dur-short) var(--ease-standard),
              border-color var(--dur-short) var(--ease-standard)}
 .chip-tal:hover,.tw-chips button:hover{background:var(--brand-tint);border-color:var(--text-primary)}
-.chip-tal svg{width:16px;height:16px;fill:var(--accent-text)}
+.chip-tal svg{width:16px;height:16px;color:var(--accent-text)}
 
 /* status badge */
 .badge,.badges span{
@@ -453,7 +453,7 @@ svg.arrow,.tile-arrow,.card-go{
   bottom:0;height:1px;background:var(--border-subtle-01)}
 .sheet-h h2{font-size:18px;line-height:24px;font-weight:600;letter-spacing:-.2px}
 .sheet-h .x{margin-left:auto;width:44px;height:44px;display:grid;place-items:center;flex:none}
-.sheet-h .x svg{width:22px;height:22px;fill:var(--icon-primary)}
+.sheet-h .x svg{width:22px;height:22px;color:var(--icon-primary)}
 .sheet-h .x:hover{background:var(--overlay-hover)}
 /* THE BODY SIZES TO ITS CONTENT, and scrolls only when the sheet hits its
    max-height — it never RESERVES blank space (Maryam, 13 Sep 2026: "the modal has
@@ -487,23 +487,23 @@ svg.arrow,.tile-arrow,.card-go{
   background:var(--layer-02);border-left:3px solid var(--border-strong-01);
   font-size:13px;line-height:19px;letter-spacing:.1px}
 .note > span:first-child{flex:none;display:grid;place-items:start}
-.note svg{width:20px;height:20px;fill:var(--icon-secondary)}
+.note svg{width:20px;height:20px;color:var(--icon-secondary)}
 .note .nb{flex:1;min-width:0}
 .note.warn{background:var(--support-warning-bg);border-left-color:var(--support-warning-ic)}
-.note.warn svg{fill:var(--support-warning-ic)}
+.note.warn svg{color:var(--support-warning-ic)}
 .note.err{background:var(--support-error-bg);border-left-color:var(--support-error)}
-.note.err svg{fill:var(--support-error)}
+.note.err svg{color:var(--support-error)}
 .note.succ{background:var(--support-success-bg);border-left-color:var(--support-success)}
-.note.succ svg{fill:var(--support-success)}
+.note.succ svg{color:var(--support-success)}
 .note.acc{background:var(--brand-tint-2);border-left-color:var(--accent)}
-.note.acc svg{fill:var(--accent-text)}
+.note.acc svg{color:var(--accent-text)}
 /* quote block — straight from the client's own document */
 .tw-quote,.why{
   display:block;padding-left:var(--s05);border-left:3px solid var(--brand-primary);
   font-size:14px;line-height:21px;color:var(--text-primary)}
 .empty{
   padding:var(--s08) var(--gutter);text-align:center;color:var(--text-secondary)}
-.empty svg{width:32px;height:32px;fill:var(--text-placeholder);margin:0 auto var(--s04)}
+.empty svg{width:32px;height:32px;color:var(--text-placeholder);margin:0 auto var(--s04)}
 .empty .t{display:block;font-size:15px;font-weight:600;color:var(--text-primary);margin-bottom:var(--s02)}
 
 /* ==========================================================================

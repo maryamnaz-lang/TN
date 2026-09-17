@@ -100,7 +100,7 @@
   width:auto;height:auto;
   border:0;border-radius:0;
   background:transparent;background-image:none}
-.app .ask-page .askfield-send svg{fill:var(--text-primary)}
+.app .ask-page .askfield-send svg{color:var(--text-primary)}
 /* THE GLYPHS MATCH THE FLOATING FIELD AT 22px (Maryam, 9 Sep 2026: "follow the
    icon sizes as well"). §105 draws the chat mic and send svg at 18; the dock's
    are 22 (§117.91), so they are restated here — a later layer at the same
@@ -125,9 +125,9 @@
   border-radius:999px;
   background:var(--accent);
   display:inline-flex;align-items:center;justify-content:center}
-.app .ask-page .askfield-send:not(:disabled) svg{fill:var(--on-accent)}
+.app .ask-page .askfield-send:not(:disabled) svg{color:var(--on-accent)}
 .app .ask-page .askfield-mic.on{background:transparent;border:0}
-.app .ask-page .askfield-mic.on svg{fill:var(--danger-ink)}
+.app .ask-page .askfield-mic.on svg{color:var(--danger-ink)}
 .app .ask-page .askfield-mic + .askfield-send{margin-left:calc(var(--s05) - var(--s03))}
 
 /* ------------------------------------------------------------------ 118.2 ---
@@ -171,5 +171,5 @@
   width:auto;height:auto;
   border:0;border-radius:0;
   background:transparent;background-image:none}
-.app .ob-send svg{fill:var(--text-primary)}
-.app .ob-send[disabled] svg{fill:var(--text-helper)}
+.app .ob-send svg{color:var(--text-primary)}
+.app .ob-send[disabled] svg{color:var(--text-helper)}

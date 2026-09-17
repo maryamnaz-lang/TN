@@ -675,11 +675,11 @@ textarea.inp{min-height:88px}
 .sn-item{
   min-height:48px;padding:0 var(--pad-x);gap:var(--s05);
   font-size:14px;letter-spacing:.1px;color:#828282}
-.sn-item svg{width:20px;height:20px;flex:none;fill:#828282}
+.sn-item svg{width:20px;height:20px;flex:none;color:#828282}
 .sn-item > span{flex:1;min-width:0}
 .sn-item:hover{background:var(--overlay-hover)}
 .sn-item.on{background:transparent;font-weight:600}
-.sn-item.on svg{fill:var(--icon-primary)}
+.sn-item.on svg{color:var(--icon-primary)}
 .sn-item.on::before{content:'';position:absolute;left:0;top:0;bottom:0;
   width:2px;background:var(--accent)}
 .sn-item .badge{
@@ -1050,7 +1050,7 @@ body{background:var(--background)}
   font-size:14px;font-weight:600;letter-spacing:.1px;color:var(--text-primary)}
 .device[data-vp="mobile"] .ios-time{font-variant-numeric:tabular-nums}
 .ios-ind{display:flex;align-items:center;gap:5px}
-.ios-ind svg{height:11px;width:auto;fill:var(--text-primary)}
+.ios-ind svg{height:11px;width:auto;color:var(--text-primary)}
 .ios-ind svg:nth-child(3){height:12px}
 .device[data-vp="mobile"] .ios-home{
   display:flex;align-items:center;justify-content:center;
@@ -1085,9 +1085,9 @@ body{background:var(--background)}
   display:flex;flex-direction:column;gap:var(--s03);min-width:0;
   padding:var(--s05) var(--s04);background:var(--surface-dark);position:relative}
 .path-mark{display:flex;gap:2px}
-.path-mark svg{width:14px;height:17px;fill:var(--on-dark-dim)}
-.path-step.on .path-mark svg{fill:var(--accent)}
-.path-step.past .path-mark svg{fill:var(--on-dark-2);opacity:.6}
+.path-mark svg{width:14px;height:17px;color:var(--on-dark-dim)}
+.path-step.on .path-mark svg{color:var(--accent)}
+.path-step.past .path-mark svg{color:var(--on-dark-2);opacity:.6}
 .path-n{
   font-size:13px;line-height:18px;font-weight:600;letter-spacing:.1px;
   color:var(--on-dark-2);overflow-wrap:anywhere}
@@ -1226,7 +1226,7 @@ button[data-toggle]:hover,button[data-addcard]:hover{background-color:transparen
              border-left-color var(--dur-short) var(--ease-standard)}
 .signed.clk{cursor:pointer}
 .signed.clk:hover{background:var(--overlay-hover);border-left-color:var(--accent)}
-.signed.clk:hover .tile-arrow{fill:var(--text-primary);transform:translateX(2px)}
+.signed.clk:hover .tile-arrow{color:var(--text-primary);transform:translateX(2px)}
 .signed.clk:focus-visible{outline:2px solid var(--brand-primary);outline-offset:2px}
 .signed-h{
   display:flex;align-items:center;gap:var(--s04);
@@ -1273,7 +1273,7 @@ button[data-toggle]:hover,button[data-addcard]:hover{background-color:transparen
 .ch.done .ch-num{
   background:transparent;color:var(--text-secondary);border:1px solid var(--rule);
   font-weight:600}
-.ch.done .ch-ic svg{fill:var(--accent)}
+.ch.done .ch-ic svg{color:var(--accent)}
 
 /* ==========================================================================
    37. NO HOLES, NO STRAY BANDS

@@ -129,6 +129,6 @@
 .app .qz-mk{
   flex:none;display:grid;place-items:center;
   width:24px;height:24px;border-radius:50%;margin-top:-1px}
-.app .qz-mk svg{width:15px;height:15px;fill:var(--text-primary)}
+.app .qz-mk svg{width:15px;height:15px;color:var(--text-primary)}
 .app .qz-mk.ok{background:var(--accent)}
 .app .qz-mk.wa{background:var(--brand-tint-2)}

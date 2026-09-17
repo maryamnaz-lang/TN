@@ -165,7 +165,7 @@
   padding:var(--s04) var(--s05);
   border-left:0;
   background-color:var(--accent-tint)}
-.app .note.acc svg{fill:var(--accent-on-2)}
+.app .note.acc svg{color:var(--accent-on-2)}
 
 /* AND THE BAND STANDS OFF THE LIST ABOVE IT. The last fact row gives up its
    bottom padding and its rule together (§2), which is right — a rule under the

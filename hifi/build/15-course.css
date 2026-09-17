@@ -61,9 +61,9 @@
   cursor:pointer;background:none;text-align:left}
 .app .stp-row:last-child{border-bottom:0}
 .app .stp-ic{flex:none;display:grid;place-items:center;height:20px}
-.app .stp-ic svg{display:block;width:17px;height:17px;fill:var(--icon-secondary)}
-.app .stp-row.did .stp-ic svg{fill:var(--support-success)}
-.app .stp-row.on  .stp-ic svg{fill:var(--accent)}
+.app .stp-ic svg{display:block;width:17px;height:17px;color:var(--icon-secondary)}
+.app .stp-row.did .stp-ic svg{color:var(--support-success)}
+.app .stp-row.on  .stp-ic svg{color:var(--accent)}
 .app .stp-b{display:flex;flex-direction:column;gap:1px;min-width:0}
 .app .stp-b b{font-size:13.5px;line-height:19px;font-weight:400}
 .app .stp-row.on .stp-b b{font-weight:600}
@@ -113,7 +113,7 @@
 .app .rec-plate{
   position:relative;aspect-ratio:16/9;background:var(--surface-dark);
   display:grid;place-items:center}
-.app .rec-play svg{width:34px;height:34px;fill:var(--on-dark);display:block;opacity:.94}
+.app .rec-play svg{width:34px;height:34px;color:var(--on-dark);display:block;opacity:.94}
 .app .rec-len{
   position:absolute;right:var(--s04);bottom:var(--s03);
   color:var(--on-dark-2);font-size:11px;line-height:15px;font-variant-numeric:tabular-nums}
@@ -469,7 +469,7 @@
 .app .ch-n{display:inline-flex;align-items:center;gap:var(--s03)}
 .app .ch-tick{display:inline-flex;flex:none}
 .app .ch-tick svg{
-  display:block;width:15px;height:15px;fill:var(--support-success)}
+  display:block;width:15px;height:15px;color:var(--support-success)}
 
 /* THE CHAPTER RING IS A QUIET GREY — Maryam, 9 Sep 2026: "for the circle icons
    use a very light grey like #828282." On the cohort leader's member page every
@@ -486,7 +486,7 @@
    and against the green tick the empty rings still pulled the eye. `--gray-20`
    (#e1e0dc) is the light end of the neutral ramp — the ring reads as an absence
    waiting to be filled rather than a mark competing with the one that is. */
-.app .ch:not(.done):not(.locked) .ch-ic svg{fill:var(--gray-20)}
+.app .ch:not(.done):not(.locked) .ch-ic svg{color:var(--gray-20)}
 
 /* and one named action closes the row */
 .app .ch-act{
@@ -542,7 +542,7 @@
 .app .cert-mark{
   grid-area:mark;display:grid;place-items:center;
   width:auto;height:auto;margin:0;align-self:center}
-.app .cert-mark svg{width:88px;height:88px;fill:var(--accent)}
+.app .cert-mark svg{width:88px;height:88px;color:var(--accent)}
 .app .cert-b{grid-area:body;min-width:0}
 .app .cert-eb{
   font-size:11px;line-height:15px;font-weight:600;letter-spacing:.8px;
@@ -555,7 +555,7 @@
 .app .cert-btn{
   background-color:transparent;color:var(--on-dark);
   border:1px solid var(--on-dark-border)}
-.app .cert-btn svg{fill:var(--on-dark)}
+.app .cert-btn svg{color:var(--on-dark)}
 
 @container app (min-width:672px){
   .app .cert{
@@ -678,9 +678,9 @@
 .app .path-mark{display:block}
 .app .path-mark svg{
   display:block;width:22px;height:22px;
-  fill:var(--on-dark-dim);margin-bottom:var(--s04)}
-.app .path-step.on .path-mark svg{fill:var(--accent)}
-.app .path-step.past .path-mark svg{fill:var(--on-dark-2);opacity:.6}
+  color:var(--on-dark-dim);margin-bottom:var(--s04)}
+.app .path-step.on .path-mark svg{color:var(--accent)}
+.app .path-step.past .path-mark svg{color:var(--on-dark-2);opacity:.6}
 .app .path-n{font-size:14px;line-height:19px}
 .app .path-w{
   font-size:11.5px;line-height:16px;color:var(--on-dark-2);
@@ -744,10 +744,10 @@
    (`--text-secondary` #828282, the side-nav icon colour). `.nrow-ic` is the
    notification icon and nothing else in any portal, so this needs no `.notif`
    scope. */
-.app .nrow .nrow-ic{border:0;background-color:transparent}
-.app .nrow .nrow-ic svg{fill:var(--text-secondary)}
-.app .nrow.un .nrow-ic{background-color:transparent}
-.app .nrow.un .nrow-ic svg{fill:var(--accent)}
+.app .nrow .nrow-ic{border:0;background-color:transparent;background-image:none}
+.app .nrow .nrow-ic svg{color:var(--text-secondary)}
+.app .nrow.un .nrow-ic{background-color:transparent;background-image:none}
+.app .nrow.un .nrow-ic svg{color:var(--accent)}
 /* and a read row steps its words back rather than being marked absent */
 .app .nrow:not(.un) .nrow-t{color:var(--text-secondary);font-weight:500}
 .app .nrow:not(.un) .nrow-d,.app .nrow:not(.un) .nrow-w{color:var(--text-helper)}
@@ -772,17 +772,6 @@
 @container app (min-width:900px){
   .app .notif-scrim.on{opacity:1;visibility:visible;pointer-events:auto}
 }
-
-/* THE PANEL FOOTER — "View all notifications", the admin's link to the full
-   record. Its rule pays the gutter like the others, and the link and its arrow
-   read in the accent as ink (Maryam, 15 Sep 2026). */
-.app .notif-f{padding:var(--s04) var(--pad-x) var(--s05);position:relative}
-.app .notif-f::before{content:'';position:absolute;left:var(--pad-x);right:var(--pad-x);
-  top:0;height:1px;background:var(--rule)}
-.app .notif-viewall{
-  display:flex;align-items:center;justify-content:center;gap:var(--s02);
-  width:100%;color:var(--accent-text);font-weight:var(--t-w-strong)}
-.app .notif-viewall svg{width:18px;height:18px;fill:var(--accent-text)}
 
 /* ==========================================================================
    AN ACTION IN THE PAGE HEADER
@@ -994,7 +983,7 @@
 .app .agid-v{
   display:inline-flex;align-items:center;gap:var(--s02);
   color:var(--support-success-ink);font-weight:600}
-.app .agid-v svg{width:15px;height:15px;fill:var(--support-success-ink);display:block}
+.app .agid-v svg{width:15px;height:15px;color:var(--support-success-ink);display:block}
 /* the agent speaks for a whole column, not a 62-character aside */
 .app .agid-bio,.app .sec > p.agid-bio{
   margin-top:var(--s06);max-width:none;
@@ -1015,9 +1004,9 @@
    read as five glyphs. Gold is what a star means. Green is what a check
    means. Neither is the accent, so neither competes with it.
    ========================================================================== */
-.app .stars svg.f,.app .stars svg[class*="f"]{fill:var(--star)}
+.app .stars svg.f,.app .stars svg[class*="f"]{color:var(--star)}
 .app .tag.green,.app .tag.green svg{color:var(--support-success-ink)}
-.app .tag.green svg{fill:var(--support-success-ink)}
+.app .tag.green svg{color:var(--support-success-ink)}
 
 /* AND THE WARNING TAG WAS LEFT BEHIND WHEN THE GREEN ONE WAS FIXED. §02 gave
    `.tag.warn` / `.tag.org` an amber FILL with `--on-warning-bg` ink; §12 then
@@ -1037,7 +1026,7 @@
    as the moderate-severity ink in the leader's attention queue. */
 .app .tag.warn,.app .tag.org,
 .app .tag.warn svg,.app .tag.org svg{color:var(--support-attention)}
-.app .tag.warn svg,.app .tag.org svg{fill:var(--support-attention)}
+.app .tag.warn svg,.app .tag.org svg{color:var(--support-attention)}
 
 /* Tal's own paragraph takes the column too */
 .app .ai-aura .ai-body,.app .ai-aura .ai-body p{max-width:none}
@@ -1330,7 +1319,7 @@
 .app .vn{display:flex;align-items:center;gap:var(--s04);min-width:180px}
 .app .vn-play{flex:none;display:grid;place-items:center;
   width:28px;height:28px;background-color:var(--accent)}
-.app .vn-play svg{width:15px;height:15px;fill:var(--on-accent);display:block}
+.app .vn-play svg{width:15px;height:15px;color:var(--on-accent);display:block}
 .app .vn-wave{display:flex;align-items:center;gap:2px;flex:1;min-width:0}
 .app .vn-wave i{display:block;width:2px;background-color:var(--accent);opacity:.5}
 .app .vn-len{
@@ -1341,7 +1330,7 @@
 .app .fa{
   display:flex;align-items:center;gap:var(--s04);margin-top:var(--s04);
   padding:var(--s04);border:1px solid var(--rule);background-color:var(--background)}
-.app .fa-ic svg,.app .fa-dl svg{width:18px;height:18px;fill:var(--icon-secondary);display:block}
+.app .fa-ic svg,.app .fa-dl svg{width:18px;height:18px;color:var(--icon-secondary);display:block}
 .app .fa-b{display:flex;flex-direction:column;gap:1px;min-width:0;flex:1}
 .app .fa-b b{font-size:12.5px;line-height:17px;font-weight:600}
 .app .fa-b > span{font-size:11px;line-height:15px;color:var(--text-secondary)}
@@ -1351,7 +1340,7 @@
   display:flex;align-items:center;gap:var(--s04);
   padding:var(--s06) var(--pad-x) var(--s07)}
 .app .composer-star{flex:none;display:grid;place-items:center}
-.app .composer-star svg{width:18px;height:18px;fill:var(--accent);display:block}
+.app .composer-star svg{width:18px;height:18px;color:var(--accent);display:block}
 .app .msg-page .composer .inp{
   flex:1;min-width:0;min-height:44px;
   background-color:var(--pure-white);
@@ -1360,11 +1349,11 @@
 .app .composer-act{
   flex:none;display:grid;place-items:center;width:40px;height:40px;
   background:none;border:0;cursor:pointer}
-.app .composer-act svg{width:20px;height:20px;fill:var(--icon-secondary);display:block}
+.app .composer-act svg{width:20px;height:20px;color:var(--icon-secondary);display:block}
 .app .composer-send{
   flex:none;display:grid;place-items:center;width:44px;height:44px;
   background-color:var(--accent);border:0;cursor:pointer}
-.app .composer-send svg{width:20px;height:20px;fill:var(--on-accent);display:block}
+.app .composer-send svg{width:20px;height:20px;color:var(--on-accent);display:block}
 
 /* ==========================================================================
    A PAST INTERVIEW
@@ -1442,7 +1431,7 @@
    an even 3px is what stops the three reading as a paragraph. */
 .app .ivrow-wb > .ivrow-out{margin-top:3px}
 .app .ivrow-wb > .ivrow-eb{margin-top:3px}
-.app .ivrow-who .tile-arrow{flex:none;width:18px;height:18px;fill:var(--icon-secondary)}
+.app .ivrow-who .tile-arrow{flex:none;width:18px;height:18px;color:var(--icon-secondary)}
 
 .app .ivrow-kit{
   display:grid;grid-template-columns:minmax(0,1fr);gap:1px;
@@ -1453,7 +1442,7 @@
   padding:var(--s05) var(--s05);background-color:var(--background);min-width:0}
 .app .kit-ic{flex:none;display:grid;place-items:center;width:26px;height:26px;
   border:1px solid var(--rule)}
-.app .kit-ic svg{width:14px;height:14px;fill:var(--icon-secondary);display:block}
+.app .kit-ic svg{width:14px;height:14px;color:var(--icon-secondary);display:block}
 .app .kit-b{display:flex;flex-direction:column;gap:1px;min-width:0}
 .app .kit-b b{font-size:12.5px;line-height:17px;font-weight:600}
 .app .kit-b > span{font-size:11px;line-height:15px;color:var(--text-secondary)}
@@ -1807,7 +1796,7 @@
   font-size:11px;line-height:15px;font-weight:600;letter-spacing:.8px;
   text-transform:uppercase;white-space:nowrap}
 .app .plate-when svg{
-  flex:none;width:14px;height:14px;fill:var(--on-dark-2);display:block}
+  flex:none;width:14px;height:14px;color:var(--on-dark-2);display:block}
 .app .plate-when b{font-weight:600}
 .app .plate-t{
   margin-top:var(--s03);
@@ -1968,7 +1957,7 @@
 /* the plate is dark, so its primary action cannot be black */
 .app .plate .btn-p{
   background-color:var(--accent);color:var(--on-accent);border-color:var(--accent)}
-.app .plate .btn-p svg{fill:var(--on-accent)}
+.app .plate .btn-p svg{color:var(--on-accent)}
 
 /* ==========================================================================
    WHERE YOU STAND

@@ -68,7 +68,7 @@
   background-color:var(--on-dark-fill);
   background-image:none;
   border-color:transparent;
-  --on-brand-fill:0}
+  --on-brand-color:0}
 /* THE ARROW FOLLOWS THE WORDS. §75.3 sets `fill:var(--on-accent)` on this
    button's svg at (0,4,0) — white, which was correct while the ground was
    orange and is a white arrow on a grey wash here. `currentColor` rather than a
@@ -108,7 +108,7 @@
   background-color:var(--on-dark-fill);
   background-image:none;
   border-color:transparent;
-  --on-brand-fill:0}
+  --on-brand-color:0}
 .app .plate .btn.btn-p[disabled] svg{fill:currentColor}
 
 /* AND NOTHING IS STATED FOR A GATED JOIN ON A WHITE GROUND, because §02.108

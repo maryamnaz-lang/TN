@@ -322,7 +322,7 @@ V.leadEvals = () => {
              Candidate" — one verb per state, and the two must not both be on
              screen saying different things about the same button. */}
       ${done ? '<span class="row-cta">View Evaluation</span>' : ''}
-      <svg class="tile-arrow" viewBox="0 -960 960 960">${inner('arrowRight')}</svg>
+      <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg>
     </button>`;
   };
 

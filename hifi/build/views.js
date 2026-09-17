@@ -439,7 +439,7 @@ function shell(){
       <button class="shell-act acct-t ${S.acct?'on':''}" data-toggle="acct"
         aria-label="Account" aria-haspopup="menu" aria-expanded="${S.acct?'true':'false'}">
         <span class="shell-avatar"><img src="${isLead()?AV.priya:AV.hana}" alt=""><i>${isLead()?'PN':'MN'}</i></span>
-        <svg class="acct-c" viewBox="0 -960 960 960" aria-hidden="true">${inner('chevDown')}</svg>
+        <svg class="acct-c" viewBox="0 0 24 24" aria-hidden="true">${inner('chevDown')}</svg>
       </button>
       ${acctMenu()}
     </div>
@@ -684,7 +684,7 @@ function agentCardOf(a, key){
       <span class="ag-m">${a.range} · ${a.ivs} interviews</span>
       <span class="ag-foot"><span style="color:var(--text-secondary)">Next: ${a.slot}</span><span class="ag-price">${a.price}</span></span>
     </span>
-    <svg class="card-go" viewBox="0 -960 960 960">${inner('arrowRight')}</svg>
+    <svg class="card-go" viewBox="0 0 24 24">${inner('arrowRight')}</svg>
   </div>`;
 }
 function agentCard(key){ return agentCardOf(AGENTS[key], key); }
@@ -1422,7 +1422,7 @@ const gcard = (kind,tag,title,sub,go,art,at) => `<button class="tile clk gcard" 
     ${tag?`<span class="eyebrow">${tag}</span>`:''}
     <h3>${title}</h3><span class="sub">${sub}</span>
   </span>
-  <svg class="tile-arrow" viewBox="0 -960 960 960">${inner('arrowRight')}</svg>
+  <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg>
 </button>`;
 
 const pict = (k,cls) => `<span class="pict ${cls||''}">${PG[k]}</span>`;
@@ -4145,7 +4145,7 @@ const allCourses = (f) => {
         <p class="all-desc">Every course in your track. The one recommended for you now is marked.</p>
       </div>
       <div class="srch all-srch">
-        <svg class="mag" viewBox="0 -960 960 960">${inner('search')}</svg>
+        <svg class="mag" viewBox="0 0 24 24">${inner('search')}</svg>
         <input class="inp" placeholder="Search all ${COURSE_LEVELS.length} courses" aria-label="Search courses">
       </div>
     </div>
@@ -5020,7 +5020,7 @@ const CALL_ROW = {
        countdown of one minute cannot be true at the same time as a date six
        days out. One edit either way — this line, or those two — and the note
        over `bkStamp` is the argument for why they must agree. */
-    return {who:a, role:'Talent agent', when:'in 1 minute',
+    return {who:a, role:'Talent agent', when:'in 5 minutes',
       label:'Level interview &middot; 45 minutes, recorded',
       x:`${(REC[k] || REC.priya).expertise}, assesses ${a.range}`,
       kind:'iv', second:{go:'interviews', ic:I.calendar, t:'Reschedule'}};
@@ -6305,7 +6305,7 @@ created: () => `${authShell()}
         ${['What happens in the interview?','How do I move up a level?','Which agent suits me?'].map(q=>
         `<button class="tile clk arrow band" data-go="stage:new">
           <span class="t-body-compact-01">${q}</span>
-          <svg class="tile-arrow" viewBox="0 -960 960 960">${inner('arrowRight')}</svg></button>`).join('')}
+          <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg></button>`).join('')}
       </div>
     </div>
   </div>
@@ -8253,7 +8253,7 @@ const allAgents = () => `
         <p class="all-desc">Select an agent from whom you want to be interviewed.</p>
       </div>
       <div class="srch all-srch">
-        <svg class="mag" viewBox="0 -960 960 960">${inner('search')}</svg>
+        <svg class="mag" viewBox="0 0 24 24">${inner('search')}</svg>
         <input class="inp" placeholder="Search all 24 agents" aria-label="Search agents">
       </div>
     </div>
@@ -12127,13 +12127,13 @@ function dd(key, opts, val){
     <button type="button" class="inp dd-btn" data-ddtoggle="${key}"
       aria-haspopup="listbox" aria-expanded="${open}">
       <span class="dd-val t-body">${cur}</span>
-      <svg class="dd-cx" viewBox="0 -960 960 960">${inner('chevDown')}</svg>
+      <svg class="dd-cx" viewBox="0 0 24 24">${inner('chevDown')}</svg>
     </button>
     <div class="dd-menu" role="listbox">
       ${opts.map(o => `<button type="button" class="dd-opt${o === cur ? ' on' : ''}"
         role="option" aria-selected="${o === cur}" data-ddset="${key}:${o}">
         <span class="dd-opt-t t-body">${o}</span>
-        <svg class="dd-tick" viewBox="0 -960 960 960">${inner('check')}</svg></button>`).join('')}
+        <svg class="dd-tick" viewBox="0 0 24 24">${inner('check')}</svg></button>`).join('')}
     </div>
   </div>`;
 }
@@ -14394,7 +14394,7 @@ function ivRow(kind, label, date, outcome, len){
         <span class="ivrow-out">${outcome}</span>
         <span class="ivrow-eb">${date}</span>
       </span>
-      <svg class="tile-arrow" viewBox="0 -960 960 960">${inner('arrowRight')}</svg>
+      <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg>
     </div>
   </div>`;
 }

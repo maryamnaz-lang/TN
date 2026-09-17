@@ -275,8 +275,8 @@
    which is exactly what trap 3's counter-example (§77.6a) cost a build cycle.
    Both classes on one compound is (0,4,1) and states a structural truth.
    The unconditional rule is the white-page case the design system ships. */
-.app .eo-fi-star svg{fill:var(--star)}
-.app .dark-card .eo-fi.eo-fi-star svg{fill:var(--star)}
+.app .eo-fi-star svg{color:var(--star)}
+.app .dark-card .eo-fi.eo-fi-star svg{color:var(--star)}
 
 /* ------------------------------------------------------------------- 108.4 ---
    THE FIGURE ROW'S TOP SPACE IS PAID BY THE BLOCK ABOVE IT NOW

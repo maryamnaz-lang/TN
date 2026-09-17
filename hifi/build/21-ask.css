@@ -222,7 +222,7 @@
   width:32px;height:32px;margin-left:auto;
   background-color:var(--layer-accent-01)}
 .app .askdock .askline-send svg{
-  width:18px;height:18px;fill:var(--text-placeholder);display:block}
+  width:18px;height:18px;color:var(--text-placeholder);display:block}
 
 /* THE MARK, AT THE SIZE THE ROW CAN CARRY, AND MOVING.
    §1 draws the line's mark at 16px as a flat star masked out of `--accent`.
@@ -334,7 +334,7 @@
 .app .ask-top .ph-back{
   display:grid;place-items:center;width:32px;height:32px;flex:none;
   margin-left:calc(var(--s03) * -1);background:transparent}
-.app .ask-top .ph-back svg{width:20px;height:20px;fill:var(--icon-primary)}
+.app .ask-top .ph-back svg{width:20px;height:20px;color:var(--icon-primary)}
 .app .ask-top-t{
   font-size:13.5px;line-height:18px;font-weight:600;letter-spacing:.05px}
 /* `.ask-top-s` — the header's right-hand status line — was stated here
@@ -382,8 +382,8 @@
 .app .askfield-send{
   flex:none;width:46px;height:46px;display:grid;place-items:center;
   background-image:var(--accent-grad);background-color:var(--accent);
-  border:0;--on-brand-fill:1}
-.app .askfield-send svg{width:20px;height:20px;fill:var(--on-accent);display:block}
+  border:0;--on-brand-color:1}
+.app .askfield-send svg{width:20px;height:20px;color:var(--on-accent);display:block}
 .app .ask-foot .tal-legal{margin:var(--s04) 0 0}
 
 /* ------------------------------------------------------------------ 5 ---
