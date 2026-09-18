@@ -13598,7 +13598,7 @@ function pfLinkedView(){
                 empty placeholder disc when it is not. A person's photo is a
                 disc (§106). */}
           <span class="lacc-av">${on
-            ? avatar({i:'', img:AV.hana}, 64)
+            ? avatar({i:'', img:AV.hana}, 36)
             : `<span class="lacc-av-empty">${I.user}</span>`}</span>
           <span class="lacc-cta t-label">${on
             ? `<span class="lacc-mk lacc-on">${I.checkFilled}</span>Linked`

@@ -10317,6 +10317,7 @@ button.btn-p:active,
   font-size:var(--t-sec-size);line-height:var(--t-sec-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-sec-ls);
   text-transform:none;color:var(--text-primary)}
+.app .conf.conf-ok .conf-a .btn-p{color:var(--text-primary)}
 .app .ob-go{
   font-size:var(--t-h3-size);line-height:var(--t-h3-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-h3-ls);
@@ -12526,11 +12527,11 @@ button.btn-p:active,
   margin-bottom:var(--s02);color:var(--brand)}
 .app .lacc-ic svg{width:36px;height:36px;display:block;fill:currentColor}
 .app .lacc-av{margin-top:auto;display:block}
-.app .lacc-av .av-ph{width:48px;height:48px;border-radius:999px}
+.app .lacc-av .av-ph{width:36px;height:36px;border-radius:999px}
 .app .lacc-av-empty{
-  display:grid;place-items:center;width:48px;height:48px;border-radius:999px;
+  display:grid;place-items:center;width:36px;height:36px;border-radius:999px;
   background:var(--gray-10);color:var(--gray-40)}
-.app .lacc-av-empty svg{width:24px;height:24px;fill:currentColor}
+.app .lacc-av-empty svg{width:18px;height:18px;fill:currentColor}
 .app .lacc-cta{
   display:inline-flex;align-items:center;gap:var(--s02);margin-top:auto}
 .app .lacc-mk{display:grid;place-items:center;width:16px;height:16px}
@@ -13163,6 +13164,12 @@ button.btn-p:active,
   animation:mo-up var(--mo-slow) var(--mo-enter) both}
 .app[data-open~="enrolOk"] .modal:has(> .conf-ok){
   animation:mo-fade var(--mo-base) var(--mo-standard) both}
+.app .conf.conf-ok{padding-top:var(--s05);padding-bottom:var(--s05)}
+.app .conf.conf-ok > .conf-b{padding:var(--s05) var(--s05) var(--s03)}
+.app .conf.conf-ok .conf-mk{margin-bottom:var(--s04)}
+.app .conf.conf-ok > .conf-a{padding-top:0}
+.app .conf.conf-ok .conf-a .btn-p{
+  background:var(--layer-02);border:1px solid var(--rule)}
 .app .ol .acc-h .ttl{
   display:flex;flex-direction:column;align-items:flex-start}
 .app .ol .ol-m{margin-top:2px}
@@ -13917,18 +13924,17 @@ button.btn-p:active,
 .pf-ring-b{display:flex; flex-direction:column; gap:2px; min-width:0}
 .pf-ring-b h3{margin:0}
 .app .iv-rec{
-  display:block;width:100%;max-width:560px;padding:0;
-  border:1px solid var(--rule);background:var(--gray-100);
-  overflow:hidden;cursor:pointer}
-.app .iv-rec-art{
-  position:relative;display:block;width:100%;aspect-ratio:16 / 9;overflow:hidden}
-.app .iv-rec-art > img{width:100%;height:100%;object-fit:cover;display:block}
-.app .iv-rec-art::after{
-  content:"";position:absolute;inset:0;pointer-events:none;
-  background:linear-gradient(180deg,rgba(0,0,0,0) 55%,rgba(0,0,0,.42))}
-.app .iv-rec .scv-play{z-index:1;width:56px;height:56px}
-.app .iv-rec .scv-play svg{width:26px;height:26px}
-.app .iv-rec .scv-at{z-index:1}
+  display:flex;align-items:center;gap:var(--s04);
+  width:100%;max-width:480px;padding:var(--s03) var(--s04);
+  border:1px solid var(--rule);background:var(--layer-01);
+  cursor:pointer;text-align:left}
+.app .iv-rec-thumb{
+  flex:none;width:64px;height:44px;overflow:hidden;background:var(--gray-100)}
+.app .iv-rec-thumb > img{width:100%;height:100%;object-fit:cover;display:block}
+.app .iv-rec-b{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1 1 auto}
+.app .iv-rec-n{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.app .iv-rec-open{flex:none;display:grid;place-items:center;width:36px;height:36px}
+.app .iv-rec-open svg{width:22px;height:22px}
 .app .iv-ladder{margin:var(--s04) 0 var(--s03)}
 .app .rowmenu{position:relative; display:inline-block}
 .app .rowmenu-list{
@@ -22914,7 +22920,7 @@ function pfLinkedView(){
                 empty placeholder disc when it is not. A person's photo is a
                 disc (§106). */}
           <span class="lacc-av">${on
-            ? avatar({i:'', img:AV.hana}, 64)
+            ? avatar({i:'', img:AV.hana}, 36)
             : `<span class="lacc-av-empty">${I.user}</span>`}</span>
           <span class="lacc-cta t-label">${on
             ? `<span class="lacc-mk lacc-on">${I.checkFilled}</span>Linked`

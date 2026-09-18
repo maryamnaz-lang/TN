@@ -36,7 +36,7 @@
      rule sweep clean on 21 screens, 84 screen-width combos with no overflow,
      zero thrown errors.
      ========================================================================== -->
-<link rel="stylesheet" href="design-system/talentnext-ds.css?b=52f2aea8">
+<link rel="stylesheet" href="design-system/talentnext-ds.css?b=7a062748">
 
 <style>
 /* ==========================================================================
@@ -134,7 +134,7 @@
        somebody choosing a stage would want it. -->
 </div>
 
-<script src="design-system/talentnext-ds.js?b=52f2aea8"></script>
+<script src="design-system/talentnext-ds.js?b=7a062748"></script>
 <script>
 /* ==========================================================================
    THE TALENT AGENT PORTAL
@@ -4422,9 +4422,12 @@ V.interview = v => {
     <section class="sec">
       <div class="sec-h"><h2>Interview recording</h2></div>
       <button class="iv-rec" data-go="transcript" data-iv="${x.id}" aria-label="Play the recording of your interview with ${x.n}">
-        <span class="iv-rec-art"><img src="${recStill(x)}" alt="" loading="lazy">
-          <span class="scv-play">${I.play}</span>
-          <span class="scv-at">48:00</span></span>
+        <span class="iv-rec-thumb"><img src="${recStill(x)}" alt="" loading="lazy"></span>
+        <span class="iv-rec-b">
+          <span class="iv-rec-n t-body">Interview with ${x.n}.mp4</span>
+          <span class="iv-rec-m t-desc">Video recording &middot; 48:00</span>
+        </span>
+        <span class="iv-rec-open">${I.play}</span>
       </button>
     </section>
 

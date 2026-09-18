@@ -158,27 +158,25 @@
 .pf-ring-b{display:flex; flex-direction:column; gap:2px; min-width:0}
 .pf-ring-b h3{margin:0}
 
-/* --- 4. THE INTERVIEW RECORDING THUMBNAIL — Maryam, 18 Sep 2026 -------------
-   The agent's recommendation screen carries a still of the call the report is
-   built from, attached as a 16:9 card. The play disc and the duration chip are
-   §111's `.scv-play` / `.scv-at`, reused so the white-on-dark ink is stated once
-   in §111 and this layer adds only geometry and ground — §63 owns every colour,
-   size, weight and case, so nothing here touches those. Agent-portal only, in the
-   design system via this layer (§124). */
+/* --- 4. THE INTERVIEW RECORDING ATTACHMENT — Maryam, 18 Sep 2026 ------------
+   The recording reads as an ATTACHMENT FILE row under its heading (Maryam, "the
+   recording should be like an attachment file"), not a full 16:9 card: a bordered
+   row with a small frame thumbnail, the filename + a meta line, and a trailing
+   play mark. Filename/meta type comes from `.t-body` / `.t-desc` in the markup, so
+   §63 still owns every size, weight and colour; this layer is geometry only.
+   Agent-portal only, in the design system via this layer (§124). */
 .app .iv-rec{
-  display:block;width:100%;max-width:560px;padding:0;
-  border:1px solid var(--rule);background:var(--gray-100);
-  overflow:hidden;cursor:pointer}
-.app .iv-rec-art{
-  position:relative;display:block;width:100%;aspect-ratio:16 / 9;overflow:hidden}
-.app .iv-rec-art > img{width:100%;height:100%;object-fit:cover;display:block}
-/* a soft dark wash at the foot so the play disc and duration read on any frame */
-.app .iv-rec-art::after{
-  content:"";position:absolute;inset:0;pointer-events:none;
-  background:linear-gradient(180deg,rgba(0,0,0,0) 55%,rgba(0,0,0,.42))}
-/* §111's marks, one size up for the larger card; z above the wash */
-.app .iv-rec .scv-play{z-index:1;width:56px;height:56px}
-.app .iv-rec .scv-play svg{width:26px;height:26px}
-.app .iv-rec .scv-at{z-index:1}
+  display:flex;align-items:center;gap:var(--s04);
+  width:100%;max-width:480px;padding:var(--s03) var(--s04);
+  border:1px solid var(--rule);background:var(--layer-01);
+  cursor:pointer;text-align:left}
+.app .iv-rec-thumb{
+  flex:none;width:64px;height:44px;overflow:hidden;background:var(--gray-100)}
+.app .iv-rec-thumb > img{width:100%;height:100%;object-fit:cover;display:block}
+.app .iv-rec-b{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1 1 auto}
+/* the filename holds one line and ellipsises rather than wrapping the row taller */
+.app .iv-rec-n{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.app .iv-rec-open{flex:none;display:grid;place-items:center;width:36px;height:36px}
+.app .iv-rec-open svg{width:22px;height:22px}
 /* the level bar sits between the lede and the picker */
 .app .iv-ladder{margin:var(--s04) 0 var(--s03)}

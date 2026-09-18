@@ -741,11 +741,11 @@
    the tall card splits into two equal gaps: the name group at the top, the
    avatar centred, the status at the foot. */
 .app .lacc-av{margin-top:auto;display:block}
-.app .lacc-av .av-ph{width:48px;height:48px;border-radius:999px}
+.app .lacc-av .av-ph{width:36px;height:36px;border-radius:999px}
 .app .lacc-av-empty{
-  display:grid;place-items:center;width:48px;height:48px;border-radius:999px;
+  display:grid;place-items:center;width:36px;height:36px;border-radius:999px;
   background:var(--gray-10);color:var(--gray-40)}
-.app .lacc-av-empty svg{width:24px;height:24px;fill:currentColor}
+.app .lacc-av-empty svg{width:18px;height:18px;fill:currentColor}
 /* the status line is a MARK plus a word; the colour is on the mark so the word
    keeps §63's label ink. Green tick when linked, accent plus to link. */
 .app .lacc-cta{

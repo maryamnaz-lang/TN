@@ -100,3 +100,21 @@
   animation:mo-up var(--mo-slow) var(--mo-enter) both}
 .app[data-open~="enrolOk"] .modal:has(> .conf-ok){
   animation:mo-fade var(--mo-base) var(--mo-standard) both}
+
+/* --- TIGHTER SUCCESS DIALOG + A QUIET CTA — Maryam, 18 Sep 2026 -------------
+   The success confirmation (`.conf-ok`: "Interview booked" and "Successfully
+   enrolled") read tall — the outer 32px, the body's 24px top and the mark's 24px
+   margin stacked into a lot of air above three short lines. This pulls each in
+   one step. Padding only, so it lands after §63 without touching type. */
+.app .conf.conf-ok{padding-top:var(--s05);padding-bottom:var(--s05)}
+.app .conf.conf-ok > .conf-b{padding:var(--s05) var(--s05) var(--s03)}
+.app .conf.conf-ok .conf-mk{margin-bottom:var(--s04)}
+.app .conf.conf-ok > .conf-a{padding-top:0}
+
+/* THE "View My Dashboard" CTA IS A QUIET LIGHT-GREY BUTTON, NOT THE BLACK
+   PRIMARY (Maryam, 18 Sep 2026). Only the interview-booked modal carries a
+   `.btn-p` here — the enrol success button is already `.btn-s` — so this scoped
+   rule reaches that one button. Ground and border only; the black ink is set in
+   §63 (which owns text colour). */
+.app .conf.conf-ok .conf-a .btn-p{
+  background:var(--layer-02);border:1px solid var(--rule)}

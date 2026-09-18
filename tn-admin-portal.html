@@ -14,7 +14,7 @@
      The <style> block is PROTOTYPE CHROME AND NOTHING ELSE (the device frame,
      the viewport picker, the wordmark size, a toast host) — no product rule.
      ========================================================================== -->
-<link rel="stylesheet" href="design-system/talentnext-ds.css?b=52f2aea8">
+<link rel="stylesheet" href="design-system/talentnext-ds.css?b=7a062748">
 
 <style>
 /* ==========================================================================
@@ -88,6 +88,11 @@
 .app .sheet-help .sheet-help-ic{
   flex:none; width:18px; height:18px; margin-top:1px; color:var(--accent)}
 .app .sheet-help .t-desc{margin:0}
+/* A TITLED info card — the same grey `.sheet-help` shell, with a strong black
+   title over its body (Maryam, 18 Sep 2026: the "What deactivating clears" block
+   reads like the plain help card). */
+.app .sheet-help .sheet-help-b{display:flex; flex-direction:column; gap:var(--s02); min-width:0}
+.app .sheet-help .sheet-help-b b{font-weight:var(--t-w-strong); color:var(--text-primary)}
 
 /* WIDER PANEL (Maryam, 13 Sep 2026, per the reference red box): the panel takes
    a bit under half the frame and the content column reduces to fit. Overrides
@@ -241,10 +246,20 @@
    content. `.iv-tabs` is a plain-class handle on the interview page's tab section:
    zero its bottom padding and the strip's own margin, and pull the content up to a
    single --s05 gap. */
-.app .sec.iv-tabs{padding-bottom:0}
+.app .sec.iv-tabs{padding-top:var(--s05); padding-bottom:0}
 .app .sec.iv-tabs > .cs{margin-bottom:0}
 .app .sec.iv-tabs::after{content:none}
 .app .sec.iv-tabs + .sec{padding-top:var(--s05)}
+/* the head section above the tabs gives up its bottom padding so the tabs sit a
+   single --s05 below the interview title, not a full section gap (Maryam, 18 Sep
+   2026: "remove unnecessary spaces above and below tabs row"). */
+.app .sec:has(+ .sec.iv-tabs){padding-bottom:0}
+/* NO DIVIDER AFTER THE TOP SECTION BLOCK on a detail screen — the identity/facts
+   block right after the back-arrow head (Maryam, 18 Sep 2026: "remove the line
+   after the four blocks row"). §14 draws a foot rule on any section that precedes
+   a heading; `:not(#_)` adds an id's worth of specificity so this clears it
+   without `!important`. Admin-local. */
+.app .modhead + .sec:not(#_)::after{content:none}
 
 /* MODALS SIT TIGHTER (Maryam, 14 Sep 2026: "less padding from all sides").
    Admin-portal-local overrides of the DS modal frame (uniform --s06); the DS
@@ -313,6 +328,13 @@
    --support-success-ink circle with a white check — the same green-circle mark
    the import-success screen draws, at name scale. */
 .app .idname-row{display:inline-flex; align-items:center; gap:var(--s02)}
+/* the rating (★ 4.9) rides beside the agent's name (Maryam, 18 Sep 2026) — body
+   size, the number in the description grey, the star its own gold. */
+.app .idrate{display:inline-flex; align-items:center; margin-left:var(--s02); font-size:var(--t-body-size); font-weight:var(--t-w-book); color:var(--text-secondary)}
+/* A FORM FIELD's label sits a little further above its input than the DS's tight
+   2px (Maryam, 18 Sep 2026: "increase the space between heading and the desc blocks
+   ... such boxes"). Admin-wide, every `.f` field label. */
+.app .f .lbl{margin-bottom:var(--s03)}
 .app .idverify{flex:none; display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; border-radius:999px; background:var(--support-success-ink); color:var(--background)}
 /* ADD-A-USER: single-role RADIOS, and the "or / promote existing candidate"
    reveal (Maryam, 16 Sep 2026). */
@@ -496,7 +518,18 @@
    evaluation and for the candidate's rating + review. --- */
 .app .iv-card{background:var(--background); border:1px solid var(--rule); border-radius:var(--radius); padding:var(--s06)}
 .app .iv-review{display:flex; flex-direction:column; gap:var(--s04)}
-.app .iv-review-r{display:flex; align-items:center; font-size:var(--t-h3-size)}
+.app .iv-review-r{display:flex; align-items:center}
+.app .iv-review-r .stars svg{width:20px; height:20px}
+/* THE AGENT-EVALUATION CARDS are neutral light-grey cards — black icon and
+   heading, platform desc grey — not the DS's `--mk`-tinted hues (Maryam, 18 Sep
+   2026: "make the colored three cards light grey cards with black icon and
+   heading, desc should have the desc color"). Admin-local, scoped to `.iv-eval`
+   so the candidate portal's signed-summary cards keep their colour. */
+.app .iv-eval .sig-c{background:var(--surface-2); border:1px solid var(--rule)}
+.app .iv-eval .sig-ic{color:var(--icon-primary)}
+.app .iv-eval .sig-t{color:var(--text-primary)}
+.app .iv-eval .sig-p{color:var(--text-secondary)}
+.app .iv-eval .sig-tag{color:var(--text-secondary); background:color-mix(in srgb, var(--text-secondary) 12%, var(--layer-01))}
 
 /* --- A headed section's heading sits FLUSH with its content on both sides
    (Maryam 15 Sep 2026: padding:0, not the double-inset padding:0 var(--pad-x)) --- */
@@ -528,8 +561,18 @@
    bottom hairlines bleed to the full section width. */
 .app .crs-list .acc-b{max-width:none}
 /* The in-progress course's progress body (coursePerf + chapter list) — the chapter
-   block stands off the performance section's key-insight foot by `--s07`. */
+   block stands off the performance section by `--s07`. */
 .app .crs-prog-ch{margin-top:var(--s07)}
+/* the progress body stands off the course row it opens from (Maryam, 18 Sep 2026:
+   "add space after the inprogress course row and it's content"). */
+.app .crs-prog{padding-top:var(--s05)}
+/* THE CHAPTER STATUS MARK SITS AT THE ROW'S RIGHT END, middle-aligned (Maryam, 18
+   Sep 2026, off the candidate portal): a green filled check for a finished chapter,
+   a light bordered ring for the rest. Overrides the DS `.ch-ic` grey square. */
+.app .crs-prog .ch-ic.crs-ch-mk{width:22px; height:22px; margin-left:auto; background:transparent; border:0; place-items:center}
+.app .crs-prog .ch-ic.crs-ch-done{color:var(--support-success)}
+.app .crs-prog .ch-ic.crs-ch-done svg{width:22px; height:22px; fill:currentColor}
+.app .crs-prog .ch-ic.crs-ch-todo{width:20px; height:20px; border-radius:50%; border:1.5px solid var(--gray-20); background:transparent}
 /* COMPACT course COVER on the accordion row — the candidate portal's My Courses
    layout (Maryam, 16 Sep 2026, reversing the same-day big-cover: "the courses
    section on super admin needs the reference layout from the candidate portal").
@@ -611,7 +654,7 @@
   </div>
 </div>
 
-<script src="design-system/talentnext-ds.js?b=52f2aea8"></script>
+<script src="design-system/talentnext-ds.js?b=7a062748"></script>
 <script>
 /* ==========================================================================
    THE SUPER ADMIN PORTAL
@@ -2231,18 +2274,22 @@ function fieldHtml(f, v){
   if(f.t === 'checks') return `<div class="f">${lbl}<div class="mt4">${f.opts.map(o => { const [ov, ol] = Array.isArray(o) ? o : [o, o];
     const on = Array.isArray(val) && val.includes(ov);
     return `<label class="cbx"><input type="checkbox" data-f="${f.k}" value="${esc(ov)}"${on ? ' checked' : ''}><span class="box">${I.check}</span><span class="txt">${esc(ol)}</span></label>`; }).join('')}</div></div>`;
-  return `<label class="f">${lbl}<input class="inp" data-f="${f.k}" type="${f.t || 'text'}" value="${esc(val)}" placeholder="${esc(ph)}" autocomplete="off"${f.t === 'number' ? ' min="0"' : ''}></label>`;
+  return `<label class="f">${lbl}<input class="inp${f.ro ? ' pfe-ro' : ''}" data-f="${f.k}" type="${f.t || 'text'}" value="${esc(val)}" placeholder="${esc(ph)}" autocomplete="off"${f.t === 'number' ? ' min="0"' : ''}${f.ro ? ' readonly' : ''}></label>`;
 }
 function recSheet(kind, id){
   const K = KINDS[kind]; if(!K) return null;
   const rec = id === 'new' ? null : K.find(id);
   const fields = typeof K.fields === 'function' ? K.fields(rec) : K.fields;
+  /* `help` may be a function of the record, so a KIND can show its info block on
+     ADD only (the agent KIND's "arrives through the vetting queue" note is about
+     creating an account, not editing one). */
+  const help = typeof K.help === 'function' ? K.help(rec) : K.help;
   return {
     title: rec ? `Edit ${K.label} — ${K.name(rec)}` : `Add ${K.an || 'a'} ${K.label}`,
     body: fields.map(f => fieldHtml(f, rec ? (typeof f.get === 'function' ? f.get(rec) : rec[f.k]) : undefined)).join('')
       /* the help line is an INFO BLOCK — a light-grey panel with an info icon on
          the left (Maryam, 13 Sep 2026) — not a bare description paragraph. */
-      + (K.help ? `<div class="sheet-help"><svg class="sheet-help-ic" viewBox="0 0 24 24" aria-hidden="true">${inner('info')}</svg><p class="t-desc">${K.help}</p></div>` : ''),
+      + (help ? `<div class="sheet-help"><svg class="sheet-help-ic" viewBox="0 0 24 24" aria-hidden="true">${inner('info')}</svg><p class="t-desc">${help}</p></div>` : ''),
     ok: rec ? 'Save Changes' : (K.okNew || `Add ${cap(K.label)}`),
     act: `save:${kind}:${rec ? rec.id : 'new'}`
   };
@@ -3628,6 +3675,9 @@ const STAFF_STATUS_LABEL = {invited:'Invited', active:'Active', inactive:'Deacti
 const staffStatusTag = u => tag(u.status, STAFF_STATUS_LABEL[u.status] || cap(u.status));
 /* an INFO block for a sheet foot — the same light panel `recSheet` draws. */
 const sheetHelp = t => `<div class="sheet-help"><svg class="sheet-help-ic" viewBox="0 0 24 24" aria-hidden="true">${inner('info')}</svg><p class="t-desc">${t}</p></div>`;
+/* the same light card WITH a strong title over its body (Maryam, 18 Sep 2026) —
+   used where a block needs a heading, e.g. "What deactivating clears". */
+const infoCard = (title, t) => `<div class="sheet-help"><svg class="sheet-help-ic" viewBox="0 0 24 24" aria-hidden="true">${inner('info')}</svg><div class="sheet-help-b"><b>${esc(title)}</b><p class="t-desc">${t}</p></div></div>`;
 /* a READ-ONLY field — §12 draws `[readonly]` + `.pfe-ro` with a dashed underline
    (the lock), with a note saying where the value is changed instead (1.8). */
 const roField = (label, val, why) => `<label class="f"><span class="lbl">${esc(label)}</span>
@@ -4056,8 +4106,9 @@ SHEETS.deactext = id => {
   return {
     title:`Deactivate ${u.name}`,
     body: fieldHtml({k:'note', l:'Reason', t:'textarea', req:1, ph:'Why this account is being deactivated. Internal only.'})
-      + (cl.length ? note('warn', 'What deactivating clears', cl.map(esc).join(' · ')) : '')
-      + sheetHelp('They are signed out immediately and can’t sign in again. The record is kept and can be reactivated; certificates already earned stay valid. A candidate forfeits their cohort seat with no refund.'),
+      /* "What deactivating clears" reads as the plain light info card, and the
+         separate "They are signed out" explainer is dropped (Maryam, 18 Sep 2026). */
+      + (cl.length ? infoCard('What deactivating clears', cl.map(esc).join(' · ')) : ''),
     ok:'Deactivate', danger:true,
     act:'submitdeactext:' + id
   };
@@ -5199,9 +5250,12 @@ function coursePerf(c){
       <text class="perf-cal-l" x="${bx + 34}" y="${by + 15}">Average score</text>
       <text class="perf-cal-v" x="${bx + 34}" y="${by + 27}">${avg}%</text></g>`;
   })() : '';
-  return `<div class="sec-h"><div class="perf-hb"><h2>Your performance</h2>
+  /* THIRD-PERSON COPY — the admin is viewing a candidate's record, not taking the
+     course (Maryam, 18 Sep 2026): "Performance" / "Score", never "Your ...". The
+     "Key insight" block is dropped. */
+  return `<div class="sec-h"><div class="perf-hb"><h2>Performance</h2>
       <p class="all-desc">Assessment average across ${total} chapters.</p></div>
-      <div class="perf-leg"><span class="perf-lg"><i class="perf-lg-l"></i>Your score</span>
+      <div class="perf-leg"><span class="perf-lg"><i class="perf-lg-l"></i>Score</span>
         <span class="perf-lg"><i class="perf-lg-d"></i>Cohort average ${cohort}%</span></div></div>
     <div class="perf-b"><div class="perf-plot">
       <svg class="perf-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Assessment score for each assessed chapter, against a cohort average of ${cohort}%">
@@ -5209,9 +5263,7 @@ function coursePerf(c){
         <line class="perf-avg-line" x1="${L}" x2="${W - R}" y1="${y(cohort).toFixed(1)}" y2="${y(cohort).toFixed(1)}" stroke-dasharray="4 4" vector-effect="non-scaling-stroke"/>
         <path class="perf-line" d="${path}" fill="none" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
         ${dots}${xl}${cal}
-      </svg></div></div>
-    ${c.insight ? `<div class="perf-f"><div class="perf-ins"><span class="perf-ins-mk"></span>
-      <span class="perf-ins-b"><b>Key insight</b><span>${esc(c.insight)}</span></span></div></div>` : ''}`;
+      </svg></div></div>`;
 }
 /* ONE CHAPTER ROW — `chRow`'s markup with the candidate's data, read-only. An
    assessed chapter is `.done` with the green tick and its `min · %` meta; the rest
@@ -5224,11 +5276,16 @@ function candChRow(i, c){
   const meta = isDone ? `${mins} min · ${(c.series || [])[i]}% assessment`
     : i === assessed ? `In progress · ${mins} min`
     : `Not started · ${mins} min`;
-  const trail = isDone ? '' : `<span class="ch-ic"><span style="fill:var(--gray-40)">${I.circle}</span></span>`;
+  /* the status mark sits at the ROW'S RIGHT END, middle-aligned (Maryam, 18 Sep 2026,
+     off the candidate portal): a green filled check for a finished chapter, a light
+     bordered ring for the rest — not an inline tick after the name. */
+  const mark = isDone
+    ? `<span class="ch-ic crs-ch-mk crs-ch-done">${I.checkFilled}</span>`
+    : `<span class="ch-ic crs-ch-mk crs-ch-todo"></span>`;
   return `<div class="ch${isDone ? ' done' : ''}">
-    <span class="ch-b"><span class="ch-n">${esc(name)}${isDone ? `<span class="ch-tick">${I.checkFilled}</span>` : ''}</span>
+    <span class="ch-b"><span class="ch-n">${esc(name)}</span>
       <span class="ch-m">${meta}${growth ? `<span class="sep">·</span><span class="ai-inline"><span class="sk"></span>Growth area</span>` : ''}</span></span>
-    ${trail}
+    ${mark}
   </div>`;
 }
 function candCourseProgress(c){
@@ -5411,6 +5468,13 @@ const AGENTS = () => USERS.filter(u => u.roles.includes('agent'));
 const starMark = `<svg viewBox="0 -960 960 960" width="15" height="15" style="display:inline-block;vertical-align:-2px;color:var(--star)" aria-hidden="true">${inner('star')}</svg>`;
 /* THE STAR LEADS THE DIGIT — "★ 4.9", not "4.9 ★" (Maryam, 7 Sep 2026). */
 const ratingCell = r => `<span style="white-space:nowrap">${starMark} ${r}</span>`;
+/* AN AGENT TAKES ONE OF TWO KINDS — a First Interview (the initial level interview,
+   complimentary, no fee) or a Re-interview (charged). Any non-re-interview seed kind
+   ("Interview", "Level interview", "First (discounted)") reads as a First Interview.
+   The first interview is free, so it carries no fee (Maryam, 18 Sep 2026). */
+const agIvIsRe = k => /re-?interview/i.test(String(k || ''));
+const agIvKind = k => agIvIsRe(k) ? 'Re-interview' : 'First Interview';
+const agIvFee = (k, fee) => agIvIsRe(k) ? (fee ? money(fee) : 'Free') : 'Free';
 const agentRanking = () => AGENTS().slice().sort((a, b) => b.rating - a.rating || b.interviewed - a.interviewed);
 const listed = a => a.status === 'active';
 
@@ -5465,12 +5529,16 @@ KINDS.agent = {
   find: id => USER_BY_ID[id], name: a => a.name, detail: a => 'agents/detail/' + a.id,
   fields: a => [
     {k:'name', l:'Full name', t:'text', req:1},
-    ...(a ? [] : [{k:'email', l:'Email address', t:'email', req:1}]),
+    /* email shows on edit too, but read-only (Maryam, 18 Sep 2026); on add it is an
+       editable required field. The Listing field is gone — a listing is paused or
+       restored from the row action, not this form (Maryam, 18 Sep 2026). */
+    a ? {k:'email', l:'Email address', t:'email', ro:1} : {k:'email', l:'Email address', t:'email', req:1},
     {k:'job', l:'Current role', t:'text', req:1, ph:'e.g. Engineering Manager, Stripe'},
-    {k:'fee', l:'Interview fee ($)', t:'number', req:1, def:150},
-    ...(a ? [{k:'status', l:'Listing', t:'select', opts:[['active', 'Listed'], ['inactive', 'Paused']]}] : [])
+    {k:'fee', l:'Interview fee ($)', t:'number', req:1, def:150}
   ],
-  help:'An agent normally arrives through the vetting queue. Adding one here creates the account as approved — use it for a known agent you have already vetted elsewhere.',
+  /* the vetting-queue note is about CREATING an account, so it shows on add only
+     (Maryam, 18 Sep 2026: "remove the info banner from here" — the edit sheet). */
+  help: a => a ? '' : 'An agent normally arrives through the vetting queue. Adding one here creates the account as approved — use it for a known agent you have already vetted elsewhere.',
   okNew:'Add Talent Agent',
   create: v => { const u = {id:newId('u', USERS), name:v.name, email:v.email, roles:['agent'], level:'—', job:v.job, rating:0, interviewed:0, status:'active', joined:today(), origin:'individual', last:'invited', fee:v.fee}; USERS.push(u); USER_BY_ID[u.id] = u; return u; },
   update: (a, v) => { a.name = v.name; a.job = v.job; a.fee = v.fee; if(v.status) a.status = v.status; },
@@ -5529,6 +5597,9 @@ function agentsDetail(){
   const books = BOOKINGS.filter(b => b.agent === a.name);
   const past = pastIvs(a);
   const acct = a.status === 'active';
+  /* total earnings — the agent's lifetime take, interviews at their fee net of the
+     20% platform share (authored figure off the seed's counts, §74). */
+  const earnings = Math.round((a.interviewed || 0) * (a.fee || 0) * 0.8);
   return `
   ${detailHead('agents/agents')}
   <section class="sec">
@@ -5540,7 +5611,7 @@ function agentsDetail(){
     <div class="idhead">
       <span class="idphoto"><img src="${agentFace(a.name)}" alt="" class="idhead-ph"></span>
       <div class="idhead-b">
-        <span class="idname-row"><span class="idname">${esc(a.name)}</span></span>
+        <span class="idname-row"><span class="idname">${esc(a.name)}</span>${a.rating ? `<span class="idrate">${ratingCell(a.rating)}</span>` : ''}</span>
         <span class="idmeta">${esc(a.job || 'Talent Agent')} &middot; ${esc(a.email)}</span>
       </div>
       <span class="idhead-act" style="display:flex;align-items:center;gap:var(--s03)">${acct ? '' : tag('inactive', 'Deactivated')}
@@ -5550,29 +5621,33 @@ function agentsDetail(){
           : `<button class="btn btn-p btn-sm noic" data-sheet="reactext:${a.id}">Reactivate ${I.arrowRight}</button>`}</span>
     </div>
     ${stats([
-      ['starOutline', 'Rating', a.rating ? ratingCell(a.rating) : '—', 'candidate reviews'],
+      ['bank', 'Total earnings', money(earnings), 'net of the platform share'],
       ['video', 'Interviewed', String(a.interviewed), 'sessions conducted'],
       ['wallet', 'Own fee', money(a.fee), 'set by the agent'],
       ['route', 'Assessment range', rangeLabel(agRange(a)), 'Cohorts']
     ])}
   </section>
 
-  <section class="sec">
+  ${''/* the Payouts section is only drawn when there is something to release
+        (Maryam, 18 Sep 2026: "when there is nothing to release do not even show
+        this payout section") — no empty state. */}
+  ${pay.length ? `<section class="sec">
     ${aiHead('Payouts to release', 'Amounts still to be released to this agent, settled weekly.',
       `<button class="btn btn-g btn-sm noic" data-go="finance/payouts">All Payouts</button>`)}
-    ${pay.length ? table(
-      [{label:'Reference'}, {label:'Period'}, {label:'Net', num:true}, {label:'Status'}, {label:'When'}, ACT_COL],
+    ${table(
+      [{label:'Reference'}, {label:'Period'}, {label:'Net', num:true}, {label:'Status'}, {label:'When'}, {label:'Actions'}],
       pay.map(p => ({cells:[esc(p.ref), esc(p.period), p.net ? money(p.net) : '—', tag(p.status), esc(p.when),
-        p.net ? rowActs([['send', 'Release now', `data-act="askrelease:${p.id}"`]]) : '']})))
-      : emptyState('wallet', 'Nothing to release', 'This agent has no payouts awaiting release right now.')}
-  </section>
+        /* the Release action is an accent link, not a kebab menu (Maryam, 18 Sep
+           2026): --accent-text label + accent arrow, matching the Payouts page. */
+        p.net ? `<button class="btn acc-link btn-sm noic" data-act="askrelease:${p.id}">Release Now ${I.arrowRight}</button>` : '']})))}
+  </section>` : ''}
 
   <section class="sec">
     ${aiHead('Upcoming interviews', 'On this agent’s diary. Open one for the candidate and fee.')}
     ${books.length ? table(
       [{label:'Candidate'}, {label:'Kind'}, {label:'Fee', num:true}, {label:'When'}, {label:'Status'}],
       books.map(b => ({id:b.id, go:'agents/interview/' + b.id, cells:[
-        personCell(b.cand), esc(b.kind), b.fee ? money(b.fee) : 'Complimentary', esc(b.slot), tag(b.status)]})))
+        personCell(b.cand), esc(agIvKind(b.kind)), agIvFee(b.kind, b.fee), esc(b.slot), tag(b.status)]})))
       : emptyState('video', 'Nothing booked', 'No interviews are on this agent’s diary right now.')}
   </section>
 
@@ -5581,7 +5656,7 @@ function agentsDetail(){
     ${past.length ? table(
       [{label:'Candidate'}, {label:'Kind'}, {label:'Fee', num:true}, {label:'When'}, {label:'Candidate rating', num:true}],
       past.map(p => ({id:p.id, go:'agents/interview/' + p.id, cells:[
-        personCell(p.cand), esc(p.kind), p.fee ? money(p.fee) : 'Complimentary', esc(p.when), p.rating ? ratingCell(p.rating) : '—']})))
+        personCell(p.cand), esc(agIvKind(p.kind)), agIvFee(p.kind, p.fee), esc(p.when), p.rating ? ratingCell(p.rating) : '—']})))
       : emptyState('video', 'No past interviews', 'This agent has no completed interviews on record yet.')}
   </section>`;
 }
@@ -5622,7 +5697,7 @@ function pastIvs(a){ return PAST_IVS.filter(p => p.agent === a.name); }
 /* A ROW OF THE INTERVIEW EVALUATION CARDS (the candidate portal's signed-summary
    look, in the design system this portal links) — one green Strengths, one violet
    Growth areas, one blue agent note. */
-const ivEvalBlock = iv => `<div class="signed">
+const ivEvalBlock = iv => `<div class="signed iv-eval">
     <div class="sig-pair">
       <div class="sig-c" style="--mk:var(--mk-2)"><i class="sig-ic">${I.star}</i>
         <div class="sig-b"><div class="sig-top"><span class="sig-t">Strengths</span><span class="sig-tag">Strong</span></div><p class="sig-p">${esc(iv.strengths)}</p></div></div>
@@ -5654,17 +5729,21 @@ function agentsInterview(){
   DETAIL_LABEL = `${iv.cand} — interview`;
   const when = piv ? iv.when : iv.slot;
   if(!piv){
-    /* UPCOMING — the candidate and the fee (Maryam, 17 Sep 2026), plus when and status for context. */
+    /* UPCOMING — the candidate name row is dropped (it is already in the head) and the
+       four remaining facts show as a HORIZONTAL `.facts pf-facts` block of FOUR
+       (Maryam, 18 Sep 2026: "remove candidate name row and make the other 4 rows into
+       4 blocks in a same row"), matching the past view. Status is `tag()` HTML, so its
+       cell is hand-written like the rating cell rather than through `admFact` (which
+       escapes its value). */
     return `${detailHead(backTo)}
     <section class="sec">
-      ${aiHead('Interview with ' + esc(iv.cand), `${esc(iv.agent)} &middot; ${esc(iv.kind)} &middot; ${esc(when)}`)}
-      ${kv([
-        ['Candidate', esc(iv.cand)],
-        ['Interview fee', iv.fee ? money(iv.fee) : 'Complimentary'],
-        ['Kind', esc(iv.kind)],
-        ['When', esc(when)],
-        ['Status', tag(iv.status)]
-      ])}
+      ${aiHead('Interview with ' + esc(iv.cand), `${esc(iv.agent)} &middot; ${esc(agIvKind(iv.kind))} &middot; ${esc(when)}`)}
+      <div class="facts pf-facts">
+        ${admFact(I.wallet, '--mk-4', 'Interview fee', agIvFee(iv.kind, iv.fee))}
+        ${admFact(I.video, '--mk-3', 'Kind', agIvKind(iv.kind))}
+        ${admFact(I.calendar, '--mk-2', 'When', when)}
+        <div style="--mk:var(--mk-1)"><span class="l pf-l">${ic('shield')}Status</span><span class="v">${tag(iv.status)}</span></div>
+      </div>
     </section>`;
   }
   /* PAST — the full record, behind TWO TABS (Maryam, 17 Sep 2026: "i need two tabs
@@ -5680,7 +5759,7 @@ function agentsInterview(){
   const ivTab = getFilter('ivtab', 'about');
   return `${detailHead(backTo)}
   <section class="sec">
-    ${aiHead('Interview with ' + esc(iv.cand), `${esc(iv.agent)} &middot; ${esc(iv.kind)} &middot; ${esc(when)}`)}
+    ${aiHead('Interview with ' + esc(iv.cand), `${esc(iv.agent)} &middot; ${esc(agIvKind(iv.kind))} &middot; ${esc(when)}`)}
   </section>
   <section class="sec sec-cs iv-tabs">
     ${filterStrip('ivtab', 'about', [['about', 'About Interview'], ['transcript', 'Transcript']])}
@@ -5693,32 +5772,35 @@ function agentsInterview(){
     : `<section class="sec">
     <div class="facts pf-facts">
       ${admFact(I.user, '--mk-4', 'Candidate', iv.cand)}
-      ${admFact(I.wallet, '--mk-3', 'Interview fee', iv.fee ? money(iv.fee) : 'Complimentary')}
+      ${admFact(I.wallet, '--mk-3', 'Interview fee', agIvFee(iv.kind, iv.fee))}
       <div style="--mk:var(--mk-2)"><span class="l pf-l">${ic('starOutline')}Candidate rating</span><span class="v">${iv.rating ? ratingCell(iv.rating) : '—'}</span></div>
       ${admFact(I.calendar, '--mk-1', 'When', when)}
     </div>
   </section>
-  ${''/* TAL'S READ — the Talent Agent portal's exact component (Maryam, 17 Sep 2026:
-        "i need the tal evaluation just like it is on the talent agent portal"): the
-        `.ai-aura.tal-eval` band with the blob mark + "Tal's read" label, the read as
-        highlighted `<b>` phrases (`.tal-eval .ai-body p b`, both ship in the DS this
-        portal links), and the "Proposed only" note under it. `iv.tal` is rich HTML
-        now, so it is NOT escaped. */}
+  ${''/* TAL'S EVALUATION — a plain section heading, and the read as ONE paragraph
+        (Maryam, 18 Sep 2026: "make tal read a paragraph" / "make tals read a section
+        heading with name 'Tal's Evaluation'"). The `.tal-eval .ai-body p b` highlight
+        still applies without `.ai-aura`; the four stored paragraphs are merged into
+        one by collapsing their `</p><p>` joins. `iv.tal` is rich HTML, not escaped. */}
   <section class="sec">
-    <div class="ai-aura tal-eval">
-      <div class="ai-head"><span class="ai-label bare">Tal's read</span></div>
-      <div class="ai-body">${iv.tal}
+    ${aiHead('Tal’s Evaluation', 'What Tal read from the interview.')}
+    <div class="tal-eval">
+      <div class="ai-body">${iv.tal.replace(/<\/p>\s*<p[^>]*>/g, ' ')}
         <p class="help mt5">Proposed only. TalentNext sets the level after analysis, so this is not a decision you make here.</p></div>
     </div>
   </section>
-  <section class="sec">
+  ${''/* the agent's evaluation is the last content block before the review — no foot
+        line (Maryam, 18 Sep 2026: "remove the line after the agent evaluation"). */}
+  <section class="sec sec-noline">
     ${aiHead(esc(iv.agent) + '’s evaluation', 'What the agent recorded after the interview.')}
     ${ivEvalBlock(iv)}
   </section>
   <section class="sec">
     ${aiHead('Candidate’s rating and review', `What ${esc(String(iv.cand).split(' ')[0])} said about this interview.`)}
-    <div class="iv-card iv-review">
-      <div class="iv-review-r">${ratingCell(iv.rating)}</div>
+    ${''/* rating is five gold stars, not a boxed number (Maryam, 18 Sep 2026:
+          "candidates rating should not be in a block, also show 5 yellow stars"). */}
+    <div class="iv-review">
+      <div class="iv-review-r">${dsStars(iv.rating)}</div>
       <p class="sig-p">&ldquo;${esc(iv.review)}&rdquo;</p>
     </div>
   </section>`}`;

@@ -4693,6 +4693,12 @@
   font-weight:var(--t-w-strong);letter-spacing:var(--t-sec-ls);
   text-transform:none;color:var(--text-primary)}
 
+/* THE INTERVIEW-BOOKED CTA IS BLACK INK ON A LIGHT-GREY GROUND (Maryam, 18 Sep
+   2026). §109 gives this one `.btn-p` its grey ground; §63 owns text colour, so
+   the black ink is stated here. Scoped to the `.conf-ok` action `.btn-p`, which
+   is only that button (the enrol success CTA is a `.btn-s`). */
+.app .conf.conf-ok .conf-a .btn-p{color:var(--text-primary)}
+
 /* =========================================================================
    44. THE INTRO'S TWO CONTROLS (§107 §0c)
 
