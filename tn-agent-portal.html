@@ -94,6 +94,66 @@
    this page links `talentnext-ds.css`. Re-running that build IS the change
    here. Do not add an `@font-face` or a `font-family` to this file. */
 </style>
+
+<style>
+/* ==========================================================================
+   FIGMA-PARITY ORB — HOME AND INTERVIEWS ONLY.
+
+   This IS a component override, which the block above rightly forbids itself,
+   so it lives in its own block with its own reason. Client asked (18 Sep 2026)
+   that the orb on the agent panel's first two tabs read EXACTLY as the Figma
+   master, node 533:4145 of Talent-Next-Website — a flattened still: a disc
+   clipped to its full box, an even #F9423A field with three white blooms
+   bottom-left through right, and a chevron mark at ~53% of the orb rather than
+   the CSS orb's 29%.
+
+   It is painted as a background image on `.borb` and the live layers inside are
+   switched off, because the ask is the STILL frame: no drift, no listening
+   bars, no speaking waves on these two views. `orb-wire.js` still stamps
+   `data-state` underneath and is simply not drawn — nothing is unbound, so a
+   view change back to any other tab returns the animated orb with no remount.
+
+   SCOPED ON `.app[data-view=...]`, which the shell already stamps (see the `at`
+   string in `renderShell`). `dashboard` and `dashboard-setup` are both Home;
+   `interview` and `transcript` are sub-pages REACHED FROM Interviews but are
+   not the tab, so they keep the live orb — the rail mark is the tab, the page
+   is not.
+   ========================================================================== */
+/* TWO SELECTOR LISTS, NOT ONE, AND THE SECOND IS NOT REDUNDANT. The design
+   system sets `background-image:none` on `.app .askdock .askline-mark .tal-mk`
+   and draws the dock orb in that element's own ::before/::after instead — four
+   classes deep. A two-class scope loses to it and the dock mark renders as
+   nothing at all, which is what the first pass did. The `.askdock
+   .askline-mark` list matches that depth and wins on source order; every other
+   orb on these two views is answered by the short list. */
+.app[data-view="dashboard"] .borb,
+.app[data-view="interviews"] .borb,
+.app[data-view="dashboard"] .askdock .askline-mark .borb,
+.app[data-view="interviews"] .askdock .askline-mark .borb{
+  background-color: transparent;
+  background-image: url("design-system/tal-orb-figma-533-4145.svg");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+  animation: none;
+}
+.app[data-view="dashboard"] .borb::before,
+.app[data-view="dashboard"] .borb::after,
+.app[data-view="dashboard"] .borb__field,
+.app[data-view="dashboard"] .borb__mark,
+.app[data-view="dashboard"] .borb__ripple,
+.app[data-view="interviews"] .borb::before,
+.app[data-view="interviews"] .borb::after,
+.app[data-view="interviews"] .borb__field,
+.app[data-view="interviews"] .borb__mark,
+.app[data-view="interviews"] .borb__ripple,
+.app[data-view="dashboard"] .askdock .askline-mark .borb::before,
+.app[data-view="dashboard"] .askdock .askline-mark .borb::after,
+.app[data-view="interviews"] .askdock .askline-mark .borb::before,
+.app[data-view="interviews"] .askdock .askline-mark .borb::after{
+  display: none;
+}
+</style>
 </head>
 <body>
 
