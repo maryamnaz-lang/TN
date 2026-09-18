@@ -3024,6 +3024,7 @@ body,.app,.pt-bar,.pt-sel,input,select,textarea,button{font-family:var(--font-sa
   .app[data-rail="open"]::after{left:var(--drawer-w)}
   .app:has(> .auth-card)::after,
   .app:has(> .ob-open)::after,
+  .app:has(> .ob-survey)::after,
   .app:has(> .nil)::after{content:none}
   .app .sn-item{
     min-height:48px;padding:0;gap:0;justify-content:center;
@@ -12843,8 +12844,8 @@ button.btn-p:active,
   flex:none;width:100%;
   padding-bottom:var(--s06)}
 .app .ob-logo{display:flex;align-items:center}
-.app .ob-logo img{display:block;height:24px;width:auto}
-@container app (min-width:900px){.app .ob-logo img{height:26px}}
+.app .ob-logo img{display:block;height:36px;width:auto}
+@container app (min-width:900px){.app .ob-logo img{height:38px}}
 .app .ob-prog{
   width:100%;max-width:720px;flex:none;
   display:flex;flex-direction:column;align-items:flex-start;gap:var(--s04)}
@@ -13006,6 +13007,81 @@ button.btn-p:active,
 .app .ob-page .ob-rec-r{margin-top:2px}
 .app .ob-page .ob-fit{margin:var(--s03) 0 0}
 .app .ob-page .ob-hint{margin:var(--s04) 0 0}
+.app .ob-survey{
+  position:relative;box-sizing:border-box;
+  flex:1 1 auto;min-height:100%;
+  display:flex;flex-direction:column;
+  background:var(--background);color:var(--text-primary)}
+.app .ob-sv-top{
+  position:absolute;top:0;left:0;right:0;z-index:2;
+  height:4px;background:var(--rule)}
+.app .ob-sv-top > i{
+  display:block;height:100%;width:var(--ob-to,0);background:var(--accent);
+  animation:ob-bar-fill .5s cubic-bezier(.22,1,.36,1)}
+@keyframes ob-bar-fill{
+  from{width:var(--ob-from,0)}
+  to{width:var(--ob-to,0)}}
+.app .ob-sv-head{
+  flex:none;display:flex;align-items:center;justify-content:space-between;
+  gap:var(--s04);padding:var(--s06) var(--s06) 0}
+.app .ob-sv-hint{
+  color:var(--text-secondary);
+  font-size:var(--t-desc-size);line-height:normal}
+.app .ob-survey .main{
+  flex:1 1 auto;min-width:0;
+  display:flex;justify-content:center;align-items:center;
+  padding:0;overflow:auto}
+.app .ob-sv-wrap{
+  width:100%;max-width:720px;box-sizing:border-box;
+  padding:var(--s07) var(--s06);
+  display:flex;flex-direction:column}
+.app .ob-sv-orb{margin-bottom:var(--s05)}
+.app .ob-sv-orb .borb.tal-mk{width:52px;height:52px;--borb-size:64px}
+.app .ob-sv-title{
+  margin:0;
+  font-size:var(--t-h1-size);line-height:var(--t-h1-lh);
+  letter-spacing:var(--t-h1-ls);
+  font-weight:var(--t-w-book);color:var(--text-primary)}
+.app .ob-sv-q{
+  margin:var(--s04) 0 0;
+  font-size:var(--t-body-size);line-height:var(--t-body-lh);
+  color:var(--text-secondary)}
+.app .ob-sv-opts{
+  display:flex;flex-direction:column;gap:var(--s03);margin-top:var(--s07)}
+.app .ob-sv-o{
+  position:relative;display:flex;align-items:center;gap:var(--s04);
+  padding:var(--s05);cursor:pointer;
+  background:var(--layer-02);border:1px solid transparent;
+  transition:background .15s ease,border-color .15s ease}
+.app .ob-sv-o.on{
+  background:color-mix(in srgb, var(--accent) 8%, var(--background));
+  border-color:var(--accent)}
+.app .ob-sv-o > input{position:absolute;opacity:0;width:0;height:0;pointer-events:none}
+.app .ob-sv-rad{
+  flex:none;width:18px;height:18px;border-radius:50%;box-sizing:border-box;
+  border:1.5px solid var(--border-strong-01);position:relative;
+  transition:border-color .15s ease,background .15s ease}
+.app .ob-sv-o.on .ob-sv-rad{border-color:var(--accent);background:var(--accent)}
+.app .ob-sv-o.on .ob-sv-rad::after{
+  content:'';position:absolute;top:50%;left:50%;
+  width:6px;height:6px;border-radius:50%;background:var(--background);
+  transform:translate(-50%,-50%)}
+.app .ob-sv-ot{display:flex;flex-direction:column;min-width:0}
+.app .ob-sv-ol{
+  font-size:var(--t-body-size);line-height:var(--t-body-lh);color:var(--text-primary)}
+.app .ob-sv-od{
+  font-size:var(--t-label-size);line-height:var(--t-label-lh);
+  color:var(--text-secondary);margin-top:2px}
+.app .ob-sv-foot{
+  display:flex;align-items:center;gap:var(--s04);
+  margin-top:var(--s08)}
+.app .ob-sv-foot .btn{min-height:48px}
+.app .ob-sv-next{margin-left:auto}
+.app .ob-sv-prev{
+  background:var(--layer-02);border:0;
+  color:var(--text-primary)}
+.app .ob-sv-prev svg{color:var(--text-primary)}
+.app .ob-done .ob-qp{margin-top:var(--s07)}
 .app .eo-course{
   display:flex;flex-direction:column;
   gap:var(--sec-h-gap)}
@@ -14579,6 +14655,9 @@ button.btn-p:active,
   .app .ob-card .ob-brand .tal-hero .borb.tal-mk.lg{
     width:72px;height:72px;--borb-size:89.4px}
 }
+.app .ob-orb-sm .borb.tal-mk{
+  width:var(--ob-orb-sm);height:var(--ob-orb-sm);
+  --borb-size:calc(var(--ob-orb-sm) * 1.24)}
 .app .modhead .ai-aura.talsum > .ai-head > .ai-label:has(> .borb)::before{
   content:none}
 .app .modhead .ai-aura.talsum > .ai-head > .ai-label > .borb.tal-mk{
@@ -18032,23 +18111,22 @@ fcode: () => `${authShell('forgot')}
 
 reset: () => `${authShell('login')}
 <main class="main"><div class="page form-page">
-  ${ph('Set a new password','Choose something you have not used here before. You will be logged in once it is saved.')}
+  ${''/* THE FORGOT-FLOW LANDING (Maryam, 18 Sep 2026): heading "Set New
+        Password", a short desc, no `.pw-rules` checklist, one "Update Password"
+        CTA and no "Back to log in" closing row. The create screen owns the
+        pre-filled/pre-ticked composition; this one is stripped to the two
+        fields and the button. */}
+  ${ph('Set New Password','Set a strong password for your account.')}
   <div class="sec">
     <div class="f-row"><div class="f"><label for="rpw">New password</label>
       <div class="pw-wrap"><input class="inp fill" id="rpw" type="password" value="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022">
-        <button class="pw-eye" data-eye="rpw" aria-label="Show password">${I.view}</button></div>
-      <ul class="pw-rules">
-        <li class="ok">${I.checkFilled}At least 12 characters</li>
-        <li class="ok">${I.checkFilled}Upper and lower case</li>
-        <li>${I.circle}One number or symbol</li>
-      </ul></div>
+        <button class="pw-eye" data-eye="rpw" aria-label="Show password">${I.view}</button></div></div>
     <div class="f last"><label for="rpw2">Confirm new password</label>
       <div class="pw-wrap"><input class="inp fill" id="rpw2" type="password" placeholder="Re-enter password">
         <button class="pw-eye" data-eye="rpw2" aria-label="Show password">${I.view}</button></div></div></div>
   </div>
   <div class="sec">
-    <button class="btn btn-p btn-full" data-go="stage:new">Save and log in ${I.arrowRight}</button>
-    <p class="t-body-02 mt5" style="color:var(--text-secondary)">Changed your mind? <a data-go="login">Back to log in</a></p>
+    <button class="btn btn-p btn-full" data-go="login">Update Password ${I.arrowRight}</button>
   </div>
 </div></main>`,
 
@@ -31045,6 +31123,7 @@ S.obSpoken = false;
 S.obMode = 'chat';
 S.obChatOpen = false;
 S.obQi = 0;
+S.obBarFrom = 0;
 
 const OB_LOW = () => qzLow(2);
 
@@ -31130,6 +31209,7 @@ function obReady(){
 }
 
 const OB_SPINE = ['Where you are','Your industry','Your experience','What is low','Why it is hard','What you want'];
+
 
 function obPanel(){
   const step = S.obStep;
@@ -31386,9 +31466,11 @@ const obChatScreen = () => `
           called here — the class is simply absent, which is cheaper than
           hiding it and means the `em` base has nothing to resolve. */}
     <div class="ob-chat-head">
-      <div class="ob-orb ob-orb-sm">
-        <span class="ob-blob">${obBlob()}</span>
-      </div>
+      ${''/* THE WELCOME ORB IS THE `borb` COMPONENT (Maryam, 18 Sep 2026), the
+            same orb the chat hero and the voice intro use, not the older
+            `obBlob()` video. `live` so it breathes like a hero mark; §133 sizes
+            it into the `.ob-orb-sm` slot. */}
+      <div class="ob-orb ob-orb-sm">${borbMark('tal-mk', true)}</div>
       <div class="ob-chat-lede">${OB_CHAT.map(t => `<p>${t}</p>`).join('')}</div>
       ${''/* IT IS `.ob-go`, THE SAME ELEMENT THE VOICE SCREEN DRAWS — not a
             restyled button. "Same font size same color same formatting" is
@@ -31435,30 +31517,48 @@ const obCompose = () => {
 
 
 
-function obQuestion(){
+function obSurveyScreen(){
   const s = OB_Q[S.obStep - 1];
-  return `
-  <div class="sec ob-sec">
-    <p class="ob-step">Question ${S.obStep} of ${OB_N}</p>
-    <h2 class="ob-q">${obTitle(s)}</h2>
-  </div>
-  <div class="sec ob-sec sec-role">
-    <div class="role-pick ob-pick">
-      ${obOpts(s).map(([k,l]) => `<label class="rad role-c ob-o${
-        S.ob[s.k] === k ? ' on' : ''}" data-ob="${s.k}" data-obv="${k}"><input type="radio" name="ob-${
-        s.k}"${S.ob[s.k] === k ? ' checked' : ''}><span class="box"></span><span class="txt role-t">${l}</span></label>`).join('')}
+  const to = Math.round((S.obStep - 1) / OB_N * 100);
+  const from = S.obBarFrom || 0;
+  S.obBarFrom = to;
+  const prev = S.obStep > 1
+    ? `<button class="btn btn-t noic ob-sv-prev" data-obgo="${S.obStep - 1}">${I.arrowLeft} Previous</button>`
+    : '';
+  const next = `<button class="btn btn-p noic ob-sv-next" data-obgo="${S.obStep + 1}"${
+    obReady() ? '' : ' disabled'}>${
+    S.obStep === OB_N ? 'See what I heard' : 'Next'} ${I.arrowRight}</button>`;
+  return `<div class="ob-survey">
+    <div class="ob-sv-top"><i style="--ob-from:${from}%;--ob-to:${to}%"></i></div>
+    ${''/* THE BRAND ROW (Maryam, 18 Sep 2026): the wordmark top-left and
+          "You're almost there!" top-right, aligned on one row under the bar. */}
+    <div class="ob-sv-head">
+      <span class="ob-logo"><img src="${LOGO_K}" alt="TalentNext"></span>
+      <span class="ob-sv-hint">You&rsquo;re almost there!</span>
     </div>
-  </div>
-  ${obFoot()}`;
+    <main class="main"><div class="ob-sv-wrap">
+      ${''/* THE QUESTION IS THE HEADING (Maryam, 18 Sep 2026: "i want the
+            questions to be a heading and forget about a description") — no theme
+            title, no sub-line. */}
+      <div class="ob-sv-orb">${borbMark('tal-mk', true)}</div>
+      <h1 class="ob-sv-title">${obTitle(s)}</h1>
+      <div class="ob-sv-opts">
+        ${obOpts(s).map(([k,l,d]) => {
+          const on = S.ob[s.k] === k;
+          return `<label class="ob-sv-o${on ? ' on' : ''}" data-ob="${s.k}" data-obv="${k}">
+            <input type="radio" name="ob-${s.k}"${on ? ' checked' : ''}>
+            <span class="ob-sv-rad" aria-hidden="true"></span>
+            <span class="ob-sv-ot"><span class="ob-sv-ol">${l}</span>${
+              d ? `<span class="ob-sv-od">${d}</span>` : ''}</span>
+          </label>`;
+        }).join('')}
+      </div>
+      <div class="ob-sv-foot">${prev}${next}</div>
+    </div></main>
+  </div>`;
 }
 
-const obFoot = () => `
-  <div class="sec ob-sec ob-act">
-    <button class="btn btn-s noic" data-obgo="${S.obStep - 1}">${I.arrowLeft} Back</button>
-    <button class="btn btn-p noic" data-obgo="${S.obStep + 1}"${
-      obReady() ? '' : ' disabled'}>${
-      S.obStep === OB_N ? 'See what I heard' : 'Next'} ${I.arrowRight}</button>
-  </div>`;
+
 
 
 const OB_PICK = {coaching:'priya', delegation:'lena', other:'owen'};
@@ -31470,57 +31570,20 @@ const obLabel = (k) => {
   return hit ? hit[1] : '&mdash;';
 };
 
-const obHeard = () => [
-  ['Where you are', obLabel('where'), 1],
-  ['Your industry', obLabel('industry'), 2],
-  ['Your experience', obLabel('years'), 3],
-  ['What is low', S.ob.band === 'other'
-    ? 'Neither of the two the quiz found'
-    : obLabel('band'), 4],
-  ['Why it is hard', obLabel('why'), 5],
-  ['What you want', obLabel('intent'), 6]
-];
-
-function obReadback(){
-  const k = obAgent(), a = AGENTS[k], r = REC[k];
-  return `
-  <div class="sec ob-sec">
-    <div class="sec-h"><h2>What I heard</h2></div>
-    <p class="all-desc">Change anything that is wrong. Once you go through, these become part of what I hold about you, and you can drop any of them later from Profile.</p>
-    <div class="tile ob-heard">
-      ${obHeard().map(([l,v,st]) => `
-        <div class="ob-hr">
-          <span class="ob-hk">${l}</span>
-          <span class="ob-hv">${v}</span>
-          <button class="ob-hx" data-obgo="${st}">Change</button>
-        </div>`).join('')}
-      ${''/* THE QUOTED NOTE ROW IS DELETED with question 5 (3 Sep 2026). It
-            was the only row on this screen whose value a reader had typed, and
-            therefore the only one that had to be escaped on the way back into
-            `innerHTML` — `obEsc` went with it. Every remaining value is an
-            option label out of `OB_Q`. */}
-    </div>
-  </div>
-  <div class="sec ob-sec">
-    <div class="sec-h"><h2>Who I would put you with</h2></div>
-    <p class="all-desc">Three agents assess Explorer candidates. This is the one whose subject is the thing you just described.</p>
-    <div class="tile ob-rec">
-      ${avatar(a, 56)}
-      <div class="ob-rec-b">
-        <span class="ob-rec-n">${a.n}</span>
-        <span class="ob-rec-r">${a.range} &middot; ${a.price} &middot; ${r.mins}</span>
-        <p class="ob-fit">${obFit()}</p>
+function obDoneScreen(){
+  const from = S.obBarFrom || 100;
+  S.obBarFrom = 100;
+  return `<div class="ob-survey ob-done">
+    <div class="ob-sv-top"><i style="--ob-from:${from}%;--ob-to:100%"></i></div>
+    <main class="main"><div class="ob-sv-wrap">
+      <div class="ob-sv-orb">${borbMark('tal-mk', true)}</div>
+      <h1 class="ob-sv-title">You&rsquo;re all set</h1>
+      <p class="ob-sv-q">That is everything I needed. Here is where you are, and what comes next.</p>
+      ${obJourney()}
+      <div class="ob-sv-foot">
+        <button class="btn btn-p noic ob-sv-next" data-obdone="1">Find an Agent ${I.arrowRight}</button>
       </div>
-    </div>
-    ${''/* NO PRONOUN HERE EITHER — this line read "with the other two beside
-          her", which is the same invented fact as `OB_FIT`'s dropped
-          pronouns. The first name is what the sentence needs and all it
-          needs. */}
-    <p class="t-helper-01 ob-hint">You are not booking anything now. ${a.n.split(' ')[0]} is on your dashboard with the other two, and the interview is what sets your level.</p>
-  </div>
-  <div class="sec ob-sec ob-act">
-    <button class="btn btn-s noic" data-obgo="${OB_N}">${I.arrowLeft} Back</button>
-    <button class="btn btn-p noic" data-obdone="1">Go to my dashboard ${I.arrowRight}</button>
+    </div></main>
   </div>`;
 }
 
@@ -31552,13 +31615,8 @@ function obScreen(){
       welcome ? '' : obDock(mid, live ? obThread() : '')}</div>`;
   }
 
-  const body = step > OB_N ? obReadback() : obQuestion();
-  return `<div class="auth-card ob-card">
-    ${obPanel()}
-    <div class="auth-col">
-      <main class="main"><div class="page form-page ob-page">${body}</div></main>
-    </div>
-  </div>`;
+  if(step >= 1 && step <= OB_N) return obSurveyScreen();
+  return obDoneScreen();
 }
 
 
@@ -31596,17 +31654,9 @@ device.addEventListener('click', e => {
   const st = t.closest('[data-obstart]');
   if(st){
     e.preventDefault(); e.stopPropagation();
-    const fresh = !S.obQi;
+    obHush();
     const stage = device.querySelector('.ob-stage');
-    const start = () => {
-      obHush();
-      S.obMode = 'chat';
-      S.obChatOpen = true;
-      if(fresh){
-        S.thread.push({who:'me', html:'Let&rsquo;s Get Started!'});
-        obSay(() => obAsk(1));
-      } else render();
-    };
+    const start = () => { S.obStep = 1; render(); };
     if(stage){ stage.classList.add('ob-leave'); setTimeout(start, OB_LEAVE); }
     else start();
     return;

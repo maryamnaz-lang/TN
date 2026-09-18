@@ -119,6 +119,12 @@ S.obChatOpen = false;
    thread has to know which turn is the live one: a past question renders its
    words and no options, the current one renders both. */
 S.obQi = 0;
+/* THE SURVEY PROGRESS BAR'S LAST WIDTH, so the next render can animate FROM it
+   TO the new one (Maryam, 18 Sep 2026: "not smoothly filling"). `render()`
+   recreates the bar element, so a plain CSS width transition never tweens — a
+   fresh node starts at its final width. Storing the previous percentage lets
+   `obSurveyScreen` hand the keyframe a real from/to pair. */
+S.obBarFrom = 0;
 
 /* THE TWO WEAKEST BANDS, READ AND NOT TYPED. `qzLow` sorts `SCORES` and takes
    the bottom two, so the question cannot name a band the chart does not draw
@@ -355,6 +361,10 @@ function obReady(){
 /* IN THE NEW ORDER — where, industry, years, band, why, intent (Maryam, 9 Sep
    2026). One label per question, positional, so it moves with `OB_Q`. */
 const OB_SPINE = ['Where you are','Your industry','Your experience','What is low','Why it is hard','What you want'];
+
+/* The per-question "theme" big title (`OB_THEME`) was removed on 18 Sep 2026 —
+   Maryam wanted the question itself as the heading, with no theme and no
+   description line. The question resolves through `obTitle`. */
 
 function obPanel(){
   const step = S.obStep;
@@ -1349,9 +1359,11 @@ const obChatScreen = () => `
           called here — the class is simply absent, which is cheaper than
           hiding it and means the `em` base has nothing to resolve. */}
     <div class="ob-chat-head">
-      <div class="ob-orb ob-orb-sm">
-        <span class="ob-blob">${obBlob()}</span>
-      </div>
+      ${''/* THE WELCOME ORB IS THE `borb` COMPONENT (Maryam, 18 Sep 2026), the
+            same orb the chat hero and the voice intro use, not the older
+            `obBlob()` video. `live` so it breathes like a hero mark; §133 sizes
+            it into the `.ob-orb-sm` slot. */}
+      <div class="ob-orb ob-orb-sm">${borbMark('tal-mk', true)}</div>
       <div class="ob-chat-lede">${OB_CHAT.map(t => `<p>${t}</p>`).join('')}</div>
       ${''/* IT IS `.ob-go`, THE SAME ELEMENT THE VOICE SCREEN DRAWS — not a
             restyled button. "Same font size same color same formatting" is
@@ -1535,22 +1547,78 @@ const obCompose = () => {
    rather than left to the input — trap 9, and §104's note says the same thing
    about `S.role`.
    ========================================================================== */
-function obQuestion(){
+/* ==========================================================================
+   THE STEPPED SURVEY (Maryam, 18 Sep 2026, with a reference)
+
+   The onboarding questions used to be a chat thread (bubbles, a composer, a
+   segmented "You're almost there!" spine). This is the replacement: one dark
+   question per screen, radio pills, Back/Next, and a single progress bar pinned
+   to the very top of the frame that fills as each question arrives. The `borb`
+   orb sits top-left above every question so it reads as Tal asking it.
+
+   IT REUSES THE STEP MACHINERY WHOLE. Selection is `data-ob`/`data-obv`
+   (the handler sets `S.ob[k]` and re-renders); Back/Next is `obFoot()`'s
+   `data-obgo` gated by `obReady()`. So this is a new SKIN over the same state,
+   not a new flow — the read-back, the completion and the answer readers are
+   untouched. `obChatScreen` (the welcome) still opens it; its "Let's Get
+   Started" now advances to step 1 rather than opening the old chat.
+
+   DARK, IN TOKENS. The ground is `--gray-100` and the inks are the black-card
+   tokens `--on-dark` / `--on-dark-2` (the §75 recipe's own inks), so no hex is
+   written and it tracks the palette. Radius stays 0 on the pills and buttons
+   (our system, not the reference's rounded corners — CLAUDE.md's "build the
+   reference in our components"); only the radio marks are round. */
+function obSurveyScreen(){
   const s = OB_Q[S.obStep - 1];
-  return `
-  <div class="sec ob-sec">
-    <p class="ob-step">Question ${S.obStep} of ${OB_N}</p>
-    <h2 class="ob-q">${obTitle(s)}</h2>
-  </div>
-  <div class="sec ob-sec sec-role">
-    <div class="role-pick ob-pick">
-      ${obOpts(s).map(([k,l]) => `<label class="rad role-c ob-o${
-        S.ob[s.k] === k ? ' on' : ''}" data-ob="${s.k}" data-obv="${k}"><input type="radio" name="ob-${
-        s.k}"${S.ob[s.k] === k ? ' checked' : ''}><span class="box"></span><span class="txt role-t">${l}</span></label>`).join('')}
+  /* THE BAR TRACKS THE STEP, filling on Next and retreating on Previous — NOT on
+     selecting an option (Maryam, 18 Sep 2026: "the top bar should fill in when I
+     click on next, not when I select an option ... on going back the bar should
+     also go back"). `(step-1)/OB_N` leaves question one at 0% and lands the
+     completion screen at 100%; selecting re-renders the SAME step, so `to` is
+     unchanged and the bar holds. `from`/`to` drive the keyframe so it animates
+     (the element is recreated each render, so a transition alone cannot tween). */
+  const to = Math.round((S.obStep - 1) / OB_N * 100);
+  const from = S.obBarFrom || 0;
+  S.obBarFrom = to;
+  const prev = S.obStep > 1
+    ? `<button class="btn btn-t noic ob-sv-prev" data-obgo="${S.obStep - 1}">${I.arrowLeft} Previous</button>`
+    : '';
+  const next = `<button class="btn btn-p noic ob-sv-next" data-obgo="${S.obStep + 1}"${
+    obReady() ? '' : ' disabled'}>${
+    S.obStep === OB_N ? 'See what I heard' : 'Next'} ${I.arrowRight}</button>`;
+  return `<div class="ob-survey">
+    <div class="ob-sv-top"><i style="--ob-from:${from}%;--ob-to:${to}%"></i></div>
+    ${''/* THE BRAND ROW (Maryam, 18 Sep 2026): the wordmark top-left and
+          "You're almost there!" top-right, aligned on one row under the bar. */}
+    <div class="ob-sv-head">
+      <span class="ob-logo"><img src="${LOGO_K}" alt="TalentNext"></span>
+      <span class="ob-sv-hint">You&rsquo;re almost there!</span>
     </div>
-  </div>
-  ${obFoot()}`;
+    <main class="main"><div class="ob-sv-wrap">
+      ${''/* THE QUESTION IS THE HEADING (Maryam, 18 Sep 2026: "i want the
+            questions to be a heading and forget about a description") — no theme
+            title, no sub-line. */}
+      <div class="ob-sv-orb">${borbMark('tal-mk', true)}</div>
+      <h1 class="ob-sv-title">${obTitle(s)}</h1>
+      <div class="ob-sv-opts">
+        ${obOpts(s).map(([k,l,d]) => {
+          const on = S.ob[s.k] === k;
+          return `<label class="ob-sv-o${on ? ' on' : ''}" data-ob="${s.k}" data-obv="${k}">
+            <input type="radio" name="ob-${s.k}"${on ? ' checked' : ''}>
+            <span class="ob-sv-rad" aria-hidden="true"></span>
+            <span class="ob-sv-ot"><span class="ob-sv-ol">${l}</span>${
+              d ? `<span class="ob-sv-od">${d}</span>` : ''}</span>
+          </label>`;
+        }).join('')}
+      </div>
+      <div class="ob-sv-foot">${prev}${next}</div>
+    </div></main>
+  </div>`;
 }
+
+/* `obQuestion` (the old light stepped screen) was replaced by `obSurveyScreen`
+   on 18 Sep 2026 and removed — `obFoot`, `obOpts` and `obTitle` all still have
+   callers (the survey and the read-back). */
 
 /* >>> `obFree` IS DELETED WITH ITS QUESTION (3 Sep 2026) AND ITS ARGUMENT IS
    KEPT, because the next control anybody types into on these screens will hit
@@ -1561,15 +1629,10 @@ function obQuestion(){
    in the chat is the one field left and it is built the same way — read and
    cleared inside `obSend`, before the render that consumes it.
 
-/* Back and Next. Back is a quiet button and Next is the accent one, which is
-   §64's split said plainly — one is the way on and one is the way back. */
-const obFoot = () => `
-  <div class="sec ob-sec ob-act">
-    <button class="btn btn-s noic" data-obgo="${S.obStep - 1}">${I.arrowLeft} Back</button>
-    <button class="btn btn-p noic" data-obgo="${S.obStep + 1}"${
-      obReady() ? '' : ' disabled'}>${
-      S.obStep === OB_N ? 'See what I heard' : 'Next'} ${I.arrowRight}</button>
-  </div>`;
+/* `obFoot` (the old shared Back/Next row) was inlined into `obSurveyScreen` on
+   18 Sep 2026 — the survey needs a conditional Previous (hidden on question one)
+   and content-width buttons, and the read-back has its own foot — so there is
+   nothing left to share. */
 
 /* ==========================================================================
    THE READ-BACK
@@ -1618,61 +1681,32 @@ const obLabel = (k) => {
   return hit ? hit[1] : '&mdash;';
 };
 
-/* the four answers as label / value / the step that set it */
-/* THE READ-BACK ROWS, IN `OB_Q`'S NEW ORDER, and each `st` is that question's
-   1-based step so the "Change" button lands on the right screen (Maryam, 9 Sep
-   2026 reorder). `want` is gone; `intent` carries the "What you want" row now. */
-const obHeard = () => [
-  ['Where you are', obLabel('where'), 1],
-  ['Your industry', obLabel('industry'), 2],
-  ['Your experience', obLabel('years'), 3],
-  ['What is low', S.ob.band === 'other'
-    ? 'Neither of the two the quiz found'
-    : obLabel('band'), 4],
-  ['Why it is hard', obLabel('why'), 5],
-  ['What you want', obLabel('intent'), 6]
-];
+/* THE COMPLETION SCREEN (Maryam, 18 Sep 2026) — REPLACES THE READ-BACK. The
+   old terminal screen recapped the six answers with a "Change" per row and named
+   the recommended agent; Maryam dropped it ("I am not sure this screen is
+   required") for a plain "You're all set" that shows the journey — the quiz done,
+   the interview & levelling next — and hands over with "Find an Agent".
 
-function obReadback(){
-  const k = obAgent(), a = AGENTS[k], r = REC[k];
-  return `
-  <div class="sec ob-sec">
-    <div class="sec-h"><h2>What I heard</h2></div>
-    <p class="all-desc">Change anything that is wrong. Once you go through, these become part of what I hold about you, and you can drop any of them later from Profile.</p>
-    <div class="tile ob-heard">
-      ${obHeard().map(([l,v,st]) => `
-        <div class="ob-hr">
-          <span class="ob-hk">${l}</span>
-          <span class="ob-hv">${v}</span>
-          <button class="ob-hx" data-obgo="${st}">Change</button>
-        </div>`).join('')}
-      ${''/* THE QUOTED NOTE ROW IS DELETED with question 5 (3 Sep 2026). It
-            was the only row on this screen whose value a reader had typed, and
-            therefore the only one that had to be escaped on the way back into
-            `innerHTML` — `obEsc` went with it. Every remaining value is an
-            option label out of `OB_Q`. */}
-    </div>
-  </div>
-  <div class="sec ob-sec">
-    <div class="sec-h"><h2>Who I would put you with</h2></div>
-    <p class="all-desc">Three agents assess Explorer candidates. This is the one whose subject is the thing you just described.</p>
-    <div class="tile ob-rec">
-      ${avatar(a, 56)}
-      <div class="ob-rec-b">
-        <span class="ob-rec-n">${a.n}</span>
-        <span class="ob-rec-r">${a.range} &middot; ${a.price} &middot; ${r.mins}</span>
-        <p class="ob-fit">${obFit()}</p>
+   IT IS THE SURVEY'S OWN LIGHT COMPOSITION (`.ob-survey`), so it reads as the
+   last screen of the flow: the orb top-left, the bar full, the same 720 column.
+   `obJourney()` is the SAME steps component the old chat's done card drew
+   (`OB_JRN` + `JRN_AI`, marks by state), so the steps are not typed twice.
+   "Find an Agent" is `data-obdone` — the handler still sets `S.recKey` from the
+   answers and writes the three profile fields on the way to the dashboard. */
+function obDoneScreen(){
+  const from = S.obBarFrom || 100;
+  S.obBarFrom = 100;
+  return `<div class="ob-survey ob-done">
+    <div class="ob-sv-top"><i style="--ob-from:${from}%;--ob-to:100%"></i></div>
+    <main class="main"><div class="ob-sv-wrap">
+      <div class="ob-sv-orb">${borbMark('tal-mk', true)}</div>
+      <h1 class="ob-sv-title">You&rsquo;re all set</h1>
+      <p class="ob-sv-q">That is everything I needed. Here is where you are, and what comes next.</p>
+      ${obJourney()}
+      <div class="ob-sv-foot">
+        <button class="btn btn-p noic ob-sv-next" data-obdone="1">Find an Agent ${I.arrowRight}</button>
       </div>
-    </div>
-    ${''/* NO PRONOUN HERE EITHER — this line read "with the other two beside
-          her", which is the same invented fact as `OB_FIT`'s dropped
-          pronouns. The first name is what the sentence needs and all it
-          needs. */}
-    <p class="t-helper-01 ob-hint">You are not booking anything now. ${a.n.split(' ')[0]} is on your dashboard with the other two, and the interview is what sets your level.</p>
-  </div>
-  <div class="sec ob-sec ob-act">
-    <button class="btn btn-s noic" data-obgo="${OB_N}">${I.arrowLeft} Back</button>
-    <button class="btn btn-p noic" data-obdone="1">Go to my dashboard ${I.arrowRight}</button>
+    </div></main>
   </div>`;
 }
 
@@ -1785,13 +1819,10 @@ function obScreen(){
       welcome ? '' : obDock(mid, live ? obThread() : '')}</div>`;
   }
 
-  const body = step > OB_N ? obReadback() : obQuestion();
-  return `<div class="auth-card ob-card">
-    ${obPanel()}
-    <div class="auth-col">
-      <main class="main"><div class="page form-page ob-page">${body}</div></main>
-    </div>
-  </div>`;
+  /* STEPS 1..OB_N ARE THE STEPPED SURVEY; step > OB_N is the completion screen,
+     both the survey's own light full-frame composition. */
+  if(step >= 1 && step <= OB_N) return obSurveyScreen();
+  return obDoneScreen();
 }
 
 /* ==========================================================================
@@ -1914,17 +1945,13 @@ device.addEventListener('click', e => {
   const st = t.closest('[data-obstart]');
   if(st){
     e.preventDefault(); e.stopPropagation();
-    const fresh = !S.obQi;
+    /* "Let's Get Started" NOW ENTERS THE STEPPED SURVEY (Maryam, 18 Sep 2026),
+       not the old chat thread — it advances to question one. The welcome's leave
+       animation is kept (the half `render()` cannot do, §107 §0g); the state
+       change waits for it, then obScreen paints `obSurveyScreen()`. */
+    obHush();
     const stage = device.querySelector('.ob-stage');
-    const start = () => {
-      obHush();
-      S.obMode = 'chat';
-      S.obChatOpen = true;
-      if(fresh){
-        S.thread.push({who:'me', html:'Let&rsquo;s Get Started!'});
-        obSay(() => obAsk(1));
-      } else render();
-    };
+    const start = () => { S.obStep = 1; render(); };
     if(stage){ stage.classList.add('ob-leave'); setTimeout(start, OB_LEAVE); }
     else start();
     return;

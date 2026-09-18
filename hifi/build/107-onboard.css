@@ -1389,8 +1389,9 @@
   flex:none;width:100%;
   padding-bottom:var(--s06)}
 .app .ob-logo{display:flex;align-items:center}
-.app .ob-logo img{display:block;height:24px;width:auto}
-@container app (min-width:900px){.app .ob-logo img{height:26px}}
+/* +12px on the wordmark (Maryam, 18 Sep 2026): 24 -> 36 base, 26 -> 38 at desktop. */
+.app .ob-logo img{display:block;height:36px;width:auto}
+@container app (min-width:900px){.app .ob-logo img{height:38px}}
 
 /* ------------------------------------------------------------------ 107.p ---
    THE PROGRESS BAR — Maryam, 9 Sep 2026, with a reference
@@ -1980,3 +1981,125 @@
    §63 cannot fix that, because inheriting the FAMILY is not one of the four
    properties that layer owns. The next multi-line field in this build needs
    all three. */
+
+/* --------------------------------------------------------------------- 11 --
+   THE STEPPED SURVEY (Maryam, 18 Sep 2026, with a reference)
+
+   The onboarding questions used to be a chat thread; this is the replacement —
+   one question per screen. A single progress bar is pinned to the frame's TOP
+   WALL and fills as each question arrives; the Tal orb sits TOP-LEFT above the
+   question so it reads as Tal asking it; radio pills; Back/Next.
+
+   IT IS THE REFERENCE IN LIGHT MODE (Maryam, 18 Sep 2026 — the reference is
+   dark, the product is light, so the palette is translated, not copied). White
+   ground, `--text-primary` / `--text-secondary` ink, `--layer-02` pills on a
+   `--rule` hairline, an accent-tinted selected pill with an accent radio.
+   The type sizes read §63's own role tokens. RADIUS STAYS 0 on the pills and
+   buttons (our system, not the reference's rounded corners); only the radio
+   marks are round, which discs always are. Back/Next keep the platform's own
+   `.btn-s` / `.btn-p` colours (quiet Back, black Next) — only their layout is
+   set here.
+   -------------------------------------------------------------------------- */
+.app .ob-survey{
+  position:relative;box-sizing:border-box;
+  flex:1 1 auto;min-height:100%;
+  display:flex;flex-direction:column;
+  background:var(--background);color:var(--text-primary)}
+
+/* the single bar on the top wall, filling per question */
+.app .ob-sv-top{
+  position:absolute;top:0;left:0;right:0;z-index:2;
+  height:4px;background:var(--rule)}
+/* THE FILL ANIMATES FROM ITS LAST WIDTH TO THE NEW ONE. `render()` recreates
+   this node, so a `transition` cannot tween (a fresh element has no prior value);
+   the keyframe runs from `--ob-from` to `--ob-to` on mount, and the base width is
+   `--ob-to` so a background-throttled pane (no animation) still lands correct. */
+.app .ob-sv-top > i{
+  display:block;height:100%;width:var(--ob-to,0);background:var(--accent);
+  animation:ob-bar-fill .5s cubic-bezier(.22,1,.36,1)}
+@keyframes ob-bar-fill{
+  from{width:var(--ob-from,0)}
+  to{width:var(--ob-to,0)}}
+
+/* the brand row: wordmark left, "You're almost there!" right, under the bar */
+.app .ob-sv-head{
+  flex:none;display:flex;align-items:center;justify-content:space-between;
+  gap:var(--s04);padding:var(--s06) var(--s06) 0}
+.app .ob-sv-hint{
+  color:var(--text-secondary);
+  font-size:var(--t-desc-size);line-height:normal}
+
+.app .ob-survey .main{
+  flex:1 1 auto;min-width:0;
+  display:flex;justify-content:center;align-items:center;
+  padding:0;overflow:auto}
+.app .ob-sv-wrap{
+  width:100%;max-width:720px;box-sizing:border-box;
+  padding:var(--s07) var(--s06);
+  display:flex;flex-direction:column}
+
+/* the orb, top-left */
+.app .ob-sv-orb{margin-bottom:var(--s05)}
+.app .ob-sv-orb .borb.tal-mk{width:52px;height:52px;--borb-size:64px}
+
+.app .ob-sv-title{
+  margin:0;
+  font-size:var(--t-h1-size);line-height:var(--t-h1-lh);
+  letter-spacing:var(--t-h1-ls);
+  font-weight:var(--t-w-book);color:var(--text-primary)}
+.app .ob-sv-q{
+  margin:var(--s04) 0 0;
+  font-size:var(--t-body-size);line-height:var(--t-body-lh);
+  color:var(--text-secondary)}
+
+.app .ob-sv-opts{
+  display:flex;flex-direction:column;gap:var(--s03);margin-top:var(--s07)}
+/* NO BORDER IN THE DEFAULT VIEW (Maryam, 18 Sep 2026) — the `--layer-02` fill
+   defines the pill; the border is transparent so the accent edge that appears
+   on selection costs no layout shift. */
+.app .ob-sv-o{
+  position:relative;display:flex;align-items:center;gap:var(--s04);
+  padding:var(--s05);cursor:pointer;
+  background:var(--layer-02);border:1px solid transparent;
+  transition:background .15s ease,border-color .15s ease}
+.app .ob-sv-o.on{
+  background:color-mix(in srgb, var(--accent) 8%, var(--background));
+  border-color:var(--accent)}
+.app .ob-sv-o > input{position:absolute;opacity:0;width:0;height:0;pointer-events:none}
+
+/* the radio mark — a disc, filled accent when chosen */
+.app .ob-sv-rad{
+  flex:none;width:18px;height:18px;border-radius:50%;box-sizing:border-box;
+  border:1.5px solid var(--border-strong-01);position:relative;
+  transition:border-color .15s ease,background .15s ease}
+.app .ob-sv-o.on .ob-sv-rad{border-color:var(--accent);background:var(--accent)}
+.app .ob-sv-o.on .ob-sv-rad::after{
+  content:'';position:absolute;top:50%;left:50%;
+  width:6px;height:6px;border-radius:50%;background:var(--background);
+  transform:translate(-50%,-50%)}
+
+.app .ob-sv-ot{display:flex;flex-direction:column;min-width:0}
+.app .ob-sv-ol{
+  font-size:var(--t-body-size);line-height:var(--t-body-lh);color:var(--text-primary)}
+.app .ob-sv-od{
+  font-size:var(--t-label-size);line-height:var(--t-label-lh);
+  color:var(--text-secondary);margin-top:2px}
+
+/* Previous / Next — content width, Previous LEFT, Next RIGHT (Maryam, 18 Sep
+   2026). `space-between` sends them to the two ends; when there is no Previous
+   (question one) `margin-left:auto` on Next keeps it right. Previous is a quiet
+   light-grey text button with NO border; Next is the platform black `.btn-p`. */
+.app .ob-sv-foot{
+  display:flex;align-items:center;gap:var(--s04);
+  margin-top:var(--s08)}
+.app .ob-sv-foot .btn{min-height:48px}
+.app .ob-sv-next{margin-left:auto}
+/* Previous is a light-grey button (the pills' `--layer-02`), no border, with
+   BLACK text and arrow (Maryam, 18 Sep 2026). */
+.app .ob-sv-prev{
+  background:var(--layer-02);border:0;
+  color:var(--text-primary)}
+.app .ob-sv-prev svg{color:var(--text-primary)}
+
+/* the completion screen's journey panel, spaced under the "You're all set" line */
+.app .ob-done .ob-qp{margin-top:var(--s07)}

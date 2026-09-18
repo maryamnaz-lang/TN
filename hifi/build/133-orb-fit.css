@@ -56,6 +56,16 @@
     width:72px;height:72px;--borb-size:89.4px}
 }
 
+/* THE ONBOARDING CHAT WELCOME'S ORB (Maryam, 18 Sep 2026) --------------------
+   `obChatScreen` now emits the `borb` component in the `.ob-orb-sm` slot instead
+   of the old `obBlob()` video. The slot is `--ob-orb-sm` square (§107, 104px);
+   the borb glass body is 0.806 of `--borb-size`, so 1.24x the slot lands the
+   body at the slot size with the glow free to bleed past it. Token-driven so it
+   tracks §107's `--ob-orb-sm` rather than pinning a number. */
+.app .ob-orb-sm .borb.tal-mk{
+  width:var(--ob-orb-sm);height:var(--ob-orb-sm);
+  --borb-size:calc(var(--ob-orb-sm) * 1.24)}
+
 /* THE SUMMARY BAND'S MARK (§70.632, §33.186) ------------------------------
    The head band's "Summary by Tal" mark was `--tal-mark` painted as a 28px
    `background-image` on `.ai-label::before` — a still picture of the orb

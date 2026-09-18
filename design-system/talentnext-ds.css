@@ -14,7 +14,7 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 6109.  Rules dropped as product-specific: 222.
+   Rules kept: 6138.  Rules dropped as product-specific: 222.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
@@ -3252,7 +3252,8 @@ button{font-family:var(--font-sans)}
   .app::after{content:''; position:absolute; top:0; bottom:0; left:var(--rail-w-nav); width:1px; background:var(--rule); z-index:41; pointer-events:none; transition:left var(--mo-base) var(--mo-standard)}
   .app[data-rail="open"]::after{left:var(--drawer-w)}
   .app:has(> .auth-card)::after,
-  .app:has(> .ob-open)::after{content:none}
+  .app:has(> .ob-open)::after,
+  .app:has(> .ob-survey)::after{content:none}
   .app .sn-item{min-height:48px; padding:0; gap:0; justify-content:center; border-top:0; position:relative}
   .app .sn-item svg{display:block; width:20px; height:20px}
   .app .sn-item > span:not(.badge){position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%)}
@@ -8995,9 +8996,9 @@ button.btn-p:active,
 }
 .app .ob-head{display:flex; align-items:center; flex:none; width:100%; padding-bottom:var(--s06)}
 .app .ob-logo{display:flex; align-items:center}
-.app .ob-logo img{display:block; height:24px; width:auto}
+.app .ob-logo img{display:block; height:36px; width:auto}
 @container app (min-width:900px){
-  .app .ob-logo img{height:26px}
+  .app .ob-logo img{height:38px}
 }
 .app .ob-prog{width:100%; max-width:720px; flex:none; display:flex; flex-direction:column; align-items:flex-start; gap:var(--s04)}
 .app .ob-prog-h{margin:0}
@@ -9082,6 +9083,34 @@ button.btn-p:active,
 .app .ob-page .ob-rec-r{margin-top:2px}
 .app .ob-page .ob-fit{margin:var(--s03) 0 0}
 .app .ob-page .ob-hint{margin:var(--s04) 0 0}
+.app .ob-survey{position:relative; box-sizing:border-box; flex:1 1 auto; min-height:100%; display:flex; flex-direction:column; background:var(--background); color:var(--text-primary)}
+.app .ob-sv-top{position:absolute; top:0; left:0; right:0; z-index:2; height:4px; background:var(--rule)}
+.app .ob-sv-top > i{display:block; height:100%; width:var(--ob-to,0); background:var(--accent); animation:ob-bar-fill .5s cubic-bezier(.22,1,.36,1)}
+@keyframes ob-bar-fill{from{width:var(--ob-from,0)} to{width:var(--ob-to,0)}}
+.app .ob-sv-head{flex:none; display:flex; align-items:center; justify-content:space-between; gap:var(--s04); padding:var(--s06) var(--s06) 0}
+.app .ob-sv-hint{color:var(--text-secondary); font-size:var(--t-desc-size); line-height:normal}
+.app .ob-survey .main{flex:1 1 auto; min-width:0; display:flex; justify-content:center; align-items:center; padding:0; overflow:auto}
+.app .ob-sv-wrap{width:100%; max-width:720px; box-sizing:border-box; padding:var(--s07) var(--s06); display:flex; flex-direction:column}
+.app .ob-sv-orb{margin-bottom:var(--s05)}
+.app .ob-sv-orb .borb.tal-mk{width:52px; height:52px; --borb-size:64px}
+.app .ob-sv-title{margin:0; font-size:var(--t-h1-size); line-height:var(--t-h1-lh); letter-spacing:var(--t-h1-ls); font-weight:var(--t-w-book); color:var(--text-primary)}
+.app .ob-sv-q{margin:var(--s04) 0 0; font-size:var(--t-body-size); line-height:var(--t-body-lh); color:var(--text-secondary)}
+.app .ob-sv-opts{display:flex; flex-direction:column; gap:var(--s03); margin-top:var(--s07)}
+.app .ob-sv-o{position:relative; display:flex; align-items:center; gap:var(--s04); padding:var(--s05); cursor:pointer; background:var(--layer-02); border:1px solid transparent; transition:background .15s ease,border-color .15s ease}
+.app .ob-sv-o.on{background:color-mix(in srgb, var(--accent) 8%, var(--background)); border-color:var(--accent)}
+.app .ob-sv-o > input{position:absolute; opacity:0; width:0; height:0; pointer-events:none}
+.app .ob-sv-rad{flex:none; width:18px; height:18px; border-radius:50%; box-sizing:border-box; border:1.5px solid var(--border-strong-01); position:relative; transition:border-color .15s ease,background .15s ease}
+.app .ob-sv-o.on .ob-sv-rad{border-color:var(--accent); background:var(--accent)}
+.app .ob-sv-o.on .ob-sv-rad::after{content:''; position:absolute; top:50%; left:50%; width:6px; height:6px; border-radius:50%; background:var(--background); transform:translate(-50%,-50%)}
+.app .ob-sv-ot{display:flex; flex-direction:column; min-width:0}
+.app .ob-sv-ol{font-size:var(--t-body-size); line-height:var(--t-body-lh); color:var(--text-primary)}
+.app .ob-sv-od{font-size:var(--t-label-size); line-height:var(--t-label-lh); color:var(--text-secondary); margin-top:2px}
+.app .ob-sv-foot{display:flex; align-items:center; gap:var(--s04); margin-top:var(--s08)}
+.app .ob-sv-foot .btn{min-height:48px}
+.app .ob-sv-next{margin-left:auto}
+.app .ob-sv-prev{background:var(--layer-02); border:0; color:var(--text-primary)}
+.app .ob-sv-prev svg{color:var(--text-primary)}
+.app .ob-done .ob-qp{margin-top:var(--s07)}
 
 /* ---- 108-enrolcourse.css ---- */
 .app .eo-course{display:flex; flex-direction:column; gap:var(--sec-h-gap)}
@@ -9904,5 +9933,6 @@ button.btn-p:active,
 @container app (max-width:899px){
   .app .ob-card .ob-brand .tal-hero .borb.tal-mk.lg{width:72px; height:72px; --borb-size:89.4px}
 }
+.app .ob-orb-sm .borb.tal-mk{width:var(--ob-orb-sm); height:var(--ob-orb-sm); --borb-size:calc(var(--ob-orb-sm) * 1.24)}
 .app .modhead .ai-aura.talsum > .ai-head > .ai-label:has(> .borb)::before{content:none}
 .app .modhead .ai-aura.talsum > .ai-head > .ai-label > .borb.tal-mk{width:28px; height:28px; --borb-size:34.8px}
