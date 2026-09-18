@@ -14,7 +14,7 @@
      The <style> block is PROTOTYPE CHROME AND NOTHING ELSE (the device frame,
      the viewport picker, the wordmark size, a toast host) — no product rule.
      ========================================================================== -->
-<link rel="stylesheet" href="design-system/talentnext-ds.css?b=7a062748">
+<link rel="stylesheet" href="design-system/talentnext-ds.css?b=11c2b8c2">
 
 <style>
 /* ==========================================================================
@@ -654,7 +654,7 @@
   </div>
 </div>
 
-<script src="design-system/talentnext-ds.js?b=7a062748"></script>
+<script src="design-system/talentnext-ds.js?b=11c2b8c2"></script>
 <script>
 /* ==========================================================================
    THE SUPER ADMIN PORTAL
@@ -4417,24 +4417,33 @@ function staffDetailView(u){
   const days = inviteDaysLeft(u);
   const sum = `<b>${esc(u.name)}</b> holds the ${esc(staffRoleName(u))} role in ${esc(u.dept || 'the team')}. ${u.status === 'invited' ? 'The invite is outstanding, so the account can’t sign in until it is accepted.' : u.status === 'inactive' ? 'The account is deactivated: the record is intact but sign-in is refused.' : 'The account is active.'}`;
   const prot = staffProtect(u);
+  /* THE HEADER ACTIONS ARE A KEBAB MENU, never inline buttons at the top-right of a
+     detail page (Maryam, 18 Sep 2026: "i do not want option actions on details pages
+     on the top right, use the menu icon and show these actions in a menu dropdown …
+     on the whole admin portal"). Every record-detail head puts its options behind
+     `rowActs`; only a STATUS tag (here the original-SA protected badge) stays visible. */
   let acts;
   if(u.orig){
     acts = '<span class="tag sm brand">Original Super Admin — protected</span>';
   } else if(u.status === 'invited'){
-    acts = `<button class="btn btn-g btn-sm noic" data-act="staffresend:${u.id}">${I.renew} Resend Invite</button>
-      <button class="btn btn-g btn-sm noic" data-act="staffpreviewactivate:${u.id}">${I.view} Preview Activation</button>
-      <button class="btn btn-g btn-sm noic" data-act="staffcancelinvite:${u.id}">${I.close} Cancel Invite</button>
-      <button class="btn btn-g btn-sm noic" data-sheet="delstaff:${u.id}">${I.delete} Delete</button>`;
+    acts = rowActs([
+      ['renew', 'Resend Invite', `data-act="staffresend:${u.id}"`],
+      ['view', 'Preview Activation', `data-act="staffpreviewactivate:${u.id}"`],
+      ['close', 'Cancel Invite', `data-act="staffcancelinvite:${u.id}"`],
+      ['delete', 'Delete', `data-sheet="delstaff:${u.id}"`]
+    ]);
   } else {
-    acts = `<button class="btn btn-g btn-sm noic" data-sheet="editstaff:${u.id}">${I.edit} Edit</button>
-      ${prot ? '' : `<button class="btn btn-g btn-sm noic" data-sheet="changerole:${u.id}">Change Role</button>`}
-      ${u.roles.includes('leader')
-        ? `<button class="btn btn-g btn-sm noic" data-act="askremoveleader:${u.id}">Remove Cohort Leader</button>`
-        : `<button class="btn btn-g btn-sm noic" data-act="askmarkleader:${u.id}">Mark As Cohort Leader</button>`}
-      ${u.status === 'active'
-        ? (prot || lastSAGuard(u) ? '' : `<button class="btn btn-g btn-sm noic" data-sheet="deactivate:${u.id}">Deactivate</button>`)
-        : `<button class="btn btn-p btn-sm noic" data-sheet="reactivate:${u.id}">Reactivate ${I.arrowRight}</button>`}
-      ${prot || lastSAGuard(u) ? '' : `<button class="btn btn-g btn-sm noic" data-sheet="delstaff:${u.id}">${I.delete} Delete</button>`}`;
+    acts = rowActs([
+      ['edit', 'Edit', `data-sheet="editstaff:${u.id}"`],
+      prot ? null : ['settings', 'Change Role', `data-sheet="changerole:${u.id}"`],
+      u.roles.includes('leader')
+        ? ['verified', 'Remove Cohort Leader', `data-act="askremoveleader:${u.id}"`]
+        : ['verified', 'Mark As Cohort Leader', `data-act="askmarkleader:${u.id}"`],
+      u.status === 'active'
+        ? (prot || lastSAGuard(u) ? null : ['deactivate', 'Deactivate', `data-sheet="deactivate:${u.id}"`])
+        : ['play', 'Reactivate', `data-sheet="reactivate:${u.id}"`],
+      prot || lastSAGuard(u) ? null : ['delete', 'Delete', `data-sheet="delstaff:${u.id}"`]
+    ]);
   }
   const caps = CAPS.filter(c => (MATRIX[staffRole(u)] || {})[c.k]);
   const invitedBy = u.invitedBy && USER_BY_ID[u.invitedBy] ? (USER_BY_ID[u.invitedBy].id === ME.id ? 'You' : USER_BY_ID[u.invitedBy].name) : '—';
@@ -4475,17 +4484,20 @@ function usersStaffDetail(){
   const isActive = u.status === 'active' || u.status === 'ok';
   const sum = `<b>${esc(u.name)}</b> holds ${u.roles.length === 1 ? 'one role' : u.roles.length + ' roles'} — ${u.roles.map(r => (ROLE_BY_K[r] || {}).short || r).join(', ')} — and joined ${esc(u.joined)}. ${u.internal ? 'An internal account.' : 'A product account, matched to the marketplace records.'}`;
   const g = grantOf(u);
+  /* Header actions in a kebab, status tag stays visible (Maryam, 18 Sep 2026). */
   const acts = u.id === 'u9'
     ? '<span class="tag sm brand">Super Admin — protected</span>'
-    : `<button class="btn btn-g btn-sm noic" data-sheet="rec:user:${u.id}">${I.edit} Edit</button>
-       <button class="btn btn-g btn-sm noic" data-act="askreset:${u.id}">Reset Password</button>
-       ${u.roles.some(isFullAccess) ? '' : `<button class="btn btn-g btn-sm noic" data-act="askviewas:${u.id}">${I.view} View As</button>`}
-       ${isAdmin(u) ? `<button class="btn btn-g btn-sm noic" data-sheet="revokeadmin:${u.id}">Revoke Super Admin</button>`
-         : u.internal && isActive ? `<button class="btn btn-g btn-sm noic" data-sheet="grant:${u.id}">Grant Super Admin</button>` : ''}
-       ${isActive
-          ? `<button class="btn btn-g btn-sm noic" data-act="askstatus:user:${u.id}:inactive">Deactivate</button>`
-          : `<button class="btn btn-p btn-sm noic" data-act="askstatus:user:${u.id}:active">Reactivate ${I.arrowRight}</button>`}
-       <button class="btn btn-g btn-sm noic" data-act="askdel:user:${u.id}">${I.delete} Delete</button>`;
+    : rowActs([
+        ['edit', 'Edit', `data-sheet="rec:user:${u.id}"`],
+        ['renew', 'Reset Password', `data-act="askreset:${u.id}"`],
+        u.roles.some(isFullAccess) ? null : ['view', 'View As', `data-act="askviewas:${u.id}"`],
+        isAdmin(u) ? ['close', 'Revoke Super Admin', `data-sheet="revokeadmin:${u.id}"`]
+          : (u.internal && isActive ? ['verified', 'Grant Super Admin', `data-sheet="grant:${u.id}"`] : null),
+        isActive
+          ? ['deactivate', 'Deactivate', `data-act="askstatus:user:${u.id}:inactive"`]
+          : ['play', 'Reactivate', `data-act="askstatus:user:${u.id}:active"`],
+        ['delete', 'Delete', `data-act="askdel:user:${u.id}"`]
+      ]);
   return `
   ${detailHead('users/users', sum)}
   <section class="sec">
@@ -4582,12 +4594,16 @@ function vettingAppDetail(){
   return `
   ${detailHead('vetting/applications', sum)}
   <section class="sec">
+    ${''/* Header actions in a kebab (Maryam, 18 Sep 2026); a decided application shows
+           only its status tag. */}
     ${aiHead(esc(a.name), esc(a.role) + ' · ' + esc(a.location),
       done ? tag(a.status)
-      : `<button class="btn btn-g btn-sm noic" data-sheet="moreinfo">${I.email} Request Info</button>
-       ${a.interview ? '' : `<button class="btn btn-g btn-sm noic" data-sheet="vetcall">${I.calendar} Schedule Call</button>`}
-       <button class="btn btn-g btn-sm" data-act="askreject:${a.id}">${I.close} Reject</button>
-       <button class="btn btn-p btn-sm noic" data-act="askhire:${a.id}">Approve &amp; Hire ${I.arrowRight}</button>`)}
+      : rowActs([
+          ['email', 'Request Info', `data-sheet="moreinfo"`],
+          a.interview ? null : ['calendar', 'Schedule Call', `data-sheet="vetcall"`],
+          ['close', 'Reject', `data-act="askreject:${a.id}"`],
+          ['check', 'Approve & Hire', `data-act="askhire:${a.id}"`]
+        ]))}
     ${kv([
       ['Email', esc(a.email)],
       ['Phone', esc(a.phone)],
@@ -4681,10 +4697,14 @@ function vettingEmpDetail(){
   return `
   ${detailHead('vetting/empverify', sum)}
   <section class="sec">
+    ${''/* Header actions in a kebab (Maryam, 18 Sep 2026); a verified employer shows
+           only its status tag. */}
     ${aiHead(esc(e.name), esc(e.industry) + ' · ' + esc(e.location),
       decided ? tag('ok', 'Verified')
-      : `<button class="btn btn-g btn-sm" data-act="askdecline:${e.id}">${I.close} Decline</button>
-         <button class="btn btn-p btn-sm noic" data-act="verifyemp:${e.id}">Verify ${I.arrowRight}</button>`)}
+      : rowActs([
+          ['close', 'Decline', `data-act="askdecline:${e.id}"`],
+          ['check', 'Verify', `data-act="verifyemp:${e.id}"`]
+        ]))}
     ${kv([
       ['Legal name', esc(e.name)],
       ['Industry', esc(e.industry)],
@@ -5614,14 +5634,17 @@ function agentsDetail(){
         <span class="idname-row"><span class="idname">${esc(a.name)}</span>${a.rating ? `<span class="idrate">${ratingCell(a.rating)}</span>` : ''}</span>
         <span class="idmeta">${esc(a.job || 'Talent Agent')} &middot; ${esc(a.email)}</span>
       </div>
+      ${''/* Header actions in a kebab (Maryam, 18 Sep 2026); the Deactivated tag stays. */}
       <span class="idhead-act" style="display:flex;align-items:center;gap:var(--s03)">${acct ? '' : tag('inactive', 'Deactivated')}
-        <button class="btn btn-g btn-sm noic" data-sheet="rec:agent:${a.id}">${I.edit} Edit</button>
-        ${acct
-          ? `<button class="btn btn-g btn-sm noic" data-sheet="deactext:${a.id}">${I.deactivate || I.close} Deactivate</button>`
-          : `<button class="btn btn-p btn-sm noic" data-sheet="reactext:${a.id}">Reactivate ${I.arrowRight}</button>`}</span>
+        ${rowActs([
+          ['edit', 'Edit', `data-sheet="rec:agent:${a.id}"`],
+          acct
+            ? ['deactivate', 'Deactivate', `data-sheet="deactext:${a.id}"`]
+            : ['play', 'Reactivate', `data-sheet="reactext:${a.id}"`]
+        ])}</span>
     </div>
     ${stats([
-      ['bank', 'Total earnings', money(earnings), 'net of the platform share'],
+      ['bank', 'Total earnings', money(earnings), 'Net amount'],
       ['video', 'Interviewed', String(a.interviewed), 'sessions conducted'],
       ['wallet', 'Own fee', money(a.fee), 'set by the agent'],
       ['route', 'Assessment range', rangeLabel(agRange(a)), 'Cohorts']
@@ -6048,15 +6071,19 @@ function cohortsDetail(){
   return `
   ${detailHead('cohorts/cohorts', sum)}
   <section class="sec">
+    ${''/* Header actions in a kebab (Maryam, 18 Sep 2026); the state tag
+           (Active · week N / Archived) stays visible beside it. */}
     ${aiHead(esc(c.name), c.leader === 'Unassigned' ? 'No leader yet'
         : `<span class="cl-lead"><span class="cl-lead-ph"><img src="${agentFace(c.leader.replace(/\s*\(.*\)/, ''))}" alt=""></span>Led by ${esc(c.leader.replace(/\s*\(.*\)/, ''))}</span>`,
-      `<button class="btn btn-g btn-sm noic" data-sheet="rec:cohort:${c.id}">${I.edit} Edit</button>
-       ${draft
-        ? `<button class="btn btn-g btn-sm noic" data-act="askdel:cohort:${c.id}">${I.delete} Delete</button>
-           <button class="btn btn-p btn-sm noic" data-act="askstatus:cohort:${c.id}:active">Start Cohort ${I.arrowRight}</button>`
-        : c.status === 'archived' ? tag('archived', 'Archived')
-        : `<button class="btn btn-g btn-sm noic" data-act="askstatus:cohort:${c.id}:archived">Archive</button>
-           <span class="tag sm green">Active · week ${c.week}</span>`}`)}
+      `<span style="display:flex;align-items:center;gap:var(--s03)">${
+        c.status === 'archived' ? tag('archived', 'Archived')
+          : draft ? '' : `<span class="tag sm green">Active · week ${c.week}</span>`}
+       ${rowActs([
+         ['edit', 'Edit', `data-sheet="rec:cohort:${c.id}"`],
+         draft ? ['delete', 'Delete', `data-act="askdel:cohort:${c.id}"`] : null,
+         draft ? ['play', 'Start Cohort', `data-act="askstatus:cohort:${c.id}:active"`] : null,
+         (!draft && c.status !== 'archived') ? ['deactivate', 'Archive', `data-act="askstatus:cohort:${c.id}:archived"`] : null
+       ])}</span>`)}
     ${''/* THE FOUR FIGURES AS A FACTS BAND, not rows — the Length row is dropped
           (Maryam, 15 Sep 2026). The candidate-detail `pf-facts` 4-across grid. */}
     <div class="facts pf-facts">
@@ -6298,10 +6325,13 @@ function cohortsCourseDetail(){
       <div class="idhead-b">
         <span class="idname-row"><span class="idname">${esc(c.name)}</span></span>
       </div>
+      ${''/* Header actions in a kebab (Maryam, 18 Sep 2026). */}
       <span class="idhead-act" style="display:flex;align-items:center;gap:var(--s03)">
-        <button class="btn btn-g btn-sm noic" data-sheet="rec:course:${c.id}">${I.edit} Edit</button>
-        ${c.status === 'live' ? '' : `<button class="btn btn-p btn-sm noic" data-act="askstatus:course:${c.id}:live">Publish ${I.arrowRight}</button>`}
-        <button class="btn btn-g btn-sm noic" data-act="askdel:course:${c.id}">${I.delete} Delete Course</button>
+        ${rowActs([
+          ['edit', 'Edit', `data-sheet="rec:course:${c.id}"`],
+          c.status === 'live' ? null : ['check', 'Publish', `data-act="askstatus:course:${c.id}:live"`],
+          ['delete', 'Delete Course', `data-act="askdel:course:${c.id}"`]
+        ])}
       </span>
     </div>
     ${''/* PRICE / LENGTH / STATUS as three blocks in a row — the candidate-detail
@@ -6708,8 +6738,9 @@ function marketRecordingDetail(){
   const filters = TX_TAGS_ADM.filter(([k]) => k === 'all' || k === 'scene' || present.has(k));
   return `${detailHead('market/recordings')}
   <section class="sec">
+    ${''/* Header action in a kebab (Maryam, 18 Sep 2026). */}
     ${aiHead('Interview Transcript', `${esc(b.cand)} with ${esc(b.agent)} · ${esc(b.kind)} · ${esc(b.slot)}${b.recLen ? ' · ' + esc(b.recLen) + ' recorded' : ''}`,
-      `<button class="btn btn-g btn-sm noic" data-act="dltranscript:${b.id}">${I.download} Download Transcript</button>`)}
+      rowActs([['download', 'Download Transcript', `data-act="dltranscript:${b.id}"`]]))}
     <div class="tx-srch">
       <svg viewBox="0 0 24 24" aria-hidden="true">${inner('search')}</svg>
       <input class="inp" data-srch="txq" placeholder="Find a word in the transcript" aria-label="Search the transcript" value="${esc(getFilter('txq', ''))}" autocomplete="off">
@@ -6914,14 +6945,17 @@ function employersDetail(){
   return `
   ${detailHead('employers/employers', sum)}
   <section class="sec">
+    ${''/* Header actions in a kebab (Maryam, 18 Sep 2026); the verification tag stays. */}
     ${aiHead(esc(e.name), esc(e.industry) + ' · ' + esc(e.location),
-      `${verifyTag(e.verify)}
-       <button class="btn btn-g btn-sm noic" data-sheet="rec:emp:${e.id}">${I.edit} Edit</button>
-       ${e.verify === 'ok' ? `<button class="btn btn-g btn-sm noic" data-act="askunverify:${e.id}">Revoke Verification</button>`
-         : e.verify === 'suspended' ? `<button class="btn btn-p btn-sm noic" data-act="askstatus:emp:${e.id}:active">Reinstate ${I.arrowRight}</button>`
-         : `<button class="btn btn-p btn-sm noic" data-act="verifyemp:${e.id}">Verify ${I.arrowRight}</button>`}
-       ${e.verify === 'suspended' ? '' : `<button class="btn btn-g btn-sm noic" data-act="askstatus:emp:${e.id}:suspended">Suspend</button>`}
-       <button class="btn btn-g btn-sm noic" data-act="askdel:emp:${e.id}">${I.delete} Delete</button>`)}
+      `<span style="display:flex;align-items:center;gap:var(--s03)">${verifyTag(e.verify)}
+       ${rowActs([
+         ['edit', 'Edit', `data-sheet="rec:emp:${e.id}"`],
+         e.verify === 'ok' ? ['close', 'Revoke Verification', `data-act="askunverify:${e.id}"`]
+           : e.verify === 'suspended' ? ['play', 'Reinstate', `data-act="askstatus:emp:${e.id}:active"`]
+           : ['check', 'Verify', `data-act="verifyemp:${e.id}"`],
+         e.verify === 'suspended' ? null : ['deactivate', 'Suspend', `data-act="askstatus:emp:${e.id}:suspended"`],
+         ['delete', 'Delete', `data-act="askdel:emp:${e.id}"`]
+       ])}</span>`)}
     ${kv([
       ['Signer', esc(e.signer)],
       ['Domain', esc(e.domain)],
@@ -7596,12 +7630,15 @@ function crmLeadDetail(){
   return `
   ${detailHead('crm/leads', sum)}
   <section class="sec">
+    ${''/* Header actions in a kebab (Maryam, 18 Sep 2026); the stage tag stays. */}
     ${aiHead(esc(l.name), esc(l.region),
-      `${leadStageTag(l.stage)}
-       <button class="btn btn-g btn-sm noic" data-sheet="rec:lead:${l.id}">${I.edit} Edit</button>
-       ${open ? `<button class="btn btn-g btn-sm noic" data-act="askstatus:lead:${l.id}:Lost">Mark Lost</button>
-                <button class="btn btn-p btn-sm noic" data-act="askstatus:lead:${l.id}:Converted">Convert ${I.arrowRight}</button>` : ''}
-       <button class="btn btn-g btn-sm noic" data-act="askdel:lead:${l.id}">${I.delete} Delete</button>`)}
+      `<span style="display:flex;align-items:center;gap:var(--s03)">${leadStageTag(l.stage)}
+       ${rowActs([
+         ['edit', 'Edit', `data-sheet="rec:lead:${l.id}"`],
+         open ? ['close', 'Mark Lost', `data-act="askstatus:lead:${l.id}:Lost"`] : null,
+         open ? ['check', 'Convert', `data-act="askstatus:lead:${l.id}:Converted"`] : null,
+         ['delete', 'Delete', `data-act="askdel:lead:${l.id}"`]
+       ])}</span>`)}
     ${kv([
       ['Email', esc(l.email)],
       ['Source', esc(l.source)],
@@ -7683,12 +7720,17 @@ function crmCampaignDetail(){
   return `
   ${detailHead('crm/campaigns', sum)}
   <section class="sec">
+    ${''/* Header actions in a kebab (Maryam, 18 Sep 2026); the status tag stays. */}
     ${aiHead(esc(c.name), esc(c.channel) + ' · owned by ' + esc(c.owner),
-      `${tag(c.status)}
-       <button class="btn btn-g btn-sm noic" data-sheet="rec:campaign:${c.id}">${I.edit} Edit</button>
-       <button class="btn btn-g btn-sm noic" data-act="toast:Campaign link copied — talentnext.io/go/${esc(c.name.toLowerCase())}">${I.link} Copy Link</button>
-       ${c.status === 'active' ? `<button class="btn btn-g btn-sm noic" data-act="askstatus:campaign:${c.id}:paused">Pause</button><button class="btn btn-g btn-sm noic" data-act="askstatus:campaign:${c.id}:ended">End</button>`
-         : c.status === 'ended' ? '' : `<button class="btn btn-p btn-sm noic" data-act="askstatus:campaign:${c.id}:active">${c.status === 'draft' ? 'Launch' : 'Resume'} ${I.arrowRight}</button>`}`)}
+      `<span style="display:flex;align-items:center;gap:var(--s03)">${tag(c.status)}
+       ${rowActs([
+         ['edit', 'Edit', `data-sheet="rec:campaign:${c.id}"`],
+         ['link', 'Copy Link', `data-act="toast:Campaign link copied — talentnext.io/go/${esc(c.name.toLowerCase())}"`],
+         ...(c.status === 'active'
+           ? [['pause', 'Pause', `data-act="askstatus:campaign:${c.id}:paused"`], ['stopFilled', 'End', `data-act="askstatus:campaign:${c.id}:ended"`]]
+           : c.status === 'ended' ? []
+           : [['play', c.status === 'draft' ? 'Launch' : 'Resume', `data-act="askstatus:campaign:${c.id}:active"`]])
+       ])}</span>`)}
     ${stats([
       ['money', 'Spend', money(c.spend), `of ${money(c.budget)} budget`],
       ['spark', 'Leads', String(c.leads), 'driven'],

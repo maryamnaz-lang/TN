@@ -495,6 +495,13 @@
   font-weight:var(--t-w-book);letter-spacing:var(--t-desc-ls);
   color:var(--text-secondary);text-transform:none}
 
+/* THE FIGURE-CARD DESCRIPTION READS SENTENCE-FIRST — its first letter is capital
+   however the source string is written (Maryam, 18 Sep 2026). `::first-letter`
+   lifts only the leading glyph, so an already-capital desc is unchanged and a
+   multi-word desc is not title-cased. §63 owns text-transform, so it lands here;
+   platform-wide, every `.stats`/`.facts` figure block on all four portals. */
+.app .stats .d::first-letter,.app .facts .d::first-letter{text-transform:uppercase}
+
 /* --- eyebrow: the small strong line that labels a figure or a block ------
    This is the role that WAS uppercase. It keeps its slot, its weight and its
    position and gives up its case and most of its tracking: .8px was there to

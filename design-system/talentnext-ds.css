@@ -14,7 +14,7 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 6162.  Rules dropped as product-specific: 222.
+   Rules kept: 6163.  Rules dropped as product-specific: 222.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
@@ -7008,6 +7008,8 @@ button.btn-p:active,
 .app .chart-head .s,
 .app .score-rank .l,
 .app .lab{font-size:var(--t-desc-size); line-height:var(--t-desc-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-desc-ls); color:var(--text-secondary); text-transform:none}
+.app .stats .d::first-letter,
+.app .facts .d::first-letter{text-transform:uppercase}
 .app .eyebrow,
 .app .stats .l,
 .app .stats .k,
