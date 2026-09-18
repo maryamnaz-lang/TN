@@ -3025,6 +3025,7 @@ body,.app,.pt-bar,.pt-sel,input,select,textarea,button{font-family:var(--font-sa
   .app:has(> .auth-card)::after,
   .app:has(> .ob-open)::after,
   .app:has(> .ob-survey)::after,
+  .app:has(> .call)::after,
   .app:has(> .nil)::after{content:none}
   .app .sn-item{
     min-height:48px;padding:0;gap:0;justify-content:center;
@@ -9892,6 +9893,9 @@ button.btn-p:active,
   font-weight:var(--t-w-strong);letter-spacing:var(--t-h3-ls);
   text-transform:none;color:var(--accent-text);
   font-variant-numeric:tabular-nums}
+.app .bkc-fv .fee-was{
+  color:var(--text-secondary);font-weight:var(--t-w-book);
+  text-decoration:line-through}
 .app .crow-dark .crow-role,
 .app .crow-dark .crow-x{color:var(--on-dark-2)}
 .app .crow-dark .crow-n{color:var(--on-dark)}
@@ -9901,6 +9905,8 @@ button.btn-p:active,
   text-transform:none;color:var(--on-dark)}
 .app .crow-dark .crow-a > .btn:not(.btn-p){color:var(--on-dark)}
 .app .crow-dark .crow-a > .btn:not(.btn-p) svg{color:var(--on-dark)}
+.app .crow-dark .crow-a > .btn.crow-resched{color:var(--gray-100)}
+.app .crow-dark .crow-a > .btn.crow-resched svg{color:var(--gray-100)}
 .app .crow-dark .crow-ph i{
   font-size:var(--t-h2-size);line-height:var(--t-h2-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-h2-ls);
@@ -11525,6 +11531,7 @@ button.btn-p:active,
 .app .crow-dark .crow-ph{background:var(--on-dark-fill)}
 @container app (min-width:900px){
   .app .crow-dark .crow-a1 > .btn{width:auto;padding-right:0}}
+.app .crow-resched{background:var(--on-dark)}
 .app .crumb-bar{
   flex:1 1 auto;min-width:0;
   display:flex;align-items:center;
@@ -12506,12 +12513,12 @@ button.btn-p:active,
   display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
   gap:var(--s04)}
 @container app (min-width:900px){
-  .app .lacc-grid{grid-template-columns:repeat(5,1fr)}
+  .app .lacc-grid{grid-template-columns:repeat(6,1fr)}
 }
 .app .lacc{
   display:flex;flex-direction:column;align-items:center;gap:var(--s02);
-  min-height:300px;
-  padding:var(--s07) var(--s05);
+  min-height:220px;
+  padding:var(--s06) var(--s04);
   background:var(--layer-01);border:1px solid var(--rule);border-radius:var(--radius);
   cursor:pointer;text-align:center}
 .app .lacc-ic{
@@ -12519,11 +12526,11 @@ button.btn-p:active,
   margin-bottom:var(--s02);color:var(--brand)}
 .app .lacc-ic svg{width:36px;height:36px;display:block;fill:currentColor}
 .app .lacc-av{margin-top:auto;display:block}
-.app .lacc-av .av-ph{width:64px;height:64px;border-radius:999px}
+.app .lacc-av .av-ph{width:48px;height:48px;border-radius:999px}
 .app .lacc-av-empty{
-  display:grid;place-items:center;width:64px;height:64px;border-radius:999px;
+  display:grid;place-items:center;width:48px;height:48px;border-radius:999px;
   background:var(--gray-10);color:var(--gray-40)}
-.app .lacc-av-empty svg{width:30px;height:30px;fill:currentColor}
+.app .lacc-av-empty svg{width:24px;height:24px;fill:currentColor}
 .app .lacc-cta{
   display:inline-flex;align-items:center;gap:var(--s02);margin-top:auto}
 .app .lacc-mk{display:grid;place-items:center;width:16px;height:16px}
@@ -13081,7 +13088,33 @@ button.btn-p:active,
   background:var(--layer-02);border:0;
   color:var(--text-primary)}
 .app .ob-sv-prev svg{color:var(--text-primary)}
-.app .ob-done .ob-qp{margin-top:var(--s07)}
+.app .ob-done .ob-qp{
+  margin-top:var(--s07);
+  border-color:var(--rule);border-radius:0;
+  background:var(--background);
+  -webkit-backdrop-filter:none;backdrop-filter:none;
+  box-shadow:none}
+.app .tn-loader{
+  --tn-loader-size:90px;
+  --tn-loader-duration:2.4s;
+  --tn-loader-ease:cubic-bezier(0.4,0,0.2,1);
+  position:relative;display:inline-flex;
+  width:var(--tn-loader-size);height:var(--tn-loader-size);aspect-ratio:1/1}
+.app .tn-loader__blade{
+  position:absolute;inset:0;width:100%;height:100%;
+  background-color:var(--icon-primary);
+  transform-origin:50% 50%;will-change:clip-path,opacity;
+  animation:tn-relay var(--tn-loader-duration) var(--tn-loader-ease) infinite}
+.app .tn-loader__blade--a{animation-delay:0s}
+.app .tn-loader__blade--b{animation-delay:calc(var(--tn-loader-duration) * -0.333333)}
+.app .tn-loader__blade--c{animation-delay:calc(var(--tn-loader-duration) * -0.666667)}
+@keyframes tn-relay{
+  0%   {clip-path:polygon(29.56% 22.88%, 18.77% 23.14%, 42.67% 49.87%, 2.57% 95.12%, 13.37% 95.12%, 53.21% 49.87%);opacity:1}
+  33%  {clip-path:polygon(62.21% 35.22%, 51.67% 35.48%, 64.52% 49.87%, 24.68% 95.12%, 35.22% 95.12%, 75.06% 50.13%);opacity:1}
+  66%  {clip-path:polygon(57.07% 4.37%, 46.79% 4.37%, 86.38% 49.87%, 64.78% 74.55%, 75.58% 74.55%, 96.92% 49.61%);opacity:1}
+  88%  {clip-path:polygon(57.07% 4.37%, 46.79% 4.37%, 86.38% 49.87%, 64.78% 74.55%, 75.58% 74.55%, 96.92% 49.61%);opacity:0}
+  89%  {clip-path:polygon(29.56% 22.88%, 18.77% 23.14%, 42.67% 49.87%, 2.57% 95.12%, 13.37% 95.12%, 53.21% 49.87%);opacity:0}
+  100% {clip-path:polygon(29.56% 22.88%, 18.77% 23.14%, 42.67% 49.87%, 2.57% 95.12%, 13.37% 95.12%, 53.21% 49.87%);opacity:1}}
 .app .eo-course{
   display:flex;flex-direction:column;
   gap:var(--sec-h-gap)}
@@ -13883,6 +13916,20 @@ button.btn-p:active,
 .app .dark-card .pf-ring .ring-f{stroke:var(--support-success)}
 .pf-ring-b{display:flex; flex-direction:column; gap:2px; min-width:0}
 .pf-ring-b h3{margin:0}
+.app .iv-rec{
+  display:block;width:100%;max-width:560px;padding:0;
+  border:1px solid var(--rule);background:var(--gray-100);
+  overflow:hidden;cursor:pointer}
+.app .iv-rec-art{
+  position:relative;display:block;width:100%;aspect-ratio:16 / 9;overflow:hidden}
+.app .iv-rec-art > img{width:100%;height:100%;object-fit:cover;display:block}
+.app .iv-rec-art::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,rgba(0,0,0,0) 55%,rgba(0,0,0,.42))}
+.app .iv-rec .scv-play{z-index:1;width:56px;height:56px}
+.app .iv-rec .scv-play svg{width:26px;height:26px}
+.app .iv-rec .scv-at{z-index:1}
+.app .iv-ladder{margin:var(--s04) 0 var(--s03)}
 .app .rowmenu{position:relative; display:inline-block}
 .app .rowmenu-list{
   position:absolute; top:calc(100% + var(--s02)); right:0; z-index:60;
@@ -15154,7 +15201,9 @@ const CFG_BASE = {track:'Explorer', level:'E3', pred:true, day:1, week:1, done:0
 
 const IV_FIRST_FREE = true;
 const ivCharged = isRe => isRe || !IV_FIRST_FREE;   /* true = this interview is charged */
-const ivFeeLabel = (isRe, price) => ivCharged(isRe) ? price : 'Complimentary';
+const ivFeeLabel = (isRe, price) => ivCharged(isRe)
+  ? price
+  : `<s class="fee-was">${price}</s> <span class="fee-free">Free</span>`;
 
 
 const RUNG = {E1:1,E2:2,E3:3,E4:4,E5:5};
@@ -17449,14 +17498,34 @@ const joinShut = (w) => {
 };
 setInterval(joinArm, 20000);
 
+function heldTill(){
+  if(!S.heldTill) S.heldTill = Date.now() + 24 * 3600 * 1000;
+  return S.heldTill;
+}
+function heldFmt(ms){
+  const s = Math.max(0, Math.floor(ms / 1000));
+  const p = n => String(n).padStart(2, '0');
+  return `${p(Math.floor(s / 3600))}:${p(Math.floor(s % 3600 / 60))}:${p(s % 60)}`;
+}
+function heldArm(){
+  const els = (typeof device !== 'undefined' && device)
+    ? device.querySelectorAll('.held-timer[data-heldtill]') : [];
+  els.forEach(el => {
+    const t = +el.dataset.heldtill;
+    if(t) el.textContent = heldFmt(t - Date.now());
+  });
+}
+setInterval(heldArm, 1000);
+
 const CALL_ROW = {
   iv: () => {
     const k = (S.booking && S.booking.agent) || (S.bk && S.bk.agent) || S.agent || 'priya';
     const a = AGENTS[k] || AGENTS.priya;
-    return {who:a, role:'Talent agent', when:'in 5 minutes',
+    const resched = S.stage === RESCHED;
+    return {who:a, role:'Talent agent', when: resched ? 'in 2 days' : 'in 5 minutes',
       label:'Level interview &middot; 45 minutes, recorded',
       x:`${(REC[k] || REC.priya).expertise}, assesses ${a.range}`,
-      kind:'iv', second:{go:'interviews', ic:I.calendar, t:'Reschedule'}};
+      kind:'iv', key:k, resched, second:{go:'interviews', ic:I.calendar, t:'Reschedule'}};
   },
   cohort: () => {
     const L = COHORT_LEAD, w = WEEK_CALL.when;
@@ -17545,7 +17614,9 @@ function crow(kind, o){
         ${o.second === false ? '' : `<button class="btn btn-sm noic${o.join === false ? '' : ' ic-l'}" ${
           c.second.go ? `data-go="${c.second.go}"` : (c.second.at || '')}>${
           o.join === false ? `${c.second.t} ${I.arrowRight}` : `${c.second.ic}${c.second.t}`}</button>`}
-        ${o.join === false ? '' : `<button class="btn btn-p btn-sm noic"${c.kind ? ` data-call="${c.kind}"` : ''}${
+        ${o.join === false ? ''
+          : c.resched ? `<button class="btn btn-sm noic crow-resched" data-go="agent:${c.key}">Reschedule ${I.arrowRight}</button>`
+          : `<button class="btn btn-p btn-sm noic"${c.kind ? ` data-call="${c.kind}"` : ''}${
           gated ? ` data-joinwhen="${c.when}" data-joinmins="${c.mins || 45}"` : ''}${
           gate ? ` disabled title="${joinShut(c.when)}"` : ''}>Join call ${I.arrowRight}</button>`}
       </div>
@@ -18408,7 +18479,7 @@ V.dashboard = (f) => {
     <div class="sec sec-call dark-card crow-dark">
       <div class="dc-hd">
         <div class="dc-hd-r"><h2 class="dc-t">Your Next Step - Interview</h2>
-          <span class="dc-when">${I.time}${callLeft(CALL_ROW.iv().when)}</span></div>
+          <span class="dc-when">${I.time}${S.stage===RESCHED?"In 2 days":callLeft(CALL_ROW.iv().when)}</span></div>
       </div>
       ${crow('iv', {when:false, second:false})}
     </div>
@@ -18473,6 +18544,29 @@ V.dashboard = (f) => {
         <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
         <div class="ai-body"><p>Your interview with <b>Priya</b> is done. It is being analysed now, and <b>TalentNext sets your level</b> from it within 24 hours. There is nothing to do but wait.</p></div>
       </div>
+    </div>
+    ${''/* THE INTERVIEW THAT HAPPENED, IN THE SAME BLACK CARD SLOT `booked` USES
+          (Maryam, 18 Sep 2026: "show a black card above quick actions and show
+          the talent agent and interview details that happened and show a timer
+          for results within 24 hours"). One stage earlier the identical card
+          held the countdown to the call in `.dc-when`; here the call is over, so
+          the row drops its Join (`join:false`) and the countdown becomes the
+          24-hour results clock. Same recipe as `booked` — §75's `.dark-card`,
+          §77's `.crow-dark`, the agent read off `CALL_ROW.iv()` so it cannot
+          disagree with who was booked — and `.dark-card` is not in `DARK_CARD`,
+          so it stays in the body above Quick Actions rather than being hoisted.
+
+          THE CLOCK IS `heldArm`'s, and it is `joinArm`'s pattern exactly: a
+          fixed deadline in `S`, a 1s interval that writes the remaining time in
+          place from `Date.now()` (never rAF — trap 17), so a background tab
+          simply repaints with the right figure and a `render()` recomputes the
+          same string it wrote. */}
+    <div class="sec sec-call dark-card crow-dark">
+      <div class="dc-hd">
+        <div class="dc-hd-r"><h2 class="dc-t">Your interview is complete</h2>
+          <span class="dc-when">${I.time}Results in <span class="held-timer" data-heldtill="${heldTill()}" style="font-variant-numeric:tabular-nums">${heldFmt(heldTill() - Date.now())}</span></span></div>
+      </div>
+      ${crow('iv', {when:false, second:false, join:false})}
     </div>
     ${quickActions([
       {ic:I.lightning, hue:'ic-prep', t:'What happens next',
@@ -19655,7 +19749,7 @@ V.interviews = (f) => {
   <div class="sec sec-call dark-card crow-dark">
     <div class="dc-hd">
       <div class="dc-hd-r"><h2 class="dc-t">Scheduled</h2>
-        <span class="dc-when">${I.time}${callLeft(CALL_ROW.iv().when)}</span></div>
+        <span class="dc-when">${I.time}${S.stage===RESCHED?"In 2 days":callLeft(CALL_ROW.iv().when)}</span></div>
     </div>
     ${crow('iv', {when:false})}
   </div>
@@ -20171,7 +20265,12 @@ V.agent = (f) => {
            screen carries the card-picker and its own "Pay" button, which is what
            now carries `stage:booked` — so the commit point moved one screen on,
            and the destination did not. */}
-    <button class="btn btn-p" data-go="checkout">${ivCharged(isRe)?'Proceed to pay '+a.price:'Proceed to book'} ${I.arrowRight}</button>
+    ${''/* A COMPLIMENTARY BOOKING SKIPS THE CHECKOUT SCREEN (Maryam, 18 Sep 2026:
+          "no need to show this screen") — there is nothing to pay, so Proceed
+          books straight away (`data-book`) and the success dialog opens on the
+          booked dashboard. A CHARGED re-interview still goes to `V.checkout` for
+          the card picker, and confirms there. */}
+    <button class="btn btn-p" ${ivCharged(isRe)?'data-go="checkout"':'data-book="1"'}>${ivCharged(isRe)?'Proceed to pay '+a.price:'Proceed to book'} ${I.arrowRight}</button>
   </div>
   </div>
 </div></main>`;
@@ -20223,7 +20322,7 @@ V.checkout = (f) => {
         ? `<div class="sec-h"><h2>Pay with</h2>${addCardAct}</div>
       ${cardPicker()}`
         : `<div class="tile"><p class="t-body-01">Your first interview is <b>complimentary</b>. There is nothing to pay. Confirm to book your time with ${a.n.split(' ')[0]}.</p></div>`}
-      <div class="bkpay-go"><button class="btn btn-p" data-go="stage:booked">${charged?'Pay '+a.price+' and book':'Confirm and book'} ${I.arrowRight}</button></div>
+      <div class="bkpay-go"><button class="btn btn-p" data-book="1">${charged?'Pay '+a.price+' and book':'Confirm and book'} ${I.arrowRight}</button></div>
     </div>
   </div>
   </div></main>`;
@@ -20693,6 +20792,23 @@ const enrolSheet = () => {
       </div>
       <div class="sheet-f conf-a">
         <button class="btn btn-s noic" data-enrolok="0">Close</button>
+      </div>
+    </div>
+  </div>`;
+};
+
+const ivBookedModal = () => {
+  const k = (S.booking && S.booking.agent) || (S.bk && S.bk.agent) || S.agent || 'priya';
+  const a = AGENTS[k] || AGENTS.priya;
+  return `<div class="modal on" data-close="ivbooked">
+    <div class="sheet conf conf-ok" role="dialog" aria-modal="true" aria-label="Interview booked">
+      <div class="sheet-b conf-b">
+        <span class="conf-mk">${I.checkFilled}</span>
+        <h2 class="conf-t">Interview booked</h2>
+        <p class="conf-x">Your time with ${a.n} is confirmed. It is on your dashboard, and the interview is what sets your level.</p>
+      </div>
+      <div class="sheet-f conf-a">
+        <button class="btn btn-p noic" data-ivbooked="0">View My Dashboard</button>
       </div>
     </div>
   </div>`;
@@ -22777,7 +22893,9 @@ const SOCIAL = [
   {k:'twitter',   n:'X',         color:'#000000', handle:'@maryamsss',
    svg:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231 5.451-6.231zm-1.161 17.52h1.833L7.084 4.126H5.117l11.966 15.644z"/></svg>'},
   {k:'youtube',   n:'YouTube',   color:'#FF0000', handle:'@maryamnaz',
-   svg:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>'}
+   svg:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>'},
+  {k:'tiktok',    n:'TikTok',    color:'#010101', handle:'@maryam.designs',
+   svg:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>'}
 ];
 S.linked = S.linked || {linkedin:true, instagram:true, twitter:true};
 
@@ -23710,7 +23828,8 @@ function render(){
          + (S.view==='transcript'?scoresSheet(f):'')
          + (S.enrolOk && S.stage==='week1' ? enrolSheet() : '')
          + (S.view==='billing' && S.receipt!=null ? receiptModal() : '')
-         + (S.view==='interviews' && S.ivCancel ? ivCancelModal() : '');
+         + (S.view==='interviews' && S.ivCancel ? ivCancelModal() : '')
+         + (S.ivBooked && (S.stage==='booked' || S.stage===RESCHED) ? ivBookedModal() : '');
   }
   const key = S.stage + '/' + S.view + (S.call ? '/call' : '');
   const entered = key !== MO.key;
@@ -23830,6 +23949,11 @@ device.addEventListener('click', e => {
 
 
   if(t.closest('[data-paid]')){ S.enrolOk = true; setStage('week1'); return; }
+
+  if(t.closest('[data-book]')){ S.ivBooked = true; setStage('booked'); return; }
+  const ivbk = t.closest('[data-ivbooked]');
+  if(ivbk){ S.ivBooked = ivbk.dataset.ivbooked === '1'; render(); return; }
+  if(t.closest('[data-close="ivbooked"]') && !t.closest('.sheet')){ S.ivBooked=false; render(); return; }
 
   const eo = t.closest('[data-enrolok]');
   if(eo){ S.enrolOk = eo.dataset.enrolok === '1'; render(); return; }
@@ -31124,6 +31248,7 @@ S.obMode = 'chat';
 S.obChatOpen = false;
 S.obQi = 0;
 S.obBarFrom = 0;
+S.obLoading = false;
 
 const OB_LOW = () => qzLow(2);
 
@@ -31599,8 +31724,21 @@ function obFit(){
     AGENTS[k].n} ${OB_FIT[k]}.`;
 }
 
+function obLoaderScreen(){
+  return `<div class="ob-survey ob-loading">
+    <main class="main">
+      <div class="tn-loader" role="status" aria-label="Loading">
+        <span class="tn-loader__blade tn-loader__blade--a"></span>
+        <span class="tn-loader__blade tn-loader__blade--b"></span>
+        <span class="tn-loader__blade tn-loader__blade--c"></span>
+      </div>
+    </main>
+  </div>`;
+}
+
 function obScreen(){
   const step = S.obStep;
+  if(S.obLoading) return obLoaderScreen();
 
   if(step === 0){
     const chat = S.obMode === 'chat';
@@ -31656,9 +31794,12 @@ device.addEventListener('click', e => {
     e.preventDefault(); e.stopPropagation();
     obHush();
     const stage = device.querySelector('.ob-stage');
-    const start = () => { S.obStep = 1; render(); };
-    if(stage){ stage.classList.add('ob-leave'); setTimeout(start, OB_LEAVE); }
-    else start();
+    const load = () => {
+      S.obLoading = true; render();
+      setTimeout(() => { S.obLoading = false; S.obStep = 1; render(); }, 2000);
+    };
+    if(stage){ stage.classList.add('ob-leave'); setTimeout(load, OB_LEAVE); }
+    else load();
     return;
   }
 
@@ -31694,8 +31835,13 @@ device.addEventListener('click', e => {
     if(S.ob.years)    PF.general.years    = obLabel('years');
     if(S.ob.where === 'school') PF.general.role = 'Student';
     e.preventDefault(); e.stopPropagation();
-    talReset(); S.askOpen = false; S.tal = false;
-    setStage('new'); render(); return;
+    S.obLoading = true; render();
+    setTimeout(() => {
+      S.obLoading = false;
+      talReset(); S.askOpen = false; S.tal = false;
+      setStage('new'); render();
+    }, 2000);
+    return;
   }
 }, true);
 

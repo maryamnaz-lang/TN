@@ -254,8 +254,13 @@ const CFG_BASE = {track:'Explorer', level:'E3', pred:true, day:1, week:1, done:0
 const IV_FIRST_FREE = true;
 const ivCharged = isRe => isRe || !IV_FIRST_FREE;   /* true = this interview is charged */
 /* the fee label a booking surface shows: the agent's price when charged, else
-   the complimentary word. `price` is `a.price` ($95 for Priya). */
-const ivFeeLabel = (isRe, price) => ivCharged(isRe) ? price : 'Complimentary';
+   the price STRUCK THROUGH with "Free" beside it (Maryam, 18 Sep 2026 — "show
+   the price but cut it and write Free next to it", replacing the "Complimentary"
+   word). `price` is `a.price` ($95 for Priya). Returns HTML (the struck span),
+   so the call site inserts it as innerHTML and must not escape it. */
+const ivFeeLabel = (isRe, price) => ivCharged(isRe)
+  ? price
+  : `<s class="fee-was">${price}</s> <span class="fee-free">Free</span>`;
 
 
 /* ==========================================================================

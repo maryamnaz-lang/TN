@@ -14,7 +14,7 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 6138.  Rules dropped as product-specific: 222.
+   Rules kept: 6156.  Rules dropped as product-specific: 222.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
@@ -3253,7 +3253,8 @@ button{font-family:var(--font-sans)}
   .app[data-rail="open"]::after{left:var(--drawer-w)}
   .app:has(> .auth-card)::after,
   .app:has(> .ob-open)::after,
-  .app:has(> .ob-survey)::after{content:none}
+  .app:has(> .ob-survey)::after,
+  .app:has(> .call)::after{content:none}
   .app .sn-item{min-height:48px; padding:0; gap:0; justify-content:center; border-top:0; position:relative}
   .app .sn-item svg{display:block; width:20px; height:20px}
   .app .sn-item > span:not(.badge){position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%)}
@@ -7376,12 +7377,15 @@ button.btn-p:active,
 .app .page .pf-facts .pf-l{color:var(--text-primary)}
 .app .bkc-fl{font-size:var(--t-eyebrow-size); line-height:var(--t-eyebrow-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-eyebrow-ls); text-transform:none; color:var(--text-secondary)}
 .app .bkc-fv{font-size:var(--t-h3-size); line-height:var(--t-h3-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h3-ls); text-transform:none; color:var(--accent-text); font-variant-numeric:tabular-nums}
+.app .bkc-fv .fee-was{color:var(--text-secondary); font-weight:var(--t-w-book); text-decoration:line-through}
 .app .crow-dark .crow-role,
 .app .crow-dark .crow-x{color:var(--on-dark-2)}
 .app .crow-dark .crow-n{color:var(--on-dark)}
 .app .crow-dark .crow-due{font-size:var(--t-h4-size); line-height:var(--t-h4-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h4-ls); text-transform:none; color:var(--on-dark)}
 .app .crow-dark .crow-a > .btn:not(.btn-p){color:var(--on-dark)}
 .app .crow-dark .crow-a > .btn:not(.btn-p) svg{color:var(--on-dark)}
+.app .crow-dark .crow-a > .btn.crow-resched{color:var(--gray-100)}
+.app .crow-dark .crow-a > .btn.crow-resched svg{color:var(--gray-100)}
 .app .crow-dark .crow-ph i{font-size:var(--t-h2-size); line-height:var(--t-h2-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h2-ls); color:var(--on-dark)}
 .app .crumb-l{font-size:var(--t-sec-size); line-height:var(--t-sec-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-sec-ls); text-transform:none; color:var(--text-helper)}
 .app .crumb-trail a.crumb-l{color:var(--text-helper)}
@@ -8201,6 +8205,7 @@ button.btn-p:active,
 @container app (min-width:900px){
   .app .crow-dark .crow-a1 > .btn{width:auto; padding-right:0}
 }
+.app .crow-resched{background:var(--on-dark)}
 
 /* ---- 78-topbar.css ---- */
 .app .crumb-bar{flex:1 1 auto; min-width:0; display:flex; align-items:center; padding-left:var(--s03)}
@@ -8831,15 +8836,15 @@ button.btn-p:active,
 .app .sec-linked > .sec-h{flex-direction:column; align-items:flex-start; gap:var(--sec-desc-gap)}
 .app .lacc-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:var(--s04)}
 @container app (min-width:900px){
-  .app .lacc-grid{grid-template-columns:repeat(5,1fr)}
+  .app .lacc-grid{grid-template-columns:repeat(6,1fr)}
 }
-.app .lacc{display:flex; flex-direction:column; align-items:center; gap:var(--s02); min-height:300px; padding:var(--s07) var(--s05); background:var(--layer-01); border:1px solid var(--rule); border-radius:var(--radius); cursor:pointer; text-align:center}
+.app .lacc{display:flex; flex-direction:column; align-items:center; gap:var(--s02); min-height:220px; padding:var(--s06) var(--s04); background:var(--layer-01); border:1px solid var(--rule); border-radius:var(--radius); cursor:pointer; text-align:center}
 .app .lacc-ic{display:grid; place-items:center; width:44px; height:44px; margin-bottom:var(--s02); color:var(--brand)}
 .app .lacc-ic svg{width:36px; height:36px; display:block; fill:currentColor}
 .app .lacc-av{margin-top:auto; display:block}
-.app .lacc-av .av-ph{width:64px; height:64px; border-radius:999px}
-.app .lacc-av-empty{display:grid; place-items:center; width:64px; height:64px; border-radius:999px; background:var(--gray-10); color:var(--gray-40)}
-.app .lacc-av-empty svg{width:30px; height:30px; fill:currentColor}
+.app .lacc-av .av-ph{width:48px; height:48px; border-radius:999px}
+.app .lacc-av-empty{display:grid; place-items:center; width:48px; height:48px; border-radius:999px; background:var(--gray-10); color:var(--gray-40)}
+.app .lacc-av-empty svg{width:24px; height:24px; fill:currentColor}
 .app .lacc-cta{display:inline-flex; align-items:center; gap:var(--s02); margin-top:auto}
 .app .lacc-mk{display:grid; place-items:center; width:16px; height:16px}
 .app .lacc-mk svg{width:16px; height:16px; display:block; fill:currentColor}
@@ -9110,7 +9115,13 @@ button.btn-p:active,
 .app .ob-sv-next{margin-left:auto}
 .app .ob-sv-prev{background:var(--layer-02); border:0; color:var(--text-primary)}
 .app .ob-sv-prev svg{color:var(--text-primary)}
-.app .ob-done .ob-qp{margin-top:var(--s07)}
+.app .ob-done .ob-qp{margin-top:var(--s07); border-color:var(--rule); border-radius:0; background:var(--background); -webkit-backdrop-filter:none; backdrop-filter:none; box-shadow:none}
+.app .tn-loader{--tn-loader-size:90px; --tn-loader-duration:2.4s; --tn-loader-ease:cubic-bezier(0.4,0,0.2,1); position:relative; display:inline-flex; width:var(--tn-loader-size); height:var(--tn-loader-size); aspect-ratio:1/1}
+.app .tn-loader__blade{position:absolute; inset:0; width:100%; height:100%; background-color:var(--icon-primary); transform-origin:50% 50%; will-change:clip-path,opacity; animation:tn-relay var(--tn-loader-duration) var(--tn-loader-ease) infinite}
+.app .tn-loader__blade--a{animation-delay:0s}
+.app .tn-loader__blade--b{animation-delay:calc(var(--tn-loader-duration) * -0.333333)}
+.app .tn-loader__blade--c{animation-delay:calc(var(--tn-loader-duration) * -0.666667)}
+@keyframes tn-relay{0%   {clip-path:polygon(29.56% 22.88%, 18.77% 23.14%, 42.67% 49.87%, 2.57% 95.12%, 13.37% 95.12%, 53.21% 49.87%);opacity:1} 33%  {clip-path:polygon(62.21% 35.22%, 51.67% 35.48%, 64.52% 49.87%, 24.68% 95.12%, 35.22% 95.12%, 75.06% 50.13%);opacity:1} 66%  {clip-path:polygon(57.07% 4.37%, 46.79% 4.37%, 86.38% 49.87%, 64.78% 74.55%, 75.58% 74.55%, 96.92% 49.61%);opacity:1} 88%  {clip-path:polygon(57.07% 4.37%, 46.79% 4.37%, 86.38% 49.87%, 64.78% 74.55%, 75.58% 74.55%, 96.92% 49.61%);opacity:0} 89%  {clip-path:polygon(29.56% 22.88%, 18.77% 23.14%, 42.67% 49.87%, 2.57% 95.12%, 13.37% 95.12%, 53.21% 49.87%);opacity:0} 100% {clip-path:polygon(29.56% 22.88%, 18.77% 23.14%, 42.67% 49.87%, 2.57% 95.12%, 13.37% 95.12%, 53.21% 49.87%);opacity:1}}
 
 /* ---- 108-enrolcourse.css ---- */
 .app .eo-course{display:flex; flex-direction:column; gap:var(--sec-h-gap)}
@@ -9586,6 +9597,14 @@ button.btn-p:active,
 .app .dark-card .pf-ring .ring-f{stroke:var(--support-success)}
 .pf-ring-b{display:flex; flex-direction:column; gap:2px; min-width:0}
 .pf-ring-b h3{margin:0}
+.app .iv-rec{display:block; width:100%; max-width:560px; padding:0; border:1px solid var(--rule); background:var(--gray-100); overflow:hidden; cursor:pointer}
+.app .iv-rec-art{position:relative; display:block; width:100%; aspect-ratio:16 / 9; overflow:hidden}
+.app .iv-rec-art > img{width:100%; height:100%; object-fit:cover; display:block}
+.app .iv-rec-art::after{content:""; position:absolute; inset:0; pointer-events:none; background:linear-gradient(180deg,rgba(0,0,0,0) 55%,rgba(0,0,0,.42))}
+.app .iv-rec .scv-play{z-index:1; width:56px; height:56px}
+.app .iv-rec .scv-play svg{width:26px; height:26px}
+.app .iv-rec .scv-at{z-index:1}
+.app .iv-ladder{margin:var(--s04) 0 var(--s03)}
 
 /* ---- 125-rowmenu.css ---- */
 .app .rowmenu{position:relative; display:inline-block}

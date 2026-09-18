@@ -5013,6 +5013,42 @@ const joinShut = (w) => {
    every interaction) would be more machinery for a worse guarantee. */
 setInterval(joinArm, 20000);
 
+/* THE 24-HOUR RESULTS CLOCK — the `held` dashboard's black card (Maryam, 18 Sep
+   2026). The interview is over and the report lands "within 24 hours", so the
+   card's time slot is a countdown to that deadline instead of `booked`'s
+   countdown to the call.
+
+   THE DEADLINE IS FIXED ONCE IN `S`, not recomputed per render — otherwise
+   every navigation would reset the clock to 24:00:00. `heldTill` lazily seats it
+   at 24h from the first read; a prototype has no real interview-end timestamp
+   (`held`'s notif says "Just now"), so this is the honest stand-in and it holds
+   across re-renders because both the markup and `heldArm` read the same `S` value.
+
+   `heldArm` IS `joinArm`'S PATTERN (its note is the argument): find the elements
+   fresh, write the one thing that changed, derive it from the CLOCK. So a tick
+   arriving late in a background tab (trap 17 — rAF never fires there) simply
+   arrives with the right answer, and the next `render()` recomputes the same
+   string. Not DOM state (trap 9): the text is a pure function of `Date.now()`
+   and the element's own `data-heldtill`. */
+function heldTill(){
+  if(!S.heldTill) S.heldTill = Date.now() + 24 * 3600 * 1000;
+  return S.heldTill;
+}
+function heldFmt(ms){
+  const s = Math.max(0, Math.floor(ms / 1000));
+  const p = n => String(n).padStart(2, '0');
+  return `${p(Math.floor(s / 3600))}:${p(Math.floor(s % 3600 / 60))}:${p(s % 60)}`;
+}
+function heldArm(){
+  const els = (typeof device !== 'undefined' && device)
+    ? device.querySelectorAll('.held-timer[data-heldtill]') : [];
+  els.forEach(el => {
+    const t = +el.dataset.heldtill;
+    if(t) el.textContent = heldFmt(t - Date.now());
+  });
+}
+setInterval(heldArm, 1000);
+
 /* ==========================================================================
    ONE ROW FOR ALL THREE CALLS — Maryam, 31 Aug 2026
 
@@ -5064,6 +5100,12 @@ const CALL_ROW = {
        the completed booking, then the flow in progress, then `S.agent`. */
     const k = (S.booking && S.booking.agent) || (S.bk && S.bk.agent) || S.agent || 'priya';
     const a = AGENTS[k] || AGENTS.priya;
+    /* THE RESCHEDULE STAGE (Maryam, 18 Sep 2026): the same booked card, but the
+       appointment is two days out and the action is to MOVE it, not join it. So
+       `resched` carries the agent key (the Reschedule button reopens that agent's
+       booking calendar) and a longer `when`; `crow` swaps Join for a white
+       Reschedule when it sees the flag. */
+    const resched = S.stage === RESCHED;
     /* THE COUNTDOWN IS 'in 1 minute' (Maryam, 31 Aug 2026), AND IT IS STILL
        ONE STRING RATHER THAN A LITERAL IN THE MARKUP. `callLeft` turns it into
        exactly "In 1 minute" — `PLATE_SOON` matches `in \d+ minute`, so the
@@ -5076,10 +5118,10 @@ const CALL_ROW = {
        countdown of one minute cannot be true at the same time as a date six
        days out. One edit either way — this line, or those two — and the note
        over `bkStamp` is the argument for why they must agree. */
-    return {who:a, role:'Talent agent', when:'in 5 minutes',
+    return {who:a, role:'Talent agent', when: resched ? 'in 2 days' : 'in 5 minutes',
       label:'Level interview &middot; 45 minutes, recorded',
       x:`${(REC[k] || REC.priya).expertise}, assesses ${a.range}`,
-      kind:'iv', second:{go:'interviews', ic:I.calendar, t:'Reschedule'}};
+      kind:'iv', key:k, resched, second:{go:'interviews', ic:I.calendar, t:'Reschedule'}};
   },
   /* the weekly cohort call, on the enrolled dashboards */
   cohort: () => {
@@ -5266,7 +5308,12 @@ function crow(kind, o){
         ${o.second === false ? '' : `<button class="btn btn-sm noic${o.join === false ? '' : ' ic-l'}" ${
           c.second.go ? `data-go="${c.second.go}"` : (c.second.at || '')}>${
           o.join === false ? `${c.second.t} ${I.arrowRight}` : `${c.second.ic}${c.second.t}`}</button>`}
-        ${o.join === false ? '' : `<button class="btn btn-p btn-sm noic"${c.kind ? ` data-call="${c.kind}"` : ''}${
+        ${o.join === false ? ''
+          /* THE RESCHEDULE STAGE SWAPS JOIN FOR A WHITE "Reschedule" (Maryam,
+             18 Sep 2026) that reopens the agent's booking calendar (`agent:<k>`)
+             rather than joining the call. */
+          : c.resched ? `<button class="btn btn-sm noic crow-resched" data-go="agent:${c.key}">Reschedule ${I.arrowRight}</button>`
+          : `<button class="btn btn-p btn-sm noic"${c.kind ? ` data-call="${c.kind}"` : ''}${
           gated ? ` data-joinwhen="${c.when}" data-joinmins="${c.mins || 45}"` : ''}${
           gate ? ` disabled title="${joinShut(c.when)}"` : ''}>Join call ${I.arrowRight}</button>`}
       </div>
@@ -6657,7 +6704,7 @@ V.dashboard = (f) => {
     <div class="sec sec-call dark-card crow-dark">
       <div class="dc-hd">
         <div class="dc-hd-r"><h2 class="dc-t">Your Next Step - Interview</h2>
-          <span class="dc-when">${I.time}${callLeft(CALL_ROW.iv().when)}</span></div>
+          <span class="dc-when">${I.time}${S.stage===RESCHED?"In 2 days":callLeft(CALL_ROW.iv().when)}</span></div>
       </div>
       ${crow('iv', {when:false, second:false})}
     </div>
@@ -6738,6 +6785,29 @@ V.dashboard = (f) => {
         <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
         <div class="ai-body"><p>Your interview with <b>Priya</b> is done. It is being analysed now, and <b>TalentNext sets your level</b> from it within 24 hours. There is nothing to do but wait.</p></div>
       </div>
+    </div>
+    ${''/* THE INTERVIEW THAT HAPPENED, IN THE SAME BLACK CARD SLOT `booked` USES
+          (Maryam, 18 Sep 2026: "show a black card above quick actions and show
+          the talent agent and interview details that happened and show a timer
+          for results within 24 hours"). One stage earlier the identical card
+          held the countdown to the call in `.dc-when`; here the call is over, so
+          the row drops its Join (`join:false`) and the countdown becomes the
+          24-hour results clock. Same recipe as `booked` — §75's `.dark-card`,
+          §77's `.crow-dark`, the agent read off `CALL_ROW.iv()` so it cannot
+          disagree with who was booked — and `.dark-card` is not in `DARK_CARD`,
+          so it stays in the body above Quick Actions rather than being hoisted.
+
+          THE CLOCK IS `heldArm`'s, and it is `joinArm`'s pattern exactly: a
+          fixed deadline in `S`, a 1s interval that writes the remaining time in
+          place from `Date.now()` (never rAF — trap 17), so a background tab
+          simply repaints with the right figure and a `render()` recomputes the
+          same string it wrote. */}
+    <div class="sec sec-call dark-card crow-dark">
+      <div class="dc-hd">
+        <div class="dc-hd-r"><h2 class="dc-t">Your interview is complete</h2>
+          <span class="dc-when">${I.time}Results in <span class="held-timer" data-heldtill="${heldTill()}" style="font-variant-numeric:tabular-nums">${heldFmt(heldTill() - Date.now())}</span></span></div>
+      </div>
+      ${crow('iv', {when:false, second:false, join:false})}
     </div>
     ${quickActions([
       {ic:I.lightning, hue:'ic-prep', t:'What happens next',
@@ -8225,7 +8295,7 @@ V.interviews = (f) => {
   <div class="sec sec-call dark-card crow-dark">
     <div class="dc-hd">
       <div class="dc-hd-r"><h2 class="dc-t">Scheduled</h2>
-        <span class="dc-when">${I.time}${callLeft(CALL_ROW.iv().when)}</span></div>
+        <span class="dc-when">${I.time}${S.stage===RESCHED?"In 2 days":callLeft(CALL_ROW.iv().when)}</span></div>
     </div>
     ${crow('iv', {when:false})}
   </div>
@@ -8841,7 +8911,12 @@ V.agent = (f) => {
            screen carries the card-picker and its own "Pay" button, which is what
            now carries `stage:booked` — so the commit point moved one screen on,
            and the destination did not. */}
-    <button class="btn btn-p" data-go="checkout">${ivCharged(isRe)?'Proceed to pay '+a.price:'Proceed to book'} ${I.arrowRight}</button>
+    ${''/* A COMPLIMENTARY BOOKING SKIPS THE CHECKOUT SCREEN (Maryam, 18 Sep 2026:
+          "no need to show this screen") — there is nothing to pay, so Proceed
+          books straight away (`data-book`) and the success dialog opens on the
+          booked dashboard. A CHARGED re-interview still goes to `V.checkout` for
+          the card picker, and confirms there. */}
+    <button class="btn btn-p" ${ivCharged(isRe)?'data-go="checkout"':'data-book="1"'}>${ivCharged(isRe)?'Proceed to pay '+a.price:'Proceed to book'} ${I.arrowRight}</button>
   </div>
   </div>
 </div></main>`;
@@ -8900,7 +8975,7 @@ V.checkout = (f) => {
         ? `<div class="sec-h"><h2>Pay with</h2>${addCardAct}</div>
       ${cardPicker()}`
         : `<div class="tile"><p class="t-body-01">Your first interview is <b>complimentary</b>. There is nothing to pay. Confirm to book your time with ${a.n.split(' ')[0]}.</p></div>`}
-      <div class="bkpay-go"><button class="btn btn-p" data-go="stage:booked">${charged?'Pay '+a.price+' and book':'Confirm and book'} ${I.arrowRight}</button></div>
+      <div class="bkpay-go"><button class="btn btn-p" data-book="1">${charged?'Pay '+a.price+' and book':'Confirm and book'} ${I.arrowRight}</button></div>
     </div>
   </div>
   </div></main>`;
@@ -9840,6 +9915,29 @@ const enrolSheet = () => {
       </div>
       <div class="sheet-f conf-a">
         <button class="btn btn-s noic" data-enrolok="0">Close</button>
+      </div>
+    </div>
+  </div>`;
+};
+
+/* THE INTERVIEW-BOOKED SUCCESS DIALOG — Maryam, 18 Sep 2026. Replaces the
+   checkout screen for the complimentary booking: "Confirm/Proceed" (`data-book`)
+   lands the reader on the booked dashboard and this arrives on top of it —
+   `enrolSheet`'s exact `.conf conf-ok` shell, one success mark, "Interview
+   booked", and one control that dismisses it onto the dashboard behind. `S.ivBooked`
+   gates it; the backdrop and the button both clear the flag. */
+const ivBookedModal = () => {
+  const k = (S.booking && S.booking.agent) || (S.bk && S.bk.agent) || S.agent || 'priya';
+  const a = AGENTS[k] || AGENTS.priya;
+  return `<div class="modal on" data-close="ivbooked">
+    <div class="sheet conf conf-ok" role="dialog" aria-modal="true" aria-label="Interview booked">
+      <div class="sheet-b conf-b">
+        <span class="conf-mk">${I.checkFilled}</span>
+        <h2 class="conf-t">Interview booked</h2>
+        <p class="conf-x">Your time with ${a.n} is confirmed. It is on your dashboard, and the interview is what sets your level.</p>
+      </div>
+      <div class="sheet-f conf-a">
+        <button class="btn btn-p noic" data-ivbooked="0">View My Dashboard</button>
       </div>
     </div>
   </div>`;
@@ -13476,7 +13574,12 @@ const SOCIAL = [
   {k:'twitter',   n:'X',         color:'#000000', handle:'@maryamsss',
    svg:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231 5.451-6.231zm-1.161 17.52h1.833L7.084 4.126H5.117l11.966 15.644z"/></svg>'},
   {k:'youtube',   n:'YouTube',   color:'#FF0000', handle:'@maryamnaz',
-   svg:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>'}
+   svg:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>'},
+  /* TikTok is a single-path glyph on its own `0 0 24 24` box, tinted by
+     `--brand` like the others (trap 7's brand-mark exception). Its brand ink is
+     black; the card carries the coloured logo whether linked or not (§105). */
+  {k:'tiktok',    n:'TikTok',    color:'#010101', handle:'@maryam.designs',
+   svg:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>'}
 ];
 S.linked = S.linked || {linkedin:true, instagram:true, twitter:true};
 
@@ -15257,7 +15360,11 @@ function render(){
             reason dialog (Interviews). Each is gated on its page and its own
             state, the pattern the four sheets above use. */
          + (S.view==='billing' && S.receipt!=null ? receiptModal() : '')
-         + (S.view==='interviews' && S.ivCancel ? ivCancelModal() : '');
+         + (S.view==='interviews' && S.ivCancel ? ivCancelModal() : '')
+         /* THE BOOKING SUCCESS DIALOG — gated on the MOMENT like `enrolSheet`:
+            `S.ivBooked` is set by the booking action, which lands on `booked`,
+            so it shows once on that dashboard and is cleared on dismiss. */
+         + (S.ivBooked && (S.stage==='booked' || S.stage===RESCHED) ? ivBookedModal() : '');
   }
   /* THE CALL IS PART OF THE KEY, because it is a whole surface arriving and
      leaving: without it, joining a call is a repaint of the same stage and
@@ -15521,6 +15628,15 @@ device.addEventListener('click', e => {
      stage as well. Nothing else sets it, so it cannot be true on a stage the
      reader walked to with the picker. */
   if(t.closest('[data-paid]')){ S.enrolOk = true; setStage('week1'); return; }
+
+  /* THE INTERVIEW BOOKING (Maryam, 18 Sep 2026) — same shape as `data-paid`:
+     `data-book` skips the checkout screen, lands on the booked dashboard
+     (`setStage('booked')` renders) and raises the success dialog (`S.ivBooked`).
+     The button and the backdrop clear it onto the dashboard behind. */
+  if(t.closest('[data-book]')){ S.ivBooked = true; setStage('booked'); return; }
+  const ivbk = t.closest('[data-ivbooked]');
+  if(ivbk){ S.ivBooked = ivbk.dataset.ivbooked === '1'; render(); return; }
+  if(t.closest('[data-close="ivbooked"]') && !t.closest('.sheet')){ S.ivBooked=false; render(); return; }
 
   /* Close, and the backdrop — the shape the skills sheet uses, and the second
      test is that the press did not land inside `.sheet` so a click on the

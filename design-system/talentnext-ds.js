@@ -1274,7 +1274,12 @@ function dsCrow(kind, o){
         ${o.second === false ? '' : `<button class="btn btn-sm noic${o.join === false ? '' : ' ic-l'}" ${
           (c.second||{}).go ? `data-go="${(c.second||{}).go}"` : ((c.second||{}).at || '')}>${
           o.join === false ? `${(c.second||{}).t} ${I.arrowRight}` : `${(c.second||{}).ic}${(c.second||{}).t}`}</button>`}
-        ${o.join === false ? '' : `<button class="btn btn-p btn-sm noic"${c.kind ? ` data-call="${c.kind}"` : ''}${
+        ${o.join === false ? ''
+          /* THE RESCHEDULE STAGE SWAPS JOIN FOR A WHITE "Reschedule" (Maryam,
+             18 Sep 2026) that reopens the agent's booking calendar (`agent:<k>`)
+             rather than joining the call. */
+          : c.resched ? `<button class="btn btn-sm noic crow-resched" data-go="agent:${c.key}">Reschedule ${I.arrowRight}</button>`
+          : `<button class="btn btn-p btn-sm noic"${c.kind ? ` data-call="${c.kind}"` : ''}${
           gated ? ` data-joinwhen="${c.when}" data-joinmins="${c.mins || 45}"` : ''}${
           gate ? ` disabled title="${dsJoinShut(c.when)}"` : ''}>Join call ${I.arrowRight}</button>`}
       </div>

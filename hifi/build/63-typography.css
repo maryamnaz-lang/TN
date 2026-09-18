@@ -2617,6 +2617,12 @@
   font-weight:var(--t-w-strong);letter-spacing:var(--t-h3-ls);
   text-transform:none;color:var(--accent-text);
   font-variant-numeric:tabular-nums}
+/* THE STRUCK ORIGINAL FEE beside "Free" (Maryam, 18 Sep 2026: "show the price
+   but cut it and write Free next to it") — the price muted and lined through,
+   while "Free" keeps `.bkc-fv`'s accent ink. */
+.app .bkc-fv .fee-was{
+  color:var(--text-secondary);font-weight:var(--t-w-book);
+  text-decoration:line-through}
 
 /* ==========================================================================
    17. THE CALL ROW ON A BLACK CARD — §77's `.crow-dark`
@@ -2685,6 +2691,10 @@
    The same classes on the other three call sites are §11's and are untouched. */
 .app .crow-dark .crow-a > .btn:not(.btn-p){color:var(--on-dark)}
 .app .crow-dark .crow-a > .btn:not(.btn-p) svg{color:var(--on-dark)}
+/* THE WHITE RESCHEDULE BUTTON (§77) takes DARK ink — the rule above would paint
+   it white on white. (0,5,0) and later, so it wins over that rule. */
+.app .crow-dark .crow-a > .btn.crow-resched{color:var(--gray-100)}
+.app .crow-dark .crow-a > .btn.crow-resched svg{color:var(--gray-100)}
 
 /* THE MARK CAN BE A LABEL, AND A LABEL HAS TYPE (1 Sep 2026). The leader's card
    is the next COHORT CALL, and a cohort is not a person: `crow` puts the

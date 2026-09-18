@@ -707,17 +707,23 @@
 .app .lacc-grid{
   display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
   gap:var(--s04)}
-/* AT DESKTOP THE FIVE NETWORKS ARE ONE FULL-WIDTH ROW. `auto-fit` alone left a
-   card wrapping once the reading column could not fit five at the 150px floor,
-   so above the breakpoint the count is fixed at five equal columns that stretch
-   to the column's whole width — one card per network, no dead space. */
+/* AT DESKTOP THE SIX NETWORKS ARE ONE FULL-WIDTH ROW (TikTok added, Maryam 18
+   Sep 2026). `auto-fit` alone left a card wrapping once the reading column could
+   not fit six at the 150px floor, so above the breakpoint the count is fixed at
+   six equal columns that stretch to the column's whole width — one card per
+   network, no dead space. */
 @container app (min-width:900px){
-  .app .lacc-grid{grid-template-columns:repeat(5,1fr)}
+  .app .lacc-grid{grid-template-columns:repeat(6,1fr)}
 }
+/* THE CARD IS SHORTER SINCE TIKTOK MADE SIX (Maryam, 18 Sep 2026: "reduce the
+   card height of all 6 card as well since it will look bad otherwise"). Six in a
+   row are narrower than five, so a 300px-tall card read as a thin sliver; 220px
+   with tighter vertical padding and a smaller avatar disc (48, below) keeps the
+   vertical-rectangle proportion the reference wanted without the emptiness. */
 .app .lacc{
   display:flex;flex-direction:column;align-items:center;gap:var(--s02);
-  min-height:300px;
-  padding:var(--s07) var(--s05);
+  min-height:220px;
+  padding:var(--s06) var(--s04);
   background:var(--layer-01);border:1px solid var(--rule);border-radius:var(--radius);
   cursor:pointer;text-align:center}
 .app .lacc-ic{
@@ -735,11 +741,11 @@
    the tall card splits into two equal gaps: the name group at the top, the
    avatar centred, the status at the foot. */
 .app .lacc-av{margin-top:auto;display:block}
-.app .lacc-av .av-ph{width:64px;height:64px;border-radius:999px}
+.app .lacc-av .av-ph{width:48px;height:48px;border-radius:999px}
 .app .lacc-av-empty{
-  display:grid;place-items:center;width:64px;height:64px;border-radius:999px;
+  display:grid;place-items:center;width:48px;height:48px;border-radius:999px;
   background:var(--gray-10);color:var(--gray-40)}
-.app .lacc-av-empty svg{width:30px;height:30px;fill:currentColor}
+.app .lacc-av-empty svg{width:24px;height:24px;fill:currentColor}
 /* the status line is a MARK plus a word; the colour is on the mark so the word
    keeps §63's label ink. Green tick when linked, accent plus to link. */
 .app .lacc-cta{

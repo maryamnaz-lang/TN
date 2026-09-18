@@ -36,7 +36,7 @@
      rule sweep clean on 21 screens, 84 screen-width combos with no overflow,
      zero thrown errors.
      ========================================================================== -->
-<link rel="stylesheet" href="design-system/talentnext-ds.css?b=8f6bb572">
+<link rel="stylesheet" href="design-system/talentnext-ds.css?b=52f2aea8">
 
 <style>
 /* ==========================================================================
@@ -134,7 +134,7 @@
        somebody choosing a stage would want it. -->
 </div>
 
-<script src="design-system/talentnext-ds.js?b=8f6bb572"></script>
+<script src="design-system/talentnext-ds.js?b=52f2aea8"></script>
 <script>
 /* ==========================================================================
    THE TALENT AGENT PORTAL
@@ -1473,7 +1473,7 @@ const PAGESUM = {
        the fee sits at that moment is the one thing `S.req`'s note flags as not
        modelled, so the sentence states the half this portal can vouch for. */
     if(ivSt(v) === 'next') return `${v.n} is ${v.day.split(' ')[0]} at ${v.time}, confirmed and in your diary. ${v.summary ? 'It’s a re-interview, so their 90-day summary is on the brief.' : 'They’re straight off the quiz, so no level exists yet.'}`;
-    if(v.st === 'report') return `You interviewed ${v.n} yesterday. Confirm the recording is clean to release your pay. Tal has a read off the transcript, and TalentNext sets the level after that.`;
+    if(v.st === 'report') return `You interviewed ${v.n} yesterday. Send your recommended level, with strengths, growth areas and your overall read. Tal has a read off the transcript to weigh against, and TalentNext confirms the final level after that.`;
     return `${v.n}, ${v.day.replace(/^\w+ /,'')}, levelled at ${v.level} by TalentNext off the transcript. Follow-up scored ${v.follow} and depth ${v.depth}.`;
   },
 
@@ -1570,13 +1570,13 @@ const TALQ = {
   ],
   interview: [
     ['Do I set the candidate’s level?',
-     'No. You run the interview and confirm the recording. Tal proposes a read off the transcript, and TalentNext sets the final level after analysis. The proposal is not binding on anyone.',
-     [['Tal’s read', 'Off the transcript'], ['You confirm', 'The recording'],
-      ['Level set by', 'TalentNext']]],
+     'You recommend one. After the call you send a recommended level across the fifteen rungs, with strengths, growth areas and your overall read. Tal proposes a read off the transcript to weigh against, and TalentNext confirms the final level after analysis.',
+     [['Tal’s read', 'Off the transcript'], ['You recommend', 'A level and notes'],
+      ['Final level', 'TalentNext confirms']]],
     ['What do I do after the call?',
-     'Confirm the recording is clean. That is what releases your pay, and it hands the transcript to TalentNext to set the level. There is no report for you to write.'],
+     'Send your recommendation: a level across the fifteen rungs, plus strengths, growth areas and your overall read. The recording goes with it, and that is what releases your pay.'],
     ['When does my pay release?',
-     'Three working days after you confirm the recording. The clock starts at the call, not at the level decision.']
+     'Three working days after you send your recommendation. The clock starts at the call, not at the level decision.']
   ],
   availability: [
     ['How far ahead can I open?',
@@ -4391,6 +4391,13 @@ V.interview = v => {
        reads them as the agent's decision. See DESIGN.md §3 "Talent Agent — V1
        model". */
     const first = x.n.split(' ')[0];
+    /* THE RECOMMENDATION IS BACK (Maryam, 18 Sep 2026, reversing the client V1
+       "recording only"): `talCode` is Tal's suggested rung parsed off `talLevel`
+       ("Explorer – E3" -> "E3") to mark the ladder; `curLvl` is the agent's own
+       pick, prefilled to Tal's full level and held in `S.slotForm.evalLevel` (the
+       `dd()` dropdown's store, so no new handler). */
+    const talCode = (x.talLevel.split(/[–-]/).pop() || '').trim();
+    const curLvl = (S.slotForm && S.slotForm.evalLevel) || x.talLevel;
     return band(null, true) + `
     ${/* THE FACTS OF THE CALL — the 4-block figure row. The old fourth cell was
           the 24-hour REPORT deadline; there is no report now, so it becomes the
@@ -4405,32 +4412,59 @@ V.interview = v => {
       ].map(c => statCell(...c)).join('')}</div>
     </section>
 
-    ${/* TAL'S READ — READ-ONLY. Tal sat in the interview in the background and
-          proposes a level and the highlights behind it; it is NOT the agent's to
-          set. The note under the body says where the decision actually lands. */''}
+    ${/* THE RECORDING — a still of the call the report is built from, attached
+          as a 16:9 thumbnail (Maryam, 18 Sep 2026, "an attached interview
+          recording thumbnail"). The play disc and duration chip are §111's
+          `.scv-play` / `.scv-at`, reused so the white-on-dark ink is stated once
+          in §111 and §124 adds only geometry. The still is the candidate's own
+          photo as a stand-in — a real captured frame is the file to drop in
+          (`recStill`). It opens the recording/transcript. */''}
+    <section class="sec">
+      <div class="sec-h"><h2>Interview recording</h2></div>
+      <button class="iv-rec" data-go="transcript" data-iv="${x.id}" aria-label="Play the recording of your interview with ${x.n}">
+        <span class="iv-rec-art"><img src="${recStill(x)}" alt="" loading="lazy">
+          <span class="scv-play">${I.play}</span>
+          <span class="scv-at">48:00</span></span>
+      </button>
+    </section>
+
+    ${/* TAL'S READ — Tal's proposal off the transcript, the starting point the
+          agent weighs their own call against (Maryam, 18 Sep 2026: the agent
+          sends a recommendation again). Read-only; the agent's own recommendation
+          is the form below, prefilled from these seeds. */''}
     <section class="sec">
       <div class="ai-aura tal-eval">
         <div class="ai-head"><span class="ai-label bare">Tal's read</span></div>
         <div class="ai-body">${x.talEval}
-          <p class="help mt5">Proposed only. TalentNext sets the level after analysis, so this is not a decision you make here.</p></div>
+          <p class="help mt5">Tal's proposal off the transcript. Weigh it against the call and set your own recommendation below.</p></div>
       </div>
     </section>
 
-    ${/* CONFIRM THE RECORDING — the agent's one deliverable. Confirming it is
-          clean releases the payout after the three working days. `.eval-form`
-          opts the section out of the label column (§10.15) so the note field
-          reads full-width under the heading. */''}
+    ${/* YOUR RECOMMENDATION (Maryam, 18 Sep 2026). The agent recommends a level
+          across the fifteen rungs, with strengths, growth areas and an overall
+          read. Tal's suggested level is marked on the ladder; the picker prefills
+          to it and the three fields seed from Tal's read, so the agent edits
+          rather than starts blank. TalentNext confirms the final level after
+          analysis. `.eval-form` opts the section out of the label column
+          (§10.15). */''}
     <section class="sec">
-      <div class="sec-h"><h2>Confirm the recording</h2></div>
+      <div class="sec-h"><h2>Your recommendation</h2></div>
       <div class="eval-form">
-        <p class="t-body-02">Confirm the interview happened and the recording is clean. This is what releases your payout. TalentNext reads the transcript and sets ${first}'s level after that.</p>
-        <label class="f mt5"><span class="lbl">Anything to flag for the level decision <span class="t-desc">(optional)</span></span>
-          <textarea class="inp" rows="3" placeholder="Anything about the call TalentNext should know when it sets the level — a connection that dropped, an off-topic detour, context the transcript won’t carry. Optional."></textarea></label>
+        <p class="t-body-02">Tal suggests <b>${x.talLevel}</b> off the transcript. Set the level you would give ${first} across the fifteen rungs. TalentNext confirms the final level after analysis.</p>
+        <div class="iv-ladder">${ivLadder(talCode)}</div>
+        <div class="f mt5"><span class="lbl">Your suggested level</span>
+          ${dd('evalLevel', LVL_OPTS, curLvl)}</div>
+        <label class="f mt5"><span class="lbl">Strengths</span>
+          <textarea class="inp" rows="3">${x.seedStrength}</textarea></label>
+        <label class="f mt5"><span class="lbl">Growth areas</span>
+          <textarea class="inp" rows="3">${x.seedGrowth}</textarea></label>
+        <label class="f mt5"><span class="lbl">Overall &mdash; what you make of ${first}</span>
+          <textarea class="inp" rows="3">${x.seedWhy}</textarea></label>
       </div>
     </section>
 
     <section class="sec">
-      <div class="btn-row"><button class="btn btn-p noic ic-l" data-confirm="sign">${I.checkFilled}Confirm Recording</button></div>
+      <div class="btn-row"><button class="btn btn-p noic ic-l" data-confirm="sendrec">${I.checkFilled}Send Recommendation</button></div>
     </section>`;
   }
 
@@ -6233,6 +6267,11 @@ const CONFIRMS = {
      generic warning. Copy matches the candidate's Closing your account block. */
   delacct: ['Delete your account?', 'This removes your profile, your notes and your interview recordings. Certificates you have already earned stay valid and stay downloadable. This cannot be undone.', 'Delete my account', CAND_DOC + '#signup/login', 'misuse'],
   sign:   ['Confirm the recording?', 'This confirms the interview happened and the recording is clean. It releases your payout after the three working days, and hands Tal’s read to TalentNext to set the level. It cannot be undone.', 'Confirm recording', null, 'checkFilled'],
+  /* SEND YOUR RECOMMENDATION (Maryam, 18 Sep 2026). The agent recommends a level
+     with strengths, growth areas and an overall read; TalentNext confirms the
+     final level after analysis. It also confirms the recording, so the payout
+     clock runs from the call as before. */
+  sendrec: ['Send your recommendation?', 'This sends your recommended level, strengths, growth areas and overall read to TalentNext, together with the recording. TalentNext confirms the final level after analysis, and your payout releases three working days after the call. It cannot be undone.', 'Send recommendation', null, 'checkFilled'],
   /* CLOSING A SLOT IS CONFIRMED, because it is the one thing on the Availability
      page that takes away something a candidate may be looking at right now. It
      is reversible — you can open the same time again — but not by undo, so it
@@ -6336,12 +6375,26 @@ function dd(key, opts, val, cfg){
   </div>`;
 }
 
-/* THE FIFTEEN-RUNG LEVEL PICKER WAS HERE AND IS GONE (client, 15 Sep 2026). The
-   agent no longer SETS the level — TalentNext does, admin-side, after analysis —
-   so `LVL_LADDER`, `levelPicker`, `S.evalForm` and the `data-lvlset` router branch
-   were removed with it. The candidate portal keeps its read-only `ladder()`; the
-   admin/moderator build is where a picker like this now belongs. See DESIGN.md §3
-   "Talent Agent — V1 model". */
+/* THE FIFTEEN-RUNG RECOMMENDATION IS BACK (Maryam, 18 Sep 2026, reversing the
+   client V1 "recording only"). The agent recommends a level again; TalentNext
+   confirms the final level after analysis. Rather than the old bespoke
+   `LVL_LADDER` / `levelPicker` / `S.evalForm` / `data-lvlset`, this reuses what
+   already ships: the level PICKER is the shared `dd()` dropdown over the fifteen
+   codes (its store `S.slotForm.evalLevel`, its handler already wired), and the
+   level BAR is the read-only ladder markup the design system draws (`.ladder`),
+   here computing the rung directly off the code so a Builder or Trailblazer level
+   marks correctly (the DS `dsRungOf` only maps E1–E5). `recStill` is the
+   recording thumbnail's frame — the candidate's own photo as a stand-in until a
+   real captured frame is dropped in. See DESIGN.md §3 "Talent Agent — V1 model". */
+const LVL_NAME = c => ({E:'Explorer', B:'Builder', T:'Trailblazer'})[c[0]] + ' – ' + c;
+const LVL_OPTS = LVL_CODES.map(LVL_NAME);
+function ivLadder(code){
+  const r = LVL_CODES.indexOf(code) + 1 || 1;
+  return `<div class="ladder">${LVL_CODES.map((c, i) =>
+    `<i class="${i < r - 1 ? 'done' : (i === r - 1 ? 'on' : '')}"><b>${c}</b></i>`).join('')}</div>
+  <div class="ladder-lab"><span>Explorer</span><span>Builder</span><span>Trailblazer</span></div>`;
+}
+const recStill = x => PHOTOS[x.n.split(' ')[0].toLowerCase()] || AV.priya;
 
 const SHEETS = {
   listing: ['Your public profile', () => {

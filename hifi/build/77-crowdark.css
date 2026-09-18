@@ -315,3 +315,9 @@
    -------------------------------------------------------------------------- */
 @container app (min-width:900px){
   .app .crow-dark .crow-a1 > .btn{width:auto;padding-right:0}}
+
+/* THE RESCHEDULE BUTTON (Maryam, 18 Sep 2026) — a WHITE button in the black
+   card's action row, replacing the accent Join on the `resched` stage. White
+   GROUND here; its dark INK is stated in §63 (that layer paints every dark-card
+   `.btn:not(.btn-p)` white, so the ink has to win there). */
+.app .crow-resched{background:var(--on-dark)}

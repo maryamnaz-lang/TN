@@ -125,6 +125,10 @@ S.obQi = 0;
    fresh node starts at its final width. Storing the previous percentage lets
    `obSurveyScreen` hand the keyframe a real from/to pair. */
 S.obBarFrom = 0;
+/* THE 2s LOADER BETWEEN THE WELCOME AND THE QUESTIONS (Maryam, 18 Sep 2026).
+   Set true by "Let's Get Started" and cleared by the timeout that then advances
+   to question one; `obScreen` paints `obLoaderScreen` while it holds. */
+S.obLoading = false;
 
 /* THE TWO WEAKEST BANDS, READ AND NOT TYPED. `qzLow` sorts `SCORES` and takes
    the bottom two, so the question cannot name a band the chart does not draw
@@ -1767,8 +1771,25 @@ function obFit(){
    nowhere else to be yet. The rail's modules are all behind the dashboard this
    screen ends on.
    ========================================================================== */
+/* THE LOADER — three relay blades on the survey's own light ground, shown for 2s
+   between "Let's Get Started" and question one (Maryam, 18 Sep 2026, off the
+   `loader.html` asset). `.ob-survey` gives the full frame, the centred `.main`
+   and the rail-line suppression; §107 draws the blades. */
+function obLoaderScreen(){
+  return `<div class="ob-survey ob-loading">
+    <main class="main">
+      <div class="tn-loader" role="status" aria-label="Loading">
+        <span class="tn-loader__blade tn-loader__blade--a"></span>
+        <span class="tn-loader__blade tn-loader__blade--b"></span>
+        <span class="tn-loader__blade tn-loader__blade--c"></span>
+      </div>
+    </main>
+  </div>`;
+}
+
 function obScreen(){
   const step = S.obStep;
+  if(S.obLoading) return obLoaderScreen();
 
   /* THE INTRO IS ITS OWN COMPOSITION AND TAKES THE FRAME. Not `.auth-card`,
      because the reference is one object on an empty ground and this screen has
@@ -1945,15 +1966,19 @@ device.addEventListener('click', e => {
   const st = t.closest('[data-obstart]');
   if(st){
     e.preventDefault(); e.stopPropagation();
-    /* "Let's Get Started" NOW ENTERS THE STEPPED SURVEY (Maryam, 18 Sep 2026),
-       not the old chat thread — it advances to question one. The welcome's leave
-       animation is kept (the half `render()` cannot do, §107 §0g); the state
-       change waits for it, then obScreen paints `obSurveyScreen()`. */
+    /* "Let's Get Started" SHOWS THE 2s LOADER, THEN THE SURVEY (Maryam, 18 Sep
+       2026). The welcome's leave animation is kept (the half `render()` cannot
+       do, §107 §0g); after it, the loader is shown for 2s, then question one.
+       `setTimeout` (not rAF) drives the delay so it still fires in a background
+       tab (trap 17). */
     obHush();
     const stage = device.querySelector('.ob-stage');
-    const start = () => { S.obStep = 1; render(); };
-    if(stage){ stage.classList.add('ob-leave'); setTimeout(start, OB_LEAVE); }
-    else start();
+    const load = () => {
+      S.obLoading = true; render();
+      setTimeout(() => { S.obLoading = false; S.obStep = 1; render(); }, 2000);
+    };
+    if(stage){ stage.classList.add('ob-leave'); setTimeout(load, OB_LEAVE); }
+    else load();
     return;
   }
 
@@ -2037,8 +2062,18 @@ device.addEventListener('click', e => {
        prints as "undefined". `talReset()` rather than `S.thread = []` — the
        thread has a timer (views.js's note). And the ask page itself is closed:
        the dashboard is the destination, not the chat over it. */
-    talReset(); S.askOpen = false; S.tal = false;
-    setStage('new'); render(); return;
+    /* THE LOADER PLAYS AGAIN FOR 2s, THEN THE DASHBOARD (Maryam, 18 Sep 2026).
+       Stay on the onboard stage so `obScreen` keeps painting `obLoaderScreen`;
+       the handover — reset the thread, close the ask page, `setStage('new')` —
+       runs in the timeout. `setTimeout` (not rAF) so it fires in a background
+       tab (trap 17). */
+    S.obLoading = true; render();
+    setTimeout(() => {
+      S.obLoading = false;
+      talReset(); S.askOpen = false; S.tal = false;
+      setStage('new'); render();
+    }, 2000);
+    return;
   }
 }, true);
 

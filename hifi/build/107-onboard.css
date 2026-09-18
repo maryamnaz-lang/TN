@@ -2101,5 +2101,37 @@
   color:var(--text-primary)}
 .app .ob-sv-prev svg{color:var(--text-primary)}
 
-/* the completion screen's journey panel, spaced under the "You're all set" line */
-.app .ob-done .ob-qp{margin-top:var(--s07)}
+/* the completion screen's journey panel: spaced under the line, and a plain
+   bordered box — no shadow, radius 0, a visible `--rule` edge (Maryam, 18 Sep
+   2026). Overrides §107's translucent, blurred, rounded, shadowed chat card. */
+.app .ob-done .ob-qp{
+  margin-top:var(--s07);
+  border-color:var(--rule);border-radius:0;
+  background:var(--background);
+  -webkit-backdrop-filter:none;backdrop-filter:none;
+  box-shadow:none}
+
+/* THE TN LOADER (Maryam, 18 Sep 2026, off the `loader.html` asset) — three relay
+   blades shown for 3s between the welcome and the questions. Ink is
+   `--icon-primary` (near-black) rather than the asset's literal #000. */
+.app .tn-loader{
+  --tn-loader-size:90px;
+  --tn-loader-duration:2.4s;
+  --tn-loader-ease:cubic-bezier(0.4,0,0.2,1);
+  position:relative;display:inline-flex;
+  width:var(--tn-loader-size);height:var(--tn-loader-size);aspect-ratio:1/1}
+.app .tn-loader__blade{
+  position:absolute;inset:0;width:100%;height:100%;
+  background-color:var(--icon-primary);
+  transform-origin:50% 50%;will-change:clip-path,opacity;
+  animation:tn-relay var(--tn-loader-duration) var(--tn-loader-ease) infinite}
+.app .tn-loader__blade--a{animation-delay:0s}
+.app .tn-loader__blade--b{animation-delay:calc(var(--tn-loader-duration) * -0.333333)}
+.app .tn-loader__blade--c{animation-delay:calc(var(--tn-loader-duration) * -0.666667)}
+@keyframes tn-relay{
+  0%   {clip-path:polygon(29.56% 22.88%, 18.77% 23.14%, 42.67% 49.87%, 2.57% 95.12%, 13.37% 95.12%, 53.21% 49.87%);opacity:1}
+  33%  {clip-path:polygon(62.21% 35.22%, 51.67% 35.48%, 64.52% 49.87%, 24.68% 95.12%, 35.22% 95.12%, 75.06% 50.13%);opacity:1}
+  66%  {clip-path:polygon(57.07% 4.37%, 46.79% 4.37%, 86.38% 49.87%, 64.78% 74.55%, 75.58% 74.55%, 96.92% 49.61%);opacity:1}
+  88%  {clip-path:polygon(57.07% 4.37%, 46.79% 4.37%, 86.38% 49.87%, 64.78% 74.55%, 75.58% 74.55%, 96.92% 49.61%);opacity:0}
+  89%  {clip-path:polygon(29.56% 22.88%, 18.77% 23.14%, 42.67% 49.87%, 2.57% 95.12%, 13.37% 95.12%, 53.21% 49.87%);opacity:0}
+  100% {clip-path:polygon(29.56% 22.88%, 18.77% 23.14%, 42.67% 49.87%, 2.57% 95.12%, 13.37% 95.12%, 53.21% 49.87%);opacity:1}}
