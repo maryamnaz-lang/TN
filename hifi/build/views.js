@@ -6193,7 +6193,7 @@ login: () => `${authShell()}
     <div class="f last"><label for="lpw">Password</label>
       <div class="pw-wrap"><input class="inp fill" id="lpw" type="password" placeholder="Enter your password">
         <button class="pw-eye" data-eye="lpw" aria-label="Show password">${I.view}</button></div>
-      <p class="t-body-02 aux"><a data-go="forgot">Forgot Password?</a></p></div>
+      <p class="t-body-02 aux"><a data-go="forgot" style="color:var(--accent-text)">Forgot Password?</a></p></div>
   </div>
   <div class="sec sec-cbx">
     <div class="cbx-list">
@@ -6201,21 +6201,30 @@ login: () => `${authShell()}
         <span class="txt">Remember me</span></label>
     </div>
   </div>
+  ${''/* THE LOG IN BUTTON GOES TO THE TAL ONBOARDING PROTOTYPE (Maryam, 18 Sep
+        2026), not the candidate dashboard. It is a plain `stage:onboard` `go()`
+        — `data-loginas` was the sign-straight-into-a-portal gesture and is not
+        what this arrival is any more. */}
   <div class="sec sec-act">
-    <div class="foot-row foot-stack"><div><button class="btn btn-p btn-full" data-loginas="candidate">Log in ${I.arrowRight}</button></div></div>
+    <div class="foot-row foot-stack"><div><button class="btn btn-p btn-full" data-go="stage:onboard">Log in ${I.arrowRight}</button></div></div>
   </div>
 </div></main>`,
 
 forgot: () => `${authShell('login')}
 <main class="main"><div class="page form-page">
-  ${ph('Reset your password','Give us the email address on your account and we will send you a link to set a new password.')}
+  ${ph('Reset Password','Enter the email for the verification code.')}
   <div class="sec">
     <div class="f last"><label for="fem">Email address</label>
       <input class="inp fill" id="fem" type="email" value="maryam.naz@tkxel.io"></div>
   </div>
+  ${''/* SEND CODE HAS A LOADING BEAT (Maryam, 18 Sep 2026). `data-send` swaps the
+        button to "Sending..." and disables it, then advances to the verification
+        screen after a short pause — the handler mutates the button and does NOT
+        render() in the interval, so the loading label survives the wait (trap 9
+        only bites a re-render). The flow is forgot -> (Sending...) -> fcode ->
+        reset; the old `sent` "Check your email" screen is off this path. */}
   <div class="sec">
-    <button class="btn btn-p btn-full" data-go="sent">Send the reset link ${I.arrowRight}</button>
-    <p class="t-body-02 mt5" style="color:var(--text-secondary)">Remembered it? <a data-go="login">Back to log in</a></p>
+    <button class="btn btn-p btn-full" data-send="fcode">Send Code ${I.arrowRight}</button>
   </div>
 </div></main>`,
 
@@ -6241,6 +6250,29 @@ sent: () => `${authShell('forgot')}
   <div class="sec">
     <button class="btn btn-p btn-full" data-go="reset">Open the link ${I.arrowRight}</button>
     <div class="mt4"><button class="btn btn-g btn-full" data-go="sent">Send it again ${I.restart}</button></div>
+  </div>
+</div></main>`,
+
+/* THE FORGOT-FLOW VERIFICATION SCREEN (Maryam, 18 Sep 2026). Content off her
+   reference — "Enter Code", a four-digit code, a Verify button, a resend line —
+   built in our auth-card components rather than the reference's own card. It is
+   the forgot flow's own screen (its own digit count and its own onward target
+   `reset`), separate from `verify`, the create-flow six-digit email confirm
+   that lands on onboarding. */
+fcode: () => `${authShell('forgot')}
+<main class="main"><div class="page form-page">
+  ${ph('Enter Code','We sent a 6-digit code to your email.')}
+  <div class="sec sec-rule">
+    <div class="sec-h" style="margin-bottom:var(--s06)"><h2 class="u-h2">Verification Code</h2></div>
+    <div class="otp">${[0,1,2,3,4,5].map(i=>`<input value="" size="1" inputmode="numeric" maxlength="1" aria-label="Digit ${i+1}">`).join('')}</div>
+  </div>
+  ${''/* THE RESEND LINE SITS BELOW THE BUTTON (Maryam, 18 Sep 2026), not beside
+        it — so this is plain block flow, NOT `.foot-row` (which lays the action
+        and the way-out side by side on desktop). Verify Code full width, the
+        resend line under it. */}
+  <div class="sec sec-act">
+    <button class="btn btn-p btn-full" data-go="reset">Verify Code ${I.arrowRight}</button>
+    <p class="t-body-02 mt5" style="color:var(--text-secondary)">Didn't receive code? <a data-go="fcode">Resend</a></p>
   </div>
 </div></main>`,
 
@@ -15293,6 +15325,9 @@ function render(){
     kids.forEach((el,i) => el.style.setProperty('--i', Math.min(i,7)));
   }
   const tb = device.querySelector('#talBody'); if(tb) tb.scrollTop = tb.scrollHeight;
+  /* keep the floating prototype menu's current-stage highlight in step with
+     whatever route just changed the stage (declaration hoisted from below) */
+  syncStagePick();
   /* THERE IS NO STEPS PANEL TO LIFT OUT OF `.app` ANY MORE. Two removals, in
      order: the panel was `position:fixed` and had to be moved here because
      `.device`'s `container-type:inline-size` makes it the containing block for
@@ -15303,7 +15338,32 @@ function render(){
      will walk into, and this is where it was found. */
 }
 
-pick.onclick = e => { const b = e.target.closest('[data-stage]'); if(b) setStage(b.dataset.stage); };
+/* THE FLOATING PROTOTYPE MENU (Maryam, 16 Sep 2026: the kebab that replaced the
+   top black bar). It is prototype chrome, so its handlers live here beside the
+   stage picker rather than in a layer. The kebab toggles `.open` on `.pt-menu`
+   (§01 gates the panel on it); an outside click closes it, and picking a stage
+   closes it too so the panel does not sit open over the page you just switched
+   to. `syncStagePick` marks the current row `.on`; it runs at the end of every
+   render (below) so any route to a stage — the picker, a `data-go="stage:…"`, a
+   restored hash — keeps the highlight honest. */
+const ptMenu   = document.getElementById('ptMenu');
+const ptToggle = document.getElementById('ptToggle');
+function ptClose(){ if(ptMenu){ ptMenu.classList.remove('open'); if(ptToggle) ptToggle.setAttribute('aria-expanded','false'); } }
+function syncStagePick(){
+  if(!pick) return;
+  pick.querySelectorAll('.pt-stage-opt').forEach(o => o.classList.toggle('on', o.dataset.stage === S.stage));
+}
+if(ptToggle && ptMenu){
+  ptToggle.addEventListener('click', e => {
+    e.stopPropagation();
+    const open = ptMenu.classList.toggle('open');
+    ptToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  document.addEventListener('click', e => { if(ptMenu.classList.contains('open') && !ptMenu.contains(e.target)) ptClose(); });
+}
+syncStagePick();
+
+pick.onclick = e => { const b = e.target.closest('[data-stage]'); if(b){ setStage(b.dataset.stage); ptClose(); } };
 /* the browser and hardware back buttons drive the same stack (the chrome's own
    Back/Reset buttons were removed — Maryam, 16 Sep 2026) */
 window.addEventListener('popstate', () => { if(S.hist.length) back(); });
@@ -15663,6 +15723,23 @@ device.addEventListener('click', e => {
      twice to the same string is idempotent, which is why this needs no guard. */
   const lr = t.closest('[data-lrole]');
   if(lr){ S.role = lr.dataset.lrole; render(); return; }
+
+  /* `data-send` IS A BUTTON WITH A LOADING BEAT before it navigates — the Send
+     Code button on the forgot screen. It swaps the label to "Sending...",
+     disables the control, then advances to the named view after a short pause.
+     The button is mutated in place and render() is NOT called until the timeout
+     fires, so the loading state persists through the wait (a render would blow
+     it away — trap 9). Guarded so a second press during the wait is ignored. */
+  const sendBtn = t.closest('[data-send]');
+  if(sendBtn){ e.preventDefault();
+    if(sendBtn.dataset.sending) return;
+    /* `pointer-events:none` inline rather than the `disabled` attribute, so the
+       button keeps its dark `.btn-p` fill — `.btn[disabled]` (§02) greys it, and
+       the reference shows the loading button still black. */
+    sendBtn.dataset.sending = '1'; sendBtn.style.pointerEvents = 'none'; sendBtn.textContent = 'Sending...';
+    const to = sendBtn.dataset.send;
+    setTimeout(() => go(to), 900);
+    return; }
 
   const g = t.closest('[data-go]');
   if(g){ e.preventDefault();

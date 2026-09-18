@@ -97,23 +97,26 @@
 </head>
 <body>
 
-<!-- prototype chrome — not part of the product -->
-<div class="pt-bar">
-  <span id="ptLogo"></span>
-  <span class="dot"></span>
-  <span class="pt-meta">Talent Agent portal &middot; v1 &middot; built on the TalentNext design system</span>
-  <span class="pt-lab">Stage</span>
-  <select class="pt-sel" id="pick" aria-label="Agent stage"></select>
-  <div class="pt-vp" id="vp" role="group" aria-label="Viewport">
-    <button data-vp="mobile">Mobile</button>
-    <button data-vp="tablet">Tablet</button>
-    <button data-vp="fluid" class="on">Desktop</button>
-    <span class="pt-scale" id="vpscale">100%</span>
-  </div>
-  <div class="pt-nav">
-    <button id="reset" title="Reset this stage" aria-label="Reset this stage">
-      <svg viewBox="0 0 24 24"><path d="M12 5V2L8 6l4 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7Z"/></svg>
-    </button>
+<!-- prototype chrome — a floating FAB in the product's own UI, matching hifi
+     (Maryam, 16 Sep 2026: "the talent agent top black prototype switcher bar has
+     become this. please implement the floating button here as well"). The old
+     `.pt-bar` is gone so the app fills the page height; the `.pt-menu`/`.pt-*`
+     styles come from the design system this page links, and the controls keep
+     their ids (#pick / #vp) so the chrome JS below wires them. -->
+<div class="pt-menu" id="ptMenu">
+  <button class="pt-toggle" id="ptToggle" aria-label="Prototype controls" aria-haspopup="true" aria-expanded="false">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="12" cy="19" r="1.7"/></svg>
+  </button>
+  <div class="pt-panel" id="ptPanel">
+    <span class="pt-lab">Stage</span>
+    <div class="pt-stages" id="pick" role="group" aria-label="Agent stage"></div>
+    <span class="pt-lab">Device</span>
+    <div class="pt-vp" id="vp" role="group" aria-label="Viewport">
+      <button data-vp="mobile">Mobile</button>
+      <button data-vp="tablet">Tablet</button>
+      <button data-vp="fluid" class="on">Desktop</button>
+      <span class="pt-scale" id="vpscale">100%</span>
+    </div>
   </div>
 </div>
 
@@ -6668,7 +6671,7 @@ function render(){
     }
   } catch(e){ console.warn('talsum type', e); }
 
-  document.getElementById('pick').value = S.stage;
+  { const pk = document.getElementById('pick'); if(pk) [...pk.children].forEach(b => b.classList.toggle('on', b.dataset.stage === S.stage)); }
   writeHash();
 }
 
@@ -7213,14 +7216,16 @@ device.addEventListener('change', e => {
 /* --------------------------------------------------------------------------
    PROTOTYPE CHROME
    -------------------------------------------------------------------------- */
-document.getElementById('ptLogo').innerHTML = `<img src="${LOGO_W}" alt="TalentNext">`;
-/* The stage's sentence is the option's `title` — see the note where `.pt-cap`
-   used to be. Nothing in the product reads it; it is the picker explaining what
-   choosing a stage will do. */
+/* THE STAGE PICKER IS AN INLINE LIST in the floating panel, not a <select>
+   (matching hifi, 16 Sep 2026). `#pick` is a div of stage buttons; the current
+   one is marked `.on` in render() and a click sets the stage. The logo row and
+   the reset button were removed with the black bar. The stage's sentence rides
+   the button `title`. */
 document.getElementById('pick').innerHTML =
-  STAGES.map(s => `<option value="${s[0]}" title="${s[2].replace(/"/g, '&quot;')}">${s[1]}</option>`).join('');
+  STAGES.map(s => `<button type="button" class="pt-stage-opt" data-stage="${s[0]}" title="${s[2].replace(/"/g, '&quot;')}">${s[1]}</button>`).join('');
 
-document.getElementById('pick').onchange = e => {
+document.getElementById('pick').onclick = e => {
+  const b = e.target.closest('[data-stage]'); if(!b) return;
   /* AND THE THREAD GOES WITH THE STAGE. Changing stage is changing WHO is signed
      in — a different month, a different level, different figures — and Tal's
      answers are read off those. A conversation carried across would be quoting
@@ -7233,23 +7238,9 @@ document.getElementById('pick').onchange = e => {
      is only drawn on the stage that has a working week in it, and an answer
      carried across would put an interview in a diary the new stage does not
      otherwise have. */
-  S.stage = e.target.value; S.view = 'dashboard'; S.nav = false; S.tal = false;
+  S.stage = b.dataset.stage; S.view = 'dashboard'; S.nav = false; S.tal = false;
   S.notif = false; S.read = []; S.peek = false; S.req = {};
   S.thread = []; S.typing = false; S.askFrom = 'dashboard';
-  render();
-};
-document.getElementById('reset').onclick = () => {
-  S.view = 'dashboard'; S.nav = false; S.tal = false;
-  S.notif = false; S.read = []; S.peek = false;
-  S.thread = []; S.typing = false; S.askFrom = 'dashboard';
-  S.confirm = false; S.sheet = false; S.tab = 'next'; S.iv = 'rafael';
-  /* AND THE THREE REQUESTS COME BACK UNANSWERED. Reset is "show me this
-     prototype from the top", and an accept is the one press in this portal
-     that changes what four other screens draw — the diary, the calendar, the
-     open-slot count and Tal's line about them. Left standing it would be a
-     demo that quietly starts one interview further on each time. */
-  S.req = {};
-  S.pfTab = 'me';
   render();
 };
 
@@ -7300,6 +7291,16 @@ document.getElementById('vp').addEventListener('click', e => {
   fitFrame();
 });
 window.addEventListener('resize', fitFrame);
+
+/* the floating chrome menu opens/closes; a click outside it closes it. */
+(function(){
+  const menu = document.getElementById('ptMenu'), tog = document.getElementById('ptToggle');
+  if(!menu || !tog) return;
+  tog.addEventListener('click', e => { e.stopPropagation();
+    const open = menu.classList.toggle('open'); tog.setAttribute('aria-expanded', open ? 'true' : 'false'); });
+  document.addEventListener('click', e => {
+    if(!menu.contains(e.target)){ menu.classList.remove('open'); tog.setAttribute('aria-expanded', 'false'); } });
+})();
 
 /* THE FIRST RENDER TAKES THE URL IF THERE IS ONE. `readHash` is a no-op on a
    plain open — no hash, so `S`'s own defaults stand and the portal still starts

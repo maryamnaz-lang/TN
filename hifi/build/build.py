@@ -1382,7 +1382,22 @@ css = '\n'.join((here / f).read_text() for f in
                  # boxes §27.1 and five later layers give `.tal-mk`. After
                  # §132 because it corrects §132, and after §115/§119/§107
                  # because it corrects those too.
-                 '133-orb-fit.css',])
+                 '133-orb-fit.css',
+                 # THE SIGN-UP ARTWORK IS A SLIDER — three photographs cross-faded
+                 # behind the welcome copy, position bars above the heading. Pure
+                 # CSS (no timer, so it never repaints the password field),
+                 # additive over §57's `.auth-brand`, so it sits last. NOT in the
+                 # design system: the photos are the candidate portal's own
+                 # onboarding art and only hifi emits the markup — `build-ds.py`
+                 # names it in `NOT_IN_DS`. Restored 18 Sep 2026 after the
+                 # `tn-loader` merge (28258cb) took Ibrahim's build.py wholesale
+                 # and dropped this entry; the layer file, its assets and the
+                 # `AUTH_ART` markup all survived the merge, only build.py's list
+                 # and the slide-embedding below were lost. NOTE the filename
+                 # collides with the orb's §132 above — a naming tidy to resolve
+                 # (rename this to 134) is flagged, but the cascade is correct as
+                 # listed: this is additive and lands last regardless of number.
+                 '132-authslide.css',])
 # ==========================================================================
 # NO HOVER
 # The state layer was fighting the layout everywhere it appeared: a wash on a
@@ -1728,6 +1743,22 @@ print(f'auth split artwork embedded: {(here / "auth-split.webp").stat().st_size/
 # is neither redrawn nor re-scaled.
 mark = base64.b64encode((here / 'auth-mark.webp').read_bytes()).decode()
 css = css.replace('__AUTHMARK__', f'data:image/webp;base64,{mark}')
+
+# THE THREE SLIDER PHOTOGRAPHS — §132 (the auth slider). Maryam's supplied
+# onboarding images, resized to 1080 wide and encoded WebP so three cost
+# ~200 KB rather than ~6 MB of source PNG. §132 paints them as cross-fading
+# `.auth-slide` layers; the base `__AUTHART__` gradient stays behind. Portal
+# only — `build-ds.py` declines §132 in `NOT_IN_DS`, so these tokens never
+# reach the design-system CSS. Restored 18 Sep 2026 with the LAYERS entry above
+# (the `tn-loader` merge dropped both).
+_slide_kb = 0
+for _i in (1, 2, 3):
+    _sl = here / f'welcome-slide-{_i}.webp'
+    css = css.replace(f'__SLIDE{_i}__',
+                      'data:image/webp;base64,' +
+                      base64.b64encode(_sl.read_bytes()).decode())
+    _slide_kb += _sl.stat().st_size / 1024
+print(f'welcome slider embedded: 3 slides, {_slide_kb:.0f} KB')
 
 # the client's award artwork — the coin stack, the four shields and the three
 # star medallions — embedded as one table so nothing on this page reaches the
@@ -2226,27 +2257,30 @@ HTML = f"""<!DOCTYPE html>
 </head>
 <body>
 <!-- prototype chrome — not part of the product -->
-<div class="pt-bar">
-  <img id="ptLogo" alt="TalentNext" style="height:18px;width:auto">
-  <span class="dot"></span>
-  <span class="pt-meta">Candidate portal · v24 · Material UI · Next in Leadership</span>
-  <span class="pt-lab">Stage</span>
-  <select class="pt-sel" id="pick" aria-label="Candidate stage"></select>
-  <div class="pt-vp" id="vp" role="group" aria-label="Viewport">
-    <button data-vp="mobile" class="on">Mobile</button>
-    <button data-vp="tablet">Tablet</button>
-    <button data-vp="fluid">Desktop</button>
-    <span class="pt-scale" id="vpscale">100%</span>
-  </div>
-  <div class="pt-nav">
-    <button id="back" title="Back" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15.4 7.4 14 6l-6 6 6 6 1.4-1.4-4.6-4.6z"/></svg></button>
-    <button id="reset" title="Reset this stage" aria-label="Reset"><svg viewBox="0 0 24 24"><path d="M12 5V2L8 6l4 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7Z"/></svg></button>
-  </div>
-</div>
-
+<!-- THE CHROME IS A FLOATING MENU, not the old top black bar (Maryam, 16 Sep
+     2026). §01's `.pt-menu` recipe: a kebab FAB bottom-right whose panel opens
+     upward and lists the stages and the device switcher INLINE — no logo row,
+     no nested <select>, no back/reset. `#pick` is now the `.pt-stages` container
+     (views.js fills it with `.pt-stage-opt` buttons); `#vp` / `#vpscale` are the
+     viewport switcher the tail script drives. The IDs the JS reads are kept. -->
 <div class="pt-stage">
   <div class="pt-fit" id="fit">
     <div class="device" id="device" data-vp="mobile"></div>
+  </div>
+</div>
+
+<div class="pt-menu" id="ptMenu">
+  <button class="pt-toggle" id="ptToggle" type="button" title="Prototype options" aria-label="Prototype options" aria-expanded="false"><svg viewBox="0 0 24 24"><path d="M12 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm0 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm0 6a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z"/></svg></button>
+  <div class="pt-panel">
+    <span class="pt-lab">Stage</span>
+    <div class="pt-stages" id="pick"></div>
+    <span class="pt-lab">Device</span>
+    <div class="pt-vp" id="vp" role="group" aria-label="Viewport">
+      <button data-vp="mobile" class="on">Mobile</button>
+      <button data-vp="tablet">Tablet</button>
+      <button data-vp="fluid">Desktop</button>
+      <span class="pt-scale" id="vpscale">100%</span>
+    </div>
   </div>
 </div>
 
