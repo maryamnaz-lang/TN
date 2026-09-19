@@ -5310,9 +5310,11 @@ function crow(kind, o){
           o.join === false ? `${c.second.t} ${I.arrowRight}` : `${c.second.ic}${c.second.t}`}</button>`}
         ${o.join === false ? ''
           /* THE RESCHEDULE STAGE SWAPS JOIN FOR A WHITE "Reschedule" (Maryam,
-             18 Sep 2026) that reopens the agent's booking calendar (`agent:<k>`)
-             rather than joining the call. */
-          : c.resched ? `<button class="btn btn-sm noic crow-resched" data-go="agent:${c.key}">Reschedule ${I.arrowRight}</button>`
+             18 Sep 2026) that reopens the agent's booking calendar rather than
+             joining the call. It uses `cal:<k>` (the calendar directly), NOT
+             `agent:<k>` — the interview is already paid, so rescheduling must not
+             re-open the payment step (Maryam, 19 Sep 2026). */
+          : c.resched ? `<button class="btn btn-sm noic crow-resched" data-go="cal:${c.key}">Reschedule ${I.arrowRight}</button>`
           : `<button class="btn btn-p btn-sm noic"${c.kind ? ` data-call="${c.kind}"` : ''}${
           gated ? ` data-joinwhen="${c.when}" data-joinmins="${c.mins || 45}"` : ''}${
           gate ? ` disabled title="${joinShut(c.when)}"` : ''}>Join call ${I.arrowRight}</button>`}
@@ -8879,9 +8881,13 @@ V.agent = (f) => {
         fee the fix is `AGENTS.<agent>.price` and all five surfaces follow; if
         it is the fee plus something this page does not draw, that something
         belongs in this row as a second line before the total does. */}
-  <div class="bkc">
-    <div class="bkc-fee"><span class="bkc-fl">Interview fee</span>
-      <span class="bkc-fv">${ivFeeLabel(isRe, a.price)}</span></div>
+  ${''/* PAYMENT ALREADY HAPPENED ON THE CHECKOUT STEP (Maryam, 19 Sep 2026):
+        booking now OPENS on `V.checkout` (via `agent:<k>`), so by the time the
+        reader reaches this calendar the card is captured (first interview, $0) or
+        the fee is charged (re-interview). This is the LAST step — it confirms the
+        chosen time and nothing more. The fee row and "Proceed to pay/book" are
+        gone; the fee lives on the payment step. */}
+  <div class="bks-w bkpay">
     ${''/* PAYING LANDS ON THE DASHBOARD, NOT ON A CONFIRMATION SCREEN (Maryam,
            31 Aug 2026: "rather than this screen after the payment, i would like
            to take the user directly on the dashboard where it now goes on
@@ -8916,42 +8922,35 @@ V.agent = (f) => {
           books straight away (`data-book`) and the success dialog opens on the
           booked dashboard. A CHARGED re-interview still goes to `V.checkout` for
           the card picker, and confirms there. */}
-    <button class="btn btn-p" ${ivCharged(isRe)?'data-go="checkout"':'data-book="1"'}>${ivCharged(isRe)?'Proceed to pay '+a.price:'Proceed to book'} ${I.arrowRight}</button>
+    <div class="bkpay-go"><button class="btn btn-p" data-book="1">Confirm booking ${I.arrowRight}</button></div>
   </div>
   </div>
 </div></main>`;
 };
 
-/* THE BOOKING CHECKOUT — Maryam, 6 Sep 2026. "Proceed to pay" lands here to
-   CHOOSE which saved card pays: the same `cardPicker` the course payment uses,
-   the default selected, "Add a card" opening the shared Stripe modal. Confirming
-   books — the button carries `stage:booked`, exactly where the old Proceed
-   button went, so a card choice is inserted between the click and the commit
-   without moving the destination. Back returns to the agent's booking page. No
-   `PAGESUM.checkout`, so the pass adds no Tal band — a focused checkout. */
+/* THE PAYMENT STEP — NOW THE FIRST SCREEN OF A BOOKING (Maryam, 19 Sep 2026).
+   Booking OPENS here, BEFORE the calendar: a candidate books an open slot only
+   after a payment method is on file. A FIRST interview is complimentary, so this
+   CAPTURES a card and charges $0 — the Stripe add-card modal opens on entry (from
+   `go('agent:<k>')`) and "Add a card" reopens it. A RE-interview shows the
+   saved-cards picker and charges the fee. `data-payok` raises the "Payment
+   successful" dialog (`paySuccessModal`), whose Continue goes to the calendar
+   (`cal:<k>`) to pick the time; the calendar's own button then confirms the
+   booking. This SUPERSEDES the old order (calendar first, pay second) and the
+   18 Sep "complimentary skips checkout" shortcut — the card/fee question now
+   comes first, every time. Back returns to where the reader came from (the
+   marketplace or the dashboard). No `PAGESUM.checkout`, so no Tal band. */
 V.checkout = (f) => {
   const a = AGENTS[S.agent||'priya'];
   const rec = REC[S.agent||'priya'];
   const isRe = !!f.reinterview;  /* first interview complimentary, re paid */
   const charged = ivCharged(isRe);
+  const first = a.n.split(' ')[0];
   return `<main class="main"><div class="page">
-  ${ph('Payment', null, null, 'agent')}
-  ${''/* THE PAYMENT PAGE KEEPS THE BOOKING PAGE'S SHAPE — Maryam, 9 Sep 2026:
-        "the payment page comes after the calendly page ... keep the previous
-        calendly page's agent section on top ... we only change the calendly ui
-        moving on the next page." So this MIRRORS V.agent's `.sec-bk`: the same
-        `.bkp` profile head (full width, its own hairline below), then the payment
-        content in the SAME 830px centred column the calendly card sat in
-        (`.bks-w`, §76.1b) rather than rail-to-rail — the checkout no longer
-        expands out of the picker's measure, so moving from the Calendly card to
-        this page only swaps the card, not the width.
-
-        THE FEE TILE AND PROCESSOR NOTE STAY GONE (Maryam, 7 Sep 2026): the price
-        is on the pay button and the card row states where the money goes. ADD A
-        CARD still rides the heading. The `.bkp` markup mirrors V.agent's — it
-        reads the same records, so only the template is repeated, not any figure.
-        The pay button sits inside `.bks-w` (left, under the picker) rather than
-        in `.bkc`, whose `margin-left:auto` would push it to the far right. */}
+  ${ph('Payment', null, null, 'agents')}
+  ${''/* THE AGENT HEAD MIRRORS V.agent's `.bkp` (Maryam, 9 Sep 2026) so moving
+        between the payment step and the calendar only swaps the card, not the
+        width — the same 830px `.bks-w` measure holds both. */}
   <div class="sec sec-bk">
     <div class="bkp">
       <div class="agid">
@@ -8967,18 +8966,57 @@ V.checkout = (f) => {
         </div>
       </div>
     </div>
-    ${''/* A COMPLIMENTARY FIRST INTERVIEW ASKS FOR NO CARD (16.3, 15 Sep 2026).
-          When there is nothing to charge the card picker is dropped and the page
-          just confirms the booking; a paid re-interview keeps the picker. */}
+    ${''/* FREE (first interview): NO card is on file yet, so the screen shows an
+          EMPTY-STATE placeholder (a card glyph + "No payment method added yet"),
+          never a saved card (Maryam, 19 Sep 2026). "Add a card" opens the Stripe
+          modal; the CTA reads "Continue to Pay". PAID (re-interview): the
+          saved-cards picker, the fee on the button. Either way `data-payok` raises
+          the success dialog — it does NOT commit the booking (the calendar does). */}
     <div class="bks-w bkpay">
       ${charged
         ? `<div class="sec-h"><h2>Pay with</h2>${addCardAct}</div>
       ${cardPicker()}`
-        : `<div class="tile"><p class="t-body-01">Your first interview is <b>complimentary</b>. There is nothing to pay. Confirm to book your time with ${a.n.split(' ')[0]}.</p></div>`}
-      <div class="bkpay-go"><button class="btn btn-p" data-book="1">${charged?'Pay '+a.price+' and book':'Confirm and book'} ${I.arrowRight}</button></div>
+        : `<div class="tile"><p class="t-body-01">Your first interview with ${first} is <b>complimentary</b>, so <b>$0</b> is charged today. Add a payment method to continue; it is saved securely for your next booking.</p></div>
+      <div class="sec-h"><h2>Payment method</h2>${addCardAct}</div>
+      <div class="empty pm-empty">${I.creditCard}<h3>No payment method added yet</h3><p>Add a card to continue. Your first interview is complimentary, so nothing is charged today.</p></div>`}
+      <div class="bkpay-go"><button class="btn btn-p" data-payok="1">${charged?'Pay '+a.price:'Continue to Pay'} ${I.arrowRight}</button></div>
     </div>
   </div>
   </div></main>`;
+};
+
+/* THE PAYMENT-SUCCESS DIALOG (Maryam, 19 Sep 2026) — the receipt beat between the
+   payment step and the calendar. `data-payok` sets `S.paySuccess` and this renders
+   over `V.checkout`: a FIRST booking reads "$0, complimentary, card saved", a
+   re-interview reads "<fee> charged to <card>". Its one control (`data-paygo`)
+   clears the flag and opens the calendar (`cal:<k>`) to pick a time. The shell is
+   `ivBookedModal`'s `.conf conf-ok` — the portal's success dialog. */
+const paySuccessModal = () => {
+  const a = AGENTS[S.agent||'priya'] || AGENTS.priya;
+  const isRe = !!cfg(S.stage).reinterview;
+  const charged = ivCharged(isRe);
+  return `<div class="modal on" data-close="paysuccess">
+    <div class="sheet conf conf-ok" role="dialog" aria-modal="true" aria-label="Payment successful">
+      <div class="sheet-b conf-b">
+        <span class="conf-mk">${I.checkFilled}</span>
+        <h2 class="conf-t">Payment successful</h2>
+        ${''/* THE AMOUNT IS ITS OWN ROW, not a figure buried in the copy (Maryam,
+              19 Sep 2026): an "Interview Fee" label over the value, reusing the
+              booking page's own fee treatment (`.bkc-fee`/`.bkc-fl`/`.bkc-fv`). A
+              complimentary first interview shows the standard fee STRUCK with
+              "Free" beside it (`ivFeeLabel`); a re-interview shows the charged
+              amount. The copy then explains, without repeating the figure. */}
+        <div class="bkc-fee pay-fee" style="align-items:center"><span class="bkc-fl">Interview Fee</span>
+          <span class="bkc-fv">${charged ? a.price : ivFeeLabel(false, a.price)}</span></div>
+        <p class="conf-x">${charged
+          ? `Your payment was successfully processed. You can now continue to select a time for your interview.`
+          : `Your first interview is complimentary, so no payment was charged. Your payment method has been saved for future bookings.`}</p>
+      </div>
+      <div class="sheet-f conf-a">
+        <button class="btn btn-p noic" data-paygo="${S.agent||'priya'}">Pick a slot</button>
+      </div>
+    </div>
+  </div>`;
 };
 
 /* `.stickybar` IS NOW DRAWN BY NOTHING IN THIS PORTAL, AND ITS RULES STAY.
@@ -14104,7 +14142,19 @@ function histWrite(fn, arg1, arg2, arg3){
 function go(target, fresh){
   if(target.startsWith('stage:')){ const p = target.slice(6).split('/');
     setStage(p[0]); if(p[1]){ S.view = p[1]; S.nav = false; render(); } return; }
-  if(target.startsWith('agent:')){ S.agent = target.slice(6); S.hist.push(S.view); histWrite('pushState',{v:'agent'},''); S.view='agent'; S.nav=false; render(); return; }
+  /* BOOKING STARTS WITH PAYMENT (Maryam, 19 Sep 2026): the marketplace card, the
+     list "Book" button and the dashboard recommendation all open the PAYMENT step
+     first (`V.checkout`), then the calendar. A FIRST interview is complimentary,
+     and its payment screen shows an EMPTY STATE (no card on file) until "Add a
+     card" opens the Stripe modal — the modal no longer auto-opens, so the missing-
+     method placeholder is what the reader lands on (Maryam, 19 Sep 2026). A
+     re-interview shows the saved-cards picker to charge the fee. `cal:` reaches
+     the calendar directly — reschedule, and "Continue" after payment — without
+     re-charging. The DS agent-card builder still emits `agent:${key}` unchanged;
+     this branch is what gives it the payment-first meaning here. */
+  if(target.startsWith('agent:')){ S.agent = target.slice(6); S.paySuccess=false; S.payWith=null; S.addCard=false;
+    S.hist.push(S.view); histWrite('pushState',{v:'checkout'},''); S.view='checkout'; S.nav=false; render(); return; }
+  if(target.startsWith('cal:')){ S.agent = target.slice(4); S.hist.push(S.view); histWrite('pushState',{v:'agent'},''); S.view='agent'; S.nav=false; render(); return; }
   /* ENTERING THE MODULE LANDS ON THE CHAPTER MENU, ALWAYS.
      `chapter:N` used to open our chapter N directly, and thirteen of our
      chapters do not map onto LightspeedVT's four. More to the point, where you
@@ -15364,7 +15414,12 @@ function render(){
          /* THE BOOKING SUCCESS DIALOG — gated on the MOMENT like `enrolSheet`:
             `S.ivBooked` is set by the booking action, which lands on `booked`,
             so it shows once on that dashboard and is cleared on dismiss. */
-         + (S.ivBooked && (S.stage==='booked' || S.stage===RESCHED) ? ivBookedModal() : '');
+         + (S.ivBooked && (S.stage==='booked' || S.stage===RESCHED) ? ivBookedModal() : '')
+         /* THE PAYMENT-SUCCESS DIALOG (Maryam, 19 Sep 2026) — shown over the
+            payment step (`V.checkout`) once `data-payok` fires, before the
+            calendar. Gated on the view so it clears itself the moment Continue
+            leaves for the calendar. */
+         + (S.view==='checkout' && S.paySuccess ? paySuccessModal() : '');
   }
   /* THE CALL IS PART OF THE KEY, because it is a whole surface arriving and
      leaving: without it, joining a call is a repaint of the same stage and
@@ -15633,7 +15688,17 @@ device.addEventListener('click', e => {
      `data-book` skips the checkout screen, lands on the booked dashboard
      (`setStage('booked')` renders) and raises the success dialog (`S.ivBooked`).
      The button and the backdrop clear it onto the dashboard behind. */
-  if(t.closest('[data-book]')){ S.ivBooked = true; setStage('booked'); return; }
+  if(t.closest('[data-book]')){ S.paySuccess = false; S.ivBooked = true; setStage('booked'); return; }
+
+  /* THE PAYMENT STEP (Maryam, 19 Sep 2026). `data-payok` confirms the payment
+     (card captured at $0 for a first interview, or the fee charged for a
+     re-interview) and raises the success dialog; it does NOT book — that is the
+     calendar's job. `data-paygo` clears the dialog and opens the calendar
+     (`cal:<k>`) to pick a time. The backdrop dismisses the dialog in place. */
+  if(t.closest('[data-payok]')){ S.paySuccess = true; render(); return; }
+  const pgo = t.closest('[data-paygo]');
+  if(pgo){ S.paySuccess = false; go('cal:' + pgo.dataset.paygo); return; }
+  if(t.closest('[data-close="paysuccess"]') && !t.closest('.sheet')){ S.paySuccess = false; render(); return; }
   const ivbk = t.closest('[data-ivbooked]');
   if(ivbk){ S.ivBooked = ivbk.dataset.ivbooked === '1'; render(); return; }
   if(t.closest('[data-close="ivbooked"]') && !t.closest('.sheet')){ S.ivBooked=false; render(); return; }

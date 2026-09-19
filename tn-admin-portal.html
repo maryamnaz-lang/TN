@@ -3622,15 +3622,18 @@ function usersAll(){
      (Epic 1). The doc keeps the two apart: "an account never appears in both".
      Role is a TAB STRIP (Maryam 13 Sep 2026, overriding the doc's Type dropdown),
      dropping the internal (Admin) bucket. */
-  const ext = USERS.filter(u => !u.internal);
-  const extTabs = ROLE_OPTS.filter(([v]) => v !== 'admin')
+  /* Employers are not part of the system for now (Maryam, 19 Sep 2026: "remove
+     the Employers tab entirely, as employers are not currently part of our
+     system") — no Employer tab and no employer rows on this screen. */
+  const ext = USERS.filter(u => !u.internal && !u.roles.includes('employer'));
+  const extTabs = ROLE_OPTS.filter(([v]) => v !== 'admin' && v !== 'employer')
     .map(([v, l]) => [v, l, v === 'all' ? ext.length : ext.filter(u => u.roles.includes(v)).length]);
   const rows = ext.filter(u => rf === 'all' ? true : u.roles.includes(rf))
     .filter(u => sf === 'all' ? true : sf === 'active' ? active(u) : sf === 'invited' ? u.status === 'invited' : (!active(u) && u.status !== 'invited'))
     .filter(u => hit(q, u.name, u.email, u.company));
   return `
   <section class="sec">
-    ${searchHead('All users', 'Every candidate, agent, cohort leader and employer on the platform. Internal staff are in the Staff directory. A row opens the full record.',
+    ${searchHead('All users', 'Every candidate, agent and cohort leader on the platform. Internal staff are in the Staff directory. A row opens the full record.',
       `<button class="btn btn-g btn-sm noic" data-go="users/import">${I.download} Bulk Import</button>
        <button class="btn btn-p btn-sm noic" data-sheet="adduser">${I.add} Add User</button>`)}
     ${filterStrip('role', 'all', extTabs)}
@@ -4180,42 +4183,39 @@ ACTIONS.dodelext = key => {
 KINDS.role = {
   label:'role', mod:'Users & Roles', after:'users/roles',
   find: k => ROLE_BY_K[k], name: r => r.name,
+  /* Every role added here is INTERNAL (Maryam, 19 Sep 2026: "the roles added by
+     the Super Admin ... will be treated as the system's internal roles"), so the
+     Kind field is gone and create/update fix `kind:'internal'`. */
   fields: [
     {k:'name', l:'Role name', t:'text', req:1, ph:'e.g. Calibration Lead'},
-    {k:'kind', l:'Kind', t:'select', opts:[['external', 'External — part of the product'], ['internal', 'Internal — runs the platform']], def:'internal'},
     {k:'desc', l:'What it does', t:'textarea', req:1, ph:'One sentence a new admin can read'}
   ],
   help:'A new role starts with no capabilities. Grant them in the permission matrix below; every grant is logged.',
   okNew:'Create Role',
-  create: v => { const k = v.name.toLowerCase().replace(/[^a-z0-9]+/g, '') || newId('role', ROLES); const r = {k, name:v.name, short:v.name, kind:v.kind, desc:v.desc}; ROLES.push(r); ROLE_BY_K[k] = r; MATRIX[k] = {}; return r; },
-  update: (r, v) => { r.name = v.name; r.short = v.name; r.kind = v.kind; r.desc = v.desc; },
+  create: v => { const k = v.name.toLowerCase().replace(/[^a-z0-9]+/g, '') || newId('role', ROLES); const r = {k, name:v.name, short:v.name, kind:'internal', desc:v.desc}; ROLES.push(r); ROLE_BY_K[k] = r; MATRIX[k] = {}; return r; },
+  update: (r, v) => { r.name = v.name; r.short = v.name; r.kind = 'internal'; r.desc = v.desc; },
   remove: r => { ROLES.splice(ROLES.indexOf(r), 1); delete ROLE_BY_K[r.k]; delete MATRIX[r.k]; USERS.forEach(u => { u.roles = u.roles.filter(x => x !== r.k); }); },
   guard: r => r.k === 'admin' ? 'The Super Admin role can’t be deleted' : null,
   delWarn: r => { const n = USERS.filter(u => u.roles.includes(r.k)).length; return `Its permissions are removed${n ? ` and the role is stripped from ${n} ${n === 1 ? 'account' : 'accounts'}` : ''}.`; }
 };
 function usersRoles(){
-  const kind = getFilter('kind', 'all');
-  /* The kind tab now leads with "All" (Maryam, 14 Sep 2026), so the roles table
-     gains a "Type" column to keep External/Internal legible when both are shown —
-     the same conditional-column pattern the Users list uses for "Added by". On the
-     External/Internal tabs the type is implied by the tab, so the column drops. */
-  const showType = kind === 'all';
-  const roles = kind === 'all' ? ROLES.slice() : ROLES.filter(r => r.kind === kind);
+  /* A single Roles view — the internal roles the Super Admin manages (Maryam,
+     19 Sep 2026: "remove the External Roles category ... there is no need to
+     maintain separate All and Internal tabs ... a single Roles view containing
+     the roles added by the Super Admin ... treated as the system's internal
+     roles"). External roles (candidate / agent / cohort leader) are self-serve
+     product memberships, not admin-managed roles, so they are not listed here;
+     the External/Internal kind tabs and the Type column go with them. */
+  const roles = ROLES.filter(r => r.kind === 'internal');
   const usersWith = k => USERS.filter(u => u.roles.includes(k)).length;
   const editing = !!S.editPerms;
   return `
   <section class="sec">
-    ${aiHead('Roles', 'Every role a person can hold and what it grants. External roles are self-serve; internal roles are assigned by an admin.', addBtn('role', 'New Role'))}
-    <div class="cs lst-filt" role="tablist" aria-label="Kind">
-      <button role="tab" class="${kind === 'all' ? 'on' : ''}" data-filter="kind:all">All<span class="lf-n">${ROLES.length}</span></button>
-      <button role="tab" class="${kind === 'external' ? 'on' : ''}" data-filter="kind:external">External<span class="lf-n">${ROLES.filter(r => r.kind === 'external').length}</span></button>
-      <button role="tab" class="${kind === 'internal' ? 'on' : ''}" data-filter="kind:internal">Internal<span class="lf-n">${ROLES.filter(r => r.kind === 'internal').length}</span></button>
-    </div>
+    ${aiHead('Roles', 'Every internal role the Super Admin manages and what it grants.', addBtn('role', 'New Role'))}
     ${table(
-      [{label:'Role'}, ...(showType ? [{label:'Type'}] : []), {label:'What it does'}, {label:'Users'}, ACT_COL],
+      [{label:'Role'}, {label:'What it does'}, {label:'Users'}, ACT_COL],
       roles.map(r => ({sv:[r.name], cells:[
         `<div>${esc(r.name)}${r.k === 'admin' ? ' <span class="tag sm rl-default">Default</span>' : ''}</div>`,
-        ...(showType ? [`<span class="tag sm">${cap(r.kind)}</span>`] : []),
         esc(r.desc),
         String(usersWith(r.k)),
         r.k === 'admin' ? '' : rowActs([editBtn('role', r.k), delBtn('role', r.k)])
