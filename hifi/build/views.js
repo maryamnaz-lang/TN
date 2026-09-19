@@ -8969,17 +8969,25 @@ V.checkout = (f) => {
     ${''/* FREE (first interview): NO card is on file yet, so the screen shows an
           EMPTY-STATE placeholder (a card glyph + "No payment method added yet"),
           never a saved card (Maryam, 19 Sep 2026). "Add a card" opens the Stripe
-          modal; the CTA reads "Continue to Pay". PAID (re-interview): the
-          saved-cards picker, the fee on the button. Either way `data-payok` raises
-          the success dialog — it does NOT commit the booking (the calendar does). */}
+          modal, and closing it flips `S.pmAdded` — the empty state is then replaced
+          by the saved card AND the CTA "Continue to Pay" appears. WHILE NO CARD IS
+          ON FILE THERE IS NO BUTTON (Maryam, 19 Sep 2026: "remove button when no
+          payment method is added") — you cannot continue without adding one. PAID
+          (re-interview): the saved-cards picker, the fee on the button, always
+          shown. Either way `data-payok` raises the success dialog — it does NOT
+          commit the booking (the calendar does). */}
     <div class="bks-w bkpay">
       ${charged
         ? `<div class="sec-h"><h2>Pay with</h2>${addCardAct}</div>
       ${cardPicker()}`
         : `<div class="tile"><p class="t-body-01">Your first interview with ${first} is <b>complimentary</b>, so <b>$0</b> is charged today. Add a payment method to continue; it is saved securely for your next booking.</p></div>
       <div class="sec-h"><h2>Payment method</h2>${addCardAct}</div>
-      <div class="empty pm-empty">${I.creditCard}<h3>No payment method added yet</h3><p>Add a card to continue. Your first interview is complimentary, so nothing is charged today.</p></div>`}
-      <div class="bkpay-go"><button class="btn btn-p" data-payok="1">${charged?'Pay '+a.price:'Continue to Pay'} ${I.arrowRight}</button></div>
+      ${S.pmAdded
+        ? cardPicker()
+        : `<div class="empty pm-empty">${I.creditCard}<h3>No payment method added yet</h3><p>Add a card to continue. Your first interview is complimentary, so nothing is charged today.</p></div>`}`}
+      ${(charged || S.pmAdded)
+        ? `<div class="bkpay-go"><button class="btn btn-p" data-payok="1">${charged?'Pay '+a.price:'Continue to Pay'} ${I.arrowRight}</button></div>`
+        : ''}
     </div>
   </div>
   </div></main>`;
@@ -14152,7 +14160,7 @@ function go(target, fresh){
      the calendar directly — reschedule, and "Continue" after payment — without
      re-charging. The DS agent-card builder still emits `agent:${key}` unchanged;
      this branch is what gives it the payment-first meaning here. */
-  if(target.startsWith('agent:')){ S.agent = target.slice(6); S.paySuccess=false; S.payWith=null; S.addCard=false;
+  if(target.startsWith('agent:')){ S.agent = target.slice(6); S.paySuccess=false; S.payWith=null; S.addCard=false; S.pmAdded=false;
     S.hist.push(S.view); histWrite('pushState',{v:'checkout'},''); S.view='checkout'; S.nav=false; render(); return; }
   if(target.startsWith('cal:')){ S.agent = target.slice(4); S.hist.push(S.view); histWrite('pushState',{v:'agent'},''); S.view='agent'; S.nav=false; render(); return; }
   /* ENTERING THE MODULE LANDS ON THE CHAPTER MENU, ALWAYS.
@@ -15769,7 +15777,11 @@ device.addEventListener('click', e => {
   const pt = t.closest('[data-paytab]');
   if(pt){ S.payTab = pt.dataset.paytab; render(); return; }
   const px = t.closest('[data-payclose]');
-  if(px){ if(px.classList.contains('modal') && e.target !== px) return; S.addCard=false; render(); return; }
+  /* CLOSING THE ADD-CARD MODAL ON THE BOOKING PAYMENT STEP means a card is now on
+     file (Maryam, 19 Sep 2026): `S.pmAdded` flips the free checkout from the empty
+     state to the saved card + "Continue to Pay". Scoped to the checkout view so it
+     never fires on the course payment or the Payments page. */
+  if(px){ if(px.classList.contains('modal') && e.target !== px) return; S.addCard=false; if(S.view==='checkout') S.pmAdded=true; render(); return; }
   /* CHOOSING WHICH SAVED CARD TO PAY WITH (the card-picker on the course payment
      and the booking checkout). `data-paypick` sets the index; `data-setdef` below
      is a different thing — it changes the account's DEFAULT card on the Payments
