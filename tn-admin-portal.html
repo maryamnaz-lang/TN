@@ -4974,12 +4974,16 @@ const ADM_SCENE_SET = [
   ['The Friday rhythm', '19:37'],       ['Managing up', '24:50'],
   ['Conflict with a peer', '31:15'],    ['Closing reflection', '41:03']
 ];
-const ADM_FACES = [AV.priya, AV.owen, AV.lena, AV.samuel, AV.hana];
+/* A DISTINCT PROFILE PHOTO PER PERSON (Maryam, 20 Sep 2026: "use different images
+   for the candidates ... you do have different images ... we are using them
+   overall on the platform"). The platform's own avatar set — the ten discs in
+   `hifi/build/avatars/` (av1 + b1..b4 + g1..g5) the candidate portal uses — is
+   assigned deterministically by a name hash, so a person keeps the same photo
+   everywhere and the table reads as ten different faces. */
+const ADM_AVATARS = ['av1', 'b1', 'b2', 'b3', 'b4', 'g1', 'g2', 'g3', 'g4', 'g5'];
 function agentFace(name){
-  const first = String(name || '').trim().toLowerCase().split(/\s+/)[0];
-  if(AV[first]) return AV[first];
   let h = 0; for(const ch of String(name || '')) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
-  return ADM_FACES[h % ADM_FACES.length];
+  return 'hifi/build/avatars/' + ADM_AVATARS[h % ADM_AVATARS.length] + '.jpg';
 }
 /* ALIGNED (14 Sep 2026): the carousel MARKUP is now the shipped `dsScenes`
    builder — `sceneCardAdm` was a hand-copy of `.scv*` (its own note said "the
@@ -7270,20 +7274,35 @@ ACTIONS.dopayoutbank = () => { const amt = FIN_BALANCE.available; FIN_BALANCE.in
    (VISA / AMEX) are artwork (§63's stated capitals exception); Mastercard is its
    two-disc mark; ACH / bank transfer is a neutral bank glyph. Each is a small
    card chip on the one hairline. */
-const METHOD_ART = {
-  visa:'<svg viewBox="0 0 36 24" width="36" height="24" role="img" aria-label="Visa"><rect x=".5" y=".5" width="35" height="23" rx="4" fill="#fff" stroke="#efefef"/><text x="18" y="16" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="10" font-weight="700" font-style="italic" letter-spacing=".4" fill="#1434CB">VISA</text></svg>',
-  mastercard:'<svg viewBox="0 0 36 24" width="36" height="24" role="img" aria-label="Mastercard"><rect x=".5" y=".5" width="35" height="23" rx="4" fill="#fff" stroke="#efefef"/><circle cx="15" cy="12" r="6.5" fill="#EB001B"/><circle cx="21" cy="12" r="6.5" fill="#F79E1B"/><path d="M18 6.7a6.5 6.5 0 0 0 0 10.6 6.5 6.5 0 0 0 0-10.6z" fill="#FF5F00"/></svg>',
-  amex:'<svg viewBox="0 0 36 24" width="36" height="24" role="img" aria-label="American Express"><rect x=".5" y=".5" width="35" height="23" rx="4" fill="#1F72CD"/><text x="18" y="15" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="8" font-weight="700" letter-spacing=".3" fill="#fff">AMEX</text></svg>',
-  ach:'<svg viewBox="0 0 36 24" width="36" height="24" role="img" aria-label="Bank transfer (ACH)"><rect x=".5" y=".5" width="35" height="23" rx="4" fill="#fff" stroke="#efefef"/><g fill="#475569"><path d="M18 5l7.5 4.2H10.5z"/><rect x="12" y="10.2" width="2.2" height="5.6"/><rect x="16.9" y="10.2" width="2.2" height="5.6"/><rect x="21.8" y="10.2" width="2.2" height="5.6"/><rect x="10.6" y="16.4" width="14.8" height="2"/></g></svg>'
+/* THE REAL BRAND LOGOS (Maryam, 20 Sep 2026: "use real images, be careful of the
+   sizes, adjust them accordingly") — the files she added under hifi/, referenced
+   by path (served alongside the portal), never the card number. Sized by HEIGHT
+   with width auto; Mastercard's file carries wide whitespace padding around the
+   discs, so it takes a taller box (h30) to read at the same visual size as the
+   two wordmarks (~16px). A bank transfer (ACH) has no card brand, so it shows the
+   processor's mark (Stripe). Amex has no supplied file — it keeps a drawn mark. */
+const METHOD_IMG = {
+  visa:      {src:'hifi/visa-1.jpg',             h:16, label:'Visa'},
+  mastercard:{src:'hifi/mastercard-logo-0.webp', h:30, label:'Mastercard'},
+  stripe:    {src:'hifi/m_logo.png',             h:15, label:'Stripe'}
 };
-METHOD_ART.bank = METHOD_ART.ach;
+METHOD_IMG.ach  = Object.assign({}, METHOD_IMG.stripe, {label:'Bank transfer (ACH) via Stripe'});
+METHOD_IMG.bank = Object.assign({}, METHOD_IMG.stripe, {label:'Bank transfer via Stripe'});
+/* AMEX shows the STRIPE mark too (Maryam, 20 Sep 2026: "use stripe logo instead
+   of amex") — only Visa and Mastercard carry their own brand image; every other
+   method (Amex, ACH, bank) reads as processed by Stripe. */
+METHOD_IMG.amex = Object.assign({}, METHOD_IMG.stripe, {label:'Stripe'});
+const METHOD_ART = {};
 const methodBrand = m => (!m || m === '—') ? '' : m.trim().split(/[\s•]/)[0];
-const METHOD_LABEL = {visa:'Visa', mastercard:'Mastercard', amex:'American Express', ach:'Bank transfer (ACH)', bank:'Bank transfer'};
-/* THE METHOD CELL — the brand icon alone, no number. Falls back to the brand
-   word for an unknown provider, and a dash for none. */
+const METHOD_LABEL = {};
+/* THE METHOD CELL — the brand logo alone, no number. A real image where one was
+   supplied, else the drawn Amex mark, else the brand word, and a dash for none. */
 function methodMark(method){
   const b = methodBrand(method); if(!b) return '<span class="t-caption">—</span>';
-  const key = b.toLowerCase(); const svg = METHOD_ART[key];
+  const key = b.toLowerCase();
+  const img = METHOD_IMG[key];
+  if(img) return `<span class="pay-mk" title="${esc(img.label)}"><img src="${img.src}" alt="${esc(img.label)}" style="height:${img.h}px"></span>`;
+  const svg = METHOD_ART[key];
   return svg ? `<span class="pay-mk" title="${esc(METHOD_LABEL[key] || b)}">${svg}</span>` : `<span class="t-caption">${esc(b)}</span>`;
 }
 
