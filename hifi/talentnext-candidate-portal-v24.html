@@ -8853,6 +8853,18 @@ button.btn-p:active,
 .app .wing-lvl .ladder i > b{font-weight:600;font-style:normal;display:block}
 .app .wing-lvl .ladder i.done{color:var(--on-accent);--on-brand-color:1}
 .app .wing-lvl .ladder i.on{color:var(--text-primary)}
+.app .iv-ladder .ladder i{
+  display:grid;place-items:center;
+  background:var(--layer-accent-01);
+  font-size:10px;line-height:1;font-weight:600;letter-spacing:.4px;
+  font-style:normal;font-variant-numeric:tabular-nums;
+  color:var(--text-secondary)}
+.app .iv-ladder .ladder i > b{font-weight:600;font-style:normal;display:block}
+.app .iv-ladder .ladder i.done{background:var(--accent);opacity:1;color:var(--on-accent)}
+.app .iv-ladder .ladder i.on{
+  background:color-mix(in srgb, var(--accent) 22%, var(--background));
+  color:var(--text-primary)}
+.app .iv-ladder .ladder-lab{color:var(--text-helper)}
 .app .wing-lvl .ladder i.on{
   --lvl-a:color-mix(in srgb, var(--accent) 14%, #fff);
   --lvl-b:color-mix(in srgb, var(--accent) 38%, #fff);
@@ -13191,7 +13203,6 @@ button.btn-p:active,
 .app .conf.conf-ok > .conf-a{padding-top:0}
 .app .conf.conf-ok .conf-a .btn-p{
   background:var(--layer-02);border:1px solid var(--rule)}
-.app .conf.conf-ok > .conf-b:has(.conf-x){padding-bottom:var(--s05)}
 .app .ol .acc-h .ttl{
   display:flex;flex-direction:column;align-items:flex-start}
 .app .ol .ol-m{margin-top:2px}
@@ -14812,6 +14823,12 @@ button.btn-p:active,
     38%{clip-path:inset(0 0 0 100%)}   
     100%{clip-path:inset(0 0 0 100%)}} 
 }
+.app .conf{padding:var(--s05)}
+.app .conf > .conf-b,.app .conf.conf-ok > .conf-b{padding:0}
+.app .conf > .conf-a,.app .conf.conf-ok > .conf-a{padding:var(--s05) 0 0}
+.app .conf .conf-mk,.app .conf.conf-ok .conf-mk{
+  background:var(--accent);box-shadow:none;margin-bottom:var(--s04)}
+.app .conf .conf-mk svg,.app .conf.conf-ok .conf-mk svg{color:var(--on-accent)}
 
 </style>
 </head>

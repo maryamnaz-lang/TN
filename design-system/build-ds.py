@@ -1075,6 +1075,12 @@ LAYERS = [
     # place hifi's build appends it after every other JS layer.
     '132-orb.css',
     '133-orb-fit.css',
+    # §134 — the one `.conf` modal treatment (Maryam, 21 Sep 2026). The Super
+    # Admin's solid-accent disc + white glyph and 16px frame, now the shared
+    # source. Every rule is on `.conf*`, a component the DS already ships, so the
+    # whole layer crosses — it is what brings the agent (and any new portal) onto
+    # the same modal look the admin's own local copy already had.
+    '134-confmodal.css',
 ]
 
 # ==========================================================================

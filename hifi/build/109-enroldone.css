@@ -119,11 +119,8 @@
 .app .conf.conf-ok .conf-a .btn-p{
   background:var(--layer-02);border:1px solid var(--rule)}
 
-/* A SUCCESS DIALOG'S DESC WANTS AIR BEFORE THE CTA (Maryam, 20 Sep 2026): the
-   §109 tightening dropped this body's foot to `--s03`, which sat the button tight
-   under the copy on every `.conf-ok` that carries a description (pay success,
-   interview booked). Any success body with a `.conf-x` pads its foot one step
-   more; a body with no desc (mark + title only) keeps the tighter foot. The fee
-   row keeps §76's centred column stack (Interview Fee over the amount) — Maryam
-   took back the one-line label/value layout, 20 Sep 2026. Layout only, after §63. */
-.app .conf.conf-ok > .conf-b:has(.conf-x){padding-bottom:var(--s05)}
+/* The desc-to-CTA gap is now §134's job — it zeroes `.conf-b` padding and puts a
+   16px (`--s05`) foot on `.conf-a`, uniform across every portal's modals — so the
+   20 Sep per-`.conf-x` padding-bottom is removed (it would have beaten §134's
+   conf-b rule on specificity and re-introduced the disagreement). The fee row
+   keeps §76's centred column stack (Interview/Course Fee over the amount). */

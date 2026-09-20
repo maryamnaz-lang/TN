@@ -14,7 +14,7 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 6176.  Rules dropped as product-specific: 222.
+   Rules kept: 6185.  Rules dropped as product-specific: 222.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
@@ -6669,6 +6669,11 @@ button.btn-p:active,
 .app .wing-lvl .ladder i > b{font-weight:600; font-style:normal; display:block}
 .app .wing-lvl .ladder i.done{color:var(--on-accent); --on-brand-color:1}
 .app .wing-lvl .ladder i.on{color:var(--text-primary)}
+.app .iv-ladder .ladder i{display:grid; place-items:center; background:var(--layer-accent-01); font-size:10px; line-height:1; font-weight:600; letter-spacing:.4px; font-style:normal; font-variant-numeric:tabular-nums; color:var(--text-secondary)}
+.app .iv-ladder .ladder i > b{font-weight:600; font-style:normal; display:block}
+.app .iv-ladder .ladder i.done{background:var(--accent); opacity:1; color:var(--on-accent)}
+.app .iv-ladder .ladder i.on{background:color-mix(in srgb, var(--accent) 22%, var(--background)); color:var(--text-primary)}
+.app .iv-ladder .ladder-lab{color:var(--text-helper)}
 .app .wing-lvl .ladder i.on{--lvl-a:color-mix(in srgb, var(--accent) 14%, #fff); --lvl-b:color-mix(in srgb, var(--accent) 38%, #fff); position:relative; overflow:hidden; opacity:1; background-color:var(--lvl-a); background-image:none}
 .app .wing-lvl .ladder i.on::before{content:''; position:absolute; top:0; bottom:0; left:-100%; width:300%; pointer-events:none; background:repeating-linear-gradient(90deg,
     var(--lvl-a) 0, var(--lvl-b) 16.667%, var(--lvl-a) 33.333%); animation:lvl-live 1.6s linear infinite}
@@ -9169,7 +9174,6 @@ button.btn-p:active,
 .app .conf.conf-ok .conf-mk{margin-bottom:var(--s04)}
 .app .conf.conf-ok > .conf-a{padding-top:0}
 .app .conf.conf-ok .conf-a .btn-p{background:var(--layer-02); border:1px solid var(--rule)}
-.app .conf.conf-ok > .conf-b:has(.conf-x){padding-bottom:var(--s05)}
 
 /* ---- 110-outline.css ---- */
 .app .ol .acc-h .ttl{display:flex; flex-direction:column; align-items:flex-start}
@@ -9977,3 +9981,14 @@ button.btn-p:active,
 .app .ob-orb-sm .borb.tal-mk{width:var(--ob-orb-sm); height:var(--ob-orb-sm); --borb-size:calc(var(--ob-orb-sm) * 1.24)}
 .app .modhead .ai-aura.talsum > .ai-head > .ai-label:has(> .borb)::before{content:none}
 .app .modhead .ai-aura.talsum > .ai-head > .ai-label > .borb.tal-mk{width:28px; height:28px; --borb-size:34.8px}
+
+/* ---- 134-confmodal.css ---- */
+.app .conf{padding:var(--s05)}
+.app .conf > .conf-b,
+.app .conf.conf-ok > .conf-b{padding:0}
+.app .conf > .conf-a,
+.app .conf.conf-ok > .conf-a{padding:var(--s05) 0 0}
+.app .conf .conf-mk,
+.app .conf.conf-ok .conf-mk{background:var(--accent); box-shadow:none; margin-bottom:var(--s04)}
+.app .conf .conf-mk svg,
+.app .conf.conf-ok .conf-mk svg{color:var(--on-accent)}

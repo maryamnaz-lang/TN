@@ -1397,7 +1397,13 @@ css = '\n'.join((here / f).read_text() for f in
                  # collides with the orb's §132 above — a naming tidy to resolve
                  # (rename this to 134) is flagged, but the cascade is correct as
                  # listed: this is additive and lands last regardless of number.
-                 '132-authslide.css',])
+                 '132-authslide.css',
+                 # §134 — ONE `.conf` MODAL TREATMENT ON EVERY PORTAL (Maryam,
+                 # 21 Sep 2026). The Super Admin's solid-accent disc + white glyph
+                 # and 16px frame, brought onto the shared source so candidate /
+                 # leader / agent match it. Lands last so it wins over §03/§105/
+                 # §109's tinted-halo disc and their paddings. Crosses to the DS.
+                 '134-confmodal.css',])
 # ==========================================================================
 # NO HOVER
 # The state layer was fighting the layout everywhere it appeared: a wash on a

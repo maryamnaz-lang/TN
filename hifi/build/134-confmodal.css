@@ -1,0 +1,34 @@
+/* ==========================================================================
+   §134 — ONE `.conf` MODAL TREATMENT ON EVERY PORTAL — Maryam, 21 Sep 2026
+
+   "This is how we have the modals structure on the super admin portal, please
+   follow the same padding, same spacing/rows gaps, same icon ui of single solid
+   bg and white icon on the other portals modals as well."
+
+   The Super Admin `.conf` is the reference (its own local copy in
+   `tn-admin-portal.html` states the same values). It is:
+
+   - A SINGLE SOLID DISC WITH A WHITE GLYPH. No light-tinted inner disc, no
+     §105/§109 halo rings, no per-kind glyph hue — the mark is an `--accent`
+     circle with an `--on-accent` glyph for EVERY confirm, success included; the
+     glyph (a tick, a warning, a video mark) carries the meaning, not the hue.
+     This supersedes §105's `--support-error-bg` halo and §109's green success
+     halo. It lands after both, so it wins on order at equal weight; the
+     `.conf.conf-ok` selectors are stated so they beat §109's own (0,3,0)/(0,4,1)
+     conf-ok rules by order.
+   - A 16px (`--s05`) OUTER FRAME on `.conf`, the body paying none (`.conf-b`
+     padding 0 — its §105 flex column and 12px `--s04` row gap are untouched, so
+     mark/title/fee/desc keep their rhythm), and the button row 16px below the
+     text (`.conf-a` padding-top `--s05`). This supersedes §03's `--s07 --gutter`
+     frame, §105's `.conf-b` padding and §109's tighter-success padding.
+
+   An icon mark's colour is an ICON colour, not type — §63 governs `<text>` and
+   words, and §105/§109 already set this mark's fill here, so stating it in a
+   layer after §63 is consistent with how the disc has always been coloured.
+   -------------------------------------------------------------------------- */
+.app .conf{padding:var(--s05)}
+.app .conf > .conf-b,.app .conf.conf-ok > .conf-b{padding:0}
+.app .conf > .conf-a,.app .conf.conf-ok > .conf-a{padding:var(--s05) 0 0}
+.app .conf .conf-mk,.app .conf.conf-ok .conf-mk{
+  background:var(--accent);box-shadow:none;margin-bottom:var(--s04)}
+.app .conf .conf-mk svg,.app .conf.conf-ok .conf-mk svg{color:var(--on-accent)}

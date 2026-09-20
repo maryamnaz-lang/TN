@@ -173,6 +173,36 @@
 .app .wing-lvl .ladder i.done{color:var(--on-accent);--on-brand-color:1}
 .app .wing-lvl .ladder i.on{color:var(--text-primary)}
 
+/* --------------------------------------------------------------------- 2b' ---
+   THE AGENT'S RECOMMENDATION LADDER — THE SAME BLOCK STRUCTURE, LIGHT MODE
+   Maryam, 21 Sep 2026: "the blocks structure on this page should follow the
+   ones we are using on the candidate portal, but here we have light mode so
+   implement the ui accordingly, not anything else."
+
+   The candidate draws the fifteen-rung ladder inside `.wing-lvl` (the black
+   level card) with §2b above. The Talent Agent draws the SAME `ivLadder` markup
+   bare, in `.iv-ladder`, on a WHITE "Your recommendation" section — where the
+   DS default (§15's `--on-dark-fill` track) is invisible and the `<i>` codes
+   render italic (the §2b `<i>{font-style:italic}` trap). This is §2b's exact
+   treatment, which is already a LIGHT-ground design (`--layer-accent-01` track,
+   `--text-secondary` codes, solid `--accent` for a passed rung): grid-centred
+   upright tabular codes, a light track for the rungs ahead, solid accent for the
+   ones passed, and a light accent tint for the suggested one. Structure only,
+   translated to light mode and nothing else. `.iv-ladder .ladder i` (0,3,1)
+   beats §15's `.ladder i` (0,2,1). */
+.app .iv-ladder .ladder i{
+  display:grid;place-items:center;
+  background:var(--layer-accent-01);
+  font-size:10px;line-height:1;font-weight:600;letter-spacing:.4px;
+  font-style:normal;font-variant-numeric:tabular-nums;
+  color:var(--text-secondary)}
+.app .iv-ladder .ladder i > b{font-weight:600;font-style:normal;display:block}
+.app .iv-ladder .ladder i.done{background:var(--accent);opacity:1;color:var(--on-accent)}
+.app .iv-ladder .ladder i.on{
+  background:color-mix(in srgb, var(--accent) 22%, var(--background));
+  color:var(--text-primary)}
+.app .iv-ladder .ladder-lab{color:var(--text-helper)}
+
 /* --------------------------------------------------------------------- 2c ---
    AND THE LEVEL YOU ARE ON IS LIT RATHER THAN FILLED
 

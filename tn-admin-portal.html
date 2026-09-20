@@ -14,7 +14,7 @@
      The <style> block is PROTOTYPE CHROME AND NOTHING ELSE (the device frame,
      the viewport picker, the wordmark size, a toast host) — no product rule.
      ========================================================================== -->
-<link rel="stylesheet" href="design-system/talentnext-ds.css?b=3f377448">
+<link rel="stylesheet" href="design-system/talentnext-ds.css?b=9bce2b05">
 
 <style>
 /* ==========================================================================
@@ -257,15 +257,16 @@
    to `.sec`'s padding shorthand at compute time), so the tabs sat 48px above the
    content. `.iv-tabs` is a plain-class handle on the interview page's tab section:
    zero its bottom padding and the strip's own margin, and pull the content up to a
-   single --s05 gap. */
-.app .sec.iv-tabs{padding-top:var(--s05); padding-bottom:0}
-.app .sec.iv-tabs > .cs{margin-bottom:0}
-.app .sec.iv-tabs::after{content:none}
-.app .sec.iv-tabs + .sec{padding-top:var(--s05)}
+   single --s05 gap. `.set-tabs` (the Settings module's own inner-tab strip,
+   21 Sep 2026) shares the same handle so its strip meets its pane the same way. */
+.app .sec.iv-tabs,.app .sec.set-tabs{padding-top:var(--s05); padding-bottom:0}
+.app .sec.iv-tabs > .cs,.app .sec.set-tabs > .cs{margin-bottom:0}
+.app .sec.iv-tabs::after,.app .sec.set-tabs::after{content:none}
+.app .sec.iv-tabs + .sec,.app .sec.set-tabs + .sec{padding-top:var(--s05)}
 /* the head section above the tabs gives up its bottom padding so the tabs sit a
    single --s05 below the interview title, not a full section gap (Maryam, 18 Sep
    2026: "remove unnecessary spaces above and below tabs row"). */
-.app .sec:has(+ .sec.iv-tabs){padding-bottom:0}
+.app .sec:has(+ .sec.iv-tabs),.app .sec:has(+ .sec.set-tabs){padding-bottom:0}
 /* NO DIVIDER AFTER THE TOP SECTION BLOCK on a detail screen — the identity/facts
    block right after the back-arrow head (Maryam, 18 Sep 2026: "remove the line
    after the four blocks row"). §14 draws a foot rule on any section that precedes
@@ -381,6 +382,35 @@
 @container app (min-width:900px){
   .app .main .sec:has(> .sec-h){display:block}
   .app .main .sec:has(> .sec-h) > .sec-h{border-right:0; min-height:0; margin-bottom:var(--sec-h-gap); padding:0 var(--pad-x)}
+}
+
+/* THE INTEGRATIONS LIST BREATHES (Maryam, 21 Sep 2026: "add some gaps between
+   all rows and dividers equally"). The `.cardrow` rows sat at the shared 12px
+   vertical padding, which read cramped for a two-line service row. Bumped to a
+   symmetric --s05 (16) top and bottom, so every row carries the same air above
+   and below its content and the divider (the row's own border-bottom) sits with
+   equal breathing room on each side. Scoped to this one list (`.intg-stack`),
+   admin-only, so no other `.cardrow` list moves. The horizontal padding stays
+   0 (the DS zeroes list-row side padding inside a `.sec`). */
+.app .intg-stack .cardrow{padding-top:var(--s06); padding-bottom:var(--s06); min-height:0}
+
+/* SETTINGS INNER-TAB SPACING — balance the gaps around the tab strip (Maryam,
+   21 Sep 2026: "unnecessary space after page desc to the tabs, and less space
+   between tabs and content"). Left alone the gap read ~72px above the strip and
+   16px below: the page heading is the first section after the band, so §128 gave
+   its `.sec-h` a 32px bottom margin AND the head section paid its own bottom
+   padding, on top of the strip's own top padding. This collapses the extras so
+   BOTH sides of the strip read one --s06 (24): the strip's own top padding is
+   the single gap above, the pane's top padding the single gap below.
+   The head section's bottom padding is zeroed with `!important` on purpose —
+   the platform section rhythm sets `.app .page > .sec` padding through a ~30-class
+   chain no plain selector can outweigh (the same reason `.authtight` in §57 does
+   it); the `.sec-h` margin loses to §128 on weight+order at (0,5,0). Inside the
+   900 tier per trap 3, after §128. */
+@container app (min-width:900px){
+  .app .main .sec.set-head{padding-bottom:0 !important}
+  .app .main .sec.set-head > .sec-h{margin-bottom:0 !important}
+  .app .main .sec.set-tabs + .sec{padding-top:var(--s06)}
 }
 </style>
 <style id="admin-recovered">
@@ -671,7 +701,7 @@
   </div>
 </div>
 
-<script src="design-system/talentnext-ds.js?b=3f377448"></script>
+<script src="design-system/talentnext-ds.js?b=9bce2b05"></script>
 <script>
 /* ==========================================================================
    THE SUPER ADMIN PORTAL
@@ -1498,7 +1528,7 @@ const MODULES=[
  {k:'catalogue', t:'Course Catalogue', ic:'book', subs:[
    {k:'catalogue', t:'Course Catalogue'}, {k:'coursedetail', t:'Course', hidden:true}]},
  {k:'market', t:'Marketplace & Interviews', ic:'market', subs:[
-   {k:'bookings', t:'Bookings'}, {k:'recordings', t:'Recordings & Transcripts'}, {k:'recording', t:'Transcript', hidden:true}]},
+   {k:'bookings', t:'Interviews'}, {k:'recordings', t:'Recordings & Transcripts'}, {k:'recording', t:'Transcript', hidden:true}]},
  {k:'finance', t:'Finance & Settlement', ic:'finance', subs:[
    /* Only Transactions and Payouts are surfaced for now (Maryam, 16 Sep 2026:
       "only keep transactions and payouts sub modules for now, hide the other sub
@@ -1531,8 +1561,17 @@ const MODULES=[
     deep-link reachable, just off the rail; drop `hidden` to bring it back. */
  {k:'employers', t:'Employers & Hiring', ic:'employers', hidden:true, subs:[
    {k:'employers', t:'All Employers'}, {k:'empdetail', t:'Employer', hidden:true}, {k:'unlocks', t:'Unlocks & DB Access'}, {k:'placements', t:'Placements'}]},
- {k:'settings', t:'Settings', ic:'settings', footer:true, subs:[
-   {k:'general', t:'General'}, {k:'profile', t:'My Profile'}, {k:'notifications', t:'Notifications'}, {k:'security', t:'Login & Security'}, {k:'payments', t:'Payments & Cards'}]}
+ /* SETTINGS IS ONE PAGE WITH INNER TABS, not a rail sub-tree (Maryam, 21 Sep
+    2026: "instead of having submodules of settings, profile and notifications
+    ... follow the candidate profile structure where the profile module has inner
+    tabs"). The sub keys stay for routing + deep links (`settings/security` still
+    lands on that tab) and for the breadcrumb labels, but every one is `hidden` so
+    the rail draws Settings as a single leaf (no chevron, no flyout). `V.settings`
+    below renders the tab strip in-page from these same subs. This is the ONE
+    module that reverses "the rail is the only sub-navigator" (§120), to mirror
+    the candidate profile. */
+ {k:'settings', t:'Settings', ic:'profile', footer:true, subs:[
+   {k:'general', t:'General', hidden:true}, {k:'profile', t:'My Profile', hidden:true}, {k:'notifications', t:'Notifications', hidden:true}, {k:'security', t:'Login & Security', hidden:true}, {k:'payments', t:'Payments & Cards', hidden:true}]}
 ];
 const MOD_BY_K={}; MODULES.forEach(m => { MOD_BY_K[m.k]=m; m._sub={}; m.subs.forEach(s => m._sub[s.k]=s); });
 const firstSub = m => (m.subs.find(s => !s.hidden) || m.subs[0]).k;
@@ -2641,7 +2680,7 @@ const talq = () => {
     ],
     market: [
       ['How many interviews are booked?', `${BOOKINGS.length}: ${BOOKINGS.filter(b => b.status === 'active').length} confirmed and paid into escrow, ${BOOKINGS.filter(b => b.status === 'pending').length} waiting on payment.`,
-        null, ['Open bookings', 'market/bookings']],
+        null, ['Open interviews', 'market/bookings']],
       ['How long are recordings kept?', 'Twenty-four months, with the candidate’s consent captured at booking. A highlight reel reaches an employer only when the candidate agreed to SCENES.',
         null, ['Recordings', 'market/recordings']]
     ],
@@ -6730,8 +6769,8 @@ function marketBookings(){
     .slice().sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
   return `
   <section class="sec">
-    ${searchHead('Bookings', 'Every interview and where it has got to. The register is read-only; a stuck interview is dealt with through Resolve.',
-      exportBtn('Bookings'), 'Search by candidate or agent')}
+    ${searchHead('Interviews', 'Every interview and where it has got to. The register is read-only; a stuck interview is dealt with through Resolve.',
+      exportBtn('Interviews'), 'Search by candidate or agent')}
     ${filterStrip('bkstage', 'all', [
       ['all', 'All', BOOKINGS.length],
       ['booked', 'Booked', count('booked')],
@@ -6742,18 +6781,21 @@ function marketBookings(){
     ])}
     ${lstTools('Search by candidate or agent', `${attnToggle()} ${filterDd('bkkind', 'all', [['all', 'Any kind'], ['first', 'First interview'], ['re', 'Re-interview']], 'Kind')}`)}
     ${rows.length ? table(
-      [{label:'Candidate'}, {label:'Agent'}, {label:'Kind'}, {label:'Scheduled'}, {label:'Stage'}, {label:'Fee', num:true}, {label:'Escrow'}, {label:'Report due'}, ACT_COL],
+      /* Columns trimmed (Maryam, 20 Sep 2026): no email sub-line on the person
+         cells, "Kind" → "Type" with the "(discounted)" note dropped, and the Stage
+         and Report due columns removed. */
+      [{label:'Candidate'}, {label:'Agent'}, {label:'Type'}, {label:'Scheduled'}, {label:'Fee', num:true}, {label:'Escrow'}, ACT_COL],
       rows.map(b => ({cells:[
-        personCell(b.cand, emailOf(b.cand)),
-        personCell(b.agent, emailOf(b.agent)),
-        esc(b.kind), esc(b.slot),
-        bkStageTag(b),
+        personCell(b.cand, ''),
+        personCell(b.agent, ''),
+        esc(b.kind.replace(/\s*\([^)]*\)/, '')), esc(b.slot),
         b.fee ? money(b.fee) : 'Free',
         escrowTag(b.escrow),
-        bkReportDue(b),
         bkNeedsAttention(b) ? rowActs([['route', 'Resolve', `data-sheet="resolve:${b.id}"`]]) : ''
-      ]})))
-      : emptyState('video', 'No bookings match', q || sf !== 'all' || kf !== 'all' || na ? 'Nothing matches the current filters.' : 'No bookings yet.')}
+      ]})), {select:false})
+      /* The Interviews register is read-only with no bulk actions, so the row-select
+         checkboxes serve no purpose — opted out (Maryam, 20 Sep 2026). */
+      : emptyState('video', 'No interviews match', q || sf !== 'all' || kf !== 'all' || na ? 'Nothing matches the current filters.' : 'No interviews yet.')}
   </section>`;
 }
 /* 8.2 — RESOLVE A FAILED INTERVIEW. Offered only on an overdue Held booking or a
@@ -7396,31 +7438,70 @@ function financeTransactions(){
       ['refund', 'Refunds', base.filter(t => t.cat === 'refund').length]
     ])}
     ${lstTools('Search by reference, person or method')}
-    ${rows.length ? table(
-      [{label:'Reference'}, {label:'Candidate'}, {label:'Course'}, {label:'Amount', num:true}, {label:'Method'}, {label:'Status'}, ACT_COL],
-      rows.map(t => ({sv:[t.ref, t.who, , (t.dir === 'out' ? -1 : 1) * (t.amt || 0)], cells:[
-        idCell(t.ref, t.when),
-        /* "Candidate" column (Maryam, 20 Sep 2026): every row is now a real person
-           (employer rows are filtered out above), so the cell is always the person
-           cell with their placeholder face — `personCell`, name only. */
-        personCell(t.who, ''),
-        /* "Course" column (Maryam, 20 Sep 2026): drop the leading "Course — "
-           label so a course row reads as the course name alone; a non-course
-           description (interview, payout) is left as written. */
-        esc(t.kind.replace(/^Course\s*[—–-]\s*/, '')),
-        (t.dir === 'out' ? '−' : '') + (t.amt ? money(t.amt) : '—'),
-        methodMark(t.method),
-        tag(t.status),
-        rowActs([['receipt', 'Download receipt', `data-act="toast:Receipt for ${esc(t.ref)} downloaded"`],
-          ...(t.dir === 'in' && t.amt && t.status !== 'refunded' ? [['renew', 'Refund', `data-act="startrefund:${t.id}"`]] : [])])
-      ]})), {bulk: () => [
+    ${rows.length ? (() => {
+      /* THE INTERVIEWS TAB HAS ITS OWN COLUMNS (Maryam, 20 Sep 2026): the "Course"
+         column becomes "Interview" and shows the interview TYPE only ("Interview" /
+         "Re-interview" — the agent name stripped), and a new "Talent Agent" column
+         next to it names the agent who ran it, WITH their photo (`personCell`). The
+         kind is "Interview — <agent>"; split on the spaced dash so "Re-interview"
+         (whose own hyphen has no surrounding spaces) stays whole. Every other tab
+         keeps the plain "Course" column. */
+      const isIv = cf === 'interview';
+      const ivSplit = k => { const p = String(k).split(/\s[—–-]\s/); return [p[0], p[1] || '']; };
+      const cols = isIv
+        ? [{label:'Reference'}, {label:'Candidate'}, {label:'Interview'}, {label:'Talent Agent'}, {label:'Amount', num:true}, {label:'Method'}, {label:'Status'}, ACT_COL]
+        : [{label:'Reference'}, {label:'Candidate'}, {label:'Course'}, {label:'Amount', num:true}, {label:'Method'}, {label:'Status'}, ACT_COL];
+      return table(cols, rows.map(t => {
+        const [ivType, ivAgent] = ivSplit(t.kind);
+        /* the middle column(s): Interview + Talent Agent on the interviews tab, else
+           the plain Course description ("Course — " prefix stripped). */
+        const mid = isIv
+          ? [esc(ivType), personCell(ivAgent, '')]
+          : [esc(t.kind.replace(/^Course\s*[—–-]\s*/, ''))];
+        return {sv:[t.ref, t.who], cells:[
+          idCell(t.ref, t.when),
+          personCell(t.who, ''),
+          ...mid,
+          (t.dir === 'out' ? '−' : '') + (t.amt ? money(t.amt) : '—'),
+          methodMark(t.method),
+          tag(t.status),
+          /* A FAILED transaction took no money (the charge never received, or the
+             payout never sent), so there is nothing to receipt or refund — the only
+             sensible action is to remove it from the ledger (Maryam, 20 Sep 2026:
+             "a failed payment means the payment didn't receive ... allow only delete
+             action on such transactions"). Every other row keeps Download receipt +
+             (for a money-in charge not already refunded) Refund. */
+          rowActs(t.status === 'failed'
+            ? [['delete', 'Delete', `data-act="asktxndel:${t.id}"`]]
+            : [['receipt', 'Download receipt', `data-act="toast:Receipt for ${esc(t.ref)} downloaded"`],
+               ...(t.dir === 'in' && t.amt && t.status !== 'refunded' ? [['renew', 'Refund', `data-act="startrefund:${t.id}"`]] : [])])
+        ]};
+      }), {bulk: () => [
         ['download', 'Download All', `data-act="bulktxdl:all"`],
         [ADM_ZIP, 'Download as zip', `data-act="bulktxdl:zip"`]
-      ]})
+      ]});
+    })()
       : emptyState('wallet', 'No transactions match', 'Nothing in this filter yet.')}
   </section>`;
 }
-ACTIONS.startrefund = key => { S.id = key.split(':')[1]; S.sheet = 'rec:refund:new'; };
+/* The per-ROW Refund action pre-fills the sheet with that charge (`S.refundTxn`,
+   read by `KINDS.refund.fields`); the generic "Issue a Refund" button clears it so
+   it opens blank (Maryam, 20 Sep 2026). */
+ACTIONS.startrefund = key => { S.refundTxn = key.split(':')[1]; S.sheet = 'rec:refund:new'; };
+/* DELETE A FAILED TRANSACTION (Maryam, 20 Sep 2026) — the only action on a `failed`
+   row. A confirm, then the row is removed from the ledger and an audit line written;
+   no step-up (a failed row moved no money). */
+ACTIONS.asktxndel = key => {
+  const t = TXNS.find(x => x.id === key.split(':')[1]); if(!t) return;
+  askConfirm({mk:'warning', title:`Delete ${t.ref}?`, danger:true, ok:'Delete Transaction',
+    body:'This payment failed, so no money was received or sent — there is nothing to refund. Deleting removes the record from the ledger. This cannot be undone.',
+    act:`dotxndel:${t.id}`});
+};
+ACTIONS.dotxndel = key => {
+  const i = TXNS.findIndex(x => x.id === key.split(':')[1]);
+  if(i >= 0){ const t = TXNS[i]; TXNS.splice(i, 1); audit('Deleted failed transaction', `${t.ref} — ${t.who}`, 'Finance & Settlement', 'med'); toast('Transaction deleted'); }
+  S.confirm = null;
+};
 /* THE ZIP GLYPH — Material Symbols Rounded `folder_zip` (FILL 0, the `0 -960 960
    960` box), pasted because the shared icon set ships no zip/folder mark. Rendered
    raw by `bulkBar` (its icon field takes a key OR a raw <svg>). */
@@ -7438,12 +7519,15 @@ ACTIONS.bulktxdl = key => {
 KINDS.refund = {
   label:'refund', mod:'Finance & Settlement', after:'finance/refunds',
   find: id => REFUNDS.find(r => r.id === id), name: r => `${r.party} · ${money(r.amount)}`,
-  fields: r => { return [
-    /* NOTHING is pre-selected on a NEW refund (Maryam, 20 Sep 2026: "do not select
-       the payment refund automatically"). No `def` on `txn`, `rtype` or `amount`, so
-       every field opens blank and the submit button stays disabled until all are
-       filled — even the per-row Refund action opens on the placeholders. */
-    {k:'txn', l:'Payment Refund', t:'select', req:1, ph:'Select a payment to refund', opts: () => TXNS.filter(x => x.dir === 'in' && x.amt).map(x => [x.id, `${x.ref} · ${x.who} · ${money(x.amt)}`]), get: x => (TXNS.find(y => y.ref === x.txnRef) || {}).id},
+  fields: r => { const t = S.refundTxn && TXNS.find(x => x.id === S.refundTxn && x.dir === 'in' && x.amt && x.status !== 'failed'); return [
+    /* TWO ENTRY POINTS (Maryam, 20 Sep 2026): the GENERIC "Issue a Refund" button
+       opens BLANK ("do not select the payment refund automatically"); a specific
+       ROW's Refund action pre-fills THAT charge and its amount ("the form should
+       have that record's selections already"). `S.refundTxn` is set only by
+       `startrefund` and cleared on the generic open and on close, so the two paths
+       stay distinct — no reliance on a lingering `S.id`. Type stays blank either way
+       (it is a refund attribute, not a property of the charge). */
+    {k:'txn', l:'Payment Refund', t:'select', req:1, ph:'Select a payment to refund', opts: () => TXNS.filter(x => x.dir === 'in' && x.amt && x.status !== 'failed').map(x => [x.id, `${x.ref} · ${x.who} · ${money(x.amt)}`]), def: t ? t.id : undefined, get: x => (TXNS.find(y => y.ref === x.txnRef) || {}).id},
     /* SA-06 A1–A4 — the KIND of refund decides where the money comes from and
        who pays it: an interview refund claws back from the platform share
        first; a cohort refund is pro-rated by the intent price; a sponsored
@@ -7452,7 +7536,7 @@ KINDS.refund = {
        settlement model — the sheet records the choice, the register holds the
        ruling. */
     {k:'rtype', l:'Type', t:'select', req:1, ph:'Select a refund type', opts:[['interview', 'Interview refund — clawback from the platform share first'], ['cohort', 'Cohort refund — pro-rated by the intent price'], ['sponsored', 'Sponsored employee — the employer is the payer'], ['credit', 'Goodwill credit instead of cash']], get: x => x.rtype || (x.type === 'Credit' ? 'credit' : 'interview')},
-    {k:'amount', l:'Amount', t:'number', req:1},
+    {k:'amount', l:'Amount', t:'number', req:1, def: t ? t.amt : undefined},
     {k:'reason', l:'Reason', t:'textarea', req:1, ph:'Recorded on the refund and the audit log'}
   ]; },
   /* No help/info block on this sheet (Maryam, 20 Sep 2026: "remove the info block
@@ -8111,7 +8195,7 @@ function systemIntegrations(){
   <section class="sec">
     ${aiHead('Integrations', 'The external services the platform runs on. Keys are rotated on a schedule.',
       `<button class="btn btn-p btn-sm noic" data-sheet="connect">${I.add} Connect A Service</button>`)}
-    <div class="tile-stack">
+    <div class="tile-stack intg-stack">
       ${INTEGRATIONS.map(g => cardRow('link',
         `${esc(g.name)} ${svcTag(g.state)}`,
         `${esc(g.cat)} · ${esc(g.detail)} · ${esc(g.env)} · ${g.webhooks} webhooks · ${esc(g.events)} events · ${esc(g.keyAge)}`,
@@ -8301,8 +8385,8 @@ const REPORTS = {
       ['Members enrolled', COHORTS.filter(c => c.status === 'active').reduce((n, c) => n + c.size, 0)]],
     todo: () => [['Cohorts without a leader', COHORTS.filter(c => c.status === 'active' && c.leader === 'Unassigned').length]]},
   market: {short:'Marketplace', go:'market/bookings', mods:['Marketplace & Interviews'],
-    sum: () => `<b>${BOOKINGS.length} bookings</b> this window; ${BOOKINGS.filter(b => !b.paid || b.status === 'pending').length} still awaiting pay.`,
-    happening: () => [['Bookings', BOOKINGS.length], ['Confirmed', BOOKINGS.filter(b => b.status === 'active').length],
+    sum: () => `<b>${BOOKINGS.length} interviews</b> this window; ${BOOKINGS.filter(b => !b.paid || b.status === 'pending').length} still awaiting pay.`,
+    happening: () => [['Interviews', BOOKINGS.length], ['Confirmed', BOOKINGS.filter(b => b.status === 'active').length],
       ['Booked value', money(BOOKINGS.filter(b => b.paid).reduce((n, b) => n + b.fee, 0))]],
     todo: () => [['Awaiting pay or settlement', BOOKINGS.filter(b => !b.paid || b.status === 'pending').length]]},
   employers: {short:'Employers', go:'employers/employers', mods:['Employers & Hiring', 'Employers'],
@@ -8621,8 +8705,33 @@ ACTIONS.askdelcard = key => { const c = CARDS.find(x => x.id === key.split(':')[
 ACTIONS.dodelcard = key => { const i = CARDS.findIndex(x => x.id === key.split(':')[1]); if(i >= 0){ const was = CARDS[i].def; CARDS.splice(i, 1); if(was && CARDS.length) CARDS[0].def = true; audit('Removed card', 'Payments & Cards', 'Settings', 'notice'); toast('Card removed'); } S.confirm = null; };
 ACTIONS.savebilling = () => { Object.assign(BILLING, readPageForm()); audit('Saved billing details', BILLING.company, 'Settings', 'notice'); toast('Billing details saved'); };
 
-V.settings = () => modView({general:settingsGeneral, profile:settingsProfile,
-  notifications:settingsNotifications, security:settingsSecurity, payments:settingsPayments});
+/* SETTINGS RENDERS AS ONE PAGE WITH INNER TABS (Maryam, 21 Sep 2026), mirroring
+   the candidate profile: the head band, then a `.sec.sec-cs` tab strip, then the
+   active pane. The tabs are the (now rail-hidden) subs; each is a `data-go`
+   button so switching a tab navigates (`settings/<key>`), keeping the URL
+   deep-linkable and the rulings-register / account-menu links working. The pane
+   renderers are unchanged — they just no longer arrive via `modView`. */
+const SETTINGS_PANES = {general:settingsGeneral, profile:settingsProfile,
+  notifications:settingsNotifications, security:settingsSecurity, payments:settingsPayments};
+const SETTINGS_TABS = [['general', 'General'], ['profile', 'My Profile'],
+  ['notifications', 'Notifications'], ['security', 'Login & Security'], ['payments', 'Payments & Cards']];
+function settingsTabs(cur){
+  return `<section class="sec sec-cs set-tabs"><div class="cs" role="tablist" aria-label="Settings">
+    ${SETTINGS_TABS.map(([k, l]) => `<button role="tab" class="${k === cur ? 'on' : ''}" aria-selected="${k === cur}" data-go="settings/${k}">${esc(l)}</button>`).join('')}
+  </div></section>`;
+}
+/* The Super Admin hides Tal's summary portal-wide, so the candidate profile's
+   summary-band-as-page-intro has no admin equivalent — the page would open with
+   no heading. A plain `aiHead('Settings', …)` sits above the tabs as the page
+   heading + description (Maryam 21 Sep 2026: "the page heading and desc is
+   missing on this page"); each pane keeps its own section heading below the
+   tabs. */
+V.settings = () => {
+  const cur = SETTINGS_PANES[S.sub] ? S.sub : 'general';
+  return head(pageSummary())
+    + `<section class="sec set-head">${aiHead('Settings', 'Your own account and how the platform runs — its identity, notifications, sign-in and billing.')}</section>`
+    + settingsTabs(cur) + SETTINGS_PANES[cur]();
+};
 
 ACTIONS.toggleset = key => {
   const path = key.split(':')[1];
@@ -8918,7 +9027,7 @@ function shell(){
           ? `<span class="shell-badge">${unreadCount()}</span>` : ''}</button>
       <button class="shell-act acct-t ${S.acct ? 'on' : ''}" data-toggle="acct"
         aria-label="Account" aria-haspopup="menu" aria-expanded="${S.acct ? 'true' : 'false'}">
-        <span class="shell-avatar av-ph"><i>${esc(initials(ME.name))}</i></span>
+        <span class="shell-avatar av-ph"><img src="${agentFace(ME.name)}" alt="${esc(ME.name)}"></span>
         <svg class="acct-c" viewBox="0 0 24 24" aria-hidden="true">${inner('chevDown')}</svg>
       </button>
       ${acctMenu()}
@@ -9071,7 +9180,7 @@ function askConfirm(o){ S._confirm = o; S.confirm = '_dyn'; }
    to match "Add User" on the same module. The guarded two-step actions
    (change role, deactivate, reactivate, delete) stay centre modals — they are a
    decision, not "creating something". */
-const SIDE_SHEET_KEYS = ['addstaff', 'editstaff', 'inviteagent', 'adduser'];
+const SIDE_SHEET_KEYS = ['addstaff', 'editstaff', 'inviteagent', 'adduser', 'connect'];
 const sideSheet = key => !!key && (key.indexOf('rec:') === 0 || SIDE_SHEET_KEYS.some(k => key === k || key.indexOf(k + ':') === 0));
 
 /* resolve `S.sheet` to its `{title, body, ok, act, danger}` — shared by the
@@ -9316,7 +9425,12 @@ function render(){
       <div class="view-col">
         ${viewAsBar()}
         <main class="main">${S.tal ? askView() : `<div class="page">${view()}</div>`}</main>
-        ${S.tal || S.sheet || S.confirm ? '' : (bulkCtx() ? bulkBar() : askDock())}
+        ${/* THE TAL FLOATING DOCK IS HIDDEN ON THE ADMIN (Maryam, 21 Sep 2026:
+            "hide tal floating bottom bar from the super admin portal"). The
+            bulk-action bar still rides the same slot when rows are selected —
+            it is a selection tool, not Tal — so only the "Ask Tal" pill goes.
+            `askDock` stays defined; drop the `: ''` to bring it back. */''}
+        ${S.tal || S.sheet || S.confirm ? '' : (bulkCtx() ? bulkBar() : '')}
       </div>
       ${sideSheet(S.sheet) ? sidePeek() : ''}
     </div>
@@ -9609,6 +9723,7 @@ device.addEventListener('click', e => {
        S.sheet a beat later so the panel slides out and the content widens back,
        instead of the panel vanishing in one frame. Guarded so a double-click
        does not re-arm it. The centre modal / confirm keep their instant close. */
+    if(d.close === 'sheet') S.refundTxn = null;   /* a fresh refund next time */
     if(d.close === 'sheet' && sideSheet(S.sheet) && !S.sheetClosing){
       S.sheetClosing = true; render();
       setTimeout(() => { S.sheet = null; S.sheetClosing = false; render(); }, 400);
@@ -9713,7 +9828,9 @@ device.addEventListener('click', e => {
   if(S.viewAs && S.viewAs.scope === 'read' && (d.sheet !== undefined || (d.act !== undefined && !/^(endviewas|toast)/.test(d.act)) || d.do !== undefined)){
     toast(`Read-only while viewing as ${(USER_BY_ID[S.viewAs.id] || {}).name || 'this user'} — end the session to make changes`, 'warn'); return;
   }
-  if(d.sheet !== undefined){ S.sheet = d.sheet; return render(); }
+  /* opening a sheet via a data-sheet button (incl. the generic "Issue a Refund")
+     clears the per-row refund prefill, so only `startrefund` fills it (20 Sep 2026) */
+  if(d.sheet !== undefined){ S.refundTxn = null; S.sheet = d.sheet; return render(); }
   /* THE SHARED STRIPE MODAL (`dsPayForm`) — "Add Card" opens it, its Card /
      US-bank tabs swap the picture, and it closes on the backdrop or the picture's
      own Save/Cancel row. A card comes back from Stripe's hosted form, so the modal
