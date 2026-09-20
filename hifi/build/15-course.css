@@ -760,6 +760,29 @@
   top:auto;bottom:-1px;height:1px;width:auto;background:var(--rule);pointer-events:none}
 .app .notif .nrow:last-child::after{display:none}
 
+/* ---- Notification row — reference-based refinement (Maryam, 21 Sep 2026) ----
+   Off a reference used only for spacing and hierarchy: a calmer, roomier row.
+   The MESSAGE is the focus; the mark TOP-ALIGNS to the title rather than sitting
+   centred on the whole block; and the TIME drops BELOW the message (§63 sizes it
+   a step smaller and inks it the floor grey), reversing the 15 Sep right-end
+   placement. A two-column grid puts the time in the message column, indented
+   past the mark, so it reads as that message's own timestamp. The row now pays
+   the same `--pad-x` as its `::after` divider (above), so mark, message and
+   divider share one left edge. Scoped to `.notif` so the admin full-page list
+   (`.mem` rows in `home/notifs`) and every other `.nrow` reuse keep the flat
+   row this does not touch. The mark sheds its 40px box (`.nrow-ic` is a bare
+   glyph here, §27 above) so `width/height:auto` lets it top-align cleanly. */
+.app .notif .nrow{
+  display:grid;grid-template-columns:auto minmax(0,1fr);
+  column-gap:var(--s04);row-gap:var(--s02);align-items:start;
+  padding:var(--s05) var(--pad-x)}
+.app .notif .nrow-ic{
+  grid-column:1;grid-row:1;align-self:start;
+  width:auto;height:auto;min-width:0;min-height:0;margin-top:1px}
+.app .notif .nrow-ic svg{width:20px;height:20px}
+.app .notif .nrow-b{grid-column:2;grid-row:1;margin:0}
+.app .notif .nrow-w{grid-column:2;grid-row:2;position:static;margin:0}
+
 /* THE PANEL DIMS THE FRAME BEHIND IT — Maryam, 15 Sep 2026: "when you open the
    notification side slider then give overlay to the screen". Only on a wide
    frame, where the panel is a 380px side panel with the app visible beside it;

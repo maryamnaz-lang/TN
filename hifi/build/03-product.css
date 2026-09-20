@@ -459,6 +459,12 @@
 .cq{display:block;margin-top:2px;font-size:12px;color:var(--text-secondary)}
 .conf{padding:var(--s07) var(--gutter);text-align:center}
 .conf svg{width:40px;height:40px;color:var(--support-success);margin:0 auto var(--s05)}
+/* A BUTTON'S OWN ICON IN A CONF FOOTER IS A BUTTON ICON, NOT THE MARK (Maryam,
+   21 Sep 2026): the rule above is written for the big centred success/warning
+   mark, but it also caught the "Get All Scenes" trailing arrow — 40px and green
+   inside the black button. A `.conf-a` button's svg follows `.btn svg` sizing;
+   the colour (currentColor, so it is the button's own ink) is restored in §63. */
+.app .conf-a .btn svg{width:20px;height:20px;margin:0}
 .box{}
 .w3{min-width:3ch}
 .eb{display:block}

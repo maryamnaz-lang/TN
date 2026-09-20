@@ -304,7 +304,12 @@
   font-size:var(--t-eyebrow-size);line-height:var(--t-eyebrow-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-eyebrow-ls);
   text-transform:none;color:var(--text-secondary)}
-.app .t-caption,.app .u-caption,.app .t-helper-01,.app .t-legal-01{
+.app .t-caption,.app .u-caption,.app .t-helper-01,.app .t-legal-01,
+/* the notification time is caption tier now: below the message, a step smaller
+   than the 13.5 desc, and always the floor grey (read AND unread) so the
+   message stays the focus — §15 lays it out, §63 sizes and inks it (Maryam,
+   21 Sep 2026, reversing the 15 Sep body-size right-end time). */
+.app .nrow-w{
   font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
   font-weight:var(--t-w-book);letter-spacing:var(--t-caption-ls);
   color:var(--text-helper)}
@@ -5555,6 +5560,11 @@
 /* THE COHORT "You" TAG IS THE SAME ACCENT INK (Maryam, 20 Sep 2026), over §105's
    light-red pill; (0,3,0) beats §02's `.tag.brand` white-on-brand. */
 .app .tag.tag-you{color:var(--accent-text)}
+/* A CONF FOOTER BUTTON'S ICON TAKES THE BUTTON'S OWN INK (Maryam, 21 Sep 2026),
+   not §03's success-green mark colour: `inherit` restores the button's text
+   colour, so the "Get All Scenes" arrow is white on the black `.btn-p`. Paired
+   with §03's size reset. */
+.app .conf-a .btn svg{color:inherit}
 
 /* THE REVIEW CAPSULE LABEL IS THE ACCENT (Maryam, 14 Sep 2026: "the icon and text
    needs to be in accent color", then again "i think you are not using the accent

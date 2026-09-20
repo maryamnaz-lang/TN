@@ -14,7 +14,7 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 6169.  Rules dropped as product-specific: 222.
+   Rules kept: 6176.  Rules dropped as product-specific: 222.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
@@ -835,6 +835,7 @@ svg.arrow,
 .cq{display:block; margin-top:2px; font-size:12px; color:var(--text-secondary)}
 .conf{padding:var(--s07) var(--gutter); text-align:center}
 .conf svg{width:40px; height:40px; color:var(--support-success); margin:0 auto var(--s05)}
+.app .conf-a .btn svg{width:20px; height:20px; margin:0}
 .w3{min-width:3ch}
 .eb{display:block}
 .line{height:1px; background:var(--border-subtle-01)}
@@ -3664,6 +3665,11 @@ button{font-family:var(--font-sans)}
 .app .notif .nrow{border-bottom:0; position:relative}
 .app .notif .nrow::after{content:''; position:absolute; left:var(--pad-x); right:var(--pad-x); top:auto; bottom:-1px; height:1px; width:auto; background:var(--rule); pointer-events:none}
 .app .notif .nrow:last-child::after{display:none}
+.app .notif .nrow{display:grid; grid-template-columns:auto minmax(0,1fr); column-gap:var(--s04); row-gap:var(--s02); align-items:start; padding:var(--s05) var(--pad-x)}
+.app .notif .nrow-ic{grid-column:1; grid-row:1; align-self:start; width:auto; height:auto; min-width:0; min-height:0; margin-top:1px}
+.app .notif .nrow-ic svg{width:20px; height:20px}
+.app .notif .nrow-b{grid-column:2; grid-row:1; margin:0}
+.app .notif .nrow-w{grid-column:2; grid-row:2; position:static; margin:0}
 .app .notif-scrim{position:absolute; inset:0; z-index:49; background:var(--overlay); opacity:0; visibility:hidden; pointer-events:none; transition:opacity var(--dur-standard) var(--ease-standard),visibility var(--dur-standard)}
 @container app (min-width:900px){
   .app .notif-scrim.on{opacity:1; visibility:visible; pointer-events:auto}
@@ -6860,7 +6866,8 @@ button.btn-p:active,
 .app .t-caption,
 .app .u-caption,
 .app .t-helper-01,
-.app .t-legal-01{font-size:var(--t-caption-size); line-height:var(--t-caption-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-caption-ls); color:var(--text-helper)}
+.app .t-legal-01,
+.app .nrow-w{font-size:var(--t-caption-size); line-height:var(--t-caption-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-caption-ls); color:var(--text-helper)}
 .app .score-pts .n,
 .app .prog-pct{font-size:var(--t-display-size); line-height:var(--t-display-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-display-ls); font-variant-numeric:tabular-nums}
 .app .ph h1,
@@ -7606,6 +7613,7 @@ button.btn-p:active,
 .app[data-portal="admin"] .viewas-t b{font-weight:var(--t-w-strong); color:var(--accent-text)}
 .app .rank-chip{color:var(--accent-text)}
 .app .tag.tag-you{color:var(--accent-text)}
+.app .conf-a .btn svg{color:inherit}
 .app .rev-cap-t{color:var(--accent); font-weight:var(--t-w-strong)}
 
 /* ---- 64-quietbtn.css ---- */

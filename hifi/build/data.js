@@ -351,12 +351,12 @@ const NOTIF = {
   consult:[
     {ic:'calendar',   t:'Your consultant call is booked', b:'Jordan Blake, Thursday, August 13 at 2:00 PM ET. A calendar invite is on its way.', w:'1h ago',    go:'dashboard', unread:1},
     {ic:'trophy',     t:'Your quiz result carried over',  b:'You are on the Explorer track. Your level comes later, from an agent interview.',   w:'3h ago',    go:'level',     unread:1},
-    {ic:'checkFilled',t:'Account created',                b:'Welcome to TalentNext, Maryam.',                                                    w:'Yesterday', go:'account',   unread:0}
+    {ic:'checkOutline' ,t:'Account created',                b:'Welcome to TalentNext, Maryam.',                                                    w:'Yesterday', go:'account',   unread:0}
   ],
   new:[
     {ic:'trophy',   t:'Your quiz result is in',       b:'You are on the Explorer track. An interview sets your level.', w:'2h ago', go:'level',      unread:1},
     {ic:'calendar', t:'3 agents have slots this week',b:'Booking early usually means starting a cohort inside 10 days.', w:'5h ago', go:'agents',     unread:1},
-    {ic:'checkFilled',t:'Account created',            b:'Welcome to TalentNext, Maryam.',                               w:'Yesterday', go:'account', unread:1}
+    {ic:'checkOutline' ,t:'Account created',            b:'Welcome to TalentNext, Maryam.',                               w:'Yesterday', go:'account', unread:1}
   ],
   booked:[
     {ic:'calendar', t:'Interview confirmed',          b:'Priya Nair, Thursday, August 20 at 6:30 PM ET.',                 w:'1h ago', go:'interviews', unread:1},
@@ -372,7 +372,7 @@ const NOTIF = {
   /* the wait — the call is done, the report is not. Nothing here asks the
      candidate to do anything; the bell reports the state. */
   held:[
-    {ic:'checkFilled',t:'Interview complete',         b:'Priya is writing up your report. It will be ready within 24 hours.', w:'Just now', go:'interviews', unread:1},
+    {ic:'checkOutline' ,t:'Interview complete',         b:'Priya is writing up your report. It will be ready within 24 hours.', w:'Just now', go:'interviews', unread:1},
     {ic:'document', t:'Your report is on its way',     b:'You will be told the moment Priya signs it. There is nothing to do.', w:'Just now', go:'level',     unread:1},
     {ic:'video',    t:'Interview recorded',            b:'The recording and transcript are what your report is built from.',    w:'Just now', go:'interviews', unread:0}
   ],
@@ -396,7 +396,7 @@ const NOTIF = {
   day90:[
     {ic:'calendar', t:'Your re-interview is available',b:'The 90 days are complete. Book it to have them assessed.', w:'Today', go:'agents',      unread:1},
     {ic:'document', t:'Your 90-day summary is ready to read',b:'Priya signs it once the re-interview is booked.',       w:'Today', go:'transcript',  unread:1},
-    {ic:'checkFilled',t:'Course complete',           b:'All 13 chapters done, 83% average.',                           w:'Yesterday', go:'transcript', unread:1}
+    {ic:'checkOutline' ,t:'Course complete',           b:'All 13 chapters done, 83% average.',                           w:'Yesterday', go:'transcript', unread:1}
   ],
   promoted:[
     {ic:'trophy',   t:'Promoted to Explorer – E4',    b:'Priya signed the decision on November 21.',                    w:'Today', go:'level',       unread:1},

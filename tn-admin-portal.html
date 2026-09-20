@@ -14,7 +14,7 @@
      The <style> block is PROTOTYPE CHROME AND NOTHING ELSE (the device frame,
      the viewport picker, the wordmark size, a toast host) — no product rule.
      ========================================================================== -->
-<link rel="stylesheet" href="design-system/talentnext-ds.css?b=efb427e5">
+<link rel="stylesheet" href="design-system/talentnext-ds.css?b=3f377448">
 
 <style>
 /* ==========================================================================
@@ -439,7 +439,7 @@
    downward on the right under a calendar icon --- */
 .app .fdate{position:relative}
 .app .fdate-t{cursor:pointer; text-align:left}
-.app .fdate-val.ph{color:var(--text-placeholder)}
+.app .fdate-val.fdate-ph{color:var(--text-placeholder)}
 .app .fdate-ic{flex:none; width:20px; height:20px; color:var(--icon-secondary)}
 .app .fdate-pop{display:none; position:absolute; top:calc(100% + var(--s02)); right:0; z-index:60; width:266px; background:var(--background); border:1px solid var(--rule); box-shadow:0 8px 24px rgba(17,17,17,.12); padding:var(--s04)}
 .app .fdate.on .fdate-pop{display:block}
@@ -640,6 +640,11 @@
 /* ========== SHARED HOOKS ========== */
 /* Dropdown option / trigger value carrying a round avatar (leader picker, member rows) */
 .app .fdd-val{display:inline-flex; align-items:center; gap:var(--s02); min-width:0}
+/* an unselected placeholder dropdown reads as placeholder text, like a field's ph.
+   The modifier is `.fdd-ph`, NOT a bare `.ph` — `.ph` is the page-header component
+   in the DS (padding 40/16/24 + decorative pseudo-elements), so a bare `.ph` here
+   inherited that and blew the field to ~87px tall (Maryam, 20 Sep 2026). */
+.app .fdd-val.fdd-ph{color:var(--text-placeholder)}
 .app .fdd-av{flex:none; width:22px; height:22px; border-radius:999px; overflow:hidden; display:inline-block; vertical-align:middle}
 .app .fdd-av img{width:100%; height:100%; object-fit:cover; display:block}
 /* Search-field magnifier */
@@ -666,7 +671,7 @@
   </div>
 </div>
 
-<script src="design-system/talentnext-ds.js?b=efb427e5"></script>
+<script src="design-system/talentnext-ds.js?b=3f377448"></script>
 <script>
 /* ==========================================================================
    THE SUPER ADMIN PORTAL
@@ -765,6 +770,12 @@ const TAGV = {
   /* good */ active:'green', settled:'green', paid:'green', live:'green', ok:'green',
   approved:'green', won:'green', reconciled:'green', placed:'green', confirmed:'green',
   published:'green', completed:'green', verified:'green',
+  /* the Transactions status sets (Maryam, 20 Sep 2026): money-in charges are
+     Received/Pending/Failed, payouts Pending/Paid/Failed, refunds
+     Pending/Refunded/Failed. `received` reads as good (green), a completed
+     `refunded` reads as done (green — it no longer falls through to plain text),
+     and `failed` is a problem (red). `pending`/`paid` already map above. */
+  received:'green', refunded:'green', failed:'red',
   /* waiting */ held:'warn', pending:'warn', review:'warn', requested:'warn', invited:'warn',
   processing:'warn', sent:'warn', overdue:'warn', unmatched:'warn', shortlisted:'warn',
   reviewing:'warn', scheduled:'warn', draft:'warn', degraded:'warn', 'in progress':'warn',
@@ -1138,19 +1149,22 @@ const BOOKINGS=[
  {id:'bk13', cand:'Isla Bennett', agent:'Priya Raman', slot:'Fri 15:30', date:'2026-08-14', fee:225, escrow:'n/a', paid:false, kind:'Interview', status:'pending'}
 ];
 const TXNS=[
- {id:'t1',  ref:'TXN-8841', when:'Today 09:12', date:'2026-08-12', who:'Maryam Naz',     party:'Candidate', kind:'Course — Foundations of Leadership',            cat:'course',    amt:100, dir:'in',  method:'Visa •4242',       fee:3.20, rail:'Stripe → In progress', status:'settled'},
- {id:'t2',  ref:'TXN-8840', when:'Today 08:40', date:'2026-08-12', who:'Jordan Vale',     party:'Candidate', kind:'Interview — Priya Raman',        cat:'interview', amt:225, dir:'in',  method:'Visa •1180',       fee:6.83, rail:'Stripe → In progress', status:'held'},
+ {id:'t1',  ref:'TXN-8841', when:'Today 09:12', date:'2026-08-12', who:'Maryam Naz',     party:'Candidate', kind:'Course — Foundations of Leadership',            cat:'course',    amt:100, dir:'in',  method:'Visa •4242',       fee:3.20, rail:'Stripe → In progress', status:'received'},
+ {id:'t2',  ref:'TXN-8840', when:'Today 08:40', date:'2026-08-12', who:'Jordan Vale',     party:'Candidate', kind:'Interview — Priya Raman',        cat:'interview', amt:225, dir:'in',  method:'Visa •1180',       fee:6.83, rail:'Stripe → In progress', status:'pending'},
  {id:'t3',  ref:'TXN-8839', when:'Today 08:05', date:'2026-08-12', who:'BrightPath',      party:'Employer',  kind:'Interview unlock — E. Novak',    cat:'unlock',    amt:40,  dir:'in',  method:'Visa •9002',       fee:1.46, rail:'Stripe → In progress', status:'held'},
- {id:'t4',  ref:'TXN-8836', when:'Yest 18:03',  date:'2026-08-11', who:'Ava Thompson',    party:'Candidate', kind:'Course — Foundations of Leadership',            cat:'course',    amt:100, dir:'in',  method:'Mastercard •5100', fee:3.20, rail:'Stripe → In progress', status:'held'},
- {id:'t5',  ref:'TXN-8834', when:'Yest 15:22',  date:'2026-08-11', who:'Emma Novak',      party:'Candidate', kind:'Re-interview — Dana Whitfield',  cat:'interview', amt:180, dir:'in',  method:'Amex •3007',       fee:5.52, rail:'Stripe → In progress', status:'held'},
- {id:'t6',  ref:'TXN-8830', when:'Yest 12:03',  date:'2026-08-11', who:'Dana Whitfield',  party:'Talent agent', kind:'Agent payout',         cat:'payout',    amt:144, dir:'out', method:'Bank ••6789',      fee:0,    rail:'In progress → Bank',   status:'settled'},
+ {id:'t17', ref:'TXN-8838', when:'Today 07:50', date:'2026-08-12', who:'Sophia Ali',      party:'Candidate', kind:'Interview scenes ×2',            cat:'scene',     amt:30,  dir:'in',  method:'Visa •4242',       fee:0.98, rail:'Stripe → In progress', status:'pending'},
+ {id:'t4',  ref:'TXN-8836', when:'Yest 18:03',  date:'2026-08-11', who:'Ava Thompson',    party:'Candidate', kind:'Course — Foundations of Leadership',            cat:'course',    amt:100, dir:'in',  method:'Mastercard •5100', fee:3.20, rail:'Stripe → In progress', status:'pending'},
+ {id:'t5',  ref:'TXN-8834', when:'Yest 15:22',  date:'2026-08-11', who:'Emma Novak',      party:'Candidate', kind:'Re-interview — Dana Whitfield',  cat:'interview', amt:180, dir:'in',  method:'Amex •3007',       fee:5.52, rail:'Stripe → In progress', status:'failed'},
+ {id:'t6',  ref:'TXN-8830', when:'Yest 12:03',  date:'2026-08-11', who:'Dana Whitfield',  party:'Talent agent', kind:'Agent payout',         cat:'payout',    amt:144, dir:'out', method:'Bank ••6789',      fee:0,    rail:'In progress → Bank',   status:'paid'},
  {id:'t7',  ref:'TXN-8827', when:'Yest 10:41',  date:'2026-08-11', who:'Meridian Labs',   party:'Employer',  kind:'Interview unlock ×3',            cat:'unlock',    amt:120, dir:'in',  method:'Visa •7781',       fee:3.78, rail:'Stripe → In progress', status:'settled'},
- {id:'t8',  ref:'TXN-8822', when:'10 Aug',      date:'2026-08-10', who:'Oliver Grant',    party:'Candidate', kind:'Interview — Dana Whitfield',    cat:'interview', amt:195, dir:'in',  method:'Visa •4242',       fee:5.96, rail:'Stripe → In progress', status:'held'},
- {id:'t9',  ref:'TXN-8818', when:'10 Aug',      date:'2026-08-10', who:'Marcus Ozoro',    party:'Talent agent', kind:'Agent payout',         cat:'payout',    amt:120, dir:'out', method:'Bank ••2231',      fee:0,    rail:'In progress → Bank',   status:'settled'},
- {id:'t10', ref:'TXN-8814', when:'9 Aug',       date:'2026-08-09', who:'Sophia Ali',      party:'Candidate', kind:'Interview — Marcus Ozoro',      cat:'interview', amt:150, dir:'in',  method:'Mastercard •6621', fee:4.65, rail:'Stripe → In progress', status:'settled'},
+ {id:'t8',  ref:'TXN-8822', when:'10 Aug',      date:'2026-08-10', who:'Oliver Grant',    party:'Candidate', kind:'Interview — Dana Whitfield',    cat:'interview', amt:195, dir:'in',  method:'Visa •4242',       fee:5.96, rail:'Stripe → In progress', status:'received'},
+ {id:'t18', ref:'TXN-8820', when:'10 Aug',      date:'2026-08-10', who:'Liam Chen',       party:'Candidate', kind:'Interview scene ×1',             cat:'scene',     amt:15,  dir:'in',  method:'Mastercard •8823', fee:0.59, rail:'Stripe → In progress', status:'received'},
+ {id:'t9',  ref:'TXN-8818', when:'10 Aug',      date:'2026-08-10', who:'Marcus Ozoro',    party:'Talent agent', kind:'Agent payout',         cat:'payout',    amt:120, dir:'out', method:'Bank ••2231',      fee:0,    rail:'In progress → Bank',   status:'pending'},
+ {id:'t10', ref:'TXN-8814', when:'9 Aug',       date:'2026-08-09', who:'Sophia Ali',      party:'Candidate', kind:'Interview — Marcus Ozoro',      cat:'interview', amt:150, dir:'in',  method:'Mastercard •6621', fee:4.65, rail:'Stripe → In progress', status:'received'},
  {id:'t11', ref:'TXN-8809', when:'9 Aug',       date:'2026-08-09', who:'NovaHealth',      party:'Employer',  kind:'Interview unlock — S. Ali',      cat:'unlock',    amt:40,  dir:'in',  method:'ACH ••4410',       fee:0.40, rail:'Stripe → In progress', status:'settled'},
- {id:'t12', ref:'TXN-8802', when:'8 Aug',       date:'2026-08-08', who:'Priya Raman',     party:'Talent agent', kind:'Agent payout',         cat:'payout',    amt:180, dir:'out', method:'Bank ••5540',      fee:0,    rail:'In progress → Bank',   status:'held'},
- {id:'t13', ref:'TXN-8797', when:'8 Aug',       date:'2026-08-08', who:'Liam Chen',       party:'Candidate', kind:'Course — Foundations of Leadership',            cat:'course',    amt:100, dir:'in',  method:'Visa •8823',       fee:3.20, rail:'Stripe → In progress', status:'settled'},
+ {id:'t19', ref:'TXN-8806', when:'9 Aug',       date:'2026-08-09', who:'Kai Andersen',    party:'Candidate', kind:'Interview scenes ×3',            cat:'scene',     amt:45,  dir:'in',  method:'ACH ••4410',       fee:0.45, rail:'Stripe → In progress', status:'received'},
+ {id:'t12', ref:'TXN-8802', when:'8 Aug',       date:'2026-08-08', who:'Priya Raman',     party:'Talent agent', kind:'Agent payout',         cat:'payout',    amt:180, dir:'out', method:'Bank ••5540',      fee:0,    rail:'In progress → Bank',   status:'failed'},
+ {id:'t13', ref:'TXN-8797', when:'8 Aug',       date:'2026-08-08', who:'Liam Chen',       party:'Candidate', kind:'Course — Foundations of Leadership',            cat:'course',    amt:100, dir:'in',  method:'Visa •8823',       fee:3.20, rail:'Stripe → In progress', status:'received'},
  {id:'t14', ref:'TXN-8790', when:'7 Aug',       date:'2026-08-07', who:'Ava Thompson',    party:'Candidate', kind:'Course refund (partial)',        cat:'refund',    amt:50,  dir:'out', method:'Visa •5100',       fee:0,    rail:'Stripe → Card',        status:'refunded'},
  {id:'t15', ref:'TXN-8781', when:'6 Aug',       date:'2026-08-06', who:'Meridian Labs',   party:'Employer',  kind:'Placement fee — R. Osei',        cat:'placement', amt:0,   dir:'in',  method:'—',                fee:0,    rail:'—',                    status:'blocked'},
  {id:'t16', ref:'TXN-8779', when:'6 Aug',       date:'2026-08-06', who:'BrightPath',      party:'Employer',  kind:'Placement fee — J. Vale',        cat:'placement', amt:0,   dir:'in',  method:'—',                fee:0,    rail:'—',                    status:'blocked'}
@@ -1169,6 +1183,7 @@ const FEES=[
  {k:'course',    t:'Course fee',           v:'$100',      unit:'per cycle',   note:'Foundations of Leadership, upfront for the 90-day cycle',         state:'set',  effective:'2026-06-01', by:'Umair'},
  {k:'platform',  t:'Platform fee',         v:'$10/mo',    unit:'per month',   note:'Bundled into the course fee',                      state:'set',  effective:'2026-06-01', by:'Umair'},
  {k:'unlock',    t:'Interview unlock',     v:'$40',       unit:'per unlock',  note:'Per interview, beyond the free highlight clip',    state:'set',  effective:'2026-06-01', by:'Umair'},
+ {k:'scene',     t:'Interview scene',      v:'$15',       unit:'per scene',   note:'A candidate buying an extra saved scene from their interview, beyond the free set', state:'set', effective:'2026-06-01', by:'Umair'},
  {k:'reinterview',t:'Re-interview fee',    v:'Agent-set', unit:'per booking', note:'Agent names their own rate for a repeat interview',  state:'set',  effective:'2026-06-01', by:'Umair'},
  {k:'placement', t:'Placement fee',        v:'Not set',   unit:'per hire',    note:'Charged when an employer confirms a hire',         state:'open', effective:'—',          by:'—'},
  {k:'split',     t:'Platform fee share',   v:'20%',       unit:'per interview', note:'The platform’s share of each interview payment; the balance is the agent’s payout', state:'set', effective:'2026-07-30', by:'Reed'},
@@ -2218,15 +2233,24 @@ const today = () => { const d = new Date(); return `${String(d.getMonth() + 1).p
 const fddAv = src => src ? `<span class="fdd-av"><img src="${src}" alt="" loading="lazy"></span>` : '';
 function formDd(f, val){
   const opts = (typeof f.opts === 'function' ? f.opts() : f.opts).map(o => Array.isArray(o) ? o : [o, o]);
-  const cur = opts.find(o => String(o[0]) === String(val)) || opts[0] || ['', ''];
+  const match = opts.find(o => String(o[0]) === String(val));
+  /* A select that carries a placeholder (`f.ph`) starts EMPTY — no option is
+     auto-selected and the hidden input holds '' — so a REQUIRED select reads as
+     blank and can gate the submit button (Maryam, 20 Sep 2026). Without `f.ph` the
+     first option stands in as the default, exactly as before (backward-compatible:
+     selects have never set `ph`). */
+  const cur = match || (f.ph ? null : (opts[0] || ['', '']));
+  const cv = cur ? cur[0] : '';
+  const cl = cur ? cur[1] : f.ph;
+  const ci = cur ? cur[2] : undefined;
   return `<label class="f"><span class="lbl">${esc(f.l)}${f.req ? ' <span class="req-star" aria-hidden="true">*</span>' : ''}</span>
     <div class="fdd fdd-form" style="display:block">
-      <input type="hidden" data-f="${f.k}" value="${esc(cur[0])}">
+      <input type="hidden" data-f="${f.k}" value="${esc(cv)}">
       <button type="button" class="fdd-t" data-formddtoggle aria-haspopup="listbox" aria-expanded="false" style="width:100%;justify-content:space-between;min-height:40px">
-        <span class="fdd-val">${fddAv(cur[2])}${esc(cur[1])}</span>
+        <span class="fdd-val${cur ? '' : ' fdd-ph'}">${fddAv(ci)}${esc(cl)}</span>
         <svg class="fdd-cx" viewBox="0 0 24 24" aria-hidden="true">${inner('chevDown')}</svg></button>
       <div class="fdd-menu" role="listbox" style="left:0;right:0;max-height:260px;overflow-y:auto">${opts.map(([ov, ol, oimg]) =>
-        `<button type="button" class="fdd-opt${String(ov) === String(cur[0]) ? ' on' : ''}" role="option" aria-selected="${String(ov) === String(cur[0]) ? 'true' : 'false'}" data-formddset="${esc(ov)}">${fddAv(oimg)}${esc(ol)}</button>`).join('')}</div>
+        `<button type="button" class="fdd-opt${String(ov) === String(cv) ? ' on' : ''}" role="option" aria-selected="${String(ov) === String(cv) ? 'true' : 'false'}" data-formddset="${esc(ov)}">${fddAv(oimg)}${esc(ol)}</button>`).join('')}</div>
     </div></label>`;
 }
 /* OUR DATE PICKER — replaces the native <input type="date"> so no browser/OS
@@ -2266,7 +2290,7 @@ function formDate(f, val){
     <div class="fdate" style="display:block">
       <input type="hidden" data-f="${f.k}" value="${esc(iso)}">
       <button type="button" class="inp fdate-t" data-datetoggle="${f.k}" aria-haspopup="dialog" aria-expanded="false" style="width:100%;display:flex;align-items:center;justify-content:space-between;gap:var(--s03);min-height:40px">
-        <span class="fdate-val${iso ? '' : ' ph'}">${iso ? dpFmt(iso) : (f.ph || 'Select a date')}</span>
+        <span class="fdate-val${iso ? '' : ' fdate-ph'}">${iso ? dpFmt(iso) : (f.ph || 'Select a date')}</span>
         <svg class="fdate-ic" viewBox="0 0 24 24" aria-hidden="true">${inner('calendar')}</svg></button>
       <div class="fdate-pop">${dateGrid(f.k, vy, vm - 1, iso)}</div>
     </div></label>`;
@@ -2296,6 +2320,17 @@ function recSheet(kind, id){
      ADD only (the agent KIND's "arrives through the vetting queue" note is about
      creating an account, not editing one). */
   const help = typeof K.help === 'function' ? K.help(rec) : K.help;
+  /* Whether a required field is empty at open — so the submit button starts
+     disabled and only lights once every required field is filled (Maryam, 20 Sep
+     2026). `syncSheetSubmit` keeps it in step as the form is edited. Reads the same
+     initial value fieldHtml renders. */
+  const initInvalid = fields.some(f => {
+    if(!f.req) return false;
+    let v;
+    if(rec) v = typeof f.get === 'function' ? f.get(rec) : rec[f.k];
+    else { const d = typeof f.def === 'function' ? f.def() : f.def; v = d == null ? '' : d; }
+    return v === '' || v == null || (Array.isArray(v) && !v.length);
+  });
   return {
     title: rec ? `Edit ${K.label} — ${K.name(rec)}` : `Add ${K.an || 'a'} ${K.label}`,
     body: fields.map(f => fieldHtml(f, rec ? (typeof f.get === 'function' ? f.get(rec) : rec[f.k]) : undefined)).join('')
@@ -2303,7 +2338,8 @@ function recSheet(kind, id){
          the left (Maryam, 13 Sep 2026) — not a bare description paragraph. */
       + (help ? `<div class="sheet-help"><svg class="sheet-help-ic" viewBox="0 0 24 24" aria-hidden="true">${inner('info')}</svg><p class="t-desc">${help}</p></div>` : ''),
     ok: rec ? 'Save Changes' : (K.okNew || `Add ${cap(K.label)}`),
-    act: `save:${kind}:${rec ? rec.id : 'new'}`
+    act: `save:${kind}:${rec ? rec.id : 'new'}`,
+    gate: true, disabled: initInvalid
   };
 }
 function readForm(){
@@ -2319,6 +2355,22 @@ function readForm(){
     out[k] = el.type === 'number' ? (el.value === '' ? '' : Number(el.value)) : el.value.trim();
   });
   return out;
+}
+/* KEEP A RECORD SHEET'S SUBMIT BUTTON IN STEP WITH THE FORM (Maryam, 20 Sep 2026):
+   the button (marked `data-submit`) is disabled while any required field is empty
+   and lights the moment they are all filled. Called after every render and, without
+   a render (trap 9 — a render would rebuild the half-filled form), on each dropdown
+   pick, date pick and keystroke. Reads the same required-field rule `saveRecord`
+   enforces, so the button state and the actual guard never disagree. */
+function syncSheetSubmit(){
+  const btn = device.querySelector('.sheet-f [data-submit="1"]');
+  if(!btn) return;
+  const parts = (btn.dataset.act || '').split(':');   /* save:kind:id */
+  if(parts[0] !== 'save') return;
+  const K = KINDS[parts[1]]; if(!K) return;
+  const fields = typeof K.fields === 'function' ? K.fields(parts[2] === 'new' ? null : K.find(parts[2])) : K.fields;
+  const vals = readForm();
+  btn.disabled = fields.some(f => f.req && (vals[f.k] === '' || vals[f.k] == null || (Array.isArray(vals[f.k]) && !vals[f.k].length)));
 }
 function saveRecord(kind, id){
   const K = KINDS[kind]; if(!K) return;
@@ -2421,7 +2473,7 @@ const countActive = arr => arr.filter(x => x.status === 'active').length;
 const heldPayouts = () => PAYOUTS.filter(p => p.status === 'held' && p.net).length;
 const openApps = () => APPLICATIONS.filter(a => a.status !== 'approved' && a.status !== 'rejected').length;
 const grossProcessed = () => TXNS.filter(t => t.dir === 'in' && t.amt).reduce((n, t) => n + t.amt, 0);
-const inProgress = () => TXNS.filter(t => t.status === 'held').reduce((n, t) => n + t.amt, 0);
+const inProgress = () => TXNS.filter(t => t.status === 'pending').reduce((n, t) => n + t.amt, 0);
 const overdueInv = () => INVOICES.filter(i => i.status === 'overdue').length;
 const openRefunds = () => REFUNDS.filter(r => r.status === 'requested' || r.status === 'processing').length;
 const contactLeads = () => LEADS.filter(l => l.stage === 'Contact captured').length;
@@ -3388,7 +3440,7 @@ KINDS.user = {
     const ivs = BOOKINGS.filter(b => b.agent === u.name && b.status === 'active');
     const led = COHORTS.filter(c => c.leader.replace(/\s*\(.*\)/, '') === u.name && c.status === 'active');
     const sponsored = u.roles.includes('employer') && /sponsor/i.test(u.company || '') ? USERS.filter(x => x.origin === 'signal').length : 0;
-    const mid = TXNS.filter(t => t.who === u.name && t.status === 'held');
+    const mid = TXNS.filter(t => t.who === u.name && t.status === 'pending');
     if(u.roles.includes('candidate')) cons.push('their profile is paused from employer visibility and their cohort seat is held — the record is not deleted');
     if(ivs.length) cons.push(`<b>${ivs.length} in-flight interview${ivs.length === 1 ? '' : 's'}</b> ${ivs.length === 1 ? 'is' : 'are'} marked for reassignment`);
     if(led.length) cons.push(`<b>${led.map(c => c.name).join(', ')}</b> ${led.length === 1 ? 'loses its' : 'lose their'} leader mid-cohort and need${led.length === 1 ? 's' : ''} one allotted`);
@@ -4974,16 +5026,26 @@ const ADM_SCENE_SET = [
   ['The Friday rhythm', '19:37'],       ['Managing up', '24:50'],
   ['Conflict with a peer', '31:15'],    ['Closing reflection', '41:03']
 ];
-/* A DISTINCT PROFILE PHOTO PER PERSON (Maryam, 20 Sep 2026: "use different images
-   for the candidates ... you do have different images ... we are using them
-   overall on the platform"). The platform's own avatar set — the ten discs in
-   `hifi/build/avatars/` (av1 + b1..b4 + g1..g5) the candidate portal uses — is
-   assigned deterministically by a name hash, so a person keeps the same photo
-   everywhere and the table reads as ten different faces. */
-const ADM_AVATARS = ['av1', 'b1', 'b2', 'b3', 'b4', 'g1', 'g2', 'g3', 'g4', 'g5'];
+/* A REAL PROFILE PHOTOGRAPH PER PERSON (Maryam, 20 Sep 2026: "get rid of avatars
+   and use real images — the other images we are using as candidate or talent
+   agent profile images overall on the platform"). This REVERSES the same-day
+   choice of `hifi/build/avatars/` (av1 + b1..b4 + g1..g5) — those are the
+   Duolingo-style ILLUSTRATED placeholder discs the candidate portal uses only for
+   the ANONYMISED same-level Ranking, never a real profile (build.py's own note).
+   The real photographs are the ones the marketplace + call surfaces show, embedded
+   in the design system this portal links: `AV.priya/owen/lena/samuel/hana` (the
+   five agent portraits) and `CALL_ART.faceW/faceM` (the two interview-call faces).
+   A person whose first name IS one of the agents gets their own portrait; everyone
+   else is assigned one of the seven deterministically by a name hash, so a face is
+   stable per person and the tables read as real photos, not cartoons. */
+const ADM_FACES = {priya:AV.priya, owen:AV.owen, lena:AV.lena, samuel:AV.samuel, hana:AV.hana, faceW:CALL_ART.faceW, faceM:CALL_ART.faceM};
+const ADM_FACE_POOL = Object.values(ADM_FACES);
 function agentFace(name){
-  let h = 0; for(const ch of String(name || '')) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
-  return 'hifi/build/avatars/' + ADM_AVATARS[h % ADM_AVATARS.length] + '.jpg';
+  const n = String(name || '').trim();
+  const first = n.toLowerCase().split(/\s+/)[0];
+  if(ADM_FACES[first]) return ADM_FACES[first];
+  let h = 0; for(const ch of n) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  return ADM_FACE_POOL[h % ADM_FACE_POOL.length];
 }
 /* ALIGNED (14 Sep 2026): the carousel MARKUP is now the shipped `dsScenes`
    builder — `sceneCardAdm` was a hand-copy of `.scv*` (its own note said "the
@@ -7308,34 +7370,43 @@ function methodMark(method){
 
 function financeTransactions(){
   const cf = getFilter('txcat', 'all'), q = getFilter('q', '');
+  /* EMPLOYERS ARE NOT PART OF THE SYSTEM (Maryam, 20 Sep 2026, extending the 19 Sep
+     removal into Finance): every employer-party transaction is dropped from this
+     table — which empties the Unlocks and Placements tabs (both were all-employer),
+     so those tabs are gone too. `base` filters at the source, so the tab counts and
+     the rows agree; the "Candidate" column then only ever holds a real person. */
+  const base = TXNS.filter(t => t.party !== 'Employer');
   /* Search by the brand word, never the full `t.method` — the last-four must not
      be queryable either (Maryam, 20 Sep 2026). */
-  const rows = TXNS.filter(t => cf === 'all' ? true : t.cat === cf).filter(t => hit(q, t.ref, t.who, t.kind, methodBrand(t.method), t.party));
+  const rows = base.filter(t => cf === 'all' ? true : t.cat === cf).filter(t => hit(q, t.ref, t.who, t.kind, methodBrand(t.method)));
   return `
   <section class="sec">
     ${searchHead('Transactions', 'Every charge, payout and refund. A pending payment settles on the weekly cycle.',
-      `${exportBtn('Transactions')} <button class="btn btn-g btn-sm noic" data-sheet="rec:refund:new">${I.add} Refund A Charge</button>`, 'Search by reference, person or method')}
+      `${exportBtn('Transactions')} <button class="btn btn-g btn-sm noic" data-sheet="rec:refund:new">${I.add} Issue a Refund</button>`, 'Search by reference, person or method')}
     ${filterStrip('txcat', 'all', [
-      ['all', 'All', TXNS.length],
-      ['course', 'Courses', TXNS.filter(t => t.cat === 'course').length],
-      ['interview', 'Interviews', TXNS.filter(t => t.cat === 'interview').length],
-      ['unlock', 'Unlocks', TXNS.filter(t => t.cat === 'unlock').length],
-      ['payout', 'Payouts', TXNS.filter(t => t.cat === 'payout').length],
-      ['refund', 'Refunds', TXNS.filter(t => t.cat === 'refund').length],
-      ['placement', 'Placements', TXNS.filter(t => t.cat === 'placement').length]
+      ['all', 'All', base.length],
+      ['course', 'Courses', base.filter(t => t.cat === 'course').length],
+      ['interview', 'Interviews', base.filter(t => t.cat === 'interview').length],
+      /* Scenes — a candidate buying additional saved scenes from their interview,
+         beyond the free set; tracked separately from the interview fee itself
+         (Maryam, 20 Sep 2026). Same row structure and `methodMark` treatment as
+         every other category. */
+      ['scene', 'Scenes', base.filter(t => t.cat === 'scene').length],
+      ['payout', 'Payouts', base.filter(t => t.cat === 'payout').length],
+      ['refund', 'Refunds', base.filter(t => t.cat === 'refund').length]
     ])}
     ${lstTools('Search by reference, person or method')}
     ${rows.length ? table(
       [{label:'Reference'}, {label:'Candidate'}, {label:'Course'}, {label:'Amount', num:true}, {label:'Method'}, {label:'Status'}, ACT_COL],
       rows.map(t => ({sv:[t.ref, t.who, , (t.dir === 'out' ? -1 : 1) * (t.amt || 0)], cells:[
         idCell(t.ref, t.when),
-        /* "Candidate" column (Maryam, 20 Sep 2026): a person carries their photo
-           (`personCell`, name only); an employer is a company, so it stays the
-           plain two-line `idCell` — no face is invented (DS person-cell rule). */
-        t.party === 'Employer' ? idCell(t.who, t.party) : personCell(t.who, ''),
+        /* "Candidate" column (Maryam, 20 Sep 2026): every row is now a real person
+           (employer rows are filtered out above), so the cell is always the person
+           cell with their placeholder face — `personCell`, name only. */
+        personCell(t.who, ''),
         /* "Course" column (Maryam, 20 Sep 2026): drop the leading "Course — "
            label so a course row reads as the course name alone; a non-course
-           description (interview, unlock, placement) is left as written. */
+           description (interview, payout) is left as written. */
         esc(t.kind.replace(/^Course\s*[—–-]\s*/, '')),
         (t.dir === 'out' ? '−' : '') + (t.amt ? money(t.amt) : '—'),
         methodMark(t.method),
@@ -7367,8 +7438,12 @@ ACTIONS.bulktxdl = key => {
 KINDS.refund = {
   label:'refund', mod:'Finance & Settlement', after:'finance/refunds',
   find: id => REFUNDS.find(r => r.id === id), name: r => `${r.party} · ${money(r.amount)}`,
-  fields: r => { const t = !r && TXNS.find(x => x.id === S.id && x.dir === 'in' && x.amt); return [
-    {k:'txn', l:'Charge', t:'select', req:1, opts: () => TXNS.filter(x => x.dir === 'in' && x.amt).map(x => [x.id, `${x.ref} · ${x.who} · ${money(x.amt)}`]), def: t ? t.id : undefined, get: x => (TXNS.find(y => y.ref === x.txnRef) || {}).id},
+  fields: r => { return [
+    /* NOTHING is pre-selected on a NEW refund (Maryam, 20 Sep 2026: "do not select
+       the payment refund automatically"). No `def` on `txn`, `rtype` or `amount`, so
+       every field opens blank and the submit button stays disabled until all are
+       filled — even the per-row Refund action opens on the placeholders. */
+    {k:'txn', l:'Payment Refund', t:'select', req:1, ph:'Select a payment to refund', opts: () => TXNS.filter(x => x.dir === 'in' && x.amt).map(x => [x.id, `${x.ref} · ${x.who} · ${money(x.amt)}`]), get: x => (TXNS.find(y => y.ref === x.txnRef) || {}).id},
     /* SA-06 A1–A4 — the KIND of refund decides where the money comes from and
        who pays it: an interview refund claws back from the platform share
        first; a cohort refund is pro-rated by the intent price; a sponsored
@@ -7376,12 +7451,13 @@ KINDS.refund = {
        not cash. Every one of those is a branch the journey marks blocked on the
        settlement model — the sheet records the choice, the register holds the
        ruling. */
-    {k:'rtype', l:'Kind', t:'select', opts:[['interview', 'Interview refund — clawback from the platform share first'], ['cohort', 'Cohort refund — pro-rated by the intent price'], ['sponsored', 'Sponsored employee — the employer is the payer'], ['credit', 'Goodwill credit instead of cash']], def:'interview', get: x => x.rtype || (x.type === 'Credit' ? 'credit' : 'interview')},
-    {k:'amount', l:'Amount ($)', t:'number', req:1, def: t ? t.amt : undefined},
+    {k:'rtype', l:'Type', t:'select', req:1, ph:'Select a refund type', opts:[['interview', 'Interview refund — clawback from the platform share first'], ['cohort', 'Cohort refund — pro-rated by the intent price'], ['sponsored', 'Sponsored employee — the employer is the payer'], ['credit', 'Goodwill credit instead of cash']], get: x => x.rtype || (x.type === 'Credit' ? 'credit' : 'interview')},
+    {k:'amount', l:'Amount', t:'number', req:1},
     {k:'reason', l:'Reason', t:'textarea', req:1, ph:'Recorded on the refund and the audit log'}
   ]; },
-  help:'A refund goes back to the original payment method — or to the sponsoring employer, or as a credit on the account. Inside the 14-day window a course fee is refundable in full. No approval threshold is set, so every refund is decided here (SA-06 E1).',
-  okNew:'Request Refund',
+  /* No help/info block on this sheet (Maryam, 20 Sep 2026: "remove the info block
+     from the form slider"). */
+  okNew:'Submit Refund',
   create: v => { const t = TXNS.find(x => x.id === v.txn); const r = {id:newId('rf', REFUNDS), party:t ? t.who : '—', partyType:t ? t.party : '—', txnRef:t ? t.ref : '—', type: v.rtype === 'credit' ? 'Credit' : 'Refund', rtype:v.rtype, amount:v.amount, reason:v.reason, status:'requested', when:'just now', date:today()}; REFUNDS.unshift(r); return r; },
   update: (r, v) => { r.amount = v.amount; r.reason = v.reason; r.rtype = v.rtype; r.type = v.rtype === 'credit' ? 'Credit' : (r.type === 'Credit' ? 'Refund' : r.type); },
   remove: r => { REFUNDS.splice(REFUNDS.indexOf(r), 1); },
@@ -9024,7 +9100,7 @@ function sheetView(){
       <div class="sheet-b">${s ? s.body : ''}</div>
       <div class="sheet-f">
         <button class="btn btn-s noic" data-close="sheet">${s && !s.ok ? 'Close' : 'Cancel'}</button>
-        ${s && !s.ok ? '' : `<button class="btn btn-p noic${s && s.danger ? ' danger' : ''}" data-act="${s ? esc(s.act) : ''}">${s ? esc(s.ok) : ''}</button>`}
+        ${s && !s.ok ? '' : `<button class="btn btn-p noic${s && s.danger ? ' danger' : ''}" data-act="${s ? esc(s.act) : ''}"${s && s.gate ? ' data-submit="1"' : ''}${s && s.gate && s.disabled ? ' disabled' : ''}>${s ? esc(s.ok) : ''}</button>`}
       </div>
     </div>
   </div>`;
@@ -9042,7 +9118,7 @@ function sidePeek(){
     <div class="sheet-b">${s ? s.body : ''}</div>
     <div class="sheet-f">
       <button class="btn btn-s noic" data-close="sheet">${s && !s.ok ? 'Close' : 'Cancel'}</button>
-      ${s && !s.ok ? '' : `<button class="btn btn-p noic${s && s.danger ? ' danger' : ''}" data-act="${s ? esc(s.act) : ''}">${s ? esc(s.ok) : ''}</button>`}
+      ${s && !s.ok ? '' : `<button class="btn btn-p noic${s && s.danger ? ' danger' : ''}" data-act="${s ? esc(s.act) : ''}"${s && s.gate ? ' data-submit="1"' : ''}${s && s.gate && s.disabled ? ' disabled' : ''}>${s ? esc(s.ok) : ''}</button>`}
     </div>
   </aside>`;
 }
@@ -9308,6 +9384,7 @@ function render(){
     }
   } catch(e){ console.warn('talsum', e); }
 
+  try { syncSheetSubmit(); } catch(e){ console.warn('sheetsubmit', e); }
   writeHash();
 }
 
@@ -9397,11 +9474,12 @@ device.addEventListener('click', e => {
     /* innerHTML, not textContent — an option may carry an avatar (`fddAv`); the
        trigger must keep it when selected (Maryam, 15 Sep 2026). The option's HTML
        is our own markup with escaped labels. */
-    if(vl) vl.innerHTML = fds.innerHTML;
+    if(vl){ vl.innerHTML = fds.innerHTML; vl.classList.remove('fdd-ph'); }
     fdd.querySelectorAll('.fdd-opt').forEach(o => { const on = o === fds; o.classList.toggle('on', on); o.setAttribute('aria-selected', String(on)); });
     fdd.classList.remove('on');
     const tr = fdd.querySelector('[data-formddtoggle]'); if(tr) tr.setAttribute('aria-expanded', 'false');
     const sb = fds.closest('.sheet-b'); if(sb) sb.classList.remove('dd-open');
+    syncSheetSubmit();
     return;
   }
   /* a click outside an open form dropdown closes it (DOM-only, no render) */
@@ -9437,9 +9515,10 @@ device.addEventListener('click', e => {
     const raw = dsx.dataset.dateset, i = raw.indexOf(':'), iso = raw.slice(i + 1);
     const fdate = dsx.closest('.fdate'), hid = fdate.querySelector('input[data-f]'), vl = fdate.querySelector('.fdate-val'), tr = fdate.querySelector('[data-datetoggle]');
     if(hid) hid.value = iso;
-    if(vl){ vl.textContent = dpFmt(iso); vl.classList.remove('ph'); }
+    if(vl){ vl.textContent = dpFmt(iso); vl.classList.remove('fdate-ph'); }
     fdate.classList.remove('on'); if(tr) tr.setAttribute('aria-expanded', 'false');
     const sb = fdate.closest('.sheet-b'); if(sb && !device.querySelector('.fdd.fdd-form.on')) sb.classList.remove('dd-open');
+    syncSheetSubmit();
     return;
   }
   /* a click outside an open date picker closes it (DOM-only) */
@@ -9477,6 +9556,9 @@ device.addEventListener('keydown', e => {
 /* THE SEARCH FIELD FILTERS AS YOU TYPE. The value goes into the page's filter
    state and the page re-renders; `SRCH_FOCUS` puts the caret back. */
 device.addEventListener('input', e => {
+  /* a keystroke in a record-sheet field re-checks the submit gate live (no render,
+     which would rebuild the half-typed form — trap 9). */
+  if(e.target.closest('.sheet-b [data-f], .peek-form [data-f]')) syncSheetSubmit();
   const el = e.target.closest('[data-srch]');
   if(el){ setFilter(el.dataset.srch, el.value); SRCH_FOCUS = {name:el.dataset.srch, pos:el.selectionStart}; return render(); }
   /* BULK IMPORT — a name/email cell edited live: update the row, re-validate the

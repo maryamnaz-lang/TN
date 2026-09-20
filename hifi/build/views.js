@@ -789,6 +789,11 @@ const SCENES = {
   ]
 };
 
+/* THE PRICE OF THE REMAINING SCENES — authored placeholder (§74). The seed has
+   no scenes add-on price, so this stands in for the upsell modal's fee row until
+   a real figure lands; the flow reads this one constant so it is set once. */
+const SCENES_PRICE = '$29';
+
 /* THE KEPT SET LIVES IN `S`, NOT IN THE DOM (trap 9). The old chooser held it
    in six `<input type=checkbox>` and counted them on click, which worked only
    because the report page happened not to be rebuilt by a pass. It has to
@@ -806,7 +811,11 @@ const SCENES = {
    choosing", and Save is what ends it. */
 const sceneKeep = (kind) => (S.scenes && S.scenes[kind]) || null;
 const scenePicked = (kind) => (S.scPick && S.scPick[kind]) || [];
-const sceneDone = (kind) => { const k = sceneKeep(kind); return !!k && k.length === 3; };
+/* DONE IS "AT LEAST THREE COMMITTED", not exactly three: buying the rest
+   (`data-scenesall`) commits all six, and the chooser must stay closed for that
+   set too — the upsell keeps a candidate who purchased from being dropped back
+   into the picker. */
+const sceneDone = (kind) => { const k = sceneKeep(kind); return !!k && k.length >= 3; };
 
 /* ONE BIG CARD. Horizontal, a 16:9 still with the play mark over it, the
    scene's own length in the corner of the still, and the title and the line
@@ -7950,7 +7959,7 @@ V.report = (f) => `<main class="main"><div class="page">
   ${(() => { const k = S.iv === 're' ? 're' : 'level';
     return sceneDone(k)
     ? `<div class="sec sec-scene">
-    <div class="sec-h"><h2>Scenes</h2><span class="t-helper-01">The three you kept</span></div>
+    <div class="sec-h"><h2>Scenes</h2><span class="t-helper-01">${(sceneKeep(k)||[]).length > 3 ? 'The full interview, all scenes' : 'The three you kept'}</span></div>
     ${sceneRow(k)}
   </div>`
     : `<div class="sec">
@@ -9990,6 +9999,35 @@ const ivBookedModal = () => {
       </div>
       <div class="sheet-f conf-a">
         <button class="btn btn-p noic" data-ivbooked="0">View My Dashboard</button>
+      </div>
+    </div>
+  </div>`;
+};
+
+/* THE SCENES UPSELL — Maryam, 20 Sep 2026. Once the candidate commits their
+   three included scenes, an OPTIONAL prompt offers the rest: buy the remaining
+   scenes and keep the whole interview. It is opt-in — "Continue with 3" and the
+   backdrop both dismiss it, leaving the three as chosen; "Get All Scenes"
+   commits the full set (a prototype unlock — the real build charges the add-on
+   here). Neutral `.conf` shell (a video mark, not the success tick), the
+   affirmative on the right per the cancel dialog's safe-left / action-right. */
+const scenesUpsellModal = (kind) => {
+  return `<div class="modal on" data-scenesclose="1">
+    <div class="sheet conf" role="dialog" aria-modal="true" aria-label="Keep more of your interview">
+      <div class="sheet-b conf-b">
+        <span class="conf-mk">${I.video}</span>
+        <h2 class="conf-t">Get All Scenes</h2>
+        ${''/* THE PRICE IS ITS OWN ROW, like the interview-fee and course-fee
+              dialogs (Maryam, 21 Sep 2026): an "Only in" label over the amount,
+              the shared `.bkc-fee`/`.bkc-fl`/`.bkc-fv` centred stack. $29 is an
+              authored placeholder (`SCENES_PRICE`, §74). */}
+        <div class="bkc-fee pay-fee" style="align-items:center"><span class="bkc-fl">Only in</span>
+          <span class="bkc-fv">${SCENES_PRICE}</span></div>
+        <p class="conf-x">You&rsquo;ve selected your 3 included scenes. Want to keep the rest? Purchase the remaining interview scenes and get access to the complete set.</p>
+      </div>
+      <div class="sheet-f conf-a">
+        <button class="btn btn-s noic" data-scenesok="1">Continue with 3</button>
+        <button class="btn btn-p noic" data-scenesall="${kind}">Get All Scenes ${I.arrowRight}</button>
       </div>
     </div>
   </div>`;
@@ -15436,7 +15474,10 @@ function render(){
             payment step (`V.checkout`) once `data-payok` fires, before the
             calendar. Gated on the view so it clears itself the moment Continue
             leaves for the calendar. */
-         + (S.view==='checkout' && S.paySuccess ? paySuccessModal() : '');
+         + (S.view==='checkout' && S.paySuccess ? paySuccessModal() : '')
+         /* THE SCENES UPSELL — gated on the report view and the flag the Save
+            action sets once the three are committed. */
+         + (S.view==='report' && S.scenesUpsell ? scenesUpsellModal(S.scenesUpsell) : '');
   }
   /* THE CALL IS PART OF THE KEY, because it is a whole surface arriving and
      leaving: without it, joining a call is a repaint of the same stage and
@@ -16271,9 +16312,30 @@ device.addEventListener('click', e => {
   const ss = t.closest('[data-scenesave]');
   if(ss){
     const kind = ss.dataset.scenesave;
-    if(scenePicked(kind).length === 3) S.scenes[kind] = scenePicked(kind).slice();
+    if(scenePicked(kind).length === 3){
+      S.scenes[kind] = scenePicked(kind).slice();
+      /* WITH THE THREE COMMITTED, OFFER THE REST (Maryam, 20 Sep 2026): an
+         optional prompt to buy the remaining scenes and keep the whole
+         interview. It is opt-in — "Continue with 3" dismisses it and the three
+         stand. */
+      S.scenesUpsell = kind;
+    }
     render(); return;
   }
+  /* GET ALL SCENES commits the whole set (all six), so the report shows the
+     complete interview. A prototype unlock: the real build charges for the
+     add-on here, then commits — there is no price in the seed to draw. */
+  const sa = t.closest('[data-scenesall]');
+  if(sa){
+    const kind = sa.dataset.scenesall;
+    S.scenes[kind] = SCENES[kind].map((_, i) => i);
+    S.scenesUpsell = null;
+    render(); return;
+  }
+  /* CONTINUE WITH 3 dismisses the prompt; the three already committed stand. A
+     backdrop click (outside the sheet) is the same dismissal. */
+  if(t.closest('[data-scenesok]')){ S.scenesUpsell = null; render(); return; }
+  if(t.closest('[data-scenesclose]') && !t.closest('.sheet')){ S.scenesUpsell = null; render(); return; }
   /* playing one is a prototype no-op: there is no video behind a scene, and a
      button that silently does nothing is better than one that opens an empty
      player. The card is still a button so that it reads and focuses as one. */

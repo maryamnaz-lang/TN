@@ -1090,6 +1090,7 @@ svg.arrow,.tile-arrow,.card-go{
 .cq{display:block;margin-top:2px;font-size:12px;color:var(--text-secondary)}
 .conf{padding:var(--s07) var(--gutter);text-align:center}
 .conf svg{width:40px;height:40px;color:var(--support-success);margin:0 auto var(--s05)}
+.app .conf-a .btn svg{width:20px;height:20px;margin:0}
 .box{}
 .w3{min-width:3ch}
 .eb{display:block}
@@ -3610,6 +3611,16 @@ body,.app,.pt-bar,.pt-sel,input,select,textarea,button{font-family:var(--font-sa
 .app .notif .nrow::after{content:'';position:absolute;left:var(--pad-x);right:var(--pad-x);
   top:auto;bottom:-1px;height:1px;width:auto;background:var(--rule);pointer-events:none}
 .app .notif .nrow:last-child::after{display:none}
+.app .notif .nrow{
+  display:grid;grid-template-columns:auto minmax(0,1fr);
+  column-gap:var(--s04);row-gap:var(--s02);align-items:start;
+  padding:var(--s05) var(--pad-x)}
+.app .notif .nrow-ic{
+  grid-column:1;grid-row:1;align-self:start;
+  width:auto;height:auto;min-width:0;min-height:0;margin-top:1px}
+.app .notif .nrow-ic svg{width:20px;height:20px}
+.app .notif .nrow-b{grid-column:2;grid-row:1;margin:0}
+.app .notif .nrow-w{grid-column:2;grid-row:2;position:static;margin:0}
 .app .notif-scrim{
   position:absolute;inset:0;z-index:49;background:var(--overlay);
   opacity:0;visibility:hidden;pointer-events:none;
@@ -9235,7 +9246,8 @@ button.btn-p:active,
   font-size:var(--t-eyebrow-size);line-height:var(--t-eyebrow-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-eyebrow-ls);
   text-transform:none;color:var(--text-secondary)}
-.app .t-caption,.app .u-caption,.app .t-helper-01,.app .t-legal-01{
+.app .t-caption,.app .u-caption,.app .t-helper-01,.app .t-legal-01,
+.app .nrow-w{
   font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
   font-weight:var(--t-w-book);letter-spacing:var(--t-caption-ls);
   color:var(--text-helper)}
@@ -10463,6 +10475,7 @@ button.btn-p:active,
 .app[data-portal="admin"] .viewas-t b{font-weight:var(--t-w-strong); color:var(--accent-text)}
 .app .rank-chip{color:var(--accent-text)}
 .app .tag.tag-you{color:var(--accent-text)}
+.app .conf-a .btn svg{color:inherit}
 .app .rev-cap-t{color:var(--accent);font-weight:var(--t-w-strong)}
 .app .btn-s,.app .btn-t,.app .btn-g,
 .app .btn-s:hover:where(.__nh),.app .btn-t:hover:where(.__nh),.app .btn-g:hover:where(.__nh),
@@ -15242,12 +15255,12 @@ const NOTIF = {
   consult:[
     {ic:'calendar',   t:'Your consultant call is booked', b:'Jordan Blake, Thursday, August 13 at 2:00 PM ET. A calendar invite is on its way.', w:'1h ago',    go:'dashboard', unread:1},
     {ic:'trophy',     t:'Your quiz result carried over',  b:'You are on the Explorer track. Your level comes later, from an agent interview.',   w:'3h ago',    go:'level',     unread:1},
-    {ic:'checkFilled',t:'Account created',                b:'Welcome to TalentNext, Maryam.',                                                    w:'Yesterday', go:'account',   unread:0}
+    {ic:'checkOutline' ,t:'Account created',                b:'Welcome to TalentNext, Maryam.',                                                    w:'Yesterday', go:'account',   unread:0}
   ],
   new:[
     {ic:'trophy',   t:'Your quiz result is in',       b:'You are on the Explorer track. An interview sets your level.', w:'2h ago', go:'level',      unread:1},
     {ic:'calendar', t:'3 agents have slots this week',b:'Booking early usually means starting a cohort inside 10 days.', w:'5h ago', go:'agents',     unread:1},
-    {ic:'checkFilled',t:'Account created',            b:'Welcome to TalentNext, Maryam.',                               w:'Yesterday', go:'account', unread:1}
+    {ic:'checkOutline' ,t:'Account created',            b:'Welcome to TalentNext, Maryam.',                               w:'Yesterday', go:'account', unread:1}
   ],
   booked:[
     {ic:'calendar', t:'Interview confirmed',          b:'Priya Nair, Thursday, August 20 at 6:30 PM ET.',                 w:'1h ago', go:'interviews', unread:1},
@@ -15260,7 +15273,7 @@ const NOTIF = {
     {ic:'creditCard',t:'Payment received',            b:'$95 for your interview. Receipt in Payments.',                 w:'Yesterday', go:'billing',  unread:0}
   ],
   held:[
-    {ic:'checkFilled',t:'Interview complete',         b:'Priya is writing up your report. It will be ready within 24 hours.', w:'Just now', go:'interviews', unread:1},
+    {ic:'checkOutline' ,t:'Interview complete',         b:'Priya is writing up your report. It will be ready within 24 hours.', w:'Just now', go:'interviews', unread:1},
     {ic:'document', t:'Your report is on its way',     b:'You will be told the moment Priya signs it. There is nothing to do.', w:'Just now', go:'level',     unread:1},
     {ic:'video',    t:'Interview recorded',            b:'The recording and transcript are what your report is built from.',    w:'Just now', go:'interviews', unread:0}
   ],
@@ -15284,7 +15297,7 @@ const NOTIF = {
   day90:[
     {ic:'calendar', t:'Your re-interview is available',b:'The 90 days are complete. Book it to have them assessed.', w:'Today', go:'agents',      unread:1},
     {ic:'document', t:'Your 90-day summary is ready to read',b:'Priya signs it once the re-interview is booked.',       w:'Today', go:'transcript',  unread:1},
-    {ic:'checkFilled',t:'Course complete',           b:'All 13 chapters done, 83% average.',                           w:'Yesterday', go:'transcript', unread:1}
+    {ic:'checkOutline' ,t:'Course complete',           b:'All 13 chapters done, 83% average.',                           w:'Yesterday', go:'transcript', unread:1}
   ],
   promoted:[
     {ic:'trophy',   t:'Promoted to Explorer – E4',    b:'Priya signed the decision on November 21.',                    w:'Today', go:'level',       unread:1},
@@ -15775,9 +15788,11 @@ const SCENES = {
   ]
 };
 
+const SCENES_PRICE = '$29';
+
 const sceneKeep = (kind) => (S.scenes && S.scenes[kind]) || null;
 const scenePicked = (kind) => (S.scPick && S.scPick[kind]) || [];
-const sceneDone = (kind) => { const k = sceneKeep(kind); return !!k && k.length === 3; };
+const sceneDone = (kind) => { const k = sceneKeep(kind); return !!k && k.length >= 3; };
 
 const STILL_Y = ['14%','24%','34%','19%','29%','39%'];
 function sceneCard(kind, i, n){
@@ -19462,7 +19477,7 @@ V.report = (f) => `<main class="main"><div class="page">
   ${(() => { const k = S.iv === 're' ? 're' : 'level';
     return sceneDone(k)
     ? `<div class="sec sec-scene">
-    <div class="sec-h"><h2>Scenes</h2><span class="t-helper-01">The three you kept</span></div>
+    <div class="sec-h"><h2>Scenes</h2><span class="t-helper-01">${(sceneKeep(k)||[]).length > 3 ? 'The full interview, all scenes' : 'The three you kept'}</span></div>
     ${sceneRow(k)}
   </div>`
     : `<div class="sec">
@@ -20863,6 +20878,28 @@ const ivBookedModal = () => {
       </div>
       <div class="sheet-f conf-a">
         <button class="btn btn-p noic" data-ivbooked="0">View My Dashboard</button>
+      </div>
+    </div>
+  </div>`;
+};
+
+const scenesUpsellModal = (kind) => {
+  return `<div class="modal on" data-scenesclose="1">
+    <div class="sheet conf" role="dialog" aria-modal="true" aria-label="Keep more of your interview">
+      <div class="sheet-b conf-b">
+        <span class="conf-mk">${I.video}</span>
+        <h2 class="conf-t">Get All Scenes</h2>
+        ${''/* THE PRICE IS ITS OWN ROW, like the interview-fee and course-fee
+              dialogs (Maryam, 21 Sep 2026): an "Only in" label over the amount,
+              the shared `.bkc-fee`/`.bkc-fl`/`.bkc-fv` centred stack. $29 is an
+              authored placeholder (`SCENES_PRICE`, §74). */}
+        <div class="bkc-fee pay-fee" style="align-items:center"><span class="bkc-fl">Only in</span>
+          <span class="bkc-fv">${SCENES_PRICE}</span></div>
+        <p class="conf-x">You&rsquo;ve selected your 3 included scenes. Want to keep the rest? Purchase the remaining interview scenes and get access to the complete set.</p>
+      </div>
+      <div class="sheet-f conf-a">
+        <button class="btn btn-s noic" data-scenesok="1">Continue with 3</button>
+        <button class="btn btn-p noic" data-scenesall="${kind}">Get All Scenes ${I.arrowRight}</button>
       </div>
     </div>
   </div>`;
@@ -23889,7 +23926,8 @@ function render(){
          + (S.view==='billing' && S.receipt!=null ? receiptModal() : '')
          + (S.view==='interviews' && S.ivCancel ? ivCancelModal() : '')
          + (S.ivBooked && (S.stage==='booked' || S.stage===RESCHED) ? ivBookedModal() : '')
-         + (S.view==='checkout' && S.paySuccess ? paySuccessModal() : '');
+         + (S.view==='checkout' && S.paySuccess ? paySuccessModal() : '')
+         + (S.view==='report' && S.scenesUpsell ? scenesUpsellModal(S.scenesUpsell) : '');
   }
   const key = S.stage + '/' + S.view + (S.call ? '/call' : '');
   const entered = key !== MO.key;
@@ -24244,9 +24282,21 @@ device.addEventListener('click', e => {
   const ss = t.closest('[data-scenesave]');
   if(ss){
     const kind = ss.dataset.scenesave;
-    if(scenePicked(kind).length === 3) S.scenes[kind] = scenePicked(kind).slice();
+    if(scenePicked(kind).length === 3){
+      S.scenes[kind] = scenePicked(kind).slice();
+      S.scenesUpsell = kind;
+    }
     render(); return;
   }
+  const sa = t.closest('[data-scenesall]');
+  if(sa){
+    const kind = sa.dataset.scenesall;
+    S.scenes[kind] = SCENES[kind].map((_, i) => i);
+    S.scenesUpsell = null;
+    render(); return;
+  }
+  if(t.closest('[data-scenesok]')){ S.scenesUpsell = null; render(); return; }
+  if(t.closest('[data-scenesclose]') && !t.closest('.sheet')){ S.scenesUpsell = null; render(); return; }
   if(t.closest('[data-scene-play]')) return;
   const ct = t.closest('[data-ctab]');
   if(ct){ S.ctab = ct.dataset.ctab; render(); return; }
