@@ -11495,6 +11495,8 @@ button.btn-p:active,
 .app .bks-w{padding:var(--s07) 0 var(--s04)}
 .app .bkc{padding-top:var(--s04)}
 .app .bkpay-go{margin-top:var(--s06)}
+.app .bks-w > .bkpay-go:first-child{margin-top:0}
+.app .bks-w > .f:last-child{margin-bottom:0}
 .app .bks-w,.app .bkc{
   width:100%;max-width:min(100%, 830px);
   margin-left:auto;margin-right:auto}
@@ -13171,6 +13173,7 @@ button.btn-p:active,
 .app .conf.conf-ok > .conf-a{padding-top:0}
 .app .conf.conf-ok .conf-a .btn-p{
   background:var(--layer-02);border:1px solid var(--rule)}
+.app .conf.conf-ok > .conf-b:has(.pay-fee){padding-bottom:var(--s05)}
 .app .ol .acc-h .ttl{
   display:flex;flex-direction:column;align-items:flex-start}
 .app .ol .ol-m{margin-top:2px}
@@ -20359,7 +20362,7 @@ const paySuccessModal = () => {
           <span class="bkc-fv">${charged ? a.price : ivFeeLabel(false, a.price)}</span></div>
         <p class="conf-x">${charged
           ? `Your payment was successfully processed. You can now continue to select a time for your interview.`
-          : `Your first interview is complimentary, so no payment was charged. Your payment method has been saved for future bookings.`}</p>
+          : `Your first interview is complimentary. No payment was charged, and your payment method is saved for future bookings.`}</p>
       </div>
       <div class="sheet-f conf-a">
         <button class="btn btn-p noic" data-paygo="${S.agent||'priya'}">Pick a slot</button>

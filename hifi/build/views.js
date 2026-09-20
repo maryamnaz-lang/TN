@@ -9018,7 +9018,7 @@ const paySuccessModal = () => {
           <span class="bkc-fv">${charged ? a.price : ivFeeLabel(false, a.price)}</span></div>
         <p class="conf-x">${charged
           ? `Your payment was successfully processed. You can now continue to select a time for your interview.`
-          : `Your first interview is complimentary, so no payment was charged. Your payment method has been saved for future bookings.`}</p>
+          : `Your first interview is complimentary. No payment was charged, and your payment method is saved for future bookings.`}</p>
       </div>
       <div class="sheet-f conf-a">
         <button class="btn btn-p noic" data-paygo="${S.agent||'priya'}">Pick a slot</button>

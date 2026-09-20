@@ -14,7 +14,7 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 6163.  Rules dropped as product-specific: 222.
+   Rules kept: 6166.  Rules dropped as product-specific: 222.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
@@ -8169,6 +8169,8 @@ button.btn-p:active,
 .app .bks-w{padding:var(--s07) 0 var(--s04)}
 .app .bkc{padding-top:var(--s04)}
 .app .bkpay-go{margin-top:var(--s06)}
+.app .bks-w > .bkpay-go:first-child{margin-top:0}
+.app .bks-w > .f:last-child{margin-bottom:0}
 .app .bks-w,
 .app .bkc{width:100%; max-width:min(100%, 830px); margin-left:auto; margin-right:auto}
 .app .bkp{display:grid; grid-template-columns:minmax(0,1fr); gap:var(--s06)}
@@ -9156,6 +9158,7 @@ button.btn-p:active,
 .app .conf.conf-ok .conf-mk{margin-bottom:var(--s04)}
 .app .conf.conf-ok > .conf-a{padding-top:0}
 .app .conf.conf-ok .conf-a .btn-p{background:var(--layer-02); border:1px solid var(--rule)}
+.app .conf.conf-ok > .conf-b:has(.pay-fee){padding-bottom:var(--s05)}
 
 /* ---- 110-outline.css ---- */
 .app .ol .acc-h .ttl{display:flex; flex-direction:column; align-items:flex-start}

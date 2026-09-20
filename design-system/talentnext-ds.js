@@ -1276,9 +1276,11 @@ function dsCrow(kind, o){
           o.join === false ? `${(c.second||{}).t} ${I.arrowRight}` : `${(c.second||{}).ic}${(c.second||{}).t}`}</button>`}
         ${o.join === false ? ''
           /* THE RESCHEDULE STAGE SWAPS JOIN FOR A WHITE "Reschedule" (Maryam,
-             18 Sep 2026) that reopens the agent's booking calendar (`agent:<k>`)
-             rather than joining the call. */
-          : c.resched ? `<button class="btn btn-sm noic crow-resched" data-go="agent:${c.key}">Reschedule ${I.arrowRight}</button>`
+             18 Sep 2026) that reopens the agent's booking calendar rather than
+             joining the call. It uses `cal:<k>` (the calendar directly), NOT
+             `agent:<k>` — the interview is already paid, so rescheduling must not
+             re-open the payment step (Maryam, 19 Sep 2026). */
+          : c.resched ? `<button class="btn btn-sm noic crow-resched" data-go="cal:${c.key}">Reschedule ${I.arrowRight}</button>`
           : `<button class="btn btn-p btn-sm noic"${c.kind ? ` data-call="${c.kind}"` : ''}${
           gated ? ` data-joinwhen="${c.when}" data-joinmins="${c.mins || 45}"` : ''}${
           gate ? ` disabled title="${dsJoinShut(c.when)}"` : ''}>Join call ${I.arrowRight}</button>`}

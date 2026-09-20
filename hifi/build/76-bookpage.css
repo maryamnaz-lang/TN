@@ -96,6 +96,22 @@
    air under the picker so it reads as the act the picker leads to. */
 .app .bkpay-go{margin-top:var(--s06)}
 
+/* ON THE CALENDAR STEP THE BUTTON IS ALONE IN ITS BLOCK, so it wants no extra
+   top margin (Maryam, 20 Sep 2026: the button-to-question gap should equal the
+   calendar-to-question gap). §76.1's `.bks-w` padding already lays 48px between
+   the question block and this one (16 foot + 32 head); the `--s06` above is for
+   the CHECKOUT, where `.bkpay-go` FOLLOWS the card picker inside one block and
+   needs its own separation. When it is the block's first child, drop it so the
+   gap is the block rhythm alone. */
+.app .bks-w > .bkpay-go:first-child{margin-top:0}
+
+/* AND THE QUESTION FIELD DROPS ITS OWN FOOT MARGIN as the block's last child
+   (Maryam, 20 Sep 2026, same ask): the generic `.f` carries a 16px
+   `margin-bottom`, which the calendar image above does not, so the button-to-
+   question gap read 16px wider than the calendar-to-question one. Zeroed here,
+   the two gaps are the `.bks-w` block rhythm alone. */
+.app .bks-w > .f:last-child{margin-bottom:0}
+
 /* ------------------------------------------------------------------ 76.1b ---
    THE CHOOSING AND THE PAYING ARE A CENTRED COLUMN, NARROWER THAN THE PROFILE
    Maryam, 31 Aug 2026, with the frame marked: "set the date time and bottom
