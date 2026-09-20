@@ -125,6 +125,14 @@
   padding:1px var(--s03);border-radius:999px;
   background:color-mix(in srgb, var(--accent) 12%, var(--background))}
 
+/* THE COHORT "You" TAG IS THE SAME LIGHT-RED PILL as the rank chip (Maryam,
+   20 Sep 2026): round, a 12% accent-over-page ground, accent ink (§63). It was
+   the black `.tag.brand` square; this drops the fill and squares to a pill.
+   (0,3,0) beats §02's `.tag.brand`/base and §22's radius. */
+.app .tag.tag-you{
+  border:0;border-radius:999px;
+  background:color-mix(in srgb, var(--accent) 12%, var(--background))}
+
 /* ------------------------------------------------------------------ 105.9 ---
    MY COURSES — the accordion of taken courses (Maryam, 9 Sep 2026). It reuses
    `.acc.ol` (the course-outline accordion) and drops the four-cell `.stats`

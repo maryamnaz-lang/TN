@@ -697,8 +697,8 @@ function agentCard(key){ return agentCardOf(AGENTS[key], key); }
 function mem(name,ini,meta,you,img){
   return `<div class="mem">
     <span class="mem-av mem-ph">${avatar({i:ini, img:AV[img||'priya']}, 36)}</span>
-    <span class="mem-b"><span class="mem-n">${name}</span><span class="mem-m">${meta}</span></span>
-    ${you?'<span class="tag brand sm">You</span>':''}
+    <span class="mem-b"><span class="mem-n">${name}</span>${meta?`<span class="mem-m">${meta}</span>`:''}</span>
+    ${you?'<span class="tag tag-you sm">You</span>':''}
   </div>`;
 }
 /* `clip` is the old row form of a scene — a 48px thumbnail, a title, a
@@ -9951,13 +9951,19 @@ V.payment = (f) => {
    which is how the delete confirmation was invisible for its whole life.
    ========================================================================== */
 const enrolSheet = () => {
-  const c = S.cards.find(x => x.def) || S.cards[0];
   return `<div class="modal on" data-close="enrolok">
     <div class="sheet conf conf-ok" role="dialog" aria-modal="true" aria-label="Successfully enrolled">
       <div class="sheet-b conf-b">
         <span class="conf-mk">${I.checkFilled}</span>
         <h2 class="conf-t">Successfully enrolled</h2>
-        <p class="conf-x">$595 paid on your ${c.brand} ending ${c.last}, and Cohort 41 is yours for the 90 days. Chapter 1 is open from today and the ten of you meet on the weekly call.</p>
+        ${''/* THE FEE IS ITS OWN ROW, like the pay-success dialog (Maryam, 20 Sep
+              2026): a "Course Fee" label over the amount, the shared
+              `.bkc-fee`/`.bkc-fl`/`.bkc-fv` treatment centred in `.pay-fee`. The
+              copy no longer repeats the figure. $595 is the enrol flow's own
+              due-today literal (course $690 less the $95 interview credit). */}
+        <div class="bkc-fee pay-fee" style="align-items:center"><span class="bkc-fl">Course Fee</span>
+          <span class="bkc-fv">$595</span></div>
+        <p class="conf-x">Your payment was successful, and your enrollment is confirmed. You&rsquo;re all set to begin your TalentNext journey.</p>
       </div>
       <div class="sheet-f conf-a">
         <button class="btn btn-s noic" data-enrolok="0">Close</button>
@@ -11290,8 +11296,11 @@ V.cohort = (f) => `<main class="main"><div class="page">
       <button class="${(S.ctab||'discussion')==='discussion'?'on':''}" data-ctab="discussion">Discussion</button>
       <button class="${S.ctab==='members'?'on':''}" data-ctab="members">Members</button>
     </div>
+    ${''/* A CANDIDATE DOES NOT SEE OTHER MEMBERS' ACTIVITY (Maryam, 20 Sep 2026):
+           only the reader's own row keeps its meta line; every other member is
+           name + face alone. `mem` omits `.mem-m` when the meta is empty. */}
     ${S.ctab==='members'
-      ? `<div class="tile-stack">${COHORT.map(([n,i,img,meta,you])=>mem(n,i,meta,you,img)).join('')}</div>`
+      ? `<div class="tile-stack">${COHORT.map(([n,i,img,meta,you])=>mem(n,i,you?meta:'',you,img)).join('')}</div>`
       : discussionRoom()}
   </div>
 </div></main>`;

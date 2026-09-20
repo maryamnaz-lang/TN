@@ -119,9 +119,11 @@
 .app .conf.conf-ok .conf-a .btn-p{
   background:var(--layer-02);border:1px solid var(--rule)}
 
-/* THE PAY-SUCCESS DESC WANTS AIR BEFORE THE CTA (Maryam, 20 Sep 2026): the
-   body's own `--s03` foot sat the "Pick a slot" button tight under the copy, so
-   a `.pay-fee`-carrying success body pads its foot one step more. The fee row
-   keeps §76's centred column stack (Interview Fee over the amount) — Maryam took
-   back the one-line label/value layout, 20 Sep 2026. Layout only, after §63. */
-.app .conf.conf-ok > .conf-b:has(.pay-fee){padding-bottom:var(--s05)}
+/* A SUCCESS DIALOG'S DESC WANTS AIR BEFORE THE CTA (Maryam, 20 Sep 2026): the
+   §109 tightening dropped this body's foot to `--s03`, which sat the button tight
+   under the copy on every `.conf-ok` that carries a description (pay success,
+   interview booked). Any success body with a `.conf-x` pads its foot one step
+   more; a body with no desc (mark + title only) keeps the tighter foot. The fee
+   row keeps §76's centred column stack (Interview Fee over the amount) — Maryam
+   took back the one-line label/value layout, 20 Sep 2026. Layout only, after §63. */
+.app .conf.conf-ok > .conf-b:has(.conf-x){padding-bottom:var(--s05)}

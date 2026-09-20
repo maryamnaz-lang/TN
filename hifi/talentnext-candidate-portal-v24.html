@@ -10006,6 +10006,7 @@ button.btn-p:active,
 .app .dark-card .eo-when{color:var(--on-dark-2)}
 .app .dark-card .eo-when > b{
   font-weight:var(--t-w-book);color:var(--on-dark-2)}
+.app .dark-card .eo-when svg{color:var(--on-dark)}
 .app .certban-t{
   font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
@@ -10461,6 +10462,7 @@ button.btn-p:active,
 .app[data-portal="admin"] .viewas-t{font-size:var(--t-compact-size); line-height:var(--t-compact-lh); color:var(--text-primary)}
 .app[data-portal="admin"] .viewas-t b{font-weight:var(--t-w-strong); color:var(--accent-text)}
 .app .rank-chip{color:var(--accent-text)}
+.app .tag.tag-you{color:var(--accent-text)}
 .app .rev-cap-t{color:var(--accent);font-weight:var(--t-w-strong)}
 .app .btn-s,.app .btn-t,.app .btn-g,
 .app .btn-s:hover:where(.__nh),.app .btn-t:hover:where(.__nh),.app .btn-g:hover:where(.__nh),
@@ -12415,6 +12417,9 @@ button.btn-p:active,
   display:inline-flex;align-items:center;
   padding:1px var(--s03);border-radius:999px;
   background:color-mix(in srgb, var(--accent) 12%, var(--background))}
+.app .tag.tag-you{
+  border:0;border-radius:999px;
+  background:color-mix(in srgb, var(--accent) 12%, var(--background))}
 .app .page .crs-acc .acc-b .stats{margin-top:var(--s04)}
 .app .page .crs-acc .acc-b .dark-card{margin:var(--s04) 0 0}
 .app .page .crs-row > .crs-thumb{
@@ -13173,7 +13178,7 @@ button.btn-p:active,
 .app .conf.conf-ok > .conf-a{padding-top:0}
 .app .conf.conf-ok .conf-a .btn-p{
   background:var(--layer-02);border:1px solid var(--rule)}
-.app .conf.conf-ok > .conf-b:has(.pay-fee){padding-bottom:var(--s05)}
+.app .conf.conf-ok > .conf-b:has(.conf-x){padding-bottom:var(--s05)}
 .app .ol .acc-h .ttl{
   display:flex;flex-direction:column;align-items:flex-start}
 .app .ol .ol-m{margin-top:2px}
@@ -15739,8 +15744,8 @@ function agentCard(key){ return agentCardOf(AGENTS[key], key); }
 function mem(name,ini,meta,you,img){
   return `<div class="mem">
     <span class="mem-av mem-ph">${avatar({i:ini, img:AV[img||'priya']}, 36)}</span>
-    <span class="mem-b"><span class="mem-n">${name}</span><span class="mem-m">${meta}</span></span>
-    ${you?'<span class="tag brand sm">You</span>':''}
+    <span class="mem-b"><span class="mem-n">${name}</span>${meta?`<span class="mem-m">${meta}</span>`:''}</span>
+    ${you?'<span class="tag tag-you sm">You</span>':''}
   </div>`;
 }
 function clip(title,note,stamp,len,kept){
@@ -20825,13 +20830,19 @@ V.payment = (f) => {
 };
 
 const enrolSheet = () => {
-  const c = S.cards.find(x => x.def) || S.cards[0];
   return `<div class="modal on" data-close="enrolok">
     <div class="sheet conf conf-ok" role="dialog" aria-modal="true" aria-label="Successfully enrolled">
       <div class="sheet-b conf-b">
         <span class="conf-mk">${I.checkFilled}</span>
         <h2 class="conf-t">Successfully enrolled</h2>
-        <p class="conf-x">$595 paid on your ${c.brand} ending ${c.last}, and Cohort 41 is yours for the 90 days. Chapter 1 is open from today and the ten of you meet on the weekly call.</p>
+        ${''/* THE FEE IS ITS OWN ROW, like the pay-success dialog (Maryam, 20 Sep
+              2026): a "Course Fee" label over the amount, the shared
+              `.bkc-fee`/`.bkc-fl`/`.bkc-fv` treatment centred in `.pay-fee`. The
+              copy no longer repeats the figure. $595 is the enrol flow's own
+              due-today literal (course $690 less the $95 interview credit). */}
+        <div class="bkc-fee pay-fee" style="align-items:center"><span class="bkc-fl">Course Fee</span>
+          <span class="bkc-fv">$595</span></div>
+        <p class="conf-x">Your payment was successful, and your enrollment is confirmed. You&rsquo;re all set to begin your TalentNext journey.</p>
       </div>
       <div class="sheet-f conf-a">
         <button class="btn btn-s noic" data-enrolok="0">Close</button>
@@ -21811,8 +21822,11 @@ V.cohort = (f) => `<main class="main"><div class="page">
       <button class="${(S.ctab||'discussion')==='discussion'?'on':''}" data-ctab="discussion">Discussion</button>
       <button class="${S.ctab==='members'?'on':''}" data-ctab="members">Members</button>
     </div>
+    ${''/* A CANDIDATE DOES NOT SEE OTHER MEMBERS' ACTIVITY (Maryam, 20 Sep 2026):
+           only the reader's own row keeps its meta line; every other member is
+           name + face alone. `mem` omits `.mem-m` when the meta is empty. */}
     ${S.ctab==='members'
-      ? `<div class="tile-stack">${COHORT.map(([n,i,img,meta,you])=>mem(n,i,meta,you,img)).join('')}</div>`
+      ? `<div class="tile-stack">${COHORT.map(([n,i,img,meta,you])=>mem(n,i,you?meta:'',you,img)).join('')}</div>`
       : discussionRoom()}
   </div>
 </div></main>`;

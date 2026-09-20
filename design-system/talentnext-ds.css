@@ -14,7 +14,7 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 6166.  Rules dropped as product-specific: 222.
+   Rules kept: 6169.  Rules dropped as product-specific: 222.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
@@ -7429,6 +7429,7 @@ button.btn-p:active,
 .app .dark-card .eo-fv-acc{color:var(--accent-on-dark)}
 .app .dark-card .eo-when{color:var(--on-dark-2)}
 .app .dark-card .eo-when > b{font-weight:var(--t-w-book); color:var(--on-dark-2)}
+.app .dark-card .eo-when svg{color:var(--on-dark)}
 .app .certban-t{font-size:var(--t-h4-size); line-height:var(--t-h4-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h4-ls); text-transform:none; color:var(--text-primary)}
 .app .certban-m{font-size:var(--t-desc-size); line-height:var(--t-desc-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-desc-ls); text-transform:none; color:var(--text-secondary)}
 .app .gcard-art > i{font-size:var(--t-h4-size); line-height:var(--t-h4-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h4-ls); text-transform:none; color:var(--text-secondary)}
@@ -7604,6 +7605,7 @@ button.btn-p:active,
 .app[data-portal="admin"] .viewas-t{font-size:var(--t-compact-size); line-height:var(--t-compact-lh); color:var(--text-primary)}
 .app[data-portal="admin"] .viewas-t b{font-weight:var(--t-w-strong); color:var(--accent-text)}
 .app .rank-chip{color:var(--accent-text)}
+.app .tag.tag-you{color:var(--accent-text)}
 .app .rev-cap-t{color:var(--accent); font-weight:var(--t-w-strong)}
 
 /* ---- 64-quietbtn.css ---- */
@@ -8783,6 +8785,7 @@ button.btn-p:active,
 .app .page .sec-out > .btn{padding-left:0}
 .app .page .idname-row{display:flex; align-items:center; gap:var(--s03)}
 .app .page .rank-chip{display:inline-flex; align-items:center; padding:1px var(--s03); border-radius:999px; background:color-mix(in srgb, var(--accent) 12%, var(--background))}
+.app .tag.tag-you{border:0; border-radius:999px; background:color-mix(in srgb, var(--accent) 12%, var(--background))}
 .app .page .crs-acc .acc-b .stats{margin-top:var(--s04)}
 .app .page .crs-acc .acc-b .dark-card{margin:var(--s04) 0 0}
 .app .page .crs-row > .crs-thumb{flex:none; width:56px; height:38px; object-fit:cover; margin-right:var(--s04); border:1px solid var(--rule)}
@@ -9158,7 +9161,7 @@ button.btn-p:active,
 .app .conf.conf-ok .conf-mk{margin-bottom:var(--s04)}
 .app .conf.conf-ok > .conf-a{padding-top:0}
 .app .conf.conf-ok .conf-a .btn-p{background:var(--layer-02); border:1px solid var(--rule)}
-.app .conf.conf-ok > .conf-b:has(.pay-fee){padding-bottom:var(--s05)}
+.app .conf.conf-ok > .conf-b:has(.conf-x){padding-bottom:var(--s05)}
 
 /* ---- 110-outline.css ---- */
 .app .ol .acc-h .ttl{display:flex; flex-direction:column; align-items:flex-start}

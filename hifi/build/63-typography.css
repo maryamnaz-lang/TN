@@ -3180,6 +3180,14 @@
 .app .dark-card .eo-when{color:var(--on-dark-2)}
 .app .dark-card .eo-when > b{
   font-weight:var(--t-w-book);color:var(--on-dark-2)}
+/* THE CALENDAR MARK IS WHITE ON THE DARK CARD, NOT ACCENT RED (Maryam,
+   20 Sep 2026): §73 sets `.eo-when svg{color:var(--accent-text)}`, which the
+   note above assumed the dark-card text colour would carry through §82's
+   `fill:currentColor` — but the svg's own colour wins over the inherited line
+   colour, so the glyph stayed red on black. A decorative categorising mark reads
+   `--on-dark` on a dark ground (§29). (0,3,0) beats §73's (0,2,0); §82's
+   `fill:currentColor` then draws it white. */
+.app .dark-card .eo-when svg{color:var(--on-dark)}
 
 /* ==========================================================================
    §21 — THE COHORT LEADER DASHBOARD'S FOUR SECTION HEADINGS — DELETED
@@ -5544,6 +5552,9 @@
    is set here — `--accent-text`, the accent as ink, over §105's light-red pill.
    `.t-label` inked `--text-secondary`, and this (0,2,0, later) overrides it. */
 .app .rank-chip{color:var(--accent-text)}
+/* THE COHORT "You" TAG IS THE SAME ACCENT INK (Maryam, 20 Sep 2026), over §105's
+   light-red pill; (0,3,0) beats §02's `.tag.brand` white-on-brand. */
+.app .tag.tag-you{color:var(--accent-text)}
 
 /* THE REVIEW CAPSULE LABEL IS THE ACCENT (Maryam, 14 Sep 2026: "the icon and text
    needs to be in accent color", then again "i think you are not using the accent
