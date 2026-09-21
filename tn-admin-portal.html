@@ -14,7 +14,7 @@
      The <style> block is PROTOTYPE CHROME AND NOTHING ELSE (the device frame,
      the viewport picker, the wordmark size, a toast host) — no product rule.
      ========================================================================== -->
-<link rel="stylesheet" href="design-system/talentnext-ds.css?b=24f56e3e">
+<link rel="stylesheet" href="design-system/talentnext-ds.css?b=b9a82854">
 
 <style>
 /* ==========================================================================
@@ -776,6 +776,25 @@
 .app .hbar-v{color:var(--text-primary); font-weight:var(--t-w-strong)}
 .app .hbar-track{height:8px; background:var(--surface-2); border-radius:999px; overflow:hidden}
 .app .hbar-track i{display:block; height:100%; background:var(--dv-3, var(--support-success)); border-radius:999px}
+/* Multi-line trend chart — a line per series (Figma "Charts", Maryam 21 Sep 2026),
+   recolored to the green --dv-* ramp (categorical data-viz never rides the brand
+   red, DESIGN.md §3). Dashed smooth curves; the chart owns its own SVG labels
+   (§63 §5, so fill/size live inline on the <text>). Uniform viewBox scale, so it
+   never distorts. The monthly series are AUTHORED PLACEHOLDER (§74) — the seed
+   carries no headcount history (SA-03 E1) — pinned so the last point equals each
+   role's real current count. */
+.app .lchart{display:flex; flex-direction:column; gap:var(--s05)}
+.app .lchart-leg{display:flex; flex-wrap:wrap; gap:var(--s03) var(--s05)}
+.app .lc-chip{display:inline-flex; align-items:center; gap:var(--s02); font-size:var(--t-desc-size); color:var(--text-secondary)}
+.app .lc-dot{width:9px; height:9px; border-radius:999px; flex:none}
+.app .lchart-svg{display:block; width:100%; height:auto; overflow:visible}
+/* Bucket cards — a 3-up `.stats` grid (Candidates by bucket, Maryam 21 Sep 2026).
+   Base `.stats` is 2-up (mobile) / 4-up (>=900); three cells there would leave a
+   grey grid-gap cell, so pin it to one column on a phone and exactly three across
+   at desktop — always fully filled. Restated inside the query so the desktop rule
+   outweighs the base 4-up (trap 3). */
+.app .stats.dash-buckets{grid-template-columns:1fr}
+@container app (min-width:900px){ .app .stats.dash-buckets{grid-template-columns:repeat(3,minmax(0,1fr))} }
 
 /* Attention-queue pager (on a dark card) */
 .app .dc-pager{display:inline-flex; align-items:center; gap:var(--s02)}
@@ -817,7 +836,7 @@
   </div>
 </div>
 
-<script src="design-system/talentnext-ds.js?b=24f56e3e"></script>
+<script src="design-system/talentnext-ds.js?b=b9a82854"></script>
 <script>
 /* ==========================================================================
    THE SUPER ADMIN PORTAL
@@ -1921,6 +1940,135 @@ function hbars(rows){
     const w = Math.max(3, Math.round(r[2] / max * 100));
     return `<div class="hbar"><div class="hbar-top"><span class="hbar-l t-desc">${esc(r[0])}</span><b class="hbar-v">${r[1]}</b></div><div class="hbar-track"><i style="width:${w}%"></i></div></div>`;
   }).join('')}</div>`;
+}
+
+/* MULTI-LINE TREND CHART — a line per series (Figma "Charts", Maryam 21 Sep 2026:
+   "i want this graph for the user by role, each role will have a line"). Built in
+   our components at the reference's proportions: smooth dashed curves, a dot+label
+   legend (matching the donut's legend), integer y-axis with hairline gridlines and
+   month x-labels. Colour rides the green `--dv-*` ramp, never the brand red
+   (categorical data-viz, DESIGN.md §3). The chart owns its own SVG labels, so
+   fill/size are inline on the <text> (§63 §5). Uniform viewBox scaling — no
+   `preserveAspectRatio:none` distortion.
+   `series` are {name, color, pts:[..n values]}; `opts.labels` overrides the months.
+   Catmull-Rom → cubic bezier for the smoothing (a monotone x grid, so no loops). */
+function smoothPath(pts){
+  if(pts.length < 2) return pts.length ? `M${pts[0].x},${pts[0].y}` : '';
+  let d = `M${pts[0].x.toFixed(1)},${pts[0].y.toFixed(1)}`;
+  for(let i = 0; i < pts.length - 1; i++){
+    const p0 = pts[i - 1] || pts[i], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2] || pts[i + 1];
+    const c1x = p1.x + (p2.x - p0.x) / 6, c1y = p1.y + (p2.y - p0.y) / 6;
+    const c2x = p2.x - (p3.x - p1.x) / 6, c2y = p2.y - (p3.y - p1.y) / 6;
+    d += ` C${c1x.toFixed(1)},${c1y.toFixed(1)} ${c2x.toFixed(1)},${c2y.toFixed(1)} ${p2.x.toFixed(1)},${p2.y.toFixed(1)}`;
+  }
+  return d;
+}
+/* A "nice" axis step for a range — 1/2/5 × 10^n — so gridline labels are round
+   (3 for a 12-count axis, $500 for a $1,140 one) rather than 1140/5. */
+function niceStep(range, target){
+  const raw = (range || 1) / (target || 4);
+  const pow = Math.pow(10, Math.floor(Math.log10(raw)));
+  const n = raw / pow;
+  return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 5 ? 5 : 10) * pow;
+}
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+/* Shared HORIZONTAL grid: one VISIBLE hairline per value tick (the 0 / 10 / 20 / 30
+   rows), plus the y-axis label for each (Maryam 21 Sep 2026: "the gaps between
+   horizontal lines to 20px means the 0 10 20 30 rows lines"). The 20px gap is set
+   by the plot height, not here — the plot is (ticks-1) × ROW_GAP tall, so
+   consecutive tick rows sit ROW_GAP apart. NO vertical gridlines. */
+const CHART_ROW_GAP = 32;               // viewBox-px between adjacent tick rows (Maryam 21 Sep 2026)
+function chartGridH(x0, x1, ticks, Y, fmt){
+  const lines = ticks.map(t => `<line x1="${x0}" y1="${Y(t).toFixed(1)}" x2="${x1}" y2="${Y(t).toFixed(1)}" stroke="var(--rule)" stroke-width="1"/>`).join('');
+  const labels = ticks.map(t => `<text x="${x0 - 8}" y="${(Y(t) + 3).toFixed(1)}" text-anchor="end" font-size="8" fill="var(--text-helper)">${esc(fmt(t))}</text>`).join('');
+  return lines + labels;
+}
+/* opts: labels, aria, fmt (y-label formatter, e.g. money), dashed (default true),
+   area (fill under each line, default false), rowGap (px between tick rows). */
+function lineChart(series, opts = {}){
+  const labels = opts.labels || MONTHS, n = labels.length;
+  const fmt = opts.fmt || (v => String(v)), dashed = opts.dashed !== false;
+  const rowGap = opts.rowGap || CHART_ROW_GAP;
+  const W = 1000, padL = opts.padL || 40, padR = 14, padT = 14, padB = 28;
+  const x0 = padL, x1 = W - padR, plotW = x1 - x0;
+  const maxV = Math.max(1, ...series.flatMap(s => s.pts));
+  const step = niceStep(maxV * 1.08, 7);
+  const vmax = Math.max(step, Math.ceil(maxV * 1.05 / step) * step);
+  const ticks = []; for(let t = 0; t <= vmax + 1e-6; t += step) ticks.push(t);
+  const plotH = (ticks.length - 1) * rowGap, y1 = padT + plotH, H = y1 + padB;
+  const X = i => x0 + (n === 1 ? 0 : i / (n - 1) * plotW);
+  const Y = v => y1 - v / vmax * plotH;
+  const grid = chartGridH(x0, x1, ticks, Y, fmt);
+  const xlab = labels.map((l, i) => `<text x="${X(i).toFixed(1)}" y="${H - 9}" text-anchor="middle" font-size="8" letter-spacing=".4" fill="var(--text-helper)">${esc(String(l).toUpperCase())}</text>`).join('');
+  const areas = opts.area ? series.map(s => {
+    const pt = s.pts.map((v, i) => ({x: X(i), y: Y(v)}));
+    return `<path d="${smoothPath(pt)} L${X(n - 1).toFixed(1)},${y1} L${x0.toFixed(1)},${y1} Z" fill="${s.color}" opacity=".08" stroke="none"/>`;
+  }).join('') : '';
+  const lines = series.map(s => `<path d="${smoothPath(s.pts.map((v, i) => ({x: X(i), y: Y(v)})))}" fill="none" stroke="${s.color}" stroke-width="2.5"${dashed ? ' stroke-dasharray="6 6"' : ''} stroke-linecap="round" stroke-linejoin="round"/>`).join('');
+  const leg = series.map(s => `<span class="lc-chip"><span class="lc-dot" style="background:${s.color}"></span>${esc(s.name)}</span>`).join('');
+  return `<div class="lchart"><div class="lchart-leg">${leg}</div><svg class="lchart-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opts.aria || 'Trend by series')}">${grid}${areas}${lines}${xlab}</svg></div>`;
+}
+/* GROUPED BAR CHART — side-by-side bars per category, one group of bars per month
+   (Figma "Charts", Maryam 21 Sep 2026). Same wrapper/legend/axis language as
+   `lineChart`; green `--dv-*` ramp; rounded bar tops; chart owns its SVG labels.
+   Same 20px tick-row spacing (the plot height is derived from the tick count). */
+function barChart(series, opts = {}){
+  const labels = opts.labels || MONTHS, n = labels.length;
+  const fmt = opts.fmt || (v => String(v));
+  const rowGap = opts.rowGap || CHART_ROW_GAP;
+  const W = 1000, padL = opts.padL || 40, padR = 14, padT = 16, padB = 28;
+  const x0 = padL, x1 = W - padR, plotW = x1 - x0;
+  const maxV = Math.max(1, ...series.flatMap(s => s.pts));
+  const step = niceStep(maxV * 1.08, 7);
+  const vmax = Math.max(step, Math.ceil(maxV * 1.05 / step) * step);
+  const ticks = []; for(let t = 0; t <= vmax + 1e-6; t += step) ticks.push(t);
+  const plotH = (ticks.length - 1) * rowGap, y1 = padT + plotH, H = y1 + padB;
+  const Y = v => y1 - v / vmax * plotH;
+  const bandW = plotW / n, gw = Math.min(bandW * 0.6, 58), gap = 5;
+  const bw = (gw - gap * (series.length - 1)) / series.length, rx = Math.min(bw / 2, 5);
+  const grid = chartGridH(x0, x1, ticks, Y, fmt);
+  const bars = labels.map((l, i) => {
+    const gl = x0 + i * bandW + (bandW - gw) / 2;
+    return series.map((s, j) => {
+      const v = s.pts[i] || 0, h = v / vmax * plotH;
+      return h <= 0 ? '' : `<rect x="${(gl + j * (bw + gap)).toFixed(1)}" y="${Y(v).toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="${rx.toFixed(1)}" fill="${s.color}"/>`;
+    }).join('');
+  }).join('');
+  const xlab = labels.map((l, i) => `<text x="${(x0 + i * bandW + bandW / 2).toFixed(1)}" y="${H - 9}" text-anchor="middle" font-size="8" letter-spacing=".4" fill="var(--text-helper)">${esc(String(l).toUpperCase())}</text>`).join('');
+  const leg = series.map(s => `<span class="lc-chip"><span class="lc-dot" style="background:${s.color}"></span>${esc(s.name)}</span>`).join('');
+  return `<div class="lchart"><div class="lchart-leg">${leg}</div><svg class="lchart-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opts.aria || 'By month')}">${grid}${bars}${xlab}</svg></div>`;
+}
+/* A gently-rising 12-point series ending EXACTLY at `end` (the role's real current
+   count) — the intra-year shape is authored placeholder (§74; the seed has no
+   headcount history, SA-03 E1), the December point is the true figure. A small
+   deterministic wave (keyed on `seed`) separates roles whose endpoints coincide. */
+function roleTrend(end, seed){
+  const start = Math.max(0, end - (2 + (seed % 2)));
+  const pts = [];
+  for(let i = 0; i < 12; i++){
+    const t = i / 11;
+    let v = start + (end - start) * Math.pow(t, 0.8);
+    v += Math.sin(i * 0.9 + seed * 1.3) * 0.22 + Math.cos(i * 0.5 + seed) * 0.12;
+    pts.push(Math.max(0, +v.toFixed(2)));
+  }
+  pts[11] = end;
+  return pts;
+}
+/* A growth ramp that works at ANY magnitude (a 20-count population as well as a
+   3-count one): rises from ~18% of `end` up to `end`, ending EXACTLY at the real
+   current figure — the December point is the truth, the intra-year climb is
+   authored placeholder (§74; no dated history, SA-03 E1). The wobble is scaled to
+   the magnitude (a per-cent), so a small line and a large one both read cleanly. */
+function growthTrend(end, seed){
+  const pts = [];
+  for(let i = 0; i < 12; i++){
+    const t = i / 11;
+    let v = end * (0.18 + 0.82 * Math.pow(t, 0.9));
+    v *= 1 + Math.sin(i * 0.8 + seed * 1.5) * 0.05;
+    pts.push(Math.max(0, +v.toFixed(2)));
+  }
+  pts[11] = end;
+  return pts;
 }
 
 /* THE REVENUE WATERFALL (Maryam, 11 Sep 2026: "I need this kind of revenue chart
@@ -3247,7 +3395,7 @@ function homeOverview(){
      2026). Same type as `secHead`'s h2 (`--t-sec`), inline because `.t-sec` is a
      token not a class; plain (not `.sec-h`) so it never turns a section into a
      label-column grid. */
-  const group = t => `<h2 style="margin:0 0 var(--s05);padding-left:0;font-size:var(--t-sec-size);line-height:var(--t-sec-lh);font-weight:500;letter-spacing:var(--t-sec-ls);color:var(--text-primary)">${t}</h2>`;
+  const group = t => `<h2 style="margin:0 0 var(--s06);padding-left:0;font-size:var(--t-sec-size);line-height:var(--t-sec-lh);font-weight:500;letter-spacing:var(--t-sec-ls);color:var(--text-primary)">${t}</h2>`;
 
   /* 2.2 — PERIOD SELECTOR + as-at time. The selector frames the panels that read
      over a period (money, marketplace); population panels are current-state. The
@@ -3300,45 +3448,34 @@ function homeOverview(){
     ], 'dash-stats')}
   </section>
 
-  ${/* ══ PEOPLE & ACCESS ══ Users lens — role split · status split */''}
+  ${/* ══ PLATFORM USERS ENGAGEMENT ══ a line per PLATFORM POPULATION over 12 months
+       — candidates, cohort leaders, talent agents — NOT the admin-created internal
+       roles (Maryam, 21 Sep 2026: "show candidates, cohort leaders, and talent
+       agents not the system roles"). The section heading is the read, so no
+       sub-heading; the "Users by status" donut is hidden. Faint 20px dotted
+       HORIZONTAL grid (0.5px), no vertical lines. Monthly engagement per
+       population is AUTHORED PLACEHOLDER (§74) — the seed has no engagement
+       telemetry (SA-03 E1); all three carry visible data (none null). */''}
   <section class="sec">
-    ${group('People &amp; access')}
-    <div class="dgrid dgrid-2">
-      <div class="dcol">
-        ${secHead('Users by role')}
-        ${hbars(roleRows.map(([name, n]) => [name, n, n]))}
-      </div>
-      <div class="dcol">
-        ${secHead('Users by status')}
-        ${hbars([
-          ['Active', `${uActive} · ${pctOf(uActive, uTot)}%`, uActive],
-          ['Invited', `${uInvited} · ${pctOf(uInvited, uTot)}%`, uInvited],
-          ['Deactivated', `${uInactive} · ${pctOf(uInactive, uTot)}%`, uInactive]
-        ])}
-      </div>
-    </div>
+    ${group('Platform Users Engagement')}
+    ${lineChart([
+      {name: 'Candidates', color: DV[0], pts: [8, 10, 12, 13, 15, 16, 17, 19, 20, 22, 23, 24]},
+      {name: 'Talent agents', color: DV[3], pts: [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]},
+      {name: 'Cohort leaders', color: DV[2], pts: [2, 3, 4, 4, 5, 6, 6, 7, 8, 9, 10, 11]}
+    ], {aria: 'Candidates, cohort leaders and talent agents over the last 12 months'})}
   </section>
 
-  ${/* ══ CANDIDATES & COHORTS ══ bucket split (donut) · in-cohort read (kv) · cohort health (table) */''}
+  ${/* ══ CANDIDATES BY BUCKET ══ three bucket cards (Maryam, 21 Sep 2026: drop the
+       donut and the "Where candidates sit" read; the section heading IS the bucket
+       read, so no sub-heading). `.dash-buckets` is a 3-up card grid — exactly the
+       three buckets, so the row fills and no cell paints the grey grid-gap. */''}
   <section class="sec">
-    ${group('Candidates &amp; cohorts')}
-    <div class="dgrid dgrid-2">
-      <div class="dcol">
-        ${secHead('Candidates by bucket')}
-        ${donut(byBucket.map(([name, n], i) => [name, n, DV[i % DV.length]]))}
-      </div>
-      <div class="dcol">
-        ${secHead('Where candidates sit')}
-        ${kv([
-          ['On an account', String(CANDS.length)],
-          ['In a cohort', String(inCohort)],
-          ['Not yet in a cohort', String(CANDS.length - inCohort)],
-          ['Active', String(activeCands)]
-        ])}
-      </div>
-    </div>
+    ${group('Candidates by bucket')}
+    ${stats(byBucket.map(([name, n]) => ['group', name, String(n), `${pctOf(n, CANDS.length)}% of candidates`]), 'dash-buckets')}
   </section>
-  <section class="sec">
+  ${/* Cohort health — HIDDEN (Maryam, 21 Sep 2026: "hide this section"). Kept so it
+       can be restored: flip the false to render the running-cohort table again. */''}
+  ${false ? `<section class="sec">
     ${aiHead('Cohort health', 'Every running cohort, how far through the 90-day loop it is, and whether it has a leader.',
       '<button class="btn btn-g btn-sm noic" data-go="cohorts/cohorts">Cohorts</button>')}
     ${liveCohorts.length ? table(
@@ -3351,46 +3488,39 @@ function homeOverview(){
       ]})),
       {paginate:false}
     ) : emptyState('cohorts', 'No active cohorts', 'Nothing is running this window.')}
+  </section>` : ''}
+
+  ${/* ══ INTERVIEWS ══ first- vs re-interview volume by month (Maryam, 21 Sep 2026:
+       heading "Interviews"; there is no plain "interview" — every one is a FIRST
+       interview or a RE-interview; drop the Booking-mix donut and the
+       Interviews-by-state list). Grouped bars, green `--dv-*` ramp. The monthly
+       split is AUTHORED PLACEHOLDER (§74) — the seed has no dated booking history
+       (SA-03 E1); first interviews run ahead of re-interviews, as in the seed. */''}
+  <section class="sec">
+    ${group('Interviews')}
+    ${barChart([
+      {name: 'First interview', color: DV[0], pts: [4, 5, 6, 5, 7, 8, 7, 9, 8, 10, 9, 11]},
+      {name: 'Re-interview', color: DV[2], pts: [2, 2, 3, 3, 4, 4, 5, 4, 6, 5, 7, 6]}
+    ], {aria: 'First interviews and re-interviews by month'})}
   </section>
 
-  ${/* ══ MARKETPLACE & INTERVIEWS ══ booking mix (donut) · interview state (kv) */''}
+  ${/* ══ PAYOUTS ══ a smooth two-line money trend (Maryam, 21 Sep 2026: heading
+       "Payouts"; drop the Revenue-streams bars and the Payments-&-payouts kv, fold
+       their figures into this graph). Agent payouts vs platform earnings by month,
+       solid smooth lines with a soft area fill (payouts reference). The LAST point
+       is the real current total (agent net = settled + pending, platform = the real
+       ~20% take); the earlier months are an authored-placeholder ramp (§74; the
+       seed has no dated ledger, SA-03 E1). */''}
   <section class="sec">
-    ${group('Marketplace &amp; interviews')}
-    <div class="dgrid dgrid-2">
-      <div class="dcol">
-        ${secHead('Booking mix')}
-        ${donut(bkMixRows.map(([kind, n], i) => [kind, n, DV[i % DV.length]]))}
-      </div>
-      <div class="dcol">
-        ${secHead('Interviews by state')}
-        ${kv(ivByStage.map(([label, n]) => [label, String(n)]))}
-      </div>
-    </div>
-  </section>
-
-  ${/* ══ FINANCE & SETTLEMENT ══ revenue streams (bars) · payments & payouts (kv) */''}
-  <section class="sec">
-    ${group('Finance &amp; settlement')}
-    <div class="dgrid dgrid-2">
-      <div class="dcol">
-        ${secHead('Revenue streams · this cycle')}
-        ${hbars([
-          ['Course fees', money(courseRev), courseRev],
-          ['Interview fees', money(interviewRev), interviewRev],
-          ['Scene purchases', money(sceneRev), sceneRev]
-        ])}
-      </div>
-      <div class="dcol">
-        ${secHead('Payments & payouts')}
-        ${kv([
-          ['In escrow (not settled)', `<b>${money(inprog)}</b>`],
-          ['Platform earnings', `<b>${money(platTake)}</b>`],
-          ['Agent payouts', `<b>${money(poSettled + poPending)}</b>`],
-          ['Settled', `<b>${money(poSettled)}</b>`],
-          ['Pending release', `<b>${money(poPending)}</b>`]
-        ])}
-      </div>
-    </div>
+    ${group('Payouts')}
+    ${(() => {
+      const agentTotal = poSettled + poPending, platTotal = platTake;
+      const ramp = [0.34, 0.42, 0.39, 0.47, 0.55, 0.6, 0.66, 0.72, 0.79, 0.86, 0.93, 1];
+      return lineChart([
+        {name: 'Agent payouts', color: DV[0], pts: ramp.map(f => Math.round(agentTotal * f))},
+        {name: 'Platform earnings', color: DV[2], pts: ramp.map(f => Math.round(platTotal * f))}
+      ], {aria: 'Agent payouts and platform earnings by month', fmt: money, dashed: false, area: true, padL: 56});
+    })()}
   </section>
 
   ${/* ══ SYSTEM & ACTIVITY ══ platform health (kv) · recent audit (timeline) */''}

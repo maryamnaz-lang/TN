@@ -183,148 +183,82 @@ const OB_LOW = () => qzLow(2);
    giving `.role-c` a second line is a change to a component four other pages
    draw. Worth doing if they ever become the main route again.
    ========================================================================== */
+/* ==========================================================================
+   THE ONBOARDING QUESTIONS (Maryam, 21 Sep 2026) replaced the six quiz-led
+   questions with the client's five. NO option DESCRIPTIONS (Maryam: "remove the
+   desc against each option as well") so every option is [key, label], and the
+   survey no longer draws the `.ob-sv-od` line.
+
+   TWO INPUT TYPES JOIN THE RADIOS. `t:'text'` is a one-line free-text field
+   ("What do you do now?") and `t:'dd'` is our dropdown ("What industry is that
+   in?"), whose "Other" option opens a text field. The two text fields write into
+   `S.ob` on each keystroke WITHOUT a render (the caret trap, trap 9/17) via the
+   `[data-obtext]` input listener below; the dropdown is `dd()` and re-renders on
+   pick like a radio (its S.ddVal store is read back by obReady / data-obdone).
+
+   THE COMPLETION SCREEN IS KEPT (Maryam: "just keep the last one where we tell
+   the step they are on") - `obDoneScreen`, unchanged. The quiz-led questions
+   (band / why) and their downstream readers are gone: `obAgent` falls back to the
+   first recommended agent, and `obMemo` (guarded on `S.ob.why`) returns nothing.
+   ========================================================================== */
 const OB_Q = [
   {k:'where',
    q:'Where are you right now?',
    tal:'Before I point you at anybody, I need a few things a quiz cannot tell me.',
-   o:[['role','In a role','Employed and leading, or on your way to it.'],
-      ['between','Between roles','Out of a role and looking for the next one.'],
-      ['school','In school','Studying, with the first role still ahead.'],
-      ['own','Running my own thing','Founder, freelance, or your own small team.']]},
+   o:[['moveup','In a job I want to move up in'],
+      ['leaving',"In a job I don't plan to stay in"],
+      ['own','Running something of my own, or trying to start it'],
+      ['between','Between things']]},
 
-  /* INDUSTRY asks SECOND and EXPERIENCE THIRD, right after where (Maryam, 9 Sep
-     2026: "the question What industry are you in? should come right after the
-     Where are you right now? question and then the experience will come after
-     the industry question"). Both moved up from their old places; their tal and
-     options are untouched. The count, the spine and the read-back all derive
-     their order from `OB_Q`, so moving the blocks is the whole change. */
-  {k:'industry',
-   q:'What industry are you in?',
-   tal:'A couple more, so your profile is set up before you walk in.',
-   o:[['software','Software','Product, platforms, SaaS.'],
-      ['finance','Finance','Banking, insurance, fintech.'],
-      ['healthcare','Healthcare','Care, life sciences, medtech.'],
-      ['retail','Retail and consumer','Shops, brands, e-commerce.'],
-      ['education','Education','Schools, training, ed-tech.'],
-      ['other','Something else','Tell me on your profile later.']]},
+  {k:'persona',
+   q:'Which of these sounds most like you? Pick one.',
+   tal:'One word people would use for you. There is no wrong answer.',
+   o:[['top','Top Performer'],
+      ['athlete','Athlete'],
+      ['leader','Leader'],
+      ['entrepreneur','Entrepreneur'],
+      ['notsure','Not Sure'],
+      ['team','Team Player']]},
+
+  {k:'role', t:'text',
+   q:'What do you do now?',
+   tal:'In your own words is fine.',
+   ph:'Operations coordinator, student, own a detailing business'},
+
+  {k:'industry', t:'dd',
+   q:'What industry is that in?',
+   tal:'Pick the closest one, or Other.',
+   o:[['security','Security'],
+      ['franchise','Franchise ownership'],
+      ['retail','Retail'],
+      ['food','Food and hospitality'],
+      ['trades','Trades and construction'],
+      ['healthcare','Healthcare'],
+      ['logistics','Transportation and logistics'],
+      ['sales','Sales'],
+      ['education','Education'],
+      ['technology','Technology'],
+      ['student','Student'],
+      ['other','Other']],
+   ph:'Tell me your industry'},
 
   {k:'years',
-   q:'How long have you been working?',
-   tal:'Roughly is fine — it helps me read where you are.',
-   o:[['0','Less than a year','Just getting started.'],
-      ['1','1 to 3 years','Finding your feet.'],
-      ['3','3 to 5 years','Into your stride.'],
-      ['5','5 to 10 years','Experienced.'],
-      ['10','More than 10 years','A long way in.']]},
-
-  /* THE ONE QUESTION THAT OPENS WITH DATA. The heading is assembled from
-     `OB_LOW()` so the two names, their two figures and the order they are in
-     all come off `SCORES`. */
-  {k:'band',
-   q:null,
-   tal:'Your quiz measured five things. Two of them came out low, and I would rather ask than assume which one matters.',
-   o:[['coaching','Coaching','Growing the people around you is the harder half.'],
-      ['delegation','Delegation','Handing work over is the harder half.'],
-      ['other','Neither — it is something else','The quiz missed it. I will ask what it is instead.']]},
-
-  /* STEP 3 IS A FUNCTION OF STEP 2, and the third branch is not a fallback —
-     it is the question re-aimed. Somebody who says neither band is biting has
-     told us the quiz missed it, so the honest next move is to ask what it
-     missed rather than to press on with a list about Coaching. The four
-     options in that branch are the other three measured bands plus managing
-     up, which is the one thing in this product's vocabulary that no band
-     covers. */
-  {k:'why',
-   q:{coaching:'Why is coaching hard right now?',
-      delegation:'Why is delegating hard right now?',
-      other:'Then what is the hard part?'},
-   tal:'This is the part the fifteen-minute call was for. The score says what; it never says why.',
-   o:{coaching:[['asked','No one asks me for it','The opportunity to practise is not there.'],
-                ['good','I do not know what good looks like','You have not seen it done well enough to copy.'],
-                ['answers','I give answers instead of questions','Solving it yourself is faster, so you do.'],
-                ['load','It is not the coaching, it is the workload','There is room for the work or the people, not both.']],
-      delegation:[['nobody','No one to hand it to','The team is not there yet, or not ready.'],
-                  ['trust','I do not trust the handover','It comes back wrong often enough that you stopped.'],
-                  ['shown','No one has shown me how','Nobody handed work to you well either.'],
-                  ['load','It is not the delegating, it is the workload','Nothing you hold is safe to pass on right now.']],
-      other:[['decide','Deciding without enough information','Calls that have to be made before the facts arrive.'],
-             ['hard','Having the hard conversations','The ones about performance, money, or leaving.'],
-             ['ahead','Planning further ahead than this week','Everything is this week, so nothing is next quarter.'],
-             ['up','Managing the people above me','The work is fine; the direction from above is not.']]}},
-
-  /* THE "What do you want out of the next 90 days?" QUESTION WAS HERE AND IS
-     REMOVED (Maryam, 9 Sep 2026: "remove the What do you want out of the next 90
-     days? question that we have right now"). Its phrasing moved onto the intent
-     question below, which now asks it and reads the answer into the course
-     category. `want`'s readers went with it: the `obMemo` want row (ai2.js), the
-     `obHeard` want row and the `OB_SPINE` "What you want" label. */
-  /* THE THREE CLIENT PROFILE FIELDS AS ONBOARDING QUESTIONS (Client, 9 Sep
-     2026). Industry, Years of experience and Intent are captured here and
-     written onto `PF.general` on the way out (`data-obdone`), so what you pick
-     shows on your profile. Current role and the student flag are already the
-     `where` question (In a role / In school / …) plus the editable profile; the
-     exact role title and degree live on the profile — a free-text field is not
-     an option in this flow (it was deleted for the render/caret trap, see
-     `obFree`). Intent is the primary COHORT grouping axis (Point 1): its options
-     ARE `INTENTS`, built from that one list so the words match the profile
-     select exactly. It is deliberately last — the aspiration is the note the
-     flow ends on. (Industry and experience moved up to second and third, right
-     after `where` — see the note there; only intent stays here.) */
-  /* THE INTENT QUESTION NOW ASKS THE 90-DAY QUESTION (Maryam, 9 Sep 2026:
-     change "Where are you trying to go?" to "What do you want out of the next 90
-     days? This will help choose you your course category."). It keeps its
-     `INTENTS` options and its cohort/course-category reader — only the heading
-     changed, taking over the phrasing of the removed `want` question above. */
-  {k:'intent',
-   q:'What do you want out of the next 90 days? This will help choose you your course category.',
-   tal:'Last one, and it is the one that groups you with the right people. It does not depend on your level.',
-   o:INTENTS.map((s,i) => [['now','next','own'][i], s,
-     ['Go further in the seat you are in.',
-      'Move toward a different kind of role.',
-      'Build or run something of your own.'][i]])}
-
-  /* >>> THE FIFTH QUESTION IS DELETED — Maryam, 3 Sep 2026: "remove this
-     question from the flow. we do not need that."
-
-     WHAT IT WAS: "Anything you want your agent to know before the interview?",
-     a free `<textarea>` on the stepped screens and the composer in the chat,
-     quoted verbatim on the read-back and never parsed. Its stated reader was a
-     PERSON rather than the product — the one answer here Tal was explicitly
-     not going to use.
-
-     WHY LOSING IT COSTS NOTHING THE FLOW WAS DOING. Every other question has a
-     downstream reader inside the build: `where` frames Tal's voice, `band` is
-     `REC`'s need, `why` is the `MEMO` line and what `obFit` quotes, `want`
-     decides which figure leads. This one had no reader at all — the agent it
-     was addressed to is a photograph and a bio, so the note went into `S.ob`
-     and stopped. Four questions with four readers is the test this file's own
-     head sets, and the fifth was the one that failed it.
-
-     AND THE FLOW GETS SHORTER BY ITSELF. `OB_N` is `OB_Q.length`, so the
-     panels now count "of 4", `obLast()` moves down a step and the closing turn
-     fires after `want`. Nothing else needed a number changed, which is what
-     deriving that count was for.
-
-     WHAT WENT WITH IT, all of it code only this question wrote: `obFree` and
-     its `<textarea>`, `obTake`, `S.ob.note`, `obEsc`, `obReady`'s `free`
-     branch, `obChatQ`'s skip row and its `data-obskip` handler, `obSend`'s
-     free branch, `obCompose`'s `free` placeholder, `OB_SPINE`'s fifth label,
-     the read-back's quoted row, and five rules across §107 and §63. The
-     composer itself STAYS and is still live on every question — that is
-     "the user can always type or ask anything", which was never this
-     question's job. */
+   q:'How many years have you been working?',
+   tal:'Roughly is fine.',
+   o:[['0','Under 1'],
+      ['1','1 to 3'],
+      ['3','3 to 7'],
+      ['7','7 to 15'],
+      ['15','15 or more']]}
 ];
 
-/* the option list for a step, resolved against the answers so far */
-const obOpts = (s) => Array.isArray(s.o) ? s.o : (s.o[S.ob.band] || s.o.other);
-/* and its heading, the same way */
-const obTitle = (s) => {
-  if(s.k === 'band'){
-    const [a,b] = OB_LOW();
-    return `Your quiz put ${a[0]} at ${a[1]} and ${b[0]} at ${b[1]}. Which one is actually biting?`;
-  }
-  return typeof s.q === 'string' ? s.q : (s.q[S.ob.band] || s.q.other);
-};
+/* the option list for a step (every remaining question's `o` is a plain array;
+   the band-branch resolution went with the quiz questions) */
+const obOpts = (s) => s.o || [];
+/* and its heading — a plain string now that no question branches its title */
+const obTitle = (s) => s.q;
+/* attribute-safe value for the free-text fields (Q3, and Q4's "Other") */
+const obAttr = v => (v || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 
 /* HOW MANY STEPS THERE ARE, DERIVED. The spine, the "N of 5" figure and the
    last step's index all read this, so adding a question is one row in `OB_Q`. */
@@ -332,11 +266,19 @@ const OB_N = OB_Q.length;
 /* step 0 is the welcome, 1..OB_N are the questions, OB_N+1 is the read-back */
 const obLast = () => OB_N + 1;
 
-/* WHETHER THE CURRENT STEP HAS BEEN ANSWERED. The note is exempt — it is the
-   one optional answer, so Next is live on it from the first paint. */
+/* WHETHER THE CURRENT STEP HAS BEEN ANSWERED. A radio needs `S.ob[k]`; a text
+   field needs a non-blank value; the dropdown always shows a value (dd() defaults
+   to its first option) so it is ready unless "Other" is chosen, which then needs
+   its own text (`S.ob[k+'Other']`). */
 function obReady(){
   const s = OB_Q[S.obStep - 1];
   if(!s) return true;
+  if(s.t === 'text'){ const v = S.ob[s.k]; return !!(v && v.trim()); }
+  if(s.t === 'dd'){
+    const chosen = S.ddVal['ob-' + s.k] || obOpts(s)[0][1];
+    if(chosen === 'Other'){ const o = S.ob[s.k + 'Other']; return !!(o && o.trim()); }
+    return true;
+  }
   return !!S.ob[s.k];
 }
 
@@ -364,7 +306,7 @@ function obReady(){
    known rather than as a sentence that has been said. */
 /* IN THE NEW ORDER — where, industry, years, band, why, intent (Maryam, 9 Sep
    2026). One label per question, positional, so it moves with `OB_Q`. */
-const OB_SPINE = ['Where you are','Your industry','Your experience','What is low','Why it is hard','What you want'];
+const OB_SPINE = ['Where you are','Who you are','What you do','Your industry','Your experience'];
 
 /* The per-question "theme" big title (`OB_THEME`) was removed on 18 Sep 2026 —
    Maryam wanted the question itself as the heading, with no theme and no
@@ -1604,16 +1546,26 @@ function obSurveyScreen(){
             title, no sub-line. */}
       <div class="ob-sv-orb">${borbMark('tal-mk', true)}</div>
       <h1 class="ob-sv-title">${obTitle(s)}</h1>
-      <div class="ob-sv-opts">
-        ${obOpts(s).map(([k,l,d]) => {
-          const on = S.ob[s.k] === k;
-          return `<label class="ob-sv-o${on ? ' on' : ''}" data-ob="${s.k}" data-obv="${k}">
-            <input type="radio" name="ob-${s.k}"${on ? ' checked' : ''}>
-            <span class="ob-sv-rad" aria-hidden="true"></span>
-            <span class="ob-sv-ot"><span class="ob-sv-ol">${l}</span>${
-              d ? `<span class="ob-sv-od">${d}</span>` : ''}</span>
-          </label>`;
-        }).join('')}
+      <div class="ob-sv-opts${s.t === 'text' || s.t === 'dd' ? ' ob-sv-opts-field' : ''}">
+        ${s.t === 'text'
+          ? `<input class="inp ob-sv-text" type="text" data-obtext="${s.k}"
+               value="${obAttr(S.ob[s.k])}" placeholder="${s.ph || ''}"
+               aria-label="${obTitle(s)}">`
+          : s.t === 'dd'
+            ? `${dd('ob-' + s.k, obOpts(s).map(o => o[1]), S.ddVal['ob-' + s.k])}${
+                (S.ddVal['ob-' + s.k] || obOpts(s)[0][1]) === 'Other'
+                  ? `<input class="inp ob-sv-text ob-sv-other" type="text" data-obtext="${s.k}Other"
+                       value="${obAttr(S.ob[s.k + 'Other'])}" placeholder="${s.ph || ''}"
+                       aria-label="Your industry">`
+                  : ''}`
+            : obOpts(s).map(([k,l]) => {
+                const on = S.ob[s.k] === k;
+                return `<label class="ob-sv-o${on ? ' on' : ''}" data-ob="${s.k}" data-obv="${k}">
+                  <input type="radio" name="ob-${s.k}"${on ? ' checked' : ''}>
+                  <span class="ob-sv-rad" aria-hidden="true"></span>
+                  <span class="ob-sv-ot"><span class="ob-sv-ol">${l}</span></span>
+                </label>`;
+              }).join('')}
       </div>
       <div class="ob-sv-foot">${prev}${next}</div>
     </div></main>
@@ -2046,14 +1998,16 @@ device.addEventListener('click', e => {
        written once on the way out exactly like `S.recKey` above, so what the
        candidate picked in the flow is what their profile shows. Guarded on a
        real answer so a deep-link that skipped the flow keeps the seeded values.
-       Labels come off `OB_Q` via `obLabel`, and intent's label is an `INTENTS`
-       string, so the profile's own intent select opens on the same option. The
-       student flag is the `where` answer — "In school" makes Current role read
-       "Student"; the exact role title and degree stay editable on the profile. */
-    if(S.ob.intent)   PF.general.intent   = obLabel('intent');
-    if(S.ob.industry) PF.general.industry = obLabel('industry');
-    if(S.ob.years)    PF.general.years    = obLabel('years');
-    if(S.ob.where === 'school') PF.general.role = 'Student';
+       Role is the free-text answer (Q3); industry is the dropdown's label out of
+       `S.ddVal` (its "Other" value is the free text); years is the radio label
+       via `obLabel`. Each is guarded on a real answer so a deep-link that skipped
+       the flow keeps the seeded values. (The old intent / student-flag writes
+       went with the questions that fed them.) */
+    if(S.ob.role)  PF.general.role  = S.ob.role;
+    if(S.ob.years) PF.general.years = obLabel('years');
+    const ind = S.ddVal['ob-industry'];
+    if(ind === 'Other'){ if(S.ob.industryOther) PF.general.industry = S.ob.industryOther; }
+    else if(ind)       PF.general.industry = ind;
     e.preventDefault(); e.stopPropagation();
     /* THE GATE'S CONVERSATION STAYS AT THE GATE — Maryam, 4 Sep 2026: "it
        shows that convo I had at the onboarding time, it should not show here."
@@ -2130,6 +2084,22 @@ function obSend(){
   if(el) el.value = '';
   if(q) ask(q);
 }
+
+/* THE SURVEY'S FREE-TEXT FIELDS, CARET-SAFE (Maryam, 21 Sep 2026 questions).
+   Q3 ("What do you do now?") and Q4's "Other" write into `S.ob` on every
+   keystroke WITHOUT a render — `render()` rebuilds `device.innerHTML` and would
+   take the field and its caret with it (trap 9/17). The only live thing that has
+   to react is the Next button's disabled state, so it is toggled in place off
+   `obReady()` rather than by repainting. The value is read back from `S.ob` the
+   next time the screen legitimately renders (Next/Previous). */
+device.addEventListener('input', e => {
+  if(S.stage !== 'onboard') return;
+  const el = e.target.closest('[data-obtext]');
+  if(!el) return;
+  S.ob[el.dataset.obtext] = el.value;
+  const next = device.querySelector('.ob-sv-next[data-obgo]');
+  if(next) next.disabled = !obReady();
+});
 
 /* ENTER IS THREE SPELLINGS AND TESTING FOUND THE THIRD THE HARD WAY. `e.key`
    is `'Enter'` on every modern browser, and the handler tested that alone —

@@ -5877,9 +5877,20 @@ function talRec(title){
                 not get to be the fourth price on one journey, so the record
                 wins and the file's wording keeps it. Change `AGENTS.priya` if
                 $120 is the real fee and all four surfaces move together. */}
-          <p class="rec-f"><span>${I.wallet}${ivCharged(isRe)?a.price+' Interview Fee':'Complimentary'}</span>
+          ${''/* THE FEE IS THE STRUCK PRICE, NOT "Next slot" (Maryam, 21 Sep 2026:
+                "instead of the next slot show the price that is $120 Free for the
+                first interview, cut the $120 so the user knows it is free"). The
+                complimentary first interview shows the agent's price STRUCK with
+                "Free" (`ivFeeLabel`, the same struck label the booking page uses)
+                in the fee chip — so the "Complimentary" word AND the next-slot
+                chip both go, leaving one clear free indicator beside the length.
+                The price is `a.price` (the agent record, $95 for Priya — one
+                price across every surface, per the note above); it reads "$120"
+                only if the record does. A charged re-interview is unchanged:
+                the fee, the length and the next slot. */}
+          <p class="rec-f"><span>${I.wallet}${ivCharged(isRe)?a.price+' Interview Fee':ivFeeLabel(false, a.price)}</span>
             <span>${I.video}${rec.mins}</span>
-            <span>${I.calendar}Next slot: ${a.slot}</span></p>
+            ${ivCharged(isRe)?`<span>${I.calendar}Next slot: ${a.slot}</span>`:''}</p>
         </div>
       </div>
       ${''/* ONE BUTTON AGAIN, AND IT IS NOT THE ONE THAT WAS HERE FIRST.

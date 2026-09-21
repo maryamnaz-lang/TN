@@ -14,7 +14,7 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 6193.  Rules dropped as product-specific: 222.
+   Rules kept: 6199.  Rules dropped as product-specific: 222.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
@@ -9122,6 +9122,10 @@ button.btn-p:active,
 .app .ob-sv-title{margin:0; font-size:var(--t-h1-size); line-height:var(--t-h1-lh); letter-spacing:var(--t-h1-ls); font-weight:var(--t-w-book); color:var(--text-primary)}
 .app .ob-sv-q{margin:var(--s04) 0 0; font-size:var(--t-body-size); line-height:var(--t-body-lh); color:var(--text-secondary)}
 .app .ob-sv-opts{display:flex; flex-direction:column; gap:var(--s03); margin-top:var(--s07)}
+.app .ob-sv-opts-field{gap:var(--s04)}
+.app .ob-sv-text{width:100%; padding:var(--s04) var(--s05); font-size:var(--t-body-size); line-height:var(--t-body-lh)}
+.app .ob-sv-opts-field .dd{width:100%}
+.app .ob-sv-opts-field .dd .dd-btn{width:100%; padding:var(--s04) var(--s05)}
 .app .ob-sv-o{position:relative; display:flex; align-items:center; gap:var(--s04); padding:var(--s05); cursor:pointer; background:var(--layer-02); border:1px solid transparent; transition:background .15s ease,border-color .15s ease}
 .app .ob-sv-o.on{background:color-mix(in srgb, var(--accent) 8%, var(--background)); border-color:var(--accent)}
 .app .ob-sv-o > input{position:absolute; opacity:0; width:0; height:0; pointer-events:none}
@@ -9386,8 +9390,8 @@ button.btn-p:active,
 .app .ai-run rect{rx:31px}
 .app .askdock .askline-send,
 .app .askdock .askline-mic{width:auto; height:auto; border:0; border-radius:0; background:transparent; background-image:none}
-.app .askdock .askline-mic svg,
 .app .askdock .askline-send svg{width:22px; height:22px}
+.app .askdock .askline-mic svg{width:18px; height:18px}
 .app .askdock .askline-mic + .askline-send{margin-left:var(--s02)}
 .app .askdock > .askline{gap:var(--s04)}
 .app .askdock .askline-mark{margin-right:-12px}
@@ -9408,8 +9412,8 @@ button.btn-p:active,
 .app .ask-page .askfield-send,
 .app .ask-page .askfield-mic{width:auto; height:auto; border:0; border-radius:0; background:transparent; background-image:none}
 .app .ask-page .askfield-send svg{color:var(--text-primary)}
-.app .ask-page .askfield-mic svg,
 .app .ask-page .askfield-send svg{width:22px; height:22px}
+.app .ask-page .askfield-mic svg{width:18px; height:18px}
 .app .ask-page .askfield-send:disabled,
 .app .askfield-send:disabled{background:transparent; background-image:none}
 .app .ask-page .askfield-send:not(:disabled){width:36px; height:36px; flex:0 0 36px; border-radius:999px; background:var(--accent); display:inline-flex; align-items:center; justify-content:center}

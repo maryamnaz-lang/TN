@@ -13083,6 +13083,10 @@ button.btn-p:active,
   color:var(--text-secondary)}
 .app .ob-sv-opts{
   display:flex;flex-direction:column;gap:var(--s03);margin-top:var(--s07)}
+.app .ob-sv-opts-field{gap:var(--s04)}
+.app .ob-sv-text{width:100%;padding:var(--s04) var(--s05);font-size:var(--t-body-size);line-height:var(--t-body-lh)}
+.app .ob-sv-opts-field .dd{width:100%}
+.app .ob-sv-opts-field .dd .dd-btn{width:100%;padding:var(--s04) var(--s05)}
 .app .ob-sv-o{
   position:relative;display:flex;align-items:center;gap:var(--s04);
   padding:var(--s05);cursor:pointer;
@@ -13547,8 +13551,8 @@ button.btn-p:active,
   width:auto;height:auto;
   border:0;border-radius:0;
   background:transparent;background-image:none}
-.app .askdock .askline-mic svg,
 .app .askdock .askline-send svg{width:22px;height:22px}
+.app .askdock .askline-mic svg{width:18px;height:18px}
 .app .askdock .askline-mic + .askline-send{margin-left:var(--s02)}
 .app .askdock > .askline{gap:var(--s04)}
 .app .askdock .askline-mark{margin-right:-12px}
@@ -13584,8 +13588,8 @@ button.btn-p:active,
   border:0;border-radius:0;
   background:transparent;background-image:none}
 .app .ask-page .askfield-send svg{color:var(--text-primary)}
-.app .ask-page .askfield-mic svg,
 .app .ask-page .askfield-send svg{width:22px;height:22px}
+.app .ask-page .askfield-mic svg{width:18px;height:18px}
 .app .ask-page .askfield-send:disabled,
 .app .askfield-send:disabled{background:transparent;background-image:none}
 .app .ask-page .askfield-send:not(:disabled){
@@ -18005,9 +18009,20 @@ function talRec(title){
                 not get to be the fourth price on one journey, so the record
                 wins and the file's wording keeps it. Change `AGENTS.priya` if
                 $120 is the real fee and all four surfaces move together. */}
-          <p class="rec-f"><span>${I.wallet}${ivCharged(isRe)?a.price+' Interview Fee':'Complimentary'}</span>
+          ${''/* THE FEE IS THE STRUCK PRICE, NOT "Next slot" (Maryam, 21 Sep 2026:
+                "instead of the next slot show the price that is $120 Free for the
+                first interview, cut the $120 so the user knows it is free"). The
+                complimentary first interview shows the agent's price STRUCK with
+                "Free" (`ivFeeLabel`, the same struck label the booking page uses)
+                in the fee chip — so the "Complimentary" word AND the next-slot
+                chip both go, leaving one clear free indicator beside the length.
+                The price is `a.price` (the agent record, $95 for Priya — one
+                price across every surface, per the note above); it reads "$120"
+                only if the record does. A charged re-interview is unchanged:
+                the fee, the length and the next slot. */}
+          <p class="rec-f"><span>${I.wallet}${ivCharged(isRe)?a.price+' Interview Fee':ivFeeLabel(false, a.price)}</span>
             <span>${I.video}${rec.mins}</span>
-            <span>${I.calendar}Next slot: ${a.slot}</span></p>
+            ${ivCharged(isRe)?`<span>${I.calendar}Next slot: ${a.slot}</span>`:''}</p>
         </div>
       </div>
       ${''/* ONE BUTTON AGAIN, AND IT IS NOT THE ONE THAT WAS HERE FIRST.
@@ -31428,73 +31443,56 @@ const OB_Q = [
   {k:'where',
    q:'Where are you right now?',
    tal:'Before I point you at anybody, I need a few things a quiz cannot tell me.',
-   o:[['role','In a role','Employed and leading, or on your way to it.'],
-      ['between','Between roles','Out of a role and looking for the next one.'],
-      ['school','In school','Studying, with the first role still ahead.'],
-      ['own','Running my own thing','Founder, freelance, or your own small team.']]},
+   o:[['moveup','In a job I want to move up in'],
+      ['leaving',"In a job I don't plan to stay in"],
+      ['own','Running something of my own, or trying to start it'],
+      ['between','Between things']]},
 
-  {k:'industry',
-   q:'What industry are you in?',
-   tal:'A couple more, so your profile is set up before you walk in.',
-   o:[['software','Software','Product, platforms, SaaS.'],
-      ['finance','Finance','Banking, insurance, fintech.'],
-      ['healthcare','Healthcare','Care, life sciences, medtech.'],
-      ['retail','Retail and consumer','Shops, brands, e-commerce.'],
-      ['education','Education','Schools, training, ed-tech.'],
-      ['other','Something else','Tell me on your profile later.']]},
+  {k:'persona',
+   q:'Which of these sounds most like you? Pick one.',
+   tal:'One word people would use for you. There is no wrong answer.',
+   o:[['top','Top Performer'],
+      ['athlete','Athlete'],
+      ['leader','Leader'],
+      ['entrepreneur','Entrepreneur'],
+      ['notsure','Not Sure'],
+      ['team','Team Player']]},
+
+  {k:'role', t:'text',
+   q:'What do you do now?',
+   tal:'In your own words is fine.',
+   ph:'Operations coordinator, student, own a detailing business'},
+
+  {k:'industry', t:'dd',
+   q:'What industry is that in?',
+   tal:'Pick the closest one, or Other.',
+   o:[['security','Security'],
+      ['franchise','Franchise ownership'],
+      ['retail','Retail'],
+      ['food','Food and hospitality'],
+      ['trades','Trades and construction'],
+      ['healthcare','Healthcare'],
+      ['logistics','Transportation and logistics'],
+      ['sales','Sales'],
+      ['education','Education'],
+      ['technology','Technology'],
+      ['student','Student'],
+      ['other','Other']],
+   ph:'Tell me your industry'},
 
   {k:'years',
-   q:'How long have you been working?',
-   tal:'Roughly is fine — it helps me read where you are.',
-   o:[['0','Less than a year','Just getting started.'],
-      ['1','1 to 3 years','Finding your feet.'],
-      ['3','3 to 5 years','Into your stride.'],
-      ['5','5 to 10 years','Experienced.'],
-      ['10','More than 10 years','A long way in.']]},
-
-  {k:'band',
-   q:null,
-   tal:'Your quiz measured five things. Two of them came out low, and I would rather ask than assume which one matters.',
-   o:[['coaching','Coaching','Growing the people around you is the harder half.'],
-      ['delegation','Delegation','Handing work over is the harder half.'],
-      ['other','Neither — it is something else','The quiz missed it. I will ask what it is instead.']]},
-
-  {k:'why',
-   q:{coaching:'Why is coaching hard right now?',
-      delegation:'Why is delegating hard right now?',
-      other:'Then what is the hard part?'},
-   tal:'This is the part the fifteen-minute call was for. The score says what; it never says why.',
-   o:{coaching:[['asked','No one asks me for it','The opportunity to practise is not there.'],
-                ['good','I do not know what good looks like','You have not seen it done well enough to copy.'],
-                ['answers','I give answers instead of questions','Solving it yourself is faster, so you do.'],
-                ['load','It is not the coaching, it is the workload','There is room for the work or the people, not both.']],
-      delegation:[['nobody','No one to hand it to','The team is not there yet, or not ready.'],
-                  ['trust','I do not trust the handover','It comes back wrong often enough that you stopped.'],
-                  ['shown','No one has shown me how','Nobody handed work to you well either.'],
-                  ['load','It is not the delegating, it is the workload','Nothing you hold is safe to pass on right now.']],
-      other:[['decide','Deciding without enough information','Calls that have to be made before the facts arrive.'],
-             ['hard','Having the hard conversations','The ones about performance, money, or leaving.'],
-             ['ahead','Planning further ahead than this week','Everything is this week, so nothing is next quarter.'],
-             ['up','Managing the people above me','The work is fine; the direction from above is not.']]}},
-
-  {k:'intent',
-   q:'What do you want out of the next 90 days? This will help choose you your course category.',
-   tal:'Last one, and it is the one that groups you with the right people. It does not depend on your level.',
-   o:INTENTS.map((s,i) => [['now','next','own'][i], s,
-     ['Go further in the seat you are in.',
-      'Move toward a different kind of role.',
-      'Build or run something of your own.'][i]])}
-
+   q:'How many years have you been working?',
+   tal:'Roughly is fine.',
+   o:[['0','Under 1'],
+      ['1','1 to 3'],
+      ['3','3 to 7'],
+      ['7','7 to 15'],
+      ['15','15 or more']]}
 ];
 
-const obOpts = (s) => Array.isArray(s.o) ? s.o : (s.o[S.ob.band] || s.o.other);
-const obTitle = (s) => {
-  if(s.k === 'band'){
-    const [a,b] = OB_LOW();
-    return `Your quiz put ${a[0]} at ${a[1]} and ${b[0]} at ${b[1]}. Which one is actually biting?`;
-  }
-  return typeof s.q === 'string' ? s.q : (s.q[S.ob.band] || s.q.other);
-};
+const obOpts = (s) => s.o || [];
+const obTitle = (s) => s.q;
+const obAttr = v => (v || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 
 const OB_N = OB_Q.length;
 const obLast = () => OB_N + 1;
@@ -31502,10 +31500,16 @@ const obLast = () => OB_N + 1;
 function obReady(){
   const s = OB_Q[S.obStep - 1];
   if(!s) return true;
+  if(s.t === 'text'){ const v = S.ob[s.k]; return !!(v && v.trim()); }
+  if(s.t === 'dd'){
+    const chosen = S.ddVal['ob-' + s.k] || obOpts(s)[0][1];
+    if(chosen === 'Other'){ const o = S.ob[s.k + 'Other']; return !!(o && o.trim()); }
+    return true;
+  }
   return !!S.ob[s.k];
 }
 
-const OB_SPINE = ['Where you are','Your industry','Your experience','What is low','Why it is hard','What you want'];
+const OB_SPINE = ['Where you are','Who you are','What you do','Your industry','Your experience'];
 
 
 function obPanel(){
@@ -31839,16 +31843,26 @@ function obSurveyScreen(){
             title, no sub-line. */}
       <div class="ob-sv-orb">${borbMark('tal-mk', true)}</div>
       <h1 class="ob-sv-title">${obTitle(s)}</h1>
-      <div class="ob-sv-opts">
-        ${obOpts(s).map(([k,l,d]) => {
-          const on = S.ob[s.k] === k;
-          return `<label class="ob-sv-o${on ? ' on' : ''}" data-ob="${s.k}" data-obv="${k}">
-            <input type="radio" name="ob-${s.k}"${on ? ' checked' : ''}>
-            <span class="ob-sv-rad" aria-hidden="true"></span>
-            <span class="ob-sv-ot"><span class="ob-sv-ol">${l}</span>${
-              d ? `<span class="ob-sv-od">${d}</span>` : ''}</span>
-          </label>`;
-        }).join('')}
+      <div class="ob-sv-opts${s.t === 'text' || s.t === 'dd' ? ' ob-sv-opts-field' : ''}">
+        ${s.t === 'text'
+          ? `<input class="inp ob-sv-text" type="text" data-obtext="${s.k}"
+               value="${obAttr(S.ob[s.k])}" placeholder="${s.ph || ''}"
+               aria-label="${obTitle(s)}">`
+          : s.t === 'dd'
+            ? `${dd('ob-' + s.k, obOpts(s).map(o => o[1]), S.ddVal['ob-' + s.k])}${
+                (S.ddVal['ob-' + s.k] || obOpts(s)[0][1]) === 'Other'
+                  ? `<input class="inp ob-sv-text ob-sv-other" type="text" data-obtext="${s.k}Other"
+                       value="${obAttr(S.ob[s.k + 'Other'])}" placeholder="${s.ph || ''}"
+                       aria-label="Your industry">`
+                  : ''}`
+            : obOpts(s).map(([k,l]) => {
+                const on = S.ob[s.k] === k;
+                return `<label class="ob-sv-o${on ? ' on' : ''}" data-ob="${s.k}" data-obv="${k}">
+                  <input type="radio" name="ob-${s.k}"${on ? ' checked' : ''}>
+                  <span class="ob-sv-rad" aria-hidden="true"></span>
+                  <span class="ob-sv-ot"><span class="ob-sv-ol">${l}</span></span>
+                </label>`;
+              }).join('')}
       </div>
       <div class="ob-sv-foot">${prev}${next}</div>
     </div></main>
@@ -32002,10 +32016,11 @@ device.addEventListener('click', e => {
   const d = t.closest('[data-obdone]');
   if(d){
     S.recKey = obAgent();
-    if(S.ob.intent)   PF.general.intent   = obLabel('intent');
-    if(S.ob.industry) PF.general.industry = obLabel('industry');
-    if(S.ob.years)    PF.general.years    = obLabel('years');
-    if(S.ob.where === 'school') PF.general.role = 'Student';
+    if(S.ob.role)  PF.general.role  = S.ob.role;
+    if(S.ob.years) PF.general.years = obLabel('years');
+    const ind = S.ddVal['ob-industry'];
+    if(ind === 'Other'){ if(S.ob.industryOther) PF.general.industry = S.ob.industryOther; }
+    else if(ind)       PF.general.industry = ind;
     e.preventDefault(); e.stopPropagation();
     S.obLoading = true; render();
     setTimeout(() => {
@@ -32023,6 +32038,15 @@ function obSend(){
   if(el) el.value = '';
   if(q) ask(q);
 }
+
+device.addEventListener('input', e => {
+  if(S.stage !== 'onboard') return;
+  const el = e.target.closest('[data-obtext]');
+  if(!el) return;
+  S.ob[el.dataset.obtext] = el.value;
+  const next = device.querySelector('.ob-sv-next[data-obgo]');
+  if(next) next.disabled = !obReady();
+});
 
 device.addEventListener('keydown', e => {
   const enter = e.key === 'Enter' || e.key === 'Return' || e.keyCode === 13;

@@ -2054,6 +2054,14 @@
 
 .app .ob-sv-opts{
   display:flex;flex-direction:column;gap:var(--s03);margin-top:var(--s07)}
+/* THE FREE-TEXT (Q3) AND DROPDOWN (Q4) FIELDS (Maryam, 21 Sep 2026). They fill
+   the option column like the pills do; the dd() component brings its own styling
+   (§123) and only needs to stretch, and the "Other" field sits under it. The
+   text field is the platform `.inp` at a comfortable survey height. */
+.app .ob-sv-opts-field{gap:var(--s04)}
+.app .ob-sv-text{width:100%;padding:var(--s04) var(--s05);font-size:var(--t-body-size);line-height:var(--t-body-lh)}
+.app .ob-sv-opts-field .dd{width:100%}
+.app .ob-sv-opts-field .dd .dd-btn{width:100%;padding:var(--s04) var(--s05)}
 /* NO BORDER IN THE DEFAULT VIEW (Maryam, 18 Sep 2026) — the `--layer-02` fill
    defines the pill; the border is transparent so the accent edge that appears
    on selection costs no layout shift. */

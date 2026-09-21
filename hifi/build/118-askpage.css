@@ -127,8 +127,10 @@
    icon sizes as well"). §105 draws the chat mic and send svg at 18; the dock's
    are 22 (§117.91), so they are restated here — a later layer at the same
    (0,3,0) wins. */
-.app .ask-page .askfield-mic svg,
 .app .ask-page .askfield-send svg{width:22px;height:22px}
+/* THE MIC IS SMALLER THAN THE SEND (Maryam, 21 Sep 2026: "reduce the icon size
+   of the mic icon" — the chat-screen field, matching the floating dock's §117). */
+.app .ask-page .askfield-mic svg{width:18px;height:18px}
 /* §105.438's disabled state paints `--layer-accent-01` as a DISC ground at
    (0,5,0); with the disc gone the ground has to go with it, and the placeholder
    ink §105.441 gives the glyph is the whole of "off" now. */
