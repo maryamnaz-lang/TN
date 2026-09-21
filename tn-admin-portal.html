@@ -393,6 +393,15 @@
    admin-only, so no other `.cardrow` list moves. The horizontal padding stays
    0 (the DS zeroes list-row side padding inside a `.sec`). */
 .app .intg-stack .cardrow{padding-top:var(--s06); padding-bottom:var(--s06); min-height:0}
+/* THE SERVICE-ICON CHIP CARRIES A LIGHT-GREY GROUND (Maryam, 21 Sep 2026: "the bg
+   of these icons should be light grey"). `.cardrow-ic` ships transparent (a bare
+   §29 glyph on white); here the provider marks sit on a soft `--layer-02` #f7f7f7
+   chip. Scoped to this one list, so the decision-tile and attention-tile
+   `.cardrow-ic` marks stay bare. The glyph keeps its --icon-primary black.
+   The DS zeroes the chip's ground for any `.sec:has(> .tile-stack)` list at
+   (0,4,0), so this restores it at (0,5,0) (`.app .main .sec:has(> .intg-stack)`)
+   — a deterministic win by weight, no `!important`. */
+.app .main .sec:has(> .intg-stack) .cardrow-ic{background:var(--layer-02)}
 
 /* SETTINGS INNER-TAB SPACING — balance the gaps around the tab strip (Maryam,
    21 Sep 2026: "unnecessary space after page desc to the tabs, and less space
@@ -3013,184 +3022,143 @@ const V = {};
 
 /* ------------------------------------------------------------ DASHBOARD --- */
 function homeOverview(){
+  /* ══════════════════════════════════════════════════════════════════════════
+     DASHBOARD — realigned to the LIVE modules only (Maryam, 21 Sep 2026).
+     The band grew before several rulings landed and was surfacing analytics for
+     modules the admin can no longer open: employer unlocks / placement fees
+     (Employers are "not part of the system for now", 19 Sep, and the module is
+     hidden), and a whole "Growth & acquisition" group of CRM lead analytics (the
+     CRM module is hidden). Every band now maps to one of the nine VISIBLE
+     modules and routes into it — nothing on the dashboard reads a hidden module.
+     Order is OPERATIONAL-FIRST: what needs the admin, then the figures, then the
+     splits. Charts stay LEAN (donut for a 2–4 slice split, hbars for a ranked
+     list) per "data over decoration" (DESIGN §5); no trend line — the seed has
+     no time series (SA-03 E1) so a trend would be authored placeholder.
+     ══════════════════════════════════════════════════════════════════════════ */
+  const pctOf = (n, t) => t ? Math.round(n / t * 100) : 0;
+  /* PEOPLE (Users & Roles). Employer accounts are ORGANISATIONS in their own
+     (hidden) module, so they stay off the account-role read. */
+  const people = USERS.filter(u => !u.roles.includes('employer'));
   const activeCands = countActive(CANDS);
-  const agentCount = USERS.filter(u => u.roles.includes('agent')).length;
-  /* COHORT LEADERS vs MODERATORS, KEYED ON `addedBy` (Maryam, 14 Sep 2026:
-     "addedBy = moderator; cap the rest"). A candidate who came up through the
-     application pathway and volunteered is a "Cohort Leader" and leads ONE cohort
-     at a time; a leader an admin ADDED directly is a "Moderator" and may lead
-     several. `u.addedBy` — the adding admin's id, the same field the Cohort Leader
-     list's "Added by" column reads — is the one marker for both the split and the
-     cap, so the two never disagree. u4 (Maryam) has none: a candidate-leader,
-     leading Cohort 2 alone. u40 (Bruno) carries one: a moderator, leading
-     Cohort 1 and Cohort 4. `u.volunteer` is kept in step but no longer the
-     signal. Authored placeholder split — read off the seed, not a signed-off KPI
-     (SA-03 E1). */
+  /* COHORT LEADERS vs MODERATORS, keyed on `addedBy` (Maryam, 14 Sep 2026:
+     "addedBy = moderator; cap the rest") — a volunteered candidate-leader has no
+     `addedBy` and leads one cohort; an admin-added moderator carries it and may
+     lead several. Authored placeholder split, read off the seed (SA-03 E1). */
   const leaders = USERS.filter(u => u.roles.includes('leader'));
   const cohortLeaderCount = leaders.filter(u => !u.addedBy).length;
   const moderatorCount = leaders.filter(u => u.addedBy).length;
+  const agentListed = USERS.filter(u => u.roles.includes('agent') && u.onboarded !== false).length;
+  const roleRows = ROLES.filter(r => r.k !== 'employer')
+    .map(r => [r.name, USERS.filter(u => u.roles.includes(r.k)).length]).filter(r => r[1] > 0);
+  const uActive = people.filter(u => u.status === 'active').length;
+  const uInvited = people.filter(u => u.status === 'invited').length;
+  const uInactive = people.filter(u => u.status === 'inactive').length;
+  const uTot = people.length;
+  /* CANDIDATES + COHORTS */
   const activeCohorts = COHORTS.filter(c => c.status === 'active').length;
+  const draftCohorts = COHORTS.filter(c => c.status === 'draft').length;
+  const liveCohorts = COHORTS.filter(c => c.status === 'active');
+  const inCohort = CANDS.filter(c => c.cohort && c.cohort !== '—').length;
+  const byBucket = BUCKETS.map(b => [b.name, CANDS.filter(c => c.bucket === b.name).length]);
+  /* COURSE CATALOGUE */
   const liveCourses = COURSES.filter(c => c.status === 'live').length;
   const draftCourses = COURSES.filter(c => c.status === 'draft').length;
-  const gross = grossProcessed();
-  const inprog = inProgress();
-  const highDec = DECISIONS.filter(d => d.sev === 'high').length;
-  const medDec = DECISIONS.filter(d => d.sev === 'med').length;
-
-  /* revenue by fee line — the "Revenue streams · this cycle" card reads these */
-  const courseRev = TXNS.filter(t => t.cat === 'course' && t.dir === 'in').reduce((n, t) => n + t.amt, 0);
-  const interviewRev = TXNS.filter(t => t.cat === 'interview' && t.dir === 'in').reduce((n, t) => n + t.amt, 0);
-  const unlockRev = TXNS.filter(t => t.cat === 'unlock' && t.dir === 'in').reduce((n, t) => n + t.amt, 0);
-  const revMax = Math.max(courseRev, interviewRev, unlockRev, 1);
-  const placementSet = FEES.find(f => f.k === 'placement').state === 'set';
-
-  /* RESTORED DASHBOARD ANALYTICS — Maryam, 8 Sep 2026. The frozen file's
-     dashboard (`tn-admin.html`, the data reference) carried payments/payouts,
-     the marketplace mix, acquisition, the funnel and the people/cohort splits;
-     the first hi-fi conversion dropped them. They come back here read from THIS
-     portal's own seed — nothing typed twice — and rendered as DATA (`.kv`,
-     `.stats`, a `table`), not the frozen file's donuts and bars, per "data over
-     decorative charts" (DESIGN §5): a proportion is stated as a count and a per
-     cent, which is the number the reader wanted from the chart anyway. */
-  const pctOf = (n, t) => t ? Math.round(n / t * 100) : 0;
-  /* marketplace + booking mix (BOOKINGS) */
-  const bkConfirmed = BOOKINGS.filter(b => b.status === 'active').length;
-  const bkAwaiting = BOOKINGS.filter(b => !b.paid || b.status === 'pending').length;
-  const gmv = BOOKINGS.filter(b => b.paid).reduce((n, b) => n + b.fee, 0);
-  const bkPaid = BOOKINGS.filter(b => b.paid).length;
-  const avgFee = bkPaid ? Math.round(gmv / bkPaid) : 0;
-  const bkTot = BOOKINGS.length || 1;
+  /* MARKETPLACE & INTERVIEWS (BOOKINGS). Booking mix by kind (donut) + the state
+     distribution across the interview lifecycle (kv). */
   const bkMix = {}; BOOKINGS.forEach(b => { bkMix[b.kind] = (bkMix[b.kind] || 0) + 1; });
   const bkMixRows = Object.entries(bkMix).sort((a, b) => b[1] - a[1]);
-  /* payouts breakdown (PAYOUTS) */
+  const ivByStage = Object.keys(BK_STAGE)
+    .map(k => [BK_STAGE[k], BOOKINGS.filter(b => bkStage(b) === k).length]).filter(r => r[1] > 0);
+  /* FINANCE & SETTLEMENT. Revenue by fee line — course / interview / scene; the
+     employer-unlock and placement lines are gone with the Employers module. */
+  const gross = grossProcessed();
+  const inprog = inProgress();
+  const courseRev = TXNS.filter(t => t.cat === 'course' && t.dir === 'in').reduce((n, t) => n + t.amt, 0);
+  const interviewRev = TXNS.filter(t => t.cat === 'interview' && t.dir === 'in').reduce((n, t) => n + t.amt, 0);
+  const sceneRev = TXNS.filter(t => t.cat === 'scene' && t.dir === 'in').reduce((n, t) => n + t.amt, 0);
   const poSettled = PAYOUTS.filter(p => p.status === 'settled').reduce((n, p) => n + p.net, 0);
   const poPending = PAYOUTS.filter(p => p.status === 'held').reduce((n, p) => n + p.net, 0);
   const poGross = PAYOUTS.reduce((n, p) => n + p.gross, 0);
   const platTake = poGross - PAYOUTS.reduce((n, p) => n + p.net, 0);
-  const poBlocked = PAYOUTS.filter(p => p.status === 'review').length;
-  /* acquisition + funnel (LEADS, CANDS, BOOKINGS, PLACEMENTS) */
-  const srcMap = {}; LEADS.forEach(l => { srcMap[l.source] = (srcMap[l.source] || 0) + 1; });
-  const srcRows = Object.entries(srcMap).sort((a, b) => b[1] - a[1]);
-  const leadTot = LEADS.length;
-  const leadConv = LEADS.filter(l => l.accountId).length;
-  const inCohort = CANDS.filter(c => c.cohort && c.cohort !== '—').length;
-  const byBucket = BUCKETS.map(b => [b.name, CANDS.filter(c => c.bucket === b.name).length]);
-  /* people (USERS roles + status) — employers are ORGANISATIONS, counted in
-     their own module, so they stay off this account-role list to avoid reading
-     against the 9-org headline. */
-  const roleRows = ROLES.filter(r => r.k !== 'employer')
-    .map(r => [r.name, USERS.filter(u => u.roles.includes(r.k)).length]).filter(r => r[1] > 0);
-  const uActive = countActive(USERS);
-  const uInactive = USERS.length - uActive;
-  /* cohort health (COHORTS) */
-  const liveCohorts = COHORTS.filter(c => c.status === 'active');
+  /* SYSTEM & INTEGRATIONS */
+  const svcLive = SVC_HEALTH.filter(s => s.state === 'live').length;
+  const intgLive = INTEGRATIONS.filter(i => i.state === 'live').length;
+  const degraded = SVC_HEALTH.filter(s => s.state !== 'live').length + INTEGRATIONS.filter(i => i.state !== 'live').length;
+  const dsarsOpen = DSARS.filter(d => d.status === 'in progress').length;
+  /* RULINGS */
+  const highDec = DECISIONS.filter(d => d.sev === 'high').length;
+  const medDec = DECISIONS.filter(d => d.sev === 'med').length;
 
-  /* NEEDS-YOUR-ATTENTION LIST (Pipeline & activity) — the four queues as clickable
-     rows (icon · title · count · arrow), the `.tile clk gcard` shape `decisionTile`
-     uses. Agents are added straight through the admin now, so their vetting queue
-     is not one of the rows. */
+  /* NEEDS-YOUR-ATTENTION — the operational lead. Each queue is a clickable
+     `.tile clk gcard` row (the count-bearing tile pattern, NOT a `.qa-c`
+     quick-action card, whose copy may not carry live queue data — §98.3), and a
+     row is drawn only when its count > 0 (§60 — never draw a control that cannot
+     act). Every route lands on a LIVE module. */
   const cohortsNoLeader = COHORTS.filter(c => c.leader === 'Unassigned' && c.status === 'active').length;
-  const attnRows = [
-    ['cohorts', 'Cohort leader', `${cohortsNoLeader} cohort${cohortsNoLeader === 1 ? '' : 's'} without a leader`, 'cohorts/assign'],
-    ['verified', 'Employer verification', `${unverifiedEmp()} awaiting checks`, 'vetting/empverify'],
-    ['bank', 'Payouts to release', `${heldPayouts()} pending`, 'finance/payouts']
-  ].map(([ic_, t, s, go]) => `<button class="tile clk gcard" data-go="${go}">
+  const leadReady = LEADER_REQS.filter(r => r.stage === 'feedback').length;
+  const ivOverdue = BOOKINGS.filter(bkOverdue).length;
+  const heldPo = heldPayouts();
+  const openRulings = DECISIONS.filter(d => d.kind === 'blocked' || d.kind === 'open').length;
+  const attn = [
+    cohortsNoLeader && ['cohorts', 'Cohorts without a leader', `${cohortsNoLeader} active cohort${cohortsNoLeader === 1 ? '' : 's'} to assign`, 'cohorts/assign'],
+    leadReady && ['group', 'Cohort leaders ready to allot', `${leadReady} recommended and interviewed`, 'cohorts/assign'],
+    ivOverdue && ['market', 'Interview reports overdue', `${ivOverdue} held interview${ivOverdue === 1 ? '' : 's'} past 24h`, 'market/bookings'],
+    heldPo && ['bank', 'Payouts to release', `${heldPo} pending settlement`, 'finance/payouts'],
+    openRulings && ['alert', 'Open decisions', `${openRulings} ruling${openRulings === 1 ? '' : 's'} awaiting a decision`, 'home/rulings']
+  ].filter(Boolean);
+  const attnRows = attn.map(([ic_, t, s, go]) => `<button class="tile clk gcard" data-go="${go}">
       <span class="cardrow-ic">${ic(ic_)}</span>
       <span class="gcard-b"><h3>${t}</h3><span class="sub">${esc(s)}</span></span>
       <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg></button>`).join('');
-  /* GROUP HEADING — the dashboard's section dividers (Maryam, 11 Sep 2026, off the
-     wireframes): a plain full-width heading leading each group of cards. It is set
-     to the SAME type as "Platform at a glance" (`secHead` renders its h2 at
-     `--t-sec` 16px / weight 500 / -.15px, `--text-primary`) — matched inline
-     because `.t-sec` is a token, not a class, and a bare `<h2>` falls to a smaller
-     base size. Plain (not `.sec-h`) so it never turns its section into a
+
+  /* GROUP HEADING — a plain full-width heading leading each group (Maryam, 11 Sep
+     2026). Same type as `secHead`'s h2 (`--t-sec`), inline because `.t-sec` is a
+     token not a class; plain (not `.sec-h`) so it never turns a section into a
      label-column grid. */
   const group = t => `<h2 style="margin:0 0 var(--s05);padding-left:0;font-size:var(--t-sec-size);line-height:var(--t-sec-lh);font-weight:500;letter-spacing:var(--t-sec-ls);color:var(--text-primary)">${t}</h2>`;
 
-  /* 2.2 — PERIOD SELECTOR + as-at time. The selector applies to the panels that
-     report over a period (money, marketplace, level changes); population panels
-     are current-state. The seed carries no time series, so switching the period
-     is presentational here (the figures are read off the seed, not a signed-off
-     KPI feed — SA-03 E1); the surface, the default and the as-at stamp are what
-     the story asks for. */
+  /* 2.2 — PERIOD SELECTOR + as-at time. The selector frames the panels that read
+     over a period (money, marketplace); population panels are current-state. The
+     seed carries no time series, so switching the period is presentational
+     (SA-03 E1); the surface, the default and the as-at stamp are what the story
+     asks for. */
   const period = S.period || 'month';
   const PERIODS = [['week', 'This week'], ['month', 'This month'], ['quarter', 'This quarter']];
   const periodBar = `<div class="lst-filters">${PERIODS.map(([v, l]) => `<button class="btn btn-sm ${period === v ? 'btn-p' : 'btn-g'} noic" data-act="setperiod:${v}">${l}</button>`).join('')}</div>`;
   const asAt = new Date().toLocaleString('en-US', {month:'short', day:'numeric', hour:'numeric', minute:'2-digit'});
 
   return `
-  ${/* PLATFORM AT A GLANCE — the overview band, kept above the grouped sections. */''}
   <section class="sec dash-periodbar">
     <div class="dash-periodbar-in">
       <div><span class="t-desc">Figures as at ${asAt}. The period applies to the money and activity panels.</span></div>
       ${periodBar}
     </div>
   </section>
+
+  ${/* ══ NEEDS YOUR ATTENTION ══ the operational lead — the live queues, count-bearing tiles */''}
+  ${attnRows ? `<section class="sec">
+    ${secHead('Needs your attention')}
+    <div class="tile-stack">${attnRows}</div>
+  </section>` : ''}
+
+  ${/* ══ PLATFORM AT A GLANCE ══ two rows of four (`.stats` is a fixed 2/4 grid) */''}
   <section class="sec">
     ${secHead('Platform at a glance')}
     ${stats([
-      ['candidates', 'Candidates', String(activeCands), `in ${activeCohorts} cohorts`],
-      ['group', 'Cohort leaders', String(cohortLeaderCount), 'volunteered'],
-      ['shield', 'Moderators', String(moderatorCount), 'admin-added'],
-      ['agents', 'Talent agents', String(agentCount), 'set own fee'],
-      ['cohorts', 'Cohorts', String(activeCohorts), `${COHORTS.filter(c => c.status === 'draft').length} in draft`],
-      ['book', 'Courses', String(COURSES.length), `${liveCourses} live, ${draftCourses} draft`],
+      ['candidates', 'Candidates', String(activeCands), `in ${activeCohorts} cohort${activeCohorts === 1 ? '' : 's'}`],
+      ['group', 'Cohort leaders', String(cohortLeaderCount), `${moderatorCount} moderator${moderatorCount === 1 ? '' : 's'}`],
+      ['agents', 'Talent agents', String(agentListed), 'listed & bookable'],
+      ['cohorts', 'Active cohorts', String(activeCohorts), `${draftCohorts} in draft`]
+    ])}
+    ${stats([
+      ['book', 'Courses', String(COURSES.length), `${liveCourses} live · ${draftCourses} draft`],
       ['money', 'Gross payment', money(gross), 'this window'],
-      ['bank', 'Payment in progress', money(inprog), 'not yet settled']
+      ['bank', 'In escrow', money(inprog), 'not yet settled'],
+      ['clock', 'Payouts pending', money(poPending), 'to release']
     ])}
   </section>
 
-  ${/* ══ REVENUE & SETTLEMENT ══ Revenue streams (bars) · payments/payouts (kv) · booking mix (donut) */''}
-  <section class="sec">
-    ${group('Revenue &amp; settlement')}
-    <div class="dgrid dgrid-3">
-      <div class="dcol">
-        ${secHead('Revenue streams · this cycle')}
-        ${hbars([
-          ['Course fees', money(courseRev), courseRev],
-          ['Interview fees', money(interviewRev), interviewRev],
-          ['Employer unlocks', money(unlockRev), unlockRev],
-          ['Placement fees', placementSet ? money(PLACEMENTS.filter(p => p.feeState === 'paid').reduce((n, p) => n + p.fee, 0)) : 'Not set', placementSet ? revMax : 0]
-        ])}
-      </div>
-      <div class="dcol">
-        ${secHead('In-progress payments & payouts')}
-        ${kv([
-          ['In-progress payments', `<b>${money(inprog)}</b>`, 'n'],
-          ['Platform earnings', `<b>${money(platTake)}</b>`, 'n'],
-          ['Agent payouts', `<b>${money(poSettled + poPending)}</b>`, 'n'],
-          ['Payouts settled', `<b>${money(poSettled)}</b>`, 'n'],
-          ['Payouts pending', `<b>${money(poPending)}</b>`, 'n'],
-          ['Blocked / at risk', `<b>${poBlocked}</b> txn${poBlocked === 1 ? '' : 's'}`, 'n']
-        ])}
-      </div>
-      <div class="dcol">
-        ${secHead('Booking mix')}
-        ${donut(bkMixRows.map(([kind, n], i) => [kind, n, DV[i % DV.length]]))}
-      </div>
-    </div>
-  </section>
-
-  ${/* ══ GROWTH & ACQUISITION ══ leads by source (bars) · candidates by bucket (donut) · new leads (line) */''}
-  <section class="sec">
-    ${group('Growth &amp; acquisition')}
-    <div class="dgrid dgrid-2">
-      <div class="dcol">
-        ${secHead('Leads by source')}
-        ${hbars(srcRows.map(([s, n]) => [s, `${n} · ${pctOf(n, leadTot)}%`, n]))}
-      </div>
-      <div class="dcol">
-        ${secHead('Candidates by bucket')}
-        ${donut(byBucket.map(([name, n], i) => [name, n, DV[i % DV.length]]))}
-      </div>
-    </div>
-  </section>
-  <section class="sec">
-    ${secHead('New leads')}
-    ${newLeadsCard()}
-  </section>
-
-  ${/* ══ PEOPLE & ACCESS ══ users by role (bars) · users by status (bars) · where users come from (stats) */''}
+  ${/* ══ PEOPLE & ACCESS ══ Users lens — role split · status split */''}
   <section class="sec">
     ${group('People &amp; access')}
     <div class="dgrid dgrid-2">
@@ -3201,31 +3169,32 @@ function homeOverview(){
       <div class="dcol">
         ${secHead('Users by status')}
         ${hbars([
-          ['Active', `${uActive} · ${pctOf(uActive, USERS.length)}%`, uActive],
-          ['Inactive', `${uInactive} · ${pctOf(uInactive, USERS.length)}%`, uInactive]
+          ['Active', `${uActive} · ${pctOf(uActive, uTot)}%`, uActive],
+          ['Invited', `${uInvited} · ${pctOf(uInvited, uTot)}%`, uInvited],
+          ['Deactivated', `${uInactive} · ${pctOf(uInactive, uTot)}%`, uInactive]
         ])}
       </div>
     </div>
   </section>
-  <section class="sec">
-    ${secHead('Where users come from')}
-    ${stats([
-      ['route', 'Individual', String(USERS.filter(u => u.origin === 'individual').length), 'direct sign-ups'],
-      ['spark', 'Signal', String(USERS.filter(u => u.origin === 'signal').length), 'sponsoring employer'],
-      ['link', 'Filter Go', String(USERS.filter(u => u.origin === 'filtergo').length), 'franchise partner'],
-      ['lock', 'Internal', String(USERS.filter(u => u.origin === 'internal').length), 'staff accounts']
-    ])}
-  </section>
 
-  ${/* ══ COHORTS & MARKETPLACE ══ marketplace stats · cohort health (table) */''}
+  ${/* ══ CANDIDATES & COHORTS ══ bucket split (donut) · in-cohort read (kv) · cohort health (table) */''}
   <section class="sec">
-    ${group('Cohorts &amp; marketplace')}
-    ${stats([
-      ['market', 'Confirmed', String(bkConfirmed), 'booked interviews'],
-      ['bank', 'Awaiting pay', String(bkAwaiting), 'unpaid or pending'],
-      ['money', 'Booked value', money(gmv), 'paid this window'],
-      ['agents', 'Avg fee', money(avgFee), 'per interview']
-    ])}
+    ${group('Candidates &amp; cohorts')}
+    <div class="dgrid dgrid-2">
+      <div class="dcol">
+        ${secHead('Candidates by bucket')}
+        ${donut(byBucket.map(([name, n], i) => [name, n, DV[i % DV.length]]))}
+      </div>
+      <div class="dcol">
+        ${secHead('Where candidates sit')}
+        ${kv([
+          ['On an account', String(CANDS.length)],
+          ['In a cohort', String(inCohort)],
+          ['Not yet in a cohort', String(CANDS.length - inCohort)],
+          ['Active', String(activeCands)]
+        ])}
+      </div>
+    </div>
   </section>
   <section class="sec">
     ${aiHead('Cohort health', 'Every running cohort, how far through the 90-day loop it is, and whether it has a leader.',
@@ -3242,23 +3211,58 @@ function homeOverview(){
     ) : emptyState('cohorts', 'No active cohorts', 'Nothing is running this window.')}
   </section>
 
-  ${/* ══ PIPELINE & ACTIVITY ══ funnel (bars) · needs your attention (list) · recent activity (timeline) */''}
+  ${/* ══ MARKETPLACE & INTERVIEWS ══ booking mix (donut) · interview state (kv) */''}
   <section class="sec">
-    ${group('Pipeline &amp; activity')}
-    <div class="dgrid dgrid-3">
+    ${group('Marketplace &amp; interviews')}
+    <div class="dgrid dgrid-2">
       <div class="dcol">
-        ${secHead('Pipeline funnel')}
+        ${secHead('Booking mix')}
+        ${donut(bkMixRows.map(([kind, n], i) => [kind, n, DV[i % DV.length]]))}
+      </div>
+      <div class="dcol">
+        ${secHead('Interviews by state')}
+        ${kv(ivByStage.map(([label, n]) => [label, String(n)]))}
+      </div>
+    </div>
+  </section>
+
+  ${/* ══ FINANCE & SETTLEMENT ══ revenue streams (bars) · payments & payouts (kv) */''}
+  <section class="sec">
+    ${group('Finance &amp; settlement')}
+    <div class="dgrid dgrid-2">
+      <div class="dcol">
+        ${secHead('Revenue streams · this cycle')}
         ${hbars([
-          ['Leads (quiz takers)', leadTot, leadTot],
-          ['On an account', CANDS.length, CANDS.length],
-          ['In a cohort', inCohort, inCohort],
-          ['Booked an interview', BOOKINGS.length, BOOKINGS.length],
-          ['Placed', PLACEMENTS.length, PLACEMENTS.length]
+          ['Course fees', money(courseRev), courseRev],
+          ['Interview fees', money(interviewRev), interviewRev],
+          ['Scene purchases', money(sceneRev), sceneRev]
         ])}
       </div>
       <div class="dcol">
-        ${secHead('Needs your attention')}
-        <div class="tile-stack">${attnRows}</div>
+        ${secHead('Payments & payouts')}
+        ${kv([
+          ['In escrow (not settled)', `<b>${money(inprog)}</b>`],
+          ['Platform earnings', `<b>${money(platTake)}</b>`],
+          ['Agent payouts', `<b>${money(poSettled + poPending)}</b>`],
+          ['Settled', `<b>${money(poSettled)}</b>`],
+          ['Pending release', `<b>${money(poPending)}</b>`]
+        ])}
+      </div>
+    </div>
+  </section>
+
+  ${/* ══ SYSTEM & ACTIVITY ══ platform health (kv) · recent audit (timeline) */''}
+  <section class="sec">
+    ${group('System &amp; activity')}
+    <div class="dgrid dgrid-2">
+      <div class="dcol">
+        ${secHead('Platform health')}
+        ${kv([
+          ['Services', `${svcLive} / ${SVC_HEALTH.length} live`],
+          ['Integrations', `${intgLive} / ${INTEGRATIONS.length} live`],
+          ['Degraded now', degraded ? tag('degraded', String(degraded)) : '0'],
+          ['Data requests open', String(dsarsOpen)]
+        ])}
       </div>
       <div class="dcol">
         ${secHead('Recent activity')}
@@ -5849,7 +5853,7 @@ function agentsDetail(){
   <section class="sec">
     ${aiHead('Upcoming interviews', 'On this agent’s diary. Open one for the candidate and fee.')}
     ${books.length ? table(
-      [{label:'Candidate'}, {label:'Kind'}, {label:'Fee', num:true}, {label:'When'}, {label:'Status'}],
+      [{label:'Candidate'}, {label:'Type'}, {label:'Fee', num:true}, {label:'When'}, {label:'Status'}],
       books.map(b => ({id:b.id, go:'agents/interview/' + b.id, cells:[
         personCell(b.cand), esc(agIvKind(b.kind)), agIvFee(b.kind, b.fee), esc(b.slot), tag(b.status)]})))
       : emptyState('video', 'Nothing booked', 'No interviews are on this agent’s diary right now.')}
@@ -5858,7 +5862,7 @@ function agentsDetail(){
   <section class="sec">
     ${aiHead('Past interviews', 'Completed interviews. Open one for the transcript, evaluations and the candidate’s review.')}
     ${past.length ? table(
-      [{label:'Candidate'}, {label:'Kind'}, {label:'Fee', num:true}, {label:'When'}, {label:'Candidate rating', num:true}],
+      [{label:'Candidate'}, {label:'Type'}, {label:'Fee', num:true}, {label:'When'}, {label:'Candidate rating', num:true}],
       past.map(p => ({id:p.id, go:'agents/interview/' + p.id, cells:[
         personCell(p.cand), esc(agIvKind(p.kind)), agIvFee(p.kind, p.fee), esc(p.when), p.rating ? ratingCell(p.rating) : '—']})))
       : emptyState('video', 'No past interviews', 'This agent has no completed interviews on record yet.')}
@@ -5944,7 +5948,7 @@ function agentsInterview(){
       ${aiHead('Interview with ' + esc(iv.cand), `${esc(iv.agent)} &middot; ${esc(agIvKind(iv.kind))} &middot; ${esc(when)}`)}
       <div class="facts pf-facts">
         ${admFact(I.wallet, '--mk-4', 'Interview fee', agIvFee(iv.kind, iv.fee))}
-        ${admFact(I.video, '--mk-3', 'Kind', agIvKind(iv.kind))}
+        ${admFact(I.video, '--mk-3', 'Type', agIvKind(iv.kind))}
         ${admFact(I.calendar, '--mk-2', 'When', when)}
         <div style="--mk:var(--mk-1)"><span class="l pf-l">${ic('shield')}Status</span><span class="v">${tag(iv.status)}</span></div>
       </div>
@@ -6745,7 +6749,7 @@ KINDS.booking = {
     ...(b ? [] : [{k:'agent', l:'Agent', t:'select', opts: () => agentNames()}]),
     {k:'date', l:'Date', t:'date', req:1},
     {k:'slot', l:'Time', t:'text', req:1, ph:'e.g. Thu 14:00'},
-    {k:'kind', l:'Kind', t:'select', opts:['Interview', 'Re-interview', 'First (discounted)'], def:'Interview'}
+    {k:'kind', l:'Type', t:'select', opts:['Interview', 'Re-interview', 'First (discounted)'], def:'Interview'}
   ],
   help:'A booking made here is on the platform’s behalf — the candidate is charged the agent’s fee unless it is their first interview, which is free.',
   okNew:'Book Interview',
@@ -6754,48 +6758,57 @@ KINDS.booking = {
   remove: b => { BOOKINGS.splice(BOOKINGS.indexOf(b), 1); },
   delWarn: b => `The booking is cancelled${b.escrow === 'held' ? ` and ${money(b.fee)} is refunded from escrow to the candidate` : ''}. Both parties are told.`
 };
-function attnToggle(){
-  const on = getFilter('bkattn', '') === '1';
-  return `<button class="btn ${on ? 'btn-p' : 'btn-g'} btn-sm noic" data-filter="bkattn:${on ? '' : '1'}" aria-pressed="${on}">Needs attention</button>`;
-}
+/* THE INTERVIEWS MODULE IS A LIST OF BOOKED INTERVIEWS, not the old tabbed
+   register (Maryam, 21 Sep 2026: "show only the booked interviews by different
+   talent agents ... no tabs, no tables, just keep the search and filter should be
+   by type and by talent agent name"). Off her reference — the agent portal's
+   booked-diary row (`.bk-row`, §31.5, shipped in the DS): a left time column
+   against a hairline, a round candidate photo, "Type · Candidate" over an
+   agent + duration + escrow sub-line, and a trailing arrow to the interview
+   detail. The status tab strip, the stage/escrow TABLE and the Needs-attention
+   toggle are gone; only the search plus two filters (Type, Talent agent) remain.
+   Scoped to `bkStage === 'booked'`, so held/reported/not-held/resolved interviews
+   no longer surface here — a stuck one is dealt with off this list. */
+const ivChip = slot => {
+  const m = String(slot || '').match(/^(.*?)\s*(\d{1,2}):(\d{2})$/);
+  if(!m) return {chip: String(slot || '—'), time:''};
+  const h = +m[2];
+  return {chip: m[1].trim() || '—', time: `${h % 12 || 12}:${m[3]} ${h < 12 ? 'AM' : 'PM'}`};
+};
+const ivEscrowNote = b => !b.fee ? 'complimentary first interview'
+  : b.escrow === 'held' ? `${money(b.fee)} already in escrow`
+  : b.escrow === 'released' ? `${money(b.fee)} released`
+  : b.escrow === 'refunded' ? `${money(b.fee)} refunded`
+  : money(b.fee);
 function marketBookings(){
-  const q = getFilter('q', ''), sf = getFilter('bkstage', 'all'), kf = getFilter('bkkind', 'all'), na = getFilter('bkattn', '') === '1';
-  const count = s => BOOKINGS.filter(b => bkStage(b) === s).length;
+  const q = getFilter('q', ''), kf = getFilter('bkkind', 'all'), af = getFilter('bkagent', 'all');
   const rows = BOOKINGS
-    .filter(b => sf === 'all' ? true : bkStage(b) === sf)
-    .filter(b => kf === 'all' ? true : kf === 're' ? /Re-/.test(b.kind) : !/Re-/.test(b.kind))
-    .filter(b => !na || bkNeedsAttention(b))
-    .filter(b => hit(q, b.cand, b.agent, emailOf(b.cand), emailOf(b.agent)))
-    .slice().sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
+    .filter(b => bkStage(b) === 'booked')
+    .filter(b => kf === 'all' ? true : kf === 're' ? agIvIsRe(b.kind) : !agIvIsRe(b.kind))
+    .filter(b => af === 'all' ? true : b.agent === af)
+    .filter(b => hit(q, b.cand, b.agent, b.kind))
+    .slice().sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')));
+  const typeFilter = filterDd('bkkind', 'all', [['all', 'Any type'], ['first', 'First interview'], ['re', 'Re-interview']], 'Type');
+  const agentFilter = filterDd('bkagent', 'all', [['all', 'Any agent'], ...agentNames().map(n => [n, n])], 'Talent agent');
   return `
   <section class="sec">
-    ${searchHead('Interviews', 'Every interview and where it has got to. The register is read-only; a stuck interview is dealt with through Resolve.',
+    ${searchHead('Interviews', 'Every interview candidates have booked with a talent agent, soonest first.',
       exportBtn('Interviews'), 'Search by candidate or agent')}
-    ${filterStrip('bkstage', 'all', [
-      ['all', 'All', BOOKINGS.length],
-      ['booked', 'Booked', count('booked')],
-      ['held', 'Held', count('held')],
-      ['reported', 'Reported', count('reported')],
-      ['nothld', 'Not held', count('nothld')],
-      ['resolved', 'Resolved', count('resolved')]
-    ])}
-    ${lstTools('Search by candidate or agent', `${attnToggle()} ${filterDd('bkkind', 'all', [['all', 'Any kind'], ['first', 'First interview'], ['re', 'Re-interview']], 'Kind')}`)}
-    ${rows.length ? table(
-      /* Columns trimmed (Maryam, 20 Sep 2026): no email sub-line on the person
-         cells, "Kind" → "Type" with the "(discounted)" note dropped, and the Stage
-         and Report due columns removed. */
-      [{label:'Candidate'}, {label:'Agent'}, {label:'Type'}, {label:'Scheduled'}, {label:'Fee', num:true}, {label:'Escrow'}, ACT_COL],
-      rows.map(b => ({cells:[
-        personCell(b.cand, ''),
-        personCell(b.agent, ''),
-        esc(b.kind.replace(/\s*\([^)]*\)/, '')), esc(b.slot),
-        b.fee ? money(b.fee) : 'Free',
-        escrowTag(b.escrow),
-        bkNeedsAttention(b) ? rowActs([['route', 'Resolve', `data-sheet="resolve:${b.id}"`]]) : ''
-      ]})), {select:false})
-      /* The Interviews register is read-only with no bulk actions, so the row-select
-         checkboxes serve no purpose — opted out (Maryam, 20 Sep 2026). */
-      : emptyState('video', 'No interviews match', q || sf !== 'all' || kf !== 'all' || na ? 'Nothing matches the current filters.' : 'No interviews yet.')}
+    ${lstTools('Search by candidate or agent', `${typeFilter} ${agentFilter}`)}
+    ${rows.length ? `<div class="tile-stack">${rows.map(b => {
+      const {chip, time} = ivChip(b.slot);
+      const typeLabel = agIvIsRe(b.kind) ? 'Re-interview' : 'First interview';
+      return `<button class="cardrow bk-row" data-go="agents/interview/${b.id}">
+        <span class="day bk-day"><div class="d">${esc(chip)}</div><div class="n">${esc(time)}</div></span>
+        <span class="av mem-av mem-ph"><span class="av-ph"><img src="${agentFace(b.cand)}" alt="" loading="lazy"></span></span>
+        <span class="cardrow-b">
+          <span class="cardrow-t">${esc(typeLabel)} &middot; ${esc(b.cand)}</span>
+          <span class="cardrow-d">${esc(b.agent)} &middot; 45 minutes, recorded &middot; ${esc(ivEscrowNote(b))}</span>
+        </span>
+        <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg>
+      </button>`;
+    }).join('')}</div>`
+      : emptyState('video', 'No interviews match', q || kf !== 'all' || af !== 'all' ? 'Nothing matches the current filters.' : 'No booked interviews right now.')}
   </section>`;
 }
 /* 8.2 — RESOLVE A FAILED INTERVIEW. Offered only on an overdue Held booking or a
@@ -6860,11 +6873,9 @@ function marketRecordings(){
           esc(b.recLen || '—'),
           esc(b.transcript || '—'),
           rowActs([
-            ['document', 'Open transcript', `data-go="market/recording/${b.id}"`],
-            ...(avail ? [['play', 'Play recording', `data-act="recplay:${b.id}"`]] : []),
-            ...(avail && b.transcript === 'Ready' ? [['download', 'Download transcript', `data-act="dltranscript:${b.id}"`]] : []),
-            ...(scenesConsent(b) === 'Given' ? [['close', 'Withdraw SCENES consent', `data-sheet="recwithdraw:${b.id}"`]] : []),
-            ...(avail ? [['delete', 'Delete recording', `data-sheet="recdelete:${b.id}"`]] : [])
+            ['play', 'View', `data-go="market/recording/${b.id}"`],
+            ...(avail && b.transcript === 'Ready' ? [['download', 'Download', `data-act="dltranscript:${b.id}"`]] : []),
+            ...(avail ? [['delete', 'Delete', `data-sheet="recdelete:${b.id}"`]] : [])
           ])
         ]}; }))
       : emptyState('video', 'No recordings match', q ? 'Nothing matches the current search.' : 'No recordings yet.')}
@@ -6902,11 +6913,31 @@ function recTranscript(b){
     .concat([``, `Note: authored placeholder transcript for the prototype; no real recording is stored.`])
     .join('\n');
 }
+/* THE RECORDING PLAYER — the View page shows the recording as well as the
+   transcript (Maryam, 21 Sep 2026: "on view we should not only see the transcript
+   ... but the recording as well"). A 16:9 poster prototype (video streaming is not
+   wired), the still a real captured frame of the interview call
+   (`assets/agent/iv-recording-still.webp`, the same frame the Talent Agent portal
+   uses as `IV_REC_STILL`) served relative — the play disc + scrubber match the
+   old modal's player, over the poster. */
+const recPlayer = b => `
+  <div class="rec-player" style="position:relative;aspect-ratio:16/9;background:#111;overflow:hidden">
+    <img src="assets/agent/iv-recording-still.webp" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.28)">
+      <div style="width:64px;height:64px;border-radius:999px;background:rgba(0,0,0,.44);display:flex;align-items:center;justify-content:center">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="#fff">${inner('play')}</svg>
+      </div>
+    </div>
+    <div style="position:absolute;left:0;right:0;bottom:0;padding:8px 12px;background:linear-gradient(transparent,rgba(0,0,0,.6));color:#fff;font-size:12px;display:flex;gap:8px;align-items:center">
+      <span>0:00</span><div style="flex:1;height:3px;background:rgba(255,255,255,.3);border-radius:999px"><div style="width:0;height:100%;background:#fff;border-radius:999px"></div></div><span>${esc(b.recLen || b.kind)}</span>
+    </div>
+  </div>
+  <p class="t-desc">Prototype player — video streaming is not wired in this build.</p>`;
 function marketRecordingDetail(){
   const b = BOOKINGS.find(x => x.id === S.id);
   if(!b) return `${detailHead('market/recordings')}
     <section class="sec">${emptyState('video', 'Recording not found', 'This recording is no longer in the register.')}</section>`;
-  DETAIL_LABEL = `${b.cand} — transcript`;
+  DETAIL_LABEL = `${b.cand} — recording`;
   const A = String(b.agent).split(' ')[0], C = String(b.cand).split(' ')[0];
   const all = TX_LINES_ADM();
   const filt = getFilter('txf', 'all'), q = (getFilter('txq', '') || '').trim().toLowerCase();
@@ -6922,9 +6953,12 @@ function marketRecordingDetail(){
   const filters = TX_TAGS_ADM.filter(([k]) => k === 'all' || k === 'scene' || present.has(k));
   return `${detailHead('market/recordings')}
   <section class="sec">
-    ${''/* Header action in a kebab (Maryam, 18 Sep 2026). */}
-    ${aiHead('Interview Transcript', `${esc(b.cand)} with ${esc(b.agent)} · ${esc(b.kind)} · ${esc(b.slot)}${b.recLen ? ' · ' + esc(b.recLen) + ' recorded' : ''}`,
+    ${''/* Header action in a kebab (Maryam, 18 Sep 2026). The View page carries the
+          recording player and the transcript both (Maryam, 21 Sep 2026). */}
+    ${aiHead('Interview recording', `${esc(b.cand)} with ${esc(b.agent)} · ${esc(b.kind)} · ${esc(b.slot)}${b.recLen ? ' · ' + esc(b.recLen) + ' recorded' : ''}`,
       rowActs([['download', 'Download Transcript', `data-act="dltranscript:${b.id}"`]]))}
+    ${recPlayer(b)}
+    ${secHead('Transcript')}
     <div class="tx-srch">
       <svg viewBox="0 0 24 24" aria-hidden="true">${inner('search')}</svg>
       <input class="inp" data-srch="txq" placeholder="Find a word in the transcript" aria-label="Search the transcript" value="${esc(getFilter('txq', ''))}" autocomplete="off">
@@ -7012,7 +7046,7 @@ SHEETS.recording = id => {
         </div>
       </div>
       <p class="t-desc">Prototype player — video streaming is not wired in this build.</p>
-      ${kv([['Candidate', esc(b.cand)], ['Agent', esc(b.agent)], ['Kind', esc(b.kind)], ['When', esc(b.slot)]])}
+      ${kv([['Candidate', esc(b.cand)], ['Agent', esc(b.agent)], ['Type', esc(b.kind)], ['When', esc(b.slot)]])}
       ${secHead('Transcript')}
       <div style="max-height:220px;overflow:auto;background:var(--surface-2);border:1px solid var(--rule);padding:12px;white-space:pre-wrap;font-size:13px;line-height:1.5">${esc(recTranscript(b))}</div>`};
 };
@@ -7464,7 +7498,13 @@ function financeTransactions(){
           ...mid,
           (t.dir === 'out' ? '−' : '') + (t.amt ? money(t.amt) : '—'),
           methodMark(t.method),
-          tag(t.status),
+          /* A PAYOUT'S pending state reads "In progress", not "Pending" (Maryam,
+             21 Sep 2026): the money is on its way to the agent's bank, so the
+             payouts set is In progress · Paid · Failed. Scoped to the payout
+             category — the money-in charges (Courses/Interviews/Scenes) keep
+             "Pending" — and the amber `warn` hue is unchanged (both `pending`
+             and `in progress` map to it). */
+          tag(t.status, t.cat === 'payout' && t.status === 'pending' ? 'In progress' : null),
           /* A FAILED transaction took no money (the charge never received, or the
              payout never sent), so there is nothing to receipt or refund — the only
              sensible action is to remove it from the ledger (Maryam, 20 Sep 2026:
@@ -7567,7 +7607,7 @@ function financePayouts(){
     ${lstTools('Search payouts')}
     <div class="tile-stack">
       ${rows.length ? rows.map(p => cardRow('bank',
-        `${esc(p.agent)} <span class="tag sm bordered">${esc(p.ref)}</span> ${tag(p.status)}`,
+        `${esc(p.agent)} <span class="tag sm bordered">${esc(p.ref)}</span> ${tag(p.status, p.status === 'held' ? 'In progress' : null)}`,
         `${esc(p.period)} · ${p.interviews} interview${p.interviews === 1 ? '' : 's'} · ${p.net ? 'net ' + money(p.net) : esc(p.when)} · ${esc(p.method)}`,
         p.status === 'held' && p.net
           ? `<button class="btn acc-link btn-sm noic" data-act="askrelease:${p.id}">Release ${I.arrowRight}</button>`
