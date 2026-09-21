@@ -164,28 +164,35 @@
    too thick"). Nothing here needs negative margins, so the rule stays single
    width at any count and survives a wrap to a second row. */
 .attn-grid{
-  display:grid; grid-template-columns:repeat(4, minmax(0, 1fr));
+  display:grid; grid-template-columns:repeat(var(--attn-cols, 4), minmax(0, 1fr));
   border-top:1px solid var(--rule); border-left:1px solid var(--rule);
 }
+/* ONE ALIGNED ROW — icon, content, arrow (Maryam, 21 Sep 2026: "the icon,
+   content and arrow all needs to be in the same row aligned"). The card was a
+   flex COLUMN (mark on top, body, arrow at the foot); it is a flex ROW now, all
+   three vertically centred like a standard `.cardrow` list row. The mark and the
+   arrow don't shrink; the body is the flexible middle and pushes the arrow to
+   the right edge. `min-height` drops (a row sizes to its own content). */
 .app .view-col .main .page .attn-grid > .tile.gcard{
-  display:flex; flex-direction:column; align-items:flex-start; gap:var(--s04);
-  min-height:132px; padding:var(--s05); margin:0;
+  display:flex; flex-direction:row; align-items:center; gap:var(--s04);
+  padding:var(--s05); margin:0;
   border:0;
   border-right:1px solid var(--rule);
   border-bottom:1px solid var(--rule);
 }
-/* The body is the card's flexible middle; the arrow sits at the foot, right. */
-.attn-grid .gcard-b{display:block; flex:1 1 auto; width:100%}
-.attn-grid .tile-arrow{align-self:flex-end; margin-top:auto}
+.attn-grid .cardrow-ic{flex:none}
+.attn-grid .gcard-b{display:block; flex:1 1 auto; min-width:0}
+.attn-grid .tile-arrow{flex:none; align-self:center; margin:0 0 0 auto}
 
-/* THE DS's LIST UNDERLINE, OFF. In a `.page` the DS hides each row's real bottom
-   border and draws the divider as an `::after` inset by `--pad-x`, so inside a
-   card it showed up as a short line floating above the card's foot (Maryam,
-   21 Sep 2026: "bottom border is inconsistent"). The pseudo is kept — it is also
-   the hover wash — but reshaped to fill the card rather than underline it, and
-   the hover state's bleed is pulled back so the wash stays inside the cell.
-   Written at (0,6,0)/(0,7,0) to beat the DS's own `.app .view-col .main .page`
-   rules by weight, no `!important`.
+/* THE DS's LIST UNDERLINE, OFF, AND NO HOVER WASH. In a `.page` the DS hides each
+   row's real bottom border and draws the divider as an `::after` inset by
+   `--pad-x`, so inside a card it showed up as a short line floating above the
+   card's foot (Maryam, 21 Sep 2026: "bottom border is inconsistent"). The pseudo
+   is kept but neutralised — transparent at rest AND on hover. The card's ONLY
+   hover answer is the arrow turning accent (Maryam, 21 Sep 2026: "remove the grey
+   bg on hover, the arrow turning in accent color is enough"). Written at (0,6,0)
+   to beat the DS's own `.app .view-col .main .page` rules by weight, no
+   `!important`.
 
    NO `:where(.__nh)` HERE. That is the DS's non-touch gate, and this portal
    never arms `.__nh` (see the note at the head of this file) — every DS `:hover`
@@ -195,13 +202,10 @@
 .app .view-col .main .page .attn-grid > .tile.gcard:hover::after{
   left:0; right:0; top:0; bottom:0; height:auto; background-color:transparent;
 }
-.app .view-col .main .page .attn-grid > .tile.gcard:hover::after{
-  background-color:var(--overlay-hover);
-}
 /* THE ARROW GOES ACCENT ON HOVER (Maryam, 21 Sep 2026). The DS takes it from
    `--text-placeholder` to `--text-primary`; here it takes the accent instead, so
-   the card's hover answer matches the accent chip it already carries. The 2px
-   nudge is the DS's and is left alone. */
+   the card's hover answer is the accent chip's mate. The 2px nudge is the DS's
+   and is left alone. */
 .app .view-col .main .page .attn-grid > .tile.gcard:hover .tile-arrow{color:var(--accent); transform:translateX(2px)}
 
 /* NARROWER VIEWPORTS — two up, then one. The container still pays top and left,
@@ -209,16 +213,21 @@
 @media (max-width:1100px){ .attn-grid{grid-template-columns:repeat(2, minmax(0, 1fr))} }
 @media (max-width:660px){ .attn-grid{grid-template-columns:minmax(0, 1fr)} }
 
-/* THE MARK SITS ON A SOLID ACCENT CHIP (Maryam, 21 Sep 2026: "for the 4 icons
-   lets give them accent red bg and white icon no border"). The DS ships this
-   chip as a black glyph on a soft `--tal-chip-1` wash with a radial highlight
-   and a 1px `--rule` edge; all three are cleared here and replaced by flat
-   `--accent` with the `--on-accent` glyph. Scoped to the attention grid, so the
-   decision tiles and every other `.cardrow-ic` list keep the DS treatment.
-   `background` (the shorthand) is used so the DS's `background-image` gradient
-   is reset along with the colour. */
-.app .view-col .main .page .attn-grid .cardrow-ic{background:var(--accent); border:0}
-.app .view-col .main .page .attn-grid .cardrow-ic svg{color:var(--on-accent)}
+/* THE MARK IS A ROUND LIGHT-ACCENT CHIP WITH AN ACCENT GLYPH (Maryam, 21 Sep
+   2026: "use round icons bg, the bg should be in light accent color and the
+   above icon should be in accent color, the icon size should be standard"). The
+   DS ships this chip as a black glyph on a soft `--tal-chip-1` wash with a
+   radial highlight and a 1px `--rule` edge; all three are cleared here and
+   replaced by the lightest accent tone (`color-mix(--accent 12%, #fff)`, the
+   same tint the auth-id chip and `.rank-chip` use) under an `--accent` glyph, on
+   a full-round chip. The SIZE is left at the DS default (36px chip / 20px glyph)
+   — the standard `.cardrow-ic` size, so nothing is resized. Scoped to the
+   attention grid, so the decision tiles and every other `.cardrow-ic` list keep
+   the DS treatment. This SUPERSEDES the same-day solid-accent + white-glyph chip.
+   `background` (the shorthand) is used so the DS's `background-image` gradient is
+   reset along with the colour. */
+.app .view-col .main .page .attn-grid .cardrow-ic{background:color-mix(in srgb, var(--accent) 12%, #fff); border:0; border-radius:50%}
+.app .view-col .main .page .attn-grid .cardrow-ic svg{color:var(--accent)}
 
 /* NO SECTION DIVIDER UNDER THE GRID (Maryam, 21 Sep 2026). The DS closes every
    `.sec` with a `--pad-x`-inset 1px `::after`. Under a bordered grid that rule
@@ -227,30 +236,14 @@
    separates it from "Platform at a glance". */
 .app .view-col .main .page .sec:has(> .attn-grid)::after{content:none; display:none}
 
-/* "PLATFORM AT A GLANCE" — A ROOMIER CELL (Maryam, 21 Sep 2026: "can we make it
-   a little bit spacious by changing the inner layout a little bit — just the
-   layout, do not touch anything like content or sizing"). Nothing is resized or
-   reworded: the same mark, label, figure and note, at the DS's own type sizes.
-   What changes is where they sit. The DS cell is a three-column grid,
-   'ic top n', which pins the figure hard to the cell's right edge, far from the
-   label it belongs to and leaving a dead channel down the middle. Here the cell
-   becomes a single column — mark, then label, then figure, then note — so the
-   figure reads directly under its own label and the freed horizontal room turns
-   into breathing space. The padding steps up one token (--s05 -> --s06) to match.
-   Scoped to `.dash-stats`, so every other `.stats` block in the portal is
-   untouched. */
-.app .page .stats.dash-stats > .stat{
-  grid-template-columns:minmax(0, 1fr);
-  grid-template-areas:'ic' 'top' 'n' 'd' 'sl';
-  grid-template-rows:auto auto auto auto 1fr;
-  column-gap:0; row-gap:var(--s02);
-  padding:var(--s06);
-}
-.app .page .stats.dash-stats .stat-top > .n{
-  justify-self:start; align-self:start; text-align:left; margin-right:0; margin-top:var(--s02);
-}
-/* The mark keeps its own row, so the label is not pulled up beside it. */
-.app .page .stats.dash-stats > .stat > .stat-ic{align-self:start; justify-self:start; margin-bottom:var(--s02)}
+/* "PLATFORM AT A GLANCE" USES THE STANDARD STAT CELL (Maryam, 21 Sep 2026:
+   "cards of platform at glance should have the standard ui that we are using for
+   the other cards where the value is on the right end"). The vertical single-
+   column override tried earlier the same day is REMOVED, so `.dash-stats` falls
+   back to the DS `.stat` shape — the three-column 'ic top n' grid where the
+   figure sits centred on the cell's right, exactly like every other `.stats`
+   block. The `.dash-stats` class is kept on the markup (harmless with no rules)
+   so a future `.dash-stats`-only tweak has a hook. */
 </style>
 <style id="admin-row-hover">
 /* A CLICKABLE TABLE ROW (`tr.clk`) LIGHTS ITS FIRST-COLUMN NAME ON HOVER
@@ -313,6 +306,12 @@
    than the DS base (0,7,0), so it wins on order. The dark-card override (0,8,0,
    §63) still beats it, so a black-card heading keeps --on-dark-2. Admin-only. */
 .app .page .sec .sec-h.aih > .aih-b > .aih-d{color:var(--text-secondary)}
+/* the dashboard page heading ("Welcome Back, Derek!") sits directly above the
+   period row — its own section, but with the bottom padding zeroed so the two
+   read as one header block rather than two full-gap sections. `!important` to
+   beat the admin section-rhythm chain (same reason `.set-head` needs it). */
+.app .main .sec.dash-head{padding-bottom:0 !important}
+.app .main .sec.dash-periodbar{padding-top:var(--s05) !important}
 /* the dashboard period selector row (2.2): caption left, the segmented buttons
    right; wraps to a stack on a narrow width. */
 .app .dash-periodbar-in{display:flex;align-items:center;justify-content:space-between;gap:var(--s05);flex-wrap:wrap}
@@ -452,7 +451,11 @@
    2px (Maryam, 18 Sep 2026: "increase the space between heading and the desc blocks
    ... such boxes"). Admin-wide, every `.f` field label. */
 .app .f .lbl{margin-bottom:var(--s03)}
-.app .idverify{flex:none; display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; border-radius:999px; background:var(--support-success-ink); color:var(--background)}
+/* THE VERIFIED MARK is the scalloped `verified` seal glyph in green, not a green
+   disc with a bare check (Maryam, 21 Sep 2026: "use the highlighted icon as the
+   verified icon against candidate or talent agent"). The glyph carries its own
+   seal + tick, so it needs no background circle. */
+.app .idverify{flex:none; display:inline-flex; align-items:center; justify-content:center; color:var(--support-success-ink)}
 /* ADD-A-USER: single-role RADIOS, and the "or / promote existing candidate"
    reveal (Maryam, 16 Sep 2026). */
 .app .adduser-roles{display:flex; flex-direction:column; gap:var(--s01)}
@@ -919,6 +922,9 @@ const TAGV = {
      `refunded` reads as done (green — it no longer falls through to plain text),
      and `failed` is a problem (red). `pending`/`paid` already map above. */
   received:'green', refunded:'green', failed:'red',
+  /* transcript states (Maryam, 21 Sep 2026): a ready transcript is done (green),
+     one still generating is in progress (amber); `failed` is already red above. */
+  ready:'green', generating:'warn',
   /* waiting */ held:'warn', pending:'warn', review:'warn', requested:'warn', invited:'warn',
   processing:'warn', sent:'warn', overdue:'warn', unmatched:'warn', shortlisted:'warn',
   reviewing:'warn', scheduled:'warn', draft:'warn', degraded:'warn', 'in progress':'warn',
@@ -1648,7 +1654,7 @@ const MODULES=[
  {k:'catalogue', t:'Course Catalogue', ic:'book', subs:[
    {k:'catalogue', t:'Course Catalogue'}, {k:'coursedetail', t:'Course', hidden:true}]},
  {k:'market', t:'Interviews', ic:'market', subs:[
-   {k:'bookings', t:'Interviews'}, {k:'recordings', t:'Recordings & Transcripts'}, {k:'recording', t:'Transcript', hidden:true}]},
+   {k:'bookings', t:'Interviews'}, {k:'recordings', t:'Recordings & Transcripts'}, {k:'recording', t:'Transcript', hidden:true}, {k:'approval', t:'Level approval', hidden:true}]},
  {k:'finance', t:'Finance & Settlement', ic:'finance', subs:[
    /* Only Transactions and Payouts are surfaced for now (Maryam, 16 Sep 2026:
       "only keep transactions and payouts sub modules for now, hide the other sub
@@ -3223,13 +3229,14 @@ function homeOverview(){
   const leadReady = LEADER_REQS.filter(r => r.stage === 'feedback').length;
   const ivOverdue = BOOKINGS.filter(bkOverdue).length;
   const heldPo = heldPayouts();
-  const openRulings = DECISIONS.filter(d => d.kind === 'blocked' || d.kind === 'open').length;
+  /* Open decisions is NOT an attention card (Maryam, 21 Sep 2026: "we hid open
+     decisions so hide it from the needs attention as well"). The Rulings
+     Register still exists; it is simply not surfaced as a live queue here. */
   const attn = [
     cohortsNoLeader && ['cohorts', 'Cohorts without a leader', `${cohortsNoLeader} active cohort${cohortsNoLeader === 1 ? '' : 's'} to assign`, 'cohorts/assign'],
     leadReady && ['group', 'Cohort leaders ready to allot', `${leadReady} recommended and interviewed`, 'cohorts/assign'],
     ivOverdue && ['market', 'Interview reports overdue', `${ivOverdue} held interview${ivOverdue === 1 ? '' : 's'} past 24h`, 'market/bookings'],
-    heldPo && ['bank', 'Payouts to release', `${heldPo} pending settlement`, 'finance/payouts'],
-    openRulings && ['alert', 'Open decisions', `${openRulings} ruling${openRulings === 1 ? '' : 's'} awaiting a decision`, 'home/rulings']
+    heldPo && ['bank', 'Payouts to release', `${heldPo} pending settlement`, 'finance/payouts']
   ].filter(Boolean);
   const attnRows = attn.map(([ic_, t, s, go]) => `<button class="tile clk gcard" data-go="${go}">
       <span class="cardrow-ic">${ic(ic_)}</span>
@@ -3253,6 +3260,12 @@ function homeOverview(){
   const asAt = new Date().toLocaleString('en-US', {month:'short', day:'numeric', hour:'numeric', minute:'2-digit'});
 
   return `
+  ${/* PAGE HEADING (Maryam, 21 Sep 2026: "the page heading on dashboard is missing.
+     It should say Welcome Back, Derek!"). The admin hides Tal's summary portal-wide,
+     so the dashboard had no visible heading — this is a plain aiHead page title,
+     the signed-in Super Admin's own first name (ME = Derek Sole). */''}
+  <section class="sec dash-head">${aiHead('Welcome Back, ' + esc(ME.name.split(' ')[0]) + '!')}</section>
+
   <section class="sec dash-periodbar">
     <div class="dash-periodbar-in">
       <div><span class="t-desc">Figures as at ${asAt}. The period applies to the money and activity panels.</span></div>
@@ -3263,7 +3276,7 @@ function homeOverview(){
   ${/* ══ NEEDS YOUR ATTENTION ══ the operational lead — the live queues, count-bearing tiles */''}
   ${attnRows ? `<section class="sec">
     ${secHead('Needs your attention')}
-    <div class="attn-grid">${attnRows}</div>
+    <div class="attn-grid" style="--attn-cols:${attn.length}">${attnRows}</div>
   </section>` : ''}
 
   ${/* ══ PLATFORM AT A GLANCE ══ two rows of four (`.stats` is a fixed 2/4 grid) */''}
@@ -3398,16 +3411,13 @@ function homeOverview(){
         <div class="tile-stack">${AUDIT.slice(0, 5).map(a => memRow(a.who, `${esc(a.act)} · ${esc(a.obj)}`, tag(a.sev, a.sev === 'high' ? 'High' : a.sev === 'notice' ? 'Notice' : 'Info'))).join('')}</div>
       </div>
     </div>
-  </section>
-
-  ${/* ══ OPEN DECISIONS & RISKS ══ the register's blocked lines (whole register is its own page) */''}
-  <section class="sec">
-    ${aiHead('Open decisions &amp; risks', `${saCount('blocked')} of ${SA_CASES.length} use cases are blocked by an undecided upstream item; ${saCount('open')} more need a stakeholder ruling. ${highDec} high · ${medDec} medium across the register.`,
-      '<button class="btn btn-g btn-sm noic" data-go="home/rulings">Open The Register</button>')}
-    <div class="tile-stack">
-      ${DECISIONS.filter(d => d.kind === 'blocked').map(decisionTile).join('')}
-    </div>
   </section>`;
+  /* OPEN DECISIONS & RISKS section removed from the dashboard (Maryam, 21 Sep
+     2026: "we hid open decisions so hide it ... yes hide that as well"). The
+     Rulings Register lives on at home/rulings (reachable directly / by deep
+     link) and `decisionTile` is still used there; it is only the dashboard
+     surfacing of open decisions that is gone — the attention card AND this
+     lower group. */
 }
 
 /* ONE DECISION AS A TILE — the eyebrow names the use case, its owner and its
@@ -5703,7 +5713,7 @@ function candidatesDetail(){
     <div class="idhead">
       <span class="idphoto"><img src="${agentFace(c.name)}" alt="" class="idhead-ph"></span>
       <div class="idhead-b">
-        <span class="idname-row"><span class="idname">${esc(c.name)}</span><span class="idverify" title="Verified candidate" aria-label="Verified"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="display:block">${inner('check')}</svg></span></span>
+        <span class="idname-row"><span class="idname">${esc(c.name)}</span><span class="idverify" title="Verified candidate" aria-label="Verified"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" style="display:block">${inner('verified')}</svg></span></span>
         <span class="idmeta">${esc(c.bucket)} &middot; ${esc(c.level)}${u ? ' &middot; ' + esc(u.email) : ''}</span>
       </div>
       <span class="idhead-act">${menu}</span>
@@ -5945,7 +5955,7 @@ function agentsDetail(){
     <div class="idhead">
       <span class="idphoto"><img src="${agentFace(a.name)}" alt="" class="idhead-ph"></span>
       <div class="idhead-b">
-        <span class="idname-row"><span class="idname">${esc(a.name)}</span>${a.rating ? `<span class="idrate">${ratingCell(a.rating)}</span>` : ''}</span>
+        <span class="idname-row"><span class="idname">${esc(a.name)}</span><span class="idverify" title="Verified talent agent" aria-label="Verified"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" style="display:block">${inner('verified')}</svg></span>${a.rating ? `<span class="idrate">${ratingCell(a.rating)}</span>` : ''}</span>
         <span class="idmeta">${esc(a.job || 'Talent Agent')} &middot; ${esc(a.email)}</span>
       </div>
       ${''/* Header actions in a kebab (Maryam, 18 Sep 2026); the Deactivated tag stays. */}
@@ -6030,6 +6040,23 @@ const PAST_IVS = [
    review:'Marcus put me at ease and the feedback was specific and kind.'}
 ];
 function pastIvs(a){ return PAST_IVS.filter(p => p.agent === a.name); }
+/* LEVEL-APPROVAL STATE (Maryam, 21 Sep 2026: "the awaiting approval are the ones
+   where the talent agent has sent the recording, level recommendation, and their
+   notes ... super admin has to approve or override this decision"). Each submitted
+   interview carries the agent's recommended level, Tal's suggested level, when it
+   was submitted, and the admin decision (null = pending, 'approved' = the agent's
+   level confirmed, 'override' = the admin set a different `finalLevel`). Authored
+   placeholder (§74). piv4 is the case where the agent and Tal differ. */
+;(function seedApproval(){
+  const M = {
+    piv1: {agentLevel:'E3', talLevel:'E3', submitted:'20 Aug 2026', decision:null},
+    piv2: {agentLevel:'E2', talLevel:'E2', submitted:'10 Aug 2026', decision:null},
+    piv3: {agentLevel:'E4', talLevel:'E4', submitted:'12 Aug 2026', decision:'approved', finalLevel:'E4'},
+    piv4: {agentLevel:'E3', talLevel:'E2', submitted:'9 Aug 2026',  decision:null}
+  };
+  PAST_IVS.forEach(p => Object.assign(p, M[p.id] || {agentLevel:'E2', talLevel:'E2', submitted:p.when, decision:null}));
+})();
+const pendingApprovals = () => PAST_IVS.filter(p => !p.decision);
 
 /* A ROW OF THE INTERVIEW EVALUATION CARDS (the candidate portal's signed-summary
    look, in the design system this portal links) — one green Strengths, one violet
@@ -6976,59 +7003,139 @@ KINDS.booking = {
   remove: b => { BOOKINGS.splice(BOOKINGS.indexOf(b), 1); },
   delWarn: b => `The booking is cancelled${b.escrow === 'held' ? ` and ${money(b.fee)} is refunded from escrow to the candidate` : ''}. Both parties are told.`
 };
-/* THE INTERVIEWS MODULE IS A LIST OF BOOKED INTERVIEWS, not the old tabbed
-   register (Maryam, 21 Sep 2026: "show only the booked interviews by different
-   talent agents ... no tabs, no tables, just keep the search and filter should be
-   by type and by talent agent name"). Off her reference — the agent portal's
-   booked-diary row (`.bk-row`, §31.5, shipped in the DS): a left time column
-   against a hairline, a round candidate photo, "Type · Candidate" over an
-   agent + duration + escrow sub-line, and a trailing arrow to the interview
-   detail. The status tab strip, the stage/escrow TABLE and the Needs-attention
-   toggle are gone; only the search plus two filters (Type, Talent agent) remain.
-   Scoped to `bkStage === 'booked'`, so held/reported/not-held/resolved interviews
-   no longer surface here — a stuck one is dealt with off this list. */
-const ivChip = slot => {
-  const m = String(slot || '').match(/^(.*?)\s*(\d{1,2}):(\d{2})$/);
-  if(!m) return {chip: String(slot || '—'), time:''};
-  const h = +m[2];
-  return {chip: m[1].trim() || '—', time: `${h % 12 || 12}:${m[3]} ${h < 12 ? 'AM' : 'PM'}`};
-};
-const ivEscrowNote = b => !b.fee ? 'complimentary first interview'
-  : b.escrow === 'held' ? `${money(b.fee)} already in escrow`
-  : b.escrow === 'released' ? `${money(b.fee)} released`
-  : b.escrow === 'refunded' ? `${money(b.fee)} refunded`
-  : money(b.fee);
+/* THE INTERVIEWS MODULE HAS TWO TABS — Upcoming and Awaiting Approval (Maryam,
+   21 Sep 2026: "i need 2 tabs here, Upcoming and Awaiting Approval ... take back
+   the upcoming interviews ui to the table ... the awaiting approval are the ones
+   where the talent agent has sent the recording, level recommendation, and their
+   notes, and super admin could see the tal's read as well, and super admin has to
+   approve or override this decision"). UPCOMING is the read-only register TABLE of
+   booked interviews (the 21 Sep diary-row list is reverted). AWAITING APPROVAL is
+   the queue of submitted interviews (`pendingApprovals()` — PAST_IVS with
+   `decision:null`); a row opens `market/approval/<id>`, where the admin reads Tal's
+   take beside the agent's recommendation and approves or overrides the level. The
+   search + Type + Talent-agent filters serve both tabs. */
+const lvlChip = lvl => `<span class="tag sm">${esc(lvl || '—')}</span>`;
 function marketBookings(){
   const q = getFilter('q', ''), kf = getFilter('bkkind', 'all'), af = getFilter('bkagent', 'all');
-  const rows = BOOKINGS
+  const tab = getFilter('bktab', 'upcoming');
+  const kmatch = k => kf === 'all' ? true : kf === 're' ? agIvIsRe(k) : !agIvIsRe(k);
+  const upCount = BOOKINGS.filter(b => bkStage(b) === 'booked').length;
+  const pending = pendingApprovals();
+  const up = BOOKINGS
     .filter(b => bkStage(b) === 'booked')
-    .filter(b => kf === 'all' ? true : kf === 're' ? agIvIsRe(b.kind) : !agIvIsRe(b.kind))
-    .filter(b => af === 'all' ? true : b.agent === af)
+    .filter(b => kmatch(b.kind)).filter(b => af === 'all' ? true : b.agent === af)
     .filter(b => hit(q, b.cand, b.agent, b.kind))
     .slice().sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')));
+  const ap = pending
+    .filter(p => kmatch(p.kind)).filter(p => af === 'all' ? true : p.agent === af)
+    .filter(p => hit(q, p.cand, p.agent, p.kind));
   const typeFilter = filterDd('bkkind', 'all', [['all', 'All'], ['first', 'First interview'], ['re', 'Re-interview']], 'Type');
   const agentFilter = filterDd('bkagent', 'all', [['all', 'All'], ...agentNames().map(n => [n, n])], 'Talent agent');
+  const upPane = up.length ? table(
+    [{label:'Candidate'}, {label:'Agent'}, {label:'Type'}, {label:'Scheduled'}, {label:'Fee', num:true}, {label:'Escrow'}],
+    up.map(b => ({cells:[
+      personCell(b.cand, ''), personCell(b.agent, ''),
+      esc(b.kind.replace(/\s*\([^)]*\)/, '')), esc(b.slot),
+      b.fee ? money(b.fee) : 'Free', escrowTag(b.escrow)
+    ]})), {select:false})
+    : emptyState('video', 'No interviews match', q || kf !== 'all' || af !== 'all' ? 'Nothing matches the current filters.' : 'No booked interviews right now.');
+  const apPane = ap.length ? table(
+    [{label:'Candidate'}, {label:'Agent'}, {label:'Recommended level'}, {label:'Tal’s suggestion'}, {label:'Submitted'}, ACT_COL],
+    ap.map(iv => ({id:iv.id, go:'market/approval/' + iv.id, cells:[
+      personCell(iv.cand, ''), personCell(iv.agent, ''),
+      lvlChip(iv.agentLevel), lvlChip(iv.talLevel), esc(iv.submitted || iv.when),
+      rowActs([['check', 'Review & decide', `data-go="market/approval/${iv.id}"`]])
+    ]})), {select:false})
+    : emptyState('check', 'Nothing awaiting approval', q || kf !== 'all' || af !== 'all' ? 'Nothing matches the current filters.' : 'Every submitted interview has been decided.');
   return `
   <section class="sec">
-    ${searchHead('Upcoming Interviews', 'Every interview candidates have booked with a talent agent, soonest first.',
+    ${searchHead(tab === 'approval' ? 'Awaiting Approval' : 'Upcoming Interviews',
+      tab === 'approval'
+        ? 'Interviews the agent has submitted with a recording, a level recommendation and their notes. Open one to read Tal’s take, then approve or override the level.'
+        : 'Every interview candidates have booked with a talent agent, soonest first.',
       exportBtn('Interviews'), 'Search by candidate or agent')}
+    ${filterStrip('bktab', 'upcoming', [['upcoming', 'Upcoming', upCount], ['approval', 'Awaiting Approval', pending.length]])}
     ${lstTools('Search by candidate or agent', `${typeFilter} ${agentFilter}`)}
-    ${rows.length ? `<div class="tile-stack">${rows.map(b => {
-      const {chip, time} = ivChip(b.slot);
-      const typeLabel = agIvIsRe(b.kind) ? 'Re-interview' : 'First interview';
-      return `<button class="cardrow bk-row" data-go="agents/interview/${b.id}">
-        <span class="day bk-day"><div class="d">${esc(chip)}</div><div class="n">${esc(time)}</div></span>
-        <span class="av mem-av mem-ph"><span class="av-ph"><img src="${agentFace(b.cand)}" alt="" loading="lazy"></span></span>
-        <span class="cardrow-b">
-          <span class="cardrow-t">${esc(typeLabel)} &middot; ${esc(b.cand)}</span>
-          <span class="cardrow-d">${esc(b.agent)} &middot; 45 minutes, recorded &middot; ${esc(ivEscrowNote(b))}</span>
-        </span>
-        <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg>
-      </button>`;
-    }).join('')}</div>`
-      : emptyState('video', 'No interviews match', q || kf !== 'all' || af !== 'all' ? 'Nothing matches the current filters.' : 'No booked interviews right now.')}
+    ${tab === 'approval' ? apPane : upPane}
   </section>`;
 }
+/* THE LEVEL-APPROVAL DETAIL — an Awaiting-Approval row opens here. The agent has
+   submitted the recording, a recommended level and their notes; the admin reads
+   Tal's take and APPROVES the agent's level or OVERRIDES it. Reuses `recPlayer`,
+   `admLadder`, the `.tal-eval` read and `ivEvalBlock`. A decision sets the
+   candidate's level, writes a High audit line, and drops the interview from the
+   queue. (Maryam, 21 Sep 2026) */
+function marketApproval(){
+  const iv = PAST_IVS.find(x => x.id === S.id);
+  if(!iv) return `${detailHead('market/bookings')}
+    <section class="sec">${emptyState('check', 'Not found', 'This interview is no longer awaiting approval.')}</section>`;
+  DETAIL_LABEL = `${iv.cand} — level approval`;
+  const decided = !!iv.decision, finalLvl = iv.finalLevel || iv.agentLevel;
+  return `${detailHead('market/bookings')}
+  <section class="sec">
+    ${aiHead('Level approval', `${esc(iv.cand)} · ${esc(iv.agent)} · ${esc(iv.when)}`)}
+  </section>
+  <section class="sec">
+    ${aiHead('Recommended level', decided
+      ? (iv.decision === 'approved' ? 'Approved — the agent’s recommendation stands.' : 'Overridden — you set a different level.')
+      : 'The agent’s recommendation and Tal’s suggestion. Approve to confirm, or override to set a different level.')}
+    <div class="facts pf-facts">
+      ${admFact(I.video, '--mk-4', 'Agent’s recommendation', iv.agentLevel)}
+      ${admFact(I.chat, '--mk-3', 'Tal’s suggestion', iv.talLevel)}
+      ${decided ? admFact(I.check, '--mk-2', 'Final level', finalLvl) : admFact(I.calendar, '--mk-2', 'Submitted', iv.submitted || iv.when)}
+      ${admFact(I.starOutline, '--mk-1', 'Candidate rating', iv.rating ? iv.rating + '.0' : '—')}
+    </div>
+    ${admLadder(finalLvl)}
+    ${decided
+      ? `<p class="t-desc mt5">${iv.decision === 'approved' ? 'You approved this level.' : 'You set this level, overriding the recommendation.'}${iv.decisionNote ? ' ' + esc(iv.decisionNote) : ''}</p>`
+      : `<div class="btn-row mt5">
+          <button class="btn btn-p" data-act="askapprovelvl:${iv.id}">${I.check} Approve ${esc(iv.agentLevel)}</button>
+          <button class="btn btn-g noic" data-sheet="overridelvl:${iv.id}">Override Level</button>
+        </div>`}
+  </section>
+  <section class="sec">
+    ${aiHead('Recording', 'The interview the agent submitted.')}
+    ${recPlayer(iv)}
+  </section>
+  <section class="sec">
+    ${aiHead('Tal’s read', 'What Tal read from the interview.')}
+    <div class="tal-eval"><div class="ai-body">${iv.tal.replace(/<\/p>\s*<p[^>]*>/g, ' ')}</div></div>
+  </section>
+  <section class="sec sec-noline">
+    ${aiHead(esc(iv.agent) + '’s notes', 'What the agent recorded after the interview.')}
+    ${ivEvalBlock(iv)}
+  </section>`;
+}
+ACTIONS.askapprovelvl = key => {
+  const iv = PAST_IVS.find(x => x.id === key.split(':')[1]); if(!iv) return;
+  askConfirm({mk:'check', title:`Approve ${iv.agentLevel} for ${iv.cand}?`,
+    body:`This confirms the agent’s recommended level. ${iv.cand}’s level is set to ${iv.agentLevel}, and both the candidate and the agent are notified.`,
+    ok:'Approve Level', act:`doapprovelvl:${iv.id}`});
+};
+ACTIONS.doapprovelvl = key => {
+  const iv = PAST_IVS.find(x => x.id === key.split(':')[1]); S.confirm = null; if(!iv) return;
+  iv.decision = 'approved'; iv.finalLevel = iv.agentLevel;
+  const c = candByName(iv.cand); if(c) c.level = iv.agentLevel;
+  audit('Approved interview level', `${iv.cand} → ${iv.agentLevel} (interviewed by ${iv.agent})`, 'Marketplace & Interviews', 'high');
+  toast(`${iv.cand} set to ${iv.agentLevel}`);
+};
+SHEETS.overridelvl = id => {
+  const iv = PAST_IVS.find(x => x.id === id); if(!iv) return {title:'Override', body:'', ok:''};
+  return {title:`Override the level for ${iv.cand}`, ok:'Set Level', act:`dooverridelvl:${iv.id}`,
+    body:`${kv([['Agent’s recommendation', iv.agentLevel], ['Tal’s suggestion', iv.talLevel]])}
+      ${fieldHtml({k:'level', l:'Set level to', t:'select', req:1, opts:LVL_CODES}, iv.agentLevel)}
+      ${fieldHtml({k:'reason', l:'Reason', t:'textarea', req:1, ph:'Required — written to the audit log'})}
+      <p class="t-desc">Overriding replaces the agent’s recommendation. ${esc(iv.cand)}’s level is set to your choice and both parties are notified.</p>`};
+};
+ACTIONS.dooverridelvl = key => {
+  const iv = PAST_IVS.find(x => x.id === key.split(':')[1]); const v = readForm(); if(!iv) return;
+  if(!v.reason){ toast('A reason is required', 'warn'); return 'keep'; }
+  iv.decision = 'override'; iv.finalLevel = v.level; iv.decisionNote = `Reason: ${v.reason}`;
+  const c = candByName(iv.cand); if(c) c.level = v.level;
+  S.sheet = null;
+  audit('Overrode interview level', `${iv.cand} → ${v.level} (agent recommended ${iv.agentLevel}) · ${v.reason}`, 'Marketplace & Interviews', 'high');
+  toast(`${iv.cand} set to ${v.level}`);
+};
 /* 8.2 — RESOLVE A FAILED INTERVIEW. Offered only on an overdue Held booking or a
    Not-held one. Chase the agent (a nudge, no state change) or Refund and close
    (full refund from escrow, booking → Resolved, nothing recovered from the
@@ -7079,17 +7186,23 @@ function marketRecordings(){
   const recs = BOOKINGS.filter(b => b.recExists).filter(b => hit(q, b.cand, b.agent, emailOf(b.cand)));
   return `
   <section class="sec">
-    ${searchHead('Recordings', 'Every interview recording and its transcript. A row opens the interview transcript; the register shows that a recording exists — not its content.', exportBtn('Recordings'), 'Search by candidate or agent')}
+    ${searchHead('Recordings & Transcripts', 'Every interview recording and its transcript. A row opens the interview transcript; the register shows that a recording exists — not its content.', exportBtn('Recordings'), 'Search by candidate or agent')}
     ${lstTools('Search by candidate or agent', '')}
     ${recs.length ? table(
-      [{label:'Candidate'}, {label:'Agent'}, {label:'Interview'}, {label:'Length', num:true}, {label:'Transcript'}, ACT_COL],
+      /* A "Scenes" column shows how many clips are kept from each interview
+         (Maryam, 21 Sep 2026) — the same count the recording's Scenes tab lists
+         (`admScenes` = `ADM_SCENE_SET` per interview with an agent), so the table
+         and the tab agree. */
+      [{label:'Candidate'}, {label:'Agent'}, {label:'Interview'}, {label:'Length', num:true}, {label:'Scenes'}, {label:'Transcript'}, ACT_COL],
       recs.map(b => { const avail = recStatus(b) === 'Available';
+        const scenes = (b.agent && b.agent !== '—') ? ADM_SCENE_SET.length : 0;
         return {id:b.id, go:'market/recording/' + b.id, cells:[
           personCell(b.cand, emailOf(b.cand)),
           personCell(b.agent),
           `${esc(b.slot)} · ${esc(b.kind)}`,
           esc(b.recLen || '—'),
-          esc(b.transcript || '—'),
+          `${scenes} scene${scenes === 1 ? '' : 's'}`,
+          b.transcript ? tag(b.transcript) : '—',
           rowActs([
             ['play', 'View', `data-go="market/recording/${b.id}"`],
             ...(avail && b.transcript === 'Ready' ? [['download', 'Download', `data-act="dltranscript:${b.id}"`]] : []),
@@ -7157,45 +7270,60 @@ function marketRecordingDetail(){
     <section class="sec">${emptyState('video', 'Recording not found', 'This recording is no longer in the register.')}</section>`;
   DETAIL_LABEL = `${b.cand} — recording`;
   const A = String(b.agent).split(' ')[0], C = String(b.cand).split(' ')[0];
-  const all = TX_LINES_ADM();
-  const filt = getFilter('txf', 'all'), q = (getFilter('txq', '') || '').trim().toLowerCase();
-  const lines = all.filter(([t, w, txt, tag, scene]) => {
-    if(filt === 'scene' && !scene) return false;
-    if(filt !== 'all' && filt !== 'scene' && tag !== filt) return false;
-    if(q && !txt.toLowerCase().includes(q)) return false;
-    return true;
-  });
-  const hi = txt => q ? esc(txt).replace(new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'ig'), '<mark>$1</mark>') : esc(txt);
-  const who = w => w === 'agent' ? A : C;
-  const present = new Set(all.map(l => l[3]).filter(Boolean));
-  const filters = TX_TAGS_ADM.filter(([k]) => k === 'all' || k === 'scene' || present.has(k));
+  /* THREE TABS (Maryam, 21 Sep 2026: "there should be 3 tabs, Recording / Scenes /
+     Transcript ... show scenes of the interview as well"). Recording is the
+     prototype player, Scenes is this interview's marked clips (`admScenes([b])`,
+     the shared `dsScenes` carousel), Transcript is the searchable line list.
+     Reuses the interview detail's `.iv-tabs` strip + `filterStrip`/`data-filter`
+     (no new handler); the transcript search/filter render only inside their pane. */
+  const tab = getFilter('rectab', 'recording');
+  const recordingPane = `<section class="sec">${recPlayer(b)}</section>`;
+  const scenesPane = admScenes([b]);
+  let transcriptPane;
+  {
+    const all = TX_LINES_ADM();
+    const filt = getFilter('txf', 'all'), q = (getFilter('txq', '') || '').trim().toLowerCase();
+    const lines = all.filter(([t, w, txt, tag, scene]) => {
+      if(filt === 'scene' && !scene) return false;
+      if(filt !== 'all' && filt !== 'scene' && tag !== filt) return false;
+      if(q && !txt.toLowerCase().includes(q)) return false;
+      return true;
+    });
+    const hi = txt => q ? esc(txt).replace(new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'ig'), '<mark>$1</mark>') : esc(txt);
+    const who = w => w === 'agent' ? A : C;
+    const present = new Set(all.map(l => l[3]).filter(Boolean));
+    const filters = TX_TAGS_ADM.filter(([k]) => k === 'all' || k === 'scene' || present.has(k));
+    transcriptPane = `<section class="sec">
+      <div class="tx-srch">
+        <svg viewBox="0 0 24 24" aria-hidden="true">${inner('search')}</svg>
+        <input class="inp" data-srch="txq" placeholder="Find a word in the transcript" aria-label="Search the transcript" value="${esc(getFilter('txq', ''))}" autocomplete="off">
+      </div>
+      <div class="tx-filters">
+        ${filters.map(([k, n]) => `<button class="tx-f${filt === k ? ' on' : ''}" data-filter="txf:${k}">${esc(n)}</button>`).join('')}
+      </div>
+      <div class="tx-lines">
+        ${lines.length ? lines.map(([t, w, txt, tag, scene]) => `
+          <div class="tx-line${w === 'agent' ? ' me' : ''}">
+            <span class="tx-t">${t}</span>
+            <div class="tx-b">
+              <span class="tx-w">${esc(who(w))}${scene ? `<span class="tx-scene">${I.video}Marked scene</span>` : ''}</span>
+              <p class="tx-x">${hi(txt)}</p>
+            </div>
+          </div>`).join('')
+        : emptyState('search', 'Nothing matches', 'Try another word, or clear the filter.')}
+      </div>
+    </section>`;
+  }
   return `${detailHead('market/recordings')}
   <section class="sec">
-    ${''/* Header action in a kebab (Maryam, 18 Sep 2026). The View page carries the
-          recording player and the transcript both (Maryam, 21 Sep 2026). */}
+    ${''/* Header action in a kebab (Maryam, 18 Sep 2026). */}
     ${aiHead('Interview recording', `${esc(b.cand)} with ${esc(b.agent)} · ${esc(b.kind)} · ${esc(b.slot)}${b.recLen ? ' · ' + esc(b.recLen) + ' recorded' : ''}`,
       rowActs([['download', 'Download Transcript', `data-act="dltranscript:${b.id}"`]]))}
-    ${recPlayer(b)}
-    ${secHead('Transcript')}
-    <div class="tx-srch">
-      <svg viewBox="0 0 24 24" aria-hidden="true">${inner('search')}</svg>
-      <input class="inp" data-srch="txq" placeholder="Find a word in the transcript" aria-label="Search the transcript" value="${esc(getFilter('txq', ''))}" autocomplete="off">
-    </div>
-    <div class="tx-filters">
-      ${filters.map(([k, n]) => `<button class="tx-f${filt === k ? ' on' : ''}" data-filter="txf:${k}">${esc(n)}</button>`).join('')}
-    </div>
-    <div class="tx-lines">
-      ${lines.length ? lines.map(([t, w, txt, tag, scene]) => `
-        <div class="tx-line${w === 'agent' ? ' me' : ''}">
-          <span class="tx-t">${t}</span>
-          <div class="tx-b">
-            <span class="tx-w">${esc(who(w))}${scene ? `<span class="tx-scene">${I.video}Marked scene</span>` : ''}</span>
-            <p class="tx-x">${hi(txt)}</p>
-          </div>
-        </div>`).join('')
-      : emptyState('search', 'Nothing matches', 'Try another word, or clear the filter.')}
-    </div>
-  </section>`;
+  </section>
+  <section class="sec sec-cs iv-tabs">
+    ${filterStrip('rectab', 'recording', [['recording', 'Recording'], ['scenes', 'Scenes'], ['transcript', 'Transcript']])}
+  </section>
+  ${tab === 'scenes' ? scenesPane : tab === 'transcript' ? transcriptPane : recordingPane}`;
 }
 /* PLAYBACK IS LOGGED (8.3): a High-severity audit line is written when playback
    starts, then the prototype player opens. */
@@ -7279,7 +7407,7 @@ ACTIONS.dltranscript = key => {
   audit('Opened interview transcript', `${b.cand} with ${b.agent}`, 'Marketplace & Interviews', 'high'); toast('Transcript downloaded');
 };
 
-V.market = () => modView({bookings:marketBookings, recordings:marketRecordings, recording:marketRecordingDetail});
+V.market = () => modView({bookings:marketBookings, recordings:marketRecordings, recording:marketRecordingDetail, approval:marketApproval});
 
 /* ======================================================================
    EMPLOYERS & HIRING
