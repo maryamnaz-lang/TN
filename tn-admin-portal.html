@@ -148,6 +148,110 @@
         beside it — one line, still visually attached. */
 .app[data-shown~="peek"] .cs button{border-right-color:transparent}
 </style>
+<style id="admin-attn-grid">
+/* "NEEDS YOUR ATTENTION" AS A FOUR-UP COLUMN GRID (Maryam, 21 Sep 2026: "should
+   be horizontal 4 cards with no spacing in between and just border, so it gives
+   the impression of a 4-column grid"). Layout only — the rows, their copy, their
+   counts and their routes are untouched; this swaps the stacked `.tile-stack`
+   for a grid and re-flows each row's own contents into a card.
+
+   ONE HAIRLINE PER JOIN. Borders are drawn on ONE side of each join, never two:
+   the CONTAINER pays the top and left edges, and each CELL pays its own right
+   and bottom. Two neighbouring cells therefore share a single 1px rule — the
+   earlier "full border on every cell, pulled back 1px" version drew two abutting
+   hairlines instead of one overlapping pair, which is why the inner verticals
+   read twice as heavy as the outer frame (Maryam, 21 Sep 2026: "middle line is
+   too thick"). Nothing here needs negative margins, so the rule stays single
+   width at any count and survives a wrap to a second row. */
+.attn-grid{
+  display:grid; grid-template-columns:repeat(4, minmax(0, 1fr));
+  border-top:1px solid var(--rule); border-left:1px solid var(--rule);
+}
+.app .view-col .main .page .attn-grid > .tile.gcard{
+  display:flex; flex-direction:column; align-items:flex-start; gap:var(--s04);
+  min-height:132px; padding:var(--s05); margin:0;
+  border:0;
+  border-right:1px solid var(--rule);
+  border-bottom:1px solid var(--rule);
+}
+/* The body is the card's flexible middle; the arrow sits at the foot, right. */
+.attn-grid .gcard-b{display:block; flex:1 1 auto; width:100%}
+.attn-grid .tile-arrow{align-self:flex-end; margin-top:auto}
+
+/* THE DS's LIST UNDERLINE, OFF. In a `.page` the DS hides each row's real bottom
+   border and draws the divider as an `::after` inset by `--pad-x`, so inside a
+   card it showed up as a short line floating above the card's foot (Maryam,
+   21 Sep 2026: "bottom border is inconsistent"). The pseudo is kept — it is also
+   the hover wash — but reshaped to fill the card rather than underline it, and
+   the hover state's bleed is pulled back so the wash stays inside the cell.
+   Written at (0,6,0)/(0,7,0) to beat the DS's own `.app .view-col .main .page`
+   rules by weight, no `!important`.
+
+   NO `:where(.__nh)` HERE. That is the DS's non-touch gate, and this portal
+   never arms `.__nh` (see the note at the head of this file) — every DS `:hover`
+   carrying it is inert, and the portal's own hovers fire natively on a plain
+   `:hover`. A rule written with the gate would simply never match. */
+.app .view-col .main .page .attn-grid > .tile.gcard::after,
+.app .view-col .main .page .attn-grid > .tile.gcard:hover::after{
+  left:0; right:0; top:0; bottom:0; height:auto; background-color:transparent;
+}
+.app .view-col .main .page .attn-grid > .tile.gcard:hover::after{
+  background-color:var(--overlay-hover);
+}
+/* THE ARROW GOES ACCENT ON HOVER (Maryam, 21 Sep 2026). The DS takes it from
+   `--text-placeholder` to `--text-primary`; here it takes the accent instead, so
+   the card's hover answer matches the accent chip it already carries. The 2px
+   nudge is the DS's and is left alone. */
+.app .view-col .main .page .attn-grid > .tile.gcard:hover .tile-arrow{color:var(--accent); transform:translateX(2px)}
+
+/* NARROWER VIEWPORTS — two up, then one. The container still pays top and left,
+   the cells still pay right and bottom, so the frame closes at every count. */
+@media (max-width:1100px){ .attn-grid{grid-template-columns:repeat(2, minmax(0, 1fr))} }
+@media (max-width:660px){ .attn-grid{grid-template-columns:minmax(0, 1fr)} }
+
+/* THE MARK SITS ON A SOLID ACCENT CHIP (Maryam, 21 Sep 2026: "for the 4 icons
+   lets give them accent red bg and white icon no border"). The DS ships this
+   chip as a black glyph on a soft `--tal-chip-1` wash with a radial highlight
+   and a 1px `--rule` edge; all three are cleared here and replaced by flat
+   `--accent` with the `--on-accent` glyph. Scoped to the attention grid, so the
+   decision tiles and every other `.cardrow-ic` list keep the DS treatment.
+   `background` (the shorthand) is used so the DS's `background-image` gradient
+   is reset along with the colour. */
+.app .view-col .main .page .attn-grid .cardrow-ic{background:var(--accent); border:0}
+.app .view-col .main .page .attn-grid .cardrow-ic svg{color:var(--on-accent)}
+
+/* NO SECTION DIVIDER UNDER THE GRID (Maryam, 21 Sep 2026). The DS closes every
+   `.sec` with a `--pad-x`-inset 1px `::after`. Under a bordered grid that rule
+   lands just below the cards' own bottom border and reads as a stray second
+   line, so it is dropped for this one section; the grid's own frame is what
+   separates it from "Platform at a glance". */
+.app .view-col .main .page .sec:has(> .attn-grid)::after{content:none; display:none}
+
+/* "PLATFORM AT A GLANCE" — A ROOMIER CELL (Maryam, 21 Sep 2026: "can we make it
+   a little bit spacious by changing the inner layout a little bit — just the
+   layout, do not touch anything like content or sizing"). Nothing is resized or
+   reworded: the same mark, label, figure and note, at the DS's own type sizes.
+   What changes is where they sit. The DS cell is a three-column grid,
+   'ic top n', which pins the figure hard to the cell's right edge, far from the
+   label it belongs to and leaving a dead channel down the middle. Here the cell
+   becomes a single column — mark, then label, then figure, then note — so the
+   figure reads directly under its own label and the freed horizontal room turns
+   into breathing space. The padding steps up one token (--s05 -> --s06) to match.
+   Scoped to `.dash-stats`, so every other `.stats` block in the portal is
+   untouched. */
+.app .page .stats.dash-stats > .stat{
+  grid-template-columns:minmax(0, 1fr);
+  grid-template-areas:'ic' 'top' 'n' 'd' 'sl';
+  grid-template-rows:auto auto auto auto 1fr;
+  column-gap:0; row-gap:var(--s02);
+  padding:var(--s06);
+}
+.app .page .stats.dash-stats .stat-top > .n{
+  justify-self:start; align-self:start; text-align:left; margin-right:0; margin-top:var(--s02);
+}
+/* The mark keeps its own row, so the label is not pulled up beside it. */
+.app .page .stats.dash-stats > .stat > .stat-ic{align-self:start; justify-self:start; margin-bottom:var(--s02)}
+</style>
 <style id="admin-row-hover">
 /* A CLICKABLE TABLE ROW (`tr.clk`) LIGHTS ITS FIRST-COLUMN NAME ON HOVER
    (Maryam, 13 Sep 2026: "the rows are clickable, so on hover I want the black
@@ -1763,7 +1867,7 @@ const statCell = (icon, label, value, note) => `
     <div class="stat-top"><div class="l">${esc(label)}</div><div class="n">${value}</div></div>
     ${note ? `<div class="d">${note}</div>` : ''}
   </div>`;
-const stats = cells => `<div class="stats">${cells.map(c => statCell(c[0], c[1], c[2], c[3])).join('')}</div>`;
+const stats = (cells, cls) => `<div class="stats${cls ? ' ' + cls : ''}">${cells.map(c => statCell(c[0], c[1], c[2], c[3])).join('')}</div>`;
 
 /* A HAIRLINE KEY/VALUE LIST — the safe band at any width (DESIGN.md §3). */
 /* ALIGNED (14 Sep 2026): delegates to the shipped `dsKv`. No admin call uses the
@@ -3048,7 +3152,14 @@ function homeOverview(){
   const cohortLeaderCount = leaders.filter(u => !u.addedBy).length;
   const moderatorCount = leaders.filter(u => u.addedBy).length;
   const agentListed = USERS.filter(u => u.roles.includes('agent') && u.onboarded !== false).length;
-  const roleRows = ROLES.filter(r => r.k !== 'employer')
+  /* "Users by role" reads the INTERNAL roles only (Maryam, 21 Sep 2026: "remove
+     the Talent Agent, Cohort Leader and Candidate from this graph"). Those three
+     are the external populations, and each already has its own figure in
+     "Platform at a glance" — Candidates, Cohort leaders, Talent agents — so the
+     bar chart was re-stating them at a scale that flattened every internal role
+     under the candidate count. Employer stays out as before: employers are
+     organisations in their own hidden module, not account roles here. */
+  const roleRows = ROLES.filter(r => r.kind === 'internal')
     .map(r => [r.name, USERS.filter(u => u.roles.includes(r.k)).length]).filter(r => r[1] > 0);
   const uActive = people.filter(u => u.status === 'active').length;
   const uInvited = people.filter(u => u.status === 'invited').length;
@@ -3138,24 +3249,28 @@ function homeOverview(){
   ${/* ══ NEEDS YOUR ATTENTION ══ the operational lead — the live queues, count-bearing tiles */''}
   ${attnRows ? `<section class="sec">
     ${secHead('Needs your attention')}
-    <div class="tile-stack">${attnRows}</div>
+    <div class="attn-grid">${attnRows}</div>
   </section>` : ''}
 
   ${/* ══ PLATFORM AT A GLANCE ══ two rows of four (`.stats` is a fixed 2/4 grid) */''}
   <section class="sec">
     ${secHead('Platform at a glance')}
+    ${/* ONE grid of eight, not two grids of four (Maryam, 21 Sep 2026: "it should
+         be 2x4 grid no space between rows"). `.stats` is already a four-column
+         1px-gap grid on a `--rule` ground, so eight cells in a single container
+         give a true 2 x 4 block whose row divider matches its column dividers;
+         two containers each paid their own top margin and border, which is what
+         opened the gap between the rows. Same eight cells, same order. */''}
     ${stats([
       ['candidates', 'Candidates', String(activeCands), `in ${activeCohorts} cohort${activeCohorts === 1 ? '' : 's'}`],
       ['group', 'Cohort leaders', String(cohortLeaderCount), `${moderatorCount} moderator${moderatorCount === 1 ? '' : 's'}`],
       ['agents', 'Talent agents', String(agentListed), 'listed & bookable'],
-      ['cohorts', 'Active cohorts', String(activeCohorts), `${draftCohorts} in draft`]
-    ])}
-    ${stats([
+      ['cohorts', 'Active cohorts', String(activeCohorts), `${draftCohorts} in draft`],
       ['book', 'Courses', String(COURSES.length), `${liveCourses} live · ${draftCourses} draft`],
       ['money', 'Gross payment', money(gross), 'this window'],
       ['bank', 'In escrow', money(inprog), 'not yet settled'],
       ['clock', 'Payouts pending', money(poPending), 'to release']
-    ])}
+    ], 'dash-stats')}
   </section>
 
   ${/* ══ PEOPLE & ACCESS ══ Users lens — role split · status split */''}
