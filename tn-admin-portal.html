@@ -1996,15 +1996,17 @@ function lineChart(series, opts = {}){
   const vmax = Math.max(step, Math.ceil(maxV * 1.05 / step) * step);
   const ticks = []; for(let t = 0; t <= vmax + 1e-6; t += step) ticks.push(t);
   const plotH = (ticks.length - 1) * rowGap, y1 = padT + plotH, H = y1 + padB;
-  const X = i => x0 + (n === 1 ? 0 : i / (n - 1) * plotW);
+  const xInset = opts.xInset != null ? opts.xInset : 28;   // side padding so JAN/DEC don't sit flush to the edges
+  const px0 = x0 + xInset, innerW = plotW - 2 * xInset;
+  const X = i => px0 + (n === 1 ? 0 : i / (n - 1) * innerW);
   const Y = v => y1 - v / vmax * plotH;
   const grid = chartGridH(x0, x1, ticks, Y, fmt);
   const xlab = labels.map((l, i) => `<text x="${X(i).toFixed(1)}" y="${H - 9}" text-anchor="middle" font-size="6" letter-spacing=".4" fill="var(--text-helper)">${esc(String(l).toUpperCase())}</text>`).join('');
   const areas = opts.area ? series.map(s => {
     const pt = s.pts.map((v, i) => ({x: X(i), y: Y(v)}));
-    return `<path d="${smoothPath(pt)} L${X(n - 1).toFixed(1)},${y1} L${x0.toFixed(1)},${y1} Z" fill="${s.color}" opacity=".08" stroke="none"/>`;
+    return `<path d="${smoothPath(pt)} L${X(n - 1).toFixed(1)},${y1} L${X(0).toFixed(1)},${y1} Z" fill="${s.color}" opacity=".08" stroke="none"/>`;
   }).join('') : '';
-  const lines = series.map(s => `<path d="${smoothPath(s.pts.map((v, i) => ({x: X(i), y: Y(v)})))}" fill="none" stroke="${s.color}" stroke-width="2.5"${dashed ? ' stroke-dasharray="6 6"' : ''} stroke-linecap="round" stroke-linejoin="round"/>`).join('');
+  const lines = series.map(s => `<path d="${smoothPath(s.pts.map((v, i) => ({x: X(i), y: Y(v)})))}" fill="none" stroke="${s.color}" stroke-width="1"${dashed ? ' stroke-dasharray="6 6"' : ''} stroke-linecap="round" stroke-linejoin="round"/>`).join('');
   const leg = series.map(s => `<span class="lc-chip"><span class="lc-dot" style="background:${s.color}"></span>${esc(s.name)}</span>`).join('');
   return `<div class="lchart"><div class="lchart-leg">${leg}</div><svg class="lchart-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opts.aria || 'Trend by series')}">${grid}${areas}${lines}${xlab}</svg></div>`;
 }
@@ -3412,7 +3414,7 @@ function homeOverview(){
      It should say Welcome Back, Derek!"). The admin hides Tal's summary portal-wide,
      so the dashboard had no visible heading — this is a plain aiHead page title,
      the signed-in Super Admin's own first name (ME = Derek Sole). */''}
-  <section class="sec dash-head">${aiHead('Welcome Back, ' + esc(ME.name.split(' ')[0]) + '!')}</section>
+  <section class="sec dash-head">${aiHead('Welcome Back, ' + esc(ME.name.split(' ')[0]) + '!', 'Monitor platform activity, users, transactions, and overall operations from one place.')}</section>
 
   <section class="sec dash-periodbar">
     <div class="dash-periodbar-in">
@@ -3459,10 +3461,10 @@ function homeOverview(){
   <section class="sec">
     ${group('Platform Users Engagement')}
     ${lineChart([
-      {name: 'Candidates', color: DV[0], pts: [8, 10, 12, 13, 15, 16, 17, 19, 20, 22, 23, 24]},
-      {name: 'Talent agents', color: DV[3], pts: [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]},
-      {name: 'Cohort leaders', color: DV[2], pts: [2, 3, 4, 4, 5, 6, 6, 7, 8, 9, 10, 11]}
-    ], {aria: 'Candidates, cohort leaders and talent agents over the last 12 months'})}
+      {name: 'Candidates', color: DV[0], pts: [15, 18, 17, 20, 19, 22, 21, 23, 22, 24, 23, 25]},
+      {name: 'Talent agents', color: DV[3], pts: [7, 9, 8, 11, 10, 12, 11, 13, 12, 14, 13, 15]},
+      {name: 'Cohort leaders', color: DV[2], pts: [3, 5, 4, 6, 6, 7, 6, 8, 8, 9, 10, 11]}
+    ], {aria: 'Candidates, cohort leaders and talent agents over the last 12 months', dashed: false})}
   </section>
 
   ${/* ══ CANDIDATES BY BUCKET ══ three bucket cards (Maryam, 21 Sep 2026: drop the
