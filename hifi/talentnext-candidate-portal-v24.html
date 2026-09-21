@@ -14829,6 +14829,40 @@ button.btn-p:active,
 .app .conf .conf-mk,.app .conf.conf-ok .conf-mk{
   background:var(--accent);box-shadow:none;margin-bottom:var(--s04)}
 .app .conf .conf-mk svg,.app .conf.conf-ok .conf-mk svg{color:var(--on-accent)}
+.borb{ --tblob-rose:#ff6e60; }
+.borb:not([data-borb-live]) .borb__field{
+  background:linear-gradient(145deg,
+    var(--tblob-rose) 0%,
+    color-mix(in srgb, var(--tblob-rose) 78%, #fff) 26%,
+    color-mix(in srgb, var(--tblob-rose) 52%, #fff) 52%,
+    color-mix(in srgb, var(--tblob-rose) 32%, #fff) 74%,
+    color-mix(in srgb, var(--tblob-rose) 20%, #fff) 100%);
+  box-shadow:none;
+  -webkit-mask-image:none;
+          mask-image:none;
+}
+.borb:not([data-borb-live])::before,
+.borb:not([data-borb-live])::after,
+.borb:not([data-borb-live]) .borb__field::before,
+.borb:not([data-borb-live]) .borb__field::after{
+  content:none;
+}
+.borb:not([data-borb-live]) .borb__cloud,
+.borb:not([data-borb-live]) .borb__ripple,
+.borb:not([data-borb-live]) .borb__waves{
+  display:none;
+}
+.borb:not([data-borb-live]) .borb__mark{
+  width:calc(var(--borb-size) * 0.40278);
+  height:calc(var(--borb-size) * 0.40278);
+  filter:none;
+}
+.borb:not([data-borb-live]) .borb__blade{
+  background:#fff;
+  box-shadow:none;
+  animation:none;
+  transition:none;
+}
 
 </style>
 </head>

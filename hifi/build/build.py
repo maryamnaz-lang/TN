@@ -1403,7 +1403,13 @@ css = '\n'.join((here / f).read_text() for f in
                  # and 16px frame, brought onto the shared source so candidate /
                  # leader / agent match it. Lands last so it wins over §03/§105/
                  # §109's tinted-halo disc and their paddings. Crosses to the DS.
-                 '134-confmodal.css',])
+                 '134-confmodal.css',
+                 # §135 — THE CHROME MARK IS THE FLAT BLOB (Maryam, 21 Sep 2026).
+                 # The supplied tal-blob.html look for every small Tal mark that
+                 # is chrome, not a live orb: `.borb:not([data-borb-live])`. Last,
+                 # because every selector is under `.borb` and it corrects §132's
+                 # own glass/motion for the idle case. Crosses to the DS.
+                 '135-tblob.css',])
 # ==========================================================================
 # NO HOVER
 # The state layer was fighting the layout everywhere it appeared: a wash on a

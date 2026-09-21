@@ -14,7 +14,7 @@
      The <style> block is PROTOTYPE CHROME AND NOTHING ELSE (the device frame,
      the viewport picker, the wordmark size, a toast host) — no product rule.
      ========================================================================== -->
-<link rel="stylesheet" href="design-system/talentnext-ds.css?b=9bce2b05">
+<link rel="stylesheet" href="design-system/talentnext-ds.css?b=644f4add">
 
 <style>
 /* ==========================================================================
@@ -710,7 +710,7 @@
   </div>
 </div>
 
-<script src="design-system/talentnext-ds.js?b=9bce2b05"></script>
+<script src="design-system/talentnext-ds.js?b=644f4add"></script>
 <script>
 /* ==========================================================================
    THE SUPER ADMIN PORTAL
@@ -1185,7 +1185,14 @@ const BOOKINGS=[
  {id:'bk10', cand:'Lucas Ferreira', agent:'Marcus Ozoro', slot:'Thu 10:30', date:'2026-08-13', fee:0, escrow:'n/a', paid:false, kind:'First (discounted)', status:'pending'},
  {id:'bk11', cand:'Emma Novak', agent:'Dana Whitfield', slot:'Thu 16:30', date:'2026-08-13', fee:180, escrow:'held', paid:true, kind:'Re-interview', status:'active'},
  {id:'bk12', cand:'Oliver Grant', agent:'Dana Whitfield', slot:'Fri 11:30', date:'2026-08-14', fee:195, escrow:'held', paid:true, kind:'Interview', status:'active'},
- {id:'bk13', cand:'Isla Bennett', agent:'Priya Raman', slot:'Fri 15:30', date:'2026-08-14', fee:225, escrow:'n/a', paid:false, kind:'Interview', status:'pending'}
+ {id:'bk13', cand:'Isla Bennett', agent:'Priya Raman', slot:'Fri 15:30', date:'2026-08-14', fee:225, escrow:'n/a', paid:false, kind:'Interview', status:'pending'},
+ /* Two UPCOMING RE-INTERVIEWS (Maryam, 21 Sep 2026: "show some re-interviews as
+    well") — candidates who have finished a cohort and are re-interviewing, so their
+    detail carries the cohort journey + leader evaluation. `stage:'booked'` is set
+    explicitly (seedInterviews keeps a pre-set stage) so they land in the Upcoming
+    list without being pending. */
+ {id:'bk14', cand:'Grace Kim',     agent:'Priya Raman',   slot:'Mon 10:00', date:'2026-08-17', fee:200, escrow:'held', paid:true, kind:'Re-interview', status:'active', stage:'booked'},
+ {id:'bk15', cand:'Diego Alvarez', agent:'Dana Whitfield', slot:'Tue 14:00', date:'2026-08-18', fee:180, escrow:'held', paid:true, kind:'Re-interview', status:'active', stage:'booked'}
 ];
 const TXNS=[
  {id:'t1',  ref:'TXN-8841', when:'Today 09:12', date:'2026-08-12', who:'Maryam Naz',     party:'Candidate', kind:'Course — Foundations of Leadership',            cat:'course',    amt:100, dir:'in',  method:'Visa •4242',       fee:3.20, rail:'Stripe → In progress', status:'received'},
@@ -1537,7 +1544,7 @@ const MODULES=[
  {k:'catalogue', t:'Course Catalogue', ic:'book', subs:[
    {k:'catalogue', t:'Course Catalogue'}, {k:'coursedetail', t:'Course', hidden:true}]},
  {k:'market', t:'Interviews', ic:'market', subs:[
-   {k:'bookings', t:'Upcoming Interviews'}, {k:'recordings', t:'Recordings & Transcripts'}, {k:'recording', t:'Transcript', hidden:true}]},
+   {k:'bookings', t:'Interviews'}, {k:'recordings', t:'Recordings & Transcripts'}, {k:'recording', t:'Transcript', hidden:true}]},
  {k:'finance', t:'Finance & Settlement', ic:'finance', subs:[
    /* Only Transactions and Payouts are surfaced for now (Maryam, 16 Sep 2026:
       "only keep transactions and payouts sub modules for now, hide the other sub
@@ -5981,8 +5988,8 @@ function agentsInterview(){
     </section>
     ${isFirst ? `${admQuiz({name: iv.cand})}
     <section class="sec">
-      ${aiHead('What they want to talk about', 'The note the candidate wrote for the agent when booking this interview.')}
-      <p class="t-body" style="background:var(--surface-2);border:1px solid var(--rule);padding:var(--s05);margin:0">${esc(ivTopicOf(iv))}</p>
+      ${aiHead('What ' + esc(String(iv.cand).split(' ')[0]) + ' wants to talk about')}
+      <p class="t-body" style="margin:0"><span style="color:var(--accent-text);font-size:1.35em;line-height:0;vertical-align:-.18em">&ldquo;</span>${esc(ivTopicOf(iv))}<span style="color:var(--accent-text);font-size:1.35em;line-height:0;vertical-align:-.18em">&rdquo;</span></p>
     </section>` : ''}`;
   }
   /* PAST — the full record, behind TWO TABS (Maryam, 17 Sep 2026: "i need two tabs

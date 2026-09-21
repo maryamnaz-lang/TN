@@ -1081,6 +1081,11 @@ LAYERS = [
     # whole layer crosses — it is what brings the agent (and any new portal) onto
     # the same modal look the admin's own local copy already had.
     '134-confmodal.css',
+    # §135 — the chrome mark is the flat blob (Maryam, 21 Sep 2026). Every rule
+    # is under `.borb:not([data-borb-live])`, so it crosses with the orb (§132/
+    # §133 above): the agent portal's own borb marks flatten with the candidate
+    # portal's. The admin portal emits no borb, so it is untouched.
+    '135-tblob.css',
 ]
 
 # ==========================================================================
