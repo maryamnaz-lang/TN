@@ -1536,8 +1536,8 @@ const MODULES=[
     `after`/`detail` and the list `go`s were repointed to match). */
  {k:'catalogue', t:'Course Catalogue', ic:'book', subs:[
    {k:'catalogue', t:'Course Catalogue'}, {k:'coursedetail', t:'Course', hidden:true}]},
- {k:'market', t:'Marketplace & Interviews', ic:'market', subs:[
-   {k:'bookings', t:'Interviews'}, {k:'recordings', t:'Recordings & Transcripts'}, {k:'recording', t:'Transcript', hidden:true}]},
+ {k:'market', t:'Interviews', ic:'market', subs:[
+   {k:'bookings', t:'Upcoming Interviews'}, {k:'recordings', t:'Recordings & Transcripts'}, {k:'recording', t:'Transcript', hidden:true}]},
  {k:'finance', t:'Finance & Settlement', ic:'finance', subs:[
    /* Only Transactions and Payouts are surfaced for now (Maryam, 16 Sep 2026:
       "only keep transactions and payouts sub modules for now, hide the other sub
@@ -1592,6 +1592,13 @@ const S = {
   mod:'home', sub:'home', id:null,        /* where you are */
   nav:false, notif:false, acct:false,     /* overlays */
   confirm:null, _confirm:null, sheet:null,/* dialogs */
+  /* THE BACK STACK — a detail page's back arrow returns to the screen you came
+     FROM, not a hardcoded list (Maryam, 21 Sep 2026: an interview opened from
+     Interviews sent Back to the agent detail). `go()` pushes the route it is
+     leaving; `goBack(fallback)` pops it. The hardcoded target each `detailHead`
+     already carried stays as the fallback for a deep link with an empty stack.
+     Same idea as the candidate portal's `S.hist` (§78). */
+  hist:[],
   /* THE SHARED STRIPE "ADD PAYMENT METHOD" MODAL — `payModal` open flag, `payTab`
      its Card / US-bank state. Both feed `dsPayForm` from the design system, the
      same modal the candidate, leader and agent portals open. */
@@ -1656,7 +1663,7 @@ function head(sum){
 function detailHead(backTo, sum){
   return `<div class="modhead">
     <div class="ph"><div class="ph-main"><div class="ph-top">
-      <button class="ph-back" data-go="${esc(backTo)}" aria-label="Back">${I.arrowLeft}</button></div></div></div>
+      <button class="ph-back" data-back="${esc(backTo)}" aria-label="Back">${I.arrowLeft}</button></div></div></div>
   </div>`;
 }
 
@@ -5927,6 +5934,19 @@ const ivTranscript = iv => { const A = String(iv.agent).split(' ')[0], C = Strin
     </div>`).join('')}</div>`;
 };
 
+/* THE "WHAT DO YOU WANT TO TALK ABOUT?" NOTE (Maryam, 21 Sep 2026). The candidate
+   writes this for the agent on the booking page; the admin seed holds no per-booking
+   note, so it is AUTHORED PLACEHOLDER (§74) — a stable leadership-situation answer
+   per candidate, assigned off a name-hash so a first interview always shows one. */
+const IV_TOPICS = [
+  'A vendor review I had to hand over mid-cycle. I planned who owned each thread, but I did not start the hard conversation the delay needed. I want to work through how to open that earlier.',
+  'Leading a project where two of my team disagreed on scope. I made the call in the end, but I am not sure I brought them along with me.',
+  'A deadline that moved on me last quarter. I cut scope rather than push the date and told the team the same afternoon. I want to test whether that was the right call.',
+  'Covering for my manager for six weeks. I kept things running but struggled to hand off the parts I usually hold myself.',
+  'Giving difficult feedback to a peer. It landed fine in the end, but I sat on it far too long first.',
+  'Rolling out a process the team pushed back on. I want to talk about how I read the room and where I lost people.'
+];
+const ivTopicOf = b => { let h = 0; for(const ch of String(b.cand || '')) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return IV_TOPICS[h % IV_TOPICS.length]; };
 function agentsInterview(){
   const piv = PAST_IVS.find(x => x.id === S.id), bk = BOOKINGS.find(x => x.id === S.id);
   const iv = piv || bk;
@@ -5943,6 +5963,12 @@ function agentsInterview(){
        4 blocks in a same row"), matching the past view. Status is `tag()` HTML, so its
        cell is hand-written like the rating cell rather than through `admFact` (which
        escapes its value). */
+    /* A FIRST interview also shows the candidate's levelling-quiz read and the note
+       they wrote the agent at booking ("What do you want to talk about?"), the
+       agent's prep for the room (Maryam, 21 Sep 2026). Both are AUTHORED PLACEHOLDER
+       (§74): `admQuiz` is the shared quiz read personalised by first name, `ivTopicOf`
+       a stable per-candidate note. A re-interview keeps the plain facts. */
+    const isFirst = !agIvIsRe(iv.kind);
     return `${detailHead(backTo)}
     <section class="sec">
       ${aiHead('Interview with ' + esc(iv.cand), `${esc(iv.agent)} &middot; ${esc(agIvKind(iv.kind))} &middot; ${esc(when)}`)}
@@ -5952,7 +5978,12 @@ function agentsInterview(){
         ${admFact(I.calendar, '--mk-2', 'When', when)}
         <div style="--mk:var(--mk-1)"><span class="l pf-l">${ic('shield')}Status</span><span class="v">${tag(iv.status)}</span></div>
       </div>
-    </section>`;
+    </section>
+    ${isFirst ? `${admQuiz({name: iv.cand})}
+    <section class="sec">
+      ${aiHead('What they want to talk about', 'The note the candidate wrote for the agent when booking this interview.')}
+      <p class="t-body" style="background:var(--surface-2);border:1px solid var(--rule);padding:var(--s05);margin:0">${esc(ivTopicOf(iv))}</p>
+    </section>` : ''}`;
   }
   /* PAST — the full record, behind TWO TABS (Maryam, 17 Sep 2026: "i need two tabs
      on this page, About Interview and Transcript, the transcript from this page will
@@ -6788,11 +6819,11 @@ function marketBookings(){
     .filter(b => af === 'all' ? true : b.agent === af)
     .filter(b => hit(q, b.cand, b.agent, b.kind))
     .slice().sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')));
-  const typeFilter = filterDd('bkkind', 'all', [['all', 'Any type'], ['first', 'First interview'], ['re', 'Re-interview']], 'Type');
-  const agentFilter = filterDd('bkagent', 'all', [['all', 'Any agent'], ...agentNames().map(n => [n, n])], 'Talent agent');
+  const typeFilter = filterDd('bkkind', 'all', [['all', 'All'], ['first', 'First interview'], ['re', 'Re-interview']], 'Type');
+  const agentFilter = filterDd('bkagent', 'all', [['all', 'All'], ...agentNames().map(n => [n, n])], 'Talent agent');
   return `
   <section class="sec">
-    ${searchHead('Interviews', 'Every interview candidates have booked with a talent agent, soonest first.',
+    ${searchHead('Upcoming Interviews', 'Every interview candidates have booked with a talent agent, soonest first.',
       exportBtn('Interviews'), 'Search by candidate or agent')}
     ${lstTools('Search by candidate or agent', `${typeFilter} ${agentFilter}`)}
     ${rows.length ? `<div class="tile-stack">${rows.map(b => {
@@ -9571,10 +9602,16 @@ window.addEventListener('hashchange', () => {
    NAVIGATION — one delegated listener on `#device`, which outlives every
    render. `data-go` carries `mod/sub[/id]`; everything else is a flag.
    ====================================================================== */
+const routeOf = () => S.mod + '/' + S.sub + (S.id ? '/' + S.id : '');
 function go(dest, keepNav){
   const p = String(dest).split('/');
   const mod = p[0], sub = p[1], id = p[2];
   if(!MOD_BY_K[mod] || !V[mod]) return;
+  /* Remember the screen we are leaving so a detail's Back can return to it. Skip
+     a no-op (navigating to the same route) and a consecutive duplicate; cap the
+     stack so it cannot grow without bound. */
+  const cur = routeOf(), next = mod + '/' + ((sub && MOD_BY_K[mod]._sub[sub]) ? sub : firstSub(MOD_BY_K[mod])) + (id ? '/' + id : '');
+  if(S.signedIn && cur !== next){ if(S.hist[S.hist.length - 1] !== cur) S.hist.push(cur); if(S.hist.length > 30) S.hist.shift(); }
   S.mod = mod;
   S.sub = (sub && MOD_BY_K[mod]._sub[sub]) ? sub : firstSub(MOD_BY_K[mod]);
   S.id = id || null;
@@ -9583,6 +9620,24 @@ function go(dest, keepNav){
      over the page and shuts, as it always did. */
   if(!keepNav) S.nav = false;
   S.notif = false; S.acct = false; S.tal = false; S.editPerms = false; S.rowMenu = null; S.pgOpen = null; S.fdOpen = null;
+  render();
+  const main = device.querySelector('.main');
+  if(main) main.scrollTop = 0;
+}
+
+/* BACK — pop the last remembered screen and go there without pushing (a back that
+   pushed would ping-pong). A stale/hidden popped target or an empty stack (a deep
+   link) falls back to the fixed list `detailHead` was given. */
+function goBack(fallback){
+  let dest = S.hist.pop();
+  if(dest){ const m = dest.split('/')[0]; if(!MOD_BY_K[m] || !V[m]) dest = null; }
+  if(!dest) dest = fallback;
+  const p = String(dest || '').split('/'), mod = p[0], sub = p[1], id = p[2];
+  if(!MOD_BY_K[mod] || !V[mod]) return;
+  S.mod = mod;
+  S.sub = (sub && MOD_BY_K[mod]._sub[sub]) ? sub : firstSub(MOD_BY_K[mod]);
+  S.id = id || null;
+  S.nav = false; S.notif = false; S.acct = false; S.tal = false; S.editPerms = false; S.rowMenu = null; S.pgOpen = null; S.fdOpen = null;
   render();
   const main = device.querySelector('.main');
   if(main) main.scrollTop = 0;
@@ -9738,7 +9793,7 @@ device.addEventListener('change', e => {
 });
 
 device.addEventListener('click', e => {
-  const t = e.target.closest('[data-go],[data-toggle],[data-close],[data-confirm],[data-do],[data-readall],[data-tab],[data-filter],[data-act],[data-sheet],[data-sort],[data-rowmenu],[data-ivopen],[data-crsopen],[data-pg],[data-pgsize],[data-pgddtoggle],[data-fdtoggle],[data-payopen],[data-paytab],[data-payclose],[data-improleopen],[data-improleset],[data-sel],[data-selall],[data-selclearall]');
+  const t = e.target.closest('[data-go],[data-back],[data-toggle],[data-close],[data-confirm],[data-do],[data-readall],[data-tab],[data-filter],[data-act],[data-sheet],[data-sort],[data-rowmenu],[data-ivopen],[data-crsopen],[data-pg],[data-pgsize],[data-pgddtoggle],[data-fdtoggle],[data-payopen],[data-paytab],[data-payclose],[data-improleopen],[data-improleset],[data-sel],[data-selall],[data-selclearall]');
 
   if(S.acct && !e.target.closest('.acct-t, .acct-menu')){ S.acct = false; render(); }
   /* §125 — an open row menu closes on any click outside its trigger or list.
@@ -9880,6 +9935,7 @@ device.addEventListener('click', e => {
   if(d.payclose !== undefined){ if(t.classList.contains('modal') && e.target !== t) return; S.payModal = false; return render(); }
   if(d.act !== undefined){ return doAction(d.act, t); }
   if(d.read && !S.read.includes(d.read)) S.read.push(d.read);
+  if(d.back !== undefined){ return goBack(d.back); }
   if(d.go !== undefined){ return go(d.go, !!t.closest('.sidenav') && device.clientWidth >= 900); }
 });
 
