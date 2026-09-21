@@ -1980,7 +1980,7 @@ const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov
 const CHART_ROW_GAP = 32;               // viewBox-px between adjacent tick rows (Maryam 21 Sep 2026)
 function chartGridH(x0, x1, ticks, Y, fmt){
   const lines = ticks.map(t => `<line x1="${x0}" y1="${Y(t).toFixed(1)}" x2="${x1}" y2="${Y(t).toFixed(1)}" stroke="var(--rule)" stroke-width="1"/>`).join('');
-  const labels = ticks.map(t => `<text x="${x0 - 8}" y="${(Y(t) + 3).toFixed(1)}" text-anchor="end" font-size="8" fill="var(--text-helper)">${esc(fmt(t))}</text>`).join('');
+  const labels = ticks.map(t => `<text x="${x0 - 8}" y="${(Y(t) + 3).toFixed(1)}" text-anchor="end" font-size="6" fill="var(--text-helper)">${esc(fmt(t))}</text>`).join('');
   return lines + labels;
 }
 /* opts: labels, aria, fmt (y-label formatter, e.g. money), dashed (default true),
@@ -1999,7 +1999,7 @@ function lineChart(series, opts = {}){
   const X = i => x0 + (n === 1 ? 0 : i / (n - 1) * plotW);
   const Y = v => y1 - v / vmax * plotH;
   const grid = chartGridH(x0, x1, ticks, Y, fmt);
-  const xlab = labels.map((l, i) => `<text x="${X(i).toFixed(1)}" y="${H - 9}" text-anchor="middle" font-size="8" letter-spacing=".4" fill="var(--text-helper)">${esc(String(l).toUpperCase())}</text>`).join('');
+  const xlab = labels.map((l, i) => `<text x="${X(i).toFixed(1)}" y="${H - 9}" text-anchor="middle" font-size="6" letter-spacing=".4" fill="var(--text-helper)">${esc(String(l).toUpperCase())}</text>`).join('');
   const areas = opts.area ? series.map(s => {
     const pt = s.pts.map((v, i) => ({x: X(i), y: Y(v)}));
     return `<path d="${smoothPath(pt)} L${X(n - 1).toFixed(1)},${y1} L${x0.toFixed(1)},${y1} Z" fill="${s.color}" opacity=".08" stroke="none"/>`;
@@ -2034,7 +2034,7 @@ function barChart(series, opts = {}){
       return h <= 0 ? '' : `<rect x="${(gl + j * (bw + gap)).toFixed(1)}" y="${Y(v).toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="${rx.toFixed(1)}" fill="${s.color}"/>`;
     }).join('');
   }).join('');
-  const xlab = labels.map((l, i) => `<text x="${(x0 + i * bandW + bandW / 2).toFixed(1)}" y="${H - 9}" text-anchor="middle" font-size="8" letter-spacing=".4" fill="var(--text-helper)">${esc(String(l).toUpperCase())}</text>`).join('');
+  const xlab = labels.map((l, i) => `<text x="${(x0 + i * bandW + bandW / 2).toFixed(1)}" y="${H - 9}" text-anchor="middle" font-size="6" letter-spacing=".4" fill="var(--text-helper)">${esc(String(l).toUpperCase())}</text>`).join('');
   const leg = series.map(s => `<span class="lc-chip"><span class="lc-dot" style="background:${s.color}"></span>${esc(s.name)}</span>`).join('');
   return `<div class="lchart"><div class="lchart-leg">${leg}</div><svg class="lchart-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opts.aria || 'By month')}">${grid}${bars}${xlab}</svg></div>`;
 }
