@@ -1,0 +1,38 @@
+/* ============================================================================
+   136. HIDE THE SCROLLBARS §12 MISSED (Maryam, 21 Sep 2026)
+
+   "remove ... this right side pig sized scroll bar." The platform is
+   scrollbar-less by design — §12 hides `.main`'s (`scrollbar-width:none` +
+   `::-webkit-scrollbar{width:0}`), and §02/§03/§09/§111/§51/§107 do the same
+   for every horizontal strip. Two VERTICAL scrollers were never covered:
+
+     .ask-thread  §53 made it the scroller so the thread scrolls BEHIND the
+                  frosted head band, but nobody hid its bar — so the chat is
+                  the one page with the OS slab down its right, which on a
+                  machine set to always-show scrollbars is the ~15px grey slab
+                  Maryam pointed at.
+     .sn-main     the rail's own scroll area, un-hidden for the same reason.
+
+   Both are hidden here exactly as §12 hides `.main`, so scrolling still works
+   (wheel / trackpad) and matches every other surface. NOT a slim custom bar:
+   the rest of the app shows none, so a grey bar on these two alone would be a
+   new element, not a fix. `.calw`'s deliberately-thin bar (§41) is left alone
+   — this names only the two offenders, no blanket. `.tal-body` (the floating
+   Tal panel's thread) is included on the same argument.
+
+   Crosses to the DS so the agent portal's chat and rail match. Reversible:
+   drop this file and its two LAYERS entries.
+   ========================================================================== */
+
+.app .ask-thread,
+.app .sn-main,
+.app .tal-body{
+  scrollbar-width:none;
+}
+.app .ask-thread::-webkit-scrollbar,
+.app .sn-main::-webkit-scrollbar,
+.app .tal-body::-webkit-scrollbar{
+  width:0;
+  height:0;
+  display:none;
+}

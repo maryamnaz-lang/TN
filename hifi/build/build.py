@@ -1409,7 +1409,12 @@ css = '\n'.join((here / f).read_text() for f in
                  # is chrome, not a live orb: `.borb:not([data-borb-live])`. Last,
                  # because every selector is under `.borb` and it corrects §132's
                  # own glass/motion for the idle case. Crosses to the DS.
-                 '135-tblob.css',])
+                 '135-tblob.css',
+                 # §136 — HIDE THE SCROLLBARS §12 MISSED (Maryam, 21 Sep 2026).
+                 # `.ask-thread` (the chat scroller, §53) and `.sn-main` were
+                 # never hidden the way §12 hides `.main`; this does. Crosses to
+                 # the DS.
+                 '136-scrollbar.css',])
 # ==========================================================================
 # NO HOVER
 # The state layer was fighting the layout everywhere it appeared: a wash on a

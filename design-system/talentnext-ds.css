@@ -14,7 +14,7 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 6191.  Rules dropped as product-specific: 222.
+   Rules kept: 6193.  Rules dropped as product-specific: 222.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
@@ -6442,9 +6442,9 @@ button.btn-p:active,
 }
 .app .ask-page .ask-foot{background:transparent; border-top:0}
 .app .ask-page{position:relative}
-.app .ask-page .ask-top{position:absolute; top:0; left:0; right:0; z-index:5; border-top:0; border-bottom:0; background:rgba(255,255,255,.55); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px)}
+.app .ask-page .ask-top{position:absolute; top:0; left:0; right:0; z-index:5; border-top:0; border-bottom:0; background:var(--askv-column)}
 .app .ask-page .ask-top::after{content:''; position:absolute; top:100%; left:0; right:0; height:28px; pointer-events:none; background:linear-gradient(to bottom,
-    rgba(255,255,255,.4), rgba(255,255,255,0)); -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); -webkit-mask-image:linear-gradient(to bottom,#000,transparent); mask-image:linear-gradient(to bottom,#000,transparent)}
+    var(--askv-column), rgba(255,255,255,0))}
 .app .ask-page .ask-thread{padding-top:92px}
 @property --askv-hot{syntax:'<percentage>'; initial-value:50%; inherits:false}
 @keyframes askv-stroke-walk{from{--askv-hot:-20%} to{--askv-hot:120%}}
@@ -10010,3 +10010,11 @@ button.btn-p:active,
 .borb:not([data-borb-live]) .borb__waves{display:none}
 .borb:not([data-borb-live]) .borb__mark{width:calc(var(--borb-size) * 0.40278); height:calc(var(--borb-size) * 0.40278); filter:none}
 .borb:not([data-borb-live]) .borb__blade{background:#fff; box-shadow:none; animation:none; transition:none}
+
+/* ---- 136-scrollbar.css ---- */
+.app .ask-thread,
+.app .sn-main,
+.app .tal-body{scrollbar-width:none}
+.app .ask-thread::-webkit-scrollbar,
+.app .sn-main::-webkit-scrollbar,
+.app .tal-body::-webkit-scrollbar{width:0; height:0; display:none}

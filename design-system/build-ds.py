@@ -1086,6 +1086,10 @@ LAYERS = [
     # §133 above): the agent portal's own borb marks flatten with the candidate
     # portal's. The admin portal emits no borb, so it is untouched.
     '135-tblob.css',
+    # §136 — hide the scrollbars §12 missed (Maryam, 21 Sep 2026): `.ask-thread`
+    # / `.sn-main` / `.tal-body`. `.app`-scoped, so the agent portal's chat and
+    # rail match. Crosses to every portal.
+    '136-scrollbar.css',
 ]
 
 # ==========================================================================

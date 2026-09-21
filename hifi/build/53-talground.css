@@ -270,26 +270,26 @@
    state — nothing behind the bar — just reads as white, as it did before.
    ------------------------------------------------------------------------ */
 .app .ask-page{position:relative}
-/* THE FROST IS LIGHTER NOW (Maryam, 9 Sep 2026: "lighten the tal row white
-   blur"). The band's white drops from .72 to .55 and its blur from 12 to 8, and
-   the fade below it from .72 to .4 with a 6px blur, so the header whitens the
-   conversation less as it scrolls behind — a softer veil rather than a solid
-   wash. The greeting state (nothing behind the bar) still reads white. */
+/* THE BLUR IS GONE (Maryam, 21 Sep 2026: "remove the blur from the top
+   header"). The frosted interaction — a translucent band with a
+   `backdrop-filter` that blurred the thread scrolling behind it, lightened on
+   9 Sep — read as a grey smudge over the top-right of the conversation. The
+   band is now a SOLID white bar with NO backdrop-filter: the header stays
+   sharp, the thread still scrolls behind it (the band is still absolute over
+   the page, so the 92px `padding-top` below is unchanged) and simply
+   disappears cleanly under the opaque bar. The `::after` keeps a plain
+   white->transparent GRADIENT fade — not a blur — so a line rising into the
+   bar softens to white before the cut rather than hard-clipping. This
+   SUPERSEDES the 8 Sep frosted band and the 9 Sep lighten. */
 .app .ask-page .ask-top{
   position:absolute;top:0;left:0;right:0;z-index:5;
   border-top:0;border-bottom:0;
-  background:rgba(255,255,255,.55);
-  -webkit-backdrop-filter:blur(8px);
-          backdrop-filter:blur(8px)}
+  background:var(--askv-column)}
 .app .ask-page .ask-top::after{
   content:'';position:absolute;top:100%;left:0;right:0;height:28px;
   pointer-events:none;
   background:linear-gradient(to bottom,
-    rgba(255,255,255,.4), rgba(255,255,255,0));
-  -webkit-backdrop-filter:blur(6px);
-          backdrop-filter:blur(6px);
-  -webkit-mask-image:linear-gradient(to bottom,#000,transparent);
-          mask-image:linear-gradient(to bottom,#000,transparent)}
+    var(--askv-column), rgba(255,255,255,0))}
 /* the thread scrolls behind the band, so it opens below band + fade */
 .app .ask-page .ask-thread{padding-top:92px}
 

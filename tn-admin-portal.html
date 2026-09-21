@@ -14,7 +14,7 @@
      The <style> block is PROTOTYPE CHROME AND NOTHING ELSE (the device frame,
      the viewport picker, the wordmark size, a toast host) — no product rule.
      ========================================================================== -->
-<link rel="stylesheet" href="design-system/talentnext-ds.css?b=644f4add">
+<link rel="stylesheet" href="design-system/talentnext-ds.css?b=24f56e3e">
 
 <style>
 /* ==========================================================================
@@ -710,7 +710,7 @@
   </div>
 </div>
 
-<script src="design-system/talentnext-ds.js?b=644f4add"></script>
+<script src="design-system/talentnext-ds.js?b=24f56e3e"></script>
 <script>
 /* ==========================================================================
    THE SUPER ADMIN PORTAL
@@ -5954,6 +5954,68 @@ const IV_TOPICS = [
   'Rolling out a process the team pushed back on. I want to talk about how I read the room and where I lost people.'
 ];
 const ivTopicOf = b => { let h = 0; for(const ch of String(b.cand || '')) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return IV_TOPICS[h % IV_TOPICS.length]; };
+
+/* THE COHORT-LEADER EVALUATION — a RE-interview candidate has finished a cohort,
+   so the agent also sees how the cohort leader read them (Maryam, 21 Sep 2026).
+   The leader is resolved from the candidate's cohort when known, else authored;
+   the read itself is AUTHORED PLACEHOLDER (§74 — the admin seed has no leader
+   evaluations). Built on the shared photo-disc, `tag()` and `qzList` components. */
+const cohortLeaderEval = (iv, c) => {
+  const first = esc(String(iv.cand).split(' ')[0]);
+  const co = (c && c.cohort && typeof COHORTS !== 'undefined') ? COHORTS.find(x => x.name === c.cohort) : null;
+  const leader = (co && co.leader) ? String(co.leader).replace(/\s*\(.*\)$/, '') : 'Dana Whitfield';
+  return `<section class="sec">
+    ${aiHead('Cohort leader evaluation', `${esc(leader)} led ${first} through the 90-day cohort. Their read going into the re-interview.`)}
+    <div style="display:flex;gap:var(--s04);align-items:center;padding:var(--s05) 0;border-bottom:1px solid var(--rule);margin-bottom:var(--s05)">
+      <span class="av mem-av mem-ph"><span class="av-ph"><img src="${agentFace(leader)}" alt="" loading="lazy"></span></span>
+      <span><span class="cardrow-t">${esc(leader)}</span><span class="t-caption" style="display:block">Cohort leader &middot; ★ 4.9</span></span>
+      <span style="margin-left:auto">${tag('active', 'Recommends re-interview')}</span>
+    </div>
+    <p class="t-body">${first} kept a steady weekly rhythm and led two peer sessions the cohort rated highly. Ready for the level conversation. Push on delegating earlier and opening the hard conversations before they escalate.</p>
+    <div class="dgrid dgrid-2" style="margin-top:var(--s05)">
+      <div class="dcol">${qzList('What stood out', 'ok', ['Consistent weekly pace', 'Strong peer feedback', 'Clear written reflections'])}</div>
+      <div class="dcol">${qzList('Where to push', 'acc', ['Delegates a little late', 'Waits on the hard conversations'])}</div>
+    </div>
+  </section>`;
+};
+
+/* THE RE-INTERVIEW EXTRAS — everything an agent wants before re-interviewing a
+   cohort finisher (Maryam, 21 Sep 2026): the candidate's whole profile (the
+   candidate-detail 8-fact band + CV), the cohort journey as four figures, and the
+   cohort-leader evaluation. Quiz + "what they want to talk about" are shown above
+   for every interview; these three are re-interview only. The candidate record is
+   resolved by name, synthesised (authored §74) when the booking's candidate is not
+   in `CANDS` so the band always fills. */
+function reInterviewExtras(iv){
+  const c = candByName(iv.cand) || {name: iv.cand, bucket: 'Explorer', level: 'E3'};
+  const p = candProfile(c);
+  const first = esc(String(iv.cand).split(' ')[0]);
+  return `
+  <section class="sec">
+    ${aiHead('Candidate profile', `Everything on record for ${first}, the same view as their candidate page.`)}
+    <div class="facts pf-facts">
+      ${admFact(I.growth, '--mk-4', 'Track', c.bucket + ' track')}
+      ${admFact(I.chart, '--mk-3', 'Current Level', c.bucket + ' – ' + c.level)}
+      ${admFact(I.trophy, '--mk-2', 'Points', (p.points || 0).toLocaleString())}
+      ${admFact(I.book, '--mk-1', 'Total courses taken', p.courses)}
+      ${admFact(I.user, '--mk-1', 'Current role', p.role)}
+      ${admFact(I.skill, '--mk-2', 'Industry', p.industry)}
+      ${admFact(I.time, '--mk-3', 'Years of experience', p.years)}
+      ${admFact(I.flag, '--mk-4', 'Aspiration', p.aspiration)}
+    </div>
+  </section>
+  ${candCV()}
+  <section class="sec">
+    ${aiHead('Cohort journey', `How ${first} moved through the 90-day cohort.`)}
+    ${stats([
+      ['book', 'Chapters done', '13 of 13', '100% complete'],
+      ['chart', 'Assessment average', '83%', 'Cohort average 79%'],
+      ['time', 'Time invested', '11h 40m', '54 min per chapter'],
+      ['flag', 'Tasks on time', '12 of 13', 'One overdue']
+    ])}
+  </section>
+  ${cohortLeaderEval(iv, c)}`;
+}
 function agentsInterview(){
   const piv = PAST_IVS.find(x => x.id === S.id), bk = BOOKINGS.find(x => x.id === S.id);
   const iv = piv || bk;
@@ -5970,11 +6032,13 @@ function agentsInterview(){
        4 blocks in a same row"), matching the past view. Status is `tag()` HTML, so its
        cell is hand-written like the rating cell rather than through `admFact` (which
        escapes its value). */
-    /* A FIRST interview also shows the candidate's levelling-quiz read and the note
+    /* EVERY upcoming interview shows the candidate's levelling-quiz read and the note
        they wrote the agent at booking ("What do you want to talk about?"), the
        agent's prep for the room (Maryam, 21 Sep 2026). Both are AUTHORED PLACEHOLDER
        (§74): `admQuiz` is the shared quiz read personalised by first name, `ivTopicOf`
-       a stable per-candidate note. A re-interview keeps the plain facts. */
+       a stable per-candidate note. A RE-interview (a cohort finisher) also shows the
+       candidate's whole profile, the cohort journey and the cohort-leader
+       evaluation — `reInterviewExtras`. */
     const isFirst = !agIvIsRe(iv.kind);
     return `${detailHead(backTo)}
     <section class="sec">
@@ -5986,11 +6050,12 @@ function agentsInterview(){
         <div style="--mk:var(--mk-1)"><span class="l pf-l">${ic('shield')}Status</span><span class="v">${tag(iv.status)}</span></div>
       </div>
     </section>
-    ${isFirst ? `${admQuiz({name: iv.cand})}
+    ${admQuiz({name: iv.cand})}
     <section class="sec">
       ${aiHead('What ' + esc(String(iv.cand).split(' ')[0]) + ' wants to talk about')}
       <p class="t-body" style="margin:0"><span style="color:var(--accent-text);font-size:1.35em;line-height:0;vertical-align:-.18em">&ldquo;</span>${esc(ivTopicOf(iv))}<span style="color:var(--accent-text);font-size:1.35em;line-height:0;vertical-align:-.18em">&rdquo;</span></p>
-    </section>` : ''}`;
+    </section>
+    ${isFirst ? '' : reInterviewExtras(iv)}`;
   }
   /* PAST — the full record, behind TWO TABS (Maryam, 17 Sep 2026: "i need two tabs
      on this page, About Interview and Transcript, the transcript from this page will
