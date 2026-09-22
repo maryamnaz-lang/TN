@@ -794,14 +794,23 @@
 .app .pstat-head{display:flex; flex-direction:column; gap:var(--s02); margin-bottom:var(--s04)}
 .app .pstat-fig{display:flex; align-items:center; gap:var(--s03); flex-wrap:wrap}
 .app .pstat-total{font-size:28px; line-height:1; font-weight:var(--t-w-strong); color:var(--text-primary); letter-spacing:-.5px; font-variant-numeric:tabular-nums}
-.app .pstat-chip{display:inline-flex; align-items:center; gap:2px; font-size:11.5px; font-weight:var(--t-w-strong); color:var(--support-success-ink); background:color-mix(in srgb, var(--support-success) 14%, #fff); padding:2px var(--s03); border-radius:999px}
+/* Same % chip as the Candidates-by-Track cards (.bcard-chip) — one chip everywhere (Maryam 22 Sep 2026). */
+.app .pstat-chip{display:inline-flex; align-items:center; gap:2px; font-size:11px; line-height:1; font-weight:var(--t-w-strong); color:var(--support-success-ink); background:color-mix(in srgb, var(--support-success) 14%, #fff); padding:3px var(--s03); border-radius:999px}
 .app .pstat-note{font-size:var(--t-desc-size); color:var(--text-secondary)}
 /* Payouts row — two cards side by side (Maryam 22 Sep 2026, inspo): Platform
    earnings breakdown (left) + Payouts statistics graph (right). Stacks on a phone. */
 .app .pay-row{display:grid; grid-template-columns:1fr; gap:var(--s05)}
-@container app (min-width:900px){ .app .pay-row{grid-template-columns:minmax(0,4fr) minmax(0,7fr); gap:var(--s06)} }
+@container app (min-width:900px){ .app .pay-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:var(--s06)} }
 .app .pay-card{border:1px solid var(--rule); background:var(--background); padding:var(--s06)}
 .app .pay-card > .sec-h{margin-bottom:var(--s04)}
+/* Semicircle gauge (payouts settlement status) — Figma node 1-601, Maryam 22 Sep 2026. */
+.app .gauge-wrap{display:flex; flex-direction:column; align-items:center; gap:var(--s05); margin-top:var(--s05)}
+.app .gauge-svg{width:100%; max-width:280px; height:auto; display:block; overflow:visible}
+.app .gauge-leg{display:flex; flex-wrap:wrap; justify-content:center; gap:var(--s05)}
+.app .gleg{display:inline-flex; align-items:center; gap:var(--s02)}
+.app .gleg-sw{width:9px; height:9px; border-radius:999px; flex:none}
+.app .gleg-l{font-size:13.5px; color:var(--text-secondary)}
+.app .gleg-v{font-size:13.5px; color:var(--text-primary); font-weight:var(--t-w-strong)}
 /* Platform-earnings breakdown (inspo "Income Breakdown"): headline, a stacked bar,
    then a per-source legend with right-aligned percentages. */
 .app .pbrk-fig{display:flex; align-items:center; gap:var(--s03); flex-wrap:wrap}
@@ -2096,7 +2105,7 @@ function lineChart(series, opts = {}){
       + `<rect x="${(mx - pw / 2).toFixed(1)}" y="${py.toFixed(1)}" width="${pw.toFixed(1)}" height="14" rx="3" fill="var(--text-primary)"/>`
       + `<text x="${mx.toFixed(1)}" y="${(py + 9.4).toFixed(1)}" text-anchor="middle" font-size="6" fill="var(--on-dark)">${esc(lbl)}</text>`;
   }
-  const leg = series.map(s => `<span class="lc-chip"><span class="lc-dot" style="background:${s.color}"></span>${esc(s.name)}</span>`).join('');
+  const leg = opts.noLeg ? '' : series.map(s => `<span class="lc-chip"><span class="lc-dot" style="background:${s.color}"></span>${esc(s.name)}</span>`).join('');
   const filt = opts.filterId ? chartFilter(opts.filterId) : '';
   const anim = opts.filterId && S.gperAnim === opts.filterId ? ' lc-anim' : '';
   return `<div class="lchart${anim}"><div class="lchart-leg"><span class="lc-chips">${leg}</span>${filt}</div><svg class="lchart-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opts.aria || 'Trend by series')}">${defs}${grid}${areas}${lines}${avgEl}${markEl}${xlab}</svg></div>`;
@@ -2139,6 +2148,35 @@ function barChart(series, opts = {}){
   const anim = opts.filterId && S.gperAnim === opts.filterId ? ' lc-anim' : '';
   return `<div class="lchart${anim}"><div class="lchart-leg"><span class="lc-chips">${leg}</span>${filt}</div><svg class="lchart-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opts.aria || 'By month')}">${grid}${bars}${xlab}</svg></div>`;
 }
+/* SEMICIRCLE GAUGE (Figma node 1-601 "Total viewers", Maryam 22 Sep 2026) — a 180°
+   arc where the FOREGROUND segment(s) fill a light-grey background track, a centred
+   total, a circle pointer (knob) at the tip of the filled arc, and a dot·label·value
+   legend. The Payouts card uses it for settlement status: only Settled fills the arc
+   (accent) — In progress and Failed are the grey BACKGROUND (Maryam 22 Sep 2026:
+   "use light grey instead of pink and it should be in the background"). Each seg is
+   {l, v, c, arc}: arc:true is drawn on the semicircle; the rest are legend-only, their
+   `c` the legend-dot grey. opts.centerLabel / centerValue / aria. */
+function gauge(segs, opts = {}){
+  const sum = segs.reduce((n, s) => n + s.v, 0) || 1;
+  const cx = 110, cy = 108, R = 86, SW = 22, L = Math.PI * R;   // L = real arc length (pathLength is unreliable here)
+  const arc = `M ${cx - R},${cy} A ${R},${R} 0 0 1 ${cx + R},${cy}`;
+  const track = `<path d="${arc}" fill="none" stroke="var(--gray-20)" stroke-width="${SW}" stroke-linecap="round"/>`;
+  let off = 0;   // arc-length already filled
+  const segArcs = segs.filter(s => s.arc && s.v > 0).map(s => {
+    const draw = s.v / sum * L;
+    /* gap = L+1 so exactly one dash draws (no repeat around the arc). */
+    const p = `<path d="${arc}" fill="none" stroke="${s.c}" stroke-width="${SW}" stroke-linecap="round" stroke-dasharray="${draw.toFixed(2)} ${(L + 1).toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}"/>`;
+    off += draw; return p;
+  }).join('');
+  /* circle pointer at the tip of the filled arc (fraction off/L along 180°→0°). */
+  const f = off / L, ang = Math.PI * (1 - f);
+  const px = cx + R * Math.cos(ang), py = cy - R * Math.sin(ang);
+  const ptr = off > 0 ? `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="9" fill="var(--background)" stroke="var(--accent)" stroke-width="4"/>` : '';
+  const center = `<text x="${cx}" y="${cy - 36}" text-anchor="middle" font-size="11" letter-spacing=".3" fill="var(--text-helper)">${esc(opts.centerLabel || 'Total')}</text>`
+    + `<text x="${cx}" y="${cy - 6}" text-anchor="middle" font-size="32" font-weight="600" fill="var(--text-primary)">${esc(String(opts.centerValue != null ? opts.centerValue : sum))}</text>`;
+  const leg = segs.map(s => `<span class="gleg"><span class="gleg-sw" style="background:${s.c}"></span><span class="gleg-l">${esc(s.l)}</span><b class="gleg-v">${esc(String(s.v))}</b></span>`).join('');
+  return `<div class="gauge-wrap"><svg class="gauge-svg" viewBox="0 0 220 126" role="img" aria-label="${esc(opts.aria || 'Breakdown')}">${track}${segArcs}${ptr}${center}</svg><div class="gauge-leg">${leg}</div></div>`;
+}
 /* MINI SPARKLINE — an angular line, no axes, for a stat card (Figma 1:917). */
 function sparkline(pts, color){
   const w = 96, h = 52, pad = 4, max = Math.max(...pts), min = Math.min(...pts), rng = (max - min) || 1;
@@ -2169,7 +2207,10 @@ const GPER_DEFAULT = 'monthly';   /* graphs open on this month's insights by def
 const chartFilter = id => `<div class="gfilt">${GPER.map(([v, l]) => `<button class="${(S.gper[id] || GPER_DEFAULT) === v ? 'on' : ''}" data-act="gper:${id}:${v}">${l}</button>`).join('')}</div>`;
 /* Title only — the period filter rides the chart's colour/legend row, not the title
    row (Maryam, 22 Sep 2026). Charts get the filter via `opts.filterId`. */
-const chartHead = title => `<div class="ghead"><h2 class="dgroup">${esc(title)}</h2></div>`;
+/* Title + an optional no-background accent nav link to the page the graph is about
+   (Maryam 22 Sep 2026: "each graph should have a button ... in accent color to
+   navigate to the relevant page"). */
+const chartHead = (title, link) => `<div class="ghead"><h2 class="dgroup">${esc(title)}</h2>${link ? `<button class="btn acc-link btn-sm noic" data-go="${link.go}">${esc(link.label)} ${I.arrowRight}</button>` : ''}</div>`;
 /* Period semantics (Maryam, 22 Sep 2026): Weekly = THIS week, 7 days Mon–Sun;
    Monthly = THIS month, its 30/31 days; Yearly = THIS year, Jan–Dec. The x-labels
    and a period-shaped placeholder dataset (§74; no dated series, SA-03 E1) follow. */
@@ -3611,13 +3652,13 @@ function homeOverview(){
        bar chart as Interviews (Maryam, 22 Sep 2026). Monthly figures are AUTHORED
        PLACEHOLDER (§74) — the seed has no engagement telemetry (SA-03 E1). */''}
   <section class="sec">
-    ${chartHead('Platform Users')}
+    ${chartHead('Platform Users', {go: 'users/users', label: 'View users'})}
     ${/* Bespoke bar palette Maryam specified 22 Sep 2026 (overrides the green --dv
          ramp for this chart): Candidates #111111 (--text-primary), Talent agents
          #f9423a (--accent), Cohort leaders #6B6B6B (no token — literal). */''}
     ${(() => {
       const {labels, series} = perData([
-        {name: 'Candidates', color: 'var(--text-primary)', pts: [15, 18, 17, 20, 19, 22, 21, 23, 22, 24, 23, 25]},
+        {name: 'Candidates', color: 'var(--text-primary)', pts: [10, 12, 11, 14, 13, 15, 14, 16, 15, 17, 16, 18]},   /* only a little above the accent bars (Maryam 22 Sep 2026) */
         {name: 'Talent agents', color: 'var(--accent)', pts: [7, 9, 8, 11, 10, 12, 11, 13, 12, 14, 13, 15]},
         {name: 'Cohort leaders', color: '#6B6B6B', pts: [3, 5, 4, 6, 6, 7, 6, 8, 8, 9, 10, 11]}
       ], 'pu');
@@ -3626,7 +3667,7 @@ function homeOverview(){
          monthly has a tight 2px gap between its 3 bars (Maryam 22 Sep 2026). */
       const rx = per === 'weekly' ? 4 : 999;
       const gap = per === 'monthly' ? 2 : 6;
-      return barChart(series, {aria: 'Candidates, cohort leaders and talent agents by period', labels, filterId: 'pu', vmax: 30, step: 5, rx, gap});
+      return barChart(series, {aria: 'Candidates, cohort leaders and talent agents by period', labels, filterId: 'pu', vmax: 25, step: 5, rx, gap});
     })()}
   </section>
 
@@ -3658,26 +3699,28 @@ function homeOverview(){
         const bar = src.map(r => `<span style="flex:${r[1]}; background:${r[2]}"></span>`).join('');
         const leg = src.map(r => `<div class="pbrk-row"><span class="pbrk-dot" style="background:${r[2]}"></span><span class="pbrk-name">${r[0]}</span><b class="pbrk-pct">${pctOf(r[1], tot)}%</b></div>`).join('');
         return `<div class="pay-card">
-          ${secHead('Platform earnings')}
+          ${chartHead('Platform earnings', {go: 'finance/transactions', label: 'View transactions'})}
           <div class="pbrk-fig"><span class="pstat-total">${money(platTake)}</span><span class="pstat-chip">↗ 12%</span></div>
-          <div class="pbrk-sub">the platform's take, by revenue source</div>
           <div class="pbrk-bar">${bar}</div>
           <div class="pbrk-leg">${leg}</div>
         </div>`;
       })()}
       ${(() => {
-        const {labels, series} = perData([
-          {name: 'Agent payouts', color: DV[0], fillOpacity: 0.14, pts: [420, 560, 470, 720, 540, 830, 610, 940, 700, 1020, 860, 1140]}
-        ], 'po');
-        const total = series[0].pts.reduce((s, v) => s + v, 0);
-        const unit = (S.gper['po'] || 'monthly') === 'weekly' ? 'this quarter' : (S.gper['po'] === 'yearly' ? 'over five years' : 'this year');
+        /* Payouts by settlement status (Maryam 22 Sep 2026, Figma gauge node 1-601):
+           how many are settled and how much is still pending to release. Counts are
+           read off the PAYOUTS seed (SA-03 E1 — a demo ledger, not signed-off KPIs). */
+        const settled = PAYOUTS.filter(p => p.status === 'settled').length;
+        const held = PAYOUTS.filter(p => p.status === 'held').length;   // pending to release
+        const totalPo = settled + held;
+        const pending = PAYOUTS.filter(p => p.status === 'held').reduce((n, p) => n + p.net, 0);
         return `<div class="pay-card">
-          ${chartHead('Payouts')}
-          <div class="pstat-head"><div class="pstat-fig">
-            <span class="pstat-total">${money(total)}</span>
-            <span class="pstat-chip">↗ 12%</span>
-            <span class="pstat-note">agent payouts ${unit}, vs last period</span>
-          </div></div>` + lineChart(series, {aria: 'Agent payouts by period', fmt: money, dashed: false, smooth: false, area: true, avg: true, noGrid: true, areaFade: true, padL: 6, xInset: 0, labels, filterId: 'po', vmax: 1200, step: 200}) + `</div>`;
+          ${chartHead('Payouts', {go: 'finance/payouts', label: 'View payouts'})}
+          <div class="pbrk-sub">${money(pending)} pending to release</div>
+          ${gauge([
+            {l: 'Settled', v: settled, c: 'var(--accent)', arc: true},
+            {l: 'In progress', v: held, c: 'var(--gray-30)'}
+          ], {centerLabel: 'Total payouts', centerValue: totalPo, aria: 'Payouts by settlement status'})}
+        </div>`;
       })()}
     </div>
   </section>
@@ -3686,7 +3729,7 @@ function homeOverview(){
        eyebrow · bucket · count · share chip · sparkline. The share % is real; the
        ↗ and the sparklines are illustrative placeholder (§74; no dated history). */''}
   <section class="sec">
-    ${group('Candidates by Track')}
+    ${chartHead('Candidates by Track', {go: 'candidates/candidates', label: 'View candidates'})}
     ${(() => {
       /* Exact sparkline SVGs Maryam supplied (22 Sep 2026, path data pasted verbatim,
          not redrawn); all three stroked in the accent (Maryam 22 Sep 2026: "all these
@@ -3727,7 +3770,7 @@ function homeOverview(){
        split is AUTHORED PLACEHOLDER (§74) — the seed has no dated booking history
        (SA-03 E1); first interviews run ahead of re-interviews, as in the seed. */''}
   <section class="sec">
-    ${chartHead('Interviews')}
+    ${chartHead('Interviews', {go: 'market/bookings', label: 'View interviews'})}
     ${(() => {
       const {labels, series} = perData([
         {name: 'First interview', color: 'var(--accent)', pts: [4, 5, 6, 5, 7, 8, 7, 9, 8, 10, 9, 11]},

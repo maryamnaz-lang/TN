@@ -18222,10 +18222,12 @@ login: () => `${authShell()}
     ${''/* SIGN-UP ROW (Maryam, 22 Sep 2026): a closing line below the button.
           "Sign up" is the accent as ink (--accent-text), semibold (the platform's
           strong weight, 500) and underlined; the lead-in is the secondary grey.
-          Navigation target is PENDING — Maryam will say where "Sign up" goes;
-          the anchor carries no data-go until then. Inline styles follow the
-          "Forgot Password?" precedent above (hifi-only markup, no layer). */}
-    <p class="auth-alt" style="text-align:left;color:var(--text-secondary);margin-top:24px">New to TALENTnext? <a style="color:var(--accent-text);font-weight:var(--t-w-strong);text-decoration:underline">Sign up</a></p>
+          NAVIGATION (Maryam, 22 Sep 2026): "Sign up" opens the get-started page on
+          the external site in a NEW TAB — a real href + target=_blank (rel
+          noopener), NOT a data-go route, because it leaves the prototype for
+          another origin. Inline styles follow the "Forgot Password?" precedent
+          above (hifi-only markup, no layer). */}
+    <p class="auth-alt" style="text-align:left;color:var(--text-secondary);margin-top:24px">New to TALENTnext? <a href="https://web-puce-six-27.vercel.app/new/get-started" target="_blank" rel="noopener" style="color:var(--accent-text);font-weight:var(--t-w-strong);text-decoration:underline">Sign up</a></p>
   </div>
 </div></main>`,
 
