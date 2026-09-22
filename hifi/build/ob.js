@@ -1530,8 +1530,7 @@ function obSurveyScreen(){
     ? `<button class="btn btn-t noic ob-sv-prev" data-obgo="${S.obStep - 1}">${I.arrowLeft} Previous</button>`
     : '';
   const next = `<button class="btn btn-p noic ob-sv-next" data-obgo="${S.obStep + 1}"${
-    obReady() ? '' : ' disabled'}>${
-    S.obStep === OB_N ? 'See what I heard' : 'Next'} ${I.arrowRight}</button>`;
+    obReady() ? '' : ' disabled'}>Next ${I.arrowRight}</button>`;
   return `<div class="ob-survey">
     <div class="ob-sv-top"><i style="--ob-from:${from}%;--ob-to:${to}%"></i></div>
     ${''/* THE BRAND ROW (Maryam, 18 Sep 2026): the wordmark top-left and

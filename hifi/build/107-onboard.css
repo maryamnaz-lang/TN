@@ -2060,6 +2060,21 @@
    text field is the platform `.inp` at a comfortable survey height. */
 .app .ob-sv-opts-field{gap:var(--s04)}
 .app .ob-sv-text{width:100%;padding:var(--s04) var(--s05);font-size:var(--t-body-size);line-height:var(--t-body-lh)}
+/* THE FIELD DOES NOT CHANGE HEIGHT ON FOCUS — the login-page treatment (Maryam,
+   22 Sep 2026: "the field size should not change on click, follow the field ui we
+   have on the login page"). §12.348's generic `.app .inp:focus` swaps the 1px
+   underline to 2px AND yanks `padding-bottom` to 0, which shrinks the box on
+   click; the auth card answers this in §17.302 and this restates it for the
+   survey field: focus is a COLOUR change to an `--accent` 1px underline with the
+   resting padding held (Maryam, 22 Sep 2026: "on active state the field should be
+   of accent color" — the underline stays 1px, so no height change, only the hue
+   moves). (0,3,0) — later than §12, no `!important`. */
+.app .ob-sv-text:focus,
+.app .ob-sv-text:focus-visible{
+  outline:0;
+  border:0;border-bottom:1px solid var(--accent);
+  padding-bottom:var(--s04);
+  background-color:transparent}
 .app .ob-sv-opts-field .dd{width:100%}
 .app .ob-sv-opts-field .dd .dd-btn{width:100%;padding:var(--s04) var(--s05)}
 /* NO BORDER IN THE DEFAULT VIEW (Maryam, 18 Sep 2026) — the `--layer-02` fill

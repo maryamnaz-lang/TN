@@ -14,7 +14,7 @@
      The <style> block is PROTOTYPE CHROME AND NOTHING ELSE (the device frame,
      the viewport picker, the wordmark size, a toast host) — no product rule.
      ========================================================================== -->
-<link rel="stylesheet" href="design-system/talentnext-ds.css?b=b9a82854">
+<link rel="stylesheet" href="design-system/talentnext-ds.css?b=b4221056">
 
 <style>
 /* ==========================================================================
@@ -427,6 +427,24 @@
    so the toolbar filter dropdowns keep their box. */
 .app .fdd-form .fdd-t{border:0; border-bottom:1px solid var(--rule); border-radius:0; background:transparent; padding-left:0; padding-right:var(--s05)}
 
+/* A formDd OPTION MAY CARRY RIGHT-ALIGNED TRAILING META (Maryam, 22 Sep 2026:
+   "the count should be right aligned on the row") — a 4th tuple element, e.g. the
+   cohort picker's member count. The option row goes flex so `.fdd-meta` sits at
+   the far right against the label on the left; the collapsed trigger shows the
+   selected option's meta the same way (its `.fdd-val` grows so the meta pins
+   right, just inside the chevron). Meta reads the description grey. Admin-local. */
+.app .fdd-opt.has-meta{display:flex; align-items:center; gap:var(--s04)}
+.app .fdd-t .fdd-val.has-meta{flex:1; min-width:0}
+.app .fdd-meta{margin-left:auto; color:var(--text-secondary); white-space:nowrap}
+
+/* MORE ROOM BETWEEN SECTIONS on the interview detail (Maryam, 22 Sep 2026: "give
+   more gaps between each section") — the upcoming/re-interview page wraps its content
+   sections in `.iv-detail-body`, and each consecutive `.sec` gains an extra `--s06`
+   over the section rhythm. The first section keeps the top-block no-divider treatment
+   it had as `.modhead + .sec` before the wrapper (§378's rule). Page-scoped. */
+.app .iv-detail-body > .sec + .sec{margin-top:var(--s06)}
+.app .modhead + .iv-detail-body > .sec:first-child::after{content:none}
+
 /* A REQUIRED FIELD'S NAME CARRIES AN ACCENT ASTERISK (Maryam, 14 Sep 2026). */
 .app .req-star{color:var(--accent); margin-left:1px}
 
@@ -811,6 +829,29 @@
 .app .gleg-sw{width:9px; height:9px; border-radius:999px; flex:none}
 .app .gleg-l{font-size:13.5px; color:var(--text-secondary)}
 .app .gleg-v{font-size:13.5px; color:var(--text-primary); font-weight:var(--t-w-strong)}
+/* ONBOARDING QUESTION EDITOR (Maryam, 22 Sep 2026) — the right-slider form: a
+   segmented answer-type control and an add/remove option list with scores.
+   Classes are `qb-*` (question builder), NOT `ob-*` — the design system already
+   ships `.ob-opt` for the candidate onboarding SURVEY (a pill), which dressed
+   every option row as a pill. */
+.app .qb-editor > .f{display:block; margin-bottom:var(--s06)}
+.app .qb-editor > .f:last-child{margin-bottom:0}
+.app .qb-editor > .f > .lbl{display:block; margin-bottom:var(--s03); font-weight:var(--t-w-strong); color:var(--text-primary)}
+.app .qb-editor .help{display:block; margin-top:var(--s02); font-size:12px; line-height:1.5; color:var(--text-secondary)}
+.app .qb-weight-inp{max-width:120px}
+.app .qb-types{display:inline-flex; border:1px solid var(--border-subtle-02); overflow:hidden; flex-wrap:wrap}
+.app .qb-type{padding:var(--s03) var(--s05); background:var(--background); border:0; border-right:1px solid var(--border-subtle-02); cursor:pointer; font-size:13.5px; color:var(--text-secondary); font-weight:var(--t-w-strong)}
+.app .qb-type:last-child{border-right:0}
+.app .qb-type.on{background:var(--accent); color:var(--on-accent)}
+.app .qb-opts{display:flex; flex-direction:column; gap:var(--s03); margin-bottom:var(--s03)}
+.app .qb-opt{display:flex; gap:var(--s03); align-items:center}
+.app .qb-opt-l{flex:1; min-width:0}
+.app .qb-opt-s{width:72px; flex:none}
+.app .qb-opt-x{flex:none; width:38px; height:38px; display:grid; place-items:center; background:transparent; border:1px solid var(--border-subtle-02); color:var(--text-secondary); cursor:pointer}
+.app .qb-opt-x svg{width:18px; height:18px}
+.app .qb-opt-x:hover{color:var(--support-error); border-color:var(--support-error)}
+.app .qb-check{display:flex; align-items:center; gap:var(--s03); margin-top:var(--s04); font-size:13.5px; color:var(--text-primary); cursor:pointer}
+.app .qb-check input{width:16px; height:16px; accent-color:var(--accent)}
 /* Platform-earnings breakdown (inspo "Income Breakdown"): headline, a stacked bar,
    then a per-source legend with right-aligned percentages. */
 .app .pbrk-fig{display:flex; align-items:center; gap:var(--s03); flex-wrap:wrap}
@@ -898,7 +939,7 @@
   </div>
 </div>
 
-<script src="design-system/talentnext-ds.js?b=b9a82854"></script>
+<script src="design-system/talentnext-ds.js?b=b4221056"></script>
 <script>
 /* ==========================================================================
    THE SUPER ADMIN PORTAL
@@ -1736,6 +1777,11 @@ const MODULES=[
    {k:'catalogue', t:'Course Catalogue'}, {k:'coursedetail', t:'Course', hidden:true}]},
  {k:'market', t:'Interviews', ic:'market', subs:[
    {k:'bookings', t:'Interviews'}, {k:'recordings', t:'Recordings & Transcripts'}, {k:'recording', t:'Transcript', hidden:true}, {k:'approval', t:'Level approval', hidden:true}]},
+ /* ONBOARDING QUESTIONS — the intake quiz builder (Maryam, 22 Sep 2026). One
+    visible sub (the questions list, drawn as a single rail leaf); `edit` is the
+    hidden full-page question editor reached from a row / Add Question. */
+ {k:'onboarding', t:'Onboarding Questions', ic:'document', subs:[
+   {k:'questions', t:'Questions'}]},
  {k:'finance', t:'Finance & Settlement', ic:'finance', subs:[
    /* Only Transactions and Payouts are surfaced for now (Maryam, 16 Sep 2026:
       "only keep transactions and payouts sub modules for now, hide the other sub
@@ -1798,6 +1844,7 @@ const S = {
      already carried stays as the fallback for a deep link with an empty stack.
      Same idea as the candidate portal's `S.hist` (§78). */
   hist:[],
+  qEdit:null,                             /* the onboarding question being edited (a working copy) */
   /* THE SHARED STRIPE "ADD PAYMENT METHOD" MODAL — `payModal` open flag, `payTab`
      its Card / US-bank state. Both feed `dsPayForm` from the design system, the
      same modal the candidate, leader and agent portals open. */
@@ -2470,8 +2517,8 @@ function table(cols, rows, opts){
   const body = shown.map(r => {
     const rk = doSel ? rkMap.get(r) : null, on = doSel && !!selMap[rk];
     const selCell = doSel ? `<td class="tbl-sel">${selBtn(`data-sel="${key}" data-selrow="${esc(rk)}"`, on, false, 'Select row')}</td>` : '';
-    const trCls = [r.go ? 'clk' : '', on ? 'sel' : ''].filter(Boolean).join(' ');
-    return `<tr${trCls ? ` class="${trCls}"` : ''}${r.go ? ` data-go="${esc(r.go)}"` : ''}>${selCell}${
+    const trCls = [(r.go || r.sheet) ? 'clk' : '', on ? 'sel' : ''].filter(Boolean).join(' ');
+    return `<tr${trCls ? ` class="${trCls}"` : ''}${r.go ? ` data-go="${esc(r.go)}"` : r.sheet ? ` data-sheet="${esc(r.sheet)}"` : ''}>${selCell}${
       r.cells.map((c, i) => {
         const col = cols[i] || {};
         const cls = [col.num ? 'num' : '', col.act ? 'tbl-act' : ''].filter(Boolean).join(' ');
@@ -2760,14 +2807,20 @@ function formDd(f, val){
   const cv = cur ? cur[0] : '';
   const cl = cur ? cur[1] : f.ph;
   const ci = cur ? cur[2] : undefined;
+  /* A 4th tuple element is right-aligned trailing META (the cohort picker's member
+     count, Maryam 22 Sep 2026). Rendered as `.fdd-meta` in the option row and, when
+     an option is selected, in the collapsed trigger. `.has-meta` turns the row flex
+     so it pins right; omitted when no option carries meta, so plain selects are
+     untouched. */
+  const cm = cur ? cur[3] : undefined;
   return `<label class="f"><span class="lbl">${esc(f.l)}${f.req ? ' <span class="req-star" aria-hidden="true">*</span>' : ''}</span>
     <div class="fdd fdd-form" style="display:block">
       <input type="hidden" data-f="${f.k}" value="${esc(cv)}">
       <button type="button" class="fdd-t" data-formddtoggle aria-haspopup="listbox" aria-expanded="false" style="width:100%;justify-content:space-between;min-height:40px">
-        <span class="fdd-val${cur ? '' : ' fdd-ph'}">${fddAv(ci)}${esc(cl)}</span>
+        <span class="fdd-val${cur ? '' : ' fdd-ph'}${cm ? ' has-meta' : ''}">${fddAv(ci)}${esc(cl)}${cm ? `<span class="fdd-meta">${esc(cm)}</span>` : ''}</span>
         <svg class="fdd-cx" viewBox="0 0 24 24" aria-hidden="true">${inner('chevDown')}</svg></button>
-      <div class="fdd-menu" role="listbox" style="left:0;right:0;max-height:260px;overflow-y:auto">${opts.map(([ov, ol, oimg]) =>
-        `<button type="button" class="fdd-opt${String(ov) === String(cv) ? ' on' : ''}" role="option" aria-selected="${String(ov) === String(cv) ? 'true' : 'false'}" data-formddset="${esc(ov)}">${fddAv(oimg)}${esc(ol)}</button>`).join('')}</div>
+      <div class="fdd-menu" role="listbox" style="left:0;right:0;max-height:260px;overflow-y:auto">${opts.map(([ov, ol, oimg, ometa]) =>
+        `<button type="button" class="fdd-opt${String(ov) === String(cv) ? ' on' : ''}${ometa ? ' has-meta' : ''}" role="option" aria-selected="${String(ov) === String(cv) ? 'true' : 'false'}" data-formddset="${esc(ov)}">${fddAv(oimg)}${esc(ol)}${ometa ? `<span class="fdd-meta">${esc(ometa)}</span>` : ''}</button>`).join('')}</div>
     </div></label>`;
 }
 /* OUR DATE PICKER — replaces the native <input type="date"> so no browser/OS
@@ -5483,7 +5536,16 @@ KINDS.cand = {
        B1–B5, T1–T5), not the MVP subset `levelOpts` returns — this picker reverses
        SA-04's "Trailblazer off every picker" for the Add/Edit Candidate record. */
     {k:'level', l:'Level', t:'select', opts: LVL_CODES, def:'E1'},
-    {k:'cohort', l:'Cohort', t:'select', opts:[['—', 'No cohort yet'], ...COHORTS.map(x => [x.name, x.name])], def:'—'},
+    /* THE COHORT PICKER NAMES EACH COHORT'S MEMBER COUNT (Maryam, 22 Sep 2026:
+       "show the member count against a cohort name in the cohort dropdown"). The
+       value stays the bare name (what `create`/`update` write to `c.cohort`); only
+       the LABEL carries the count, `size / cap`, the same reading the roster and
+       the cohort tables show. `c.size` is kept current by `syncCohortSizes()` in
+       the render pipeline, so it is accurate at open. "No cohort yet" takes none.
+       The count rides the option's 4th tuple element (`ometa`) so formDd renders it
+       RIGHT-ALIGNED on the row (Maryam 22 Sep 2026: "right aligned on the row"), not
+       baked into the label. */
+    {k:'cohort', l:'Cohort', t:'select', opts:[['—', 'No cohort yet'], ...COHORTS.map(x => [x.name, x.name, undefined, `${x.size} / ${x.cap || 10}`])], def:'—'},
     /* COURSE is READ-ONLY when editing (Maryam 20 Sep 2026: "the course row should
        show the course name and it should not be editable") — a candidate's course
        follows their own enrolment, the admin does not set it here. It shows the
@@ -5494,7 +5556,9 @@ KINDS.cand = {
       : {k:'course', l:'Course', t:'select', opts:[['—', 'No course yet'], ...COURSES.filter(x => x.status === 'live').map(x => [x.name, x.name])], def:'—'},
     ...(c ? [{k:'status', l:'Status', t:'select', opts:[['active', 'Active'], ['inactive', 'Deactivated']]}] : [])
   ],
-  help:'A candidate is also an account with the candidate role. The bucket follows the level; consent is the candidate’s to give and is not set here.',
+  /* No info block on this form (Maryam, 22 Sep 2026: "remove the info block in the
+     form") — the candidate `help` note is dropped; the sheet renders the fields
+     alone. Other KINDS keep their own `help`. */
   okNew:'Add Candidate',
   create: v => {
     const u = {id:newId('u', USERS), name:v.name, email:v.email, roles:['candidate'], level:v.level, status:'active', joined:today(), origin:'individual', last:'invited'};
@@ -5899,20 +5963,23 @@ const SOCIAL_ADM = [
 const CAND_LINKED = {linkedin:true, instagram:true, twitter:true};
 function candSocials(){
   const c = CAND_BY_ID[S.id] || CANDS[0];
+  /* ONLY THE CONNECTED accounts are shown (Maryam, 22 Sep 2026: "only show the
+     linked accounts") — the "Not connected" cards are dropped, and with every
+     surviving card `on`, the empty-avatar / "Not connected" branches are gone. If
+     the candidate has linked none, the whole section is omitted rather than
+     drawing an empty grid under the heading. */
+  const linked = SOCIAL_ADM.filter(s => !!CAND_LINKED[s.k]);
+  if(!linked.length) return '';
   return `<section class="sec">
     ${secHead('Linked accounts')}
     <div class="lacc-grid">
-      ${SOCIAL_ADM.map(s => { const on = !!CAND_LINKED[s.k];
-        return `<div class="lacc lacc-ro${on ? ' on' : ''}" style="--brand:${s.color}">
+      ${linked.map(s => `<div class="lacc lacc-ro on" style="--brand:${s.color}">
           <span class="lacc-ic">${s.svg}</span>
           <span class="lacc-n t-h4">${esc(s.n)}</span>
-          <span class="lacc-sub t-desc">${on ? esc(s.handle || 'Connected') : 'Not connected'}</span>
-          <span class="lacc-av">${on
-            ? `<span class="av-ph"><img src="${agentFace(c.name)}" alt=""></span>`
-            : `<span class="lacc-av-empty">${I.user}</span>`}</span>
-          ${on ? `<span class="lacc-cta t-label"><span class="lacc-mk lacc-on">${I.checkFilled}</span>Linked</span>` : ''}
-        </div>`;
-      }).join('')}
+          <span class="lacc-sub t-desc">${esc(s.handle || 'Connected')}</span>
+          <span class="lacc-av"><span class="av-ph"><img src="${agentFace(c.name)}" alt=""></span></span>
+          <span class="lacc-cta t-label"><span class="lacc-mk lacc-on">${I.checkFilled}</span>Linked</span>
+        </div>`).join('')}
     </div>
   </section>`;
 }
@@ -6500,14 +6567,21 @@ const cohortLeaderEval = (iv, c) => {
   const first = esc(String(iv.cand).split(' ')[0]);
   const co = (c && c.cohort && typeof COHORTS !== 'undefined') ? COHORTS.find(x => x.name === c.cohort) : null;
   const leader = (co && co.leader) ? String(co.leader).replace(/\s*\(.*\)$/, '') : 'Dana Whitfield';
+  /* NO divider line above this section (Maryam, 22 Sep 2026) — the Cohort journey
+     `.sec` carries `.sec-noline` (its §14 foot `::after` off). The section keeps its
+     normal top padding so it has a proper gap below the journey band (no line), in
+     step with the wider inter-section spacing on this page (`.iv-detail-body`,
+     Maryam 22 Sep 2026: "give more gaps between each section"). The aiHead desc is
+     dropped, the ★ is the rating gold `--star`, the read runs FULL WIDTH (no reading
+     measure), and "Recommends re-interview" is a green chip. */
   return `<section class="sec">
-    ${aiHead('Cohort leader evaluation', `${esc(leader)} led ${first} through the 90-day cohort. Their read going into the re-interview.`)}
+    ${aiHead('Cohort leader evaluation')}
     <div style="display:flex;gap:var(--s04);align-items:center;padding:var(--s05) 0;border-bottom:1px solid var(--rule);margin-bottom:var(--s05)">
       <span class="av mem-av mem-ph"><span class="av-ph"><img src="${agentFace(leader)}" alt="" loading="lazy"></span></span>
-      <span><span class="cardrow-t">${esc(leader)}</span><span class="t-caption" style="display:block">Cohort leader &middot; ★ 4.9</span></span>
-      <span style="margin-left:auto">${tag('active', 'Recommends re-interview')}</span>
+      <span><span class="cardrow-t">${esc(leader)}</span><span class="t-caption" style="display:block">Cohort leader &middot; <span style="color:var(--star)">★</span> 4.9</span></span>
+      <span style="margin-left:auto"><span class="tag sm green">Recommends re-interview</span></span>
     </div>
-    <p class="t-body">${first} kept a steady weekly rhythm and led two peer sessions the cohort rated highly. Ready for the level conversation. Push on delegating earlier and opening the hard conversations before they escalate.</p>
+    <p class="t-body" style="max-width:none">${first} kept a steady weekly rhythm and led two peer sessions the cohort rated highly. Ready for the level conversation. Push on delegating earlier and opening the hard conversations before they escalate.</p>
     <div class="dgrid dgrid-2" style="margin-top:var(--s05)">
       <div class="dcol">${qzList('What stood out', 'ok', ['Consistent weekly pace', 'Strong peer feedback', 'Clear written reflections'])}</div>
       <div class="dcol">${qzList('Where to push', 'acc', ['Delegates a little late', 'Waits on the hard conversations'])}</div>
@@ -6541,7 +6615,7 @@ function reInterviewExtras(iv){
     </div>
   </section>
   ${candCV()}
-  <section class="sec">
+  <section class="sec sec-noline">
     ${aiHead('Cohort journey', `How ${first} moved through the 90-day cohort.`)}
     ${stats([
       ['book', 'Chapters done', '13 of 13', '100% complete'],
@@ -6576,7 +6650,14 @@ function agentsInterview(){
        candidate's whole profile, the cohort journey and the cohort-leader
        evaluation — `reInterviewExtras`. */
     const isFirst = !agIvIsRe(iv.kind);
+    /* THE CONTENT SECTIONS ARE WRAPPED IN `.iv-detail-body` so a page-scoped rule can
+       widen the gap between every section (Maryam, 22 Sep 2026: "give more gaps
+       between each section") — including the sections that come from shared helpers
+       (`admQuiz`, `candCV`, `reInterviewExtras`), which a per-section class could not
+       reach. detailHead stays outside so the first section keeps its top-block
+       treatment (the wrapper restates the no-divider `::after` rule). */
     return `${detailHead(backTo)}
+    <div class="iv-detail-body">
     <section class="sec">
       ${aiHead('Interview with ' + esc(iv.cand), `${esc(iv.agent)} &middot; ${esc(agIvKind(iv.kind))} &middot; ${esc(when)}`)}
       <div class="facts pf-facts">
@@ -6591,7 +6672,8 @@ function agentsInterview(){
       ${aiHead('What ' + esc(String(iv.cand).split(' ')[0]) + ' wants to talk about')}
       <p class="t-body" style="margin:0"><span style="color:var(--accent-text);font-size:1.35em;line-height:0;vertical-align:-.18em">&ldquo;</span>${esc(ivTopicOf(iv))}<span style="color:var(--accent-text);font-size:1.35em;line-height:0;vertical-align:-.18em">&rdquo;</span></p>
     </section>
-    ${isFirst ? '' : reInterviewExtras(iv)}`;
+    ${isFirst ? '' : reInterviewExtras(iv)}
+    </div>`;
   }
   /* PAST — the full record, behind TWO TABS (Maryam, 17 Sep 2026: "i need two tabs
      on this page, About Interview and Transcript, the transcript from this page will
@@ -7802,6 +7884,133 @@ ACTIONS.dltranscript = key => {
 };
 
 V.market = () => modView({bookings:marketBookings, recordings:marketRecordings, recording:marketRecordingDetail, approval:marketApproval});
+
+/* ══════════════════════════════════════════════════════════════════════════
+   ONBOARDING QUESTIONS — the intake-quiz FORM BUILDER (Maryam, 22 Sep 2026).
+   A proper editor: create typed questions and set each one's weightage and
+   per-option scores, so the quiz can be evaluated. Types: single choice (scored
+   options), free text (one line) and dropdown (a fixed list, optional "Other"
+   with a text field). Seeded with the five client questions; the scores/weights
+   are AUTHORED PLACEHOLDER (§74) — the real scoring model is the client's to set.
+   ══════════════════════════════════════════════════════════════════════════ */
+const OB_TYPES = [['single', 'Single choice'], ['text', 'Free text'], ['dropdown', 'Dropdown']];
+const obTypeLabel = t => (OB_TYPES.find(x => x[0] === t) || ['', '—'])[1];
+let ONBOARDING_Q = [
+  {id:'obq1', text:'Where are you right now?', type:'single', weight:1, options:[
+    {label:'In a job I want to move up in', score:3},
+    {label:"In a job I don't plan to stay in", score:2},
+    {label:'Running something of my own, or trying to start it', score:4},
+    {label:'Between things', score:1}]},
+  {id:'obq2', text:'Which of these sounds most like you? Pick one.', type:'single', weight:1, options:[
+    {label:'Top Performer', score:5}, {label:'Athlete', score:4}, {label:'Leader', score:5},
+    {label:'Entrepreneur', score:4}, {label:'Not Sure', score:1}, {label:'Team Player', score:3}]},
+  {id:'obq3', text:'What do you do now?', type:'text', weight:0,
+    placeholder:'"Operations coordinator," "student," "own a detailing business."', options:[]},
+  {id:'obq4', text:'What industry is that in?', type:'dropdown', weight:0, other:true, options:[
+    {label:'Security'}, {label:'Franchise ownership'}, {label:'Retail'}, {label:'Food and hospitality'},
+    {label:'Trades and construction'}, {label:'Healthcare'}, {label:'Transportation and logistics'},
+    {label:'Sales'}, {label:'Education'}, {label:'Technology'}, {label:'Student'}]},
+  {id:'obq5', text:'How many years have you been working?', type:'single', weight:1, options:[
+    {label:'Under 1', score:1}, {label:'1 to 3', score:2}, {label:'3 to 7', score:3},
+    {label:'7 to 15', score:4}, {label:'15 or more', score:5}]}
+];
+let OB_SEQ = 6;
+const obNewQuestion = () => ({id:null, _id:'new', text:'', type:'single', weight:1, options:[{label:'', score:0}, {label:'', score:0}]});
+/* the quiz's max score, so "it can be evaluated" is visible: each single-choice
+   question contributes weight × its best option score. */
+const obMaxScore = () => ONBOARDING_Q.reduce((n, q) => q.type === 'single'
+  ? n + (q.weight || 0) * Math.max(0, ...(q.options || []).map(o => +o.score || 0)) : n, 0);
+
+function onboardingQuestions(){
+  const q = getFilter('q', '').toLowerCase();
+  const rows = ONBOARDING_Q.filter(x => !q || x.text.toLowerCase().includes(q));
+  const scored = ONBOARDING_Q.filter(x => x.type === 'single').length;
+  return `
+  <section class="sec">
+    ${searchHead('Onboarding Questions',
+      'The intake quiz new candidates answer. Build the questions, set each one’s answer type and weightage, and the answers are scored against it.',
+      `<button class="btn btn-p btn-sm noic" data-sheet="obedit:new">${I.add} Add Question</button>`, 'Search questions')}
+    ${lstTools('Search questions')}
+    ${rows.length ? table(
+        [{label:'#'}, {label:'Question'}, {label:'Answer type'}, {label:'Options'}, {label:'Weight'}, ACT_COL],
+        rows.map((x, i) => ({ id:x.id, sheet:'obedit:' + x.id, cells:[
+          String(i + 1),
+          esc(x.text),
+          obTypeLabel(x.type),
+          x.type === 'text' ? '—' : String((x.options || []).length),
+          x.type === 'single' ? '×' + (x.weight || 0) : '—',
+          rowActs([['edit', 'Edit', `data-sheet="obedit:${x.id}"`], ['delete', 'Delete', `data-act="obdel:${x.id}"`]])
+        ]})),
+        {select:false})
+      : emptyState('document', 'No questions yet', q ? 'Nothing matches your search.' : 'Add the first onboarding question.')}
+    <p class="t-caption" style="margin-top:var(--s05)">Quiz total: up to <b>${obMaxScore()}</b> points across ${scored} scored question${scored === 1 ? '' : 's'}.</p>
+  </section>`;
+}
+V.onboarding = () => modView({questions:onboardingQuestions});
+
+/* THE QUESTION EDITOR IS THE RIGHT SLIDER (Maryam, 22 Sep 2026: "why is it not on
+   the right slider"), like Add User / Add Staff — a `SHEETS` entry rendered by
+   `sidePeek` (its key is in `SIDE_SHEET_KEYS`). A working copy lives in `S.qEdit`,
+   loaded once per record id and kept across in-place renders (type switch, add
+   option) so edits are not wiped (trap 9); the sheet's Save runs `obsave`. Its
+   classes are `qb-*` — NOT `ob-*`, which the design system already ships for the
+   candidate onboarding SURVEY (`.ob-opt` is that survey's pill; reusing it here
+   dressed every option row as a pill). */
+SHEETS.obedit = id => {
+  const isNew = !id || id === 'new';
+  if(!S.qEdit || (isNew ? S.qEdit._id !== 'new' : S.qEdit._id !== id)){
+    const src = !isNew && ONBOARDING_Q.find(x => x.id === id);
+    S.qEdit = src ? Object.assign(JSON.parse(JSON.stringify(src)), {_id:id}) : obNewQuestion();
+  }
+  const q = S.qEdit, isSingle = q.type === 'single', isDrop = q.type === 'dropdown', isText = q.type === 'text';
+  const optsBlock = isText ? '' : `
+    <div class="f"><span class="lbl">${isSingle ? 'Options and their score' : 'Options'}</span>
+      <div class="qb-opts">${(q.options || []).map((o, i) => `
+        <div class="qb-opt">
+          <input class="inp qb-opt-l" data-qbopt="${i}:label" value="${esc(o.label || '')}" placeholder="Option label" aria-label="Option ${i + 1}">
+          ${isSingle ? `<input class="inp qb-opt-s" type="number" min="0" data-qbopt="${i}:score" value="${o.score == null ? 0 : o.score}" aria-label="Score" title="Score">` : ''}
+          <button type="button" class="qb-opt-x" data-act="oboptdel:${i}" aria-label="Remove option">${I.close}</button>
+        </div>`).join('')}</div>
+      <button type="button" class="btn acc-link btn-sm noic" data-act="oboptadd">${I.add} Add option</button>
+    </div>
+    ${isDrop ? `<label class="qb-check"><input type="checkbox" data-act="obother"${q.other ? ' checked' : ''}> Allow “Other” with a text field</label>` : ''}`;
+  const body = `
+    <div class="qb-editor">
+      <label class="f"><span class="lbl">Question</span>
+        <input class="inp" data-qbf="text" value="${esc(q.text || '')}" placeholder="Type the question"></label>
+      <div class="f"><span class="lbl">Answer type</span>
+        <div class="qb-types">${OB_TYPES.map(([v, l]) => `<button type="button" class="qb-type${q.type === v ? ' on' : ''}" data-act="obtype:${v}">${l}</button>`).join('')}</div></div>
+      ${isText ? `<label class="f"><span class="lbl">Placeholder</span>
+        <input class="inp" data-qbf="placeholder" value="${esc(q.placeholder || '')}" placeholder="Example answer shown in the field"></label>` : ''}
+      ${isSingle ? `<label class="f"><span class="lbl">Weightage</span>
+        <input class="inp qb-weight-inp" type="number" min="0" data-qbf="weight" value="${q.weight == null ? 0 : q.weight}">
+        <span class="help">How much this question counts when the quiz is scored. Free-text and dropdown answers are informational and carry no weight.</span></label>` : ''}
+      ${optsBlock}
+    </div>`;
+  return {title: isNew ? 'New question' : 'Edit question', body, ok:'Save Question', act:'obsave'};
+};
+
+/* the editor's actions (doAction renders after each, so these only mutate S). */
+ACTIONS.obtype = key => { const v = key.split(':')[1]; S.qEdit.type = v;
+  if((v === 'single' || v === 'dropdown') && !(S.qEdit.options || []).length) S.qEdit.options = [{label:'', score:0}, {label:'', score:0}]; return 'keep'; };
+ACTIONS.oboptadd = () => { (S.qEdit.options = S.qEdit.options || []).push({label:'', score:0}); return 'keep'; };
+ACTIONS.oboptdel = key => { S.qEdit.options.splice(+key.split(':')[1], 1); return 'keep'; };
+ACTIONS.obother = () => { S.qEdit.other = !S.qEdit.other; return 'keep'; };
+ACTIONS.obsave = () => {
+  const q = S.qEdit; if(!q || !(q.text || '').trim()){ toast('Give the question a title', 'warn'); return 'keep'; }
+  const clean = {text:q.text.trim(), type:q.type, weight:q.type === 'single' ? (+q.weight || 0) : 0,
+    options:q.type === 'text' ? [] : (q.options || []).filter(o => (o.label || '').trim())
+      .map(o => q.type === 'single' ? {label:o.label.trim(), score:+o.score || 0} : {label:o.label.trim()})};
+  if(q.type === 'text') clean.placeholder = q.placeholder || '';
+  if(q.type === 'dropdown') clean.other = !!q.other;
+  if(q._id && q._id !== 'new'){ const rec = ONBOARDING_Q.find(x => x.id === q._id); Object.assign(rec, clean); audit('Edited onboarding question', rec.text, 'Onboarding Questions', 'med'); }
+  else { const rec = Object.assign({id:'obq' + (OB_SEQ++)}, clean); ONBOARDING_Q.push(rec); audit('Added onboarding question', rec.text, 'Onboarding Questions', 'med'); }
+  S.qEdit = null; toast('Question saved');   /* doAction closes the sheet */
+};
+ACTIONS.obdel = key => { const id = key.split(':')[1]; const rec = ONBOARDING_Q.find(x => x.id === id);
+  askConfirm({mk:'warning', title:'Delete this question?', body:`“${esc(rec ? rec.text : '')}” will be removed from the intake quiz.`, ok:'Delete', danger:true, act:'doobdel:' + id}); };
+ACTIONS.doobdel = key => { const id = key.split(':')[1]; const rec = ONBOARDING_Q.find(x => x.id === id);
+  ONBOARDING_Q = ONBOARDING_Q.filter(x => x.id !== id); if(rec) audit('Deleted onboarding question', rec.text, 'Onboarding Questions', 'high'); S.confirm = null; toast('Question deleted'); };
 
 /* ======================================================================
    EMPLOYERS & HIRING
@@ -9960,7 +10169,7 @@ function askConfirm(o){ S._confirm = o; S.confirm = '_dyn'; }
    to match "Add User" on the same module. The guarded two-step actions
    (change role, deactivate, reactivate, delete) stay centre modals — they are a
    decision, not "creating something". */
-const SIDE_SHEET_KEYS = ['addstaff', 'editstaff', 'inviteagent', 'adduser', 'connect'];
+const SIDE_SHEET_KEYS = ['addstaff', 'editstaff', 'inviteagent', 'adduser', 'connect', 'obedit'];
 const sideSheet = key => !!key && (key.indexOf('rec:') === 0 || SIDE_SHEET_KEYS.some(k => key === k || key.indexOf(k + ':') === 0));
 
 /* resolve `S.sheet` to its `{title, body, ok, act, danger}` — shared by the
@@ -10393,7 +10602,9 @@ device.addEventListener('click', e => {
     /* innerHTML, not textContent — an option may carry an avatar (`fddAv`); the
        trigger must keep it when selected (Maryam, 15 Sep 2026). The option's HTML
        is our own markup with escaped labels. */
-    if(vl){ vl.innerHTML = fds.innerHTML; vl.classList.remove('fdd-ph'); }
+    /* carry `.has-meta` onto the trigger so its `.fdd-val` grows and the copied
+       `.fdd-meta` (e.g. the cohort count) pins right, matching the option row. */
+    if(vl){ vl.innerHTML = fds.innerHTML; vl.classList.remove('fdd-ph'); vl.classList.toggle('has-meta', fds.classList.contains('has-meta')); }
     fdd.querySelectorAll('.fdd-opt').forEach(o => { const on = o === fds; o.classList.toggle('on', on); o.setAttribute('aria-selected', String(on)); });
     fdd.classList.remove('on');
     const tr = fdd.querySelector('[data-formddtoggle]'); if(tr) tr.setAttribute('aria-expanded', 'false');
@@ -10475,6 +10686,14 @@ device.addEventListener('keydown', e => {
 /* THE SEARCH FIELD FILTERS AS YOU TYPE. The value goes into the page's filter
    state and the page re-renders; `SRCH_FOCUS` puts the caret back. */
 device.addEventListener('input', e => {
+  /* ONBOARDING QUESTION EDITOR — a keystroke updates the working copy in `S.qEdit`
+     WITHOUT a render, so the caret stays put (trap 9). `data-obf` is a top-level
+     field; `data-obopt="<i>:<field>"` an option's label or score. */
+  const obf = e.target.closest('[data-qbf]');
+  if(obf && S.qEdit){ S.qEdit[obf.dataset.qbf] = obf.value; return; }
+  const obopt = e.target.closest('[data-qbopt]');
+  if(obopt && S.qEdit){ const ci = obopt.dataset.qbopt.indexOf(':'), i = +obopt.dataset.qbopt.slice(0, ci), f = obopt.dataset.qbopt.slice(ci + 1);
+    (S.qEdit.options[i] = S.qEdit.options[i] || {})[f] = obopt.value; return; }
   /* a keystroke in a record-sheet field re-checks the submit gate live (no render,
      which would rebuild the half-typed form — trap 9). */
   if(e.target.closest('.sheet-b [data-f], .peek-form [data-f]')) syncSheetSubmit();
@@ -10528,7 +10747,7 @@ device.addEventListener('click', e => {
        S.sheet a beat later so the panel slides out and the content widens back,
        instead of the panel vanishing in one frame. Guarded so a double-click
        does not re-arm it. The centre modal / confirm keep their instant close. */
-    if(d.close === 'sheet') S.refundTxn = null;   /* a fresh refund next time */
+    if(d.close === 'sheet'){ S.refundTxn = null; S.qEdit = null; }   /* a fresh refund / question next time */
     if(d.close === 'sheet' && sideSheet(S.sheet) && !S.sheetClosing){
       S.sheetClosing = true; render();
       setTimeout(() => { S.sheet = null; S.sheetClosing = false; render(); }, 400);

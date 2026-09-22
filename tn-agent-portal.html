@@ -36,7 +36,7 @@
      rule sweep clean on 21 screens, 84 screen-width combos with no overflow,
      zero thrown errors.
      ========================================================================== -->
-<link rel="stylesheet" href="design-system/talentnext-ds.css?b=b9a82854">
+<link rel="stylesheet" href="design-system/talentnext-ds.css?b=b4221056">
 
 <style>
 /* ==========================================================================
@@ -154,6 +154,56 @@
   display: none;
 }
 </style>
+
+<style>
+/* ==========================================================================
+   INTERVIEW SCREEN — stack "Interview recording" and "Tal's read" (Maryam,
+   22 Sep 2026: "both content should be below the heading, the Tal's read
+   paragraph full width"). §10.15's label column keys its opt-out on the
+   content class; `.iv-rec` and `.tal-eval` are not on that list, so they got
+   the 184px spine. This restates the DS opt-out (its exact declarations) for
+   those two, so they read like "The interview" (.stats) and "Your
+   recommendation" (.eval-form): heading above, content full width. Inside the
+   ≥900 tier per trap 3; agent-portal-local markup, so kept out of the DS.
+   ========================================================================== */
+@container app (min-width:900px){
+  .app .sec:has(> .iv-rec),
+  .app .sec:has(> .tal-eval){display:block}
+  .app .sec:has(> .iv-rec) > .sec-h,
+  .app .sec:has(> .tal-eval) > .sec-h{border-right:0; min-height:0; margin-bottom:var(--sec-h-gap); padding:0 var(--pad-x)}
+}
+/* Tal's read paragraph runs full width (Maryam, 22 Sep 2026). The DS caps BOTH
+   `.ai-body` and `.ai-body p` at 68ch (the reading measure) and lifts them only
+   for `.ai-aura`; `.tal-eval` is not `.ai-aura`, so lift both here too. */
+.app .tal-eval .ai-body,
+.app .tal-eval .ai-body p{max-width:none}
+
+/* THE RECOMMENDATION FORM breathes (Maryam, 22 Sep 2026: "sub sections are too
+   close ... gaps around 20px"). 20px between fields, a clear label-to-control gap. */
+.app .eval-form > .f{margin-top:20px}
+.app .eval-form > .f > .lbl{display:block; margin-bottom:var(--s03)}
+
+/* A DROPDOWN OPTION MAY CARRY A DESCRIPTION (Maryam, 22 Sep 2026) — used by the
+   TALENT-type picker so the agent knows what each acronym means. `dd(...,{desc})`
+   stacks the label over its meaning; the tick sits at the top-right. */
+.app .dd-opt-2{align-items:flex-start}
+.app .dd-opt-main{display:flex; flex-direction:column; gap:3px; min-width:0}
+.app .dd-opt-d{font-size:12px; line-height:1.45; color:var(--text-secondary); font-weight:400; white-space:normal}
+.app .dd-opt-2 .dd-tick{margin-top:3px; flex:none}
+
+/* The unreached ladder rungs read #efefef, not the beige --layer-accent-01
+   (Maryam, 22 Sep 2026: "the grey on the tiles needs to be #efefef"). The passed
+   (.done, accent) and current (.on, tint) rungs have higher specificity, so only
+   the plain future tiles change. */
+.app .iv-ladder .ladder i{background:var(--rule)}
+
+/* THE LADDER IS THE LEVEL PICKER (Maryam, 22 Sep 2026) — rungs are clickable; the
+   label sits above them. Cursor + a hover/focus affordance so it reads as pickable. */
+.app .eval-form .f > .iv-ladder{margin-top:0}
+.app .iv-ladder .ladder-pick i{cursor:pointer}
+.app .iv-ladder .ladder-pick i:not(.done):not(.on):hover{background:var(--gray-20)}
+.app .iv-ladder .ladder-pick i:focus-visible{outline:2px solid var(--accent); outline-offset:1px}
+</style>
 </head>
 <body>
 
@@ -194,7 +244,7 @@
        somebody choosing a stage would want it. -->
 </div>
 
-<script src="design-system/talentnext-ds.js?b=b9a82854"></script>
+<script src="design-system/talentnext-ds.js?b=b4221056"></script>
 <script>
 /* ==========================================================================
    THE TALENT AGENT PORTAL
@@ -839,7 +889,7 @@ const IVS = [
    day:'Tuesday 18 August', time:'5:00 PM', kind:'First interview',
    band:'Explorer, predicted by the quiz', level:'Explorer – E2',
    due:'6:00 PM today', asked:'Running her first team of four',
-   talLevel:'Explorer – E3',
+   talLevel:'Explorer – E3', talType:'Leader',
    /* TAL'S EVALUATION, structured like a module summary — bold lead-ins and the
       key phrases highlighted (Maryam, 6 Sep 2026: "extensive … some highlighting
       points … content highlights"). Authored placeholder in the shape a real
@@ -4455,13 +4505,22 @@ V.interview = v => {
        ("Explorer – E3" -> "E3") to mark the ladder; `curLvl` is the agent's own
        pick, prefilled to Tal's full level and held in `S.slotForm.evalLevel` (the
        `dd()` dropdown's store, so no new handler). */
-    const talCode = (x.talLevel.split(/[–-]/).pop() || '').trim();
     const curLvl = (S.slotForm && S.slotForm.evalLevel) || x.talLevel;
+    /* THE LADDER IS THE PICKER (Maryam, 22 Sep 2026): the rungs are clickable and
+       mark the agent's own pick (`curCode` off `curLvl`), not Tal's read. Clicking
+       a rung writes `S.slotForm.evalLevel` through the shared `dd()` handler. */
+    const curCode = (curLvl.split(/[–-]/).pop() || '').trim();
+    /* T·A·L·E·N·T type: Tal's suggested lens, and the agent's own pick prefilled
+       to it (Maryam, 22 Sep 2026). `evalType` reuses the `dd()` store/handler. */
+    const talType = talTypeOf(x);
+    const curType = (S.slotForm && S.slotForm.evalType) || talType;
     return band(null, true) + `
     ${/* THE FACTS OF THE CALL — the 4-block figure row. The old fourth cell was
           the 24-hour REPORT deadline; there is no report now, so it becomes the
           recording state, which is the thing the agent confirms below. */''}
-    <section class="sec">
+    ${/* sec-noline: no divider between "The interview" and "Interview recording"
+          (Maryam, 22 Sep 2026). */''}
+    <section class="sec sec-noline">
       <div class="sec-h"><h2>The interview</h2></div>
       <div class="stats eval-stats">${[
         ['calendar', 'Held', `${x.day.replace(/^\w+ /, '').replace(/ (\w{3})\w*$/, ' $1')} &middot; ${x.time}`, ''],
@@ -4503,7 +4562,10 @@ V.interview = v => {
       <div class="sec-h"><h2>Tal's read</h2></div>
       <div class="tal-eval">
         <div class="ai-body">${x.talEval}
-          <p class="help mt5">Tal's proposal off the transcript. Weigh it against the call and set your own recommendation below.</p></div>
+          ${/* Which of the six T·A·L·E·N·T lenses Tal reads the candidate through
+                (Maryam, 22 Sep 2026). The `<b>` takes Tal's accent ramp; the
+                meaning is Maryam's supplied copy. */''}
+          <p class="mt5">Tal reads ${first} as a <b>${talType}</b>.</p></div>
       </div>
     </section>
 
@@ -4518,9 +4580,15 @@ V.interview = v => {
       <div class="sec-h"><h2>Your recommendation</h2></div>
       <div class="eval-form">
         <p class="t-body-02">Tal suggests <b>${x.talLevel}</b> off the transcript. Set the level you would give ${first} across the fifteen rungs. TalentNext confirms the final level after analysis.</p>
-        <div class="iv-ladder">${ivLadder(talCode)}</div>
-        <div class="f mt5"><span class="lbl">Your suggested level</span>
-          ${dd('evalLevel', LVL_OPTS, curLvl)}</div>
+        ${/* The "Your suggested level" field sits ABOVE the blocks, and the blocks
+              themselves are the picker (Maryam, 22 Sep 2026). */''}
+        <div class="f"><span class="lbl">Your suggested level</span>
+          <div class="iv-ladder">${ivLadder(curCode, true)}</div></div>
+        ${/* THE T·A·L·E·N·T TYPE picker (Maryam, 22 Sep 2026) — the agent picks
+              the lens too, prefilled to Tal's read; the meaning of the current
+              pick sits under it. Reuses the `dd()` store/handler (`S.slotForm.evalType`). */''}
+        <div class="f mt5"><span class="lbl">TALENT type</span>
+          ${dd('evalType', TALENT_OPTS, curType, {desc: talentDesc})}</div>
         <label class="f mt5"><span class="lbl">Strengths</span>
           <textarea class="inp" rows="3">${x.seedStrength}</textarea></label>
         <label class="f mt5"><span class="lbl">Growth areas</span>
@@ -6434,9 +6502,9 @@ function dd(key, opts, val, cfg){
       <svg class="dd-cx" viewBox="0 0 24 24">${inner('chevDown')}</svg>
     </button>
     <div class="dd-menu" role="listbox">
-      ${opts.map(o => `<button type="button" class="dd-opt${o === cur ? ' on' : ''}"
+      ${opts.map(o => `<button type="button" class="dd-opt${o === cur ? ' on' : ''}${cfg.desc ? ' dd-opt-2' : ''}"
         role="option" aria-selected="${o === cur}" data-ddset="${key}:${o}">
-        <span class="dd-opt-t t-body">${o}</span>
+        <span class="dd-opt-main"><span class="dd-opt-t t-body">${o}</span>${cfg.desc ? `<span class="dd-opt-d">${cfg.desc(o)}</span>` : ''}</span>
         <svg class="dd-tick" viewBox="0 0 24 24">${inner('check')}</svg></button>`).join('')}
     </div>
   </div>`;
@@ -6455,12 +6523,34 @@ function dd(key, opts, val, cfg){
    real captured frame is dropped in. See DESIGN.md §3 "Talent Agent — V1 model". */
 const LVL_NAME = c => ({E:'Explorer', B:'Builder', T:'Trailblazer'})[c[0]] + ' – ' + c;
 const LVL_OPTS = LVL_CODES.map(LVL_NAME);
-function ivLadder(code){
+function ivLadder(code, pick){
   const r = LVL_CODES.indexOf(code) + 1 || 1;
-  return `<div class="ladder">${LVL_CODES.map((c, i) =>
-    `<i class="${i < r - 1 ? 'done' : (i === r - 1 ? 'on' : '')}"><b>${c}</b></i>`).join('')}</div>
+  const cls = i => i < r - 1 ? 'done' : (i === r - 1 ? 'on' : '');
+  /* `pick` makes each rung clickable — an `<i>` carrying `data-ddset`, which the
+     shared dd handler catches (`closest('[data-ddset]')`) to set the level. */
+  const rungs = LVL_CODES.map((c, i) => pick
+    ? `<i class="${cls(i)}" role="button" tabindex="0" data-ddset="evalLevel:${LVL_NAME(c)}" aria-label="Set level ${c}"><b>${c}</b></i>`
+    : `<i class="${cls(i)}"><b>${c}</b></i>`).join('');
+  return `<div class="ladder${pick ? ' ladder-pick' : ''}">${rungs}</div>
   <div class="ladder-lab"><span>Explorer</span><span>Builder</span><span>Trailblazer</span></div>`;
 }
+/* THE T·A·L·E·N·T TYPES (Maryam, 22 Sep 2026) — the six lenses Tal reads a
+   candidate through, spelling TALENT. Tal names which one the candidate falls in
+   on the read, and the agent picks their own on the recommendation. Meanings are
+   Maryam's supplied copy, kept verbatim (no em dashes — Tal's voice). */
+const TALENT_TYPES = [
+  {k:'Top Performer', d:"The standard you hold yourself to, what you do when the work falls short of it, and how you show up the next day."},
+  {k:'Athlete',       d:"How you prepare, how you take coaching and criticism, and what you do after things don't go your way."},
+  {k:'Leader',        d:"How you set direction, how you get people to come with you, and how you pull the best out of the people around you."},
+  {k:'Entrepreneur',  d:"How you start things before you have them figured out, how you test an idea, and how you decide whether to keep going or move on."},
+  {k:'Not Sure',      d:"A wider conversation if none of these feel exactly right yet. What you've been drawn to, what you've been good at, and where you might be headed."},
+  {k:'Team Player',   d:"How you build trust, how you show up for people counting on you, and what you do when a group isn't working well together."}
+];
+const TALENT_OPTS = TALENT_TYPES.map(t => t.k);
+const talentDesc = k => (TALENT_TYPES.find(t => t.k === k) || {}).d || '';
+/* Tal's suggested type for a record: its own `talType`, else a stable per-id pick
+   (authored placeholder, §74 — no transcript pass in this build). */
+const talTypeOf = x => x.talType || TALENT_OPTS[[...x.id].reduce((a, c) => a + c.charCodeAt(0), 0) % TALENT_OPTS.length];
 /* THE RECORDING STILL is a captured frame of the video call (Maryam,
    21 Sep 2026, image supplied) — a real frame dropped in, replacing the
    candidate-photo stand-in. One 16:9 WebP for every recording preview; the
@@ -6607,6 +6697,15 @@ const device = document.getElementById('device');
 const MO = {key:'', open:{}};
 
 function render(){
+  /* PRESERVE THE PAGE SCROLL across an in-place render (Maryam, 22 Sep 2026:
+     "clicking anything takes me to the top"). `render()` reassigns
+     `device.innerHTML`, which drops the old `.main` and its scroll offset, so any
+     interaction that only re-renders (a dropdown pick, a toggle) jumped to the
+     top. Capture the current offset and restore it after the rebuild; real
+     NAVIGATION (`data-go`) still resets to 0 by setting `.main.scrollTop = 0`
+     AFTER this returns, so it overrides the restore. */
+  const _prevMain = device.querySelector('.main');
+  const _prevScroll = _prevMain ? _prevMain.scrollTop : 0;
   const v = f();
   /* SIGN-IN HAS ITS OWN VIEW REGISTRY, so it gets its own guard and skips the
      rail's. `V` and `SIGNIN` share the `S.view` slot deliberately — one state
@@ -6736,6 +6835,18 @@ function render(){
          from the design system, opened by `S.payModal`. */''}
     ${dsPayForm(S.payTab, S.payModal)}
   </div>`;
+
+  /* restore the page scroll captured above (an in-place render keeps its place).
+     `.main` is `scroll-behavior:smooth`, so a plain assignment ANIMATES from the
+     rebuilt-to-0 offset back to where you were — the visible "jump to top then
+     back" (Maryam, 22 Sep 2026). Force this one restore instant so the page does
+     not move at all; the CSS smooth stays for real navigation. */
+  const _newMain = device.querySelector('.main');
+  if(_newMain && _prevScroll){
+    _newMain.style.scrollBehavior = 'auto';
+    _newMain.scrollTop = _prevScroll;
+    _newMain.style.scrollBehavior = '';
+  }
 
   /* THE STEPS PANEL STAYS WHERE IT IS RENDERED. Two lines used to live here —
      the same two `views.js` ended on — moving `.stp-all` and `.stp-overlay` out
