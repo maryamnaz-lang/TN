@@ -445,6 +445,15 @@
 .app .iv-detail-body > .sec + .sec{margin-top:var(--s06)}
 .app .modhead + .iv-detail-body > .sec:first-child::after{content:none}
 
+/* THE LEVEL-APPROVAL LADDER FOLLOWS THE TALENT AGENT EVALUATION LADDER (Maryam, 22
+   Sep 2026). The DS's §59.2b `.iv-ladder` treatment gives upright tabular codes over
+   a visible track, but its future rungs read the beige --layer-accent-01; the agent
+   portal overrides them to #efefef ("the grey on the tiles needs to be #efefef"),
+   which is a portal-local rule not carried into the DS. Restated here so the admin
+   approval ladder matches the agent's exactly. The .done/.on rungs have higher
+   specificity, so only the plain future tiles change. */
+.app .iv-ladder .ladder i{background:var(--rule)}
+
 /* A REQUIRED FIELD'S NAME CARRIES AN ACCENT ASTERISK (Maryam, 14 Sep 2026). */
 .app .req-star{color:var(--accent); margin-left:1px}
 
@@ -6509,13 +6518,17 @@ function pastIvs(a){ return PAST_IVS.filter(p => p.agent === a.name); }
    level confirmed, 'override' = the admin set a different `finalLevel`). Authored
    placeholder (§74). piv4 is the case where the agent and Tal differ. */
 ;(function seedApproval(){
+  /* `talType` is the T·A·L·E·N·T lens Tal reads the candidate through, named on the
+     approval screen's "Tal's read" (mirroring the talent agent evaluation screen,
+     Maryam 22 Sep 2026). Authored placeholder (§74 — no transcript pass in this
+     build). */
   const M = {
-    piv1: {agentLevel:'E3', talLevel:'E3', submitted:'20 Aug 2026', decision:null},
-    piv2: {agentLevel:'E2', talLevel:'E2', submitted:'10 Aug 2026', decision:null},
-    piv3: {agentLevel:'E4', talLevel:'E4', submitted:'12 Aug 2026', decision:'approved', finalLevel:'E4'},
-    piv4: {agentLevel:'E3', talLevel:'E2', submitted:'9 Aug 2026',  decision:null}
+    piv1: {agentLevel:'E3', talLevel:'E3', submitted:'20 Aug 2026', decision:null, talType:'Leader'},
+    piv2: {agentLevel:'E2', talLevel:'E2', submitted:'10 Aug 2026', decision:null, talType:'Team Player'},
+    piv3: {agentLevel:'E4', talLevel:'E4', submitted:'12 Aug 2026', decision:'approved', finalLevel:'E4', talType:'Top Performer'},
+    piv4: {agentLevel:'E3', talLevel:'E2', submitted:'9 Aug 2026',  decision:null, talType:'Athlete'}
   };
-  PAST_IVS.forEach(p => Object.assign(p, M[p.id] || {agentLevel:'E2', talLevel:'E2', submitted:p.when, decision:null}));
+  PAST_IVS.forEach(p => Object.assign(p, M[p.id] || {agentLevel:'E2', talLevel:'E2', submitted:p.when, decision:null, talType:'Leader'}));
 })();
 const pendingApprovals = () => PAST_IVS.filter(p => !p.decision);
 
@@ -7546,10 +7559,45 @@ function marketApproval(){
   if(!iv) return `${detailHead('market/bookings')}
     <section class="sec">${emptyState('check', 'Not found', 'This interview is no longer awaiting approval.')}</section>`;
   DETAIL_LABEL = `${iv.cand} — level approval`;
+  const first = esc(String(iv.cand).split(' ')[0]);
   const decided = !!iv.decision, finalLvl = iv.finalLevel || iv.agentLevel;
+  const talType = iv.talType || 'Leader';
+  /* THE SCREEN MIRRORS THE TALENT AGENT EVALUATION SCREEN (Maryam, 22 Sep 2026:
+     "improve ... just like talent agent evaluation screen") — same flow, top to
+     bottom: Interview recording, Tal's read (heading only, one flowing read + the
+     "Tal reads {first} as a {type}" line), the recommendation (agent's level + Tal's
+     suggestion on the ladder), the agent's notes, and a SINGLE primary action at the
+     END — "Approve Evaluation" (Maryam: "a button at the end of the page") beside
+     Override Level, not the mid-page Approve/Override the recommended-level band used
+     to carry. Read-only where the agent's screen is a form (the admin approves, it
+     does not write the recommendation). Wrapped in `.iv-detail-body` for the same
+     wider inter-section spacing as the interview detail. */
   return `${detailHead('market/bookings')}
+  <div class="iv-detail-body">
   <section class="sec">
     ${aiHead('Level approval', `${esc(iv.cand)} · ${esc(iv.agent)} · ${esc(iv.when)}`)}
+  </section>
+  <section class="sec">
+    ${secHead('Interview recording')}
+    ${/* THE COMPACT RECORDING CARD, exactly the talent agent evaluation screen's
+         `.iv-rec` (in the DS this portal links) — a 480px card with a 64×44 still,
+         the file name, "Video recording · 48:00" and a play mark. NOT the full-bleed
+         16:9 `recPlayer` (which blew the section width open on desktop). Non-clickable
+         here (cursor default) — the approval screen has no booking-backed recording
+         detail to open. (Maryam, 22 Sep 2026) */''}
+    <div class="iv-rec" style="cursor:default">
+      <span class="iv-rec-thumb"><img src="assets/agent/iv-recording-still.webp" alt="" loading="lazy"></span>
+      <span class="iv-rec-b">
+        <span class="iv-rec-n t-body">Interview with ${esc(iv.cand)}.mp4</span>
+        <span class="iv-rec-m t-desc">Video recording &middot; 48:00</span>
+      </span>
+      <span class="iv-rec-open">${I.play}</span>
+    </div>
+  </section>
+  <section class="sec">
+    ${aiHead('Tal’s read')}
+    <div class="tal-eval"><div class="ai-body">${iv.tal.replace(/<\/p>\s*<p[^>]*>/g, ' ')}
+      <p class="mt5">Tal reads ${first} as a <b>${esc(talType)}</b>.</p></div></div>
   </section>
   <section class="sec">
     ${aiHead('Recommended level', decided
@@ -7561,26 +7609,31 @@ function marketApproval(){
       ${decided ? admFact(I.check, '--mk-2', 'Final level', finalLvl) : admFact(I.calendar, '--mk-2', 'Submitted', iv.submitted || iv.when)}
       ${admFact(I.starOutline, '--mk-1', 'Candidate rating', iv.rating ? iv.rating + '.0' : '—')}
     </div>
-    ${admLadder(finalLvl)}
-    ${decided
-      ? `<p class="t-desc mt5">${iv.decision === 'approved' ? 'You approved this level.' : 'You set this level, overriding the recommendation.'}${iv.decisionNote ? ' ' + esc(iv.decisionNote) : ''}</p>`
-      : `<div class="btn-row mt5">
-          <button class="btn btn-p" data-act="askapprovelvl:${iv.id}">${I.check} Approve ${esc(iv.agentLevel)}</button>
-          <button class="btn btn-g noic" data-sheet="overridelvl:${iv.id}">Override Level</button>
-        </div>`}
-  </section>
-  <section class="sec">
-    ${aiHead('Recording', 'The interview the agent submitted.')}
-    ${recPlayer(iv)}
-  </section>
-  <section class="sec">
-    ${aiHead('Tal’s read', 'What Tal read from the interview.')}
-    <div class="tal-eval"><div class="ai-body">${iv.tal.replace(/<\/p>\s*<p[^>]*>/g, ' ')}</div></div>
+    ${/* THE LADDER FOLLOWS THE TALENT AGENT EVALUATION SCREEN (Maryam, 22 Sep 2026:
+         "follow talent agent evaluation page components for super admin evaluation as
+         well") — wrapped in `.iv-ladder` so it takes the DS's §59.2b light-ground
+         treatment (a --layer-accent-01 track for future rungs, accent for passed, a
+         light tint for the current one, and grid-centred UPRIGHT tabular codes). A
+         bare `.ladder` here fell through to the DS dark default (--on-dark-fill track,
+         the `<i>{font-style:italic}` trap) — invisible future rungs and slanted codes
+         on the white section. `admLadder` itself is unchanged so the black level card
+         keeps the dark default. Read-only (no `.ladder-pick` — the admin approves or
+         overrides via the actions below, it does not pick on the ladder). */''}
+    <div class="iv-ladder">${admLadder(finalLvl)}</div>
   </section>
   <section class="sec sec-noline">
     ${aiHead(esc(iv.agent) + '’s notes', 'What the agent recorded after the interview.')}
     ${ivEvalBlock(iv)}
-  </section>`;
+  </section>
+  <section class="sec">
+    ${decided
+      ? `<p class="t-desc">${iv.decision === 'approved' ? `You approved ${esc(finalLvl)}.` : `You set ${esc(finalLvl)}, overriding the recommendation.`}${iv.decisionNote ? ' ' + esc(iv.decisionNote) : ''}</p>`
+      : `<div class="btn-row">
+          <button class="btn btn-p noic ic-l" data-act="askapprovelvl:${iv.id}">${I.checkFilled}Approve Evaluation</button>
+          <button class="btn btn-g noic" data-sheet="overridelvl:${iv.id}">Override Level</button>
+        </div>`}
+  </section>
+  </div>`;
 }
 ACTIONS.askapprovelvl = key => {
   const iv = PAST_IVS.find(x => x.id === key.split(':')[1]); if(!iv) return;
