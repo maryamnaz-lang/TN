@@ -784,7 +784,8 @@
    carries no headcount history (SA-03 E1) — pinned so the last point equals each
    role's real current count. */
 .app .lchart{display:flex; flex-direction:column; gap:var(--s05)}
-.app .lchart-leg{display:flex; flex-wrap:wrap; gap:var(--s03) var(--s05)}
+.app .lchart-leg{display:flex; align-items:center; justify-content:space-between; gap:var(--s04); flex-wrap:wrap}
+.app .lc-chips{display:flex; flex-wrap:wrap; align-items:center; gap:var(--s03) var(--s05)}
 .app .lc-chip{display:inline-flex; align-items:center; gap:var(--s02); font-size:var(--t-desc-size); color:var(--text-secondary)}
 .app .lc-dot{width:9px; height:9px; border-radius:999px; flex:none}
 .app .lchart-svg{display:block; width:100%; height:auto; overflow:visible}
@@ -819,6 +820,34 @@
    outweighs the base 4-up (trap 3). */
 .app .stats.dash-buckets{grid-template-columns:1fr}
 @container app (min-width:900px){ .app .stats.dash-buckets{grid-template-columns:repeat(3,minmax(0,1fr))} }
+/* Bucket STAT CARDS (Figma 1:917, Maryam 22 Sep 2026): eyebrow · title · big number
+   · green % chip on the left, a mini sparkline on the right. Three across, stacking
+   on a phone. */
+.app .bcards{display:grid; grid-template-columns:1fr; gap:var(--s05)}
+@container app (min-width:900px){ .app .bcards{grid-template-columns:repeat(3,1fr)} }
+.app .bcard{border:1px solid var(--rule); background:var(--background); padding:var(--s05) var(--s06); display:flex; align-items:center; justify-content:space-between; gap:var(--s04)}
+.app .bcard-l{display:flex; flex-direction:column; gap:var(--s02); min-width:0}
+.app .bcard-eye{font-size:var(--t-eyebrow-size); color:var(--text-secondary)}
+.app .bcard-trow{display:flex; align-items:center; gap:var(--s03); flex-wrap:wrap}
+.app .bcard-t{font-size:var(--t-h4-size); color:var(--text-primary); font-weight:var(--t-w-strong)}
+.app .bcard-n{font-size:28px; line-height:1.05; font-weight:var(--t-w-strong); color:var(--text-primary); letter-spacing:-.5px; font-variant-numeric:tabular-nums}
+.app .bcard-chip{display:inline-flex; align-items:center; gap:2px; font-size:11px; line-height:1; font-weight:var(--t-w-strong); color:var(--support-success-ink); background:color-mix(in srgb, var(--support-success) 14%, #fff); padding:3px var(--s03); border-radius:999px}
+.app .bcard-spark{height:56px; width:auto; flex:none; display:block}
+/* Per-chart period filter (Maryam 22 Sep 2026): title left, Weekly/Monthly/Yearly
+   chips right (10px); the selected one is an accent chip. */
+.app .ghead{display:flex; align-items:center; justify-content:space-between; gap:var(--s04); margin-bottom:var(--s06); flex-wrap:wrap}
+.app .ghead .dgroup{margin:0; font-size:var(--t-sec-size); line-height:var(--t-sec-lh); font-weight:500; letter-spacing:var(--t-sec-ls); color:var(--text-primary)}
+.app .gfilt{display:flex; gap:var(--s02); flex:none}
+.app .gfilt button{font-size:12px; line-height:1; font-weight:var(--t-w-strong); padding:4px 9px; border:0; border-radius:999px; background:transparent; color:var(--text-secondary); cursor:pointer}
+.app .gfilt button.on{background:var(--accent); color:var(--on-accent)}
+/* Smooth transition when a chart's period filter switches (Maryam 22 Sep 2026):
+   the JUST-SWITCHED chart (`.lc-anim`) grows its bars up from the baseline and
+   fades its lines/areas in. One-render only — the marker is cleared after render,
+   so unrelated re-renders don't re-animate. */
+.app .lc-anim .lchart-svg{animation:gperFade .45s ease both}
+.app .lc-anim .lchart-svg rect{transform-box:fill-box; transform-origin:center bottom; animation:gperBar .5s cubic-bezier(.2,.8,.2,1) both}
+@keyframes gperBar{from{transform:scaleY(0)} to{transform:scaleY(1)}}
+@keyframes gperFade{from{opacity:0} to{opacity:1}}
 
 /* Attention-queue pager (on a dark card) */
 .app .dc-pager{display:inline-flex; align-items:center; gap:var(--s02)}
@@ -1750,6 +1779,7 @@ const firstSub = m => (m.subs.find(s => !s.hidden) || m.subs[0]).k;
    ====================================================================== */
 const S = {
   mod:'home', sub:'home', id:null,        /* where you are */
+  gper:{},                                /* per-chart period filter (weekly/monthly/yearly) */
   nav:false, notif:false, acct:false,     /* overlays */
   confirm:null, _confirm:null, sheet:null,/* dialogs */
   /* THE BACK STACK — a detail page's back arrow returns to the screen you came
@@ -2018,32 +2048,58 @@ function lineChart(series, opts = {}){
   const W = 1000, padL = opts.padL || 40, padR = 14, padT = 14, padB = 28;
   const x0 = padL, x1 = W - padR, plotW = x1 - x0;
   const maxV = Math.max(1, ...series.flatMap(s => s.pts));
-  const step = niceStep(maxV * 1.08, 7);
-  const vmax = Math.max(step, Math.ceil(maxV * 1.05 / step) * step);
+  /* opts.vmax pins the axis so the height never changes between filters; else it
+     auto-fits the data. opts.step optionally pins the gridline step too. */
+  const step = opts.step || niceStep((opts.vmax || maxV * 1.08), 7);
+  const vmax = opts.vmax || Math.max(step, Math.ceil(maxV * 1.05 / step) * step);
   const ticks = []; for(let t = 0; t <= vmax + 1e-6; t += step) ticks.push(t);
   const plotH = (ticks.length - 1) * rowGap, y1 = padT + plotH, H = y1 + padB;
   const xInset = opts.xInset != null ? opts.xInset : 28;   // side padding so JAN/DEC don't sit flush to the edges
   const px0 = x0 + xInset, innerW = plotW - 2 * xInset;
   const X = i => px0 + (n === 1 ? 0 : i / (n - 1) * innerW);
-  const Y = v => y1 - v / vmax * plotH;
+  const Y = v => y1 - Math.min(v, vmax) / vmax * plotH;
   const path = pts => opts.smooth === false ? ('M' + pts.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' L')) : smoothPath(pts);
-  const grid = chartGridH(x0, x1, ticks, Y, fmt);
+  const grid = opts.noGrid ? '' : chartGridH(x0, x1, ticks, Y, fmt);   // no y-axis / gridlines when noGrid (Figma income-statistics look)
   const xlab = labels.map((l, i) => `<text x="${X(i).toFixed(1)}" y="${H - 9}" text-anchor="middle" font-size="6" letter-spacing=".4" fill="var(--text-helper)">${esc(String(l).toUpperCase())}</text>`).join('');
-  const areas = opts.area ? series.map(s => {
+  /* Area fill: flat translucent by default, or (opts.areaFade) a vertical gradient
+     that fades to transparent BEFORE the base — the reference's "blur out" look. */
+  let defs = '';
+  const areas = opts.area ? series.map((s, si) => {
     const pt = s.pts.map((v, i) => ({x: X(i), y: Y(v)}));
-    return `<path d="${path(pt)} L${X(n - 1).toFixed(1)},${y1} L${X(0).toFixed(1)},${y1} Z" fill="${s.color}" opacity=".08" stroke="none"/>`;
+    const fo = s.fillOpacity != null ? s.fillOpacity : 0.08;
+    let fill = s.color, opAttr = ` opacity="${fo}"`;
+    if(opts.areaFade){
+      const gid = `lcg-${opts.filterId || 'x'}-${si}`;
+      defs += `<linearGradient id="${gid}" x1="0" y1="${padT}" x2="0" y2="${y1}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="${s.color}" stop-opacity="${(fo * 2.4).toFixed(3)}"/><stop offset="0.82" stop-color="${s.color}" stop-opacity="0"/></linearGradient>`;
+      fill = `url(#${gid})`; opAttr = '';
+    }
+    return `<path d="${path(pt)} L${X(n - 1).toFixed(1)},${y1} L${X(0).toFixed(1)},${y1} Z" fill="${fill}"${opAttr} stroke="none"/>`;
   }).join('') : '';
+  if(defs) defs = `<defs>${defs}</defs>`;
   const lines = series.map(s => `<path d="${path(s.pts.map((v, i) => ({x: X(i), y: Y(v)})))}" fill="none" stroke="${s.color}" stroke-width="1"${dashed ? ' stroke-dasharray="6 6"' : ''} stroke-linecap="round" stroke-linejoin="round"/>`).join('');
   let avgEl = '';
   if(opts.avg && series[0]){
     const a = series[0].pts.reduce((s, v) => s + v, 0) / series[0].pts.length, ay = Y(a);
-    const lbl = 'Avg ' + fmt(Math.round(a)), pw = lbl.length * 4 + 12;
-    avgEl = `<line x1="${px0.toFixed(1)}" y1="${ay.toFixed(1)}" x2="${x1}" y2="${ay.toFixed(1)}" stroke="var(--text-primary)" stroke-width="0.5" stroke-dasharray="2 2" opacity=".45"/>`
-      + `<rect x="${px0.toFixed(1)}" y="${(ay - 6).toFixed(1)}" width="${pw.toFixed(1)}" height="12" rx="3" fill="var(--text-primary)"/>`
-      + `<text x="${(px0 + pw / 2).toFixed(1)}" y="${(ay + 2.4).toFixed(1)}" text-anchor="middle" font-size="6" fill="var(--on-dark)">${esc(lbl)}</text>`;
+    const lbl = 'Avg ' + fmt(Math.round(a)), pw = lbl.length * 5 + 14;
+    avgEl = `<line x1="${px0.toFixed(1)}" y1="${ay.toFixed(1)}" x2="${x1}" y2="${ay.toFixed(1)}" stroke="var(--text-primary)" stroke-width="1" stroke-dasharray="0.5 4" stroke-linecap="round" opacity=".5"/>`
+      + `<rect x="${px0.toFixed(1)}" y="${(ay - 7).toFixed(1)}" width="${pw.toFixed(1)}" height="14" rx="3" fill="var(--text-primary)"/>`
+      + `<path d="M${(px0 + pw).toFixed(1)},${(ay - 3).toFixed(1)} l4,3 l-4,3 Z" fill="var(--text-primary)"/>`
+      + `<text x="${(px0 + pw / 2).toFixed(1)}" y="${(ay + 2.6).toFixed(1)}" text-anchor="middle" font-size="6" fill="var(--on-dark)">${esc(lbl)}</text>`;
+  }
+  let markEl = '';
+  if(opts.marker && series[opts.marker.s || 0]){        // a highlighted point + dashed drop line + value pill (Figma 1:262)
+    const ms = opts.marker.s || 0, mi = Math.max(0, Math.min(series[ms].pts.length - 1, opts.marker.i));
+    const mv = series[ms].pts[mi], mx = X(mi), my = Y(mv);
+    const lbl = String(fmt(mv)), pw = lbl.length * 4 + 14, py = my - 14 - 8;
+    markEl = `<line x1="${mx.toFixed(1)}" y1="${my.toFixed(1)}" x2="${mx.toFixed(1)}" y2="${y1}" stroke="${series[ms].color}" stroke-width="0.5" stroke-dasharray="2 2"/>`
+      + `<circle cx="${mx.toFixed(1)}" cy="${my.toFixed(1)}" r="3" fill="${series[ms].color}" stroke="var(--background)" stroke-width="1"/>`
+      + `<rect x="${(mx - pw / 2).toFixed(1)}" y="${py.toFixed(1)}" width="${pw.toFixed(1)}" height="14" rx="3" fill="var(--text-primary)"/>`
+      + `<text x="${mx.toFixed(1)}" y="${(py + 9.4).toFixed(1)}" text-anchor="middle" font-size="6" fill="var(--on-dark)">${esc(lbl)}</text>`;
   }
   const leg = series.map(s => `<span class="lc-chip"><span class="lc-dot" style="background:${s.color}"></span>${esc(s.name)}</span>`).join('');
-  return `<div class="lchart"><div class="lchart-leg">${leg}</div><svg class="lchart-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opts.aria || 'Trend by series')}">${grid}${areas}${lines}${avgEl}${xlab}</svg></div>`;
+  const filt = opts.filterId ? chartFilter(opts.filterId) : '';
+  const anim = opts.filterId && S.gperAnim === opts.filterId ? ' lc-anim' : '';
+  return `<div class="lchart${anim}"><div class="lchart-leg"><span class="lc-chips">${leg}</span>${filt}</div><svg class="lchart-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opts.aria || 'Trend by series')}">${defs}${grid}${areas}${lines}${avgEl}${markEl}${xlab}</svg></div>`;
 }
 /* GROUPED BAR CHART — side-by-side bars per category, one group of bars per month
    (Figma "Charts", Maryam 21 Sep 2026). Same wrapper/legend/axis language as
@@ -2056,25 +2112,87 @@ function barChart(series, opts = {}){
   const W = 1000, padL = opts.padL || 40, padR = 14, padT = 16, padB = 28;
   const x0 = padL, x1 = W - padR, plotW = x1 - x0;
   const maxV = Math.max(1, ...series.flatMap(s => s.pts));
-  const step = niceStep(maxV * 1.08, 7);
-  const vmax = Math.max(step, Math.ceil(maxV * 1.05 / step) * step);
+  const step = opts.step || niceStep((opts.vmax || maxV * 1.08), 7);   // opts.vmax pins the axis (constant height across filters)
+  const vmax = opts.vmax || Math.max(step, Math.ceil(maxV * 1.05 / step) * step);
   const ticks = []; for(let t = 0; t <= vmax + 1e-6; t += step) ticks.push(t);
   const plotH = (ticks.length - 1) * rowGap, y1 = padT + plotH, H = y1 + padB;
-  const Y = v => y1 - v / vmax * plotH;
-  const bandW = plotW / n, gw = Math.min(bandW * 0.6, 58), gap = 5;
-  const bw = (gw - gap * (series.length - 1)) / series.length / 2 + 1, rx = Math.min(bw / 2, 5);  // half-width bars + 1px (Maryam 22 Sep 2026)
+  const Y = v => y1 - Math.min(v, vmax) / vmax * plotH;
+  const bandW = plotW / n, gw = Math.min(bandW * 0.8, 140), gap = opts.gap != null ? opts.gap : 6;
+  const bw = (gw - gap * (series.length - 1)) / series.length / 2;
+  /* corner radius via opts.rx (default 12). Cap it to HALF THE WIDTH and set ry=rx
+     so tall bars get a vertical PILL (semicircle top/bottom, flat sides) — not the
+     pointed ellipse SVG makes when ry is left to balloon to half the height. A big
+     opts.rx (e.g. 999) therefore means "fully round". (Maryam 22 Sep 2026) */
+  const rx = Math.min(opts.rx != null ? opts.rx : 12, bw / 2);
   const gwEff = series.length * bw + gap * (series.length - 1);   // re-center the narrower group in each band
   const grid = chartGridH(x0, x1, ticks, Y, fmt);
   const bars = labels.map((l, i) => {
     const gl = x0 + i * bandW + (bandW - gwEff) / 2;
     return series.map((s, j) => {
-      const v = s.pts[i] || 0, h = v / vmax * plotH;
-      return h <= 0 ? '' : `<rect x="${(gl + j * (bw + gap)).toFixed(1)}" y="${Y(v).toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="${rx.toFixed(1)}" fill="${s.color}"/>`;
+      const v = s.pts[i] || 0, h = Math.min(v, vmax) / vmax * plotH;
+      return h <= 0 ? '' : `<rect x="${(gl + j * (bw + gap)).toFixed(1)}" y="${Y(v).toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="${rx.toFixed(1)}" ry="${rx.toFixed(1)}" fill="${s.color}"/>`;
     }).join('');
   }).join('');
   const xlab = labels.map((l, i) => `<text x="${(x0 + i * bandW + bandW / 2).toFixed(1)}" y="${H - 9}" text-anchor="middle" font-size="6" letter-spacing=".4" fill="var(--text-helper)">${esc(String(l).toUpperCase())}</text>`).join('');
   const leg = series.map(s => `<span class="lc-chip"><span class="lc-dot" style="background:${s.color}"></span>${esc(s.name)}</span>`).join('');
-  return `<div class="lchart"><div class="lchart-leg">${leg}</div><svg class="lchart-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opts.aria || 'By month')}">${grid}${bars}${xlab}</svg></div>`;
+  const filt = opts.filterId ? chartFilter(opts.filterId) : '';
+  const anim = opts.filterId && S.gperAnim === opts.filterId ? ' lc-anim' : '';
+  return `<div class="lchart${anim}"><div class="lchart-leg"><span class="lc-chips">${leg}</span>${filt}</div><svg class="lchart-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opts.aria || 'By month')}">${grid}${bars}${xlab}</svg></div>`;
+}
+/* MINI SPARKLINE — an angular line, no axes, for a stat card (Figma 1:917). */
+function sparkline(pts, color){
+  const w = 96, h = 52, pad = 4, max = Math.max(...pts), min = Math.min(...pts), rng = (max - min) || 1;
+  const X = i => pad + i / (pts.length - 1) * (w - 2 * pad);
+  const Y = v => h - pad - (v - min) / rng * (h - 2 * pad);
+  const d = 'M' + pts.map((v, i) => `${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(' L');
+  return `<svg class="bcard-spark" viewBox="0 0 ${w} ${h}" aria-hidden="true"><path d="${d}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
+/* BUCKET STAT CARD (Figma 1:917) — eyebrow · title · big number · green % chip on
+   the left, a sparkline on the right. `pct` is the share; the ↗ is illustrative. */
+function bucketCard(eye, title, num, pct, sparkSvg){
+  return `<div class="bcard">
+    <div class="bcard-l">
+      <span class="bcard-eye">${esc(eye)}</span>
+      <div class="bcard-trow"><span class="bcard-t">${esc(title)}</span><span class="bcard-chip">↗ ${esc(pct)}</span></div>
+      <span class="bcard-n">${esc(String(num))}</span>
+    </div>
+    ${sparkSvg}
+  </div>`;
+}
+/* PER-CHART PERIOD FILTER (Maryam, 22 Sep 2026): Weekly / Monthly / Yearly chips at
+   the chart's top-right, the selected one an accent chip. `chartHead(title, id)`
+   pairs the section title with the filter; `perData(base, id)` swaps the x-labels
+   and a period-scaled dataset off the monthly base (all authored placeholder, §74 —
+   the seed has no dated series, SA-03 E1, so switching the period is presentational). */
+const GPER = [['weekly', 'Weekly'], ['monthly', 'Monthly'], ['yearly', 'Yearly']];
+const GPER_DEFAULT = 'monthly';   /* graphs open on this month's insights by default (Maryam, 22 Sep 2026) */
+const chartFilter = id => `<div class="gfilt">${GPER.map(([v, l]) => `<button class="${(S.gper[id] || GPER_DEFAULT) === v ? 'on' : ''}" data-act="gper:${id}:${v}">${l}</button>`).join('')}</div>`;
+/* Title only — the period filter rides the chart's colour/legend row, not the title
+   row (Maryam, 22 Sep 2026). Charts get the filter via `opts.filterId`. */
+const chartHead = title => `<div class="ghead"><h2 class="dgroup">${esc(title)}</h2></div>`;
+/* Period semantics (Maryam, 22 Sep 2026): Weekly = THIS week, 7 days Mon–Sun;
+   Monthly = THIS month, its 30/31 days; Yearly = THIS year, Jan–Dec. The x-labels
+   and a period-shaped placeholder dataset (§74; no dated series, SA-03 E1) follow. */
+const WEEK7 = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const daysThisMonth = () => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate(); };
+/* Reshape a monthly base series into `count` points, a gentle wavy rise around a
+   scaled mean — deterministic, never null. */
+function chartSeries(pts, count, scale){
+  const mean = (pts.reduce((a, b) => a + b, 0) / pts.length) * scale, out = [];
+  for(let i = 0; i < count; i++){
+    const t = count > 1 ? i / (count - 1) : 0;
+    out.push(Math.max(1, Math.round(mean * (0.65 + 0.7 * t) + Math.sin(i * 0.8 + 1) * mean * 0.16 + Math.cos(i * 0.45) * mean * 0.08)));
+  }
+  return out;
+}
+function perData(base, id){
+  const per = S.gper[id] || GPER_DEFAULT;
+  /* All three periods are shaped to the SAME magnitude as the yearly base (scale 1),
+     so a fixed y-axis fits every filter and the chart height never changes when you
+     switch (Maryam, 22 Sep 2026). Only the x-labels and the wave differ. */
+  if(per === 'weekly') return {labels: WEEK7, series: base.map(s => ({...s, pts: chartSeries(s.pts, 7, 1)}))};
+  if(per === 'monthly'){ const dn = daysThisMonth(); return {labels: Array.from({length: dn}, (_, i) => String(i + 1)), series: base.map(s => ({...s, pts: chartSeries(s.pts, dn, 1)}))}; }
+  return {labels: MONTHS, series: base};   /* yearly = Jan…Dec (the base 12) */
 }
 /* A gently-rising 12-point series ending EXACTLY at `end` (the role's real current
    count) — the intra-year shape is authored placeholder (§74; the seed has no
@@ -2777,6 +2895,10 @@ ACTIONS.attn = key => { const dir = key.split(':')[1]; const n = attnItems().len
 ACTIONS.revview = key => { S.revView = key.split(':')[1]; };
 /* 2.2 — the dashboard period selector (This week / month / quarter). */
 ACTIONS.setperiod = key => { S.period = key.split(':')[1]; };
+/* Per-chart Weekly/Monthly/Yearly filter (Maryam, 22 Sep 2026): `gper:<chartId>:<period>`.
+   `S.gperAnim` marks the chart that just switched so ONLY it plays the grow-in
+   transition on the next render (a one-render marker, cleared at the end of render). */
+ACTIONS.gper = key => { const [, id, per] = key.split(':'); if(S.gper[id] !== per){ S.gper[id] = per; S.gperAnim = id; } };
 ACTIONS.askdel = key => {
   const [, kind, id] = key.split(':'); const K = KINDS[kind]; const rec = K && K.find(id); if(!rec) return;
   if(K.guard){ const why = K.guard(rec); if(why){ toast(why, 'warn'); return; } }
@@ -3452,12 +3574,9 @@ function homeOverview(){
      the signed-in Super Admin's own first name (ME = Derek Sole). */''}
   <section class="sec dash-head">${aiHead('Welcome Back, ' + esc(ME.name.split(' ')[0]) + '!', 'Monitor platform activity, users, transactions, and overall operations from one place.')}</section>
 
-  <section class="sec dash-periodbar">
-    <div class="dash-periodbar-in">
-      <div><span class="t-desc">Figures as at ${asAt}. The period applies to the money and activity panels.</span></div>
-      ${periodBar}
-    </div>
-  </section>
+  ${/* Dashboard period bar removed (Maryam, 22 Sep 2026: "remove this") — each chart
+       now carries its own Weekly/Monthly/Yearly filter. `periodBar`/`asAt` are left
+       defined but unused so the bar can be restored by re-adding the section. */''}
 
   ${/* ══ NEEDS YOUR ATTENTION ══ the operational lead — the live queues, count-bearing tiles */''}
   ${attnRows ? `<section class="sec">
@@ -3492,24 +3611,97 @@ function homeOverview(){
        bar chart as Interviews (Maryam, 22 Sep 2026). Monthly figures are AUTHORED
        PLACEHOLDER (§74) — the seed has no engagement telemetry (SA-03 E1). */''}
   <section class="sec">
-    ${group('Platform Users')}
+    ${chartHead('Platform Users')}
     ${/* Bespoke bar palette Maryam specified 22 Sep 2026 (overrides the green --dv
          ramp for this chart): Candidates #111111 (--text-primary), Talent agents
          #f9423a (--accent), Cohort leaders #6B6B6B (no token — literal). */''}
-    ${barChart([
-      {name: 'Candidates', color: 'var(--text-primary)', pts: [15, 18, 17, 20, 19, 22, 21, 23, 22, 24, 23, 25]},
-      {name: 'Talent agents', color: 'var(--accent)', pts: [7, 9, 8, 11, 10, 12, 11, 13, 12, 14, 13, 15]},
-      {name: 'Cohort leaders', color: '#6B6B6B', pts: [3, 5, 4, 6, 6, 7, 6, 8, 8, 9, 10, 11]}
-    ], {aria: 'Candidates, cohort leaders and talent agents by month'})}
+    ${(() => {
+      const {labels, series} = perData([
+        {name: 'Candidates', color: 'var(--text-primary)', pts: [15, 18, 17, 20, 19, 22, 21, 23, 22, 24, 23, 25]},
+        {name: 'Talent agents', color: 'var(--accent)', pts: [7, 9, 8, 11, 10, 12, 11, 13, 12, 14, 13, 15]},
+        {name: 'Cohort leaders', color: '#6B6B6B', pts: [3, 5, 4, 6, 6, 7, 6, 8, 8, 9, 10, 11]}
+      ], 'pu');
+      const per = S.gper['pu'] || GPER_DEFAULT;
+      /* weekly 4px corners; monthly + yearly fully rounded (big rx caps at half-width);
+         monthly has a tight 2px gap between its 3 bars (Maryam 22 Sep 2026). */
+      const rx = per === 'weekly' ? 4 : 999;
+      const gap = per === 'monthly' ? 2 : 6;
+      return barChart(series, {aria: 'Candidates, cohort leaders and talent agents by period', labels, filterId: 'pu', vmax: 30, step: 5, rx, gap});
+    })()}
   </section>
 
-  ${/* ══ CANDIDATES BY BUCKET ══ three bucket cards (Maryam, 21 Sep 2026: drop the
-       donut and the "Where candidates sit" read; the section heading IS the bucket
-       read, so no sub-heading). `.dash-buckets` is a 3-up card grid — exactly the
-       three buckets, so the row fills and no cell paints the grey grid-gap. */''}
+  ${/* ══ PAYOUTS ══ an inspo "statistics-card" money graph (Maryam, 22 Sep 2026:
+       "i want the inspo like graph for payouts statistics and the platform
+       earnings"). A headline total + % change chip, then a SPIKY (angular) area
+       line for agent payouts with a dotted average baseline, plus platform earnings
+       as a second line. Monthly figures are AUTHORED PLACEHOLDER (§74; the seed has
+       no dated ledger, SA-03 E1); the % change is illustrative. */''}
+  ${/* ══ PAYOUTS + PLATFORM EARNINGS ══ two cards in one row (Maryam, 22 Sep 2026,
+       inspo): LEFT a Platform-earnings BREAKDOWN card (headline + stacked bar of the
+       revenue sources + % legend, reusing the removed Finance figures), RIGHT the
+       Payouts STATISTICS graph (headline + % chip + a single spiky area line for
+       agent payouts with a dotted average baseline). Monthly figures + the % change
+       are AUTHORED PLACEHOLDER (§74; no dated ledger, SA-03 E1). */''}
   <section class="sec">
-    ${group('Candidates by bucket')}
-    ${stats(byBucket.map(([name, n]) => ['group', name, String(n), `${pctOf(n, CANDS.length)}% of candidates`]), 'dash-buckets')}
+    ${group('Earnings & Payouts')}
+    <div class="pay-row">
+      ${(() => {
+        /* Bar palette matches the Platform Users chart (Maryam 22 Sep 2026):
+           Course fees #111 (--text-primary), Interview fees #f9423a (--accent),
+           Scene purchases #6B6B6B (literal, no token). Overrides the --dv green ramp. */
+        const src = [
+          ['Course fees', courseRev, 'var(--text-primary)'],
+          ['Interview fees', interviewRev, 'var(--accent)'],
+          ['Scene purchases', sceneRev, '#6B6B6B']
+        ];
+        const tot = src.reduce((s, r) => s + r[1], 0) || 1;
+        const bar = src.map(r => `<span style="flex:${r[1]}; background:${r[2]}"></span>`).join('');
+        const leg = src.map(r => `<div class="pbrk-row"><span class="pbrk-dot" style="background:${r[2]}"></span><span class="pbrk-name">${r[0]}</span><b class="pbrk-pct">${pctOf(r[1], tot)}%</b></div>`).join('');
+        return `<div class="pay-card">
+          ${secHead('Platform earnings')}
+          <div class="pbrk-fig"><span class="pstat-total">${money(platTake)}</span><span class="pstat-chip">↗ 12%</span></div>
+          <div class="pbrk-sub">the platform's take, by revenue source</div>
+          <div class="pbrk-bar">${bar}</div>
+          <div class="pbrk-leg">${leg}</div>
+        </div>`;
+      })()}
+      ${(() => {
+        const {labels, series} = perData([
+          {name: 'Agent payouts', color: DV[0], fillOpacity: 0.14, pts: [420, 560, 470, 720, 540, 830, 610, 940, 700, 1020, 860, 1140]}
+        ], 'po');
+        const total = series[0].pts.reduce((s, v) => s + v, 0);
+        const unit = (S.gper['po'] || 'monthly') === 'weekly' ? 'this quarter' : (S.gper['po'] === 'yearly' ? 'over five years' : 'this year');
+        return `<div class="pay-card">
+          ${chartHead('Payouts')}
+          <div class="pstat-head"><div class="pstat-fig">
+            <span class="pstat-total">${money(total)}</span>
+            <span class="pstat-chip">↗ 12%</span>
+            <span class="pstat-note">agent payouts ${unit}, vs last period</span>
+          </div></div>` + lineChart(series, {aria: 'Agent payouts by period', fmt: money, dashed: false, smooth: false, area: true, avg: true, noGrid: true, areaFade: true, padL: 6, xInset: 0, labels, filterId: 'po', vmax: 1200, step: 200}) + `</div>`;
+      })()}
+    </div>
+  </section>
+
+  ${/* ══ CANDIDATES BY BUCKET ══ three STAT CARDS (Figma 1:917, Maryam 22 Sep 2026):
+       eyebrow · bucket · count · share chip · sparkline. The share % is real; the
+       ↗ and the sparklines are illustrative placeholder (§74; no dated history). */''}
+  <section class="sec">
+    ${group('Candidates by Track')}
+    ${(() => {
+      /* Exact sparkline SVGs Maryam supplied (22 Sep 2026, path data pasted verbatim,
+         not redrawn); all three stroked in the accent (Maryam 22 Sep 2026: "all these
+         3 graphs should be in accent color"). */
+      const TRK = {
+        Explorer:    {c: 'var(--accent)', vb: '0 0 146 104', d: 'M1.5 102.434L18.7432 85.6119L26.1028 66.6867L37.0373 93.3923L44.3971 80.7755L52.1775 1.5L72.154 79.0934L86.6634 53.2289L114.42 102.434L123.042 90.0279L128.299 69.4205L144.49 53.2289'},
+        Builder:     {c: 'var(--accent)', vb: '0 0 148 120', d: 'M1.50024 118.416L21.2668 107.271L27.5748 89.1868L36.6168 97.5979L63.3223 1.5L78.4625 73.2054L92.9718 40.8223L113.369 89.1868L123.462 74.4671L131.453 80.1447L146.383 46.9204'},
+        Trailblazer: {c: 'var(--accent)', vb: '0 0 147 107', d: 'M1.5 104.591L18.7393 89.42L25.2905 61.8373L34.5996 72.8706L63.9063 47.3565L73.905 1.50012L89.7651 64.5957L113.21 1.50012L120.106 75.9735L129.415 44.5982L144.586 69.4227'}
+      };
+      return `<div class="bcards">${byBucket.map(([name, n]) => {
+        const t = TRK[name] || TRK.Explorer;
+        const svg = `<svg class="bcard-spark" viewBox="${t.vb}" fill="none" aria-hidden="true"><path d="${t.d}" stroke="${t.c}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+        return bucketCard('Candidates', name, n, `${pctOf(n, CANDS.length)}%`, svg);
+      }).join('')}</div>`;
+    })()}
   </section>
   ${/* Cohort health — HIDDEN (Maryam, 21 Sep 2026: "hide this section"). Kept so it
        can be restored: flip the false to render the running-cohort table again. */''}
@@ -3535,58 +3727,19 @@ function homeOverview(){
        split is AUTHORED PLACEHOLDER (§74) — the seed has no dated booking history
        (SA-03 E1); first interviews run ahead of re-interviews, as in the seed. */''}
   <section class="sec">
-    ${group('Interviews')}
-    ${barChart([
-      {name: 'First interview', color: DV[0], pts: [4, 5, 6, 5, 7, 8, 7, 9, 8, 10, 9, 11]},
-      {name: 'Re-interview', color: DV[2], pts: [2, 2, 3, 3, 4, 4, 5, 4, 6, 5, 7, 6]}
-    ], {aria: 'First interviews and re-interviews by month'})}
-  </section>
-
-  ${/* ══ PAYOUTS ══ an inspo "statistics-card" money graph (Maryam, 22 Sep 2026:
-       "i want the inspo like graph for payouts statistics and the platform
-       earnings"). A headline total + % change chip, then a SPIKY (angular) area
-       line for agent payouts with a dotted average baseline, plus platform earnings
-       as a second line. Monthly figures are AUTHORED PLACEHOLDER (§74; the seed has
-       no dated ledger, SA-03 E1); the % change is illustrative. */''}
-  ${/* ══ PAYOUTS + PLATFORM EARNINGS ══ two cards in one row (Maryam, 22 Sep 2026,
-       inspo): LEFT a Platform-earnings BREAKDOWN card (headline + stacked bar of the
-       revenue sources + % legend, reusing the removed Finance figures), RIGHT the
-       Payouts STATISTICS graph (headline + % chip + a single spiky area line for
-       agent payouts with a dotted average baseline). Monthly figures + the % change
-       are AUTHORED PLACEHOLDER (§74; no dated ledger, SA-03 E1). */''}
-  <section class="sec">
-    <div class="pay-row">
-      ${(() => {
-        const src = [
-          ['Course fees', courseRev, DV[0]],
-          ['Interview fees', interviewRev, DV[3]],
-          ['Scene purchases', sceneRev, DV[2]]
-        ];
-        const tot = src.reduce((s, r) => s + r[1], 0) || 1;
-        const bar = src.map(r => `<span style="flex:${r[1]}; background:${r[2]}"></span>`).join('');
-        const leg = src.map(r => `<div class="pbrk-row"><span class="pbrk-dot" style="background:${r[2]}"></span><span class="pbrk-name">${r[0]}</span><b class="pbrk-pct">${pctOf(r[1], tot)}%</b></div>`).join('');
-        return `<div class="pay-card">
-          ${secHead('Platform earnings')}
-          <div class="pbrk-fig"><span class="pstat-total">${money(platTake)}</span><span class="pstat-chip">↗ 12%</span></div>
-          <div class="pbrk-sub">the platform's take, by revenue source</div>
-          <div class="pbrk-bar">${bar}</div>
-          <div class="pbrk-leg">${leg}</div>
-        </div>`;
-      })()}
-      ${(() => {
-        const agentPts = [420, 560, 470, 720, 540, 830, 610, 940, 700, 1020, 860, 1140];
-        const total = agentPts.reduce((s, v) => s + v, 0);
-        return `<div class="pay-card">
-          ${secHead('Payouts')}
-          <div class="pstat-head"><div class="pstat-fig">
-            <span class="pstat-total">${money(total)}</span>
-            <span class="pstat-chip">↗ 12%</span>
-            <span class="pstat-note">agent payouts this year, vs last year</span>
-          </div></div>` + lineChart([
-            {name: 'Agent payouts', color: DV[0], pts: agentPts}
-          ], {aria: 'Agent payouts by month', fmt: money, dashed: false, smooth: false, area: true, avg: true, padL: 56}) + `</div>`;
-      })()}
-    </div>
+    ${chartHead('Interviews')}
+    ${(() => {
+      const {labels, series} = perData([
+        {name: 'First interview', color: 'var(--accent)', pts: [4, 5, 6, 5, 7, 8, 7, 9, 8, 10, 9, 11]},
+        {name: 'Re-interview', color: 'var(--text-primary)', fillOpacity: 0.04, pts: [2, 2, 3, 3, 4, 4, 5, 4, 6, 5, 7, 6]}
+      ], 'iv');
+      const total = series.reduce((s, ser) => s + ser.pts.reduce((a, b) => a + b, 0), 0);
+      const mi = Math.round((series[0].pts.length - 1) * 0.7);   // a highlighted point, like the reference
+      return `<div class="pstat-head"><div class="pstat-fig">
+        <span class="pstat-total">${total}</span>
+        <span class="pstat-note">interviews this period</span>
+      </div></div>` + lineChart(series, {aria: 'First interviews and re-interviews by period', labels, smooth: true, dashed: false, area: true, marker: {i: mi, s: 0}, filterId: 'iv', vmax: 12, step: 2, xInset: 0});
+    })()}
   </section>
 
   ${/* System & activity — HIDDEN (Maryam, 22 Sep 2026: "hide system and activity
@@ -10083,6 +10236,7 @@ function render(){
   } catch(e){ console.warn('talsum', e); }
 
   try { syncSheetSubmit(); } catch(e){ console.warn('sheetsubmit', e); }
+  S.gperAnim = null;   /* one-render marker: the just-switched chart has painted its grow-in, clear it */
   writeHash();
 }
 

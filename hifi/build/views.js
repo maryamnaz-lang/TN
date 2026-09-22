@@ -6276,6 +6276,13 @@ login: () => `${authShell()}
         what this arrival is any more. */}
   <div class="sec sec-act">
     <div class="foot-row foot-stack"><div><button class="btn btn-p btn-full" data-go="stage:onboard">Log in ${I.arrowRight}</button></div></div>
+    ${''/* SIGN-UP ROW (Maryam, 22 Sep 2026): a closing line below the button.
+          "Sign up" is the accent as ink (--accent-text), semibold (the platform's
+          strong weight, 500) and underlined; the lead-in is the secondary grey.
+          Navigation target is PENDING — Maryam will say where "Sign up" goes;
+          the anchor carries no data-go until then. Inline styles follow the
+          "Forgot Password?" precedent above (hifi-only markup, no layer). */}
+    <p class="auth-alt" style="text-align:left;color:var(--text-secondary);margin-top:24px">New to TALENTnext? <a style="color:var(--accent-text);font-weight:var(--t-w-strong);text-decoration:underline">Sign up</a></p>
   </div>
 </div></main>`,
 
