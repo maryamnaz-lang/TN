@@ -788,6 +788,30 @@
 .app .lc-chip{display:inline-flex; align-items:center; gap:var(--s02); font-size:var(--t-desc-size); color:var(--text-secondary)}
 .app .lc-dot{width:9px; height:9px; border-radius:999px; flex:none}
 .app .lchart-svg{display:block; width:100%; height:auto; overflow:visible}
+/* Statistics-card header for the Payouts graph (inspo "Income Statistics", Maryam
+   22 Sep 2026): a headline figure, a % change chip and a caption, above the chart. */
+.app .pstat-head{display:flex; flex-direction:column; gap:var(--s02); margin-bottom:var(--s04)}
+.app .pstat-fig{display:flex; align-items:center; gap:var(--s03); flex-wrap:wrap}
+.app .pstat-total{font-size:28px; line-height:1; font-weight:var(--t-w-strong); color:var(--text-primary); letter-spacing:-.5px; font-variant-numeric:tabular-nums}
+.app .pstat-chip{display:inline-flex; align-items:center; gap:2px; font-size:11.5px; font-weight:var(--t-w-strong); color:var(--support-success-ink); background:color-mix(in srgb, var(--support-success) 14%, #fff); padding:2px var(--s03); border-radius:999px}
+.app .pstat-note{font-size:var(--t-desc-size); color:var(--text-secondary)}
+/* Payouts row — two cards side by side (Maryam 22 Sep 2026, inspo): Platform
+   earnings breakdown (left) + Payouts statistics graph (right). Stacks on a phone. */
+.app .pay-row{display:grid; grid-template-columns:1fr; gap:var(--s05)}
+@container app (min-width:900px){ .app .pay-row{grid-template-columns:minmax(0,4fr) minmax(0,7fr); gap:var(--s06)} }
+.app .pay-card{border:1px solid var(--rule); background:var(--background); padding:var(--s06)}
+.app .pay-card > .sec-h{margin-bottom:var(--s04)}
+/* Platform-earnings breakdown (inspo "Income Breakdown"): headline, a stacked bar,
+   then a per-source legend with right-aligned percentages. */
+.app .pbrk-fig{display:flex; align-items:center; gap:var(--s03); flex-wrap:wrap}
+.app .pbrk-sub{font-size:var(--t-desc-size); color:var(--text-secondary); margin-top:2px}
+.app .pbrk-bar{display:flex; gap:4px; height:26px; margin:var(--s05) 0}
+.app .pbrk-bar > span{display:block; border-radius:4px; min-width:6px}
+.app .pbrk-leg{display:flex; flex-direction:column; gap:var(--s03)}
+.app .pbrk-row{display:flex; align-items:center; gap:var(--s03); font-size:var(--t-body-size); color:var(--text-secondary)}
+.app .pbrk-dot{width:10px; height:10px; border-radius:3px; flex:none}
+.app .pbrk-name{flex:1; min-width:0}
+.app .pbrk-pct{color:var(--text-primary); font-weight:var(--t-w-strong)}
 /* Bucket cards — a 3-up `.stats` grid (Candidates by bucket, Maryam 21 Sep 2026).
    Base `.stats` is 2-up (mobile) / 4-up (>=900); three cells there would leave a
    grey grid-gap cell, so pin it to one column on a phone and exactly three across
@@ -1984,7 +2008,9 @@ function chartGridH(x0, x1, ticks, Y, fmt){
   return lines + labels;
 }
 /* opts: labels, aria, fmt (y-label formatter, e.g. money), dashed (default true),
-   area (fill under each line, default false), rowGap (px between tick rows). */
+   area (fill under each line, default false), rowGap (px between tick rows),
+   smooth (default true — false gives angular/spiky segments), avg (draw a dotted
+   average baseline off series[0] with a dark "Avg <v>" pill, inspo statistics look). */
 function lineChart(series, opts = {}){
   const labels = opts.labels || MONTHS, n = labels.length;
   const fmt = opts.fmt || (v => String(v)), dashed = opts.dashed !== false;
@@ -2000,15 +2026,24 @@ function lineChart(series, opts = {}){
   const px0 = x0 + xInset, innerW = plotW - 2 * xInset;
   const X = i => px0 + (n === 1 ? 0 : i / (n - 1) * innerW);
   const Y = v => y1 - v / vmax * plotH;
+  const path = pts => opts.smooth === false ? ('M' + pts.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' L')) : smoothPath(pts);
   const grid = chartGridH(x0, x1, ticks, Y, fmt);
   const xlab = labels.map((l, i) => `<text x="${X(i).toFixed(1)}" y="${H - 9}" text-anchor="middle" font-size="6" letter-spacing=".4" fill="var(--text-helper)">${esc(String(l).toUpperCase())}</text>`).join('');
   const areas = opts.area ? series.map(s => {
     const pt = s.pts.map((v, i) => ({x: X(i), y: Y(v)}));
-    return `<path d="${smoothPath(pt)} L${X(n - 1).toFixed(1)},${y1} L${X(0).toFixed(1)},${y1} Z" fill="${s.color}" opacity=".08" stroke="none"/>`;
+    return `<path d="${path(pt)} L${X(n - 1).toFixed(1)},${y1} L${X(0).toFixed(1)},${y1} Z" fill="${s.color}" opacity=".08" stroke="none"/>`;
   }).join('') : '';
-  const lines = series.map(s => `<path d="${smoothPath(s.pts.map((v, i) => ({x: X(i), y: Y(v)})))}" fill="none" stroke="${s.color}" stroke-width="1"${dashed ? ' stroke-dasharray="6 6"' : ''} stroke-linecap="round" stroke-linejoin="round"/>`).join('');
+  const lines = series.map(s => `<path d="${path(s.pts.map((v, i) => ({x: X(i), y: Y(v)})))}" fill="none" stroke="${s.color}" stroke-width="1"${dashed ? ' stroke-dasharray="6 6"' : ''} stroke-linecap="round" stroke-linejoin="round"/>`).join('');
+  let avgEl = '';
+  if(opts.avg && series[0]){
+    const a = series[0].pts.reduce((s, v) => s + v, 0) / series[0].pts.length, ay = Y(a);
+    const lbl = 'Avg ' + fmt(Math.round(a)), pw = lbl.length * 4 + 12;
+    avgEl = `<line x1="${px0.toFixed(1)}" y1="${ay.toFixed(1)}" x2="${x1}" y2="${ay.toFixed(1)}" stroke="var(--text-primary)" stroke-width="0.5" stroke-dasharray="2 2" opacity=".45"/>`
+      + `<rect x="${px0.toFixed(1)}" y="${(ay - 6).toFixed(1)}" width="${pw.toFixed(1)}" height="12" rx="3" fill="var(--text-primary)"/>`
+      + `<text x="${(px0 + pw / 2).toFixed(1)}" y="${(ay + 2.4).toFixed(1)}" text-anchor="middle" font-size="6" fill="var(--on-dark)">${esc(lbl)}</text>`;
+  }
   const leg = series.map(s => `<span class="lc-chip"><span class="lc-dot" style="background:${s.color}"></span>${esc(s.name)}</span>`).join('');
-  return `<div class="lchart"><div class="lchart-leg">${leg}</div><svg class="lchart-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opts.aria || 'Trend by series')}">${grid}${areas}${lines}${xlab}</svg></div>`;
+  return `<div class="lchart"><div class="lchart-leg">${leg}</div><svg class="lchart-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opts.aria || 'Trend by series')}">${grid}${areas}${lines}${avgEl}${xlab}</svg></div>`;
 }
 /* GROUPED BAR CHART — side-by-side bars per category, one group of bars per month
    (Figma "Charts", Maryam 21 Sep 2026). Same wrapper/legend/axis language as
@@ -2027,10 +2062,11 @@ function barChart(series, opts = {}){
   const plotH = (ticks.length - 1) * rowGap, y1 = padT + plotH, H = y1 + padB;
   const Y = v => y1 - v / vmax * plotH;
   const bandW = plotW / n, gw = Math.min(bandW * 0.6, 58), gap = 5;
-  const bw = (gw - gap * (series.length - 1)) / series.length, rx = Math.min(bw / 2, 5);
+  const bw = (gw - gap * (series.length - 1)) / series.length / 2 + 1, rx = Math.min(bw / 2, 5);  // half-width bars + 1px (Maryam 22 Sep 2026)
+  const gwEff = series.length * bw + gap * (series.length - 1);   // re-center the narrower group in each band
   const grid = chartGridH(x0, x1, ticks, Y, fmt);
   const bars = labels.map((l, i) => {
-    const gl = x0 + i * bandW + (bandW - gw) / 2;
+    const gl = x0 + i * bandW + (bandW - gwEff) / 2;
     return series.map((s, j) => {
       const v = s.pts[i] || 0, h = v / vmax * plotH;
       return h <= 0 ? '' : `<rect x="${(gl + j * (bw + gap)).toFixed(1)}" y="${Y(v).toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="${rx.toFixed(1)}" fill="${s.color}"/>`;
@@ -3450,21 +3486,21 @@ function homeOverview(){
     ], 'dash-stats')}
   </section>
 
-  ${/* ══ PLATFORM USERS ENGAGEMENT ══ a line per PLATFORM POPULATION over 12 months
-       — candidates, cohort leaders, talent agents — NOT the admin-created internal
-       roles (Maryam, 21 Sep 2026: "show candidates, cohort leaders, and talent
-       agents not the system roles"). The section heading is the read, so no
-       sub-heading; the "Users by status" donut is hidden. Faint 20px dotted
-       HORIZONTAL grid (0.5px), no vertical lines. Monthly engagement per
-       population is AUTHORED PLACEHOLDER (§74) — the seed has no engagement
-       telemetry (SA-03 E1); all three carry visible data (none null). */''}
+  ${/* ══ PLATFORM USERS ══ a grouped bar per PLATFORM POPULATION over 12 months —
+       candidates, cohort leaders, talent agents — NOT the admin-created internal
+       roles (Maryam, 21 Sep 2026). Heading "Platform Users" and the same grouped
+       bar chart as Interviews (Maryam, 22 Sep 2026). Monthly figures are AUTHORED
+       PLACEHOLDER (§74) — the seed has no engagement telemetry (SA-03 E1). */''}
   <section class="sec">
-    ${group('Platform Users Engagement')}
-    ${lineChart([
-      {name: 'Candidates', color: DV[0], pts: [15, 18, 17, 20, 19, 22, 21, 23, 22, 24, 23, 25]},
-      {name: 'Talent agents', color: DV[3], pts: [7, 9, 8, 11, 10, 12, 11, 13, 12, 14, 13, 15]},
-      {name: 'Cohort leaders', color: DV[2], pts: [3, 5, 4, 6, 6, 7, 6, 8, 8, 9, 10, 11]}
-    ], {aria: 'Candidates, cohort leaders and talent agents over the last 12 months', dashed: false})}
+    ${group('Platform Users')}
+    ${/* Bespoke bar palette Maryam specified 22 Sep 2026 (overrides the green --dv
+         ramp for this chart): Candidates #111111 (--text-primary), Talent agents
+         #f9423a (--accent), Cohort leaders #6B6B6B (no token — literal). */''}
+    ${barChart([
+      {name: 'Candidates', color: 'var(--text-primary)', pts: [15, 18, 17, 20, 19, 22, 21, 23, 22, 24, 23, 25]},
+      {name: 'Talent agents', color: 'var(--accent)', pts: [7, 9, 8, 11, 10, 12, 11, 13, 12, 14, 13, 15]},
+      {name: 'Cohort leaders', color: '#6B6B6B', pts: [3, 5, 4, 6, 6, 7, 6, 8, 8, 9, 10, 11]}
+    ], {aria: 'Candidates, cohort leaders and talent agents by month'})}
   </section>
 
   ${/* ══ CANDIDATES BY BUCKET ══ three bucket cards (Maryam, 21 Sep 2026: drop the
@@ -3506,27 +3542,57 @@ function homeOverview(){
     ], {aria: 'First interviews and re-interviews by month'})}
   </section>
 
-  ${/* ══ PAYOUTS ══ a smooth two-line money trend (Maryam, 21 Sep 2026: heading
-       "Payouts"; drop the Revenue-streams bars and the Payments-&-payouts kv, fold
-       their figures into this graph). Agent payouts vs platform earnings by month,
-       solid smooth lines with a soft area fill (payouts reference). The LAST point
-       is the real current total (agent net = settled + pending, platform = the real
-       ~20% take); the earlier months are an authored-placeholder ramp (§74; the
-       seed has no dated ledger, SA-03 E1). */''}
+  ${/* ══ PAYOUTS ══ an inspo "statistics-card" money graph (Maryam, 22 Sep 2026:
+       "i want the inspo like graph for payouts statistics and the platform
+       earnings"). A headline total + % change chip, then a SPIKY (angular) area
+       line for agent payouts with a dotted average baseline, plus platform earnings
+       as a second line. Monthly figures are AUTHORED PLACEHOLDER (§74; the seed has
+       no dated ledger, SA-03 E1); the % change is illustrative. */''}
+  ${/* ══ PAYOUTS + PLATFORM EARNINGS ══ two cards in one row (Maryam, 22 Sep 2026,
+       inspo): LEFT a Platform-earnings BREAKDOWN card (headline + stacked bar of the
+       revenue sources + % legend, reusing the removed Finance figures), RIGHT the
+       Payouts STATISTICS graph (headline + % chip + a single spiky area line for
+       agent payouts with a dotted average baseline). Monthly figures + the % change
+       are AUTHORED PLACEHOLDER (§74; no dated ledger, SA-03 E1). */''}
   <section class="sec">
-    ${group('Payouts')}
-    ${(() => {
-      const agentTotal = poSettled + poPending, platTotal = platTake;
-      const ramp = [0.34, 0.42, 0.39, 0.47, 0.55, 0.6, 0.66, 0.72, 0.79, 0.86, 0.93, 1];
-      return lineChart([
-        {name: 'Agent payouts', color: DV[0], pts: ramp.map(f => Math.round(agentTotal * f))},
-        {name: 'Platform earnings', color: DV[2], pts: ramp.map(f => Math.round(platTotal * f))}
-      ], {aria: 'Agent payouts and platform earnings by month', fmt: money, dashed: false, area: true, padL: 56});
-    })()}
+    <div class="pay-row">
+      ${(() => {
+        const src = [
+          ['Course fees', courseRev, DV[0]],
+          ['Interview fees', interviewRev, DV[3]],
+          ['Scene purchases', sceneRev, DV[2]]
+        ];
+        const tot = src.reduce((s, r) => s + r[1], 0) || 1;
+        const bar = src.map(r => `<span style="flex:${r[1]}; background:${r[2]}"></span>`).join('');
+        const leg = src.map(r => `<div class="pbrk-row"><span class="pbrk-dot" style="background:${r[2]}"></span><span class="pbrk-name">${r[0]}</span><b class="pbrk-pct">${pctOf(r[1], tot)}%</b></div>`).join('');
+        return `<div class="pay-card">
+          ${secHead('Platform earnings')}
+          <div class="pbrk-fig"><span class="pstat-total">${money(platTake)}</span><span class="pstat-chip">↗ 12%</span></div>
+          <div class="pbrk-sub">the platform's take, by revenue source</div>
+          <div class="pbrk-bar">${bar}</div>
+          <div class="pbrk-leg">${leg}</div>
+        </div>`;
+      })()}
+      ${(() => {
+        const agentPts = [420, 560, 470, 720, 540, 830, 610, 940, 700, 1020, 860, 1140];
+        const total = agentPts.reduce((s, v) => s + v, 0);
+        return `<div class="pay-card">
+          ${secHead('Payouts')}
+          <div class="pstat-head"><div class="pstat-fig">
+            <span class="pstat-total">${money(total)}</span>
+            <span class="pstat-chip">↗ 12%</span>
+            <span class="pstat-note">agent payouts this year, vs last year</span>
+          </div></div>` + lineChart([
+            {name: 'Agent payouts', color: DV[0], pts: agentPts}
+          ], {aria: 'Agent payouts by month', fmt: money, dashed: false, smooth: false, area: true, avg: true, padL: 56}) + `</div>`;
+      })()}
+    </div>
   </section>
 
-  ${/* ══ SYSTEM & ACTIVITY ══ platform health (kv) · recent audit (timeline) */''}
-  <section class="sec">
+  ${/* System & activity — HIDDEN (Maryam, 22 Sep 2026: "hide system and activity
+       section"). Kept so it can be restored: flip the false to render the
+       platform-health kv + recent-activity timeline again. */''}
+  ${false ? `<section class="sec">
     ${group('System &amp; activity')}
     <div class="dgrid dgrid-2">
       <div class="dcol">
@@ -3543,7 +3609,7 @@ function homeOverview(){
         <div class="tile-stack">${AUDIT.slice(0, 5).map(a => memRow(a.who, `${esc(a.act)} · ${esc(a.obj)}`, tag(a.sev, a.sev === 'high' ? 'High' : a.sev === 'notice' ? 'Notice' : 'Info'))).join('')}</div>
       </div>
     </div>
-  </section>`;
+  </section>` : ''}`;
   /* OPEN DECISIONS & RISKS section removed from the dashboard (Maryam, 21 Sep
      2026: "we hid open decisions so hide it ... yes hide that as well"). The
      Rulings Register lives on at home/rulings (reachable directly / by deep
