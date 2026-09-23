@@ -1121,9 +1121,10 @@ input:-webkit-autofill:focus{
 .app .qb-opt{display:flex; gap:var(--s03); align-items:center}
 .app .qb-opt-l{flex:1; min-width:0}
 .app .qb-opt-s{width:72px; flex:none}
-.app .qb-opt-x{flex:none; width:38px; height:38px; display:grid; place-items:center; background:transparent; border:1px solid var(--border-subtle-02); color:var(--text-secondary); cursor:pointer}
+/* The option-remove cross is a bare accent glyph — no border box (Maryam, 23 Sep 2026). */
+.app .qb-opt-x{flex:none; width:38px; height:38px; display:grid; place-items:center; background:transparent; border:0; color:var(--accent-text); cursor:pointer}
 .app .qb-opt-x svg{width:18px; height:18px}
-.app .qb-opt-x:hover{color:var(--support-error); border-color:var(--support-error)}
+.app .qb-opt-x:hover{color:var(--accent)}
 .app .qb-check{display:flex; align-items:center; gap:var(--s03); margin-top:var(--s04); font-size:13.5px; color:var(--text-primary); cursor:pointer}
 .app .qb-check input{width:16px; height:16px; accent-color:var(--accent)}
 /* Platform-earnings breakdown (inspo "Income Breakdown"): headline, a stacked bar,
@@ -8448,9 +8449,11 @@ function onboardingQuestions(){
   const scored = ONBOARDING_Q.filter(x => x.type === 'single').length;
   return `
   <section class="sec">
+    ${/* Add Question hidden (Maryam, 23 Sep 2026) — the intake set is fixed; questions
+         are edited, not added. Restore by putting the button back in the act slot. */''}
     ${searchHead('Onboarding Questions',
       'The intake quiz new candidates answer. Build the questions, set each one’s answer type and weightage, and the answers are scored against it.',
-      `<button class="btn btn-p btn-sm noic" data-sheet="obedit:new">${I.add} Add Question</button>`, 'Search questions')}
+      '', 'Search questions')}
     ${lstTools('Search questions')}
     ${rows.length ? table(
         [{label:'#'}, {label:'Question'}, {label:'Answer type'}, {label:'Options'}, {label:'Weight'}, ACT_COL],
@@ -8460,11 +8463,11 @@ function onboardingQuestions(){
           obTypeLabel(x.type),
           x.type === 'text' ? '—' : String((x.options || []).length),
           x.type === 'single' ? '×' + (x.weight || 0) : '—',
-          rowActs([['edit', 'Edit', `data-sheet="obedit:${x.id}"`], ['delete', 'Delete', `data-act="obdel:${x.id}"`]])
+          /* Edit only — a question cannot be deleted (Maryam, 23 Sep 2026). */
+          rowActs([['edit', 'Edit', `data-sheet="obedit:${x.id}"`]])
         ]})),
         {select:false})
       : emptyState('document', 'No questions yet', q ? 'Nothing matches your search.' : 'Add the first onboarding question.')}
-    <p class="t-caption" style="margin-top:var(--s05)">Quiz total: up to <b>${obMaxScore()}</b> points across ${scored} scored question${scored === 1 ? '' : 's'}.</p>
   </section>`;
 }
 V.onboarding = () => modView({questions:onboardingQuestions});
@@ -8499,13 +8502,11 @@ SHEETS.obedit = id => {
     <div class="qb-editor">
       <label class="f"><span class="lbl">Question</span>
         <input class="inp" data-qbf="text" value="${esc(q.text || '')}" placeholder="Type the question"></label>
-      <div class="f"><span class="lbl">Answer type</span>
-        <div class="qb-types">${OB_TYPES.map(([v, l]) => `<button type="button" class="qb-type${q.type === v ? ' on' : ''}" data-act="obtype:${v}">${l}</button>`).join('')}</div></div>
+      ${/* Answer type and Weightage are hidden in the editor (Maryam, 23 Sep 2026) —
+           each question keeps the type it already has; only the wording and options are
+           edited. The type still drives which blocks render below. */''}
       ${isText ? `<label class="f"><span class="lbl">Placeholder</span>
         <input class="inp" data-qbf="placeholder" value="${esc(q.placeholder || '')}" placeholder="Example answer shown in the field"></label>` : ''}
-      ${isSingle ? `<label class="f"><span class="lbl">Weightage</span>
-        <input class="inp qb-weight-inp" type="number" min="0" data-qbf="weight" value="${q.weight == null ? 0 : q.weight}">
-        <span class="help">How much this question counts when the quiz is scored. Free-text and dropdown answers are informational and carry no weight.</span></label>` : ''}
       ${optsBlock}
     </div>`;
   return {title: isNew ? 'New question' : 'Edit question', body, ok:'Save Question', act:'obsave'};
