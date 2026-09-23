@@ -24,6 +24,11 @@
    __SLIDE__ photographs embedded inline. Pure CSS, no JS: the slide state is
    animation PHASE, never `render()` (a repaint would blow away a typed field).
    (Maryam, 23 Sep 2026: "use the exact same component" on the admin login.) */
+/* The OTP error state — red cells + red message when the code is wrong (correct
+   is 000000). (0,3,0)/(0,3,1) beats the DS `.otp input` and its :focus rule. */
+.app .otp.otp-err input,
+.app .otp.otp-err input:focus{border-bottom-color:var(--support-error); color:var(--support-error)}
+.app .otp-msg{color:var(--support-error); margin-top:var(--s03)}
 /* ==========================================================================
    132 — THE FRONT DOOR IS A SLIDER
    Maryam, 17 Sep 2026: "on this page i want an image slider on the left side …
@@ -686,6 +691,11 @@
 .app .pw-rule.ok{color:var(--text-primary)}
 .app .pw-rule.ok svg{color:var(--support-success)}
 
+/* SIGN-IN ERROR BANNER (story 1.4) — the "email or password is not correct",
+   lockout and status-refusal messages sit above the form; the fields go red via
+   `.f.err` (the shared rule above). Soft 4px corner, a stated auth exception. */
+.app .auth-err{margin-bottom:var(--s05); padding:var(--s04) var(--s05); border:1px solid var(--support-error); background:color-mix(in srgb, var(--support-error) 7%, #fff); color:var(--support-error); font-size:var(--t-desc-size); line-height:normal; border-radius:4px}
+
 /* THE QUIZ-RESULTS BLOCK on the candidate detail (Maryam, 14 Sep 2026). The
    candidate portal draws this content in a 372px slide-over; on the wider detail
    page it reads best as a centred vertical column at the reference's own measure,
@@ -1291,7 +1301,8 @@ const TAGV = {
   /* problem */ blocked:'red', declined:'red', lost:'red', unverified:'red',
   inactive:'red', rejected:'red', down:'red', open:'red', flagged:'red', passed:'',
   /* neutral-ish */ applied:'', feedback:'green', 'n/a':'',
-  /* the Super Admin journey's states (7 Sep 2026) */ reassign:'warn', expired:'red', offboarded:'red', voided:'red', permanent:'green', 'time-boxed':'warn', credit:'green'
+  /* the Super Admin journey's states (7 Sep 2026) */ reassign:'warn', expired:'red', offboarded:'red', voided:'red', permanent:'green', 'time-boxed':'warn', credit:'green',
+  /* staff deletion lifecycle (story 1.8) — in flight (amber) then done (red). */ deleting:'warn', deleted:'red'
 };
 /* `held` DISPLAYS as "Pending" — the hold word is removed from the UI while the
    status key stays (Maryam, 15 Sep 2026: "the hold state will be removed from
@@ -2098,9 +2109,14 @@ const S = {
      same modal the candidate, leader and agent portals open. */
   payModal:false, payTab:'card',
   /* THE GATE IS REAL NOW (SA-02). The portal opens on the sign-in scene unless
-     the hash deep-links to a page — a link someone sent you should land on the
-     screen, the way `hifi/` treats its own hash. Log out returns to the scene. */
-  signedIn: !!location.hash,
+     THIS TAB has actually signed in — a flag in `sessionStorage`, set on a
+     successful code, cleared on log out. A RELOAD no longer walks into the portal
+     just because a hash is in the URL (a stale `#home/home` left after logout did
+     exactly that): the presence of a hash is not a session (Maryam, 23 Sep 2026).
+     `sessionStorage` is per-tab and survives a reload, so a signed-in reader who
+     reloads stays in; a fresh tab / deep link lands on sign-in. try/catch because
+     the accessor throws in some privacy modes. */
+  signedIn: (() => { try { return sessionStorage.getItem('tn-admin-signedin') === '1'; } catch(e){ return false; } })(),
   /* SA sign-in / reset / activation are all password + a one-time code by email
      or SMS (Epic 1, stories 1.2 / 1.4 / 1.5). `auth` is the step:
      login → deliver → code (→ setpw on the reset flow); `authFlow` says whether
@@ -2989,7 +3005,7 @@ const saTag = st => tag(st === 'confirmed' ? 'confirmed' : st === 'open' ? 'requ
    button carries `data-do`, a plain control `data-act`. Cosmetic actions
    toast; state-changing ones mutate a record and re-render. */
 const ACTIONS = {
-  logout: () => { S.confirm = null; if(S.viewAs) ACTIONS.endviewas(); S.signedIn = false; S.auth = 'login'; S.nav = S.notif = S.acct = false; S.tal = false; }
+  logout: () => { S.confirm = null; if(S.viewAs) ACTIONS.endviewas(); S.signedIn = false; try { sessionStorage.removeItem('tn-admin-signedin'); } catch(e){} S.auth = 'login'; S.nav = S.notif = S.acct = false; S.tal = false; }
 };
 /* DETAIL_LABEL — the record name a detail page puts in the last breadcrumb
    crumb. Declared up here so `render()` can always clear it. */
@@ -3281,7 +3297,9 @@ ACTIONS.askdel = key => {
   if(K.guard){ const why = K.guard(rec); if(why){ toast(why, 'warn'); return; } }
   /* 1.6 — deleting an account or a role is one of the four step-up actions: a
      fresh code is asked for before it commits. */
-  const stepup = kind === 'user' || kind === 'role';
+  /* Step-up guards account deletion (staff 1.8 / external 3.6), not role deletion —
+     the story's list names accounts only (Maryam, 23 Sep 2026). */
+  const stepup = kind === 'user';
   askConfirm({mk:'warning', stepup, title:`Delete ${K.name(rec)}?`,
     body: (K.delWarn ? K.delWarn(rec) : `This ${K.label} is removed from the platform.`) + ' This can’t be undone.',
     ok:`Delete ${cap(K.label)}`, danger:true, act:`del:${kind}:${id}`});
@@ -4399,7 +4417,7 @@ ACTIONS.askgrant = () => {
   if(isAdmin(u)){ toast(`${u.name} already holds Super Admin`, 'warn'); return 'keep'; }
   S._pending = v;
   const until = v.term === 'perm' ? null : new Date(Date.now() + Number(v.term) * 864e5).toISOString().slice(0, 10);
-  askConfirm({mk:'warning', stepup:true, title:`Grant ${u.name} Super Admin?`,
+  askConfirm({mk:'warning', title:`Grant ${u.name} Super Admin?`,
     body:`Full control across every module${until ? `, expiring ${mdy(until)}` : ', with no expiry'}. ${v.approver === 'none' ? 'Single-approver — there is no second Super Admin to co-sign.' : `Co-signed by ${(USER_BY_ID[v.approver] || {}).name || 'a second Super Admin'}.`} Logged at high severity.`,
     ok:'Grant Super Admin', danger:true, act:'dogrant:' + u.id});
 };
@@ -4429,7 +4447,7 @@ ACTIONS.askrevokeadmin = key => {
   const u = USER_BY_ID[key.split(':')[1]]; const v = readForm();
   if(!u) return; if(!v.reason){ toast('A reason is required', 'warn'); return 'keep'; }
   S._pending = v;
-  askConfirm({mk:'warning', stepup:true, title:`Revoke ${u.name}’s Super Admin?`,
+  askConfirm({mk:'warning', title:`Revoke ${u.name}’s Super Admin?`,
     body: v.kind === 'emergency' ? `Every session ${u.name} holds ends now and the role comes off. Logged at high severity as an emergency revocation.` : `The role comes off${u.roles.length === 1 ? ' and, as their only role, the account is offboarded' : ''}. Logged at high severity.`,
     ok:'Revoke', danger:true, act:'dorevokeadmin:' + u.id});
 };
@@ -4513,7 +4531,7 @@ ACTIONS.askviewas2 = key => {
   const u = USER_BY_ID[key.split(':')[1]]; const v = readForm();
   if(!u) return; if(!v.reason){ toast('A reason is required', 'warn'); return 'keep'; }
   S._pending = v;
-  askConfirm({mk:'warning', stepup:true, title:`Open a ${v.scope === 'write' ? 'write-enabled' : 'read-only'} session as ${u.name}?`,
+  askConfirm({mk:'warning', title:`Open a ${v.scope === 'write' ? 'write-enabled' : 'read-only'} session as ${u.name}?`,
     body:`You see the platform as ${u.name}’s record holds it${v.scope === 'write' ? ', and anything you change is written in their name and logged at high severity' : ' and can change nothing until you end the session'}. Interview video is excluded.`,
     ok:'Start Session', danger: v.scope === 'write', act:'doviewas:' + u.id});
 };
@@ -4650,7 +4668,10 @@ function usersAll(){
    password storage are out of a prototype's scope (handoff ruling #3): the
    screens and the flow are built, not the send.
    ====================================================================== */
-const STAFF_STATUS_LABEL = {invited:'Invited', active:'Active', inactive:'Deactivated'};
+const STAFF_STATUS_LABEL = {invited:'Invited', active:'Active', inactive:'Deactivated', deleting:'Deletion in progress', deleted:'Deleted'};
+/* The five processors an erasure request is dispatched to (story 1.8). The account
+   reaches "Deleted" only once all five confirm. */
+const DEL_PROCESSORS = [['stripe', 'Stripe'], ['twilio', 'Twilio'], ['lightspeed', 'LightspeedVT'], ['email', 'Email sender'], ['auth0', 'Auth0']];
 const staffStatusTag = u => tag(u.status, STAFF_STATUS_LABEL[u.status] || cap(u.status));
 /* an INFO block for a sheet foot — the same light panel `recSheet` draws. */
 const sheetHelp = t => `<div class="sheet-help"><svg class="sheet-help-ic" viewBox="0 0 24 24" aria-hidden="true">${inner('info')}</svg><p class="t-desc">${t}</p></div>`;
@@ -4686,6 +4707,8 @@ const lastSAGuard = u => isSA(u) && activeSAs().length <= 1 ? 'This is the only 
 function staffRowActs(u){
   const acts = [['view', 'View', `data-go="users/staffdetail/${u.id}"`]];
   const prot = staffProtect(u);
+  /* A deletion in flight or complete offers nothing but View. */
+  if(u.status === 'deleting' || u.status === 'deleted') return rowActs(acts);
   if(u.status === 'invited'){
     acts.push(['renew', 'Resend Invite', `data-act="staffresend:${u.id}"`]);
     acts.push(['eye', 'Preview Activation', `data-act="staffpreviewactivate:${u.id}"`]);
@@ -4715,23 +4738,26 @@ PAGESUM['users/staff'] = () => {
 function usersStaff(){
   const rf = getFilter('role', 'all'), sf = getFilter('status', 'all'), df = getFilter('dept', 'all'), q = getFilter('q', '');
   const rows = USERS.filter(u => u.internal)
+    .filter(u => staffRole(u) !== 'admin')   /* Super Admins are not listed in Staff Members (Maryam, 23 Sep 2026) */
     .filter(u => rf === 'all' || staffRole(u) === rf)
     .filter(u => sf === 'all' || u.status === sf)
     .filter(u => df === 'all' || u.dept === df)
     .filter(u => hit(q, u.name, u.email));
-  const nameCell = u => `<div>${esc(u.name)}${u.orig ? ' <span class="tag sm brand">Default</span>' : ''}</div><div class="t-caption">${esc(u.email)}</div>`;
+  const nameCell = u => u.status === 'deleted'
+    ? `<div>Former staff member</div><div class="t-caption">Erased</div>`
+    : `<div>${esc(u.name)}${u.orig ? ' <span class="tag sm brand">Default</span>' : ''}</div><div class="t-caption">${esc(u.email)}</div>`;
   return `
   <section class="sec">
     ${searchHead('Staff Members', 'Everyone internal with an account, at what level, and who has stopped using it. A row opens the full record.',
       `<button class="btn btn-g btn-sm noic" data-act="staffexport">${I.download} Export</button>
        <button class="btn btn-p btn-sm noic" data-sheet="addstaff">${I.add} Add Staff Member</button>`)}
     ${lstTools('Search by name or email',
-      filterDd('role', 'all', [['all', 'All roles'], ...staffRoleOpts(true)], 'Role')
+      filterDd('role', 'all', [['all', 'All roles'], ...staffRoleOpts(false)], 'Role')
       + filterDd('status', 'all', [['all', 'All'], ['invited', 'Invited'], ['active', 'Active'], ['inactive', 'Deactivated']], 'Status')
       + filterDd('dept', 'all', [['all', 'All'], ...DEPARTMENTS.map(d => [d, d])], 'Department'))}
     ${rows.length ? table(
       [{label:'Name'}, {label:'Role'}, {label:'Job title'}, {label:'Department'}, {label:'Status'}, {label:'Last signed in'}, {label:'Added'}, ACT_COL],
-      rows.map(u => ({go:'users/staffdetail/' + u.id, sv:[u.name], cells:[
+      rows.map(u => ({id:u.id, go:'users/staffdetail/' + u.id, sv:[u.name], cells:[
         nameCell(u),
         esc(staffRoleName(u)),
         esc(u.job || '—'),
@@ -4740,7 +4766,7 @@ function usersStaff(){
         esc(u.last || 'Never'),
         esc(u.joined),
         staffRowActs(u)
-      ]})))
+      ]})), {bulk: usersBulk})
       : emptyState('users', 'No staff match', q ? `Nothing matches “${q}” in this filter.` : 'No staff in this filter yet.')}
   </section>`;
 }
@@ -4754,6 +4780,7 @@ const csvCell = v => { const s = String(v == null ? '' : v); return /[",\n]/.tes
 function staffRowsFiltered(){
   const rf = getFilter('role', 'all'), sf = getFilter('status', 'all'), df = getFilter('dept', 'all'), q = getFilter('q', '');
   return USERS.filter(u => u.internal)
+    .filter(u => staffRole(u) !== 'admin')   /* Super Admins are not in the Staff directory */
     .filter(u => rf === 'all' || staffRole(u) === rf)
     .filter(u => sf === 'all' || u.status === sf)
     .filter(u => df === 'all' || u.dept === df)
@@ -4796,7 +4823,6 @@ const STAFF_ADD_RULES = () => [
   {k:'role', l:'Role', req:1, msg:'Select a role.', select:1}
 ];
 SHEETS.addstaff = () => {
-  const actorSA = isSA(ME);
   return {
     title:'Add staff member',
     body: [
@@ -4806,8 +4832,10 @@ SHEETS.addstaff = () => {
       fieldHtml({k:'phone', l:'Phone number', t:'text', ph:'+1 (415) 555-0100', max:30}),
       fieldHtml({k:'job', l:'Job title', t:'text', req:1, ph:'e.g. Level Reviewer', max:100}),
       deptField(),
-      fieldHtml({k:'role', l:'Role', t:'select', req:1, ph:'Select a role', opts:staffRoleOpts(actorSA)})
-    ].join('') + sheetHelp(`Phone is optional — the verification code always goes to the email address. The staff member sets their own password and verifies by a one-time code. ${actorSA ? 'Super Admin can be assigned because you hold it.' : 'Only a Super Admin can assign the Super Admin role.'}`),
+      /* Super Admin is never offered here — the role is granted through the grant flow,
+         not by adding a staff member (Maryam, 23 Sep 2026), so `staffRoleOpts(false)`. */
+      fieldHtml({k:'role', l:'Role', t:'select', req:1, ph:'Select a role', opts:staffRoleOpts(false)})
+    ].join(''),
     ok:'Send Invite',
     act:'sendinvite',
     rules: STAFF_ADD_RULES(),
@@ -4929,7 +4957,7 @@ ACTIONS.savestaff = key => {
   const from = `${u.name} · ${u.job} · ${u.dept}`;
   u.name = `${v.first} ${v.last}`.trim(); u.job = v.job; u.dept = v.dept; u.phone = v.phone || '';
   audit('Edited staff details', u.name, 'Users & Roles', 'med', {from, to:`${u.name} · ${u.job} · ${u.dept}`});
-  toast(`${u.name} saved`);
+  toast(`${u.name} saved. They’ve been notified.`);
   S.sheet = null;
 };
 
@@ -5031,7 +5059,7 @@ ACTIONS.doreactivate = key => {
   if(!u) return;
   u.status = 'active'; if(v.role) u.roles = [v.role]; delete u.deactivatedOn; u.last = 'Just now';
   audit('Reactivated staff account', `${u.name} · ${(ROLE_BY_K[v.role] || {}).name} · ${v.note || ''}`, 'Users & Roles', 'high');
-  toast(`${u.name} reactivated`);
+  toast(`${u.name} reactivated. They’ll be notified when they next sign in.`);
 };
 
 /* 1.11 DELETE — a mandatory reason, an irreversibility confirmation, then the
@@ -5061,11 +5089,25 @@ ACTIONS.dodelstaff = key => {
   const u = USER_BY_ID[key.split(':')[1]]; const v = S._pending || {}; S._pending = null; S.confirm = null;
   if(!u) return;
   const g = staffProtect(u) || lastSAGuard(u); if(g){ toast(g, 'warn'); return; }
-  const nm = u.name;
-  USERS.splice(USERS.indexOf(u), 1); delete USER_BY_ID[u.id];
-  audit('Deleted staff account', `${nm} · ${v.note || ''}`, 'Users & Roles', 'high');
-  toast(`${nm} deleted. Personal data is being erased; the audit trail is kept.`);
-  if(S.sub === 'staffdetail'){ S.mod = 'users'; S.sub = 'staff'; S.id = null; }
+  /* 1.8 — the account moves to "Deletion in progress", the 30-day erasure clock
+     starts, sign-in is refused, and an erasure request is dispatched to the five
+     processors. The account reaches "Deleted" only once all five confirm. The
+     record is kept through the window so the lifecycle is visible; the emailed
+     notice is narrated (prototype ruling). */
+  u.status = 'deleting'; u.last = 'Access ended';
+  u.deletion = {started: isoToday(), note: v.note || '', emailed: true, proc: {}};
+  DEL_PROCESSORS.forEach(([k]) => u.deletion.proc[k] = null);
+  audit('Started account deletion', `${u.name} · ${v.note || ''}`, 'Users & Roles', 'high');
+  toast(`${u.name}: deletion started. Personal data will be erased over 30 days; the audit trail is kept.`);
+};
+/* Mocked processor confirmation (the send is out of a prototype's scope). When all
+   five are in, the account reaches "Deleted" and its personal data reads as a
+   pseudonym. */
+ACTIONS.confirmproc = key => {
+  const [, id, pk] = key.split(':'); const u = USER_BY_ID[id]; if(!u || !u.deletion) return;
+  u.deletion.proc[pk] = isoToday();
+  if(DEL_PROCESSORS.every(([k]) => u.deletion.proc[k])){ u.status = 'deleted'; audit('Account deletion complete', `${u.name} · all processors confirmed`, 'Users & Roles', 'high'); toast('All processors confirmed — the account is now deleted.'); }
+  else toast('Processor confirmation recorded.');
 };
 
 /* 3.2 INVITE A TALENT AGENT — the only external type that can be invited
@@ -5461,9 +5503,12 @@ ACTIONS.impdo = () => {
    Roles module, not here), their status and provenance, and their recent audit
    lines. Actions mirror the directory row, guards and all. */
 function staffDetailView(u){
-  DETAIL_LABEL = u.name;
+  const deleted = u.status === 'deleted';
+  const dispName = deleted ? 'Former staff member' : u.name;
+  const dispEmail = deleted ? 'Erased' : u.email;
+  DETAIL_LABEL = dispName;
   const days = inviteDaysLeft(u);
-  const sum = `<b>${esc(u.name)}</b> holds the ${esc(staffRoleName(u))} role in ${esc(u.dept || 'the team')}. ${u.status === 'invited' ? 'The invite is outstanding, so the account can’t sign in until it is accepted.' : u.status === 'inactive' ? 'The account is deactivated: the record is intact but sign-in is refused.' : 'The account is active.'}`;
+  const sum = `<b>${esc(dispName)}</b> ${u.status === 'invited' ? `was invited to the ${esc(staffRoleName(u))} role. The invite is outstanding, so the account can’t sign in until it is accepted.` : u.status === 'inactive' ? `holds the ${esc(staffRoleName(u))} role. The account is deactivated: the record is intact but sign-in is refused.` : u.status === 'deleting' ? 'is being deleted. Personal data is erased over 30 days from the request; sign-in is refused and the audit trail is kept.' : deleted ? 'has been deleted. Personal data is erased; the audit trail is kept under a pseudonym.' : `holds the ${esc(staffRoleName(u))} role in ${esc(u.dept || 'the team')}. The account is active.`}`;
   const prot = staffProtect(u);
   /* THE HEADER ACTIONS ARE A KEBAB MENU, never inline buttons at the top-right of a
      detail page (Maryam, 18 Sep 2026: "i do not want option actions on details pages
@@ -5473,6 +5518,10 @@ function staffDetailView(u){
   let acts;
   if(u.orig){
     acts = '<span class="tag sm brand">Default Super Admin — protected</span>';
+  } else if(u.status === 'deleting' || u.status === 'deleted'){
+    /* A deletion in flight or complete offers no actions — the record is on its
+       way out and cannot be edited, deactivated or re-deleted. */
+    acts = staffStatusTag(u);
   } else if(u.status === 'invited'){
     acts = rowActs([
       ['renew', 'Resend Invite', `data-act="staffresend:${u.id}"`],
@@ -5497,7 +5546,7 @@ function staffDetailView(u){
   return `
   ${detailHead('users/staff', sum)}
   <section class="sec">
-    ${aiHead(esc(u.name), esc(u.email), acts)}
+    ${aiHead(esc(dispName), esc(dispEmail), acts)}
     ${kv([
       ['Role', esc(staffRoleName(u))],
       ['Status', u.status === 'invited'
@@ -5505,14 +5554,24 @@ function staffDetailView(u){
         : u.status === 'inactive' && u.deactivatedOn
           ? `${staffStatusTag(u)} <span class="t-caption">· since ${esc(dpFmt(u.deactivatedOn) || u.deactivatedOn)}</span>`
           : staffStatusTag(u)],
-      ['Job title', esc(u.job || '—')],
-      ['Department', esc(u.dept || '—')],
-      ['Phone', esc(u.phone || '—')],
+      ['Job title', deleted ? 'Erased' : esc(u.job || '—')],
+      ['Department', deleted ? 'Erased' : esc(u.dept || '—')],
+      ['Phone', deleted ? 'Erased' : esc(u.phone || '—')],
       ['Added', esc(u.joined)],
       ['Invited by', esc(invitedBy)],
       ['Last signed in', esc(u.last || 'Never')]
     ])}
   </section>
+  ${u.deletion ? `
+  <section class="sec">
+    ${aiHead('Deletion', deleted ? 'Personal data has been erased. The audit trail is kept under a pseudonym.' : 'Personal data is erased over 30 days from the request. The account cannot sign in.')}
+    ${infoCard('How this is handled', `Started ${esc(dpFmt(u.deletion.started) || u.deletion.started)}. ${u.deletion.emailed ? 'An email telling them the account was deleted was sent before the address was erased. ' : ''}A one-way hash of the email address is kept so it cannot be used on a new account; everything they did stays readable under a consistent pseudonym.`)}
+    <div class="tile-stack">
+      ${DEL_PROCESSORS.map(([k, label]) => { const at = u.deletion.proc[k];
+        return cardRow(at ? 'check' : 'clock', esc(label), at ? `Confirmed ${esc(dpFmt(at) || at)}` : 'Awaiting confirmation',
+          at ? '' : `<button class="btn acc-link btn-sm noic" data-act="confirmproc:${u.id}:${k}">Confirm erasure ${I.arrowRight}</button>`); }).join('')}
+    </div>
+  </section>` : ''}
 
   <section class="sec">
     ${aiHead(`What a ${staffRoleName(u)} can do`, 'The permissions this role carries. Change them in the Roles module, not here.')}
@@ -9126,7 +9185,7 @@ V.finance = () => modView({overview:financeOverview, transactions:financeTransac
 /* finance actions */
 ACTIONS.askrelease = key => {
   const p = PAYOUTS.find(x => x.id === key.split(':')[1]); if(!p) return;
-  askConfirm({mk:'warning', title:`Release payout to ${p.agent}?`,
+  askConfirm({mk:'warning', stepup:true, title:`Release payout to ${p.agent}?`,
     body:`This releases ${money(p.net)} from escrow to ${p.agent} now, ahead of the normal settlement cycle. Recorded in the audit log.`,
     ok:`Release ${money(p.net)}`, act:'dorelease:' + p.id});
 };
@@ -9879,7 +9938,7 @@ function readPageForm(){ const out = {}; device.querySelectorAll('.page [data-fo
 PAGESUM['settings/general'] = () => `The platform's identity and how dates, currency and the timezone read across the admin. These change the admin views, <b>not what a candidate sees</b>.`;
 PAGESUM['settings/profile'] = () => `Your own account, <b>${esc(ME.name)}, ${esc(staffRoleName(ME))}</b>. You can correct your name here. Your email, job title and role are managed in the Staff module.`;
 PAGESUM['settings/notifications'] = () => `What reaches you, by email and in the bell. <b>The vetting queue and settlement alerts</b> are the two worth keeping on.`;
-PAGESUM['settings/security'] = () => `Your own password, phone number and sessions. Two-factor is always on, a fresh code is ${SEC.stepup === false ? 'not ' : ''}asked for on the highest-severity actions, and you can <b>sign out every other session</b> from here.`;
+PAGESUM['settings/security'] = () => `Your own password, phone number and sessions. Two-factor is always on, your password is ${SEC.stepup === false ? 'not ' : ''}asked for again on the highest-severity actions, and you can <b>sign out every other session</b> from here.`;
 PAGESUM['settings/payments'] = () => `The cards and billing details the platform bills against. Full card numbers are never stored — <b>Stripe tokenises them</b>.`;
 
 function settingsGeneral(){
@@ -10081,7 +10140,7 @@ function settingsSecurity(){
   <section class="sec">
     ${aiHead('Two-factor', 'A one-time code is required at every sign-in, on every device. It is sent to the email address on your account — email is the only destination.')}
     ${kv([['Two-factor at sign-in', tag('active', 'Always on')]])}
-    ${swToggle('Step-up code on the highest-severity actions', 'sec.stepup', SEC.stepup !== false)}
+    ${swToggle('Step-up password on the highest-severity actions', 'sec.stepup', SEC.stepup !== false)}
   </section>`;
 }
 ACTIONS.changepw = () => {
@@ -10186,7 +10245,7 @@ ACTIONS.toggleset = key => {
   /* SA-02 A1 — the step-up gate on grant, revoke, View As and release-all. Off,
      those confirmations run without a code; the switch is logged high because it
      is the platform's posture, not a preference. */
-  if(path === 'sec.stepup'){ SEC.stepup = SEC.stepup === false; audit(`Step-up code ${SEC.stepup ? 'on' : 'off'}`, ME.name, 'Settings', 'high', {from: SEC.stepup ? 'off' : 'on', to: SEC.stepup ? 'on' : 'off'}); toast('Step-up ' + (SEC.stepup ? 'on' : 'off')); return; }
+  if(path === 'sec.stepup'){ SEC.stepup = SEC.stepup === false; audit(`Step-up password ${SEC.stepup ? 'on' : 'off'}`, ME.name, 'Settings', 'high', {from: SEC.stepup ? 'off' : 'on', to: SEC.stepup ? 'on' : 'off'}); toast('Step-up ' + (SEC.stepup ? 'on' : 'off')); return; }
   const [grp, k] = path.split('.');
   if(NOTIF_PREFS[grp] && k in NOTIF_PREFS[grp]){ NOTIF_PREFS[grp][k] = !NOTIF_PREFS[grp][k]; }
 };
@@ -10247,18 +10306,52 @@ const authIdPanel = (label, email, back) => `
    not the send). The resend cooldown is enforced behaviourally (an early press is
    refused) rather than ticked live, to keep the OTP field's caret. */
 const otpMaskEmail = e => { const [n, d] = String(e || '').split('@'); return d ? `${(n || '').slice(0, 1)}${'•'.repeat(Math.max(3, (n || '').length - 1))}@${d}` : e; };
+/* Still used to mask the admin's own phone number in Login & Security (the own-phone
+   change keeps its two-step); it is no longer an OTP destination. */
+const otpMaskPhone = p => { const s = String(p || '').replace(/[^\d]/g, ''); return s.length >= 4 ? `+${s.slice(0, 1)} ••• ••• ${s.slice(-4)}` : p; };
 /* Email is the only OTP destination (stories 1.1 / 1.2 / 1.4 — the staff member is
    not asked where to send it), so there is no channel picker. The code screen just
    states the masked address it went to. */
+/* THE CODE ENTRY IS THE CANDIDATE PORTAL'S SIX DASHED DIGIT CELLS — the `.otp`
+   component the forgot-password flow uses (grabbed verbatim; the CSS ships in the
+   DS this portal links). `verifyotp` reads the six inputs joined. The RESEND ROW
+   is a separate helper placed AFTER the button, in the candidate portal's
+   "Didn't receive code? Resend" formatting (Maryam, 23 Sep 2026). */
 function otpEntryBlock(sentAt, resendAct){
-  const left = Math.max(0, 40 - Math.floor((Date.now() - (sentAt || 0)) / 1000));
   return `<div class="sec sec-rule">
-    <div class="f"><label for="lcode">Verification code</label>
-      <input class="inp fill" id="lcode" inputmode="numeric" autocomplete="one-time-code" placeholder="6-digit code" maxlength="6"></div>
-    <p class="t-body-02 aux mt5">${left > 0
-      ? `You can resend the code in about ${left}s.`
-      : `<a data-act="${resendAct}">Resend code</a>`}</p>
+    <div class="sec-h" style="margin-bottom:var(--s06)"><h2 class="u-h2">Verification code</h2></div>
+    <div class="otp" data-otp>${[0,1,2,3,4,5].map(i => `<input value="" size="1" inputmode="numeric" autocomplete="${i === 0 ? 'one-time-code' : 'off'}" maxlength="1" aria-label="Digit ${i + 1}">`).join('')}</div>
   </div>`;
+}
+/* The resend row — the candidate portal's "Didn't receive code? Resend" line, sitting
+   under the button. The cooldown COUNTS DOWN LIVE (the `otpResend` interval at boot
+   rewrites only this line from `data-until`, so the OTP carets are safe — trap 9/17):
+   while cooling it reads "Resend in Ns" (muted), then becomes the clickable link. */
+function otpResendText(until, resendAct){
+  const left = Math.max(0, Math.ceil((until - Date.now()) / 1000));
+  return `Didn't receive code? ${left > 0
+    ? `<span class="otp-wait" style="color:var(--accent-text)">Resend in ${left}s</span>`
+    : `<a data-act="${resendAct}" style="color:var(--accent-text);text-decoration:underline">Resend</a>`}`;
+}
+function otpResendRow(sentAt, resendAct){
+  const until = (sentAt || 0) + 40000;
+  return `<p class="t-body-02 mt5" id="otpResend" data-resend="${resendAct}" data-until="${until}" style="color:var(--text-secondary)">${otpResendText(until, resendAct)}</p>`;
+}
+/* THE CODE ERROR STATE (Maryam, 23 Sep 2026) — the correct code is 000000; any
+   other six digits mark the cells red with a message, WITHOUT a render (the verify
+   action returns 'stay') so the typed digits and caret stay put. Typing again
+   clears it (the `.otp input` branch of the input listener). */
+const OTP_CORRECT = '000000';
+function otpError(msg){
+  const otp = device.querySelector('.otp'); if(!otp) return;
+  otp.classList.add('otp-err');
+  let m = otp.parentNode.querySelector('.otp-msg');
+  if(!m){ m = document.createElement('p'); m.className = 'otp-msg t-body-02'; otp.parentNode.insertBefore(m, otp.nextSibling); }
+  m.textContent = msg;
+}
+function otpClearError(){
+  const otp = device.querySelector('.otp'); if(otp) otp.classList.remove('otp-err');
+  const m = device.querySelector('.otp-msg'); if(m) m.remove();
 }
 const PW_RULE_TEXT = 'At least 12 characters, with an uppercase letter, a lowercase letter, a number and a special character.';
 function pwRules(pw){ pw = pw || ''; return {len:pw.length >= 12, up:/[A-Z]/.test(pw), lo:/[a-z]/.test(pw), num:/\d/.test(pw), sp:/[^A-Za-z0-9]/.test(pw)}; }
@@ -10292,28 +10385,35 @@ function authView(){
   /* `.auth-card` is a CHILD of `.app` — §17/§57 key every rule on
      `.app:has(> .auth-card)` and `.auth-card > .auth-col`, the shape hifi's
      render writes; one element wearing both classes matches neither. */
+  /* The log-in card takes the candidate portal's `.authtight` rhythm (Maryam, 23
+     Sep 2026: "the same gaps and spaces as the candidate portal login card"): the
+     DS zeroes every section's own padding and carries one 32px margin on each join
+     (desc → fields → button), the two fields 32 apart, and drops the divider line
+     under the sub-text. Login only — the deliver/code/reset steps keep their own. */
+  const pageCls = S.auth === 'login' ? 'page form-page authtight' : 'page form-page';
   return `<div class="app authShell" data-portal="admin"><div class="auth-card">${AUTH_ART_ADMIN}
     <div class="auth-col">
       <header class="shell"><span class="shell-logo" style="padding-left:var(--s05)"><img src="${LOGO_K}" alt="TalentNext"></span></header>
-      <main class="main"><div class="page form-page">${step}</div></main>
+      <main class="main"><div class="${pageCls}">${step}</div></main>
     </div></div>
     <div class="pt-toasts" id="toasts"></div>
   </div>`;
 }
 function authLogin(){
+  const e = S.authErr || {};
   return `
-  ${dsPh('Log in', 'Enter the email address and password on your TalentNext staff account.')}
+  ${dsPh('Log in', 'Enter your details to sign in to your account.')}
+  ${e.top ? `<div class="auth-err" role="alert">${esc(e.top)}</div>` : ''}
   <div class="sec sec-rule">
-    <div class="f"><label for="lem">Email address</label>
-      <input class="inp fill" id="lem" type="email" value="${esc(ME.email)}" autocomplete="username"></div>
-    <div class="f last"><label for="lpw">Password</label>
-      <div class="pw-wrap"><input class="inp fill" id="lpw" type="password" value="••••••••••••" autocomplete="current-password">
-        <button class="pw-eye" data-eye="lpw" aria-label="Show password">${I.view}</button></div></div>
-    <p class="t-body-02 aux"><a data-act="goreset">Forgotten your password?</a></p>
+    <div class="f${e.em || e.emRed ? ' err' : ''}"><label for="lem">Email address</label>
+      <input class="inp fill" id="lem" type="email" value="${esc(e.emVal != null ? e.emVal : ME.email)}" autocomplete="username">${e.em ? `<span class="f-msg">${esc(e.em)}</span>` : ''}</div>
+    <div class="f last${e.pw || e.pwRed ? ' err' : ''}"><label for="lpw">Password</label>
+      <div class="pw-wrap"><input class="inp fill" id="lpw" type="password" value="${e.pwclear ? '' : '••••••••••••'}" autocomplete="current-password">
+        <button class="pw-eye" data-eye="lpw" aria-label="Show password">${I.view}</button></div>${e.pw ? `<span class="f-msg">${esc(e.pw)}</span>` : ''}
+      <p class="t-body-02 aux"><a data-act="goreset" style="color:var(--accent-text);text-decoration:underline">Forgot Password?</a></p></div>
   </div>
   <div class="sec sec-act">
-    <div class="foot-row foot-stack"><div><button class="btn btn-p btn-full" data-act="signin">Log in ${I.arrowRight}</button></div>
-    <p class="t-body-02 mt5" style="color:var(--text-secondary)">Staff accounts are created by a Super Admin — there is no sign-up here.</p></div>
+    <div class="foot-row foot-stack"><div><button class="btn btn-p btn-full" data-act="signin">Log in ${I.arrowRight}</button></div></div>
   </div>`;
 }
 /* 1.4 step 2 / 1.5 step 2 — the OTP entry. The code always goes to the email on
@@ -10321,12 +10421,19 @@ function authLogin(){
    choice. */
 function authCode(){
   const reset = S.authFlow === 'reset';
+  /* The heading carries a BACK ARROW (Maryam, 23 Sep 2026) — `.ph-back` with
+     `data-act="authback"`, the same inline arrow `dsPh`'s back variant draws, so
+     the code screen has a way back to the log-in step. The old red "Signing in
+     as … Not you?" identity block is removed. */
   return `
-  ${dsPh('Enter your code', `We sent a six-digit code to ${otpMaskEmail(ME.email)}. It expires in 10 minutes.`)}
-  ${authIdPanel(reset ? 'Resetting for' : 'Signing in as', ME.email, 'authback')}
+  <div class="ph"><div class="ph-main"><div class="ph-top">
+    <button class="ph-back" data-act="authback" aria-label="Back">${I.arrowLeft}</button>
+    <h1>Enter Sign-in Code</h1></div>
+    <p>We have sent a six-digit code to your email address. It will expire in 10 minutes.</p></div></div>
   ${otpEntryBlock(S.otpSentAt, 'resendcode')}
   <div class="sec sec-act">
-    <div class="foot-row foot-stack"><div><button class="btn btn-p btn-full" data-act="verifyotp">${reset ? 'Verify' : 'Verify And Sign In'} ${I.arrowRight}</button></div></div>
+    <button class="btn btn-p btn-full" data-act="verifyotp">${reset ? 'Verify' : 'Verify And Sign In'} ${I.arrowRight}</button>
+    ${otpResendRow(S.otpSentAt, 'resendcode')}
   </div>`;
 }
 /* 1.5 step 1 — identify the account. The flow advances whether or not the address
@@ -10356,30 +10463,36 @@ function authSetpw(){
 const SEED_PW = 'Operations-2026!';   /* the prototype's one known password */
 ACTIONS.signin = () => {
   const em = ((device.querySelector('#lem') || {}).value || '').trim(), pw = (device.querySelector('#lpw') || {}).value || '';
-  if(!em || !pw){ toast('Enter your email address and password', 'warn'); return; }
+  /* Field-level validation shown inline, red field + message below it (1.4). */
+  const fe = {emVal: em};
+  if(!em) fe.em = 'Enter your email address.';
+  else if(!EMAIL_RE.test(em)) fe.em = 'Enter a valid email address.';
+  if(!pw) fe.pw = 'Enter your password.';
+  if(fe.em || fe.pw){ S.authErr = fe; return; }
   /* Lockout: 5 wrong passwords → 15 minutes, a message that does not reveal
-     whether the address exists (1.4). */
-  if(S.lockUntil && Date.now() < S.lockUntil){ toast('Too many failed attempts. Try again in 15 minutes.', 'warn'); return; }
+     whether the address exists (1.4). Shown in the banner above the form. */
+  if(S.lockUntil && Date.now() < S.lockUntil){ S.authErr = {emVal:em, top:'Too many failed attempts. Try again in 15 minutes.'}; return; }
   /* An Invited or Deactivated account is refused before any code is sent (1.4).
      Matched on the entered address so the two states are demonstrable. */
   const acct = USERS.find(u => (u.email || '').toLowerCase() === em.toLowerCase());
-  if(acct && acct.internal && acct.status === 'invited'){ toast('Your account is not set up yet. Use the invite link sent to your email address.', 'warn'); return; }
-  if(acct && acct.internal && acct.status === 'inactive'){ toast('This account is no longer active. Contact your administrator.', 'warn'); return; }
+  if(acct && acct.internal && acct.status === 'invited'){ S.authErr = {emVal:em, top:'Your account is not set up yet. Use the invite link sent to your email address.'}; return; }
+  if(acct && acct.internal && acct.status === 'inactive'){ S.authErr = {emVal:em, top:'This account is no longer active. Contact your administrator.'}; return; }
   /* Credentials are checked before any code is issued — a prototype accepts the
      seeded pair (the prefilled dots, or the known password), and counts anything
      else as a failed attempt toward the lockout. */
   const pwOk = pw.startsWith('•') || pw === SEED_PW;
   if(!pwOk){
     S.loginFails = (S.loginFails || 0) + 1;
-    if(S.loginFails >= 5){ S.lockUntil = Date.now() + 15 * 60000; S.loginFails = 0; AUDIT.unshift({when:'Just now', who:em, role:'—', obj:'Account locked for 15 minutes', act:'Sign-in lockout', mod:'System & Audit', cat:'Sign-in', sev:'high', ip:'10.2.14.2'}); toast('Too many failed attempts. Try again in 15 minutes.', 'warn'); return; }
-    toast('That email address or password is not correct.', 'warn'); return;
+    if(S.loginFails >= 5){ S.lockUntil = Date.now() + 15 * 60000; S.loginFails = 0; AUDIT.unshift({when:'Just now', who:em, role:'—', obj:'Account locked for 15 minutes', act:'Sign-in lockout', mod:'System & Audit', cat:'Sign-in', sev:'high', ip:'10.2.14.2'}); S.authErr = {top:'Too many failed attempts. Try again in 15 minutes.'}; return; }
+    /* Incorrect: message above the form, both fields red, password cleared (1.4). */
+    S.authErr = {top:'That email address or password is not correct.', emRed:true, pwRed:true, pwclear:true}; return;
   }
-  S.loginFails = 0;
+  S.loginFails = 0; S.authErr = null;
   S.authFlow = 'signin'; S.otpSentAt = Date.now(); S.auth = 'code';
   toast('Code sent to your email');
 };
-ACTIONS.authback = () => { S.auth = 'login'; S.authFlow = 'signin'; };
-ACTIONS.goreset = () => { S.auth = 'reset'; S.authFlow = 'reset'; };
+ACTIONS.authback = () => { S.auth = 'login'; S.authFlow = 'signin'; S.authErr = null; };
+ACTIONS.goreset = () => { S.auth = 'reset'; S.authFlow = 'reset'; S.authErr = null; };
 ACTIONS.resetcont = () => { S.authFlow = 'reset'; S.otpSentAt = Date.now(); S.auth = 'code'; toast('Code sent to your email'); };
 ACTIONS.resendcode = () => {
   const left = 40 - Math.floor((Date.now() - (S.otpSentAt || 0)) / 1000);
@@ -10387,20 +10500,27 @@ ACTIONS.resendcode = () => {
   S.otpSentAt = Date.now(); toast('A fresh code is on its way');
 };
 ACTIONS.verifyotp = () => {
-  const code = ((device.querySelector('#lcode') || {}).value || '').trim();
-  if(!/^\d{6}$/.test(code)){ toast('That code is not correct. Check it and try again.', 'warn'); return; }
-  if(Date.now() - (S.otpSentAt || 0) > 10 * 60000){ toast('That code has expired. Request a new one.', 'warn'); return; }
+  const code = Array.from(device.querySelectorAll('.otp input')).map(i => (i.value || '').trim()).join('');
+  if(code.length < 6){ otpError('Enter all six digits.'); return 'stay'; }
+  if(Date.now() - (S.otpSentAt || 0) > 10 * 60000){ otpError('That code has expired. Request a new one.'); return 'stay'; }
+  if(code !== OTP_CORRECT){ otpError('That code is not correct. Check it and try again.'); return 'stay'; }
   if(S.authFlow === 'reset'){ S.auth = 'setpw'; return; }
   S.signedIn = true; S.auth = 'login';
+  try { sessionStorage.setItem('tn-admin-signedin', '1'); } catch(e){}
   AUDIT.unshift({when:'Just now', who:ME.name, role:'Super Admin', obj:'Email + password + one-time code (email)', act:'Signed in', mod:'System & Audit', cat:'Sign-in', sev:'notice', ip:'10.2.14.2'});
-  if(!MOD_BY_K[S.mod]){ S.mod = 'home'; S.sub = 'home'; }
+  /* ALWAYS LAND ON THE FIRST MODULE (Maryam, 23 Sep 2026) — a fresh sign-in opens
+     the dashboard, never the page a stale hash last pointed at. Reset the module,
+     the sub-page, the history stack and the hash so `render()`/`writeHash` start
+     from home. */
+  S.mod = 'home'; S.sub = 'home'; S.hist = [];
+  try { history.replaceState(null, '', location.pathname + location.search); } catch(e){}
 };
 ACTIONS.savenewpw = () => {
   const np = (device.querySelector('#np') || {}).value || '', cp = (device.querySelector('#cp') || {}).value || '';
   if(!pwOK(np)){ toast(PW_RULE_TEXT, 'warn'); return; }
   if(np !== cp){ toast('Both passwords must match.', 'warn'); return; }
   audit('Reset own password', ME.name, 'System & Audit', 'high');
-  S.auth = 'login'; S.authFlow = 'signin'; S.otpCh = null;
+  S.auth = 'login'; S.authFlow = 'signin';
   toast('Password reset. Sign in with your new password.');
 };
 
@@ -10425,7 +10545,7 @@ function activateView(){
     /* the code went to the email on the account — email is the only destination. */
     step = `${dsPh('Enter your code', `We sent a six-digit code to ${otpMaskEmail(u.email)}. It expires in 10 minutes.`)}
       ${otpEntryBlock(a.sentAt, 'actresend')}
-      <div class="sec sec-act"><div class="foot-row foot-stack"><div><button class="btn btn-p btn-full" data-act="actverify">Verify ${I.arrowRight}</button></div></div></div>`;
+      <div class="sec sec-act"><button class="btn btn-p btn-full" data-act="actverify">Verify ${I.arrowRight}</button>${otpResendRow(a.sentAt, 'actresend')}</div></div>`;
   }
   return `<div class="app authShell" data-portal="admin"><div class="auth-card">${AUTH_ART_ADMIN}
     <div class="auth-col">
@@ -10439,15 +10559,22 @@ function activateView(){
     <div class="pt-toasts" id="toasts"></div>
   </div>`;
 }
-ACTIONS.staffpreviewactivate = key => { const u = USER_BY_ID[key.split(':')[1]]; if(!u) return; S.activate = {id:u.id, step:'choose', ch:null, sentAt:0}; };
+ACTIONS.staffpreviewactivate = key => {
+  const u = USER_BY_ID[key.split(':')[1]]; if(!u) return;
+  /* An expired invite (past 7 days) is refused, not activated (1.2). Otherwise the
+     code is sent to the email at once — email is the only destination. */
+  const d = inviteDaysLeft(u);
+  if(d != null && d <= 0){ S.activate = {id:u.id, step:'expired', sentAt:0}; return; }
+  S.activate = {id:u.id, step:'code', sentAt:Date.now()};
+  toast('Code sent to your email');
+};
 ACTIONS.closeactivate = () => { S.activate = null; };
-ACTIONS.actpick = key => { S.activate.ch = key.split(':')[1]; };
-ACTIONS.actsend = () => { if(!S.activate.ch){ toast('Choose where to send your code', 'warn'); return; } S.activate.sentAt = Date.now(); S.activate.step = 'code'; toast(`Code sent to your ${S.activate.ch === 'sms' ? 'mobile' : 'email'}`); };
-ACTIONS.actchange = () => { S.activate.ch = null; S.activate.step = 'choose'; };
 ACTIONS.actresend = () => { const left = 40 - Math.floor((Date.now() - (S.activate.sentAt || 0)) / 1000); if(left > 0){ toast(`Please wait about ${left}s before resending`, 'warn'); return; } S.activate.sentAt = Date.now(); toast('A fresh code is on its way'); };
 ACTIONS.actverify = () => {
-  const code = ((device.querySelector('#lcode') || {}).value || '').trim();
-  if(!/^\d{6}$/.test(code)){ toast('That code is not correct. Check it and try again.', 'warn'); return; }
+  const code = Array.from(device.querySelectorAll('.otp input')).map(i => (i.value || '').trim()).join('');
+  if(code.length < 6){ otpError('Enter all six digits.'); return 'stay'; }
+  if(Date.now() - (S.activate.sentAt || 0) > 10 * 60000){ otpError('That code has expired. Request a new one.'); return 'stay'; }
+  if(code !== OTP_CORRECT){ otpError('That code is not correct. Check it and try again.'); return 'stay'; }
   S.activate.step = 'setpw';
 };
 ACTIONS.actsetpw = () => {
@@ -10455,7 +10582,7 @@ ACTIONS.actsetpw = () => {
   if(!pwOK(np)){ toast(PW_RULE_TEXT, 'warn'); return; }
   if(np !== cp){ toast('Both passwords must match.', 'warn'); return; }
   const u = USER_BY_ID[S.activate.id];
-  if(u){ u.status = 'active'; u.last = 'Just now'; audit('Activated staff account', `${u.name} · ${S.activate.ch === 'sms' ? 'SMS' : 'email'}`, 'Users & Roles', 'notice'); }
+  if(u){ u.status = 'active'; u.last = 'Just now'; audit('Activated staff account', `${u.name} · email`, 'Users & Roles', 'notice'); }
   S.activate = null; S.mod = 'users'; S.sub = 'staff'; S.id = null;
   toast(`${u ? u.name : 'The account'} is now active`);
 };
@@ -10598,9 +10725,9 @@ function confirmSheet(){
         <span class="conf-mk">${c && c.mk === 'check' ? I.checkFilled : I.warning}</span>
         <h2 class="conf-t">${c ? esc(c.title) : ''}</h2>
         <p class="conf-x">${c ? c.body : ''}</p>
-        ${c && c.stepup && SEC.stepup !== false ? `<label class="f mt4"><span class="lbl">Authenticator code</span>
-          <input class="inp" data-f="code" inputmode="numeric" autocomplete="one-time-code" placeholder="6-digit code from your app"></label>
-        <p class="t-desc">Step-up at the point of action (SA-02 A1): this one needs a fresh code, not only the one you signed in with.</p>` : ''}
+        ${c && c.stepup && SEC.stepup !== false ? `<label class="f mt4"><span class="lbl">Password</span>
+          <input class="inp" data-f="stepuppw" type="password" autocomplete="current-password" placeholder="Your current password"></label>
+        <p class="t-desc">Confirm it is you before this commits (story 1.4): enter your current password, entered fresh however recently you signed in.${S.stepupTries ? ` <b>${3 - S.stepupTries} attempt${3 - S.stepupTries === 1 ? '' : 's'} left.</b>` : ''}</p>` : ''}
       </div>
       <div class="sheet-f conf-a">
         <button class="btn btn-s noic" data-close="confirm">${c && c.cancel ? esc(c.cancel) : 'Cancel'}</button>
@@ -10609,7 +10736,7 @@ function confirmSheet(){
     </div>
   </div>`;
 }
-function askConfirm(o){ S._confirm = o; S.confirm = '_dyn'; }
+function askConfirm(o){ S._confirm = o; S.confirm = '_dyn'; S.stepupTries = 0; }
 
 /* THE EDITING SHEETS — the design system's bottom `.sheet`. An entry in
    `SHEETS` is an object or a function of `S.id`; a `rec:<kind>:<id>` key is
@@ -10827,13 +10954,13 @@ function render(){
   /* 1.2 — THE ACTIVATION PREVIEW. A full-frame scene layered over everything
      (the invite link has no console), previewed from an Invited staff row. */
   if(S.activate){ device.innerHTML = activateView();
-    const f = device.querySelector('#lcode, #np'); if(f && document.activeElement !== f){ try { f.focus(); } catch(e){} }
+    const f = device.querySelector('.otp input, #np'); if(f && document.activeElement !== f){ try { f.focus(); } catch(e){} }
     return; }
   /* SA-02 — THE GATE. Signed out, the frame holds the sign-in scene and nothing
      else: no shell, no rail, no dock, no hash written. */
   if(!S.signedIn){
     device.innerHTML = authView();
-    const f = device.querySelector('#lcode, #lem'); if(f && document.activeElement !== f) { try { f.focus(); } catch(e){} }
+    const f = device.querySelector('.otp input, #lem'); if(f && document.activeElement !== f) { try { f.focus(); } catch(e){} }
     return;
   }
   if(!MOD_BY_K[S.mod] || !V[S.mod]){ S.mod = 'home'; S.sub = 'home'; }
@@ -11153,9 +11280,23 @@ device.addEventListener('click', e => {
   }
 });
 device.addEventListener('keydown', e => {
+  /* OTP — Backspace on an empty cell steps back to the previous one (caret-safe). */
+  const otpk = e.target.closest('.otp input');
+  if(otpk && e.key === 'Backspace' && !otpk.value){ const p = otpk.previousElementSibling; if(p && p.tagName === 'INPUT'){ p.focus(); e.preventDefault(); } return; }
   if(e.target.id !== 'askIn' || e.key !== 'Enter') return;
   const q = e.target.value.trim();
   if(q){ e.target.value = ''; ask(q); }
+});
+/* OTP — pasting a 6-digit code fills every cell and focuses the last (a real habit
+   for one-time codes; maxlength:1 would otherwise drop all but the first digit). */
+device.addEventListener('paste', e => {
+  const cell = e.target.closest && e.target.closest('.otp input'); if(!cell) return;
+  const digits = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, 6);
+  if(!digits) return;
+  e.preventDefault();
+  const cells = Array.from(cell.closest('.otp').querySelectorAll('input'));
+  cells.forEach((c, i) => { c.value = digits[i] || ''; });
+  (cells[Math.min(digits.length, cells.length) - 1] || cell).focus();
 });
 
 /* THE SEARCH FIELD FILTERS AS YOU TYPE. The value goes into the page's filter
@@ -11163,6 +11304,21 @@ device.addEventListener('keydown', e => {
 device.addEventListener('input', e => {
   /* the set-password checklist ticks live as the rules are met (no render, trap 9). */
   if(e.target.id === 'np'){ syncPwRules(); }
+  /* the sign-in fields clear their error as the actor corrects them (no render — a
+     render would rebuild the auth form and drop the caret; the DOM is cleared in
+     place and S.authErr reset so the next render agrees). */
+  if(e.target.id === 'lem' || e.target.id === 'lpw'){
+    const f = e.target.closest('.f'); if(f){ f.classList.remove('err'); const m = f.querySelector('.f-msg'); if(m) m.remove(); }
+    const banner = device.querySelector('.auth-err'); if(banner) banner.remove();
+    S.authErr = null;
+  }
+  /* OTP CELLS — a typed digit keeps a single number and advances to the next cell;
+     no render, so the caret and the other cells hold (trap 9). Backspace-to-previous
+     is in the keydown listener. */
+  const otpc = e.target.closest('.otp input');
+  if(otpc){ otpClearError();   /* editing clears the red error state (no render) */
+    otpc.value = (otpc.value || '').replace(/\D/g, '').slice(0, 1);
+    if(otpc.value){ const n = otpc.nextElementSibling; if(n && n.tagName === 'INPUT') n.focus(); } return; }
   /* ONBOARDING QUESTION EDITOR — a keystroke updates the working copy in `S.qEdit`
      WITHOUT a render, so the caret stays put (trap 9). `data-obf` is a top-level
      field; `data-obopt="<i>:<field>"` an option's label or score. */
@@ -11241,13 +11397,26 @@ device.addEventListener('click', e => {
   }
   if(d.confirm !== undefined){ S.confirm = d.confirm; return render(); }
   if(d.do !== undefined){
-    /* SA-02 A1 — a step-up confirmation does not run without its code. Six
-       digits is the whole check in a prototype; the point is the gate, not the
-       verification. */
+    /* Step-up (story 1.4): the actor's current password before a guarded action
+       commits — 3 attempts, and a third failure abandons the action AND ends the
+       session. The prototype accepts the seeded password; the point is the gate
+       and its failure behaviour, not the credential store. */
     const cf = S._confirm;
     if(S.confirm === '_dyn' && cf && cf.stepup && SEC.stepup !== false){
-      const code = (device.querySelector('.modal.on .conf [data-f="code"]') || {}).value || '';
-      if(!/^\d{6}$/.test(code.trim())){ toast('Enter the 6-digit code from your authenticator', 'warn'); return; }
+      const pw = (device.querySelector('.modal.on .conf [data-f="stepuppw"]') || {}).value || '';
+      if(pw !== SEED_PW){
+        S.stepupTries = (S.stepupTries || 0) + 1;
+        if(S.stepupTries >= 3){
+          S.stepupTries = 0; S.confirm = null; S._confirm = null; S._pending = null;
+          AUDIT.unshift({when:'Just now', who:ME.name, role:'Super Admin', obj:`Step-up failed three times — ${esc(cf.title || 'a guarded action')}`, act:'Step-up failed, session ended', mod:'System & Audit', cat:'Sign-in', sev:'high', ip:'10.2.14.2'});
+          S.signedIn = false; try { sessionStorage.removeItem('tn-admin-signedin'); } catch(e){} S.auth = 'login';
+          toast('That password is incorrect. For your security you have been signed out.', 'warn');
+          return render();
+        }
+        toast(`That password is incorrect. ${3 - S.stepupTries} attempt${3 - S.stepupTries === 1 ? '' : 's'} left.`, 'warn');
+        return render();
+      }
+      S.stepupTries = 0;
     }
     return doAction(d.do, t);
   }
@@ -11425,6 +11594,16 @@ document.getElementById('reset')?.addEventListener('click', () => {
 /* the prototype-bar wordmark (present only if the bar is restored) */
 const ptLogoEl = document.getElementById('ptLogo');
 if(ptLogoEl) ptLogoEl.innerHTML = `<img src="${LOGO_K}" alt="TalentNext">`;
+
+/* THE RESEND COUNTDOWN TICKS LIVE (Maryam, 23 Sep 2026). One app-life interval
+   rewrites ONLY the `#otpResend` line each second from its `data-until` stamp, so
+   the OTP cells' carets are never touched (trap 9/17 — a full render would rebuild
+   them). When the clock runs out the line becomes the "Resend code" link. */
+setInterval(() => {
+  const el = document.getElementById('otpResend'); if(!el) return;
+  const html = otpResendText(+el.dataset.until || 0, el.dataset.resend || 'resendcode');
+  if(el.innerHTML !== html) el.innerHTML = html;
+}, 1000);
 
 /* ---- boot ---- */
 readHash();
