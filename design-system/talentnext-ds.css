@@ -317,7 +317,7 @@ select.inp{appearance:none; cursor:pointer; background-image:linear-gradient(45d
 .sw.on::after{transform:translateX(18px)}
 .srch{position:relative}
 .srch .inp{padding-left:48px}
-.srch > svg{position:absolute; left:var(--s05); top:14px; width:20px; height:20px; color:var(--icon-secondary); pointer-events:none}
+.srch > svg{position:absolute; left:var(--s05); top:50%; transform:translateY(-50%); width:20px; height:20px; color:var(--icon-secondary); pointer-events:none}
 .row-lead,
 .tile,
 .gcard,

@@ -14,7 +14,7 @@
      The <style> block is PROTOTYPE CHROME AND NOTHING ELSE (the device frame,
      the viewport picker, the wordmark size, a toast host) — no product rule.
      ========================================================================== -->
-<link rel="stylesheet" href="design-system/talentnext-ds.css?b=b4221056">
+<link rel="stylesheet" href="design-system/talentnext-ds.css?b=64e30767">
 <style id="admin-auth-slider">
 /* THE FRONT DOOR IS A SLIDER — ported verbatim from the candidate portal's
    §132 (hifi/build/132-authslide.css). That layer is hifi-only
@@ -248,10 +248,25 @@
    inside `.device`, whose `container-type` makes it the containing block for a
    fixed child, so a toast is clipped to the frame it belongs to (the same
    mechanism the agent portal's steps popup note records). */
-.pt-toasts{position:fixed;left:50%;bottom:var(--s06);transform:translateX(-50%);
-  z-index:60;display:flex;flex-direction:column;gap:var(--s03);width:min(360px,86%);
+.pt-toasts{position:fixed;right:var(--s06);bottom:var(--s06);
+  z-index:60;display:flex;flex-direction:column;align-items:flex-end;gap:var(--s03);width:min(360px,86%);
   pointer-events:none}
-.pt-toasts .note{margin:0;box-shadow:0 6px 24px rgba(17,17,17,.12);background:var(--pure-white,#fff)}
+.pt-toasts .note{margin:0;box-shadow:0 6px 24px rgba(17,17,17,.12);background:var(--pure-white,#fff);
+  width:100%;animation:ptToastIn .28s cubic-bezier(.16,1,.3,1) both}
+@keyframes ptToastIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+/* KILL CHROME'S AUTOFILL HIGHLIGHT (Maryam, 23 Sep 2026: "the blue bg should be
+   removed"). Chrome paints a fixed blue/yellow ground on `:-webkit-autofill` fields
+   and keeps it until the value is edited — it read as a stuck blue box on the Add /
+   Edit form. The background can't be set directly (Chrome overrides it), so paint
+   over it with an inset box-shadow in the field's own ground and hold the text ink;
+   the huge transition delay stops the tint from ever animating back in. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus{
+  -webkit-text-fill-color:var(--text-primary);
+  -webkit-box-shadow:0 0 0 1000px var(--background,#fff) inset;
+  box-shadow:0 0 0 1000px var(--background,#fff) inset;
+  transition:background-color 100000s ease-out 0s, color 100000s ease-out 0s}
 </style>
 <style id="pilot-side-sheet">
 /* PILOT (Maryam, 13 Sep 2026) — a record form opens as the candidate portal's
@@ -594,7 +609,18 @@
    below the text. */
 .app .conf{padding:var(--s05)}
 .app .conf > .conf-b{padding:0}
-.app .conf > .conf-a{padding:var(--s05) 0 0}
+/* A wider gap between the text/field and the action buttons (Maryam, 23 Sep 2026). */
+.app .conf > .conf-a{padding:var(--s06) 0 0}
+/* The step-up Password label + field read LEFT and fill the row (Maryam, 23 Sep 2026:
+   "the title password should be left aligned to the row and the row should be of full
+   width") — the rest of the `.conf` stays centred. */
+.app .conf .conf-step{text-align:left; width:100%; align-items:stretch}
+.app .conf label.conf-step .inp{width:100%}
+/* The step-up field masks its characters WITHOUT being a real `type=password`, so
+   Chrome's password manager never offers to save/manage it (Maryam, 23 Sep 2026:
+   "remove the default browser save password action"). `-webkit-text-security:disc`
+   renders dots; it is a text input to the browser, so no credential UI fires. */
+.app .conf .pw-mask{-webkit-text-security:disc; text-security:disc}
 /* THE CONFIRM ICON is ONE accent circle with a BLACK glyph (Maryam, 14 Sep 2026):
    no light-red inner disc, no outer ring (the DS box-shadow), no per-kind hue. */
 .app .conf .conf-mk, .app .conf.conf-ok .conf-mk{background:var(--accent); box-shadow:none; margin-bottom:var(--s04)}
@@ -1187,7 +1213,7 @@
   </div>
 </div>
 
-<script src="design-system/talentnext-ds.js?b=b4221056"></script>
+<script src="design-system/talentnext-ds.js?b=64e30767"></script>
 <script>
 /* ==========================================================================
    THE SUPER ADMIN PORTAL
@@ -2061,6 +2087,12 @@ const MODULES=[
     so the rail draws a single item with no tree. Drop `hidden` to bring one back. */
  {k:'system', t:'Integrations', ic:'link', subs:[
    {k:'integrations', t:'Integrations'}, {k:'overview', t:'System Health', hidden:true}, {k:'audit', t:'Audit Log', hidden:true}, {k:'compliance', t:'Compliance & Safeguarding', hidden:true}]},
+ /* AUDIT LOG is its OWN top-level rail item (Maryam, 23 Sep 2026: "add audit log")
+    — the immutable action record deserves the rail, not a hidden System sub. The
+    page (`systemAudit`) is unchanged; this just surfaces it at `audit/audit`. The
+    old `system/audit` deep link still renders it too (V.system keeps the sub). */
+ {k:'audit', t:'Audit Log', ic:'doc', subs:[
+   {k:'audit', t:'Audit Log'}]},
  /* Reports hidden wholesale for now (Maryam, 16 Sep 2026: "hide reports module
     for now"), like CRM/Vetting — module and pages stay defined and deep-link
     reachable, just off the rail; drop `hidden` to bring it back. */
@@ -2234,11 +2266,22 @@ function searchHead(title, desc, act, ph){
    heading used to hold. */
 function lstTools(ph, filters){
   const q = getFilter('q', '');
+  /* WHILE A SIDE-SHEET FORM IS OPEN, nothing the admin does in the form may touch the
+     table (Maryam, 23 Sep 2026: "anything i am doing in the form ... should not affect
+     the table"). The cause was Chrome AUTOFILL dropping the form's email into this box —
+     Chrome ignores `autocomplete="off"` when a field's placeholder says "email". Two
+     guards, so it is deterministic and does not depend on Chrome honouring anything:
+       1. `readonly` + untabbable — Chrome skips readonly fields, so it is not even
+          offered as an autofill target;
+       2. the `data-srch` hook is REMOVED — so even if some value lands in the box, the
+          input listener's `[data-srch]` branch cannot match and the table filter never
+          fires. The clear (X) is dropped too. */
+  const locked = sideSheet(S.sheet);
   return `<div class="lst-tools">
     <div class="srch${q ? ' srch-has' : ''}">
       <svg class="mag" viewBox="0 0 24 24">${inner('search')}</svg>
-      <input class="inp" data-srch="q" value="${esc(q)}" placeholder="${esc(ph || 'Search')}" aria-label="${esc(ph || 'Search')}" autocomplete="off">
-      ${q ? `<button type="button" class="srch-x" data-srchclear="q" aria-label="Clear search">${I.close}</button>` : ''}
+      <input class="inp"${locked ? '' : ' data-srch="q"'} value="${esc(q)}" placeholder="${esc(ph || 'Search')}" aria-label="${esc(ph || 'Search')}" autocomplete="off"${locked ? ' readonly tabindex="-1"' : ''}>
+      ${q && !locked ? `<button type="button" class="srch-x" data-srchclear="q" aria-label="Clear search">${I.close}</button>` : ''}
     </div>
     ${filters ? `<div class="lst-filters">${filters}</div>` : ''}
   </div>`;
@@ -3087,6 +3130,21 @@ function formDd(f, val){
         `<button type="button" class="fdd-opt${String(ov) === String(cv) ? ' on' : ''}${ometa ? ' has-meta' : ''}" role="option" aria-selected="${String(ov) === String(cv) ? 'true' : 'false'}" data-formddset="${esc(ov)}">${fddAv(oimg)}${esc(ol)}${ometa ? `<span class="fdd-meta">${esc(ometa)}</span>` : ''}</button>`).join('')}</div>
     </div></label>`;
 }
+/* re-sync a formDd trigger's VISIBLE label to its hidden `[data-f]` value. The pick
+   handler (`data-formddset`) does this on click; the form-draft restore in `render()`
+   sets the hidden value directly, so it calls this to make the trigger agree. A plain
+   text/date input (no `.fdd` ancestor) no-ops. */
+function restoreFormDdDisplay(hid){
+  const fdd = hid.closest && hid.closest('.fdd'); if(!fdd) return;
+  const vl = fdd.querySelector('.fdd-val'); if(!vl) return;
+  const opts = [...fdd.querySelectorAll('[data-formddset]')];
+  const opt = opts.find(b => String(b.getAttribute('data-formddset')) === String(hid.value));
+  if(opt){
+    vl.innerHTML = opt.innerHTML; vl.classList.remove('fdd-ph');
+    vl.classList.toggle('has-meta', opt.classList.contains('has-meta'));
+    opts.forEach(b => { const on = b === opt; b.classList.toggle('on', on); b.setAttribute('aria-selected', on ? 'true' : 'false'); });
+  }
+}
 /* OUR DATE PICKER — replaces the native <input type="date"> so no browser/OS
    picker shows on the Super Admin portal (Maryam, 15 Sep 2026: "this needs to be
    in our ui"). A trigger carrying the calendar icon opens a compact month grid on
@@ -3210,7 +3268,7 @@ function ruleError(r, v, vals, exceptId){
   if(r.req && empty) return r.msg || (r.select ? `Select a ${String(r.l || '').toLowerCase()}.` : `Enter a ${String(r.l || '').toLowerCase()}.`);
   if(empty) return null;   /* an optional field left blank passes every other check */
   if(r.email && !EMAIL_RE.test(v)) return 'Enter a valid email address.';
-  if(r.unique && USERS.some(u => u.id !== exceptId && (u.email || '').toLowerCase() === String(v).toLowerCase())) return 'This email address is already in use on the platform.';
+  if(r.unique){ const skip = exceptId != null ? exceptId : r.exceptId; if(USERS.some(u => u.id !== skip && (u.email || '').toLowerCase() === String(v).toLowerCase())) return 'This email address is already in use on the platform.'; }
   if(r.phone && !isPhone(v)) return 'Enter a valid phone number.';
   if(r.max && String(v).length > r.max) return `Keep it under ${r.max} characters.`;
   return null;
@@ -3545,7 +3603,7 @@ const talq = () => {
       ['Is anything down?', `${SVC_HEALTH.filter(s => s.state !== 'live').map(s => s.name + ' is ' + s.state).join('; ') || 'Every service is live'}. ${FEATURE_FLAGS.filter(f => f.on).length} of ${FEATURE_FLAGS.length} feature flags are on.`,
         null, ['System health', 'system/overview']],
       ['What did I change recently?', AUDIT.filter(a => a.who === ME.name).slice(0, 3).map(a => `${a.act} — ${a.obj}`).join('; ') + '.',
-        null, ['Audit log', 'system/audit']],
+        null, ['Audit log', 'audit/audit']],
       ['Any open data requests?', `${openDsars()} against the 30-day clock: ${DSARS.filter(d => d.status === 'in progress').map(d => `${d.who} (${d.type}, due ${d.due})`).join(', ')}.`,
         null, ['Compliance', 'system/compliance']]
     ],
@@ -4711,7 +4769,6 @@ function staffRowActs(u){
   if(u.status === 'deleting' || u.status === 'deleted') return rowActs(acts);
   if(u.status === 'invited'){
     acts.push(['renew', 'Resend Invite', `data-act="staffresend:${u.id}"`]);
-    acts.push(['eye', 'Preview Activation', `data-act="staffpreviewactivate:${u.id}"`]);
     acts.push(['close', 'Cancel Invite', `data-act="staffcancelinvite:${u.id}"`]);
   } else {
     /* Edit is hidden on a protected account (the original Super Admin and the
@@ -4737,12 +4794,18 @@ PAGESUM['users/staff'] = () => {
 
 function usersStaff(){
   const rf = getFilter('role', 'all'), sf = getFilter('status', 'all'), df = getFilter('dept', 'all'), q = getFilter('q', '');
-  const rows = USERS.filter(u => u.internal)
+  /* Status is a TAB STRIP now — All / Invited / Active / Deactivated — not a dropdown
+     (Maryam, 23 Sep 2026), matching the Users role tabs. Counts reflect the other live
+     filters (role / department / search); the status filter itself is applied after. */
+  const base = USERS.filter(u => u.internal)
     .filter(u => staffRole(u) !== 'admin')   /* Super Admins are not listed in Staff Members (Maryam, 23 Sep 2026) */
     .filter(u => rf === 'all' || staffRole(u) === rf)
-    .filter(u => sf === 'all' || u.status === sf)
     .filter(u => df === 'all' || u.dept === df)
     .filter(u => hit(q, u.name, u.email));
+  const scount = s => s === 'all' ? base.length : base.filter(u => u.status === s).length;
+  const STAFF_STATUS_TABS = [['all', 'All', scount('all')], ['invited', 'Invited', scount('invited')],
+    ['active', 'Active', scount('active')], ['inactive', 'Deactivated', scount('inactive')]];
+  const rows = base.filter(u => sf === 'all' || u.status === sf);
   const nameCell = u => u.status === 'deleted'
     ? `<div>Former staff member</div><div class="t-caption">Erased</div>`
     : `<div>${esc(u.name)}${u.orig ? ' <span class="tag sm brand">Default</span>' : ''}</div><div class="t-caption">${esc(u.email)}</div>`;
@@ -4751,9 +4814,9 @@ function usersStaff(){
     ${searchHead('Staff Members', 'Everyone internal with an account, at what level, and who has stopped using it. A row opens the full record.',
       `<button class="btn btn-g btn-sm noic" data-act="staffexport">${I.download} Export</button>
        <button class="btn btn-p btn-sm noic" data-sheet="addstaff">${I.add} Add Staff Member</button>`)}
+    ${filterStrip('status', 'all', STAFF_STATUS_TABS)}
     ${lstTools('Search by name or email',
       filterDd('role', 'all', [['all', 'All roles'], ...staffRoleOpts(false)], 'Role')
-      + filterDd('status', 'all', [['all', 'All'], ['invited', 'Invited'], ['active', 'Active'], ['inactive', 'Deactivated']], 'Status')
       + filterDd('dept', 'all', [['all', 'All'], ...DEPARTMENTS.map(d => [d, d])], 'Department'))}
     ${rows.length ? table(
       [{label:'Name'}, {label:'Role'}, {label:'Job title'}, {label:'Department'}, {label:'Status'}, {label:'Last signed in'}, {label:'Added'}, ACT_COL],
@@ -4935,14 +4998,17 @@ SHEETS.editstaff = id => {
   return {
     title:`Edit ${u.name}`,
     body: [
+      /* Email address sits after Last name (matching the Add-staff order) but is
+         READ-ONLY — a staff member's email is their sign-in identifier and is not
+         edited here (Maryam, 23 Sep 2026). */
       fieldHtml({k:'first', l:'First name', t:'text', req:1, max:50}, first),
       fieldHtml({k:'last', l:'Last name', t:'text', req:1, max:50}, last),
-      fieldHtml({k:'job', l:'Job title', t:'text', req:1, max:100}, u.job),
-      deptField(u.dept),
+      roField('Email address', u.email),
       /* Phone is a contact detail now, not a sign-in factor — editable here and
          optional (Maryam, 23 Sep 2026). */
       fieldHtml({k:'phone', l:'Phone number', t:'text', ph:'+1 (415) 555-0100', max:30}, u.phone),
-      roField('Email address', u.email, 'The sign-in identifier and where every one-time code is sent. To change it, delete the account and send a new invite.')
+      fieldHtml({k:'job', l:'Job title', t:'text', req:1, max:100}, u.job),
+      deptField(u.dept)
     ].join(''),
     ok:'Save Changes',
     act:'savestaff:' + id,
@@ -5525,7 +5591,6 @@ function staffDetailView(u){
   } else if(u.status === 'invited'){
     acts = rowActs([
       ['renew', 'Resend Invite', `data-act="staffresend:${u.id}"`],
-      ['view', 'Preview Activation', `data-act="staffpreviewactivate:${u.id}"`],
       ['close', 'Cancel Invite', `data-act="staffcancelinvite:${u.id}"`],
       ['delete', 'Delete', `data-sheet="delstaff:${u.id}"`]
     ]);
@@ -9186,7 +9251,7 @@ V.finance = () => modView({overview:financeOverview, transactions:financeTransac
 ACTIONS.askrelease = key => {
   const p = PAYOUTS.find(x => x.id === key.split(':')[1]); if(!p) return;
   askConfirm({mk:'warning', stepup:true, title:`Release payout to ${p.agent}?`,
-    body:`This releases ${money(p.net)} from escrow to ${p.agent} now, ahead of the normal settlement cycle. Recorded in the audit log.`,
+    body:`You are releasing the payment of ${money(p.net)} to ${p.agent}. Please enter your password below to confirm this action.`,
     ok:`Release ${money(p.net)}`, act:'dorelease:' + p.id});
 };
 ACTIONS.dorelease = key => { const p = PAYOUTS.find(x => x.id === key.split(':')[1]); if(p){ p.status = 'settled'; p.when = 'Released'; audit('Released payout', `${p.agent} — ${money(p.net)}`, 'Finance & Settlement', 'high'); toast(money(p.net) + ' released to ' + p.agent); } S.confirm = null; };
@@ -9681,19 +9746,16 @@ function systemAudit(){
   <section class="sec">
     ${searchHead('Audit log', 'Every consequential action, in order. Immutable and retained for compliance. A line opens to its before and after state.',
       `${exportBtn('Audit log')} <button class="btn btn-g btn-sm noic" data-sheet="auditalert">${I.notification} Alert Rules</button>`, 'Search by actor, action or object')}
-    ${filterStrip('audsev', 'all', [
-      ['all', 'All', AUDIT.length],
-      ['high', 'High', AUDIT.filter(a => a.sev === 'high').length],
-      ['med', 'Medium', AUDIT.filter(a => a.sev === 'med').length],
-      ['notice', 'Notice', AUDIT.filter(a => a.sev === 'notice').length],
-      ['info', 'Info', AUDIT.filter(a => (a.sev || 'info') === 'info').length]
-    ])}
+    ${/* Severity is a FILTER DROPDOWN beside When now, not a tab strip (Maryam,
+         23 Sep 2026: "remove the priority tabs ... add a filter"). The module tabs
+         stay; the "Every module" tab reads "All". */''}
     <div class="cs lst-filt" role="tablist" aria-label="Module">
-      <button role="tab" class="${mf === 'all' ? 'on' : ''}" data-filter="audmod:all">Every module</button>
+      <button role="tab" class="${mf === 'all' ? 'on' : ''}" data-filter="audmod:all">All</button>
       ${mods.map(m => `<button role="tab" class="${mf === m ? 'on' : ''}" data-filter="audmod:${esc(m)}">${esc(m)}<span class="lf-n">${AUDIT.filter(a => a.mod === m).length}</span></button>`).join('')}
     </div>
     ${lstTools('Search by actor, action or object',
-      filterDd('audwhen', 'all', [['all', 'Any time'], ['today', 'Today'], ['yest', 'Yesterday'], ['older', 'Older']], 'When'))}
+      filterDd('audsev', 'all', [['all', 'All'], ['high', 'High'], ['med', 'Medium'], ['notice', 'Notice'], ['info', 'Info']], 'Severity')
+      + filterDd('audwhen', 'all', [['all', 'Any time'], ['today', 'Today'], ['yest', 'Yesterday'], ['older', 'Older']], 'When'))}
     ${rows.length ? table(
       [{label:'When', sort:false}, {label:'Actor'}, {label:'Action'}, {label:'Module'}, {label:'Severity'}, {label:'IP'}, ACT_COL],
       rows.map(a => ({sv:[, a.who, a.act], cells:[
@@ -9788,6 +9850,10 @@ SHEETS.retention = () => ({title:'Retention periods',
 ACTIONS.doretention = () => { const v = readForm(); RETENTION.filter(r => r.data !== 'Audit log').forEach((r, i) => { if(v['r' + i]) r.keep = v['r' + i]; }); audit('Changed retention periods', 'Retention', 'System & Audit', 'high'); toast('Retention periods saved'); };
 
 V.system = () => modView({overview:systemOverview, integrations:systemIntegrations, audit:systemAudit, compliance:systemCompliance});
+/* Audit Log as its own top-level module (Maryam, 23 Sep 2026) — reuses the same
+   `systemAudit` page under the `audit/audit` route. */
+V.audit = () => modView({audit:systemAudit});
+PAGESUM['audit/audit'] = PAGESUM['system/audit'];
 
 /* ======================================================================
    THE REPORTS MODULE (Maryam, 8 Sep 2026) — one report per functional
@@ -9886,7 +9952,7 @@ function reportPage(key){
 
   <section class="sec">
     ${aiHead(dHead, 'The latest actions logged in this area.',
-      '<button class="btn btn-g btn-sm noic" data-go="system/audit">Audit Log</button>')}
+      '<button class="btn btn-g btn-sm noic" data-go="audit/audit">Audit Log</button>')}
     ${done.length
       ? `<div class="tile-stack">${done.map(a => memRow(a.who, `${esc(a.act)} · ${esc(a.obj)}`, tag(a.sev, sevL(a.sev)))).join('')}</div>`
       : emptyState('doc', 'Nothing logged yet', 'No recent actions in this area.')}
@@ -10725,13 +10791,14 @@ function confirmSheet(){
         <span class="conf-mk">${c && c.mk === 'check' ? I.checkFilled : I.warning}</span>
         <h2 class="conf-t">${c ? esc(c.title) : ''}</h2>
         <p class="conf-x">${c ? c.body : ''}</p>
-        ${c && c.stepup && SEC.stepup !== false ? `<label class="f mt4"><span class="lbl">Password</span>
-          <input class="inp" data-f="stepuppw" type="password" autocomplete="current-password" placeholder="Your current password"></label>
-        <p class="t-desc">Confirm it is you before this commits (story 1.4): enter your current password, entered fresh however recently you signed in.${S.stepupTries ? ` <b>${3 - S.stepupTries} attempt${3 - S.stepupTries === 1 ? '' : 's'} left.</b>` : ''}</p>` : ''}
+        ${c && c.stepup && SEC.stepup !== false ? `<label class="f mt4 conf-step"><span class="lbl">Password</span>
+          <input class="inp pw-mask" data-f="stepuppw" type="text" inputmode="text" autocomplete="off" name="tn-stepup-${Date.now()}" data-1p-ignore data-lpignore="true" spellcheck="false" placeholder="Your current password"></label>` : ''}
       </div>
       <div class="sheet-f conf-a">
         <button class="btn btn-s noic" data-close="confirm">${c && c.cancel ? esc(c.cancel) : 'Cancel'}</button>
-        <button class="btn btn-p noic${c && c.danger ? ' danger' : ''}" data-do="${c ? esc(c.act) : ''}">${c ? esc(c.ok) : ''}</button>
+        ${/* the primary is disabled until the step-up password is typed (Maryam, 23 Sep
+             2026); a live input listener flips it without a render (trap 9). */''}
+        <button class="btn btn-p noic${c && c.danger ? ' danger' : ''}" data-do="${c ? esc(c.act) : ''}"${c && c.stepup && SEC.stepup !== false ? ' data-stepup-go="1" disabled' : ''}>${c ? esc(c.ok) : ''}</button>
       </div>
     </div>
   </div>`;
@@ -10812,7 +10879,7 @@ function sheetView(){
    click-away — the way out is the header X, matching §44. */
 function sidePeek(){
   const s = resolveSheet();
-  return `<aside class="peek peek-form" aria-label="${s ? esc(s.title) : ''}">
+  return `<aside class="peek peek-form" data-sheet-key="${esc(String(S.sheet || ''))}" aria-label="${s ? esc(s.title) : ''}">
     <div class="sheet-h"><h2>${s ? esc(s.title) : ''}</h2>
       <button class="x" data-close="sheet" aria-label="Close">${I.close}</button></div>
     <div class="sheet-b">${s ? s.body : ''}</div>
@@ -11006,6 +11073,24 @@ function render(){
      to the first column (§125) */
   const _prevWrapX = [...device.querySelectorAll('.tbl-wrap')].map(w => w.scrollLeft);
 
+  /* PRESERVE AN OPEN SIDE-SHEET FORM ACROSS A RENDER. The form's values live only in
+     the DOM (read on save), so any unrelated render — clearing the table search, a
+     search box Chrome autofills, a background refresh — rebuilt `sidePeek()` from an
+     empty `SHEETS.<key>()` and wiped everything the user had typed. Snapshot every
+     `[data-f]` here and restore it below; closing the sheet leaves no `.peek-form` to
+     restore into, so a genuine close still clears (trap 9). */
+  let _formDraft = null;
+  const _prevPeek = device.querySelector('.peek-form');
+  if(_prevPeek){
+    _formDraft = {__sheet: _prevPeek.getAttribute('data-sheet-key') || ''};
+    _prevPeek.querySelectorAll('[data-f]').forEach(el => { _formDraft[el.dataset.f] = el.value; });
+    const af = document.activeElement;
+    if(af && af.dataset && af.dataset.f && _prevPeek.contains(af)){
+      let pos = null; try { pos = af.selectionStart; } catch(e){}
+      _formDraft.__focus = {k: af.dataset.f, pos};
+    }
+  }
+
   /* THE ASK PAGE REPLACES THE PAGE and is the direct child of `.main` (§21
      gives it `height:100%`); the dock is not printed while it, a sheet or a
      confirmation is open — the dock is the invitation to the surface. */
@@ -11078,6 +11163,25 @@ function render(){
     const f = IMP_FOCUS; IMP_FOCUS = null;
     const el = device.querySelector(f.sel);
     if(el){ el.focus(); try { el.setSelectionRange(f.pos, f.pos); } catch(e){} }
+  }
+  /* restore the side-sheet form snapshot captured above, so a background render
+     (search clear, autofill, a refresh) can never wipe a half-filled form. */
+  if(_formDraft){
+    const np = device.querySelector('.peek-form');
+    /* only restore into the SAME sheet — switching addstaff→editstaff must not carry
+       one form's values onto another, which would clobber the record's prefill. */
+    if(np && (np.getAttribute('data-sheet-key') || '') === _formDraft.__sheet){
+      Object.keys(_formDraft).forEach(k => {
+        if(k === '__focus' || k === '__sheet') return;
+        const el = np.querySelector(`[data-f="${CSS.escape ? CSS.escape(k) : k}"]`);
+        if(!el || el.value === _formDraft[k]) return;
+        el.value = _formDraft[k];
+        restoreFormDdDisplay(el);   /* refresh a dropdown trigger's visible label */
+      });
+      const fc = _formDraft.__focus;
+      if(fc){ const fe = np.querySelector(`[data-f="${CSS.escape ? CSS.escape(fc.k) : fc.k}"]`);
+        if(fe){ fe.focus(); if(fc.pos != null){ try { fe.setSelectionRange(fc.pos, fc.pos); } catch(e){} } } }
+    }
   }
 
   try {
@@ -11304,6 +11408,12 @@ device.addEventListener('paste', e => {
 device.addEventListener('input', e => {
   /* the set-password checklist ticks live as the rules are met (no render, trap 9). */
   if(e.target.id === 'np'){ syncPwRules(); }
+  /* the step-up confirm's Release/Delete/… button is disabled until the password is
+     typed (Maryam, 23 Sep 2026) — toggled live, no render (trap 9). */
+  if(e.target.dataset && e.target.dataset.f === 'stepuppw'){
+    const btn = device.querySelector('.conf [data-stepup-go]');
+    if(btn) btn.disabled = !e.target.value.trim();
+  }
   /* the sign-in fields clear their error as the actor corrects them (no render — a
      render would rebuild the auth form and drop the caret; the DOM is cleared in
      place and S.authErr reset so the next render agrees). */
@@ -11397,25 +11507,16 @@ device.addEventListener('click', e => {
   }
   if(d.confirm !== undefined){ S.confirm = d.confirm; return render(); }
   if(d.do !== undefined){
-    /* Step-up (story 1.4): the actor's current password before a guarded action
-       commits — 3 attempts, and a third failure abandons the action AND ends the
-       session. The prototype accepts the seeded password; the point is the gate
-       and its failure behaviour, not the credential store. */
+    /* Step-up (story 1.4): the actor confirms their password before a guarded action
+       commits. This is a PROTOTYPE — any non-empty password is accepted (like the OTP
+       and the settings password flows), the point is the gate, not a credential store.
+       It never signs the actor out (Maryam, 23 Sep 2026: "do not make me logout"). The
+       confirm button is already disabled until the field has a value, so this is just a
+       defensive guard. */
     const cf = S._confirm;
     if(S.confirm === '_dyn' && cf && cf.stepup && SEC.stepup !== false){
-      const pw = (device.querySelector('.modal.on .conf [data-f="stepuppw"]') || {}).value || '';
-      if(pw !== SEED_PW){
-        S.stepupTries = (S.stepupTries || 0) + 1;
-        if(S.stepupTries >= 3){
-          S.stepupTries = 0; S.confirm = null; S._confirm = null; S._pending = null;
-          AUDIT.unshift({when:'Just now', who:ME.name, role:'Super Admin', obj:`Step-up failed three times — ${esc(cf.title || 'a guarded action')}`, act:'Step-up failed, session ended', mod:'System & Audit', cat:'Sign-in', sev:'high', ip:'10.2.14.2'});
-          S.signedIn = false; try { sessionStorage.removeItem('tn-admin-signedin'); } catch(e){} S.auth = 'login';
-          toast('That password is incorrect. For your security you have been signed out.', 'warn');
-          return render();
-        }
-        toast(`That password is incorrect. ${3 - S.stepupTries} attempt${3 - S.stepupTries === 1 ? '' : 's'} left.`, 'warn');
-        return render();
-      }
+      const pw = (device.querySelector('.modal.on .conf [data-f="stepuppw"]') || {}).value.trim() || '';
+      if(!pw){ toast('Enter your current password to confirm.', 'warn'); return; }
       S.stepupTries = 0;
     }
     return doAction(d.do, t);

@@ -243,7 +243,10 @@ select.inp{appearance:none;cursor:pointer;
 /* search */
 .srch{position:relative}
 .srch .inp{padding-left:48px}
-.srch > svg{position:absolute;left:var(--s05);top:14px;width:20px;height:20px;
+/* The magnifier is CENTRED against the field, not pinned at a fixed `top` (Maryam,
+   23 Sep 2026: "mid align the search icon with the text") — a hardcoded top drifts
+   off centre whenever the field height changes. */
+.srch > svg{position:absolute;left:var(--s05);top:50%;transform:translateY(-50%);width:20px;height:20px;
   color:var(--icon-secondary);pointer-events:none}
 
 /* ==========================================================================
