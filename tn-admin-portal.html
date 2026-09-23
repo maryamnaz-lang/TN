@@ -490,6 +490,18 @@
    :not(#_) lift, so §10.5's ≥900 label column cannot win) */
 .app .page .kv-ends .kv:not(#_){grid-template-columns:minmax(0,1fr) auto; gap:var(--s04)}
 .app .page .kv-ends .kv .v:not(#_){text-align:right}
+/* NOTIFICATIONS (story 2.3): the dismiss cross rides the row's top-right
+   corner, outside the row button; a row with a cross reserves room for it. The
+   full list hosts the panel's `.notif .nrow` rows in-flow — `.notif-page`
+   undoes the panel's off-canvas positioning, nothing else. */
+.app .nrow-wrap{position:relative}
+.app .nrow-wrap.has-x > .nrow{padding-right:calc(var(--pad-x) + 28px)}
+.app .nrow-x{position:absolute; top:var(--s04); right:var(--s04); width:28px; height:28px; display:grid; place-items:center; color:var(--text-secondary); background:transparent; border:0; cursor:pointer}
+.app .nrow-x svg{width:16px; height:16px}
+.app .nrow-x:hover{color:var(--text-primary)}
+.app .page .notif.notif-page{position:static; transform:none; visibility:visible; max-width:none; width:auto; border:0; z-index:auto; background:transparent; display:block}
+.app .page .notif.notif-page .nrow{padding-left:0}
+.app .page .notif.notif-page .nrow::after, .app .page .notif.notif-page .nrow-wrap .nrow::after{left:0; right:0}
 .app button.sw{cursor:pointer; padding:0; border:0}
 .app button.sw:focus-visible{outline:none}
 .app button.sw:focus-visible::after{box-shadow:0 1px 3px var(--thumb-shadow),0 0 0 8px var(--brand-tint-2)}
@@ -2062,12 +2074,27 @@ const DSARS=[
 ];
 
 /* admin-context notifications (tn-admin.html:3641) */
+/* THE NOTIFICATION SET — story 2.3 (Maryam's QA, 23 Sep 2026). Every item is
+   one of the story's fixed templates, points only at a VISIBLE module, and
+   carries its KIND: `cond` (condition-based — raised while something is true,
+   cleared by the work itself, so it has NO dismiss cross) or `info`
+   (informational — something happened, cleared by dismissing it). `id` is what
+   read and dismiss state key on (`S.read` / `S.dismissed`), per account, so two
+   items with the same heading never share a state. Timings and names are
+   authored placeholder (§74); `rd` is the seed's read flag. */
 const ADMIN_NOTIF=[
- {ic:'flag',  h:'Vetting queue',       t:'3 talent agents are awaiting approval before they can take interviews.', w:'12m ago', rd:false, go:'vetting/applications'},
- {ic:'alert', h:'Open decision',       t:'Agent compensation is still unreconciled — $100/mo listing fee vs a percentage payout share.', w:'1h ago', rd:false, go:'finance/feeconfig'},
- {ic:'money', h:'Finance & settlement',t:'Payment settlement rules are undefined — 12 payouts are pending release.', w:'3h ago', rd:false, go:'finance/payouts'},
- {ic:'users', h:'New account',         t:'Employer account created — Signal Home Office. Verification not yet run.', w:'Yesterday', rd:true, go:'employers/empverify'},
- {ic:'route', h:'Cohorts',             t:'Bootstrap gap: no Builders are available to lead the first Explorer cohorts.', w:'Yesterday', rd:true, go:'cohorts/assign'}
+ {id:'n1',  kind:'cond', ic:'money',  h:'Refund waiting for a decision',     t:'Sophia Ali · $120 interview refund · requested yesterday.', w:'12m ago', rd:false, go:'finance/transactions'},
+ {id:'n2',  kind:'cond', ic:'alert',  h:'Payout run completed with failures', t:'2 of 8 payouts failed at the provider · run of 22-09-2026.', w:'1h ago', rd:false, go:'finance/payouts'},
+ {id:'n3',  kind:'cond', ic:'flag',   h:'Candidate level waiting over 48 hours', t:'Liam Chen · Explorer – E3 recommended by Priya Nair.', w:'2h ago', rd:false, go:'market/bookings'},
+ {id:'n4',  kind:'cond', ic:'users',  h:'Cohort has no leader',              t:'Cohort 4 · starts 01-10-2026 with 7 members.', w:'3h ago', rd:false, go:'cohorts/assign'},
+ {id:'n5',  kind:'info', ic:'user',   h:'Your role was changed',             t:'You are now Super Admin · changed by Derek.', w:'5h ago', rd:false, go:'settings/profile'},
+ {id:'n6',  kind:'cond', ic:'time',   h:'Interview report past its deadline', t:'Grace Kim with Owen Hart · held 19-09-2026.', w:'Yesterday', rd:true, go:'market/bookings'},
+ {id:'n7',  kind:'info', ic:'lock',   h:'Your password was changed',         t:'Changed from Chrome on macOS · London, UK.', w:'Yesterday', rd:true, go:'settings/security'},
+ {id:'n8',  kind:'info', ic:'users',  h:'Invitation accepted',               t:'Amira Khan accepted your invitation and is now active.', w:'2 days ago', rd:true, go:'users/staff'},
+ {id:'n9',  kind:'info', ic:'download', h:'Your export is ready',            t:'Transactions export · link valid for 7 days.', w:'2 days ago', rd:true, go:'finance/transactions'},
+ {id:'n10', kind:'cond', ic:'route',  h:'Cohort below its minimum size',     t:'Cohort 3 reached its start date with 3 of 5 members.', w:'3 days ago', rd:true, go:'cohorts/cohorts'},
+ {id:'n11', kind:'info', ic:'user',   h:'Your details were changed',         t:'Job title updated by Derek.', w:'4 days ago', rd:true, go:'settings/profile'},
+ {id:'n12', kind:'info', ic:'users',  h:'Invitation expired',                t:'Your invitation to Noah Reyes expired without being accepted.', w:'6 days ago', rd:true, go:'users/staff'}
 ];
 
 /* ======================================================================
@@ -2197,7 +2224,8 @@ const S = {
   auth:'login', authFlow:'signin', otpCh:null, otpSentAt:0, activate:null,
   viewAs:null,                            /* SA-11 — {id, scope, since, tell} while impersonating */
   _pending:null,                          /* a sheet's values carried into a second confirmation */
-  read:[],                                /* notifications marked read */
+  read:[],                                /* notification ids marked read */
+  dismissed:[],                           /* informational notification ids dismissed (story 2.3) */
   tab:{}, filter:{}, sort:{}, pg:{}, pgOpen:null, fdOpen:null, /* per-page substate; pgOpen/fdOpen = open dropdowns */
   attnPage:0,                             /* the "Needs your attention" black card shows one action item at a time; this is which (0..N-1) */
   revView:'year',                         /* the Revenue-by-line line chart's Year/Month/Week granularity */
@@ -3388,6 +3416,8 @@ ACTIONS.attn = key => { const dir = key.split(':')[1]; const n = attnItems().len
 /* THE REVENUE-BY-LINE CHART's Year/Month/Week toggle — sets the granularity; doAction re-renders. */
 ACTIONS.revview = key => { S.revView = key.split(':')[1]; };
 /* 2.2 — the dashboard period selector (This week / month / quarter). */
+/* a Needs-your-attention item opens its directory pre-filtered (story 2.2) */
+ACTIONS.attngo = key => { const [, route, fk, fv] = key.split(':'); (S.filter[route] = S.filter[route] || {})[fk] = fv; go(route); return 'keep'; };
 ACTIONS.setperiod = key => { S.period = key.split(':')[1]; };
 /* Per-chart Weekly/Monthly/Yearly filter (Maryam, 22 Sep 2026): `gper:<chartId>:<period>`.
    `S.gperAnim` marks the chart that just switched so ONLY it plays the grow-in
@@ -4012,6 +4042,8 @@ function homeOverview(){
   const interviewRev = TXNS.filter(t => t.cat === 'interview' && t.dir === 'in').reduce((n, t) => n + t.amt, 0);
   const sceneRev = TXNS.filter(t => t.cat === 'scene' && t.dir === 'in').reduce((n, t) => n + t.amt, 0);
   const poSettled = PAYOUTS.filter(p => p.status === 'settled').reduce((n, p) => n + p.net, 0);
+  const refunded = TXNS.filter(t => t.cat === 'refund' && t.status === 'refunded').reduce((n, t) => n + t.amt, 0);
+  const staffCount = USERS.filter(u => u.internal).length;
   const poPending = PAYOUTS.filter(p => p.status === 'held').reduce((n, p) => n + p.net, 0);
   const poGross = PAYOUTS.reduce((n, p) => n + p.gross, 0);
   const platTake = poGross - PAYOUTS.reduce((n, p) => n + p.net, 0);
@@ -4033,6 +4065,10 @@ function homeOverview(){
   const leadReady = LEADER_REQS.filter(r => r.stage === 'feedback').length;
   const ivOverdue = BOOKINGS.filter(bkOverdue).length;
   const heldPo = heldPayouts();
+  const ATTN_STORY = false;
+  const invitesStaff = USERS.filter(u => u.status === 'invited' && u.internal).length;
+  const invitesExt = USERS.filter(u => u.status === 'invited' && !u.internal && !u.roles.includes('employer')).length;
+  const agNotListed = AGENTS().filter(a => agState(a) === 'notlisted').length;
   /* Open decisions is NOT an attention card (Maryam, 21 Sep 2026: "we hid open
      decisions so hide it from the needs attention as well"). The Rulings
      Register still exists; it is simply not surfaced as a live queue here. */
@@ -4040,9 +4076,19 @@ function homeOverview(){
     cohortsNoLeader && ['cohorts', 'Cohorts without a leader', `${cohortsNoLeader} active cohort${cohortsNoLeader === 1 ? '' : 's'} to assign`, 'cohorts/assign'],
     leadReady && ['group', 'Cohort leaders ready to allot', `${leadReady} recommended and interviewed`, 'cohorts/assign'],
     ivOverdue && ['market', 'Interview reports overdue', `${ivOverdue} held interview${ivOverdue === 1 ? '' : 's'} past 24h`, 'market/bookings'],
-    heldPo && ['bank', 'Payouts to release', `${heldPo} pending settlement`, 'finance/payouts']
+    heldPo && ['bank', 'Payouts to release', `${heldPo} pending settlement`, 'finance/payouts'],
+    /* STORY 2.2's two items, each opening its directory ALREADY FILTERED to the
+       accounts it counts (`attngo:<route>:<filter>:<value>` presets the list's
+       own filter, then navigates). PARKED "for the moment" (Maryam's QA, 23 Sep
+       2026: the attention row stays the previous three) — `ATTN_STORY` false
+       keeps them off; flip it to bring both back. */
+    /* staff invites live in the Staff directory, external ones in All Users (an
+       account never appears in both), so each count opens the list that holds it */
+    ATTN_STORY && invitesStaff && ['users', 'Outstanding staff invitations', `${invitesStaff} staff account${invitesStaff === 1 ? '' : 's'} not yet accepted`, 'attngo:users/staff:status:invited'],
+    ATTN_STORY && invitesExt && ['users', 'Outstanding invitations', `${invitesExt} account${invitesExt === 1 ? '' : 's'} not yet accepted`, 'attngo:users/users:status:invited'],
+    ATTN_STORY && agNotListed && ['agents', 'Agents active but not listed', `${agNotListed} agent${agNotListed === 1 ? '' : 's'} not bookable`, 'attngo:agents/agents:agstate:notlisted']
   ].filter(Boolean);
-  const attnRows = attn.map(([ic_, t, s, go]) => `<button class="tile clk gcard" data-go="${go}">
+  const attnRows = attn.map(([ic_, t, s, go]) => `<button class="tile clk gcard" ${go.indexOf('attngo:') === 0 ? `data-act="${go}"` : `data-go="${go}"`}>
       <span class="cardrow-ic">${ic(ic_)}</span>
       <span class="gcard-b"><h3>${t}</h3><span class="sub">${esc(s)}</span></span>
       <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg></button>`).join('');
@@ -4097,7 +4143,15 @@ function homeOverview(){
       ['book', 'Courses', String(COURSES.length), `${liveCourses} live · ${draftCourses} draft`],
       ['money', 'Gross payment', money(gross), 'this window'],
       ['bank', 'In escrow', money(inprog), 'not yet settled'],
-      ['clock', 'Payouts pending', money(poPending), 'to release']
+      ['clock', 'Payouts pending', money(poPending), 'to release'],
+      /* STORY 2.2 COMPLETION (Maryam's QA, 23 Sep 2026: "whatever is partial,
+         add that only"): Platform at a glance gains TOTAL USERS and STAFF;
+         Money at a glance gains RELEASED and REFUNDED. A third row of four
+         keeps the fixed 4-column `.stats` grid whole. Read off the seed. */
+      ['users', 'Total users', String(uTot), `${uActive} active · ${uInvited} invited`],
+      ['user', 'Staff', String(staffCount), 'internal accounts'],
+      ['money', 'Released', money(poSettled), 'paid out to agents'],
+      ['money', 'Refunded', money(refunded), 'returned to payers']
     ], 'dash-stats')}
   </section>
 
@@ -4170,7 +4224,7 @@ function homeOverview(){
         const pending = PAYOUTS.filter(p => p.status === 'held').reduce((n, p) => n + p.net, 0);
         return `<div class="pay-card">
           ${chartHead('Payouts', {go: 'finance/payouts', label: 'View payouts'})}
-          <div class="pbrk-sub">${money(pending)} pending to release</div>
+          <div class="pbrk-sub">${money(pending)} held in escrow now · ${money(pending)} releasing this week</div>
           ${gauge([
             {l: 'Settled', v: settled, c: 'var(--accent)', arc: true},
             {l: 'In progress', v: held, c: 'var(--gray-30)'}
@@ -4352,23 +4406,25 @@ SHEETS.sacase = arg => {
    concerns; opening one marks it read. Read state is per account (`S.read`). */
 PAGESUM['home/notifs'] = () => { const u = unreadCount(); return `Everything that has needed you, newest first. <b>${u} unread</b>. The bell carries the same list; this is the full record for the last 90 days. Acting on any item happens in the module that owns it.`; };
 function homeNotifs(){
-  const isRead = n => n.rd || S.read.includes(n.h);
+  /* THE FULL LIST — every notification the account holds, newest first, paged,
+     All (pre-selected) / Unread, each row the SAME `.nrow` the bell panel draws
+     (story 2.3). `.notif-page` hosts the panel's row styles in-flow. */
   const f = getFilter('nf', 'all');
-  const rows = ADMIN_NOTIF.filter(n => f === 'unread' ? !isRead(n) : true);
+  const live = notifLive();
+  const rows = live.filter(n => f === 'unread' ? !notifRead(n) : true);
+  const key = pageKey() + '#notifs';
+  const cur = S.pg[key] || {};
+  const size = cur.size || PAGE_DEFAULT, pages = Math.max(1, Math.ceil(rows.length / size));
+  const page = Math.min(cur.page || 0, pages - 1);
+  const slice = rows.slice(page * size, (page + 1) * size);
   return `
   <section class="sec">
     ${searchHead('Notifications', 'What has needed you, newest first. Opening an item marks it read; acting on it happens in the module that owns it.',
-      unreadCount() ? '<button class="btn btn-g btn-sm noic" data-readall="1">Mark All Read</button>' : '')}
-    ${filterStrip('nf', 'all', [['all', 'All', ADMIN_NOTIF.length], ['unread', 'Unread', ADMIN_NOTIF.filter(n => !isRead(n)).length]])}
-    ${rows.length ? `<div class="tile-stack mt4">
-      ${rows.map(n => `<button class="mem clk${isRead(n) ? '' : ' nrow un'}" data-go="${esc(n.go)}" data-read="${esc(n.h)}">
-        <span class="mem-av" aria-hidden="true">${ic(n.ic)}</span>
-        <span class="mem-b"><span class="mem-n">${esc(n.h)}${isRead(n) ? '' : ' <span class="dot on" style="display:inline-block;vertical-align:middle"></span>'}</span>
-          <span class="mem-m">${esc(n.t)}</span></span>
-        <span class="t-caption">${esc(n.w)}</span>
-      </button>`).join('')}
-    </div>` : emptyState('notification', f === 'unread' ? 'Nothing unread' : 'No notifications', 'You are all caught up.')}
-    ${note('', '', 'Notifications are held for 90 days and then removed. This list is not the audit log — the permanent record is on System → Audit Log.')}
+      `<span style="display:flex;gap:var(--s05)">${unreadCount() ? '<button class="btn btn-g btn-sm noic" data-readall="1">Mark All Read</button>' : ''}${readInfoCount() ? '<button class="btn btn-g btn-sm noic" data-act="notifdismissread">Dismiss All Read</button>' : ''}</span>`)}
+    ${filterStrip('nf', 'all', [['all', 'All', live.length], ['unread', 'Unread', live.filter(n => !notifRead(n)).length]])}
+    ${slice.length ? `<div class="notif notif-page mt4"><div class="notif-b">${slice.map(notifRow).join('')}</div></div>
+      ${rows.length > PAGE_SIZES[0] ? pagination(key, rows.length, page, size, pages) : ''}`
+      : emptyState('notification', f === 'unread' ? 'Nothing unread' : 'No notifications', 'You are all caught up.')}
   </section>`;
 }
 V.home = () => modView({home:homeOverview, rulings:homeRulings, notifs:homeNotifs});
@@ -10835,25 +10891,40 @@ function sidenav(){
 }
 
 /* THE NOTIFICATION PANEL — §27, the admin-context feed. */
-const unreadCount = () => ADMIN_NOTIF.filter(n => !n.rd && !S.read.includes(n.h)).length;
+const notifRead = n => n.rd || S.read.includes(n.id);
+const notifLive = () => ADMIN_NOTIF.filter(n => !S.dismissed.includes(n.id));
+const unreadCount = () => notifLive().filter(n => !notifRead(n)).length;
+const readInfoCount = () => notifLive().filter(n => n.kind === 'info' && notifRead(n)).length;
+/* ONE NOTIFICATION ROW, drawn identically in the bell panel and the full list
+   (story 2.3). The row is the design system's `.nrow`; an INFORMATIONAL item
+   gets a dismiss cross as a SIBLING of the row button (a button cannot hold a
+   button), so pressing it never opens the item. A condition-based item has no
+   cross — the work clears it. */
+const notifRow = n => `<div class="nrow-wrap${n.kind === 'info' ? ' has-x' : ''}">
+  <button class="nrow ${notifRead(n) ? '' : 'un'}" data-go="${esc(n.go)}" data-read="${esc(n.id)}">
+    <span class="nrow-ic">${ic(n.ic)}</span>
+    <span class="nrow-b"><span class="nrow-t">${esc(n.h)}</span>
+      <span class="nrow-d">${esc(n.t)}</span></span>
+    <span class="nrow-w">${esc(n.w)}</span>
+  </button>${n.kind === 'info' ? `<button class="nrow-x" data-act="notifdismiss:${esc(n.id)}" aria-label="Dismiss ${esc(n.h)}">${I.close}</button>` : ''}
+</div>`;
+const notifActs = () => `${unreadCount() ? '<button class="notif-all" data-readall="1">Mark all read</button>' : ''}${readInfoCount() ? '<button class="notif-all" data-act="notifdismissread">Dismiss all read</button>' : ''}`;
 function notifPanel(){
-  const isRead = n => n.rd || S.read.includes(n.h);
+  /* the panel shows the 10 most recent (story 2.3); the seed is newest first */
+  const items = notifLive().slice(0, 10);
   return `<div class="notif-scrim ${S.notif ? 'on' : ''}" data-close="notif" aria-hidden="true"></div>
   <aside class="notif ${S.notif ? 'on' : ''}" aria-label="Notifications">
     <div class="notif-h"><h2>Notifications</h2>
-      ${unreadCount() ? '<button class="notif-all" data-readall="1">Mark all read</button>' : ''}
+      ${notifActs()}
       <button class="x" data-close="notif" aria-label="Close">${I.close}</button></div>
     <div class="notif-b">
-      ${ADMIN_NOTIF.map(n => `
-        <button class="nrow ${isRead(n) ? '' : 'un'}" data-go="${esc(n.go)}" data-read="${esc(n.h)}">
-          <span class="nrow-ic">${ic(n.ic)}</span>
-          <span class="nrow-b"><span class="nrow-t">${esc(n.h)}</span>
-            <span class="nrow-d">${esc(n.t)}</span></span>
-          <span class="nrow-w">${esc(n.w)}</span>
-        </button>`).join('')}
+      ${items.length ? items.map(notifRow).join('') : emptyState('notification', 'No notifications', 'You are all caught up.')}
     </div>
   </aside>`;
 }
+/* dismissing is immediate, no confirmation, no undo, for this account only */
+ACTIONS.notifdismiss = key => { const id = key.split(':')[1]; const n = ADMIN_NOTIF.find(x => x.id === id); if(n && n.kind === 'info' && !S.dismissed.includes(id)) S.dismissed.push(id); };
+ACTIONS.notifdismissread = () => { notifLive().forEach(n => { if(n.kind === 'info' && notifRead(n)) S.dismissed.push(n.id); }); };
 
 /* THE CONFIRMATION DIALOG — the `.conf` sheet, for every destructive action
    and log-out (DESIGN.md §3). `data-do` on the confirm button names the action
@@ -11547,7 +11618,7 @@ device.addEventListener('click', e => {
     return render();
   }
   if(d.readall){
-    ADMIN_NOTIF.forEach(n => { if(!n.rd && !S.read.includes(n.h)) S.read.push(n.h); });
+    notifLive().forEach(n => { if(!notifRead(n)) S.read.push(n.id); });
     return render();
   }
   if(d.confirm !== undefined){ S.confirm = d.confirm; return render(); }
@@ -11742,7 +11813,7 @@ document.getElementById('reset')?.addEventListener('click', () => {
   S.mod = 'home'; S.sub = 'home'; S.id = null;
   S.nav = S.notif = S.acct = false; S.confirm = null; S.sheet = null;
   S.tal = false; S.thread = []; S.typing = false; S.editPerms = false; S.rowMenu = null;
-  S.read = []; S.tab = {}; S.filter = {}; S.sort = {}; S.pg = {}; S.pgOpen = null; S.fdOpen = null;
+  S.read = []; S.dismissed = []; S.tab = {}; S.filter = {}; S.sort = {}; S.pg = {}; S.pgOpen = null; S.fdOpen = null;
   render();
 });
 
