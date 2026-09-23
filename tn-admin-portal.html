@@ -445,6 +445,18 @@
 .app .iv-detail-body > .sec + .sec{margin-top:var(--s06)}
 .app .modhead + .iv-detail-body > .sec:first-child::after{content:none}
 
+/* THE DETAIL-PAGE CONTENT TAKES THE SAME `--pad-x` INSET AS THE BACK ARROW AND THE
+   ACTION BUTTONS (Maryam, 22 Sep 2026: "give the padding to the content ... a normal
+   page padding just like any other page"). The back-arrow header (`.ph`) and any
+   headless section (the Approve/Override action row) already sit at the DS `--pad-x`
+   inset; the HEADED content sections were flush against the content box (the 15 Sep
+   "align heading with content" fix zeroed them), so they read as un-padded next to
+   the arrow and button. Padding every `.iv-detail-body` section by `--pad-x` moves
+   the headings, facts, ladder and notes out to the arrow/button edge — one padded
+   column, arrow and buttons untouched. The back arrow keeps its normal optical hang.
+   Scoped to `.iv-detail-body` (approval + interview detail). */
+.app .iv-detail-body > .sec{padding-inline:var(--pad-x)}
+
 /* THE LEVEL-APPROVAL LADDER FOLLOWS THE TALENT AGENT EVALUATION LADDER (Maryam, 22
    Sep 2026). The DS's §59.2b `.iv-ladder` treatment gives upright tabular codes over
    a visible track, but its future rungs read the beige --layer-accent-01; the agent
@@ -1767,7 +1779,7 @@ const ADMIN_NOTIF=[
 const MODULES=[
  {k:'home', t:'Dashboard', ic:'home', subs:[{k:'home', t:'Overview'}, {k:'rulings', t:'Rulings Register', hidden:true}, {k:'notifs', t:'Notifications', hidden:true}]},
  {k:'users', t:'Users & Roles', ic:'users', subs:[
-   {k:'users', t:'All Users'}, {k:'staff', t:'Staff Members', hidden:true}, {k:'roles', t:'Roles & Permissions'}, {k:'import', t:'Bulk Import', hidden:true}, {k:'staffdetail', t:'Staff', hidden:true}]},
+   {k:'users', t:'All Users'}, {k:'staff', t:'Staff Members'}, {k:'roles', t:'Roles & Permissions'}, {k:'import', t:'Bulk Import', hidden:true}, {k:'staffdetail', t:'Staff', hidden:true}]},
  {k:'vetting', t:'Vetting & Approvals', ic:'vetting', hidden:true, subs:[
    {k:'applications', t:'Agent Applications'}, {k:'appdetail', t:'Application', hidden:true}, {k:'empverify', t:'Employer Verification'}, {k:'empverifydetail', t:'Employer', hidden:true}]},
  {k:'candidates', t:'Candidates', ic:'candidates', subs:[
