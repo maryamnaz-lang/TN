@@ -447,6 +447,77 @@
    block. The `.dash-stats` class is kept on the markup (harmless with no rules)
    so a future `.dash-stats`-only tweak has a hook. */
 </style>
+<style id="admin-switch">
+/* THE ADMIN SWITCH IS THE CANDIDATE PORTAL'S TOGGLE (Maryam's QA, 23 Sep 2026:
+   "wherever we are using the toggle button in super admin it should look like
+   this, pick the same component from the candidate portal"). The candidate's
+   `.tg > input + .sw` keys its ON look on `input:checked ~ .sw`; the admin's
+   switch is a `button.sw[role=switch]` whose state is the `.on` class, so it
+   only ever matched the DS's older `.sw.on` rules (18px travel, no tinted
+   track, white thumb). These restate the candidate ON state for `.sw.on`:
+   accent thumb over a half-opacity accent track, 20px travel. The OFF state
+   already is the candidate's (white thumb, grey track) via the shared `.sw`. */
+.app .sw.on::before{background:var(--accent); opacity:.5}
+.app .sw.on::after{transform:translateX(20px); background-color:var(--accent); border-color:var(--accent)}
+/* an admin toggle row carries a title only (no description line), so the
+   title centres on the switch instead of hanging from the row's top */
+.app .page .pf-tgs > .tg > .tb{align-self:center}
+/* SETTINGS FORMS READ BY INK AND WEIGHT, NOT SIZE (Maryam's QA, 23 Sep 2026:
+   "the fields are not looking as fields ... use better typo hierarchy by
+   changing colour and font weight, no bolding, just medium or regular"). On a
+   settings page (`[data-form]`, not the sheets) the LABEL is the description
+   grey at book weight and the VALUE the primary ink at medium, so the entry
+   reads as the thing and the label as its caption. Sizes are untouched (§63). */
+.app .page [data-form] .f > .lbl{color:var(--text-secondary); font-weight:var(--t-w-book)}
+.app .page [data-form] .f > .inp{color:var(--text-primary); font-weight:var(--t-w-strong)}
+/* the admin brand logos sit inside the candidate's 40px card-mark box */
+.app .pay-cards .cardrow-ic .pay-mk img{max-width:28px; max-height:18px; width:auto}
+/* the card list breathes: equal air above/below each row (the Integrations
+   list's recipe) and a clear gap before the Stripe note under it */
+.app .pay-cards > .cardrow{padding-top:var(--s05); padding-bottom:var(--s05); min-height:0}
+.app .pay-cards{margin-bottom:var(--s06)}
+/* a fixed-state row in a toggle list: its status sits at the row's right end
+   where a switch would, centred on the title like the switch */
+.app .page .pf-tgs > .tg-fixed{align-items:center}
+.app .page .pf-tgs > .tg-fixed > .statw{margin-left:auto; padding-right:var(--s03)}
+/* A SESSION'S SIGN OUT IS RED TEXT, NO STROKE (Maryam's QA, 23 Sep 2026): the
+   DS danger ghost (`.btn.danger`, red ink), whose DS border is cleared here.
+   "Sign Out Everywhere Else" stays the plain black ghost with no stroke. */
+.app .page .cardrow .btn.btn-g.danger:not(#_){border-color:transparent; padding-left:0; padding-right:0}
+.app .page .pf-tgs > .tg-fixed > .statw:not(#_){padding-right:0}
+/* a record whose label and value sit at OPPOSITE ENDS of the row — the DS's
+   `.dcol .kv` declarations, restated for a full-width block (0,4,0 + the
+   :not(#_) lift, so §10.5's ≥900 label column cannot win) */
+.app .page .kv-ends .kv:not(#_){grid-template-columns:minmax(0,1fr) auto; gap:var(--s04)}
+.app .page .kv-ends .kv .v:not(#_){text-align:right}
+.app button.sw{cursor:pointer; padding:0; border:0}
+.app button.sw:focus-visible{outline:none}
+.app button.sw:focus-visible::after{box-shadow:0 1px 3px var(--thumb-shadow),0 0 0 8px var(--brand-tint-2)}
+</style>
+<style id="admin-rail-tip">
+/* THE COLLAPSED RAIL NAMES EVERY ICON ON HOVER AND ON KEYBOARD FOCUS (design
+   QA, 23 Sep 2026: "hover over each icon in the collapsed sidebar, verify a
+   tooltip appears showing the item's title"). A LEAF module (no sub-pages) and
+   Log out get a dark label beside the icon, drawn from `data-tip` (the old
+   native `title` was slow, unstyled and absent on focus, so it is gone). A
+   PARENT module already answers with its §120.1c flyout, so it draws no tip;
+   the flyout now also opens on `:focus-within`, so Tab reaches the sub-pages.
+   Only the shut ≥900 rail — the open rail and the mobile drawer show labels.
+   Plain `:hover` here: the DS's hovers are disarmed (trap 6), this file's are
+   not. */
+@container app (min-width:900px){
+  .app[data-rail="shut"] .sidenav .sn-item[data-tip]:not(.sn-parent)::after{
+    content:attr(data-tip); position:absolute; left:calc(100% + var(--s03)); top:50%;
+    transform:translate(-4px,-50%); z-index:60; pointer-events:none; white-space:nowrap; width:max-content; max-width:none; overflow:visible;
+    padding:var(--s02) var(--s04); background:var(--gray-100); color:var(--on-dark);
+    font-size:var(--t-label-size); line-height:var(--t-label-lh); font-weight:var(--t-w-book);
+    opacity:0; visibility:hidden; transition:opacity .12s ease, transform .12s ease, visibility 0s .12s}
+  .app[data-rail="shut"] .sidenav .sn-item[data-tip]:not(.sn-parent):hover::after,
+  .app[data-rail="shut"] .sidenav .sn-item[data-tip]:not(.sn-parent):focus-visible::after{
+    opacity:1; visibility:visible; transform:translate(0,-50%); transition:opacity .12s ease, transform .12s ease}
+  .app[data-rail="shut"] .sn-node:focus-within > .sn-subs{opacity:1; visibility:visible; pointer-events:auto; transform:none}
+}
+</style>
 <style id="admin-row-hover">
 /* A CLICKABLE TABLE ROW (`tr.clk`) LIGHTS ITS FIRST-COLUMN NAME ON HOVER
    (Maryam, 13 Sep 2026: "the rows are clickable, so on hover I want the black
@@ -2950,9 +3021,17 @@ const navRow = (icon, title, sub, go, cta) => `
 /* A CARD ROW — `.cardrow`: a mark, a title line with tags, a description, and
    the actions on the right. Used where a record has more to say than a table
    cell holds (a payout, a refund, a flag). */
+/* A SIGNED-IN SESSION'S MARK NAMES ITS DEVICE (Maryam's QA, 23 Sep 2026: "if
+   it's a phone show a phone icon, if it's a laptop show a computer icon rather
+   than the lock"). A phone is the set's own `phone` (a stroked handset); the
+   set ships no computer glyph, so `ADM_LAPTOP` is a local one in the SAME cut —
+   a `0 0 24 24` box, 1.5 stroke, round caps/joins, like `ADM_ZIP`. `cardRow`
+   takes a raw `<svg>` as its icon for this (anything else resolves via `ic`). */
+const ADM_LAPTOP = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16V7.5C4.5 6.12 5.62 5 7 5h10c1.38 0 2.5 1.12 2.5 2.5V16"/><path d="M2.5 16h19l-.9 1.8c-.34.68-1.03 1.2-1.79 1.2H5.19c-.76 0-1.45-.52-1.79-1.2L2.5 16Z"/></svg>';
+const sessIcon = s => /iphone|android|phone|pixel|galaxy/i.test(s.dev) ? 'phone' : ADM_LAPTOP;
 const cardRow = (icon, title, desc, acts) => `
   <div class="cardrow">
-    <span class="cardrow-ic">${ic(icon)}</span>
+    <span class="cardrow-ic">${String(icon).charAt(0) === '<' ? icon : ic(icon)}</span>
     <span class="cardrow-b"><span class="cardrow-t">${title}</span>
       <span class="cardrow-d">${desc}</span></span>
     ${acts ? `<span class="cardrow-a">${acts}</span>` : ''}
@@ -3227,7 +3306,29 @@ function validateSheet(rules, exceptId){
    a render (trap 9 — a render would rebuild the half-filled form), on each dropdown
    pick, date pick and keystroke. Reads the same required-field rule `saveRecord`
    enforces, so the button state and the actual guard never disagree. */
+/* A SETTINGS SAVE IS GREY UNTIL SOMETHING CHANGED (Maryam's QA, 23 Sep 2026:
+   "by default in settings all the save buttons would be greyed out, only when
+   there is an actual update they will be black"). Each settings section's
+   primary action (Save / Save Changes / Change Password / Send Code / Verify)
+   is `disabled` (§02's grey `.btn[disabled]`) until a field in the SAME section
+   differs from what the page rendered — `defaultChecked`, or the rendered
+   value stamped once as `data-v0` (a HIDDEN input's `defaultValue` follows its
+   value, so `formDd`'s picks would never read as a change otherwise); typing a
+   field back to its original greys the button again. DOM-only, never a render
+   (trap 9); a save re-renders, so the new values become the defaults and the
+   button greys itself. Runs after every render and on every input/pick. */
+function syncSettingsSave(){
+  if(S.mod !== 'settings') return;
+  device.querySelectorAll('.page .sec').forEach(sec => {
+    const fields = [...sec.querySelectorAll('[data-f]')]; if(!fields.length) return;
+    const dirty = fields.some(el => (el.type === 'checkbox' || el.type === 'radio')
+      ? el.checked !== el.defaultChecked
+      : el.value !== (el.dataset.v0 === undefined ? (el.dataset.v0 = el.defaultValue) : el.dataset.v0));
+    sec.querySelectorAll('.btn-p[data-act]').forEach(btn => { btn.disabled = !dirty; });
+  });
+}
 function syncSheetSubmit(){
+  syncSettingsSave();
   const btn = device.querySelector('.sheet-f [data-submit="1"]');
   if(!btn) return;
   const vals = readForm();
@@ -5313,7 +5414,7 @@ function usersRoles(){
         "Only a Reviewer sees the raw score" note went with it. */''}
   <section class="sec">
     ${aiHead('Permissions', '',
-      editing ? `<button class="btn btn-p btn-sm noic" data-act="editperms"${S.permsDirty ? '' : ' disabled'}>Update Permissions</button>`
+      editing ? `<span style="display:flex;align-items:center;gap:var(--s05)"><button class="btn btn-g btn-sm noic" data-act="cancelperms">Cancel</button><button class="btn btn-p btn-sm noic" data-act="editperms"${permsChanged() ? '' : ' disabled'}>Update Permissions</button></span>`
         : '<button class="btn btn-g btn-sm noic" data-act="editperms">' + I.edit + ' Edit Permissions</button>')}
     <div class="tbl-wrap"><table class="tbl perm-tbl">
       <tr><th>Capability</th>${roles.map(r => `<th class="num">${esc(r.short)}</th>`).join('')}</tr>
@@ -5328,7 +5429,20 @@ function usersRoles(){
 /* Enter edit mode with a clean slate — `S.permsDirty` gates the "Update
    Permissions" button, which stays disabled until a capability is toggled
    (Maryam 20 Sep 2026). Leaving (Update / Done) saves and clears the flag. */
-ACTIONS.editperms = () => { S.editPerms = !S.editPerms; S.permsDirty = false; if(!S.editPerms) toast('Permission changes saved'); };
+/* CANCEL SITS BESIDE UPDATE (Maryam's QA, 23 Sep 2026: "a cancel button with no
+   stroke, and the update button disabled at first, only working if anything
+   updates"). Entering edit mode snapshots `MATRIX`; Update is live only while
+   the matrix DIFFERS from that snapshot, so toggling a box and toggling it back
+   greys it again; Cancel restores the snapshot and leaves edit mode. Cancel is
+   the plain ghost (`.btn-g`, no stroke). The per-toggle audit lines already
+   written stay — the log records what happened, including a reverted edit. */
+const permsChanged = () => S.permsSnap != null && JSON.stringify(MATRIX) !== S.permsSnap;
+ACTIONS.editperms = () => { S.editPerms = !S.editPerms; S.permsDirty = false;
+  if(S.editPerms) S.permsSnap = JSON.stringify(MATRIX); else { S.permsSnap = null; toast('Permission changes saved'); } };
+ACTIONS.cancelperms = () => {
+  if(S.permsSnap != null){ const snap = JSON.parse(S.permsSnap); Object.keys(MATRIX).forEach(k => delete MATRIX[k]); Object.assign(MATRIX, snap); }
+  S.editPerms = false; S.permsDirty = false; S.permsSnap = null;
+};
 ACTIONS.toggleperm = key => {
   const [, rk, ck] = key.split(':'); const r = ROLE_BY_K[rk]; const c = CAPS.find(x => x.k === ck); if(!r || !c) return;
   MATRIX[rk] = MATRIX[rk] || {};
@@ -9929,8 +10043,13 @@ const SESSIONS = [
   {id:'s3', dev:'Windows PC', browser:'Firefox on Windows', loc:'Manchester, UK', started:'09-12-2026 09:30', when:'Yesterday', current:false}
 ];
 /* a design-system switch that reads a state path and flips it */
-const swToggle = (label, path, on) => `<div class="kv"><span class="k">${label}</span>
-  <span class="v"><button class="sw${on ? ' on' : ''}" role="switch" aria-checked="${on}" aria-label="${esc(String(label).replace(/<[^>]+>/g, ''))}" data-act="toggleset:${path}"></button></span></div>`;
+/* It is the candidate portal's own toggle row (`.tg` in a `.pf-tgs` list, the
+   candidate Notifications tab) — label left, switch right, the shared `.sw`
+   drawn after a real checkbox (Maryam's QA, 23 Sep 2026: "use kinda exact same
+   ui as in candidate portal"). The router's `data-act` rides the INPUT: a click
+   on the row reaches it through the label, so one press flips one path. */
+const swToggle = (label, path, on) => `<label class="tg"><div class="tb"><b>${label}</b></div><input type="checkbox"${on ? ' checked' : ''} aria-label="${esc(String(label).replace(/<[^>]+>/g, ''))}" data-act="toggleset:${path}"><span class="sw"></span></label>`;
+const swList = (...rows) => `<div class="pf-tgs">${rows.join('')}</div>`;
 /* a settings form — fields read on Save through the same `data-f` the sheets use */
 const settingsForm = fields => `<div class="mt4" data-form="1">${fields.map(f => fieldHtml(f, f.v)).join('')}</div>`;
 function readPageForm(){ const out = {}; device.querySelectorAll('.page [data-form] [data-f]').forEach(el => { out[el.dataset.f] = el.value.trim(); }); return out; }
@@ -10047,12 +10166,14 @@ function settingsProfile(){
   </section>
   <section class="sec">
     ${secHead('Account')}
-    ${kv([
+    ${''/* a two-column record: label at the LEFT end, value at the RIGHT end
+          (Maryam's QA, 23 Sep 2026), the dashboard `.dcol .kv` recipe */}
+    <div class="kv-ends">${kv([
       ['Status', staffStatusTag(ME)],
       ['Member since', esc(ME.joined)],
       ['Invited by', esc(invitedBy)],
       ['Password &amp; phone', '<a data-go="settings/security">Login &amp; Security</a>']
-    ])}
+    ])}</div>
   </section>`;
 }
 ACTIONS.saveprofile = () => {
@@ -10069,16 +10190,18 @@ function settingsNotifications(){
   return `
   <section class="sec">
     ${aiHead('Email', 'What lands in your inbox.')}
-    ${swToggle('Vetting queue', 'email.vetting', e.vetting)}
-    ${swToggle('Payouts &amp; settlement', 'email.payouts', e.payouts)}
-    ${swToggle('New accounts', 'email.accounts', e.accounts)}
-    ${swToggle('Weekly summary', 'email.summary', e.summary)}
+    ${swList(
+      swToggle('Vetting queue', 'email.vetting', e.vetting),
+      swToggle('Payouts &amp; settlement', 'email.payouts', e.payouts),
+      swToggle('New accounts', 'email.accounts', e.accounts),
+      swToggle('Weekly summary', 'email.summary', e.summary))}
   </section>
   <section class="sec">
     ${aiHead('In-app', 'What shows in the bell and on the dashboard.')}
-    ${swToggle('Show the bell badge', 'inapp.badge', a.badge)}
-    ${swToggle('Open decisions', 'inapp.decisions', a.decisions)}
-    ${swToggle('Compliance alerts', 'inapp.compliance', a.compliance)}
+    ${swList(
+      swToggle('Show the bell badge', 'inapp.badge', a.badge),
+      swToggle('Open decisions', 'inapp.decisions', a.decisions),
+      swToggle('Compliance alerts', 'inapp.compliance', a.compliance))}
   </section>`;
 }
 
@@ -10130,17 +10253,22 @@ function settingsSecurity(){
     ${aiHead('Signed-in sessions', 'Where your account is signed in. End any you do not recognise.',
       SESSIONS.filter(s => !s.current).length ? '<button class="btn btn-g btn-sm noic" data-act="askrevokeall">Sign Out Everywhere Else</button>' : '')}
     <div class="tile-stack">
-      ${SESSIONS.map(s => cardRow('lock',
+      ${SESSIONS.map(s => cardRow(sessIcon(s),
         `${esc(s.dev)} ${s.current ? '<span class="tag sm green">This device</span>' : ''}`,
         `${esc(s.browser)} · ${esc(s.loc)} · started ${esc(s.started)} · ${s.current ? 'active now' : 'last active ' + esc(s.when)}`,
-        s.current ? '' : `<button class="btn btn-g btn-sm noic" data-act="revoke:${s.id}">Sign Out</button>`)).join('')}
+        s.current ? '' : `<button class="btn btn-g btn-sm noic danger" data-act="revoke:${s.id}">Sign Out</button>`)).join('')}
     </div>
   </section>
 
   <section class="sec">
     ${aiHead('Two-factor', 'A one-time code is required at every sign-in, on every device. It is sent to the email address on your account — email is the only destination.')}
-    ${kv([['Two-factor at sign-in', tag('active', 'Always on')]])}
-    ${swToggle('Step-up password on the highest-severity actions', 'sec.stepup', SEC.stepup !== false)}
+    ${''/* "Always on" is a row of the SAME toggle list, directly above the step-up
+          switch, its status where that row's switch sits (Maryam's QA, 23 Sep
+          2026) — two-factor cannot be switched off, so it states its state
+          rather than drawing a control that could never act (§60). */}
+    ${swList(
+      `<div class="tg tg-fixed"><div class="tb"><b>Two-factor at sign-in</b></div>${tag('active', 'Always on')}</div>`,
+      swToggle('Step-up password on the highest-severity actions', 'sec.stepup', SEC.stepup !== false))}
   </section>`;
 }
 ACTIONS.changepw = () => {
@@ -10180,13 +10308,29 @@ function settingsPayments(){
   return `
   <section class="sec">
     ${aiHead('Cards on file', 'What the platform bills against.',
-      `<button class="btn btn-p btn-sm noic ic-l" data-payopen="1">${I.add}Add Card</button>`)}
-    <div class="tile-stack">
-      ${CARDS.map(c => cardRow('creditCard',
-        `${c.brand} •••• ${c.last} ${c.def ? '<span class="pill-def">Default</span>' : ''}`,
-        `Expires ${esc(c.exp)}`,
-        `${c.def ? '' : `<button class="btn btn-g btn-sm noic" data-act="defcard:${c.id}">Make Default</button>`}
-         ${CARDS.length > 1 ? `<button class="btn btn-g btn-sm noic" data-act="askdelcard:${c.id}">Remove</button>` : ''}`)).join('')}
+      `<button class="btn btn-t btn-sm noic ic-l" data-payopen="1">${I.add}Add a card</button>`)}
+    ${''/* THE CANDIDATE PORTAL'S "Your Cards" ROW, markup for markup (Maryam's QA,
+          23 Sep 2026: "use the same components already in the candidate portal,
+          do not make a new one"): the `.rad.card-rad` default radio on the LEFT
+          (replacing "Make Default"), the brand logo in `.cardrow-ic`, "Visa
+          ending 4242" + the Default pill, "Expires …", and the red bin-led
+          `.lnk.card-del` Remove. All of it ships in the DS this file links. The
+          logo is the admin's own `methodMark` (the Transactions method column's
+          real Visa / Mastercard images) — the candidate's `BMK` set is hifi-only.
+          `data-act` rides the radio INPUT so a press on the ring or the row's
+          label runs `defcard` once (the toggle rows' pattern). */}
+    <div class="tile-stack pay-cards">
+      ${CARDS.map(c => { const nm = c.brand.charAt(0) + c.brand.slice(1).toLowerCase();
+        return `<div class="cardrow">
+        <label class="rad card-rad" title="Make this the default card">
+          <input type="radio" name="paydef"${c.def ? ' checked' : ''} data-act="defcard:${c.id}" aria-label="Make ${esc(nm)} ending ${esc(c.last)} the default"><span class="box"></span></label>
+        <span class="cardrow-ic">${methodMark(c.brand)}</span>
+        <span class="cardrow-b">
+          <span class="cardrow-t">${esc(nm)} ending ${esc(c.last)}${c.def ? ' <span class="pill-def">Default</span>' : ''}</span>
+          <span class="cardrow-d">Expires ${esc(c.exp)}</span>
+        </span>
+        ${CARDS.length > 1 ? `<span class="cardrow-a"><button class="lnk card-del" data-act="askdelcard:${c.id}">${I.delete}Remove</button></span>` : ''}
+      </div>`; }).join('')}
     </div>
     ${note('', 'Tokenised by Stripe', 'TalentNext never stores full card numbers — they are tokenised by Stripe and only the last four digits are held.')}
   </section>
@@ -10608,7 +10752,7 @@ function shell(){
   return `
   <header class="shell">
     <button class="shell-act nav-t ${S.nav ? 'on' : ''}" data-toggle="nav"
-      aria-label="${S.nav ? 'Collapse' : 'Expand'} navigation">${S.nav ? I.close
+      aria-label="${S.nav ? 'Collapse' : 'Expand'} navigation" aria-expanded="${S.nav ? 'true' : 'false'}" aria-controls="admin-sidenav">${S.nav ? I.close
       : `<span class="nav-t-mark">${TN_MARK}</span><span class="nav-t-menu">${I.menu}</span>`}</button>
     <button class="shell-logo" data-go="home/home" aria-label="TalentNext home"><img src="${LOGO_K}" alt="TalentNext"></button>
     ${crumbBar()}
@@ -10674,18 +10818,18 @@ function sidenav(){
       ? `<div class="sn-trail">${modCount}<svg class="sn-chev${expanded ? ' open' : ''}" viewBox="0 0 24 24" aria-hidden="true">${inner('chevDown')}</svg></div>`
       : modCount;
     const expAttr = hasSubs ? ` aria-expanded="${expanded ? 'true' : 'false'}"` : '';
-    const btn = `<button class="sn-item ${on ? 'on' : ''}${hasSubs ? ' sn-parent' : ''}" title="${esc(m.t)}" data-go="${m.k}/${firstSub(m)}"${on && !expanded ? ' aria-current="page"' : ''}${expAttr}>${ic(m.ic)}<span>${esc(m.t)}</span>${trail}</button>`;
+    const btn = `<button class="sn-item ${on ? 'on' : ''}${hasSubs ? ' sn-parent' : ''}" data-tip="${esc(m.t)}" data-go="${m.k}/${firstSub(m)}"${on && !expanded ? ' aria-current="page"' : ''}${expAttr}>${ic(m.ic)}<span>${esc(m.t)}</span>${trail}</button>`;
     /* a parent rides in a `.sn-node` (position:relative) so the flyout has an
        anchor and one hover region spans the icon and the panel it opens. */
     return hasSubs ? `<div class="sn-node${on ? ' on' : ''}">${btn}${subs}</div>` : btn;
   };
   return `
   <div class="scrim ${S.nav ? 'on' : ''}" data-close="nav"></div>
-  <nav class="sidenav ${S.nav ? 'on' : ''}" aria-label="Portal">
+  <nav class="sidenav ${S.nav ? 'on' : ''}" id="admin-sidenav" aria-label="Portal">
     <div class="sn-main">${main.map(item).join('')}</div>
     <div class="sn-foot">
       ${foot.map(item).join('')}
-      <button class="sn-item" title="Log out" data-confirm="logout">${I.logout}<span>Log out</span></button>
+      <button class="sn-item" data-tip="Log out" data-confirm="logout">${I.logout}<span>Log out</span></button>
     </div>
   </nav>`;
 }
@@ -10946,6 +11090,15 @@ function placeRowMenu(){
 }
 
 function render(){
+  /* OPENING A SIDE DRAWER SHUTS THE RAIL (Maryam's QA, 23 Sep 2026: "when the
+     sidebar is open and I open the side drawer, e.g. by clicking an Add button,
+     the sidebar should automatically minimise"). The in-flow `.peek` form takes
+     the room the open rail held. Fired on the OPENING render only (the peek was
+     not up last paint), so the reader can still re-open the rail while the
+     drawer is up; closing the drawer does not re-open it. */
+  const railPeek = sideSheet(S.sheet);
+  if(railPeek && !S._peekWas) S.nav = false;
+  S._peekWas = railPeek;
   ROWMENU_SEQ = 0;                        /* §125 — stable per-render menu ids */
   TBL_SEQ = 0;                            /* §127 — stable per-render table ids */
   TBL_ROWKEYS = {};                       /* row-select — rebuilt as each table renders */
@@ -11302,6 +11455,7 @@ device.addEventListener('paste', e => {
 /* THE SEARCH FIELD FILTERS AS YOU TYPE. The value goes into the page's filter
    state and the page re-renders; `SRCH_FOCUS` puts the caret back. */
 device.addEventListener('input', e => {
+  if(e.target.closest('.page [data-f]')) syncSettingsSave();
   /* the set-password checklist ticks live as the rules are met (no render, trap 9). */
   if(e.target.id === 'np'){ syncPwRules(); }
   /* the sign-in fields clear their error as the actor corrects them (no render — a
@@ -11348,6 +11502,7 @@ device.addEventListener('input', e => {
 /* BULK IMPORT — the role <select> chosen, or a CSV file picked. Both re-validate
    and re-render (a `change` never needs a caret restored). */
 device.addEventListener('change', e => {
+  if(e.target.closest('.page [data-f]')) syncSettingsSave();
   const rl = e.target.closest('[data-improle]');
   if(rl){ S.imp.rows[+rl.dataset.improle].role = rl.value; S.imp.rows = impValidate(S.imp.rows); return render(); }
   const f = e.target.closest('#impFile');
