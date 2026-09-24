@@ -2159,11 +2159,13 @@ const MODULES=[
     so the rail draws a single item with no tree. Drop `hidden` to bring one back. */
  {k:'system', t:'Integrations', ic:'link', subs:[
    {k:'integrations', t:'Integrations'}, {k:'overview', t:'System Health', hidden:true}, {k:'audit', t:'Audit Log', hidden:true}, {k:'compliance', t:'Compliance & Safeguarding', hidden:true}]},
- /* AUDIT LOG is its OWN top-level rail item (Maryam, 23 Sep 2026: "add audit log")
-    — the immutable action record deserves the rail, not a hidden System sub. The
-    page (`systemAudit`) is unchanged; this just surfaces it at `audit/audit`. The
-    old `system/audit` deep link still renders it too (V.system keeps the sub). */
- {k:'audit', t:'Audit Log', ic:'doc', subs:[
+ /* AUDIT LOG hidden wholesale for now (Maryam, 24 Sep 2026: "hide audit log module
+    and everything relevant to that for now"), like Reports/Employers/CRM — the
+    module and its page (`systemAudit`) stay defined and deep-link reachable
+    (`audit/audit`, `system/audit`), just off the rail. The internal `audit()`
+    record keeps being written; only the surface is hidden. Drop `hidden` to bring
+    it back. (Was surfaced as its own rail item, Maryam 23 Sep 2026.) */
+ {k:'audit', t:'Audit Log', ic:'doc', hidden:true, subs:[
    {k:'audit', t:'Audit Log'}]},
  /* Reports hidden wholesale for now (Maryam, 16 Sep 2026: "hide reports module
     for now"), like CRM/Vetting — module and pages stay defined and deep-link
@@ -4427,7 +4429,7 @@ function homeNotifs(){
         <span class="t-caption">${esc(n.w)}</span>
       </button>`).join('')}
     </div>` : emptyState('notification', f === 'unread' ? 'Nothing unread' : 'No notifications', 'You are all caught up.')}
-    ${note('', '', 'Notifications are held for 90 days and then removed. This list is not the audit log — the permanent record is on System → Audit Log.')}
+    ${note('', '', 'Notifications are held for 90 days and then removed.')}
   </section>`;
 }
 V.home = () => modView({home:homeOverview, rulings:homeRulings, notifs:homeNotifs});
@@ -4850,6 +4852,18 @@ function inviteDaysLeft(u){
   return Math.ceil((exp - Date.now()) / 864e5);
 }
 const inviteBadge = u => { const d = inviteDaysLeft(u); return d == null ? '' : d > 0 ? ` <span class="t-caption">${d} day${d === 1 ? '' : 's'} left</span>` : ` <span class="t-caption">expired</span>`; };
+/* An invited row's whole status is ONE piece of text at one size and colour
+   (Maryam, 24 Sep 2026: "use same font size and color for the whole status") —
+   never the two-part "Invited" tag + grey caption. An expired invite reads
+   "Invitation Expired" in the accent ink; a live one reads "Expires in N days",
+   N counting down from the 7-day window, in the invited amber. Both are a single
+   `.statw` span so §63 sizes them like every other status word. */
+const staffInviteStatus = u => {
+  const d = inviteDaysLeft(u);
+  if(d == null) return staffStatusTag(u);
+  if(d <= 0) return `<span class="statw" style="color:var(--accent-text)">Invitation Expired</span>`;
+  return `<span class="statw warn">Expires in ${d} day${d === 1 ? '' : 's'}</span>`;
+};
 /* GUARDS (1.3 / 1.7 / 1.9 / 1.11). `staffProtect` blocks the original Super
    Admin and the actor's own account — neither may be role-changed, deactivated
    or deleted. `lastSAGuard` blocks removing access from the only Super Admin
@@ -4870,20 +4884,28 @@ function staffRowActs(u){
   /* A deletion in flight or complete offers nothing but View. */
   if(u.status === 'deleting' || u.status === 'deleted') return rowActs(acts);
   if(u.status === 'invited'){
-    acts.push(['renew', 'Resend Invite', `data-act="staffresend:${u.id}"`]);
+    /* Resend only once the invite has EXPIRED — a live invite still in its window
+       cannot be re-sent (Maryam, 24 Sep 2026). `inviteDaysLeft` <= 0 is expired;
+       null (no date) counts as sendable. */
+    const dl = inviteDaysLeft(u);
+    if(dl == null || dl <= 0) acts.push(['renew', 'Resend Invite', `data-act="staffresend:${u.id}"`]);
     acts.push(['close', 'Cancel Invite', `data-act="staffcancelinvite:${u.id}"`]);
-  } else {
+  } else if(u.status === 'active'){
     /* Edit is hidden on a protected account (the original Super Admin and the
        actor's own — the latter edits in My Profile, story 1.5/1.6). */
     if(!prot) acts.push(['edit', 'Edit', `data-sheet="editstaff:${u.id}"`]);
     if(!prot) acts.push(['group', 'Change Role', `data-sheet="changerole:${u.id}"`]);
-    if(u.status === 'active'){
-      if(!prot && !lastSAGuard(u)) acts.push(['deactivate', 'Deactivate', `data-sheet="deactivate:${u.id}"`]);
-    } else {
-      acts.push(['play', 'Reactivate', `data-sheet="reactivate:${u.id}"`]);
-    }
+    if(!prot && !lastSAGuard(u)) acts.push(['deactivate', 'Deactivate', `data-sheet="deactivate:${u.id}"`]);
+  } else {
+    /* A DEACTIVATED account offers only Reactivate — no Edit or Change Role, its
+       details and role are frozen until it is brought back (Maryam, 24 Sep 2026:
+       "do not give edit and change role permissions to a deactivated account"). */
+    acts.push(['play', 'Reactivate', `data-sheet="reactivate:${u.id}"`]);
   }
-  if(!prot && !lastSAGuard(u)) acts.push(['delete', 'Delete', `data-sheet="delstaff:${u.id}"`]);
+  /* No Delete on an invited row — Cancel Invite already removes the account
+     (Maryam, 24 Sep 2026: "remove the delete option since cancel invite is doing
+     the same thing"). Delete rides every other unprotected status. */
+  if(u.status !== 'invited' && !prot && !lastSAGuard(u)) acts.push(['delete', 'Delete', `data-sheet="delstaff:${u.id}"`]);
   return rowActs(acts);
 }
 
@@ -4927,7 +4949,7 @@ function usersStaff(){
         esc(staffRoleName(u)),
         esc(u.job || '—'),
         esc(u.dept || '—'),
-        u.status === 'invited' ? `${staffStatusTag(u)}${inviteBadge(u)}` : staffStatusTag(u),
+        u.status === 'invited' ? staffInviteStatus(u) : staffStatusTag(u),
         esc(u.last || 'Never'),
         esc(u.joined),
         staffRowActs(u)
@@ -5706,18 +5728,23 @@ function staffDetailView(u){
        way out and cannot be edited, deactivated or re-deleted. */
     acts = staffStatusTag(u);
   } else if(u.status === 'invited'){
+    /* No Delete on an invited account — Cancel Invite already removes it; Resend
+       only once the invite has EXPIRED (Maryam, 24 Sep 2026). */
     acts = rowActs([
-      ['renew', 'Resend Invite', `data-act="staffresend:${u.id}"`],
-      ['close', 'Cancel Invite', `data-act="staffcancelinvite:${u.id}"`],
-      ['delete', 'Delete', `data-sheet="delstaff:${u.id}"`]
+      (days == null || days <= 0) ? ['renew', 'Resend Invite', `data-act="staffresend:${u.id}"`] : null,
+      ['close', 'Cancel Invite', `data-act="staffcancelinvite:${u.id}"`]
     ]);
   } else {
     /* No "Mark As Cohort Leader" here — a staff member is never a cohort leader;
        that capability is added only in the Users module (Maryam, 23 Sep 2026). */
+    /* A DEACTIVATED account offers Reactivate + Delete only — no Edit or Change
+       Role, its details and role are frozen until it is brought back (Maryam,
+       24 Sep 2026). */
+    const active = u.status === 'active';
     acts = rowActs([
-      prot ? null : ['edit', 'Edit', `data-sheet="editstaff:${u.id}"`],
-      prot ? null : ['settings', 'Change Role', `data-sheet="changerole:${u.id}"`],
-      u.status === 'active'
+      (active && !prot) ? ['edit', 'Edit', `data-sheet="editstaff:${u.id}"`] : null,
+      (active && !prot) ? ['settings', 'Change Role', `data-sheet="changerole:${u.id}"`] : null,
+      active
         ? (prot || lastSAGuard(u) ? null : ['deactivate', 'Deactivate', `data-sheet="deactivate:${u.id}"`])
         : ['play', 'Reactivate', `data-sheet="reactivate:${u.id}"`],
       prot || lastSAGuard(u) ? null : ['delete', 'Delete', `data-sheet="delstaff:${u.id}"`]
@@ -5732,7 +5759,7 @@ function staffDetailView(u){
     ${kv([
       ['Role', esc(staffRoleName(u))],
       ['Status', u.status === 'invited'
-        ? `${staffStatusTag(u)}${days != null ? (days > 0 ? ` · ${days} day${days === 1 ? '' : 's'} left` : ' · expired') : ''}`
+        ? staffInviteStatus(u)
         : u.status === 'inactive' && u.deactivatedOn
           ? `${staffStatusTag(u)} <span class="t-caption">· since ${esc(dpFmt(u.deactivatedOn) || u.deactivatedOn)}</span>`
           : staffStatusTag(u)],
