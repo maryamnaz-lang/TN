@@ -1448,6 +1448,61 @@ const ROLES=[
 ];
 const ROLE_BY_K={}; ROLES.forEach(r => ROLE_BY_K[r.k]=r);
 
+/* ══ EPIC 4 — ROLES & PERMISSIONS (the story's permission model) ═════════════
+   Rebuilt to the user-stories shape (Maryam, 24 Sep 2026): a Module × Action
+   matrix (12 modules × View/Create/Edit/Delete, restricted per module), ten
+   named SENSITIVE permissions of their own, and two RESERVED-to-Super-Admin
+   rows. Screens-only — there is no runtime `can()` gate in this single-Super-
+   Admin prototype. This model drives the Roles page only; the older CAPS/MATRIX
+   (the Program/Business wall, the staff-detail capability chips) is a separate
+   SA-journey surface and is left intact. A permission key is `module:action`
+   for a module action, or the bare key for a sensitive/reserved one. */
+const PERM_MODULES = [
+  ['dashboard', 'Dashboard', ['view']],
+  ['staff', 'Staff', ['view', 'create', 'edit', 'delete']],
+  ['users', 'Users', ['view', 'create', 'edit', 'delete']],
+  ['roles', 'Roles', ['view', 'create', 'edit', 'delete']],
+  ['levelling', 'Levelling', ['view', 'create', 'edit', 'delete']],
+  ['marketplace', 'Marketplace', ['view', 'create', 'edit', 'delete']],
+  ['cohorts', 'Cohorts', ['view', 'create', 'edit', 'delete']],
+  ['interviews', 'Interviews', ['view', 'create', 'edit', 'delete']],
+  ['finance', 'Finance', ['view', 'create', 'edit', 'delete']],
+  ['audit', 'Audit Log', ['view']],
+  ['onboarding', 'Onboarding Questions', ['view', 'edit']],
+  ['settings', 'Settings', ['view', 'edit']]
+];
+const PERM_ACT_LABEL = {view:'View', create:'Create', edit:'Edit', delete:'Delete'};
+const PERM_SENSITIVE = [
+  ['approvelevel', 'Approve candidate level'], ['approvescore', 'Approve agent score'],
+  ['releasepayout', 'Release payout'], ['changefee', 'Change fee'], ['approverefund', 'Approve refund'],
+  ['accountsdelete', 'Accounts: Delete'], ['dataexport', 'Data: Export'], ['viewrawscore', 'View AI raw score'],
+  ['setrange', 'Set assessment range'], ['playrecording', 'Play a recording']
+];
+const PERM_RESERVED = [
+  ['grantsa', 'Grant or revoke Super Admin'], ['overridetraining', 'Override the training-module gate']
+];
+const permAllKeys = () => { const k = []; PERM_MODULES.forEach(([m, , acts]) => acts.forEach(a => k.push(m + ':' + a))); PERM_SENSITIVE.forEach(([kk]) => k.push(kk)); PERM_RESERVED.forEach(([kk]) => k.push(kk)); return k; };
+const permIsReserved = pk => PERM_RESERVED.some(([kk]) => kk === pk);
+const permNonReserved = () => permAllKeys().filter(k => !permIsReserved(k));
+/* the built-in roles, in the story's order: Super Admin, Admin, Reviewer,
+   Supervisor, Manager of Agents (mapped onto the ROLES keys). */
+const BUILTIN_ROLES = ['admin', 'admin2', 'reviewer', 'supervisor', 'manager'];
+const roleIsBuiltin = k => BUILTIN_ROLES.includes(k);
+/* per-role grant SET (the story's starting sets): Super Admin holds everything;
+   Admin everything but the two reserved; Reviewer / Supervisor / Manager nothing.
+   A custom role starts empty. Applied here as a deployment step. */
+const PERMSET = {
+  admin: new Set(permAllKeys()),
+  admin2: new Set(permNonReserved()),
+  reviewer: new Set(), supervisor: new Set(), manager: new Set()
+};
+/* the roles shown as matrix columns / listed in the role table: built-in first
+   (story order), then any custom internal role. */
+const permRoleCols = () => [
+  ...BUILTIN_ROLES.map(k => ROLE_BY_K[k]).filter(Boolean),
+  ...ROLES.filter(r => r.kind === 'internal' && !roleIsBuiltin(r.k))
+];
+
 /* DEPARTMENTS (Epic 1, story 1.1 / 1.7 / 1.8). The doc flags the option list as
    "pending from the client" — so this is AUTHORED PLACEHOLDER, flagged. Edit /
    Add-staff read it for the Department dropdown; the Staff directory filters on
@@ -4767,55 +4822,99 @@ const typeLabel = u => (ROLE_BY_K[mainRole(u)] || {}).name || '—';
 const userDetailRoute = u => u.roles.includes('candidate') ? 'candidates/detail/' + u.id
   : u.roles.includes('agent') ? 'agents/detail/' + u.id
   : 'users/staffdetail/' + u.id;
-const USER_STATUS_LABEL = {invited:'Invited', active:'Active', ok:'Active', inactive:'Deactivated'};
+const USER_STATUS_LABEL = {invited:'Invited', active:'Active', ok:'Active', inactive:'Deactivated', deleting:'Deletion in progress', deleted:'Deleted'};
 const userStatusTag = u => tag(u.status === 'ok' ? 'active' : u.status, USER_STATUS_LABEL[u.status] || cap(u.status));
+/* EXTERNAL INVITE STATUS (story 3.2, Maryam 24 Sep 2026: "implement this just
+   like i did on the staff member module … 'Invitation Expired' / 'Expires in N
+   days'"). An invited external row reads the same single-`.statw` countdown the
+   staff directory uses (`staffInviteStatus`): "Expires in N days" in the invited
+   amber while the 7-day link is live, "Invitation Expired" in accent ink once it
+   runs out. An account with no `invitedOn` (older seed) falls back to the plain
+   status tag. Defined after `staffInviteStatus`/`inviteDaysLeft`, which sit just
+   above in the Epic 1 block. */
+const extInviteStatus = u => {
+  if(u.status !== 'invited') return userStatusTag(u);
+  const d = inviteDaysLeft(u);
+  if(d == null) return userStatusTag(u);
+  if(d <= 0) return `<span class="statw" style="color:var(--accent-text)">Invitation Expired</span>`;
+  return `<span class="statw warn">Expires in ${d} day${d === 1 ? '' : 's'}</span>`;
+};
 const candLevel = u => { const c = CAND_BY_ID[u.id]; const lv = (c && c.level) || (u.level && u.level !== '—' ? u.level : ''); return lv || 'Not yet levelled'; };
 
+/* EXTERNAL accounts only — internal staff live in the Staff directory (Epic 1).
+   Shared by the view and the CSV export so both read one filtered set. */
+function usersRowsFiltered(){
+  const rf = getFilter('role', 'all'), q = getFilter('q', ''), sf = getFilter('status', 'all'), ef = getFilter('erasure', 'all');
+  const ext = USERS.filter(u => !u.internal && !u.roles.includes('employer'));
+  return ext.filter(u => rf === 'all' ? true : u.roles.includes(rf))
+    .filter(u => { if(sf === 'all') return true; const st = u.status === 'ok' ? 'active' : u.status; return st === sf; })
+    .filter(u => ef === 'all' ? true : erasureState(u) === ef)
+    .filter(u => hit(q, u.name, u.email, u.company));
+}
+/* the row action menu, by status: a deleting/deleted account offers only View. */
+function usersRowMenu(u){
+  const active = u.status === 'active' || u.status === 'ok';
+  const acts = [['view', 'View', `data-go="${userDetailRoute(u)}"`]];
+  if(u.status === 'deleting' || u.status === 'deleted') return acts;
+  if(u.status === 'invited'){
+    acts.push(['renew', 'Resend invite', `data-act="staffresend:${u.id}"`], ['close', 'Cancel invite', `data-act="staffcancelinvite:${u.id}"`]);
+  } else {
+    acts.push(active ? ['deactivate', 'Deactivate', `data-sheet="deactext:${u.id}"`] : ['play', 'Reactivate', `data-sheet="reactext:${u.id}"`]);
+    if(active && !u.roles.some(isFullAccess)) acts.push(['view', 'View as', `data-act="askviewas:${u.id}"`]);
+  }
+  acts.push(['group', 'Merge into another account', `data-sheet="merge:${u.id}"`], ['delete', 'Delete', `data-sheet="delext:${u.id}"`]);
+  return acts;
+}
 function usersAll(){
-  const rf = getFilter('role', 'all'), q = getFilter('q', ''), sf = getFilter('status', 'all');
-  const active = u => u.status === 'active' || u.status === 'ok';
-  /* EXTERNAL accounts only — internal staff live in the Staff directory
-     (Epic 1). The doc keeps the two apart: "an account never appears in both".
-     Role is a TAB STRIP (Maryam 13 Sep 2026, overriding the doc's Type dropdown),
-     dropping the internal (Admin) bucket. */
-  /* Employers are not part of the system for now (Maryam, 19 Sep 2026: "remove
-     the Employers tab entirely, as employers are not currently part of our
-     system") — no Employer tab and no employer rows on this screen. */
+  const q = getFilter('q', '');
+  /* Employers are not part of the system for now (Maryam, 19 Sep 2026). Role is a
+     TAB STRIP (Maryam 13 Sep 2026, overriding the doc's Type dropdown). */
   const ext = USERS.filter(u => !u.internal && !u.roles.includes('employer'));
   const extTabs = ROLE_OPTS.filter(([v]) => v !== 'admin' && v !== 'employer')
     .map(([v, l]) => [v, l, v === 'all' ? ext.length : ext.filter(u => u.roles.includes(v)).length]);
-  const rows = ext.filter(u => rf === 'all' ? true : u.roles.includes(rf))
-    .filter(u => sf === 'all' ? true : sf === 'active' ? active(u) : sf === 'invited' ? u.status === 'invited' : (!active(u) && u.status !== 'invited'))
-    .filter(u => hit(q, u.name, u.email, u.company));
+  const rows = usersRowsFiltered();
   return `
   <section class="sec">
     ${searchHead('All users', 'Every candidate, agent and cohort leader on the platform. Internal staff are in the Staff directory. A row opens the full record.',
       `<button class="btn btn-g btn-sm noic" data-go="users/import">${I.download} Bulk Import</button>
+       <button class="btn btn-g btn-sm noic" data-act="usersexport">${I.download} Export</button>
        <button class="btn btn-p btn-sm noic" data-sheet="adduser">${I.add} Add User</button>`)}
     ${filterStrip('role', 'all', extTabs)}
     ${lstTools('Search by name or email',
-      filterDd('status', 'all', [['all', 'All'], ['invited', 'Invited'], ['active', 'Active'], ['inactive', 'Deactivated']], 'Status'))}
+      filterDd('status', 'all', [['all', 'All'], ['invited', 'Invited'], ['active', 'Active'], ['inactive', 'Deactivated'], ['deleting', 'Deletion in progress'], ['deleted', 'Deleted']], 'Status')
+      + filterDd('erasure', 'all', [['all', 'All'], ['none', 'None'], ['progress', 'Deletion in progress'], ['overdue', 'Overdue'], ['deleted', 'Deleted']], 'Erasure'))}
     ${rows.length ? table(
-      [{label:'User'}, {label:'Type'}, {label:'Cohort leader'}, {label:'Level'}, {label:'Status'}, {label:'Joined'}, {label:'Last active'}, ACT_COL],
+      [{label:'User'}, {label:'Type'}, {label:'Cohort leader'}, {label:'Level'}, {label:'Status'}, {label:'Erasure'}, {label:'Joined'}, {label:'Last active'}, ACT_COL],
       rows.map(u => ({id:u.id, go:userDetailRoute(u), sv:[u.name], cells:[
         personCell(u.name, u.email),
         esc(typeLabel(u)),
         u.roles.includes('leader') ? '<span class="tag sm">Cohort leader</span>' : '<span class="t-caption">—</span>',
         u.roles.includes('candidate') ? esc(candLevel(u)) : '<span class="t-caption">—</span>',
-        userStatusTag(u),
+        extInviteStatus(u),
+        erasureCell(u),
         esc(u.joined),
         esc(u.last),
-        rowActs([['view', 'View', `data-go="${userDetailRoute(u)}"`],
-          ...(u.status === 'invited'
-            ? [['renew', 'Resend invite', `data-act="staffresend:${u.id}"`], ['close', 'Cancel invite', `data-act="staffcancelinvite:${u.id}"`]]
-            : [active(u) ? ['deactivate', 'Deactivate', `data-sheet="deactext:${u.id}"`] : ['play', 'Reactivate', `data-sheet="reactext:${u.id}"`]]),
-          ...(u.roles.some(isFullAccess) ? [] : [['view', 'View as', `data-act="askviewas:${u.id}"`]]),
-          ['group', 'Merge into another account', `data-sheet="merge:${u.id}"`],
-          ['delete', 'Delete', `data-sheet="delext:${u.id}"`]])
+        rowActs(usersRowMenu(u))
       ]})), {bulk: usersBulk})
       : emptyState('users', 'No accounts match', q ? `Nothing matches “${q}” in this filter.` : 'Nothing in this filter yet.')}
   </section>`;
 }
+/* CSV EXPORT — exactly the visible columns for the current filtered set, mirroring
+   the Staff directory export (`staffexport`): built for real, refused above the row
+   limit, every export logs an audit line (story 3.1, Maryam 24 Sep 2026). */
+ACTIONS.usersexport = () => {
+  const rows = usersRowsFiltered();
+  if(!rows.length){ toast('Nothing to export in this filter', 'warn'); return; }
+  if(rows.length > EXPORT_ROW_LIMIT){ toast(`This export is larger than the ${EXPORT_ROW_LIMIT} row limit. Narrow your filters and try again.`, 'warn'); return; }
+  const head = ['Name', 'Email', 'Type', 'Cohort leader', 'Level', 'Status', 'Erasure', 'Joined', 'Last active'];
+  const body = rows.map(u => [u.name, u.email, typeLabel(u), u.roles.includes('leader') ? 'Yes' : '',
+    u.roles.includes('candidate') ? candLevel(u) : '', USER_STATUS_LABEL[u.status] || cap(u.status),
+    ERASE_LABEL[erasureState(u)], u.joined, u.last || 'Never'].map(csvCell).join(','));
+  const csv = head.map(csvCell).join(',') + '\n' + body.join('\n') + '\n';
+  try { const a = document.createElement('a'); a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv); a.download = 'users-directory.csv'; a.click(); } catch(e){}
+  audit('Exported users directory', `${rows.length} row${rows.length === 1 ? '' : 's'}`, 'Users & Roles', 'notice');
+  toast(`Exporting ${rows.length} row${rows.length === 1 ? '' : 's'}. A download link will reach your notifications, valid 7 days.`);
+};
 
 /* ======================================================================
    EPIC 1 — SUPER ADMIN ACCESS & PROVISIONING (the staff lifecycle)
@@ -5323,7 +5422,7 @@ ACTIONS.doinviteagent = () => {
   if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ toast('Enter a valid email address', 'warn'); return 'keep'; }
   if(USERS.some(u => u.email.toLowerCase() === email.toLowerCase())){ toast('This email address is already in use on the platform', 'warn'); return 'keep'; }
   const name = `${v.first} ${v.last}`.trim();
-  const u = {id:newId('u', USERS), name, email, roles:['agent'], level:'—', status:'invited', joined:today(), origin:'individual', last:'Never', fee:0, rating:0, interviewed:0, onboarded:false};
+  const u = {id:newId('u', USERS), name, email, roles:['agent'], level:'—', status:'invited', joined:today(), origin:'individual', last:'Never', fee:0, rating:0, interviewed:0, onboarded:false, invitedOn:today(), invitedBy:ME.id};
   USERS.push(u); USER_BY_ID[u.id] = u;
   audit('Invited talent agent', name, 'Users & Roles', 'high');
   toast(`Invite sent to ${email}`);
@@ -5369,6 +5468,72 @@ ACTIONS.doremoveleader = key => {
    in-flight items it clears (an agent's upcoming interviews + listing, a leader's
    live cohorts); a candidate has none. Delete adds the step-up code (story 1.6).
    The clearing is summarised rather than simulated end-to-end (prototype). */
+/* ======================================================================
+   EXTERNAL ACCOUNT LIFECYCLE (Epic 3 · stories 3.4 / 3.5 / 3.6)
+
+   Maryam, 24 Sep 2026 — the FULL lifecycle now applies to candidates and agents,
+   not only staff. Deactivating schedules an erasure after a grace period (a
+   reversible countdown); deleting runs the SAME 5-processor erasure record the
+   staff module owns (`DEL_PROCESSORS` + `confirmproc`), moving the account
+   Deactivated → Deletion in progress → Deleted with a 30-day deadline. This
+   REVERSES the same-day "delete directly, no Deletion-in-progress" note on the
+   external delete — a deliberate scope decision (the approved Epic 3 plan), taken
+   knowingly, so the direct-splice delete is gone and the lifecycle is shared with
+   the staff machinery that was already built.
+   ====================================================================== */
+const GRACE_DAYS = 30, ERASE_DAYS = 30;
+const isoPlus = (iso, n) => new Date(new Date(iso).getTime() + n * 864e5).toISOString().slice(0, 10);
+const isoDaysLeft = iso => Math.ceil((new Date(iso).getTime() - Date.now()) / 864e5);
+/* erasure state for the directory column + filter (story 3.1): None while the
+   account is only deactivated (erasure has not begun) or active; Deletion in
+   progress once a delete is running; Overdue past the 30-day deadline; Deleted
+   when all five processors have confirmed. */
+function erasureState(u){
+  if(u.status === 'deleted') return 'deleted';
+  if(u.status === 'deleting' && u.deletion) return isoDaysLeft(u.deletion.dueBy) < 0 ? 'overdue' : 'progress';
+  return 'none';
+}
+const ERASE_LABEL = {none:'None', progress:'Deletion in progress', overdue:'Overdue', deleted:'Deleted'};
+function erasureCell(u){
+  const s = erasureState(u);
+  if(s === 'none') return '<span class="t-caption">—</span>';
+  if(s === 'overdue') return `<span class="statw" style="color:var(--support-error)">Overdue ${-isoDaysLeft(u.deletion.dueBy)}d</span>`;
+  if(s === 'progress') return '<span class="statw warn">Deletion in progress</span>';
+  return '<span class="statw">Deleted</span>';
+}
+/* The erasure PANEL shown on a candidate/agent detail once the account is
+   deactivated-with-a-schedule (the grace countdown) or being deleted (the
+   5-processor record, reusing the staff markup). Empty on an active account. */
+function externalErasurePanel(u){
+  if(u.deletion){
+    const overdue = erasureState(u) === 'overdue';
+    const left = isoDaysLeft(u.deletion.dueBy);
+    return `<section class="sec">
+      ${aiHead('Erasure', u.status === 'deleted'
+        ? 'Personal data has been erased across the platform and every processor. The audit trail is kept under a pseudonym.'
+        : `Erasure due by ${dpFmt(u.deletion.dueBy)} (${overdue ? `<span style="color:var(--support-error)">Overdue by ${-left} days</span>` : `${Math.max(0, left)} days remaining`}). The account cannot sign in.`)}
+      ${infoCard('What is kept', 'Payment receipts and invoices for 7 years under the accounting rule; a certificate as a credential with the name stripped; the audit trail pseudonymised; a one-way hash of the email so the address cannot open a new account.')}
+      <div class="tile-stack">
+        ${DEL_PROCESSORS.map(([k, label]) => { const at = u.deletion.proc[k];
+          return cardRow(at ? 'check' : 'clock', esc(label), at ? `Confirmed ${dpFmt(at)}` : 'Requested',
+            at ? '' : `<button class="btn acc-link btn-sm noic" data-act="confirmproc:${u.id}:${k}">Confirm erasure ${I.arrowRight}</button>`); }).join('')}
+      </div>
+    </section>`;
+  }
+  if(u.erasure && u.status === 'inactive'){
+    const dleft = Math.max(0, isoDaysLeft(u.erasure.beginsOn));
+    return `<section class="sec">
+      ${aiHead('Scheduled erasure', `Erasure begins on ${dpFmt(u.erasure.beginsOn)} (${dleft} day${dleft === 1 ? '' : 's'} remaining) unless the account is reactivated first.`)}
+      ${infoCard(u.erasure.by === 'holder' ? 'Closed by the account holder' : 'Deactivated by an administrator', 'The account sits deactivated for the grace period, then erasure begins automatically and runs to a 30-day deadline. Reactivating cancels it outright.')}
+    </section>`;
+  }
+  return '';
+}
+/* The badge beside a deactivated account's status: admin-deactivated vs the
+   holder closing it themselves (story 3.4). */
+const closedByBadge = u => u.status === 'inactive' && u.erasure
+  ? `<span class="tag sm">${u.erasure.by === 'holder' ? 'Closed by account holder' : 'Deactivated by administrator'}</span>` : '';
+
 function extClearing(u){
   const items = [];
   if(u.roles.includes('agent')){
@@ -5380,14 +5545,40 @@ function extClearing(u){
   if(leads) items.push(`${leads} live cohort${leads === 1 ? '' : 's'} to reassign to another leader`);
   return items;
 }
+/* THE ACTIONABLE, BLOCKING CLEARING FLOW (stories 3.4 / 3.6, Maryam 24 Sep 2026).
+   Money in escrow and cohorts left leaderless are the two items that must be
+   resolved IN the flow before deactivate/delete can commit — each carries its own
+   control, and the action is refused until none remain. Booked interviews and the
+   listing are auto-consequences (named in the confirm), not blockers. The reason
+   note lives in `S.clearNote` (not the DOM) so releasing a payout — which
+   re-renders — does not wipe it; a `clearNoteFor` guard resets it per account, the
+   `S.qEdit`-style "load once per id" pattern. */
+const heldEscrow = u => u.roles.includes('agent') ? PAYOUTS.filter(p => p.agent === u.name && p.status === 'held') : [];
+const clearingBlocked = u => heldEscrow(u).length
+  ? 'Release every payment still in escrow before continuing'
+  : (leaderCohorts(u.name).length ? 'Reassign this leader’s live cohorts (Cohort Leaders) before continuing' : null);
+function clearingUI(u, id){
+  if(S.clearNoteFor !== id){ S.clearNote = ''; S.clearNoteFor = id; }
+  const note = `<label class="f"><span class="lbl">Reason <span class="req-star" aria-hidden="true">*</span></span>
+    <textarea class="inp" rows="3" oninput="S.clearNote=this.value" placeholder="Why this account is being removed. Internal only.">${esc(S.clearNote || '')}</textarea></label>`;
+  const held = heldEscrow(u), led = leaderCohorts(u.name);
+  if(!held.length && !led.length) return note;
+  const rows = [];
+  held.forEach(p => rows.push(cardRow('wallet', `Escrow ${esc(p.ref)}`, `${money(p.net)} held for ${esc(p.period)}`,
+    `<button class="btn acc-link btn-sm noic" data-act="clearpayout:${u.id}:${p.id}">Release ${I.arrowRight}</button>`)));
+  led.forEach(c => rows.push(cardRow('users', esc(c.name), 'Live cohort with no replacement leader',
+    `<span class="t-caption">Reassign in Cohort Leaders</span>`)));
+  return note + `<div style="margin-top:var(--s05)">${note2Head('Clear before continuing')}<div class="tile-stack">${rows.join('')}</div></div>`;
+}
+const note2Head = t => `<p class="t-label" style="margin-bottom:var(--s03);color:var(--text-secondary)">${esc(t)}</p>`;
+ACTIONS.clearpayout = key => { const pid = key.split(':')[2]; const p = PAYOUTS.find(x => x.id === pid);
+  if(p){ p.status = 'settled'; p.when = 'Released'; audit('Released payout in account clearing', p.ref, 'Finance & Settlement', 'high'); toast(`${p.ref} released`); } };
 SHEETS.deactext = id => {
   const u = USER_BY_ID[id]; if(!u) return {title:'Deactivate', body:'', ok:''};
   const cl = extClearing(u);
   return {
     title:`Deactivate ${u.name}`,
-    body: fieldHtml({k:'note', l:'Reason', t:'textarea', req:1, ph:'Why this account is being deactivated. Internal only.'})
-      /* "What deactivating clears" reads as the plain light info card, and the
-         separate "They are signed out" explainer is dropped (Maryam, 18 Sep 2026). */
+    body: clearingUI(u, 'deact:' + id)
       + (cl.length ? infoCard('What deactivating clears', cl.map(esc).join(' · ')) : ''),
     ok:'Deactivate', danger:true,
     act:'submitdeactext:' + id
@@ -5395,24 +5586,38 @@ SHEETS.deactext = id => {
 };
 ACTIONS.submitdeactext = key => {
   const u = USER_BY_ID[key.split(':')[1]]; if(!u) return;
-  const v = readForm(); if(!v.note){ toast('Enter a note explaining this deactivation', 'warn'); return 'keep'; }
-  S._pending = {note:v.note};
+  if(!(S.clearNote || '').trim()){ toast('Enter a note explaining this deactivation', 'warn'); return 'keep'; }
+  /* the actionable, blocking clearing gate (3.4): escrow released and cohorts
+     reassigned before the account can be deactivated. */
+  const b = clearingBlocked(u); if(b){ toast(b, 'warn'); return 'keep'; }
+  S._pending = {note:S.clearNote};
   const cl = extClearing(u);
   askConfirm({mk:'warning', danger:true, title:`Deactivate ${u.name}?`, body:`${cl.length ? cl.join(', ') + '. ' : ''}They will be signed out and notified.`, ok:'Deactivate', act:'dodeactext:' + u.id});
 };
 ACTIONS.dodeactext = key => {
   const u = USER_BY_ID[key.split(':')[1]]; const v = S._pending || {}; S._pending = null; S.confirm = null; if(!u) return;
   u.status = 'inactive'; u.last = 'Signed out'; if(u.roles.includes('agent')) u.onboarded = false;
+  /* schedule the grace-period erasure and mark how the account got here (3.4) */
+  u.deactivatedOn = isoToday(); u.deactivateNote = v.note || ''; u.erasure = {beginsOn: isoPlus(isoToday(), GRACE_DAYS), by:'admin'};
   const c = CAND_BY_ID[u.id]; if(c) c.status = 'inactive';
-  audit('Deactivated account', `${u.name} · ${v.note || ''}`, 'Users & Roles', 'high');
-  toast(`${u.name} deactivated`);
+  audit('Deactivated account', `${u.name} · erasure scheduled ${dpFmt(u.erasure.beginsOn)} · ${v.note || ''}`, 'Users & Roles', 'high');
+  toast(`${u.name} deactivated. Erasure scheduled for ${dpFmt(u.erasure.beginsOn)} unless reactivated.`);
+  S.clearNote = ''; S.clearNoteFor = null;
 };
 SHEETS.reactext = id => {
   const u = USER_BY_ID[id]; if(!u) return {title:'Reactivate', body:'', ok:''};
+  /* read-only context (story 3.5): when the account was deactivated, the internal
+     note captured then, and the erasure it is counting down to. */
+  const ctx = u.erasure ? kv([
+    ['Deactivated on', u.deactivatedOn ? dpFmt(u.deactivatedOn) : '—'],
+    ['Reason given', u.deactivateNote || '—'],
+    ['Erasure begins', `${dpFmt(u.erasure.beginsOn)} · ${Math.max(0, isoDaysLeft(u.erasure.beginsOn))} days remaining`]
+  ]) : '';
   return {
     title:`Reactivate ${u.name}`,
-    body: fieldHtml({k:'note', l:'Reason', t:'textarea', req:1, ph:'Why access is being restored. Internal only.'})
-      + sheetHelp('Sign-in, profile, level, certificates and history are restored intact. An agent returns as Not listed and must relist; a candidate is not returned to their old cohort and enrols again.'),
+    body: ctx
+      + fieldHtml({k:'note', l:'Reason', t:'textarea', req:1, ph:'Why access is being restored. Internal only.'})
+      + sheetHelp('The scheduled erasure is cancelled outright. Sign-in, profile, level, certificates and history are restored intact. An agent returns as Not listed and must relist; a candidate is not returned to their old cohort and enrols again.'),
     ok:'Reactivate',
     act:'submitreactext:' + id
   };
@@ -5426,17 +5631,19 @@ ACTIONS.submitreactext = key => {
 ACTIONS.doreactext = key => {
   const u = USER_BY_ID[key.split(':')[1]]; const v = S._pending || {}; S._pending = null; S.confirm = null; if(!u) return;
   u.status = 'active'; u.last = 'Just now';
+  /* reactivation CANCELS the pending erasure outright — the countdown is not
+     resumed, it is gone (story 3.5). */
+  delete u.erasure; delete u.deactivatedOn;
   const c = CAND_BY_ID[u.id]; if(c) c.status = 'active';
-  audit('Reactivated account', `${u.name} · ${v.note || ''}`, 'Users & Roles', 'high');
-  toast(`${u.name} reactivated`);
+  audit('Reactivated account', `${u.name} · pending erasure cancelled · ${v.note || ''}`, 'Users & Roles', 'high');
+  toast(`${u.name} reactivated. The scheduled erasure is cancelled.`);
 };
 SHEETS.delext = id => {
   const u = USER_BY_ID[id]; if(!u) return {title:'Delete', body:'', ok:''};
   const cl = extClearing(u);
   return {
     title:`Delete ${u.name}`,
-    body: fieldHtml({k:'note', l:'Reason', t:'textarea', req:1, ph:'Why this account is being erased. Internal only.'})
-      + (cl.length ? note('warn', 'What deleting clears first', cl.map(esc).join(' · ')) : '')
+    body: clearingUI(u, 'del:' + id)
       + sheetHelp('This erases their personal data across the platform and cannot be undone. Payment receipts are kept 7 years for accounting; certificates keep the credential with the name removed; the audit trail is pseudonymised.'),
     ok:'Delete', danger:true,
     act:'submitdelext:' + id
@@ -5444,17 +5651,24 @@ SHEETS.delext = id => {
 };
 ACTIONS.submitdelext = key => {
   const u = USER_BY_ID[key.split(':')[1]]; if(!u) return;
-  const v = readForm(); if(!v.note){ toast('Enter a note explaining this deletion', 'warn'); return 'keep'; }
-  S._pending = {note:v.note};
+  if(!(S.clearNote || '').trim()){ toast('Enter a note explaining this deletion', 'warn'); return 'keep'; }
+  const b = clearingBlocked(u); if(b){ toast(b, 'warn'); return 'keep'; }
+  S._pending = {note:S.clearNote};
   askConfirm({mk:'warning', danger:true, stepup:true, title:`Delete ${u.name} permanently?`, body:'This erases their personal data across the platform and cannot be undone.', ok:'Delete', act:'dodelext:' + u.id});
 };
 ACTIONS.dodelext = key => {
   const u = USER_BY_ID[key.split(':')[1]]; const v = S._pending || {}; S._pending = null; S.confirm = null; if(!u) return;
-  const nm = u.name;
-  if(KINDS.user && KINDS.user.remove) KINDS.user.remove(u); else { USERS.splice(USERS.indexOf(u), 1); delete USER_BY_ID[u.id]; }
-  audit('Deleted account', `${nm} · ${v.note || ''}`, 'Users & Roles', 'high');
-  toast(`${nm} deleted. Personal data is being erased; receipts and the audit trail are kept.`);
-  if(S.mod !== 'users' || S.sub !== 'users'){ S.mod = 'users'; S.sub = 'users'; S.id = null; }
+  /* START THE ERASURE LIFECYCLE rather than splicing the record (3.6): the account
+     moves to Deletion in progress, carries the 5-processor erasure record and a
+     30-day deadline, and reaches Deleted only once every processor confirms
+     (`confirmproc`). It stays in the directory under its erasure state until then,
+     so a delete opened from a detail page leaves the erasure record on screen. */
+  u.status = 'deleting'; delete u.erasure;
+  u.deletion = {started: isoToday(), dueBy: isoPlus(isoToday(), ERASE_DAYS), proc:{}, emailed:true};
+  const c = CAND_BY_ID[u.id]; if(c) c.status = 'inactive';
+  audit('Started account erasure', `${u.name} · due ${dpFmt(u.deletion.dueBy)} · ${v.note || ''}`, 'Users & Roles', 'high');
+  toast(`${u.name} — erasure started across five processors. Due by ${dpFmt(u.deletion.dueBy)}.`);
+  S.clearNote = ''; S.clearNoteFor = null;
 };
 
 KINDS.role = {
@@ -5464,56 +5678,63 @@ KINDS.role = {
      the Super Admin ... will be treated as the system's internal roles"), so the
      Kind field is gone and create/update fix `kind:'internal'`. */
   fields: [
-    {k:'name', l:'Role name', t:'text', req:1, ph:'e.g. Calibration Lead'},
-    {k:'desc', l:'What it does', t:'textarea', req:1, ph:'One sentence a new admin can read'}
+    {k:'name', l:'Role name', t:'text', req:1, max:50, ph:'e.g. Calibration Lead'},
+    {k:'desc', l:'Description', t:'textarea', req:1, max:255, ph:'One sentence a new admin can read'}
   ],
-  help:'A new role starts with no capabilities. Grant them in the permission matrix below; every grant is logged.',
+  help:'A new custom role starts with no permissions. Grant them in the permission matrix below; the change is logged.',
   okNew:'Create Role',
-  create: v => { const k = v.name.toLowerCase().replace(/[^a-z0-9]+/g, '') || newId('role', ROLES); const r = {k, name:v.name, short:v.name, kind:'internal', desc:v.desc}; ROLES.push(r); ROLE_BY_K[k] = r; MATRIX[k] = {}; return r; },
+  create: v => { const k = v.name.toLowerCase().replace(/[^a-z0-9]+/g, '') || newId('role', ROLES); const r = {k, name:v.name, short:v.name, kind:'internal', desc:v.desc}; ROLES.push(r); ROLE_BY_K[k] = r; MATRIX[k] = {}; PERMSET[k] = new Set(); return r; },
   update: (r, v) => { r.name = v.name; r.short = v.name; r.kind = 'internal'; r.desc = v.desc; },
-  remove: r => { ROLES.splice(ROLES.indexOf(r), 1); delete ROLE_BY_K[r.k]; delete MATRIX[r.k]; USERS.forEach(u => { u.roles = u.roles.filter(x => x !== r.k); }); },
+  remove: r => { ROLES.splice(ROLES.indexOf(r), 1); delete ROLE_BY_K[r.k]; delete MATRIX[r.k]; delete PERMSET[r.k]; USERS.forEach(u => { u.roles = u.roles.filter(x => x !== r.k); }); },
   guard: r => r.k === 'admin' ? 'The Super Admin role can’t be deleted' : null,
   delWarn: r => { const n = USERS.filter(u => u.roles.includes(r.k)).length; return `Its permissions are removed${n ? ` and the role is stripped from ${n} ${n === 1 ? 'account' : 'accounts'}` : ''}.`; }
 };
 function usersRoles(){
-  /* A single Roles view — the internal roles the Super Admin manages (Maryam,
-     19 Sep 2026: "remove the External Roles category ... there is no need to
-     maintain separate All and Internal tabs ... a single Roles view containing
-     the roles added by the Super Admin ... treated as the system's internal
-     roles"). External roles (candidate / agent / cohort leader) are self-serve
-     product memberships, not admin-managed roles, so they are not listed here;
-     the External/Internal kind tabs and the Type column go with them. */
-  const roles = ROLES.filter(r => r.kind === 'internal');
+  /* EPIC 4 — the role list + the Module × Action permission matrix. Built-in
+     roles ship with the platform (Super Admin, Admin, Reviewer, Supervisor,
+     Manager of Agents); custom roles are created here. The Super Admin column is
+     read-only and holds everything; the two reserved rows are locked and blank on
+     every other column. Screens-only — no runtime enforcement. */
+  const cols = permRoleCols();
   const usersWith = k => USERS.filter(u => u.roles.includes(k)).length;
   const editing = !!S.editPerms;
+  const lockCell = `<td class="num pm-off" title="Held by Super Admin only, cannot be granted to another role">${pmNo}</td>`;
+  const permRow = (pk, label, reserved) => `<tr><td>${esc(label)}</td>${cols.map(r => {
+    const isSA = r.k === 'admin';
+    const on = PERMSET[r.k] && PERMSET[r.k].has(pk);
+    if(reserved && !isSA) return lockCell;
+    if(!editing || isSA) return `<td class="num ${on ? 'pm-on' : 'pm-off'}">${on ? pmYes : pmNo}</td>`;
+    return `<td class="num ${on ? 'pm-on' : 'pm-off'}"><button class="btn btn-g btn-sm" data-act="toggleperm:${r.k}:${pk}" aria-pressed="${on}" aria-label="${esc(label)} for ${esc(r.name)}: ${on ? 'granted' : 'not granted'}">${on ? I.checkFilled : I.checkOutline}</button></td>`;
+  }).join('')}</tr>`;
+  const modHead = label => `<tr><td colspan="${cols.length + 1}" style="font-weight:var(--t-w-strong);color:var(--text-primary);background:var(--surface-2);padding:var(--s04)">${esc(label)}</td></tr>`;
+  const body = PERM_MODULES.map(([m, label, acts]) => modHead(label) + acts.map(a => permRow(m + ':' + a, PERM_ACT_LABEL[a])).join('')).join('')
+    + modHead('Sensitive permissions') + PERM_SENSITIVE.map(([pk, l]) => permRow(pk, l)).join('')
+    + modHead('Reserved to Super Admin') + PERM_RESERVED.map(([pk, l]) => permRow(pk, l, true)).join('');
   return `
   <section class="sec">
-    ${aiHead('Roles', 'Every internal role the Super Admin manages and what it grants.', addBtn('role', 'New Role'))}
+    ${aiHead('Roles', 'Every role and what it grants. Built-in roles ship with the platform; custom roles are yours to shape.', addBtn('role', 'New Role'))}
     ${table(
-      [{label:'Role'}, {label:'What it does'}, {label:'Users'}, ACT_COL],
-      roles.map(r => ({sv:[r.name], cells:[
+      [{label:'Role'}, {label:'Type'}, {label:'Description'}, {label:'Accounts', num:true}, ACT_COL],
+      cols.map(r => ({sv:[r.name], cells:[
         `<div>${esc(r.name)}${r.k === 'admin' ? ' <span class="tag sm rl-default">Default</span>' : ''}</div>`,
+        roleIsBuiltin(r.k) ? 'Built-in' : 'Custom',
         esc(r.desc),
         String(usersWith(r.k)),
-        r.k === 'admin' ? '' : rowActs([editBtn('role', r.k), delBtn('role', r.k)])
+        r.k === 'admin' ? '' : rowActs([
+          ['edit', 'Edit permissions', `data-act="editperms"`],
+          ...(roleIsBuiltin(r.k) ? [] : [delBtn('role', r.k)])
+        ])
       ]})), {select:false})}
   </section>
 
-  ${/* The Permissions matrix. The "Super Admin holders" grant/revoke section
-        (SA-01 / SA-16 — grantOf/revokeadmin, still defined) was removed here on
-        Maryam's ask (14 Sep 2026); the heading lost its description and the
-        "Only a Reviewer sees the raw score" note went with it. */''}
   <section class="sec">
-    ${aiHead('Permissions', '',
-      editing ? `<span style="display:flex;align-items:center;gap:var(--s05)"><button class="btn btn-g btn-sm noic" data-act="cancelperms">Cancel</button><button class="btn btn-p btn-sm noic" data-act="editperms"${permsChanged() ? '' : ' disabled'}>Update Permissions</button></span>`
+    ${aiHead('Permissions', 'A granted permission is marked. The Super Admin column holds every permission and is read-only; the two reserved permissions can be held only by Super Admin.',
+      editing
+        ? `<span style="display:flex;align-items:center;gap:var(--s05)"><button class="btn btn-g btn-sm noic" data-act="cancelperms">Cancel</button><button class="btn btn-p btn-sm noic" data-act="saveperms"${permsChanged() ? '' : ' disabled'}>Update Permissions</button></span>`
         : '<button class="btn btn-g btn-sm noic" data-act="editperms">' + I.edit + ' Edit Permissions</button>')}
     <div class="tbl-wrap"><table class="tbl perm-tbl">
-      <tr><th>Capability</th>${roles.map(r => `<th class="num">${esc(r.short)}</th>`).join('')}</tr>
-      ${CAPS.map(c => `<tr><td>${esc(c.t)}</td>${roles.map(r => {
-        const on = !!(MATRIX[r.k] && MATRIX[r.k][c.k]);
-        if(!editing || r.k === 'admin') return `<td class="num ${on ? 'pm-on' : 'pm-off'}">${on ? pmYes : pmNo}</td>`;
-        return `<td class="num ${on ? 'pm-on' : 'pm-off'}"><button class="btn btn-g btn-sm" data-act="toggleperm:${r.k}:${c.k}" aria-pressed="${on}" aria-label="${esc(c.t)} for ${esc(r.name)}: ${on ? 'granted' : 'not granted'}">${on ? I.checkFilled : I.checkOutline}</button></td>`;
-      }).join('')}</tr>`).join('')}
+      <tr><th>Permission</th>${cols.map(r => `<th class="num">${esc(r.short)}</th>`).join('')}</tr>
+      ${body}
     </table></div>
   </section>`;
 }
@@ -5527,36 +5748,42 @@ function usersRoles(){
    greys it again; Cancel restores the snapshot and leaves edit mode. Cancel is
    the plain ghost (`.btn-g`, no stroke). The per-toggle audit lines already
    written stay — the log records what happened, including a reverted edit. */
-const permsChanged = () => S.permsSnap != null && JSON.stringify(MATRIX) !== S.permsSnap;
-ACTIONS.editperms = () => { S.editPerms = !S.editPerms; S.permsDirty = false;
-  if(S.editPerms) S.permsSnap = JSON.stringify(MATRIX); else { S.permsSnap = null; toast('Permission changes saved'); } };
+/* EPIC 4 permission editing (rewritten for the PERMSET model). Entering edit
+   mode snapshots every role's grant set; "Update Permissions" is live only while
+   the sets DIFFER from that snapshot. Toggling flips a role's membership of a
+   permission key (the Super Admin column and the two reserved rows never render
+   an editable control, so they cannot be toggled). Saving shows the story's
+   confirmation prompt (N added, N removed, N accounts) before it commits, and
+   writes one audit line. Cancel restores the snapshot. */
+const permSnapshot = () => JSON.stringify(Object.fromEntries(Object.keys(PERMSET).map(k => [k, [...PERMSET[k]].sort()])));
+const permsChanged = () => S.permsSnap != null && permSnapshot() !== S.permsSnap;
+ACTIONS.editperms = () => { if(!S.editPerms){ S.editPerms = true; S.permsSnap = permSnapshot(); } };
 ACTIONS.cancelperms = () => {
-  if(S.permsSnap != null){ const snap = JSON.parse(S.permsSnap); Object.keys(MATRIX).forEach(k => delete MATRIX[k]); Object.assign(MATRIX, snap); }
-  S.editPerms = false; S.permsDirty = false; S.permsSnap = null;
+  if(S.permsSnap != null){ const snap = JSON.parse(S.permsSnap); Object.keys(PERMSET).forEach(k => { PERMSET[k] = new Set(snap[k] || []); }); }
+  S.editPerms = false; S.permsSnap = null;
 };
 ACTIONS.toggleperm = key => {
-  const [, rk, ck] = key.split(':'); const r = ROLE_BY_K[rk]; const c = CAPS.find(x => x.k === ck); if(!r || !c) return;
-  MATRIX[rk] = MATRIX[rk] || {};
-  const on = !MATRIX[rk][ck];
-  /* SA-10 E1 — a grant across the Program / Business wall is warned and asked,
-     not refused (the refusal is the open ruling). */
-  const side = roleSide(rk);
-  if(on && side && CAP_SIDE[ck] && CAP_SIDE[ck] !== side){
-    askConfirm({mk:'warning', title:`Grant “${c.t}” to ${r.name}?`,
-      body:`${r.name} is a ${side}-side role and this is a ${CAP_SIDE[ck]} capability — the grant breaches the Program / Business wall (SA-10 E1). Whether that should be refused is an open ruling; granting it is logged at high severity with the breach named.`,
-      ok:'Grant Anyway', danger:true, act:`doperm:${rk}:${ck}`});
-    return;
-  }
-  if(on) MATRIX[rk][ck] = 1; else delete MATRIX[rk][ck];
-  S.permsDirty = true;
-  audit(`${on ? 'Granted' : 'Removed'} capability`, `${r.name} — ${c.t}`, 'Users & Roles', 'high', {from: on ? 'not granted' : 'granted', to: on ? 'granted' : 'not granted'});
+  const parts = key.split(':'); const rk = parts[1]; const pk = parts.slice(2).join(':');
+  const r = ROLE_BY_K[rk]; if(!r || rk === 'admin') return;   /* Super Admin is read-only */
+  if(permIsReserved(pk)) return;                              /* reserved is not grantable */
+  PERMSET[rk] = PERMSET[rk] || new Set();
+  if(PERMSET[rk].has(pk)) PERMSET[rk].delete(pk); else PERMSET[rk].add(pk);
 };
-ACTIONS.doperm = key => {
-  const [, rk, ck] = key.split(':'); const r = ROLE_BY_K[rk]; const c = CAPS.find(x => x.k === ck); S.confirm = null; if(!r || !c) return;
-  MATRIX[rk] = MATRIX[rk] || {}; MATRIX[rk][ck] = 1;
-  S.permsDirty = true;
-  audit('Granted capability across the wall', `${r.name} — ${c.t} (${roleSide(rk) || 'mixed'} role, ${CAP_SIDE[ck]} capability)`, 'Users & Roles', 'high', {from:'not granted', to:'granted'});
-  toast('Granted — breach logged');
+ACTIONS.saveperms = () => {
+  if(!permsChanged()){ S.editPerms = false; S.permsSnap = null; return; }
+  const snap = JSON.parse(S.permsSnap); let added = 0, removed = 0; const changed = new Set();
+  Object.keys(PERMSET).forEach(k => { const now = PERMSET[k], was = new Set(snap[k] || []);
+    now.forEach(pk => { if(!was.has(pk)){ added++; changed.add(k); } });
+    was.forEach(pk => { if(!now.has(pk)){ removed++; changed.add(k); } }); });
+  const accounts = [...changed].reduce((n, k) => n + USERS.filter(u => u.roles.includes(k)).length, 0);
+  askConfirm({mk:'check', title:'Save permission changes?',
+    body:`${added} permission${added === 1 ? '' : 's'} added, ${removed} removed across ${changed.size} role${changed.size === 1 ? '' : 's'}. This affects ${accounts} account${accounts === 1 ? '' : 's'}.`,
+    ok:'Save Changes', act:'dosaveperms'});
+};
+ACTIONS.dosaveperms = () => {
+  S.confirm = null; S.editPerms = false; S.permsSnap = null;
+  audit('Edited role permissions', 'Permission matrix updated', 'Users & Roles', 'high');
+  toast('Permission changes saved');
 };
 
 /* ══ BULK IMPORT USERS — a three-step wizard (Maryam, 11 Sep 2026, off the
@@ -6762,6 +6989,75 @@ function candCourses(){
   </section>`;
 }
 
+/* ---- CANDIDATE DETAIL PANELS (story 3.7, Maryam 24 Sep 2026) --------------
+   The story wants the level, cohort and money answerable on one screen. Three
+   panels added to the candidate detail: Levelling (approved level, provenance,
+   history + Override), Cohorts (their cohort with progress, linking through) and
+   Payments (their transactions). The Activity panel stays out — the Audit Log
+   module is hidden. */
+function candLevellingPanel(c){
+  const rung = (LVL_CODES.indexOf(c.level) + 1) || 2;
+  const hist = levelHistory(c);
+  const levelled = c.agent && c.agent !== '—';
+  return `<section class="sec">
+    ${aiHead('Levelling', 'The approved level, how it was reached, and every change on the record.',
+      `<button class="btn btn-g btn-sm noic" data-sheet="candoverride:${c.id}">Override Level</button>`)}
+    ${kv([
+      ['Current level', `${esc(c.bucket)} — ${esc(c.level)}`],
+      ['Position', levelled ? `Rung ${rung} of 15` : 'Not yet levelled'],
+      ['Interviewer', levelled ? esc(c.agent) : '—'],
+      ['Set by', levelled ? 'TalentNext' : '—']
+    ])}
+    ${hist.length
+      ? `<div class="tile-stack" style="margin-top:var(--s06)">${hist.map(h => cardRow('chart', `${esc(h.from)} → ${esc(h.to)}`, `${esc(h.by || 'TalentNext')}${h.when ? ' · ' + esc(h.when) : ''}${h.kind === 'override' ? ' · override' : ''}`, '')).join('')}</div>`
+      : `<p class="t-desc" style="margin-top:var(--s05)">No level changes recorded yet.</p>`}
+  </section>`;
+}
+function candCohortsPanel(c){
+  const cos = COHORTS.filter(x => x.name === c.cohort);
+  if(!cos.length && (!c.cohort || c.cohort === '—'))
+    return `<section class="sec">${secHead('Cohorts')}${emptyState('cohorts', 'No cohort', 'This candidate is not in a cohort yet.')}</section>`;
+  const rows = cos.length ? cos : [{name:c.cohort, leader:'—', status:'active', week:null, day:null, start:''}];
+  return `<section class="sec">
+    ${secHead('Cohorts')}
+    ${table([{label:'Cohort'}, {label:'Leader'}, {label:'Started'}, {label:'Progress'}, {label:'Status'}],
+      rows.map(x => ({...(x.id ? {id:x.id, go:'cohorts/detail/' + x.id} : {}), cells:[
+        esc(x.name),
+        esc((x.leader || '—').replace(/\s*\(.*\)/, '')),
+        x.start ? (dpFmt(x.start) || x.start) : '—',
+        x.week ? `Week ${x.week} of 13${x.day ? ` · ${Math.max(0, 90 - x.day)} days left` : ''}` : '—',
+        tag(x.status === 'active' ? 'active' : x.status)]})))}
+  </section>`;
+}
+function candPaymentsPanel(c){
+  const tx = TXNS.filter(t => t.who === c.name);
+  return `<section class="sec">
+    ${secHead('Payments')}
+    ${tx.length
+      ? table([{label:'Date'}, {label:'Item'}, {label:'Amount', num:true}, {label:'Status'}],
+        tx.map(t => ({cells:[esc(t.when || t.date), esc(t.kind), money(t.amt), tag(t.status)]})))
+      : emptyState('wallet', 'No transactions', 'No course or interview payments on record for this candidate.')}
+  </section>`;
+}
+SHEETS.candoverride = id => {
+  const c = CAND_BY_ID[id] || (USER_BY_ID[id] && CAND_BY_ID[USER_BY_ID[id].id]);
+  if(!c) return {title:'Override level', body:'', ok:''};
+  return {title:`Override the level for ${c.name}`, ok:'Set Level', act:'docandoverride:' + id,
+    body: fieldHtml({k:'level', l:'New level', t:'select', req:1, opts:levelOpts(c.level).map(l => [l, l])}, c.level)
+      + fieldHtml({k:'reason', l:'Reason', t:'textarea', req:1, max:500, ph:'Why the level is being overridden. Internal only.'})
+      + sheetHelp('The override lands immediately and is kept on the candidate’s level history. TalentNext sets the level from the interview; an override is the admin’s correction of it.')};
+};
+ACTIONS.docandoverride = key => {
+  const c = CAND_BY_ID[key.split(':')[1]]; const v = readForm(); if(!c) return;
+  if(!v.level){ toast('Choose a level', 'warn'); return 'keep'; }
+  if(!v.reason){ toast('A reason is required', 'warn'); return 'keep'; }
+  const from = c.level; if(v.level === from){ toast('That is already this candidate’s level', 'warn'); return 'keep'; }
+  levelHistory(c); c.history.unshift({from, to:v.level, by:ME.name, when:today(), kind:'override'});
+  c.level = v.level; const u = USER_BY_ID[c.id]; if(u) u.level = v.level;
+  audit('Overrode candidate level', `${c.name} · ${from} → ${v.level} · ${v.reason}`, 'Candidates', 'high', {from, to:v.level});
+  toast(`${c.name} set to ${v.level}`); S.sheet = null;
+};
+
 function candidatesDetail(){
   const c = CAND_BY_ID[S.id] || CANDS[0];
   DETAIL_LABEL = c.name;
@@ -6815,6 +7111,11 @@ function candidatesDetail(){
     </div>
   </section>
 
+  ${''/* LEVELLING + COHORTS panels (story 3.7) — level provenance, history and
+         override; the candidate's cohort with progress. */}
+  ${candLevellingPanel(c)}
+  ${candCohortsPanel(c)}
+
   ${''/* COURSES the candidate is taking and has taken, with each completed
         course's completion certificate — before Interviews (Maryam, 15 Sep). */}
   ${candCourses()}
@@ -6826,6 +7127,9 @@ function candidatesDetail(){
       : emptyState('video', 'No interviews booked', 'This candidate has not booked a marketplace interview yet.')}
   </section>
 
+  ${''/* PAYMENTS panel (story 3.7) — every transaction for this candidate. */}
+  ${candPaymentsPanel(c)}
+
   ${''/* THE CANDIDATE'S CV — Experience / Education / Licenses & certifications /
         Skills, the candidate portal's own sections, read-only (Maryam, 15 Sep
         2026). */}
@@ -6833,7 +7137,10 @@ function candidatesDetail(){
 
   ${''/* QUIZ RESULTS — full width, its heading aligned with the page content
          (Maryam, 15 Sep 2026). */}
-  ${admQuiz(c)}`;
+  ${admQuiz(c)}
+  ${''/* ERASURE — the grace countdown or the 5-processor deletion record, once the
+         account is deactivated-with-a-schedule or being deleted (Epic 3, 3.4/3.6). */}
+  ${u ? externalErasurePanel(u) : ''}`;
 }
 V.candidates = () => modView({candidates:candidatesAll, detail:candidatesDetail});
 
@@ -6960,14 +7267,22 @@ KINDS.agent = {
        restored from the row action, not this form (Maryam, 18 Sep 2026). */
     a ? {k:'email', l:'Email address', t:'email', ro:1} : {k:'email', l:'Email address', t:'email', req:1},
     {k:'job', l:'Current role', t:'text', req:1, ph:'e.g. Engineering Manager, Stripe'},
-    {k:'fee', l:'Interview fee ($)', t:'number', req:1, def:150}
+    {k:'fee', l:'Interview fee ($)', t:'number', req:1, def:150},
+    /* PER-AGENT COMMISSION (story 3.2/3.9, Maryam 24 Sep 2026). There is no
+       platform-wide commission — the platform's share is set for THIS agent, at
+       the point the account is created, 0–100 with one decimal. It rides the
+       agent record and is shown on the agent detail's Listing panel; changing it
+       later is a fee decision. The 1–5 "initial agent score" the story also asks
+       for is deliberately NOT captured — it only seeded the out-of-100 quarterly
+       score, which this build does not use (agent standing is the star rating). */
+    {k:'commission', l:'Commission (%)', t:'number', req:1, def:20, ph:'The platform’s share of this agent’s fee'}
   ],
   /* the vetting-queue note is about CREATING an account, so it shows on add only
      (Maryam, 18 Sep 2026: "remove the info banner from here" — the edit sheet). */
-  help: a => a ? '' : 'An agent normally arrives through the vetting queue. Adding one here creates the account as approved — use it for a known agent you have already vetted elsewhere.',
+  help: a => a ? '' : 'An agent normally arrives through the vetting queue. Adding one here creates the account as approved — use it for a known agent you have already vetted elsewhere. The commission is this agent’s alone; there is no platform-wide figure.',
   okNew:'Add Talent Agent',
-  create: v => { const u = {id:newId('u', USERS), name:v.name, email:v.email, roles:['agent'], level:'—', job:v.job, rating:0, interviewed:0, status:'active', joined:today(), origin:'individual', last:'invited', fee:v.fee}; USERS.push(u); USER_BY_ID[u.id] = u; return u; },
-  update: (a, v) => { a.name = v.name; a.job = v.job; a.fee = v.fee; if(v.status) a.status = v.status; },
+  create: v => { const u = {id:newId('u', USERS), name:v.name, email:v.email, roles:['agent'], level:'—', job:v.job, rating:0, interviewed:0, status:'active', joined:today(), origin:'individual', last:'invited', fee:v.fee, commission:v.commission != null && v.commission !== '' ? Number(v.commission) : 20, commissionAt:today()}; USERS.push(u); USER_BY_ID[u.id] = u; return u; },
+  update: (a, v) => { a.name = v.name; a.job = v.job; a.fee = v.fee; if(v.commission != null && v.commission !== '' && Number(v.commission) !== a.commission){ a.commission = Number(v.commission); a.commissionAt = today(); } if(v.status) a.status = v.status; },
   remove: a => { a.roles = a.roles.filter(r => r !== 'agent'); if(!a.roles.length){ USERS.splice(USERS.indexOf(a), 1); delete USER_BY_ID[a.id]; } },
   delWarn: a => `${a.name} comes off the marketplace and loses the agent role. Booked interviews are cancelled and refunded; held payouts settle on the next cycle.`,
   status: (a, val) => val === 'inactive'
@@ -7014,6 +7329,56 @@ function agentsAll(){
   </section>`;
 }
 
+/* ---- AGENT DETAIL PANELS (story 3.8, Maryam 24 Sep 2026) ------------------
+   Listing details (commission, industries, intents, availability), a Reports
+   panel (evaluations filed) and an Earnings summary (escrow / paid / next /
+   destination). The out-of-100 Agent Score and training status stay OUT (Epic 6
+   is excluded; standing is the star rating). Industries / intents / availability
+   are authored placeholder — the seed has no agent-onboarding record (§74). */
+function agentListingPanel(a){
+  const comm = a.commission != null ? a.commission : 20;
+  return `<section class="sec">
+    ${aiHead('Listing details', 'What candidates are matched on, and this agent’s commercial terms.')}
+    ${kv([
+      ['Listing state', AG_STATE[agState(a)][1]],
+      ['Assessment range', rangeLabel(agRange(a))],
+      ['Interview fee', a.fee ? money(a.fee) : 'Free first'],
+      ['Commission', `${comm}% to the platform${a.commissionAt ? ' · since ' + esc(a.commissionAt) : ''}`],
+      ['Industries', esc((a.industries || ['Technology', 'Financial services']).join(', '))],
+      ['Intents', esc((a.intents || ['Develop in role', 'Move to a new role']).join(', '))],
+      ['Availability', esc(a.availability || 'Mon–Thu, afternoons')]
+    ])}
+    ${infoCard('Set by the agent', 'Industries, intents, fee and availability are the agent’s own, set at onboarding. The assessment range is set here; the commission is a fee decision, changed on the agent record.')}
+  </section>`;
+}
+function agentEarningsPanel(a){
+  const held = PAYOUTS.filter(p => p.agent === a.name && p.status === 'held');
+  const paid = PAYOUTS.filter(p => p.agent === a.name && p.status === 'settled');
+  const inEscrow = held.reduce((n, p) => n + (p.net || 0), 0);
+  const paidTotal = paid.reduce((n, p) => n + (p.net || 0), 0);
+  const dest = a.payoutMethod || (PAYOUTS.find(p => p.agent === a.name && p.method && p.method !== '—') || {}).method;
+  return `<section class="sec">
+    ${aiHead('Earnings', 'Escrow, payouts to date, and the destination they settle to.')}
+    ${stats([
+      ['wallet', 'In escrow', money(inEscrow), 'awaiting release'],
+      ['bank', 'Paid to date', money(paidTotal), 'net, released'],
+      ['route', 'Next payout', held.length ? money(held[0].net) : '—', held.length ? esc(held[0].when) : 'nothing pending'],
+      [dest ? 'check' : 'warning', 'Payout destination', dest ? 'On file' : 'Not on file', dest ? esc(dest) : 'cannot be paid']
+    ])}
+  </section>`;
+}
+function agentReportsPanel(a){
+  const past = pastIvs(a);
+  if(!past.length) return '';
+  const proposed = p => (String(p.tal || '').match(/([EBT]\d)\b/) || [, '—'])[1];
+  return `<section class="sec">
+    ${aiHead('Reports filed', 'The evaluations this agent has filed — the level they proposed and the candidate’s rating.')}
+    ${table([{label:'Candidate'}, {label:'Proposed level'}, {label:'Filed'}, {label:'Candidate rating', num:true}],
+      past.map(p => ({id:p.id, go:'agents/interview/' + p.id, cells:[
+        personCell(p.cand), esc(proposed(p)), esc(p.when), p.rating ? ratingCell(p.rating) : '—']})))}
+  </section>`;
+}
+
 function agentsDetail(){
   const a = USER_BY_ID[S.id] || AGENTS()[0];
   DETAIL_LABEL = a.name;
@@ -7057,6 +7422,9 @@ function agentsDetail(){
     ])}
   </section>
 
+  ${''/* LISTING DETAILS (story 3.8) — commercial terms + match signals. */}
+  ${agentListingPanel(a)}
+
   ${''/* the Payouts section is only drawn when there is something to release
         (Maryam, 18 Sep 2026: "when there is nothing to release do not even show
         this payout section") — no empty state. */}
@@ -7087,7 +7455,13 @@ function agentsDetail(){
       past.map(p => ({id:p.id, go:'agents/interview/' + p.id, cells:[
         personCell(p.cand), esc(agIvKind(p.kind)), agIvFee(p.kind, p.fee), esc(p.when), p.rating ? ratingCell(p.rating) : '—']})))
       : emptyState('video', 'No past interviews', 'This agent has no completed interviews on record yet.')}
-  </section>`;
+  </section>
+
+  ${''/* REPORTS + EARNINGS panels (story 3.8), then the erasure record once the
+         account is being deactivated/deleted. */}
+  ${agentReportsPanel(a)}
+  ${agentEarningsPanel(a)}
+  ${externalErasurePanel(a)}`;
 }
 
 /* PAST INTERVIEWS — authored placeholder (§74): the seed has no interview history
@@ -7999,8 +8373,36 @@ const removeAsLeader = r => { if(!r) return;
   audit('Removed cohort leader', r.name, 'Cohort Management', 'high'); };
 ACTIONS.askremovelead = key => { const r = LR_BY_ID[key.split(':')[1]]; if(!r) return;
   const lead = leaderCohorts(r.name);
-  askConfirm({mk:'warning', title:`Remove ${r.name} as a cohort leader?`, body:`Their cohort-leader access is revoked${lead.length ? ` and ${lead.map(c => c.name).join(', ')} ${lead.length === 1 ? 'returns' : 'return'} to no leader` : ''}. Logged at high severity.`, ok:'Remove', danger:true, act:'doremovelead:' + r.id}); };
+  /* WHEN THE LEADER HOLDS RUNNING COHORTS, hand each to a replacement leader
+     inside the flow — Remove stays unavailable until every cohort carries one
+     (story 3.3, Maryam 24 Sep 2026). With no live cohort, the plain confirm. */
+  if(lead.length){ S.id = r.id; S.sheet = 'removelead:' + r.id; return; }
+  askConfirm({mk:'warning', title:`Remove ${r.name} as a cohort leader?`, body:'Their cohort-leader access is revoked. Their main role and record are unchanged. Logged at high severity.', ok:'Remove', danger:true, act:'doremovelead:' + r.id}); };
 ACTIONS.doremovelead = key => { const r = LR_BY_ID[key.split(':')[1]]; if(r){ const nm = r.name; removeAsLeader(r); toast(`${nm} removed as cohort leader`); } S.confirm = null; };
+/* the replacement-picker sheet: one leader dropdown per running cohort, Remove
+   gated on every one being filled. Reassigns each cohort, then revokes the
+   capability WITHOUT unassigning (the cohorts already have a new leader). */
+SHEETS.removelead = id => {
+  const r = LR_BY_ID[id]; if(!r) return {title:'Remove cohort leader', body:'', ok:''};
+  const lead = leaderCohorts(r.name);
+  const pool = USERS.filter(u => u.roles.includes('leader') && u.name !== r.name && u.status !== 'inactive');
+  if(!pool.length) return {title:`Remove ${r.name} as a cohort leader`, ok:'',
+    body: note('warn', 'No cohort leader is free', 'A leader becomes available when their current cohort completes or is cancelled. Assign one before removing this capability.')};
+  const opts = pool.map(u => [u.name, u.name, agentFace(u.name)]);
+  return {title:`Remove ${r.name} as a cohort leader`, ok:'Remove', danger:true, act:'doremovelead2:' + id,
+    body: `<p class="t-desc" style="margin-bottom:var(--s05)">${esc(r.name)} leads ${lead.length} running cohort${lead.length === 1 ? '' : 's'}. Assign a replacement leader for each before the capability can be removed.</p>`
+      + lead.map(c => fieldHtml({k:'repl_' + c.id, l:`Replacement for ${c.name}`, t:'select', req:1, ph:'Choose a leader', opts})).join('')};
+};
+ACTIONS.doremovelead2 = key => {
+  const r = LR_BY_ID[key.split(':')[1]]; if(!r){ S.sheet = null; return; }
+  const v = readForm(); const lead = leaderCohorts(r.name);
+  for(const c of lead){ if(!v['repl_' + c.id]){ toast('Assign a replacement leader for every cohort', 'warn'); return 'keep'; } }
+  lead.forEach(c => { c.leader = v['repl_' + c.id]; });
+  const u = USERS.find(x => x.name === r.name); if(u) u.roles = u.roles.filter(role => role !== 'leader');
+  const i = LEADER_REQS.indexOf(r); if(i >= 0) LEADER_REQS.splice(i, 1);
+  audit('Removed cohort leader, cohorts reassigned', `${r.name} · ${lead.map(c => c.name + ' → ' + v['repl_' + c.id]).join(', ')}`, 'Cohort Management', 'high');
+  toast(`${r.name} removed; ${lead.length} cohort${lead.length === 1 ? '' : 's'} reassigned`); S.sheet = null;
+};
 ACTIONS.bulkleadremove = () => { const ctx = bulkCtx(); if(!ctx) return; S._pending = {ids: ctx.ids.slice(), selKey: ctx.key};
   askConfirm({mk:'warning', title:`Remove ${ctx.ids.length} cohort leader${ctx.ids.length === 1 ? '' : 's'}?`, body:`Their cohort-leader access is revoked and any cohort they lead returns to no leader. Logged at high severity.`, ok:'Remove All', danger:true, act:'dobulkleadremove'}); };
 ACTIONS.dobulkleadremove = () => { const p = S._pending || {}; S._pending = null; S.confirm = null; let n = 0;
