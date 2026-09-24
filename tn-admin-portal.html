@@ -5257,16 +5257,18 @@ ACTIONS.dodelstaff = key => {
   const u = USER_BY_ID[key.split(':')[1]]; const v = S._pending || {}; S._pending = null; S.confirm = null;
   if(!u) return;
   const g = staffProtect(u) || lastSAGuard(u); if(g){ toast(g, 'warn'); return; }
-  /* 1.8 — the account moves to "Deletion in progress", the 30-day erasure clock
-     starts, sign-in is refused, and an erasure request is dispatched to the five
-     processors. The account reaches "Deleted" only once all five confirm. The
-     record is kept through the window so the lifecycle is visible; the emailed
-     notice is narrated (prototype ruling). */
-  u.status = 'deleting'; u.last = 'Access ended';
-  u.deletion = {started: isoToday(), note: v.note || '', emailed: true, proc: {}};
-  DEL_PROCESSORS.forEach(([k]) => u.deletion.proc[k] = null);
-  audit('Started account deletion', `${u.name} · ${v.note || ''}`, 'Users & Roles', 'high');
-  toast(`${u.name}: deletion started. Personal data will be erased over 30 days; the audit trail is kept.`);
+  /* DELETE DIRECTLY — no "Deletion in progress" lifecycle (Maryam, 24 Sep 2026:
+     "we will not show the Deletion in progress status, the user will directly be
+     deleted"). The account is removed from the directory at once, mirroring the
+     external delete (dodelext); the "deleting" 30-day/processor lifecycle is gone. */
+  const nm = u.name;
+  USERS.splice(USERS.indexOf(u), 1); delete USER_BY_ID[u.id];
+  audit('Deleted account', `${nm} · ${v.note || ''}`, 'Users & Roles', 'high');
+  toast(`${nm} deleted. Personal data is erased; the audit trail is kept.`);
+  /* A delete opened from the staff detail page has nothing left to draw — return
+     to the Staff Members directory. */
+  if(S.mod === 'users' && S.sub === 'staff' && S.id === u.id){ S.id = null; }
+  else if(S.mod !== 'users' || S.sub !== 'staff'){ S.mod = 'users'; S.sub = 'staff'; S.id = null; }
 };
 /* Mocked processor confirmation (the send is out of a prototype's scope). When all
    five are in, the account reaches "Deleted" and its personal data reads as a
@@ -10699,8 +10701,17 @@ ACTIONS.signin = () => {
     S.authErr = {top:'That email address or password is not correct.', emRed:true, pwRed:true, pwclear:true}; return;
   }
   S.loginFails = 0; S.authErr = null;
-  S.authFlow = 'signin'; S.otpSentAt = Date.now(); S.auth = 'code';
-  toast('Code sent to your email');
+  /* SKIP THE ONE-TIME CODE ON SIGN-IN (Maryam, 24 Sep 2026: "hide this otp screen
+     since we will be directly logging in the user") — a correct email + password
+     signs the Super Admin straight in. The `code` step survives only on the reset
+     flow (goreset/resetcont → authFlow 'reset'), where the code protects a password
+     change. Everything the OTP-success branch did lands here instead. */
+  S.authFlow = 'signin';
+  S.signedIn = true; S.auth = 'login';
+  try { sessionStorage.setItem('tn-admin-signedin', '1'); } catch(e){}
+  AUDIT.unshift({when:'Just now', who:ME.name, role:'Super Admin', obj:'Email + password', act:'Signed in', mod:'System & Audit', cat:'Sign-in', sev:'notice', ip:'10.2.14.2'});
+  S.mod = 'home'; S.sub = 'home'; S.hist = [];
+  try { history.replaceState(null, '', location.pathname + location.search); } catch(e){}
 };
 ACTIONS.authback = () => { S.auth = 'login'; S.authFlow = 'signin'; S.authErr = null; };
 ACTIONS.goreset = () => { S.auth = 'reset'; S.authFlow = 'reset'; S.authErr = null; };
