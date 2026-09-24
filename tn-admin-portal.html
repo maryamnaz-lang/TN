@@ -903,10 +903,15 @@ input:-webkit-autofill:focus{
    a modal is not, so restate the bare glyph here. */
 .app .clr-stack .cardrow-ic{background:none; border:0; width:auto; height:auto}
 .app .clr-stack .cardrow-ic svg{width:18px; height:18px; color:var(--icon-primary)}   /* the standard page-icon size (§29) */
-/* the replacement-leader picker sits BELOW the cohort text, not on its row */
-.app .clr-repl{margin-top:var(--s04); max-width:340px}
+/* the replacement-leader picker sits BELOW the cohort text and runs FULL WIDTH
+   (Maryam, 24 Sep 2026: "the field should be full width") */
+.app .clr-repl{margin-top:var(--s04)}
 .app .clr-repl .f{margin:0}
 .app .clr-repl .lbl{display:none}
+/* A GATED DANGER BUTTON reads as DISABLED, not full red (Maryam, 24 Sep 2026: the
+   Deactivate button looked clickable while it was disabled). Matches the DS's plain
+   `.btn[disabled]` grey; specificity beats the admin's accent/danger fill. */
+.app .btn.danger[disabled],.app .btn-p.danger[disabled]{background:var(--layer-02); background-image:none; color:var(--text-disabled); border-color:transparent}
 
 /* SETTINGS INNER-TAB SPACING — balance the gaps around the tab strip (Maryam,
    21 Sep 2026: "unnecessary space after page desc to the tabs, and less space
@@ -3496,10 +3501,28 @@ function syncSheetSubmit(){
   if(s && s.gateFn){ btn.disabled = s.gateFn(vals); return; }
   if(s && s.rules){ btn.disabled = s.rules.some(r => r.req && (vals[r.k] === '' || vals[r.k] == null || (Array.isArray(vals[r.k]) && !vals[r.k].length))); return; }
   const parts = (btn.dataset.act || '').split(':');   /* save:kind:id */
-  if(parts[0] !== 'save') return;
-  const K = KINDS[parts[1]]; if(!K) return;
-  const fields = typeof K.fields === 'function' ? K.fields(parts[2] === 'new' ? null : K.find(parts[2])) : K.fields;
-  btn.disabled = fields.some(f => f.req && (vals[f.k] === '' || vals[f.k] == null || (Array.isArray(vals[f.k]) && !vals[f.k].length)));
+  if(parts[0] === 'save'){
+    const K = KINDS[parts[1]]; if(!K) return;
+    const fields = typeof K.fields === 'function' ? K.fields(parts[2] === 'new' ? null : K.find(parts[2])) : K.fields;
+    btn.disabled = fields.some(f => f.req && (vals[f.k] === '' || vals[f.k] == null || (Array.isArray(vals[f.k]) && !vals[f.k].length)));
+    return;
+  }
+  /* GENERIC GATE — any sheet with a REQUIRED field (its `.f` carries a `.req-star`)
+     disables the button until that field is answered (Maryam, 24 Sep 2026: "if a
+     reason is required then disable the button — everywhere"). Reads the DOM so a
+     sheet needs no `rules`/`gateFn` to be gated; a sheet with no required field is
+     never disabled. */
+  const scope = btn.closest('.sheet, .peek-form') || device;
+  const reqEmpty = [...scope.querySelectorAll('.f')].some(f => {
+    if(!f.querySelector('.req-star')) return false;
+    const el = f.querySelector('[data-f]'); if(!el) return false;
+    if(el.type === 'checkbox' || el.type === 'radio'){
+      const k = el.dataset.f, sel = CSS.escape ? CSS.escape(k) : k;
+      return ![...scope.querySelectorAll(`[data-f="${sel}"]`)].some(x => x.checked);   /* any member checked = satisfied */
+    }
+    return !String(el.value || '').trim();
+  });
+  btn.disabled = reqEmpty;
 }
 function saveRecord(kind, id){
   const K = KINDS[kind]; if(!K) return;
@@ -3570,8 +3593,9 @@ ACTIONS.askdel = key => {
 ACTIONS.del = key => {
   const [, kind, id] = key.split(':'); const K = KINDS[kind]; const rec = K && K.find(id); if(!rec) return;
   const nm = K.name(rec);
+  const detail = K.delAudit ? K.delAudit(rec) : nm;   /* capture before remove (a role's permset is cleared by it) */
   K.remove(rec);
-  audit(`Deleted ${K.label}`, nm, K.mod, 'high');
+  audit(`Deleted ${K.label}`, detail, K.mod, 'high');
   toast(`${nm} deleted`);
   S.confirm = null;
   /* on the record's own page? go back to its list */
@@ -5053,6 +5077,11 @@ function staffRowActs(u){
        actor's own — the latter edits in My Profile, story 1.5/1.6). */
     if(!prot) acts.push(['edit', 'Edit', `data-sheet="editstaff:${u.id}"`]);
     if(!prot) acts.push(['group', 'Change Role', `data-sheet="changerole:${u.id}"`]);
+    /* A staff account can be given the Cohort Leader capability (invite confirm) or
+       the Talent Agent role (a modal that captures commission + starting score, then
+       invites) — story 3.3 / 3.9 (Maryam, 24 Sep 2026). */
+    if(!u.roles.includes('leader')) acts.push(['verified', 'Mark as Cohort Leader', `data-act="askmarkleader:${u.id}"`]);
+    if(!u.roles.includes('agent')) acts.push(['agent', 'Mark as Talent Agent', `data-sheet="markagent:${u.id}"`]);
     if(!prot && !lastSAGuard(u)) acts.push(['deactivate', 'Deactivate', `data-sheet="deactivate:${u.id}"`]);
   } else {
     /* A DEACTIVATED account offers only Reactivate — no Edit or Change Role, its
@@ -5590,7 +5619,9 @@ ACTIONS.submitrmleader = key => {
 ACTIONS.askmarkleader = key => {
   const u = USER_BY_ID[key.split(':')[1]]; if(!u) return;
   if(u.roles.includes('leader')){ toast(`${u.name} is already a cohort leader`, 'warn'); return; }
-  if(!leaderEligible(u)){ toast('Cohort leaders must be at level E5 or above', 'warn'); return; }
+  /* An INTERNAL STAFF account is always eligible; a CANDIDATE must be at E5+ (story
+     3.3, Maryam 24 Sep 2026 — staff can be marked from the Staff directory). */
+  if(!(u.internal || leaderEligible(u))){ toast('Cohort leaders must be at level E5 or above', 'warn'); return; }
   askConfirm({mk:'check', title:`Invite ${u.name} to lead a cohort?`, body:`An invitation to become a cohort leader is sent to ${u.name}. Once accepted, their account can be placed on a cohort; their main role is unchanged.`, ok:'Send Invite', act:'domarkleader:' + u.id});
 };
 ACTIONS.domarkleader = key => {
@@ -5598,6 +5629,33 @@ ACTIONS.domarkleader = key => {
   if(!u.roles.includes('leader')) u.roles = [...u.roles, 'leader'];
   audit('Invited as cohort leader', u.name, 'Users & Roles', 'notice');
   toast(`Invitation sent to ${u.name} to lead a cohort.`);
+};
+/* MARK AS TALENT AGENT (story 3.9, Maryam 24 Sep 2026) — grant the Talent Agent role
+   to an existing account (a staff member) with its commission and starting Agent
+   Score set here, then send the invite to the agent workspace. Unlike a candidate's
+   cohort-leader capability, this needs the two commercial values, so it is a modal
+   rather than a plain confirm. */
+SHEETS.markagent = id => {
+  const u = USER_BY_ID[id]; if(!u) return {title:'Mark as talent agent', body:'', ok:''};
+  return {
+    title:`Invite ${u.name} to be a talent agent`,
+    body: `<p class="t-desc" style="margin-bottom:var(--s05)">${esc(u.name)} keeps their current account and role. Set the commission and starting Agent Score; an invitation to the agent workspace is sent.</p>`
+      + fieldHtml({k:'commission', l:'Commission (%)', t:'number', req:1, def:20, ph:'The platform’s share of this agent’s fee'})
+      + fieldHtml({k:'rating', l:'Initial rating', t:'stars', req:1, hint:'Their starting Agent Score out of 5, shown to candidates until the first quarterly review replaces it.'}),
+    ok:'Send Invite',
+    act:'submitmarkagent:' + id,
+    gate:true, disabled:true
+  };
+};
+ACTIONS.submitmarkagent = key => {
+  const u = USER_BY_ID[key.split(':')[1]]; if(!u) return;
+  const v = readForm();
+  if(v.commission === '' || v.commission == null || !v.rating){ toast('Set the commission and initial rating', 'warn'); return 'keep'; }
+  if(!u.roles.includes('agent')) u.roles = [...u.roles, 'agent'];
+  u.commission = Number(v.commission); u.commissionAt = today(); u.rating = Number(v.rating); u.interviewed = u.interviewed || 0; u.onboarded = false;
+  audit('Invited as talent agent', `${u.name} · ${u.commission}% commission · ${u.rating}★ start`, 'Users & Roles', 'high');
+  toast(`Invitation sent to ${u.name} to become a talent agent.`);
+  S.sheet = null;
 };
 ACTIONS.askremoveleader = key => {
   const u = USER_BY_ID[key.split(':')[1]]; if(!u) return;
@@ -5797,11 +5855,13 @@ SHEETS.reactext = id => {
   ]) : '';
   return {
     title:`Reactivate ${u.name}`,
+    /* the info block is removed and the Reason sits a section-gap below the context
+       (Maryam, 24 Sep 2026); the button is gated on the required reason. */
     body: ctx
-      + fieldHtml({k:'note', l:'Reason', t:'textarea', req:1, ph:'Why access is being restored. Internal only.'})
-      + sheetHelp('The scheduled erasure is cancelled outright. Sign-in, profile, level, certificates and history are restored intact. An agent returns as Not listed and must relist; a candidate is not returned to their old cohort and enrols again.'),
+      + `<div style="margin-top:var(--s06)">${fieldHtml({k:'note', l:'Reason', t:'textarea', req:1, ph:'Why access is being restored. Internal only.'})}</div>`,
     ok:'Reactivate',
-    act:'submitreactext:' + id
+    act:'submitreactext:' + id,
+    gate:true, disabled:true, rules:[{k:'note', l:'Reason', req:1}]
   };
 };
 ACTIONS.submitreactext = key => {
@@ -5873,8 +5933,18 @@ KINDS.role = {
   create: v => { const k = v.name.toLowerCase().replace(/[^a-z0-9]+/g, '') || newId('role', ROLES); const r = {k, name:v.name, short:v.name, kind:'internal', desc:v.desc}; ROLES.push(r); ROLE_BY_K[k] = r; MATRIX[k] = {}; PERMSET[k] = new Set(); return r; },
   update: (r, v) => { r.name = v.name; r.short = v.name; r.kind = 'internal'; r.desc = v.desc; },
   remove: r => { ROLES.splice(ROLES.indexOf(r), 1); delete ROLE_BY_K[r.k]; delete MATRIX[r.k]; delete PERMSET[r.k]; USERS.forEach(u => { u.roles = u.roles.filter(x => x !== r.k); }); },
-  guard: r => r.k === 'admin' ? 'The Super Admin role can’t be deleted' : null,
-  delWarn: r => { const n = USERS.filter(u => u.roles.includes(r.k)).length; return `Its permissions are removed${n ? ` and the role is stripped from ${n} ${n === 1 ? 'account' : 'accounts'}` : ''}.`; }
+  /* Only a CUSTOM role with NO holders can be deleted (story 11.x, Maryam 24 Sep
+     2026): a built-in role is permanent, and a held role is refused with the reason
+     so the admin moves the holders first. */
+  guard: r => {
+    if(roleIsBuiltin(r.k) || r.k === 'admin') return 'Built-in roles can’t be deleted';
+    const n = USERS.filter(u => u.roles.includes(r.k)).length;
+    if(n) return 'Move every holder to another role first.';
+    return null;
+  },
+  /* the audit records the role AND its permission set (story 11.x). */
+  delAudit: r => `${r.name} · permissions: ${[...(PERMSET[r.k] || [])].join(', ') || 'none'}`,
+  delWarn: r => 'Its permissions are removed and it disappears from the role selector.'
 };
 function usersRoles(){
   /* EPIC 4 — the role list + the Module × Action permission matrix. Built-in
@@ -7414,8 +7484,16 @@ const rangeCovers = (r, lvl) => LADDER.indexOf(lvl) >= LADDER.indexOf(r[0]) && L
 /* An INVITED agent (created through the Invite Talent Agent flow) is its own state
    and its own tab (Maryam, 24 Sep 2026) — it has not accepted, so it is neither
    listed, paused nor "not listed" (which means onboarded-but-hidden). */
-const agState = a => a.status === 'invited' ? 'invited' : (a.onboarded === false ? 'notlisted' : (a.status === 'active' ? 'listed' : 'paused'));
-const AG_STATE = {listed:['active', 'Listed'], paused:['inactive', 'Paused'], notlisted:['', 'Not listed'], invited:['warn', 'Invited']};
+/* A DEACTIVATED ACCOUNT (its own tab, Maryam 24 Sep 2026) is distinct from a PAUSED
+   listing: both sit at status `inactive`, but deactivating (`deactext`) also stamps
+   `erasure`/`deactivatedOn` while pausing a listing (`agpause`) does not. The
+   deactivated check takes precedence over notlisted (deactivating sets onboarded:false). */
+const agDeactivated = a => a.status === 'inactive' && (a.erasure || a.deactivatedOn);
+const agState = a => a.status === 'invited' ? 'invited'
+  : (agDeactivated(a) ? 'deactivated'
+  : (a.onboarded === false ? 'notlisted'
+  : (a.status === 'active' ? 'listed' : 'paused')));
+const AG_STATE = {listed:['active', 'Listed'], paused:['inactive', 'Paused'], notlisted:['', 'Not listed'], invited:['warn', 'Invited'], deactivated:['inactive', 'Deactivated']};
 const agStateTag = a => { const [v, l] = AG_STATE[agState(a)]; return tag(v, l); };
 /* THE RANKING IS BY CANDIDATE RATING ALONE, recalculated WEEKLY — it is not live
    (6.1). Only Listed agents carry a rank. We freeze it once at load and state
@@ -7510,7 +7588,8 @@ function agentsAll(){
       ['listed', 'Listed', count('listed')],
       ['paused', 'Paused', count('paused')],
       ['notlisted', 'Not listed', count('notlisted')],
-      ['invited', 'Invited', count('invited')]
+      ['invited', 'Invited', count('invited')],
+      ['deactivated', 'Deactivated', count('deactivated')]
     ])}
     ${lstTools('Search by name or email', filterDd('agrange', 'all', [['all', 'Any level'], ...LADDER.map(l => [l, l])], 'Assesses'))}
     ${list.length ? table(
@@ -11673,7 +11752,7 @@ function sheetView(){
       <div class="sheet-b">${s ? s.body : ''}</div>
       <div class="sheet-f">
         <button class="btn btn-s noic" data-close="sheet">${s && !s.ok ? 'Close' : 'Cancel'}</button>
-        ${s && !s.ok ? '' : `<button class="btn btn-p noic${s && s.danger ? ' danger' : ''}" data-act="${s ? esc(s.act) : ''}"${s && s.gate ? ' data-submit="1"' : ''}${s && s.gate && s.disabled ? ' disabled' : ''}>${s ? esc(s.ok) : ''}</button>`}
+        ${s && !s.ok ? '' : `<button class="btn btn-p noic${s && s.danger ? ' danger' : ''}" data-act="${s ? esc(s.act) : ''}" data-submit="1"${s && s.gate && s.disabled ? ' disabled' : ''}>${s ? esc(s.ok) : ''}</button>`}
       </div>
     </div>
   </div>`;
@@ -11691,7 +11770,7 @@ function sidePeek(){
     <div class="sheet-b">${s ? s.body : ''}</div>
     <div class="sheet-f">
       <button class="btn btn-s noic" data-close="sheet">${s && !s.ok ? 'Close' : 'Cancel'}</button>
-      ${s && !s.ok ? '' : `<button class="btn btn-p noic${s && s.danger ? ' danger' : ''}" data-act="${s ? esc(s.act) : ''}"${s && s.gate ? ' data-submit="1"' : ''}${s && s.gate && s.disabled ? ' disabled' : ''}>${s ? esc(s.ok) : ''}</button>`}
+      ${s && !s.ok ? '' : `<button class="btn btn-p noic${s && s.danger ? ' danger' : ''}" data-act="${s ? esc(s.act) : ''}" data-submit="1"${s && s.gate && s.disabled ? ' disabled' : ''}>${s ? esc(s.ok) : ''}</button>`}
     </div>
   </aside>`;
 }
