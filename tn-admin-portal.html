@@ -661,6 +661,16 @@ input:-webkit-autofill:focus{
    single --s05 below the interview title, not a full section gap (Maryam, 18 Sep
    2026: "remove unnecessary spaces above and below tabs row"). */
 .app .sec:has(+ .sec.iv-tabs),.app .sec:has(+ .sec.set-tabs){padding-bottom:0}
+/* the interview head sits tight to the tabs (Maryam, 24 Sep 2026: "remove the
+   unnecessary gap above the tabs"). The section-rhythm `:not()` chain sets this
+   section's padding and no plain selector outweighs it, so `.iv-head` carries the
+   sanctioned `!important` (the authtight-card precedent); its heading also drops the
+   gap-to-content it does not use (the section holds only the title). */
+.app .sec.iv-head{padding-bottom:0 !important}
+.app .sec.iv-head > .sec-h{margin-bottom:0 !important}
+/* Tal's read runs the FULL page width here (Maryam, 24 Sep 2026: "give tals read full
+   page width") — the DS caps `.ai-body`/`.ai-body p` at the ~68ch reading measure. */
+.app .tal-eval,.app .tal-eval .ai-body,.app .tal-eval .ai-body p{max-width:none}
 /* NO DIVIDER AFTER THE TOP SECTION BLOCK on a detail screen — the identity/facts
    block right after the back-arrow head (Maryam, 18 Sep 2026: "remove the line
    after the four blocks row"). §14 draws a foot rule on any section that precedes
@@ -833,8 +843,23 @@ input:-webkit-autofill:focus{
 .app .adduser-roles .rdo input:focus-visible ~ .rdo-dot{outline:2px solid var(--accent); outline-offset:2px}
 /* the leader-only block is revealed by :has when the Cohort Leader radio is
    checked — no render fires on the radio change, so typed fields survive. */
+/* the candidate's level beside the name in the leader picker — accent as ink */
+.app .cand-lvl{color:var(--accent-text); margin-left:var(--s02)}
 .app .adduser-leaderpick{display:none}
 .app .adduser-form:has(input[data-f="role"][value="leader"]:checked) .adduser-leaderpick{display:block}
+/* The Talent-Agent commercials reveal only when the Agent radio is checked. */
+.app .adduser-agentonly{display:none}
+.app .adduser-form:has(input[data-f="role"][value="agent"]:checked) .adduser-agentonly{display:block}
+/* The 5-star initial-rating picker: siblings, row-reverse, so a checked star and
+   every lower one fill gold; hover previews the same. */
+.app .star-pick{display:inline-flex; flex-direction:row-reverse; justify-content:flex-end; gap:var(--s01); margin-top:var(--s02)}
+.app .star-pick input{position:absolute; width:0; height:0; opacity:0}
+.app .star-pick label{cursor:pointer; color:var(--gray-20); line-height:0}
+.app .star-pick label svg{display:block; color:inherit; transition:color var(--dur-short) var(--ease-standard)}
+.app .star-pick label:hover, .app .star-pick label:hover ~ label{color:var(--star)}
+.app .star-pick input:checked ~ label{color:var(--star)}
+.app .star-pick input:focus-visible ~ label{outline:2px solid var(--accent); outline-offset:2px}
+.app .f-hint{display:block; margin-top:var(--s03); font-size:var(--t-desc-size); color:var(--text-secondary)}
 .app .adduser-or{display:flex; align-items:center; gap:var(--s04); margin:var(--s06) 0 var(--s05); color:var(--text-secondary)}
 .app .adduser-or::before, .app .adduser-or::after{content:''; flex:1 1 auto; height:1px; background:var(--rule)}
 .app .adduser-or span{font-size:var(--t-desc-size); color:var(--text-secondary)}
@@ -872,6 +897,16 @@ input:-webkit-autofill:focus{
    (0,4,0), so this restores it at (0,5,0) (`.app .main .sec:has(> .intg-stack)`)
    — a deterministic win by weight, no `!important`. */
 .app .main .sec:has(> .intg-stack) .cardrow-ic{background:var(--layer-02)}
+/* THE ACCOUNT-CLEARING ROWS (delete/deactivate modal) carry BARE glyphs — no chip
+   box (Maryam, 24 Sep 2026: "remove the bg box from the icons"). The `.cardrow-ic`
+   ships a tinted chip and the DS only zeroes it inside a `.sec > .tile-stack`, which
+   a modal is not, so restate the bare glyph here. */
+.app .clr-stack .cardrow-ic{background:none; border:0; width:auto; height:auto}
+.app .clr-stack .cardrow-ic svg{width:18px; height:18px; color:var(--icon-primary)}   /* the standard page-icon size (§29) */
+/* the replacement-leader picker sits BELOW the cohort text, not on its row */
+.app .clr-repl{margin-top:var(--s04); max-width:340px}
+.app .clr-repl .f{margin:0}
+.app .clr-repl .lbl{display:none}
 
 /* SETTINGS INNER-TAB SPACING — balance the gaps around the tab strip (Maryam,
    21 Sep 2026: "unnecessary space after page desc to the tabs, and less space
@@ -3257,14 +3292,17 @@ function formDd(f, val){
      so it pins right; omitted when no option carries meta, so plain selects are
      untouched. */
   const cm = cur ? cur[3] : undefined;
+  /* A label may be `{html:'…'}` to carry RICH markup (e.g. a candidate's level in
+     accent beside the name); a plain string is escaped as before. */
+  const rlbl = x => x && typeof x === 'object' && x.html != null ? x.html : esc(x);
   return `<label class="f"><span class="lbl">${esc(f.l)}${f.req ? ' <span class="req-star" aria-hidden="true">*</span>' : ''}</span>
     <div class="fdd fdd-form" style="display:block">
       <input type="hidden" data-f="${f.k}" value="${esc(cv)}">
       <button type="button" class="fdd-t" data-formddtoggle aria-haspopup="listbox" aria-expanded="false" style="width:100%;justify-content:space-between;min-height:40px">
-        <span class="fdd-val${cur ? '' : ' fdd-ph'}${cm ? ' has-meta' : ''}">${fddAv(ci)}${esc(cl)}${cm ? `<span class="fdd-meta">${esc(cm)}</span>` : ''}</span>
+        <span class="fdd-val${cur ? '' : ' fdd-ph'}${cm ? ' has-meta' : ''}">${fddAv(ci)}${rlbl(cl)}${cm ? `<span class="fdd-meta">${esc(cm)}</span>` : ''}</span>
         <svg class="fdd-cx" viewBox="0 0 24 24" aria-hidden="true">${inner('chevDown')}</svg></button>
       <div class="fdd-menu" role="listbox" style="left:0;right:0;max-height:260px;overflow-y:auto">${opts.map(([ov, ol, oimg, ometa]) =>
-        `<button type="button" class="fdd-opt${String(ov) === String(cv) ? ' on' : ''}${ometa ? ' has-meta' : ''}" role="option" aria-selected="${String(ov) === String(cv) ? 'true' : 'false'}" data-formddset="${esc(ov)}">${fddAv(oimg)}${esc(ol)}${ometa ? `<span class="fdd-meta">${esc(ometa)}</span>` : ''}</button>`).join('')}</div>
+        `<button type="button" class="fdd-opt${String(ov) === String(cv) ? ' on' : ''}${ometa ? ' has-meta' : ''}" role="option" aria-selected="${String(ov) === String(cv) ? 'true' : 'false'}" data-formddset="${esc(ov)}">${fddAv(oimg)}${rlbl(ol)}${ometa ? `<span class="fdd-meta">${esc(ometa)}</span>` : ''}</button>`).join('')}</div>
     </div></label>`;
 }
 /* re-sync a formDd trigger's VISIBLE label to its hidden `[data-f]` value. The pick
@@ -3335,6 +3373,7 @@ function fieldHtml(f, v){
   const ph = f.ph || ('Enter ' + String(f.l || '').toLowerCase());
   if(f.t === 'select') return formDd(f, val);
   if(f.t === 'date') return formDate(f, val);
+  if(f.t === 'stars') return `<div class="f">${lbl}${starPick(f.k, val)}${f.hint ? `<span class="f-hint">${esc(f.hint)}</span>` : ''}</div>`;
   if(f.t === 'textarea') return `<label class="f">${lbl}<textarea class="inp" data-f="${f.k}" rows="3" placeholder="${esc(ph)}"${f.max ? ` maxlength="${f.max}"` : ''}>${esc(val)}</textarea></label>`;
   if(f.t === 'checks') return `<div class="f">${lbl}<div class="mt4">${f.opts.map(o => { const [ov, ol] = Array.isArray(o) ? o : [o, o];
     const on = Array.isArray(val) && val.includes(ov);
@@ -3451,6 +3490,10 @@ function syncSheetSubmit(){
   /* A sheet that declares `rules` gates on those (any required field empty →
      disabled), the same discipline record sheets get from their fields. */
   const s = resolveSheet();
+  /* a sheet may supply `gateFn(vals)` for a CONDITIONAL gate a static `rules`
+     array cannot express (the Add-a-user form: required fields depend on the
+     role, and Cohort Leader accepts an existing-candidate pick instead). */
+  if(s && s.gateFn){ btn.disabled = s.gateFn(vals); return; }
   if(s && s.rules){ btn.disabled = s.rules.some(r => r.req && (vals[r.k] === '' || vals[r.k] == null || (Array.isArray(vals[r.k]) && !vals[r.k].length))); return; }
   const parts = (btn.dataset.act || '').split(':');   /* save:kind:id */
   if(parts[0] !== 'save') return;
@@ -3466,9 +3509,12 @@ function saveRecord(kind, id){
   if(missing){ toast(`${missing.l} is required`, 'warn'); return 'keep'; }
   if(id === 'new'){
     const rec = K.create(vals);
-    audit(`Added ${K.label}`, K.name(rec), K.mod, K.sev);
-    toast(`${cap(K.label)} added — ${K.name(rec)}`);
-    if(K.detail){ const d = K.detail(rec).split('/'); S.mod = d[0]; S.sub = d[1]; S.id = d[2] || null; }
+    audit(K.createdAudit || `Added ${K.label}`, K.name(rec), K.mod, K.sev);
+    toast(K.createdMsg ? K.createdMsg(rec) : `${cap(K.label)} added — ${K.name(rec)}`);
+    /* `stayOnCreate` keeps the admin on the list and just closes the sheet, rather
+       than opening the new record's detail (Maryam, 24 Sep 2026: an invite should
+       land the row in the Invited tab, not a detail page). */
+    if(K.detail && !K.stayOnCreate){ const d = K.detail(rec).split('/'); S.mod = d[0]; S.sub = d[1]; S.id = d[2] || null; }
   } else {
     const rec = K.find(id); if(!rec) return;
     K.update(rec, vals);
@@ -4560,9 +4606,13 @@ KINDS.user = {
   help:'A new account receives an invite email and is created when they accept. Roles stack — tick every role the person holds.',
   okNew:'Send Invite',
   create: v => {
-    const u = {id:newId('u', USERS), name:v.name, email:v.email, roles:v.roles, level:'—', status:'active', joined:today(), origin:v.origin, last:'invited', internal: v.origin === 'internal'};
+    /* "Send Invite" creates an INVITED account — the person is added when they accept,
+       so it opens at status `invited` with a dated `invitedOn`, and the directory shows
+       the 7-day "Expires in N days" countdown (`extInviteStatus`) rather than "Active"
+       (Maryam, 24 Sep 2026). Matches the staff invite (`sendinvite`). */
+    const u = {id:newId('u', USERS), name:v.name, email:v.email, roles:v.roles, level:'—', status:'invited', joined:today(), origin:v.origin, last:'Never', internal: v.origin === 'internal', invitedOn:today(), invitedBy:ME.id};
     USERS.push(u); USER_BY_ID[u.id] = u;
-    if(v.roles.includes('candidate')){ const c = {id:u.id, name:u.name, bucket:'Explorer', level:'E1', cohort:'—', agent:'—', consent:{video:0, ai:0, scenes:0, vis:0}, status:'active', last:'invited'}; CANDS.push(c); CAND_BY_ID[c.id] = c; }
+    if(v.roles.includes('candidate')){ const c = {id:u.id, name:u.name, bucket:'Explorer', level:'E1', cohort:'—', agent:'—', consent:{video:0, ai:0, scenes:0, vis:0}, status:'invited', last:'Never'}; CANDS.push(c); CAND_BY_ID[c.id] = c; }
     return u;
   },
   update: (u, v) => { u.name = v.name; u.email = v.email; u.roles = v.roles; u.origin = v.origin; u.internal = v.origin === 'internal'; if(v.status) u.status = v.status;
@@ -4860,9 +4910,18 @@ function usersRowMenu(u){
     acts.push(['renew', 'Resend invite', `data-act="staffresend:${u.id}"`], ['close', 'Cancel invite', `data-act="staffcancelinvite:${u.id}"`]);
   } else {
     acts.push(active ? ['deactivate', 'Deactivate', `data-sheet="deactext:${u.id}"`] : ['play', 'Reactivate', `data-sheet="reactext:${u.id}"`]);
-    if(active && !u.roles.some(isFullAccess)) acts.push(['view', 'View as', `data-act="askviewas:${u.id}"`]);
+    /* "View as" (impersonation) is hidden (Maryam, 24 Sep 2026); `askviewas` stays
+       defined, just not surfaced from the row menu. */
+    /* A candidate at level E5+ who is not already a leader can be invited to lead a
+       cohort, right from the row (Maryam, 24 Sep 2026) — the same action as the
+       detail page, opening the invite confirmation. A candidate who IS a leader gets
+       the counterpart "Remove as Cohort Leader" (assign a replacement first). */
+    if(active && u.roles.includes('leader')) acts.push(['close', 'Remove as Cohort Leader', `data-sheet="rmleader:${u.id}"`]);
+    else if(active && leaderEligible(u)) acts.push(['verified', 'Mark as Cohort Leader', `data-act="askmarkleader:${u.id}"`]);
   }
-  acts.push(['group', 'Merge into another account', `data-sheet="merge:${u.id}"`], ['delete', 'Delete', `data-sheet="delext:${u.id}"`]);
+  /* "Merge into another account" is hidden (Maryam, 24 Sep 2026); the merge sheet /
+     askmerge / domerge stay defined, just not surfaced from the row menu. */
+  acts.push(['delete', 'Delete', `data-sheet="delext:${u.id}"`]);
   return acts;
 }
 function usersAll(){
@@ -5150,31 +5209,74 @@ ACTIONS.sendinvite = () => {
    one. The reveal is pure CSS (`.adduser-form:has(input[value="leader"]:checked)`),
    so a radio change fires no render() and the half-typed name/email survive. */
 SHEETS.adduser = () => {
-  const roleOpts = ROLES.filter(r => r.kind === 'external');
-  const leaderCands = CANDS.filter(c => !((USER_BY_ID[c.id] || {}).roles || []).includes('leader'));
-  const candOpts = [['', 'Select a candidate'], ...leaderCands.map(c => [c.id, c.name])];
+  /* Only Talent Agent and Cohort Leader are addable here (Maryam, 24 Sep 2026:
+     "remove candidate and employer options in the roles"): candidates self-serve
+     (they sign up themselves), and employers are not part of the system for now
+     (19 Sep). The shared ROLES array is untouched — it still backs the filters,
+     permissions matrix and every other surface. */
+  const ADDABLE = ['agent', 'leader'];
+  const roleOpts = ROLES.filter(r => r.kind === 'external' && ADDABLE.includes(r.k));
+  /* Only candidates at level E5 or above and not already a leader — each option shows
+     the level in accent beside the name with the email as meta (`leaderCandOpts`,
+     shared with the remove-leader replacement picker; Maryam, 24 Sep 2026). */
+  const candOpts = leaderCandOpts();
   return {
     title:'Add a user',
     body:
       `<div class="adduser-form">
         <div class="f"><span class="lbl">Role <span class="req-star" aria-hidden="true">*</span></span>
           <div class="adduser-roles mt4" role="radiogroup" aria-label="Role">
-            ${roleOpts.map(r => `<label class="rdo"><input type="radio" name="adduser-role" data-f="role" value="${esc(r.k)}"><span class="rdo-dot"></span><span class="rdo-txt">${esc(r.name)}</span></label>`).join('')}
+            ${roleOpts.map(r => `<label class="rdo"><input type="radio" name="adduser-role" data-f="role" value="${esc(r.k)}"${r.k === 'agent' ? ' checked' : ''}><span class="rdo-dot"></span><span class="rdo-txt">${esc(r.name)}</span></label>`).join('')}
           </div>
         </div>
-        ${fieldHtml({k:'name', l:'Full name', t:'text', ph:'First and last name'})}
-        ${fieldHtml({k:'email', l:'Email address', t:'email', ph:'name@company.com'})}
+        ${fieldHtml({k:'name', l:'Full name', t:'text', req:1, ph:'First and last name'})}
+        ${fieldHtml({k:'email', l:'Email address', t:'email', req:1, ph:'name@company.com'})}
         ${''/* Origin field and the info block are hidden (Maryam, 16 Sep 2026);
               new accounts default to 'individual' origin in submitadduser. */}
+        ${''/* TALENT-AGENT commercials (story 3.2, Maryam 24 Sep 2026): a new agent
+              carries a per-agent commission and a starting 5-star Agent Score, both
+              set at creation. Revealed by pure CSS only when the Agent radio is
+              checked (`.adduser-form:has(input[value="agent"]:checked)`), so the
+              radio change fires no render() and the half-typed name/email survive. */}
+        <div class="adduser-agentonly">
+          ${fieldHtml({k:'commission', l:'Commission (%)', t:'number', req:1, ph:'The platform’s share of this agent’s fee'})}
+          <div class="f"><span class="lbl">Initial rating <span class="req-star" aria-hidden="true">*</span></span>
+            ${starPick('rating')}
+            <span class="f-hint">Their starting Agent Score out of 5, shown to candidates until the first quarterly review replaces it.</span>
+          </div>
+        </div>
         <div class="adduser-leaderpick">
           <div class="adduser-or"><span>Choose an existing candidate</span></div>
           ${formDd({k:'leadercand', l:'', t:'select', opts: candOpts}, '')}
         </div>
       </div>`,
     ok:'Send Invite',
-    act:'submitadduser'
+    act:'submitadduser',
+    /* The Send Invite button is DISABLED until the required fields are answered
+       (Maryam, 24 Sep 2026). The requirement is conditional, so it uses `gateFn`
+       (not a static `rules` array): a role must be chosen; an AGENT needs name,
+       email, commission and an initial rating; a COHORT LEADER needs either an
+       existing-candidate pick, or a name and email to invite a new one. */
+    gate:true, disabled:true,
+    gateFn: v => {
+      if(!v.role) return true;
+      const has = k => String(v[k] == null ? '' : v[k]).trim() !== '';
+      if(v.role === 'agent') return !(has('name') && has('email') && has('commission') && has('rating'));
+      if(v.leadercand) return false;   /* promoting an existing candidate */
+      return !(has('name') && has('email'));
+    }
   };
 };
+/* A 5-star rating PICKER (Maryam, 24 Sep 2026). Radio siblings + row-reverse so
+   `input:checked ~ label` fills the checked star and every lower one; hover previews
+   the same way. `data-f` is a radio group, so `readForm` reads the picked value with
+   no render() — the caret and the rest of the form survive a click. */
+function starPick(key, cur){
+  const s = `<svg viewBox="0 -960 960 960" width="26" height="26" style="display:block" aria-hidden="true">${inner('star')}</svg>`;
+  return `<div class="star-pick" role="radiogroup" aria-label="Initial rating">
+    ${[5,4,3,2,1].map(n => `<input type="radio" id="sp-${key}-${n}" name="sp-${key}" data-f="${key}" value="${n}"${String(n) === String(cur) ? ' checked' : ''}><label for="sp-${key}-${n}" title="${n} star${n === 1 ? '' : 's'}">${s}</label>`).join('')}
+  </div>`;
+}
 ACTIONS.submitadduser = () => {
   const v = readForm();
   if(!v.role){ toast('Choose a role', 'warn'); return 'keep'; }
@@ -5193,7 +5295,17 @@ ACTIONS.submitadduser = () => {
   if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ toast('Enter a valid email address', 'warn'); return 'keep'; }
   if(USERS.some(u => u.email.toLowerCase() === email.toLowerCase())){ toast('This email address is already in use on the platform', 'warn'); return 'keep'; }
   const rec = KINDS.user.create({name:v.name, email, roles:[v.role], origin:v.origin || 'individual'});
-  audit('Invited user', `${rec.name} · ${(ROLES.find(r => r.k === v.role) || {}).name || v.role}`, 'Users & Roles', 'high');
+  /* A NEW TALENT AGENT carries its per-agent commission and starting Agent Score
+     from the moment it is created (story 3.2, Maryam 24 Sep 2026) — the same shape
+     KINDS.agent.create writes, so the new row reads correctly in the Talent Agents
+     table and detail. Commission defaults to 20% when left blank. */
+  if(v.role === 'agent'){
+    rec.commission = (v.commission !== '' && v.commission != null) ? Number(v.commission) : 20;
+    rec.commissionAt = today();
+    rec.rating = v.rating ? Number(v.rating) : 0;
+    rec.interviewed = rec.interviewed || 0;
+  }
+  audit('Invited user', `${rec.name} · ${(ROLES.find(r => r.k === v.role) || {}).name || v.role}${v.role === 'agent' ? ` · ${rec.commission}% commission · ${rec.rating || 0}★ start` : ''}`, 'Users & Roles', 'high');
   toast(`Invite sent to ${email}`);
   S.sheet = null;
 };
@@ -5439,17 +5551,53 @@ const levelCode = lv => String(lv || '').split(/[ ·]/)[0];
    member is never a cohort leader (Maryam, 23 Sep 2026). The old `u.internal ||`
    fallback is removed. */
 const leaderEligible = u => !!u && u.roles.includes('candidate') && LVL_CODES.indexOf(levelCode((CAND_BY_ID[u.id] || u).level)) >= LVL_CODES.indexOf('E5');
+/* The E5+ candidate options shared by the Add-a-user Cohort-Leader picker and the
+   "Remove as cohort leader" replacement picker (Maryam, 24 Sep 2026): only candidates
+   at level E5 or above and not already a leader; each option shows the level in accent
+   beside the name with the email as right-aligned meta. `exceptId` drops one id. */
+function leaderCandOpts(exceptId){
+  const canLead = c => LVL_CODES.indexOf(levelCode(c.level)) >= LVL_CODES.indexOf('E5');
+  const cands = CANDS.filter(c => c.id !== exceptId && !((USER_BY_ID[c.id] || {}).roles || []).includes('leader') && canLead(c));
+  return [['', 'Select a candidate'], ...cands.map(c => [c.id,
+    {html: `${esc(c.name)} <span class="cand-lvl">${esc(levelCode(c.level))}</span>`}, null, (USER_BY_ID[c.id] || {}).email || ''])];
+}
+/* Remove-as-cohort-leader: a replacement E5+ candidate is assigned first, then the
+   current leader loses the capability and any cohort they lead moves to the
+   replacement (Maryam, 24 Sep 2026). On the Users table row menu AND the candidate
+   detail — this reverses the 20 Sep "no remove on the detail page" note. */
+SHEETS.rmleader = id => {
+  const u = USER_BY_ID[id]; if(!u) return {title:'Remove cohort leader', body:'', ok:''};
+  const leads = leaderCohorts(u.name);
+  return {
+    title:`Remove ${u.name} as a cohort leader`,
+    body: `<p class="t-desc" style="margin-bottom:var(--s05)">Assign a replacement cohort leader before removing ${esc(u.name)}${leads.length ? `. The ${leads.length} cohort${leads.length === 1 ? '' : 's'} they lead will move to the replacement` : ''}. Their main role is unchanged.</p>`
+      + formDd({k:'repl', l:'Replacement cohort leader', t:'select', req:1, opts: leaderCandOpts(id)}, ''),
+    ok:'Remove', danger:true, act:'submitrmleader:' + id,
+    gate:true, disabled:true, gateFn: v => !v.repl
+  };
+};
+ACTIONS.submitrmleader = key => {
+  const u = USER_BY_ID[key.split(':')[1]]; if(!u) return;
+  const v = readForm();
+  const rep = USER_BY_ID[v.repl]; if(!rep){ toast('Choose a replacement cohort leader', 'warn'); return 'keep'; }
+  if(!rep.roles.includes('leader')) rep.roles = [...rep.roles, 'leader'];
+  leaderCohorts(u.name).forEach(c => { c.leader = rep.name; });
+  u.roles = u.roles.filter(r => r !== 'leader');
+  audit('Removed cohort leader, replacement assigned', `${u.name} → ${rep.name}`, 'Users & Roles', 'high');
+  toast(`${u.name} removed as cohort leader. ${rep.name} assigned in their place.`);
+  S.sheet = null;
+};
 ACTIONS.askmarkleader = key => {
   const u = USER_BY_ID[key.split(':')[1]]; if(!u) return;
   if(u.roles.includes('leader')){ toast(`${u.name} is already a cohort leader`, 'warn'); return; }
   if(!leaderEligible(u)){ toast('Cohort leaders must be at level E5 or above', 'warn'); return; }
-  askConfirm({mk:'check', title:`Mark ${u.name} as a cohort leader?`, body:'They can then be placed on a cohort. This does not change their main role.', ok:'Mark As Cohort Leader', act:'domarkleader:' + u.id});
+  askConfirm({mk:'check', title:`Invite ${u.name} to lead a cohort?`, body:`An invitation to become a cohort leader is sent to ${u.name}. Once accepted, their account can be placed on a cohort; their main role is unchanged.`, ok:'Send Invite', act:'domarkleader:' + u.id});
 };
 ACTIONS.domarkleader = key => {
   const u = USER_BY_ID[key.split(':')[1]]; S.confirm = null; if(!u) return;
   if(!u.roles.includes('leader')) u.roles = [...u.roles, 'leader'];
-  audit('Marked as cohort leader', u.name, 'Users & Roles', 'notice');
-  toast(`${u.name} can now be placed on a cohort. They’ve been notified.`);
+  audit('Invited as cohort leader', u.name, 'Users & Roles', 'notice');
+  toast(`Invitation sent to ${u.name} to lead a cohort.`);
 };
 ACTIONS.askremoveleader = key => {
   const u = USER_BY_ID[key.split(':')[1]]; if(!u) return;
@@ -5554,25 +5702,54 @@ function extClearing(u){
    re-renders — does not wipe it; a `clearNoteFor` guard resets it per account, the
    `S.qEdit`-style "load once per id" pattern. */
 const heldEscrow = u => u.roles.includes('agent') ? PAYOUTS.filter(p => p.agent === u.name && p.status === 'held') : [];
-const clearingBlocked = u => heldEscrow(u).length
-  ? 'Release every payment still in escrow before continuing'
-  : (leaderCohorts(u.name).length ? 'Reassign this leader’s live cohorts (Cohort Leaders) before continuing' : null);
+const clearingBlocked = u => heldEscrow(u).length ? 'Release every payment still in escrow before continuing' : null;
+/* the pool of leaders who can take over a cohort — any other active leader. */
+const leaderReplOpts = u => USERS.filter(x => x.roles.includes('leader') && x.name !== u.name && x.status !== 'inactive' && x.status !== 'deleting' && x.status !== 'deleted').map(x => [x.name, x.name, agentFace(x.name)]);
+/* snapshot the modal's chosen replacements into `S.clearRepl` so a re-render
+   (releasing a payout) does not lose the picks; keyed by cohort id. */
+function stashClearRepl(){ S.clearRepl = S.clearRepl || {};
+  device.querySelectorAll('.modal.on .sheet [data-f^="repl_"]').forEach(el => { S.clearRepl[el.dataset.f.slice(5)] = el.value; }); }
 function clearingUI(u, id){
-  if(S.clearNoteFor !== id){ S.clearNote = ''; S.clearNoteFor = id; }
+  if(S.clearNoteFor !== id){ S.clearNote = ''; S.clearNoteFor = id; S.clearRepl = {}; }
+  /* the Reason input re-checks the clearing gate live so the action button follows
+     it (no data-f — the value lives in `S.clearNote`), plus escrow/replacement. */
   const note = `<label class="f"><span class="lbl">Reason <span class="req-star" aria-hidden="true">*</span></span>
-    <textarea class="inp" rows="3" oninput="S.clearNote=this.value" placeholder="Why this account is being removed. Internal only.">${esc(S.clearNote || '')}</textarea></label>`;
+    <textarea class="inp" rows="3" oninput="S.clearNote=this.value; try{syncSheetSubmit()}catch(e){}" placeholder="Why this account is being removed. Internal only.">${esc(S.clearNote || '')}</textarea></label>`;
   const held = heldEscrow(u), led = leaderCohorts(u.name);
   if(!held.length && !led.length) return note;
   const rows = [];
   held.forEach(p => rows.push(cardRow('wallet', `Escrow ${esc(p.ref)}`, `${money(p.net)} held for ${esc(p.period)}`,
     `<button class="btn acc-link btn-sm noic" data-act="clearpayout:${u.id}:${p.id}">Release ${I.arrowRight}</button>`)));
-  led.forEach(c => rows.push(cardRow('users', esc(c.name), 'Live cohort with no replacement leader',
-    `<span class="t-caption">Reassign in Cohort Leaders</span>`)));
-  return note + `<div style="margin-top:var(--s05)">${note2Head('Clear before continuing')}<div class="tile-stack">${rows.join('')}</div></div>`;
+  /* A LEADER'S LIVE COHORTS carry a replacement-leader picker BELOW the cohort text
+     (Maryam, 24 Sep 2026: "choose a new leader field should be below, not on the same
+     row") — the picker sits inside the row body under the description. The cohort task
+     shows ONLY when this person actually leads a cohort. */
+  const opts = leaderReplOpts(u);
+  S.clearRepl = S.clearRepl || {};
+  led.forEach(c => rows.push(
+    `<div class="cardrow clr-cohort">
+      <span class="cardrow-ic">${ic('users')}</span>
+      <span class="cardrow-b"><span class="cardrow-t">${esc(c.name)}</span>
+        <span class="cardrow-d">Live cohort — choose a replacement leader</span>
+        <div class="clr-repl">${formDd({k:'repl_' + c.id, l:'', t:'select', ph:'Choose a leader', opts}, S.clearRepl[c.id] || '')}</div></span>
+    </div>`));
+  return note + `<div style="margin-top:var(--s05)">${note2Head('Clear before continuing')}<div class="tile-stack clr-stack">${rows.join('')}</div></div>`;
+}
+/* The deactivate/delete button is DISABLED until everything is cleared (Maryam, 24 Sep
+   2026): a reason is written, no escrow is still held, and every live cohort has a
+   replacement leader chosen. Reads the same state the submit handlers enforce. */
+function clearingDisabled(u, v){
+  if(!(S.clearNote || '').trim()) return true;
+  if(heldEscrow(u).length) return true;
+  return leaderCohorts(u.name).some(c => !(v && v['repl_' + c.id]));
 }
 const note2Head = t => `<p class="t-label" style="margin-bottom:var(--s03);color:var(--text-secondary)">${esc(t)}</p>`;
-ACTIONS.clearpayout = key => { const pid = key.split(':')[2]; const p = PAYOUTS.find(x => x.id === pid);
+ACTIONS.clearpayout = key => { stashClearRepl(); const pid = key.split(':')[2]; const p = PAYOUTS.find(x => x.id === pid);
   if(p){ p.status = 'settled'; p.when = 'Released'; audit('Released payout in account clearing', p.ref, 'Finance & Settlement', 'high'); toast(`${p.ref} released`); } };
+/* read the chosen replacements and confirm every live cohort has one; returns the
+   {cohortId: leaderName} map, or null when a cohort is still unassigned. */
+function clearingRepl(u){ stashClearRepl(); const led = leaderCohorts(u.name); const repl = {};
+  for(const c of led){ const r = S.clearRepl[c.id]; if(!r) return null; repl[c.id] = r; } return repl; }
 SHEETS.deactext = id => {
   const u = USER_BY_ID[id]; if(!u) return {title:'Deactivate', body:'', ok:''};
   const cl = extClearing(u);
@@ -5581,28 +5758,33 @@ SHEETS.deactext = id => {
     body: clearingUI(u, 'deact:' + id)
       + (cl.length ? infoCard('What deactivating clears', cl.map(esc).join(' · ')) : ''),
     ok:'Deactivate', danger:true,
+    gate:true, disabled:true, gateFn: v => clearingDisabled(u, v),
     act:'submitdeactext:' + id
   };
 };
 ACTIONS.submitdeactext = key => {
   const u = USER_BY_ID[key.split(':')[1]]; if(!u) return;
+  stashClearRepl();   /* keep any replacement picks across a validation re-render */
   if(!(S.clearNote || '').trim()){ toast('Enter a note explaining this deactivation', 'warn'); return 'keep'; }
-  /* the actionable, blocking clearing gate (3.4): escrow released and cohorts
-     reassigned before the account can be deactivated. */
-  const b = clearingBlocked(u); if(b){ toast(b, 'warn'); return 'keep'; }
-  S._pending = {note:S.clearNote};
+  /* the actionable, blocking clearing gate (3.4): escrow released and every live
+     cohort assigned a replacement leader before the account can be deactivated. */
+  if(heldEscrow(u).length){ toast('Release every payment still in escrow before continuing', 'warn'); return 'keep'; }
+  const repl = clearingRepl(u); if(repl === null){ toast('Choose a replacement leader for every live cohort', 'warn'); return 'keep'; }
+  S._pending = {note:S.clearNote, repl};
   const cl = extClearing(u);
   askConfirm({mk:'warning', danger:true, title:`Deactivate ${u.name}?`, body:`${cl.length ? cl.join(', ') + '. ' : ''}They will be signed out and notified.`, ok:'Deactivate', act:'dodeactext:' + u.id});
 };
 ACTIONS.dodeactext = key => {
   const u = USER_BY_ID[key.split(':')[1]]; const v = S._pending || {}; S._pending = null; S.confirm = null; if(!u) return;
+  /* reassign every live cohort to the replacement chosen in the modal (3.4). */
+  if(v.repl) leaderCohorts(u.name).forEach(c => { if(v.repl[c.id]) c.leader = v.repl[c.id]; });
   u.status = 'inactive'; u.last = 'Signed out'; if(u.roles.includes('agent')) u.onboarded = false;
   /* schedule the grace-period erasure and mark how the account got here (3.4) */
   u.deactivatedOn = isoToday(); u.deactivateNote = v.note || ''; u.erasure = {beginsOn: isoPlus(isoToday(), GRACE_DAYS), by:'admin'};
   const c = CAND_BY_ID[u.id]; if(c) c.status = 'inactive';
   audit('Deactivated account', `${u.name} · erasure scheduled ${dpFmt(u.erasure.beginsOn)} · ${v.note || ''}`, 'Users & Roles', 'high');
   toast(`${u.name} deactivated. Erasure scheduled for ${dpFmt(u.erasure.beginsOn)} unless reactivated.`);
-  S.clearNote = ''; S.clearNoteFor = null;
+  S.clearNote = ''; S.clearNoteFor = null; S.clearRepl = {};
 };
 SHEETS.reactext = id => {
   const u = USER_BY_ID[id]; if(!u) return {title:'Reactivate', body:'', ok:''};
@@ -5646,14 +5828,17 @@ SHEETS.delext = id => {
     body: clearingUI(u, 'del:' + id)
       + sheetHelp('This erases their personal data across the platform and cannot be undone. Payment receipts are kept 7 years for accounting; certificates keep the credential with the name removed; the audit trail is pseudonymised.'),
     ok:'Delete', danger:true,
+    gate:true, disabled:true, gateFn: v => clearingDisabled(u, v),
     act:'submitdelext:' + id
   };
 };
 ACTIONS.submitdelext = key => {
   const u = USER_BY_ID[key.split(':')[1]]; if(!u) return;
+  stashClearRepl();   /* keep any replacement picks across a validation re-render */
   if(!(S.clearNote || '').trim()){ toast('Enter a note explaining this deletion', 'warn'); return 'keep'; }
-  const b = clearingBlocked(u); if(b){ toast(b, 'warn'); return 'keep'; }
-  S._pending = {note:S.clearNote};
+  if(heldEscrow(u).length){ toast('Release every payment still in escrow before continuing', 'warn'); return 'keep'; }
+  const repl = clearingRepl(u); if(repl === null){ toast('Choose a replacement leader for every live cohort', 'warn'); return 'keep'; }
+  S._pending = {note:S.clearNote, repl};
   askConfirm({mk:'warning', danger:true, stepup:true, title:`Delete ${u.name} permanently?`, body:'This erases their personal data across the platform and cannot be undone.', ok:'Delete', act:'dodelext:' + u.id});
 };
 ACTIONS.dodelext = key => {
@@ -5663,12 +5848,14 @@ ACTIONS.dodelext = key => {
      30-day deadline, and reaches Deleted only once every processor confirms
      (`confirmproc`). It stays in the directory under its erasure state until then,
      so a delete opened from a detail page leaves the erasure record on screen. */
+  /* reassign every live cohort to the replacement chosen in the modal (3.6). */
+  if(v.repl) leaderCohorts(u.name).forEach(c => { if(v.repl[c.id]) c.leader = v.repl[c.id]; });
   u.status = 'deleting'; delete u.erasure;
   u.deletion = {started: isoToday(), dueBy: isoPlus(isoToday(), ERASE_DAYS), proc:{}, emailed:true};
   const c = CAND_BY_ID[u.id]; if(c) c.status = 'inactive';
   audit('Started account erasure', `${u.name} · due ${dpFmt(u.deletion.dueBy)} · ${v.note || ''}`, 'Users & Roles', 'high');
   toast(`${u.name} — erasure started across five processors. Due by ${dpFmt(u.deletion.dueBy)}.`);
-  S.clearNote = ''; S.clearNoteFor = null;
+  S.clearNote = ''; S.clearNoteFor = null; S.clearRepl = {};
 };
 
 KINDS.role = {
@@ -7069,13 +7256,12 @@ function candidatesDetail(){
      dropdown `rowActs` draws. */
   const menu = rowActs([
     ['edit', 'Edit', `data-sheet="rec:cand:${c.id}"`],
-    /* Only MARK as cohort leader here (Maryam 20 Sep 2026: "do not give remove a
-       cohort leader option in candidate detail page menu") — removing the
-       capability lives on the Cohort Leaders table (`cohortsAssign` "Remove as
-       cohort leader"), so an already-leading candidate shows no toggle here. */
-    u && !u.roles.includes('leader') && leaderEligible(u)
-      ? ['verified', 'Mark As Cohort Leader', `data-act="askmarkleader:${c.id}"`]
-      : null,
+    /* Mark OR Remove as cohort leader (Maryam 24 Sep 2026 — this REVERSES the 20 Sep
+       "no remove on the candidate detail" note): an eligible non-leader is invited;
+       a current leader is removed via the replacement-picker modal (`rmleader`). */
+    u && u.roles.includes('leader')
+      ? ['close', 'Remove as Cohort Leader', `data-sheet="rmleader:${c.id}"`]
+      : (u && leaderEligible(u) ? ['verified', 'Mark As Cohort Leader', `data-act="askmarkleader:${c.id}"`] : null),
     c.status === 'active'
       ? ['deactivate', 'Deactivate', `data-act="askstatus:cand:${c.id}:inactive"`]
       : ['play', 'Reactivate', `data-act="askstatus:cand:${c.id}:active"`],
@@ -7111,9 +7297,9 @@ function candidatesDetail(){
     </div>
   </section>
 
-  ${''/* LEVELLING + COHORTS panels (story 3.7) — level provenance, history and
-         override; the candidate's cohort with progress. */}
-  ${candLevellingPanel(c)}
+  ${''/* LEVELLING panel is HIDDEN (Maryam, 24 Sep 2026: "hide leveling section");
+         `candLevellingPanel` stays defined, just not drawn. COHORTS panel stays. */}
+  ${''/* candLevellingPanel(c) */}
   ${candCohortsPanel(c)}
 
   ${''/* COURSES the candidate is taking and has taken, with each completed
@@ -7225,8 +7411,11 @@ const rangeCovers = (r, lvl) => LADDER.indexOf(lvl) >= LADDER.indexOf(r[0]) && L
 /* THREE LISTING STATES (6.1): Listed (bookable), Paused (an admin took them out),
    Not listed (never finished their own onboarding, so never appeared). Listing
    state is independent of account status. */
-const agState = a => a.onboarded === false ? 'notlisted' : (a.status === 'active' ? 'listed' : 'paused');
-const AG_STATE = {listed:['active', 'Listed'], paused:['inactive', 'Paused'], notlisted:['', 'Not listed']};
+/* An INVITED agent (created through the Invite Talent Agent flow) is its own state
+   and its own tab (Maryam, 24 Sep 2026) — it has not accepted, so it is neither
+   listed, paused nor "not listed" (which means onboarded-but-hidden). */
+const agState = a => a.status === 'invited' ? 'invited' : (a.onboarded === false ? 'notlisted' : (a.status === 'active' ? 'listed' : 'paused'));
+const AG_STATE = {listed:['active', 'Listed'], paused:['inactive', 'Paused'], notlisted:['', 'Not listed'], invited:['warn', 'Invited']};
 const agStateTag = a => { const [v, l] = AG_STATE[agState(a)]; return tag(v, l); };
 /* THE RANKING IS BY CANDIDATE RATING ALONE, recalculated WEEKLY — it is not live
    (6.1). Only Listed agents carry a rank. We freeze it once at load and state
@@ -7266,23 +7455,37 @@ KINDS.agent = {
        editable required field. The Listing field is gone — a listing is paused or
        restored from the row action, not this form (Maryam, 18 Sep 2026). */
     a ? {k:'email', l:'Email address', t:'email', ro:1} : {k:'email', l:'Email address', t:'email', req:1},
-    {k:'job', l:'Current role', t:'text', req:1, ph:'e.g. Engineering Manager, Stripe'},
-    {k:'fee', l:'Interview fee ($)', t:'number', req:1, def:150},
+    /* Current role and Interview fee are REMOVED (Maryam, 24 Sep 2026: "remove
+       current role and interview fee fields from the form") — the agent sets their
+       own fee at onboarding, and the role is not captured here. */
     /* PER-AGENT COMMISSION (story 3.2/3.9, Maryam 24 Sep 2026). There is no
        platform-wide commission — the platform's share is set for THIS agent, at
        the point the account is created, 0–100 with one decimal. It rides the
        agent record and is shown on the agent detail's Listing panel; changing it
-       later is a fee decision. The 1–5 "initial agent score" the story also asks
-       for is deliberately NOT captured — it only seeded the out-of-100 quarterly
-       score, which this build does not use (agent standing is the star rating). */
-    {k:'commission', l:'Commission (%)', t:'number', req:1, def:20, ph:'The platform’s share of this agent’s fee'}
+       later is a fee decision. */
+    {k:'commission', l:'Commission (%)', t:'number', req:1, def:20, ph:'The platform’s share of this agent’s fee'},
+    /* INITIAL RATING (Maryam, 24 Sep 2026: "add the rating option ... just like the
+       talent agent invitation form on the users submodule") — a starting 5-star
+       Agent Score, captured on the invite only (not the edit sheet). */
+    ...(a ? [] : [{k:'rating', l:'Initial rating', t:'stars', req:1, hint:'Their starting Agent Score out of 5, shown to candidates until the first quarterly review replaces it.'}]),
+    /* ASSESSMENT RANGE is editable on the EDIT sheet (Maryam, 24 Sep 2026: "the edit
+       page should also show assessment range which is editable") — two level pickers
+       whose values default to the current `a.range`; `update` writes it back. */
+    ...(a ? [
+      {k:'from', l:'Assessment range (from)', t:'select', opts: LADDER.map(l => [l, l]), get: x => agRange(x)[0]},
+      {k:'to', l:'Assessment range (to)', t:'select', opts: LADDER.map(l => [l, l]), get: x => agRange(x)[1]}
+    ] : [])
   ],
-  /* the vetting-queue note is about CREATING an account, so it shows on add only
-     (Maryam, 18 Sep 2026: "remove the info banner from here" — the edit sheet). */
-  help: a => a ? '' : 'An agent normally arrives through the vetting queue. Adding one here creates the account as approved — use it for a known agent you have already vetted elsewhere. The commission is this agent’s alone; there is no platform-wide figure.',
-  okNew:'Add Talent Agent',
-  create: v => { const u = {id:newId('u', USERS), name:v.name, email:v.email, roles:['agent'], level:'—', job:v.job, rating:0, interviewed:0, status:'active', joined:today(), origin:'individual', last:'invited', fee:v.fee, commission:v.commission != null && v.commission !== '' ? Number(v.commission) : 20, commissionAt:today()}; USERS.push(u); USER_BY_ID[u.id] = u; return u; },
-  update: (a, v) => { a.name = v.name; a.job = v.job; a.fee = v.fee; if(v.commission != null && v.commission !== '' && Number(v.commission) !== a.commission){ a.commission = Number(v.commission); a.commissionAt = today(); } if(v.status) a.status = v.status; },
+  /* The info block is REMOVED (Maryam, 24 Sep 2026: "remove the info block at the
+     end of the form"). This is an INVITE, matching the Add User → Talent Agent flow:
+     the account is created at status `invited` with a dated invitation, not
+     approved-active; the "Expires in N days" countdown shows until accepted. */
+  okNew:'Invite Talent Agent',
+  /* An invite closes the sheet and drops the row into the Invited tab — it does not
+     open a detail page (Maryam, 24 Sep 2026). */
+  stayOnCreate:true, createdAudit:'Invited talent agent', createdMsg: rec => `Invite sent to ${rec.email}`,
+  create: v => { const u = {id:newId('u', USERS), name:v.name, email:v.email, roles:['agent'], level:'—', job:v.job, rating:v.rating ? Number(v.rating) : 0, interviewed:0, status:'invited', joined:today(), origin:'individual', last:'Never', invitedOn:today(), invitedBy:ME.id, fee:v.fee, commission:v.commission != null && v.commission !== '' ? Number(v.commission) : 20, commissionAt:today()}; USERS.push(u); USER_BY_ID[u.id] = u; return u; },
+  update: (a, v) => { a.name = v.name; a.job = v.job; a.fee = v.fee; if(v.commission != null && v.commission !== '' && Number(v.commission) !== a.commission){ a.commission = Number(v.commission); a.commissionAt = today(); } if(v.from && v.to) a.range = [v.from, v.to]; if(v.status) a.status = v.status; },
   remove: a => { a.roles = a.roles.filter(r => r !== 'agent'); if(!a.roles.length){ USERS.splice(USERS.indexOf(a), 1); delete USER_BY_ID[a.id]; } },
   delWarn: a => `${a.name} comes off the marketplace and loses the agent role. Booked interviews are cancelled and refunded; held payouts settle on the next cycle.`,
   status: (a, val) => val === 'inactive'
@@ -7301,12 +7504,13 @@ function agentsAll(){
   return `
   <section class="sec">
     ${searchHead('Agent directory', 'Every talent agent, listed or not. They set their own fee; a candidate’s first interview is free.',
-      `${exportBtn('Talent agents')} ${addBtn('agent', 'Add Talent Agent')}`, 'Search by name or email')}
+      `${exportBtn('Talent agents')} ${addBtn('agent', 'Invite Talent Agent')}`, 'Search by name or email')}
     ${filterStrip('agstate', 'all', [
       ['all', 'All', AGENTS().length],
       ['listed', 'Listed', count('listed')],
       ['paused', 'Paused', count('paused')],
-      ['notlisted', 'Not listed', count('notlisted')]
+      ['notlisted', 'Not listed', count('notlisted')],
+      ['invited', 'Invited', count('invited')]
     ])}
     ${lstTools('Search by name or email', filterDd('agrange', 'all', [['all', 'Any level'], ...LADDER.map(l => [l, l])], 'Assesses'))}
     ${list.length ? table(
@@ -7317,13 +7521,24 @@ function agentsAll(){
         a.rating ? ratingCell(a.rating) : '—',
         String(a.interviewed),
         rangeLabel(agRange(a)),
-        a.fee ? money(a.fee) : 'Free first',
-        agStateTag(a),
-        rowActs([
-          ['route', 'Set assessment range', `data-sheet="agrange:${a.id}"`],
-          ...(agState(a) === 'listed' ? [['pause', 'Pause listing', `data-sheet="agpause:${a.id}"`]] : []),
-          ...(agState(a) === 'paused' ? [['play', 'Restore listing', `data-sheet="agrestore:${a.id}"`]] : [])
-        ])
+        a.fee ? money(a.fee) : '—',   /* no fee yet — the agent sets it from their side (Maryam, 24 Sep 2026) */
+        a.status === 'invited' ? extInviteStatus(a) : agStateTag(a),
+        a.status === 'invited'
+          ? rowActs([
+              ['view', 'View', `data-go="agents/detail/${a.id}"`],
+              ['renew', 'Resend invite', `data-act="staffresend:${a.id}"`],
+              ['close', 'Cancel invite', `data-act="staffcancelinvite:${a.id}"`]
+            ])
+          : rowActs([
+              /* Agent menu (Maryam, 24 Sep 2026): View, Edit, Pause/Restore Listing,
+                 Deactivate, Delete. Set assessment range moved onto the Edit sheet. */
+              ['view', 'View', `data-go="agents/detail/${a.id}"`],
+              ['edit', 'Edit', `data-sheet="rec:agent:${a.id}"`],
+              ...(agState(a) === 'listed' ? [['pause', 'Pause Listing', `data-sheet="agpause:${a.id}"`]] : []),
+              ...(agState(a) === 'paused' ? [['play', 'Restore Listing', `data-sheet="agrestore:${a.id}"`]] : []),
+              (a.status === 'active' || a.status === 'ok') ? ['deactivate', 'Deactivate', `data-sheet="deactext:${a.id}"`] : ['play', 'Reactivate', `data-sheet="reactext:${a.id}"`],
+              ['delete', 'Delete', `data-sheet="delext:${a.id}"`]
+            ])
       ]})), {selectKind:'agent'})
       : emptyState('agents', 'No agents match', q || sf !== 'all' || rf !== 'all' ? 'Nothing matches the current filters.' : 'No agents yet.')}
   </section>`;
@@ -7408,10 +7623,15 @@ function agentsDetail(){
       ${''/* Header actions in a kebab (Maryam, 18 Sep 2026); the Deactivated tag stays. */}
       <span class="idhead-act" style="display:flex;align-items:center;gap:var(--s03)">${acct ? '' : tag('inactive', 'Deactivated')}
         ${rowActs([
+          /* Agent detail menu (Maryam, 24 Sep 2026): Edit, Pause/Restore Listing,
+             Deactivate/Reactivate, Delete (View is the current page). */
           ['edit', 'Edit', `data-sheet="rec:agent:${a.id}"`],
+          ...(agState(a) === 'listed' ? [['pause', 'Pause Listing', `data-sheet="agpause:${a.id}"`]] : []),
+          ...(agState(a) === 'paused' ? [['play', 'Restore Listing', `data-sheet="agrestore:${a.id}"`]] : []),
           acct
             ? ['deactivate', 'Deactivate', `data-sheet="deactext:${a.id}"`]
-            : ['play', 'Reactivate', `data-sheet="reactext:${a.id}"`]
+            : ['play', 'Reactivate', `data-sheet="reactext:${a.id}"`],
+          ['delete', 'Delete', `data-sheet="delext:${a.id}"`]
         ])}</span>
     </div>
     ${stats([
@@ -7422,8 +7642,9 @@ function agentsDetail(){
     ])}
   </section>
 
-  ${''/* LISTING DETAILS (story 3.8) — commercial terms + match signals. */}
-  ${agentListingPanel(a)}
+  ${''/* LISTING DETAILS (story 3.8) is HIDDEN (Maryam, 24 Sep 2026: "hide listing
+        details section"); `agentListingPanel` stays defined, just not drawn. */}
+  ${''/* agentListingPanel(a) */}
 
   ${''/* the Payouts section is only drawn when there is something to release
         (Maryam, 18 Sep 2026: "when there is nothing to release do not even show
@@ -7686,7 +7907,7 @@ function agentsInterview(){
      `admFact` escapes its value and `ratingCell` is HTML. */
   const ivTab = getFilter('ivtab', 'about');
   return `${detailHead(backTo)}
-  <section class="sec">
+  <section class="sec iv-head">
     ${aiHead('Interview with ' + esc(iv.cand), `${esc(iv.agent)} &middot; ${esc(agIvKind(iv.kind))} &middot; ${esc(when)}`)}
   </section>
   <section class="sec sec-cs iv-tabs">
@@ -11676,8 +11897,17 @@ function render(){
   let _formDraft = null;
   const _prevPeek = device.querySelector('.peek-form');
   if(_prevPeek){
-    _formDraft = {__sheet: _prevPeek.getAttribute('data-sheet-key') || ''};
-    _prevPeek.querySelectorAll('[data-f]').forEach(el => { _formDraft[el.dataset.f] = el.value; });
+    _formDraft = {__sheet: _prevPeek.getAttribute('data-sheet-key') || '', __checked: []};
+    /* A RADIO/CHECKBOX GROUP shares one `data-f` across several inputs, so snapshotting
+       `el.value` last-wins (and restoring `.value`, never `.checked`) both LOST the
+       selection and corrupted the first input's value — a mid-render flipped the
+       Add-a-user Role radio to the last option and dropped the pick (Maryam, 24 Sep
+       2026). Capture the CHECKED member by [data-f, value] instead; text/number/
+       select/hidden fields still snapshot their value. */
+    _prevPeek.querySelectorAll('[data-f]').forEach(el => {
+      if(el.type === 'radio' || el.type === 'checkbox'){ if(el.checked) _formDraft.__checked.push([el.dataset.f, el.value]); return; }
+      _formDraft[el.dataset.f] = el.value;
+    });
     const af = document.activeElement;
     if(af && af.dataset && af.dataset.f && _prevPeek.contains(af)){
       let pos = null; try { pos = af.selectionStart; } catch(e){}
@@ -11766,11 +11996,18 @@ function render(){
        one form's values onto another, which would clobber the record's prefill. */
     if(np && (np.getAttribute('data-sheet-key') || '') === _formDraft.__sheet){
       Object.keys(_formDraft).forEach(k => {
-        if(k === '__focus' || k === '__sheet') return;
+        if(k === '__focus' || k === '__sheet' || k === '__checked') return;
         const el = np.querySelector(`[data-f="${CSS.escape ? CSS.escape(k) : k}"]`);
         if(!el || el.value === _formDraft[k]) return;
         el.value = _formDraft[k];
         restoreFormDdDisplay(el);   /* refresh a dropdown trigger's visible label */
+      });
+      /* re-check the radio/checkbox members that were on before the render, matched
+         by [data-f, value] so a group's correct option is restored (not its first). */
+      (_formDraft.__checked || []).forEach(([k, val]) => {
+        const esc2 = s => CSS.escape ? CSS.escape(s) : String(s).replace(/"/g, '\\"');
+        const el = np.querySelector(`[data-f="${esc2(k)}"][value="${esc2(val)}"]`);
+        if(el) el.checked = true;
       });
       const fc = _formDraft.__focus;
       if(fc){ const fe = np.querySelector(`[data-f="${CSS.escape ? CSS.escape(fc.k) : fc.k}"]`);
