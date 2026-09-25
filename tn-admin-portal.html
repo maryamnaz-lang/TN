@@ -515,7 +515,7 @@ input:-webkit-autofill:focus{
    role they hold. A compact pill trigger + a downward menu (every admin dropdown
    opens downward, 12 Sep 2026). Plain `:hover` here — this file's hovers are live
    (the DS's are disarmed, trap 6). */
-.app .roleswitch{position:relative; flex:none; display:flex; align-items:center; margin-left:var(--s02); min-width:0}
+.app .roleswitch{position:relative; flex:none; display:flex; align-items:center; min-width:0}
 .app .roleswitch-t{display:inline-flex; align-items:center; gap:var(--s02); max-width:220px; height:34px; padding:0 var(--s03); background:var(--layer-01); border:1px solid var(--border-subtle-02); border-radius:var(--radius); color:var(--text-primary); font-size:var(--t-label-size); line-height:var(--t-label-lh); font-weight:var(--t-w-strong); white-space:nowrap; cursor:pointer; transition:background var(--dur-short) var(--ease-standard)}
 .app .roleswitch-t .rsw-l{overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 .app .roleswitch-t:hover{background:var(--overlay-hover)}
@@ -523,7 +523,7 @@ input:-webkit-autofill:focus{
 .app .roleswitch-t .rsw-c{flex:none; width:16px; height:16px; color:var(--icon-secondary); transition:transform var(--dur-short) var(--ease-standard)}
 .app .roleswitch-t .rsw-c svg{width:16px; height:16px; display:block}
 .app .roleswitch-t.on .rsw-c{transform:rotate(180deg)}
-.app .roleswitch-menu{position:absolute; top:calc(100% + var(--s02)); left:0; z-index:60; min-width:230px; max-width:calc(100vw - var(--s05)); background:var(--layer-01); border:1px solid var(--rule); box-shadow:0 8px 24px rgba(17,17,17,.12); padding:var(--s02); display:none}
+.app .roleswitch-menu{position:absolute; top:calc(100% + var(--s02)); right:0; left:auto; z-index:60; min-width:230px; max-width:calc(100vw - var(--s05)); background:var(--layer-01); border:1px solid var(--rule); box-shadow:0 8px 24px rgba(17,17,17,.12); padding:var(--s02); display:none}
 .app .roleswitch-menu.on{display:block}
 .app .rsw-i{display:flex; align-items:center; gap:var(--s03); width:100%; padding:var(--s03); background:transparent; border:0; text-align:left; cursor:pointer; color:var(--text-primary); font-size:var(--t-body-size); line-height:var(--t-body-lh); font-weight:var(--t-w-book); border-radius:var(--radius)}
 .app .rsw-i .rsw-i-l{flex:1; white-space:nowrap}
@@ -552,11 +552,12 @@ input:-webkit-autofill:focus{
   .app[data-rail="shut"] .sidenav .sn-item[data-tip]:not(.sn-parent)::after{
     content:attr(data-tip); position:absolute; left:calc(100% + var(--s03)); top:50%;
     transform:translate(-4px,-50%); z-index:60; pointer-events:none; white-space:nowrap; width:max-content; max-width:none; overflow:visible;
+    display:flex; align-items:center; justify-content:center; text-align:center;
     /* the collapsed-rail LEAF label matches the parent flyout panel (§120.1c `.sn-subs`) —
        a white chip with the hairline + soft shadow, not a solid black pill (Maryam, 25 Sep
        2026: "the hover ui should be the one we were using previously"). */
     padding:var(--s03) var(--s05); background:var(--layer-01); color:var(--text-primary);
-    border:1px solid var(--rule); box-shadow:0 8px 24px rgba(17,17,17,.12); text-align:center;
+    border:1px solid var(--rule); box-shadow:0 8px 24px rgba(17,17,17,.12);
     font-size:var(--t-label-size); line-height:var(--t-label-lh); font-weight:var(--t-w-book);
     opacity:0; visibility:hidden; transition:opacity .12s ease, transform .12s ease, visibility 0s .12s}
   .app[data-rail="shut"] .sidenav .sn-item[data-tip]:not(.sn-parent):hover::after,
@@ -653,27 +654,36 @@ input:-webkit-autofill:focus{
 /* PERMISSIONS MATRIX MARKS (Maryam, 14 Sep 2026): granted in the accent,
    ungranted a very light grey. Read-mode marks (pmYes/pmNo) carry their own inline
    colour; these colour the edit-mode toggle icons, which have none. */
-.app .perm-tbl .btn[aria-pressed="true"] svg{color:var(--accent)}
-.app .perm-tbl .btn[aria-pressed="false"] svg{color:var(--gray-20)}
-/* The edit-view toggle is icon-only, so an edit row is the same height as a read
+.app .perm-grid .btn[aria-pressed="true"] svg{color:var(--accent)}
+.app .perm-grid .btn[aria-pressed="false"] svg{color:var(--gray-20)}
+/* The edit-mode toggle is icon-only, so an edit row is the same height as a read
    row (Maryam, 14 Sep 2026). The default .btn min-height (32px) made edit rows
    ~12px taller than the read table; drop the button chrome to its glyph. */
-.app .perm-tbl td .btn{min-height:0; height:auto; padding:0; border:0}
-/* Every role column is CENTRED under its own heading (Maryam, 14 Sep 2026) — the
-   mark sits mid-column, not right-aligned like a figure. The first column
-   (Capability) stays left. Beats `.tbl .num{text-align:right}` (0,2,0). */
-.app .perm-tbl th:not(:first-child), .app .perm-tbl td:not(:first-child){text-align:center}
-/* The Permissions heading row breathes like the Roles one (Maryam, 14 Sep 2026).
-   The modhead's first section (Roles) gets s06 above and s06 below its heading
-   (DS 9572/9573); this later section had the default 12 heading-to-content gap, so
-   lift it to s06. Top padding is already s06, matching Roles. */
-.app .sec:has(.perm-tbl){padding-top:var(--s06)}
-.app .sec:has(.perm-tbl) > .sec-h{margin-bottom:var(--s06)}
+.app .perm-grid td .btn{min-height:0; height:auto; padding:0; border:0}
 /* INFORMATION ICON (story 4.1): a quiet inline info glyph next to a reserved
    permission's label and the Super Admin column head, carrying its reason as a
    native title tooltip. Helper grey so it reads as a hint, not a mark. */
 .app .perm-info{display:inline-flex;vertical-align:middle;color:var(--text-helper);cursor:help;line-height:0}
 .app .perm-info svg{display:block}
+/* PER-MODULE PERMISSION GRIDS (Maryam, 25 Sep 2026, Taskora reference): one bordered
+   table per module — module name top-left, actions across the top, roles down the
+   first column. Each grid is its own card with a full --rule border, light row
+   dividers, and a gap to the next; the action columns centre their tick/dash. */
+.app .perm-wrap{margin-bottom:var(--s06);border:1px solid var(--rule)}
+.app .perm-wrap:last-child{margin-bottom:0}
+.app .perm-grid{width:100%}
+.app .perm-grid th, .app .perm-grid td{padding:var(--s04) var(--s05);vertical-align:middle}
+.app .perm-grid th:not(:first-child), .app .perm-grid td:not(:first-child){text-align:center}
+.app .perm-grid tr:first-child th{background:var(--surface-2)}
+.app .perm-grid tr + tr td{border-top:1px solid var(--rule)}
+/* Override the admin .tbl first-data-row offset (DS s06) — these grids read as one
+   even block, so every role row keeps the same padding. Equal specificity, later. */
+.app[data-portal="admin"] .perm-grid tr:first-child + tr td{padding-top:var(--s04)}
+.app .perm-grid-name{font-weight:var(--t-w-strong);color:var(--text-primary)}
+/* Sensitive / Reserved "Governs" tables: the Permission is the anchor column, the
+   Governs prose wraps freely and reads in the description grey. */
+.app .perm-gov td:last-child{color:var(--text-secondary);white-space:normal}
+.app .perm-gov th:last-child, .app .perm-gov td:last-child{width:64%}
 
 /* TAL SUMMARY HIDDEN PORTAL-WIDE (Maryam, 17 Sep 2026, #admin-nosum). With the
    "Summary by Tal" band gone from `head()`, a list-page head band is only an empty
@@ -694,6 +704,23 @@ input:-webkit-autofill:focus{
 .app .sec.iv-tabs > .cs,.app .sec.set-tabs > .cs{margin-bottom:0}
 .app .sec.iv-tabs::after,.app .sec.set-tabs::after{content:none}
 .app .sec.iv-tabs + .sec,.app .sec.set-tabs + .sec{padding-top:var(--s05)}
+/* THE LEVEL-APPROVAL TAB STRIP sits the SAME distance below the head as above its
+   content (Maryam, 25 Sep 2026: "remove the unusual gap above the tabs ... reduce it to
+   the gap below the tabs"). The head→tabs `.sec + .sec` 24px margin stacked on the
+   strip's own top padding, making the gap above the tab labels (~57px) far larger than
+   the gap below them (~40px). Dropping that section margin and setting a fixed 12px top
+   padding lands the above gap at ~41px, level with below. Higher specificity + the child
+   combinator beat the `.iv-detail-body > .sec + .sec` margin; scoped so the interview-
+   detail and Settings strips are untouched. */
+.app .iv-detail-body > .sec.iv-tabs.iv-tabs-tight{margin-top:0; padding-top:var(--s04)}
+/* THE LEVEL-APPROVAL ACTION ROW (Maryam, 25 Sep 2026): the Approve-Tal and Reviewer-
+   override ghosts carry a VISIBLE light-grey outline — the ghost's default --rule
+   (#efefef) edge is near-invisible on white, so `.appr-out` steps it to the findable
+   --border-subtle-02 (#c7c6c3). The Tal button leads with the platform's static Tal blob
+   (`borbMark('appr-orb')`, no live state so §135 renders the flat blob), sized down from
+   its 288px default to a 22px button mark. */
+.app .appr-out{border-color:var(--border-subtle-02)}
+.app .appr-orb{--borb-size:22px; flex:none}
 /* the head section above the tabs gives up its bottom padding so the tabs sit a
    single --s05 below the interview title, not a full section gap (Maryam, 18 Sep
    2026: "remove unnecessary spaces above and below tabs row"). */
@@ -805,6 +832,25 @@ input:-webkit-autofill:focus{
    column, arrow and buttons untouched. The back arrow keeps its normal optical hang.
    Scoped to `.iv-detail-body` (approval + interview detail). */
 .app .iv-detail-body > .sec{padding-inline:var(--pad-x)}
+/* THE LEVEL CHANGE DETAIL runs a FLAT 32px section rhythm with NO dividers (Maryam,
+   25 Sep 2026: "whole page section gaps should be 32px. remove the section dividers").
+   `.lc-body` overrides `.iv-detail-body`'s 72px gaps and §14's foot hairlines: each
+   section pays 16px top + 16px bottom (16 + 16 = a 32px gap between any two), the extra
+   consecutive-section margin is dropped, and every `::after` divider is switched off. */
+.app .lc-body.iv-detail-body > .sec{padding-top:var(--s05); padding-bottom:var(--s05); margin-top:0}
+.app .lc-body.iv-detail-body > .sec::after{content:none}
+/* TAL'S READ + THE AGENT EVALUATION ARE ONE SECTION under a single heading (Maryam,
+   25 Sep 2026: "the heading update was in place of Tal's read, no other heading will be
+   there"). Inside it, the facts band takes a gap below Tal's read prose, and the
+   agent-notes block (`.signed`) drops its shipped `border-top` + 32px `padding-top` (that
+   would read as a stray divider + big gap) and takes a normal `--s06` gap instead. */
+.app .lc-body .tal-eval + .facts{margin-top:var(--s07)}
+/* the agent-notes block (`.signed`) — the DS's `.app .page .sec > .signed` (0,4,0) forces a
+   `border-top` + 32px `padding-top` (a divider + big gap). Beat it (0,5,0) to drop the divider
+   and pad, and use a plain 32px `margin-top` so every subsection here sits a uniform 32px apart
+   (Maryam, 25 Sep 2026: "remove the divider after the blocks and keep the same gap between every
+   subsection that is 32px gap"). */
+.app .lc-body.iv-detail-body > .sec > .signed{border-top:0; padding-top:0; margin-top:var(--s07)}
 
 /* THE LEVEL-APPROVAL LADDER FOLLOWS THE TALENT AGENT EVALUATION LADDER (Maryam, 22
    Sep 2026). The DS's §59.2b `.iv-ladder` treatment gives upright tabular codes over
@@ -1052,8 +1098,14 @@ input:-webkit-autofill:focus{
 /* the Transcript fact card's "Ready →" link on the Level Change detail (Maryam,
    25 Sep 2026) — accent ink with a trailing arrow, sitting inside a `.facts` cell
    value. */
-.app .lc-tx{display:inline-flex; align-items:center; gap:var(--s02); color:var(--accent-text); cursor:pointer; text-decoration:none}
-.app .lc-tx svg{width:16px; height:16px; color:var(--accent-text)}
+.app .lc-tx{display:flex; align-items:center; gap:var(--s02); width:100%; color:var(--accent-text); cursor:pointer; text-decoration:none}
+.app .lc-tx svg{width:16px; height:16px; color:var(--accent-text); margin-left:auto}
+/* the Talent Agent / Approved by person cards on the Level Change 8-card grid — a
+   small photo left of the name (smaller than the cohort head's `.cl-lead-ph`,
+   Maryam 25 Sep 2026: "reduce the profile images sizes"). */
+.app .lc-face{display:inline-flex; align-items:center; gap:var(--s02)}
+.app .lc-face-ph{flex:none; width:18px; height:18px; border-radius:999px; overflow:hidden}
+.app .lc-face-ph img{width:100%; height:100%; object-fit:cover; display:block}
 
 /* --- Static scenes row (three interview scenes): keep the candidate side's
    FIXED 240px cards sitting close together (.scv is flex:none width:240px in the
@@ -1356,7 +1408,13 @@ input:-webkit-autofill:focus{
    accent-tint fill + accent edge marks a picked letter, matching the row-select
    affordance. DOM-only toggle (no render, trap 9) so the reason textarea survives. */
 .app .ltr-pick{display:flex; flex-wrap:wrap; gap:var(--s03); margin-top:var(--s02)}
-.app .ltr-chip{display:inline-flex; align-items:center; gap:var(--s02); padding:var(--s02) var(--s04); border:1px solid var(--rule); background:var(--background); cursor:pointer; color:var(--text-secondary); font:inherit; line-height:1.2}
+.app .ltr-chip{display:inline-flex; align-items:center; gap:var(--s02); padding:var(--s02) var(--s04); border:1px solid var(--rule); border-radius:999px; background:var(--background); cursor:pointer; color:var(--text-secondary); font:inherit; line-height:1.2}
+/* THE OVERRIDE MODAL LAYS ITS SECTIONS OUT ON ONE 32px RHYTHM (Maryam, 25 Sep 2026:
+   "each section should have 32px gap") — a flat column so the kv block and the closing
+   text sit the same distance apart as the `.f` fields, which alone carried the 32px
+   (`--s07`) margin. Zeroing child margins keeps the gap uniform. */
+.app .ovr-body{display:flex; flex-direction:column; gap:var(--s07)}
+.app .sheet-b .ovr-body > *{margin-bottom:0}
 .app .ltr-chip b{color:var(--text-primary); font-weight:var(--t-w-strong)}
 .app .ltr-chip.on{border-color:var(--accent); background:color-mix(in srgb, var(--accent) 8%, var(--background)); color:var(--accent-text)}
 .app .ltr-chip.on b{color:var(--accent-text)}
@@ -1580,14 +1638,24 @@ const PERM_MODULES = [
   ['settings', 'Settings', ['view', 'edit']]
 ];
 const PERM_ACT_LABEL = {view:'View', create:'Create', edit:'Edit', delete:'Delete'};
+/* Sensitive permissions (story 4.1) — each is a permission of its own rather than
+   folded into a module's Edit. The third element is the catalogue's "Governs". */
 const PERM_SENSITIVE = [
-  ['approvelevel', 'Approve candidate level'], ['approvescore', 'Approve agent score'],
-  ['releasepayout', 'Release payout'], ['changefee', 'Change fee'], ['approverefund', 'Approve refund'],
-  ['accountsdelete', 'Accounts: Delete'], ['dataexport', 'Data: Export'], ['viewrawscore', 'View AI raw score'],
-  ['setrange', 'Set assessment range'], ['playrecording', 'Play a recording']
+  ['approvelevel', 'Approve candidate level', 'Approving, denying or overriding a level (5.2, 5.3), and Override level on the candidate detail (3.7)'],
+  ['approvescore', 'Approve agent score', 'The quarterly Agent Score review'],
+  ['releasepayout', 'Release payout', 'Releasing payouts, placing and clearing holds, early release, and escrow clearing inside 3.4 and 3.6'],
+  ['changefee', 'Change fee', 'Agent commission (3.2, 3.9 and the agent record), course price (7.1), discount codes, and partner invoices (9.8, with Finance: Edit)'],
+  ['approverefund', 'Approve refund', 'Refund decisions and retries, and refund clearing inside 3.4 and 3.6'],
+  ['accountsdelete', 'Accounts: Delete', 'Deleting an external account (3.6)'],
+  ['dataexport', 'Data: Export', 'Every export on the platform'],
+  ['viewrawscore', 'View AI raw score', 'Seeing the AI raw score (3.7 and the levelling stories)'],
+  ['setrange', 'Set assessment range', 'Setting an agent’s assessment range (3.8, 6.1)'],
+  ['playrecording', 'Play a recording', 'Playing an interview recording (8.4)']
 ];
+/* Reserved to Super Admin (story 4.1) — grantable to no other role. */
 const PERM_RESERVED = [
-  ['grantsa', 'Grant or revoke Super Admin'], ['overridetraining', 'Override the training-module listing gate']
+  ['grantsa', 'Grant or revoke Super Admin', 'Giving or removing the Super Admin role (1.3)'],
+  ['overridetraining', 'Override the training-module listing gate', 'Listing an agent who has not completed the LightspeedVT training module (6.2)']
 ];
 const permAllKeys = () => { const k = []; PERM_MODULES.forEach(([m, , acts]) => acts.forEach(a => k.push(m + ':' + a))); PERM_SENSITIVE.forEach(([kk]) => k.push(kk)); PERM_RESERVED.forEach(([kk]) => k.push(kk)); return k; };
 const permIsReserved = pk => PERM_RESERVED.some(([kk]) => kk === pk);
@@ -2307,7 +2375,7 @@ const MODULES=[
     & Tracks (5.5, moved out of Cohort Management), with the change detail (5.4) and the
     approval detail as hidden drill-ins. */
  {k:'levelling', t:'Levelling', ic:'chart', subs:[
-   {k:'log', t:'Levelling Log'}, {k:'queue', t:'Level Approval Queue'}, {k:'levels', t:'Levels & Tracks'},
+   {k:'log', t:'Levelling Log'}, {k:'queue', t:'Level Approvals'}, {k:'levels', t:'Levels & Tracks'},
    {k:'change', t:'Level change', hidden:true}, {k:'approval', t:'Level approval', hidden:true}]},
  /* ONBOARDING QUESTIONS — the intake quiz builder (Maryam, 22 Sep 2026). One
     visible sub (the questions list, drawn as a single rail leaf); `edit` is the
@@ -5069,12 +5137,6 @@ ACTIONS.usersexport = () => {
   const rows = usersRowsFiltered();
   if(!rows.length){ toast('Nothing to export in this filter', 'warn'); return; }
   if(rows.length > EXPORT_ROW_LIMIT){ toast(`This export is larger than the ${EXPORT_ROW_LIMIT} row limit. Narrow your filters and try again.`, 'warn'); return; }
-  const head = ['Name', 'Email', 'Type', 'Cohort leader', 'Level', 'Status', 'Erasure', 'Joined', 'Last active'];
-  const body = rows.map(u => [u.name, u.email, typeLabel(u), u.roles.includes('leader') ? 'Yes' : '',
-    u.roles.includes('candidate') ? candLevel(u) : '', USER_STATUS_LABEL[u.status] || cap(u.status),
-    ERASE_LABEL[erasureState(u)], u.joined, u.last || 'Never'].map(csvCell).join(','));
-  const csv = head.map(csvCell).join(',') + '\n' + body.join('\n') + '\n';
-  try { const a = document.createElement('a'); a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv); a.download = 'users-directory.csv'; a.click(); } catch(e){}
   audit('Exported users directory', `${rows.length} row${rows.length === 1 ? '' : 's'}`, 'Users & Roles', 'notice');
   toast(`Exporting ${rows.length} row${rows.length === 1 ? '' : 's'}. A download link will reach your notifications, valid 7 days.`);
 };
@@ -5244,10 +5306,6 @@ ACTIONS.staffexport = () => {
   const rows = staffRowsFiltered();
   if(!rows.length){ toast('Nothing to export in this filter', 'warn'); return; }
   if(rows.length > EXPORT_ROW_LIMIT){ toast(`This export is larger than the ${EXPORT_ROW_LIMIT} row limit. Narrow your filters and try again.`, 'warn'); return; }
-  const head = ['Name', 'Email', 'Role', 'Job title', 'Department', 'Status', 'Last signed in', 'Added'];
-  const body = rows.map(u => [u.name, u.email, staffRoleName(u), u.job || '', u.dept || '', STAFF_STATUS_LABEL[u.status] || u.status, u.last || 'Never', u.joined].map(csvCell).join(','));
-  const csv = head.map(csvCell).join(',') + '\n' + body.join('\n') + '\n';
-  try { const a = document.createElement('a'); a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv); a.download = 'staff-directory.csv'; a.click(); } catch(e){}
   audit('Exported staff directory', `${rows.length} row${rows.length === 1 ? '' : 's'}`, 'Users & Roles', 'notice');
   toast(`Exporting ${rows.length} row${rows.length === 1 ? '' : 's'}. A download link will reach your notifications, valid 7 days.`);
 };
@@ -6013,11 +6071,11 @@ KINDS.role = {
   create: v => { const k = v.name.toLowerCase().replace(/[^a-z0-9]+/g, '') || newId('role', ROLES); const r = {k, name:v.name, short:v.name, kind:'internal', desc:v.desc}; ROLES.push(r); ROLE_BY_K[k] = r; MATRIX[k] = {}; PERMSET[k] = new Set(); return r; },
   update: (r, v) => { r.name = v.name; r.short = v.name; r.kind = 'internal'; r.desc = v.desc; },
   remove: r => { ROLES.splice(ROLES.indexOf(r), 1); delete ROLE_BY_K[r.k]; delete MATRIX[r.k]; delete PERMSET[r.k]; USERS.forEach(u => { u.roles = u.roles.filter(x => x !== r.k); }); },
-  /* Only a CUSTOM role with NO holders can be deleted (story 11.x, Maryam 24 Sep
-     2026): a built-in role is permanent, and a held role is refused with the reason
-     so the admin moves the holders first. */
+  /* Every role except Super Admin is a custom role and can be deleted once it has
+     no holders (Maryam, 25 Sep 2026): only Super Admin is permanent; a held role is
+     refused with the reason so the admin moves the holders first. */
   guard: r => {
-    if(roleIsBuiltin(r.k) || r.k === 'admin') return 'Built-in roles can’t be deleted';
+    if(r.k === 'admin') return 'The Super Admin role can’t be deleted';
     const n = USERS.filter(u => u.roles.includes(r.k)).length;
     if(n) return 'Move every holder to another role first.';
     return null;
@@ -6027,56 +6085,85 @@ KINDS.role = {
   delWarn: r => 'Its permissions are removed and it disappears from the role selector.'
 };
 function usersRoles(){
-  /* EPIC 4 — the role list + the Module × Action permission matrix. Built-in
-     roles ship with the platform (Super Admin, Admin, Reviewer, Supervisor,
-     Manager of Agents); custom roles are created here. The Super Admin column is
-     read-only and holds everything; the two reserved rows are locked and blank on
-     every other column. Screens-only — no runtime enforcement. */
-  const cols = permRoleCols();
+  /* EPIC 4 — the role list + PER-MODULE permission grids (Maryam, 25 Sep 2026, off
+     the Taskora reference: "multiple tables, each showing each role in the first
+     column, each table specific to a module"). So the Permissions surface is ONE
+     GRID PER MODULE: the module name in the top-left header cell, that module's
+     actions across the top, every ROLE as a row, a tick where the role holds the
+     permission and a dash where it does not. The Sensitive and Reserved groups are
+     not modules, so they keep their Permission + Governs list tables (each name a
+     named permission with a description, reserved rows carrying the info icon).
+     Screens-only — no runtime enforcement. Per-role editing (the retired inline
+     matrix) can be re-wired onto these grids: `PERMSET` and the handlers
+     (`editperms`/`toggleperm`/`saveperms`/`permRoleCols`) stay defined. */
   const usersWith = k => USERS.filter(u => u.roles.includes(k)).length;
-  const editing = !!S.editPerms;
-  /* Information Icon (story 4.1): a small `info` glyph carrying its reason as a
-     tooltip — on each reserved row's label and on the Super Admin column head. */
-  const permInfo = msg => `<span class="perm-info" title="${esc(msg)}" tabindex="0" aria-label="${esc(msg)}"><svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">${inner('info')}</svg></span>`;
+  const roles = permRoleCols();
   const RESERVED_MSG = 'This permission is held by Super Admin only and cannot be granted to another role.';
-  const SA_COL_MSG = 'Super Admin holds every permission and cannot be restricted.';
-  const lockCell = `<td class="num pm-off" title="${esc(RESERVED_MSG)}">${pmNo}</td>`;
-  const permRow = (pk, label, reserved) => `<tr><td>${esc(label)}${reserved ? ' ' + permInfo(RESERVED_MSG) : ''}</td>${cols.map(r => {
-    const isSA = r.k === 'admin';
-    const on = PERMSET[r.k] && PERMSET[r.k].has(pk);
-    if(reserved && !isSA) return lockCell;
-    if(!editing || isSA) return `<td class="num ${on ? 'pm-on' : 'pm-off'}">${on ? pmYes : pmNo}</td>`;
-    return `<td class="num ${on ? 'pm-on' : 'pm-off'}"><button class="btn btn-g btn-sm" data-act="toggleperm:${r.k}:${pk}" aria-pressed="${on}" aria-label="${esc(label)} for ${esc(r.name)}: ${on ? 'granted' : 'not granted'}">${on ? I.checkFilled : I.checkOutline}</button></td>`;
-  }).join('')}</tr>`;
-  const modHead = label => `<tr><td colspan="${cols.length + 1}" style="font-weight:var(--t-w-strong);color:var(--text-primary);background:var(--surface-2);padding:var(--s04)">${esc(label)}</td></tr>`;
-  const body = PERM_MODULES.map(([m, label, acts]) => modHead(label) + acts.map(a => permRow(m + ':' + a, PERM_ACT_LABEL[a])).join('')).join('')
-    + modHead('Sensitive permissions') + PERM_SENSITIVE.map(([pk, l]) => permRow(pk, l)).join('')
-    + modHead('Reserved to Super Admin') + PERM_RESERVED.map(([pk, l]) => permRow(pk, l, true)).join('');
+  const permInfo = msg => `<span class="perm-info" title="${esc(msg)}" tabindex="0" aria-label="${esc(msg)}"><svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">${inner('info')}</svg></span>`;
+  const editing = !!S.editPerms;
+  /* EVERY grid shows all four CRUD columns (Maryam, 25 Sep 2026). THE SUPER ADMIN
+     ROW IS ALWAYS ALL TICKS — the Super Admin is unrestricted and holds every
+     permission on the platform (Maryam, 25 Sep 2026: "super admin cannot delete a
+     user? wtf"), so it never shows a dash even where a module models the action
+     elsewhere (e.g. user deletion is the sensitive Accounts: Delete, not a Users
+     module permission). For every OTHER role a cell is a tick only when the action
+     EXISTS for the module AND the role holds it; an action the module does not
+     carry shows a dash. In EDIT MODE a grantable cell (an existing action on a
+     non-Super-Admin role) becomes a toggle (`toggleperm`). */
+  const ALL_ACTS = ['view', 'create', 'edit', 'delete'];
+  const cellFor = (r, mkey, a, acts) => {
+    if(r.k === 'admin') return `<td class="num pm-on">${pmYes}</td>`;   /* Super Admin: always granted */
+    const exists = acts.includes(a); const pk = mkey + ':' + a;
+    const on = exists && !!(PERMSET[r.k] && PERMSET[r.k].has(pk));
+    if(!exists) return `<td class="num pm-off">${pmNo}</td>`;
+    if(!editing) return `<td class="num ${on ? 'pm-on' : 'pm-off'}">${on ? pmYes : pmNo}</td>`;
+    return `<td class="num ${on ? 'pm-on' : 'pm-off'}"><button class="btn btn-g btn-sm" data-act="toggleperm:${r.k}:${pk}" aria-pressed="${on}" aria-label="${esc(r.name)}: ${esc(PERM_ACT_LABEL[a])}, ${on ? 'granted' : 'not granted'}">${on ? I.checkFilled : I.checkOutline}</button></td>`;
+  };
+  /* one grid per module — module name top-left, all four actions as columns, roles as rows. */
+  const moduleGrid = (mkey, label, acts) => `
+    <div class="tbl-wrap perm-wrap"><table class="tbl perm-grid">
+      <tr><th class="perm-grid-name">${esc(label)}</th>${ALL_ACTS.map(a => `<th class="num">${esc(PERM_ACT_LABEL[a])}</th>`).join('')}</tr>
+      ${roles.map(r => `<tr><td>${esc(r.name)}</td>${ALL_ACTS.map(a => cellFor(r, mkey, a, acts)).join('')}</tr>`).join('')}
+    </table></div>`;
+  const govRows = list => list.map(([pk, l, gov, reserved]) =>
+    `<tr><td>${esc(l)}${reserved ? ' ' + permInfo(RESERVED_MSG) : ''}</td><td>${esc(gov || '')}</td></tr>`
+  ).join('');
   return `
   <section class="sec">
-    ${aiHead('Roles', 'Every role and what it grants. Built-in roles ship with the platform; custom roles are yours to shape.', addBtn('role', 'New Role'))}
+    ${aiHead('Roles', 'Every role and what it grants. Super Admin ships with the platform; custom roles are yours to shape.', addBtn('role', 'New Role'))}
     ${table(
-      [{label:'Role'}, {label:'Type'}, {label:'Description'}, {label:'Accounts', num:true}, ACT_COL],
-      cols.map(r => ({sv:[r.name], cells:[
+      [{label:'Role'}, {label:'Description'}, {label:'Accounts', num:true}, ACT_COL],
+      roles.map(r => ({sv:[r.name], cells:[
         `<div>${esc(r.name)}${r.k === 'admin' ? ' <span class="tag sm rl-default">Default</span>' : ''}</div>`,
-        roleIsBuiltin(r.k) ? 'Built-in' : 'Custom',
         esc(r.desc),
         String(usersWith(r.k)),
-        r.k === 'admin' ? '' : rowActs([
-          ['edit', 'Edit permissions', `data-act="editperms"`],
-          ...(roleIsBuiltin(r.k) ? [] : [delBtn('role', r.k)])
-        ])
+        /* Every role except Super Admin is treated as a custom role (Maryam, 25 Sep
+           2026): Edit (name + description) and Delete on all but Super Admin. */
+        r.k === 'admin' ? '' : rowActs([editBtn('role', r.k), delBtn('role', r.k)])
       ]})), {select:false})}
   </section>
 
   <section class="sec">
-    ${aiHead('Permissions', 'A granted permission is marked. The Super Admin column holds every permission and is read-only; the two reserved permissions can be held only by Super Admin.',
+    ${aiHead('Permissions', 'Each module lists what every role can do. A tick is a granted permission; the Super Admin holds them all.',
       editing
         ? `<span style="display:flex;align-items:center;gap:var(--s05)"><button class="btn btn-g btn-sm noic" data-act="cancelperms">Cancel</button><button class="btn btn-p btn-sm noic" data-act="saveperms"${permsChanged() ? '' : ' disabled'}>Update Permissions</button></span>`
         : '<button class="btn btn-g btn-sm noic" data-act="editperms">' + I.edit + ' Edit Permissions</button>')}
-    <div class="tbl-wrap"><table class="tbl perm-tbl">
-      <tr><th>Permission</th>${cols.map(r => `<th class="num">${esc(r.short)}${r.k === 'admin' ? ' ' + permInfo(SA_COL_MSG) : ''}</th>`).join('')}</tr>
-      ${body}
+    ${PERM_MODULES.map(([m, label, acts]) => moduleGrid(m, label, acts)).join('')}
+  </section>
+
+  <section class="sec">
+    ${aiHead('Sensitive permissions', 'Each is a permission of its own rather than folded into a module’s Edit.')}
+    <div class="tbl-wrap"><table class="tbl perm-gov">
+      <tr><th>Permission</th><th>Governs</th></tr>
+      ${govRows(PERM_SENSITIVE)}
+    </table></div>
+  </section>
+
+  <section class="sec">
+    ${aiHead('Reserved to Super Admin', 'Held by Super Admin only and grantable to no other role.')}
+    <div class="tbl-wrap"><table class="tbl perm-gov">
+      <tr><th>Permission</th><th>Governs</th></tr>
+      ${govRows(PERM_RESERVED.map(([k, l, g]) => [k, l, g, true]))}
     </table></div>
   </section>`;
 }
@@ -6739,12 +6826,12 @@ const standingLabel = c => `${esc(bucketOf(c.level))} — ${levelLetters(c.level
    [data-f="letters"] carries the comma-joined keys so readForm reads it like any
    field and syncSheetSubmit's generic gate can require it; the chips toggle DOM-only
    (data-ltrtoggle, no render — trap 9). */
-function lettersPicker(sel){
-  sel = sel || [];
+function lettersPicker(sel, opts){
+  sel = sel || []; opts = opts || {};
   return `<div class="f"><label>TALENT letters <span class="req-star">*</span></label>
     <input type="hidden" data-f="letters" value="${esc(sel.join(','))}">
-    <div class="ltr-pick">${TALENT_LETTERS.map(x => `<button type="button" class="ltr-chip${sel.includes(x.k) ? ' on' : ''}" data-ltrtoggle="${x.k}" title="${esc(x.name)} — ${esc(x.meaning)}"><b>${x.ltr}</b><span>${esc(x.name)}</span></button>`).join('')}</div>
-    <span class="t-desc">Pick one to six. The letters are shown in TALENT order; meanings are client content.</span></div>`;
+    <div class="ltr-pick">${TALENT_LETTERS.map(x => `<button type="button" class="ltr-chip${sel.includes(x.k) ? ' on' : ''}" data-ltrtoggle="${x.k}" title="${esc(x.name)} — ${esc(x.meaning)}"><b>${x.ltr}</b><span>${esc(x.name)}</span></button>`).join('')}</div>${opts.hideHint ? '' : `
+    <span class="t-desc">Pick one to six. The letters are shown in TALENT order; meanings are client content.</span>`}</div>`;
 }
 const readLetters = v => (v && v.letters ? String(v.letters).split(',').filter(Boolean) : []);
 /* keep-scattered level history (5.1): write one change row onto the candidate. Rows
@@ -8009,14 +8096,17 @@ function pastIvs(a){ return PAST_IVS.filter(p => p.agent === a.name); }
      (agentLetters / talLetters), a TRANSCRIPT status (Ready / Failed — 5.2's Failed
      path is drawn for piv2), and the report-filed time + 24h approval DEADLINE with
      an `overdue` marker (5.2 orders the queue by deadline; a past-deadline item stays
-     and reads Overdue). All authored placeholder (§74). */
+     and reads Overdue). `dueInMin` is the minutes left on the 24h approval clock —
+     authored placeholder (§74; the seed has no live timestamps), signed so the queue
+     can show a live "time left" that reads accent under 1h / overdue and orange above.
+     All authored placeholder (§74). */
   const M = {
-    piv1: {agentLevel:'E3', talLevel:'E3', agentLetters:['L', 'A'], talLetters:['L'], submitted:'20 Aug 2026', filed:'20 Aug 2026, 4:10 PM', deadline:'21 Aug 2026, 4:10 PM', overdue:true, transcript:'Ready', decision:null, talType:'Leader'},
-    piv2: {agentLevel:'E2', talLevel:'E2', agentLetters:['T2'], talLetters:['T2'], submitted:'Today', filed:'Today, 9:15 AM', deadline:'Tomorrow, 9:15 AM', overdue:false, transcript:'Failed', decision:null, talType:'Team Player'},
-    piv3: {agentLevel:'E4', talLevel:'E4', agentLetters:['T1', 'L'], talLetters:['T1', 'L'], submitted:'12 Aug 2026', filed:'12 Aug 2026, 1:00 PM', deadline:'13 Aug 2026, 1:00 PM', overdue:false, transcript:'Ready', decision:'approved', finalLevel:'E4', finalLetters:['T1', 'L'], talType:'Top Performer'},
-    piv4: {agentLevel:'E3', talLevel:'E2', agentLetters:['A', 'L'], talLetters:['A'], submitted:'9 Aug 2026', filed:'9 Aug 2026, 2:30 PM', deadline:'10 Aug 2026, 2:30 PM', overdue:true, transcript:'Ready', decision:null, talType:'Athlete'}
+    piv1: {agentLevel:'E3', talLevel:'E3', agentLetters:['L', 'A'], talLetters:['L'], submitted:'20 Aug 2026', filed:'20 Aug 2026, 4:10 PM', deadline:'21 Aug 2026, 4:10 PM', dueInMin:42, overdue:false, transcript:'Ready', decision:null, talType:'Leader'},
+    piv2: {agentLevel:'E2', talLevel:'E2', agentLetters:['T2'], talLetters:['T2'], submitted:'Today', filed:'Today, 9:15 AM', deadline:'Tomorrow, 9:15 AM', dueInMin:1290, overdue:false, transcript:'Failed', decision:null, talType:'Team Player'},
+    piv3: {agentLevel:'E4', talLevel:'E4', agentLetters:['T1', 'L'], talLetters:['T1', 'L'], submitted:'12 Aug 2026', filed:'12 Aug 2026, 1:00 PM', deadline:'13 Aug 2026, 1:00 PM', dueInMin:-1, overdue:false, transcript:'Ready', decision:'approved', finalLevel:'E4', finalLetters:['T1', 'L'], talType:'Top Performer'},
+    piv4: {agentLevel:'E3', talLevel:'E2', agentLetters:['A', 'L'], talLetters:['A'], submitted:'9 Aug 2026', filed:'9 Aug 2026, 2:30 PM', deadline:'10 Aug 2026, 2:30 PM', dueInMin:-95, overdue:true, transcript:'Ready', decision:null, talType:'Athlete'}
   };
-  PAST_IVS.forEach(p => Object.assign(p, M[p.id] || {agentLevel:'E2', talLevel:'E2', agentLetters:['L'], talLetters:['L'], submitted:p.when, filed:p.when, deadline:p.when, overdue:false, transcript:'Ready', decision:null, talType:'Leader'}));
+  PAST_IVS.forEach(p => Object.assign(p, M[p.id] || {agentLevel:'E2', talLevel:'E2', agentLetters:['L'], talLetters:['L'], submitted:p.when, filed:p.when, deadline:p.when, dueInMin:300, overdue:false, transcript:'Ready', decision:null, talType:'Leader'}));
 })();
 const pendingApprovals = () => PAST_IVS.filter(p => !p.decision);
 /* the queue is ordered by the 24h approval deadline, earliest first, with overdue
@@ -8035,14 +8125,23 @@ let LEVEL_SEQ = 100;
 const LEVEL_LOG = [];
 function pushLevelLog(r){ r.id = 'lc' + (++LEVEL_SEQ); LEVEL_LOG.unshift(r); return r; }
 ;(function seedLevelLog(){
+  /* `tal` / `talType` / `note` / `rating` / `filed` are AUTHORED PLACEHOLDER (§74) so the
+     change detail can show the same "Tal's read" + agent proposed evaluation the approval
+     screen does. Each `tal` read is consistent with the row's own `to` level (no em dashes,
+     §5). The talent agent (`proposedBy`) and the approver (`approvedBy`) are DIFFERENT
+     people (Maryam, 25 Sep 2026) — the agent interviews and proposes, a reviewer/admin approves. */
   const rows = [
-    {cand:'Maryam Naz', from:'E1', fromLetters:[], to:'E2', toLetters:['A', 'L', 'E'], proposedBy:'Nadia Haddad', decidedOn:'Agent proposal', approvedBy:'Nadia Haddad', approvedRole:'Reviewer', source:'Re-interview', date:'12 Aug 2026',
-     agentLevel:'E2', agentLetters:['A', 'L', 'E'], talLevel:'E2', talLetters:['A', 'L'], reasoning:'Reads from consequence to people; three dated examples.', strengths:'Clear ownership of outcomes.', growth:'Coaching rather than fixing.', aiRaw:'0.71'},
-    {cand:'Jordan Vale', from:'E5', fromLetters:['E'], to:'B1', toLetters:['E', 'L'], proposedBy:'Priya Raman', decidedOn:'Tal proposal', approvedBy:'Derek Sole', approvedRole:'Super Admin', source:'Re-interview', date:'2 Aug 2026',
-     agentLevel:'E5', agentLetters:['E'], talLevel:'B1', talLetters:['E', 'L'], reasoning:'Frames trade-offs across teams; closes cleanly under pressure.', strengths:'Holds two priorities at once.', growth:'Tighten how a decision is closed.', aiRaw:'0.83'},
-    {cand:'Ava Stone', from:'', fromLetters:[], to:'E2', toLetters:['L'], proposedBy:'Dana Whitfield', decidedOn:'Reviewer override', approvedBy:'Derek Sole', approvedRole:'Super Admin', source:'First interview', date:'28 Jul 2026', reason:'Transcript shows one clear coaching example the report understated.',
-     agentLevel:'E2', agentLetters:['L', 'A'], talLevel:'E2', talLetters:['L'], reasoning:'Separates decision from result.', strengths:'Honest about misses.', growth:'Bring a second person into the work.', aiRaw:'0.64'},
-    {cand:'Kai Andersen', from:'E3', fromLetters:['T1'], to:'E3', toLetters:['T1', 'L'], proposedBy:'', decidedOn:'', approvedBy:'Derek Sole', approvedRole:'Super Admin', source:'', date:'20 Jul 2026', reason:'Adding Leader after the cohort feedback; level unchanged.'}
+    {cand:'Maryam Naz', from:'E1', fromLetters:[], to:'E2', toLetters:['A', 'L', 'E'], proposedBy:'Dana Whitfield', decidedOn:'Agent proposal', approvedBy:'Nadia Haddad', approvedRole:'Reviewer', source:'Re-interview', date:'12 Aug 2026', filed:'12 Aug 2026, 4:10 PM', rating:5, talType:'Leader',
+     agentLevel:'E2', agentLetters:['A', 'L', 'E'], talLevel:'E2', talLetters:['A', 'L'], reasoning:'Reads from consequence to people; three dated examples.', strengths:'Clear ownership of the outcomes she owns, with three examples that each carry a date and a name.', growth:'Coaching rather than fixing. She still solves a problem herself where developing someone else would be the next move.', note:'She talks cautiously, but she has already run a reorganization and can explain every call she made in it. That is a solid E2 with E3 in reach.', aiRaw:'0.71',
+     tal:'<p>Tal suggests <b>Explorer – E2</b>. Maryam reads as someone who <b>reasons from consequence, not policy</b>: she starts from the people a decision lands on and works back.</p><p>What earns E2: <b>three dated examples</b> she can walk through call by call. What would move it to E3 is coaching a report through a hard call rather than solving it herself.</p>'},
+    {cand:'Jordan Vale', from:'E5', fromLetters:['E'], to:'B1', toLetters:['E', 'L'], proposedBy:'Priya Raman', decidedOn:'Tal proposal', approvedBy:'Derek Sole', approvedRole:'Super Admin', source:'Re-interview', date:'2 Aug 2026', filed:'2 Aug 2026, 1:00 PM', rating:5, talType:'Leader',
+     agentLevel:'E5', agentLetters:['E'], talLevel:'B1', talLetters:['E', 'L'], reasoning:'Frames trade-offs across teams; closes cleanly under pressure.', strengths:'Holds two competing priorities in view and can say what each one costs. Examples span more than one team.', growth:'Tighten how a decision is closed. He explores well but the ending is sometimes left open.', note:'Reads a room and a roadmap at once. Comfortable stepping into Builder.', aiRaw:'0.83',
+     tal:'<p>Tal suggests <b>Builder – B1</b>. Jordan <b>frames a trade-off across teams</b> and names what each option costs.</p><p>What earns B1: examples that <b>span more than one team</b> and a decision he can defend call by call.</p>'},
+    {cand:'Ava Stone', from:'', fromLetters:[], to:'E2', toLetters:['L'], proposedBy:'Dana Whitfield', decidedOn:'Reviewer override', approvedBy:'Derek Sole', approvedRole:'Super Admin', source:'First interview', date:'28 Jul 2026', filed:'28 Jul 2026, 2:30 PM', rating:4, talType:'Team Player', reason:'Transcript shows one clear coaching example the report understated.',
+     agentLevel:'E2', agentLetters:['L', 'A'], talLevel:'E2', talLetters:['L'], reasoning:'Separates decision from result.', strengths:'Clear about the outcomes she owns and honest about the ones she missed.', growth:'Bring a second person into the work. Most examples are her acting alone.', note:'Solid and self-aware. One example of coaching a report would move her above E2.', aiRaw:'0.64',
+     tal:'<p>Tal suggests <b>Explorer – E2</b>. Ava is <b>clear about the outcomes she owns</b> and honest about the ones she missed.</p><p>What holds it at E2: most examples are <b>her acting alone</b>. Bringing a second person into the work is the next move.</p>'},
+    {cand:'Kai Andersen', from:'E3', fromLetters:['T1'], to:'E3', toLetters:['T1', 'L'], proposedBy:'', decidedOn:'', approvedBy:'Derek Sole', approvedRole:'Super Admin', source:'', date:'20 Jul 2026', filed:'20 Jul 2026', rating:5, talType:'Leader', reason:'Adding Leader after the cohort feedback; level unchanged.',
+     tal:'<p>Tal keeps the level at <b>Explorer – E3</b> and adds the <b>Leader</b> letter after the cohort feedback.</p><p>The read did not change; the letter recognises how he carried the group.</p>'}
   ];
   /* reversed so the array ends newest-first (unshift), matching runtime decisions. */
   rows.slice().reverse().forEach(r => { r.direction = levelDirection(r.from, r.to); pushLevelLog(r); });
@@ -9145,6 +9244,18 @@ function marketBookings(){
 /* THE LEVEL APPROVAL QUEUE (Epic 5.2) — the submitted interviews awaiting a decision, moved
    out of Interviews. Ordered by the 24h deadline (overdue first), searchable, filtered by
    Type and Talent agent; a row opens the approval detail. */
+/* DUE TIME — the time left on the 24h approval clock, coloured by urgency (Maryam
+   25 Sep 2026): under 1 hour left (or already overdue) reads --accent, above an hour
+   reads the platform's --in-progress orange. `dueInMin` is authored placeholder (§74). */
+const dueLeftLabel = m => m <= 0 ? 'Overdue'
+  : m < 60 ? `${Math.round(m)} min left`
+  : m < 1440 ? `${Math.round(m / 60)} hr left`
+  : `${Math.round(m / 1440)} day${Math.round(m / 1440) === 1 ? '' : 's'} left`;
+function dueTime(iv){
+  if(iv.dueInMin == null) return esc(iv.deadline || '—');
+  const color = iv.dueInMin < 60 ? 'var(--accent)' : 'var(--in-progress)';
+  return `<span class="statw" style="color:${color}">${dueLeftLabel(iv.dueInMin)}</span>`;
+}
 function levellingQueue(){
   const q = getFilter('q', ''), kf = getFilter('bkkind', 'all'), af = getFilter('bkagent', 'all');
   const kmatch = k => kf === 'all' ? true : kf === 're' ? agIvIsRe(k) : !agIvIsRe(k);
@@ -9155,15 +9266,15 @@ function levellingQueue(){
   const agentFilter = filterDd('bkagent', 'all', [['all', 'All'], ...agentNames().map(n => [n, n])], 'Talent agent');
   return `
   <section class="sec">
-    ${searchHead('Level Approval Queue', 'Interviews the agent has submitted with a recording, a level recommendation and their notes. Open one to read Tal’s take, then approve or override the level.',
+    ${searchHead('Level Approvals', 'Interviews the agent has submitted with a recording, a level recommendation and their notes. Open one to read Tal’s take, then approve or override the level.',
       exportBtn('Level changes'), 'Search by candidate or agent')}
     ${lstTools('Search by candidate or agent', `${typeFilter} ${agentFilter}`)}
     ${ap.length ? table(
-      [{label:'Candidate'}, {label:'Agent'}, {label:'Recommended level'}, {label:'Tal’s suggestion'}, {label:'Report filed'}, {label:'Deadline'}, ACT_COL],
+      [{label:'Candidate'}, {label:'Agent'}, {label:'Recommended level'}, {label:'Report filed'}, {label:'Due Time'}, ACT_COL],
       ap.map(iv => ({id:iv.id, go:'levelling/approval/' + iv.id, cells:[
         personCell(iv.cand, ''), personCell(iv.agent, ''),
-        lvlLtrChip(iv.agentLevel, iv.agentLetters), lvlLtrChip(iv.talLevel, iv.talLetters), esc(iv.filed || iv.submitted || iv.when),
-        `${esc(iv.deadline || '—')}${iv.overdue ? ' ' + tag('failed', 'Overdue') : ''}`,
+        esc(levelLetters(iv.agentLevel, iv.agentLetters)), esc(iv.filed || iv.submitted || iv.when),
+        dueTime(iv),
         rowActs([['check', 'Review & decide', `data-go="levelling/approval/${iv.id}"`]])
       ]})), {select:false})
       : emptyState('check', 'Nothing awaiting approval', q || kf !== 'all' || af !== 'all' ? 'Nothing matches the current filters.' : 'Every submitted interview has been decided.')}
@@ -9185,29 +9296,40 @@ function marketApproval(){
   const finalLetters = iv.finalLetters || iv.agentLetters || [];
   const src = agIvIsRe(iv.kind) ? 'Re-interview' : 'First interview';
   const talType = iv.talType || 'Leader';
-  /* THE SCREEN MIRRORS THE TALENT AGENT EVALUATION SCREEN (Maryam, 22 Sep 2026:
-     "improve ... just like talent agent evaluation screen") — same flow, top to
-     bottom: Interview recording, Tal's read (heading only, one flowing read + the
-     "Tal reads {first} as a {type}" line), the recommendation (agent's level + Tal's
-     suggestion on the ladder), the agent's notes, and a SINGLE primary action at the
-     END — "Approve Evaluation" (Maryam: "a button at the end of the page") beside
-     Override Level, not the mid-page Approve/Override the recommended-level band used
-     to carry. Read-only where the agent's screen is a form (the admin approves, it
-     does not write the recommendation). Wrapped in `.iv-detail-body` for the same
-     wider inter-section spacing as the interview detail. */
+  /* THE SCREEN HAS TWO TABS — "Recommendation" and "Transcript" (Maryam, 25 Sep 2026:
+     "this page should have two tabs Recommendation and Transcript ... show full
+     transcript there and remove it from this page"). Same `filterStrip`/`data-filter`
+     tab mechanism the interview detail uses (`.iv-tabs`), state per page via
+     `getFilter`. TRANSCRIPT tab = the full `ivTranscript` (or the Failed message).
+     RECOMMENDATION tab MIRRORS THE LEVEL CHANGE DETAIL'S recommendation section
+     (`levellingChange`, Maryam: "follow the ui ... on the levelling log detail page"):
+     the recording card, then ONE merged "{agent} and Tal's Recommendation" section —
+     the flowing Tal's read + the T·A·L·E·N·T lens, a 4-cell facts band, the agent's
+     notes (`ivEvalBlock`) — with NO separate "Tal's read"/"Recommended level" headings
+     and NO ladder (the levelling bar was dropped there too), then the decision actions.
+     Read-only where the agent's screen is a form (the admin approves, it does not write
+     the recommendation). Wrapped in `.iv-detail-body`, the proven tabs+spacing wrapper. */
+  const tab = getFilter('apptab', 'recommendation');
   return `${detailHead('levelling/queue')}
   <div class="iv-detail-body">
   <section class="sec">
     ${aiHead('Level approval', `${esc(iv.cand)} · ${esc(iv.agent)} · ${esc(iv.when)}`)}
   </section>
-  <section class="sec">
+  <section class="sec sec-cs iv-tabs iv-tabs-tight">
+    ${filterStrip('apptab', 'recommendation', [['recommendation', 'Recommendation'], ['transcript', 'Transcript']])}
+  </section>
+  ${tab === 'transcript'
+    ? `<section class="sec">
+    ${aiHead('Interview transcript', 'The full interview transcript.')}
+    ${iv.transcript === 'Failed'
+      ? `<p class="t-desc">No transcript exists for this interview. The recording failed to transcribe, so settle the level on the agent report in the Recommendation tab.</p>`
+      : ivTranscript(iv)}
+  </section>`
+    : `<section class="sec">
     ${secHead('Interview recording')}
     ${/* THE COMPACT RECORDING CARD, exactly the talent agent evaluation screen's
          `.iv-rec` (in the DS this portal links) — a 480px card with a 64×44 still,
-         the file name, "Video recording · 48:00" and a play mark. NOT the full-bleed
-         16:9 `recPlayer` (which blew the section width open on desktop). Non-clickable
-         here (cursor default) — the approval screen has no booking-backed recording
-         detail to open. (Maryam, 22 Sep 2026) */''}
+         the file name, "Video recording · 48:00" and a play mark. Non-clickable here. */''}
     <div class="iv-rec" style="cursor:default">
       <span class="iv-rec-thumb"><img src="assets/agent/iv-recording-still.webp" alt="" loading="lazy"></span>
       <span class="iv-rec-b">
@@ -9217,60 +9339,35 @@ function marketApproval(){
       <span class="iv-rec-open">${I.play}</span>
     </div>
   </section>
-  <section class="sec">
-    ${aiHead('Tal’s read')}
+  ${/* ONE MERGED SECTION — the levellingChange recommendation UI: a single
+       "{agent} and Tal's Recommendation" heading, the flowing read + type line, the
+       4-cell facts band (Final level once decided, else Report filed), the notes. */''}
+  <section class="sec sec-noline">
+    ${aiHead(esc(iv.agent) + ' and Tal’s Recommendation')}
     <div class="tal-eval"><div class="ai-body">${iv.tal.replace(/<\/p>\s*<p[^>]*>/g, ' ')}
       <p class="mt5">Tal reads ${first} as a <b>${esc(talType)}</b>.</p></div></div>
-  </section>
-  ${/* THE TRANSCRIPT ON THE REVIEW SCREEN (Epic 5.2) — the reviewer reads what was
-       actually said before settling the level. Opening it writes an audit line (5.2).
-       A Failed transcript states that none exists and the decision actions stay
-       available so the reviewer settles on the agent report. Reuses `ivTranscript`. */''}
-  <section class="sec">
-    ${secHead('Interview transcript')}
-    ${iv.transcript === 'Failed'
-      ? `<p class="t-desc">No transcript exists for this interview. The recording failed to transcribe, so settle the level on the agent report below.</p>`
-      : (S.ivTxOpen === iv.id
-          ? `<button class="btn btn-g btn-sm noic" data-act="ivtxclose">Hide transcript</button>${ivTranscript(iv)}`
-          : `<button class="btn btn-g btn-sm noic" data-act="ivtxopen:${iv.id}">Read the transcript</button>`)}
-  </section>
-  <section class="sec">
-    ${aiHead('Recommended level', decided
-      ? (iv.decision === 'approved' ? 'Approved — the agent’s recommendation stands.' : 'Overridden — you set a different level.')
-      : 'The agent’s recommendation and Tal’s suggestion. Approve to confirm, or override to set a different level.')}
     <div class="facts pf-facts">
       ${admFact(I.video, '--mk-4', 'Agent’s recommendation', levelLetters(iv.agentLevel, iv.agentLetters))}
       ${admFact(I.chat, '--mk-3', 'Tal’s suggestion', iv.talLevel ? levelLetters(iv.talLevel, iv.talLetters) : '—')}
       ${decided ? admFact(I.check, '--mk-2', 'Final level', levelLetters(finalLvl, finalLetters)) : admFact(I.calendar, '--mk-2', 'Report filed', iv.filed || iv.submitted || iv.when)}
       ${admFact(I.starOutline, '--mk-1', 'Candidate rating', iv.rating ? iv.rating + '.0' : '—')}
     </div>
-    ${/* THE LADDER FOLLOWS THE TALENT AGENT EVALUATION SCREEN (Maryam, 22 Sep 2026:
-         "follow talent agent evaluation page components for super admin evaluation as
-         well") — wrapped in `.iv-ladder` so it takes the DS's §59.2b light-ground
-         treatment (a --layer-accent-01 track for future rungs, accent for passed, a
-         light tint for the current one, and grid-centred UPRIGHT tabular codes). A
-         bare `.ladder` here fell through to the DS dark default (--on-dark-fill track,
-         the `<i>{font-style:italic}` trap) — invisible future rungs and slanted codes
-         on the white section. `admLadder` itself is unchanged so the black level card
-         keeps the dark default. Read-only (no `.ladder-pick` — the admin approves or
-         overrides via the actions below, it does not pick on the ladder). */''}
-    <div class="iv-ladder">${admLadder(finalLvl)}</div>
-  </section>
-  <section class="sec sec-noline">
-    ${aiHead(esc(iv.agent) + '’s notes', 'What the agent recorded after the interview.')}
     ${ivEvalBlock(iv)}
   </section>
-  <section class="sec">
+  <section class="sec sec-noline">
     ${decided
       ? `<p class="t-desc">${iv.decision === 'approved' ? `You approved ${esc(levelLetters(finalLvl, finalLetters))}.` : `You set ${esc(levelLetters(finalLvl, finalLetters))}, overriding the recommendation.`}${iv.decisionNote ? ' ' + esc(iv.decisionNote) : ''}</p>`
       : `${/* THREE ACTIONS (Epic 5.2): approve the agent's proposal, approve Tal's
              proposal (offered only when a Tal proposal exists), or reviewer override
-             (level + letters + reason). */''}<div class="btn-row">
+             (level + letters + reason). The Tal button leads with the platform's static
+             Tal blob (`borbMark`, no live state → §135 flat blob); the override leads
+             with the edit glyph; both ghosts carry a visible light-grey outline
+             (`appr-out`). (Maryam, 25 Sep 2026) */''}<div class="btn-row">
           <button class="btn btn-p noic ic-l" data-act="askapproveagent:${iv.id}">${I.checkFilled}Approve agent proposal</button>
-          ${iv.talLevel ? `<button class="btn btn-g noic" data-act="askapprovetal:${iv.id}">Approve Tal proposal</button>` : ''}
-          <button class="btn btn-g noic" data-sheet="overridelvl:${iv.id}">Reviewer override</button>
+          ${iv.talLevel ? `<button class="btn btn-g noic ic-l appr-out appr-tal" data-act="askapprovetal:${iv.id}">${borbMark('appr-orb')}Approve Tal proposal</button>` : ''}
+          <button class="btn btn-g noic ic-l appr-out" data-sheet="overridelvl:${iv.id}">${I.edit}Reviewer override</button>
         </div>`}
-  </section>
+  </section>`}
   </div>`;
 }
 ACTIONS.ivtxopen = key => {
@@ -9336,11 +9433,10 @@ SHEETS.overridelvl = id => {
   return {title:`Reviewer override for ${iv.cand}`, ok:'Set Level', act:`dooverridelvl:${iv.id}`,
     gate:true, disabled:true,
     gateFn: v => { const L = readLetters(v); return !v.level || !L.length || !v.reason; },
-    body:`${kv([['Agent’s proposal', levelLetters(iv.agentLevel, iv.agentLetters)], ['Tal’s proposal', iv.talLevel ? levelLetters(iv.talLevel, iv.talLetters) : '—']])}
+    body:`<div class="ovr-body">${kv([['Agent’s proposal', levelLetters(iv.agentLevel, iv.agentLetters)], ['Tal’s proposal', iv.talLevel ? levelLetters(iv.talLevel, iv.talLetters) : '—']])}
       ${fieldHtml({k:'level', l:'Set level to', t:'select', req:1, opts:LVL_CODES}, iv.agentLevel)}
-      ${lettersPicker(iv.agentLetters)}
-      ${fieldHtml({k:'reason', l:'Reason', t:'textarea', req:1, max:500, ph:'Required — written to the audit log'})}
-      <p class="t-desc">Overriding substitutes the result the reviewer approves. ${esc(iv.cand)}’s level and letters are set to your choice and both parties are notified.</p>`};
+      ${lettersPicker(iv.agentLetters, {hideHint:true})}
+      ${fieldHtml({k:'reason', l:'Reason', t:'textarea', req:1, max:500, ph:'Required — written to the audit log'})}</div>`};
 };
 ACTIONS.dooverridelvl = key => {
   const iv = PAST_IVS.find(x => x.id === key.split(':')[1]); const v = readForm(); if(!iv) return;
@@ -9358,19 +9454,36 @@ ACTIONS.dooverridelvl = key => {
    the read-only change detail (5.4); Override (5.3) is offered on a live candidate not
    currently awaiting a decision. Date-range filtering is a follow-up (the seed dates are
    free-text; the story marks the range Optional). */
-function levellingLog(){
+function levellingRowsFiltered(){
   const q = getFilter('q', ''), sf = getFilter('lcsrc', 'all'), df = getFilter('lcdir', 'all');
-  const pendById = new Set(pendingApprovals().map(p => (candByName(p.cand) || {}).id).filter(Boolean));
-  const rows = LEVEL_LOG
+  return LEVEL_LOG
     .filter(r => sf === 'all' ? true : r.source === sf)
     .filter(r => df === 'all' ? true : r.direction === df)
     .filter(r => hit(q, r.cand, r.email || ''));
+}
+/* CSV EXPORT — exactly the visible columns for the current filtered set, mirroring the
+   Users/Staff exports (`usersexport`): refused above the Settings row limit, every export
+   logs an audit line and confirms with the app's own toast — NO instant browser download
+   (`a.click()`), which pops Chrome's own top-left download chip. The story delivers the file
+   by an in-app notification link, and the receipt/bulk-download actions already set the
+   "no file leaves the browser" convention (Maryam 25 Sep 2026). (Epic 5.1 screen action.) */
+ACTIONS.levellingexport = () => {
+  const rows = levellingRowsFiltered();
+  if(!rows.length){ toast('Nothing to export in this filter', 'warn'); return; }
+  if(rows.length > EXPORT_ROW_LIMIT){ toast(`This export is larger than the ${EXPORT_ROW_LIMIT} row limit. Narrow your filters and try again.`, 'warn'); return; }
+  audit('Exported levelling log', `${rows.length} row${rows.length === 1 ? '' : 's'}`, 'Levelling', 'notice');
+  toast(`Exporting ${rows.length} row${rows.length === 1 ? '' : 's'}. A download link will reach your notifications, valid 7 days.`);
+};
+function levellingLog(){
+  const q = getFilter('q', ''), sf = getFilter('lcsrc', 'all'), df = getFilter('lcdir', 'all');
+  const pendById = new Set(pendingApprovals().map(p => (candByName(p.cand) || {}).id).filter(Boolean));
+  const rows = levellingRowsFiltered();
   const srcDd = filterDd('lcsrc', 'all', [['all', 'All'], ['First interview', 'First interview'], ['Re-interview', 'Re-interview']], 'Source');
   const dirDd = filterDd('lcdir', 'all', [['all', 'All'], ['Up', 'Up'], ['Down', 'Down'], ['Held', 'Held']], 'Direction');
   return `
   <section class="sec">
     ${searchHead('Levelling Log', 'Every level change that has gone live, across every candidate — who moved, who proposed it, who approved it and when it took effect.',
-      exportBtn('Level changes'), 'Search by candidate name or email')}
+      `<button class="btn btn-g btn-sm noic" data-act="levellingexport">${I.download} Export</button>`, 'Search by candidate name or email')}
     ${lstTools('Search by candidate name or email', `${srcDd} ${dirDd}`)}
     ${rows.length ? table(
       [{label:'Candidate'}, {label:'From'}, {label:'To'}, {label:'Direction'}, {label:'Proposed by'}, {label:'Approved by'}, {label:'Source'}, {label:'Date'}, ACT_COL],
@@ -9413,7 +9526,7 @@ function levellingChange(){
   const cLevel = c ? c.level : r.to;
   const cEmail = c ? emailOf(c.name) : (r.email || '');
   return `${detailHead('levelling/log')}
-  <div class="iv-detail-body">
+  <div class="iv-detail-body lc-body">
   <section class="sec">
     <div class="idhead">
       <span class="idphoto"><img src="${agentFace(cName)}" alt="" class="idhead-ph"></span>
@@ -9429,7 +9542,7 @@ function levellingChange(){
          Approved by) carry the person's photo left of the name (`.cl-lead`); the
          Transcript card carries a trailing arrow to the transcript page. This
          replaces the old 4-card band + the Approved-by / Source / Proposed-by kv. */
-      const face = name => name ? `<span class="cl-lead"><span class="cl-lead-ph"><img src="${agentFace(name)}" alt=""></span>${esc(name)}</span>` : '—';
+      const face = name => name ? `<span class="lc-face"><span class="lc-face-ph"><img src="${agentFace(name)}" alt=""></span>${esc(name)}</span>` : '—';
       const htmlCell = (icon, mk, label, htmlVal) => `<div style="--mk:var(${mk})"><span class="l pf-l">${icon}${label}</span><span class="v">${htmlVal}</span></div>`;
       /* the transcript page for this candidate's interview; a specific recording
          where we can match a booking, else the Recordings & Transcripts register.
@@ -9449,22 +9562,36 @@ function levellingChange(){
     </div>`;
     })()}
   </section>
-  ${hasProps ? `<section class="sec">
-    ${secHead('The two proposals')}
-    <div class="facts pf-facts">
-      ${admFact(I.video, '--mk-4', 'Agent proposal' + mark('Agent proposal'), levelLetters(r.agentLevel, r.agentLetters))}
-      ${admFact(I.chat, '--mk-3', 'Tal proposal' + mark('Tal proposal'), r.talLevel ? levelLetters(r.talLevel, r.talLetters) : 'Not recorded')}
-    </div>
-  </section>` : ''}
-  ${(r.reasoning || r.strengths || r.growth) ? `<section class="sec">
-    ${secHead('The report')}
-    ${kv([
-      ...(r.reasoning ? [['Reasoning', r.reasoning]] : []),
-      ...(r.strengths ? [['Strengths', r.strengths]] : []),
-      ...(r.growth ? [['Growth areas', r.growth]] : []),
-      ...(r.aiRaw ? [['AI raw score', r.aiRaw + '  (visible with the View AI raw score permission)']] : [])
-    ])}
-  </section>` : ''}
+  ${/* TAL'S READ + THE TALENT AGENT'S PROPOSED EVALUATION (Maryam, 25 Sep 2026) —
+       this replaces the old "The two proposals" fact pair AND "The report" kv, and
+       mirrors the Approval detail / Talent Agent evaluation screen: a flowing "Tal's
+       read" with its accent `<b>` highlights + the T·A·L·E·N·T lens, then a
+       "Recommended level" band (agent's recommendation / Tal's suggestion / final /
+       rating) over the read-only ladder, then the agent's notes (`ivEvalBlock`).
+       Data is the log row's own authored fields (§74), consistent with its `to` level. */''}
+  ${(() => {
+    const first = esc(String(r.cand).split(' ')[0]);
+    const talRead = r.tal ? r.tal.replace(/<\/p>\s*<p[^>]*>/g, ' ') : (r.reasoning ? `<p>${esc(r.reasoning)}</p>` : '');
+    if(!talRead && !r.agentLevel) return '';
+    /* ONE SECTION for Tal's read + the agent's proposed evaluation (Maryam, 25 Sep 2026:
+       "the heading update was in place of Tal's read, no other heading will be there") —
+       the single heading "{talent agent name} and Tal's Recommendation" REPLACES the
+       "Tal's read" heading; below it sit Tal's read prose, the facts band and the agent's
+       notes, with NO other heading and no inner divider. Without an agent proposal (an
+       admin override) it falls back to just Tal's read under a "Tal's read" heading. */
+    const heading = r.agentLevel ? `${esc(r.proposedBy || 'The agent')} and Tal’s Recommendation` : 'Tal’s read';
+    return `<section class="sec sec-noline">
+      ${aiHead(heading)}
+      ${talRead ? `<div class="tal-eval"><div class="ai-body">${talRead}${r.talType ? `<p class="mt5">Tal reads ${first} as a <b>${esc(r.talType)}</b>.</p>` : ''}</div></div>` : ''}
+      ${r.agentLevel ? `<div class="facts pf-facts">
+        ${admFact(I.video, '--mk-4', 'Agent’s recommendation', levelLetters(r.agentLevel, r.agentLetters))}
+        ${admFact(I.chat, '--mk-3', 'Tal’s suggestion', r.talLevel ? levelLetters(r.talLevel, r.talLetters) : '—')}
+        ${admFact(I.check, '--mk-2', 'Final level', levelLetters(r.to, r.toLetters))}
+        ${admFact(I.starOutline, '--mk-1', 'Candidate rating', r.rating ? r.rating + '.0' : '—')}
+      </div>
+      ${ivEvalBlock({strengths:r.strengths || '', growth:r.growth || '', agent:r.proposedBy || 'The agent', note:r.note || ''})}` : ''}
+    </section>`;
+  })()}
   ${r.reason ? `<section class="sec">
     ${secHead(r.source === 'Admin override' ? 'Override reason' : 'Reviewer override reason')}
     <p class="t-desc">${esc(r.reason)} <span class="t-caption">Internal — never shown to the candidate or the agent.</span></p>
@@ -12105,7 +12232,6 @@ function shell(){
       aria-label="${S.nav ? 'Collapse' : 'Expand'} navigation" aria-expanded="${S.nav ? 'true' : 'false'}" aria-controls="admin-sidenav">${S.nav ? I.close
       : `<span class="nav-t-mark">${TN_MARK}</span><span class="nav-t-menu">${I.menu}</span>`}</button>
     <button class="shell-logo" data-go="home/home" aria-label="TalentNext home"><img src="${LOGO_K}" alt="TalentNext"></button>
-    ${roleSwitch()}
     ${crumbBar()}
     <div class="shell-right">
       <button class="shell-act ${S.notif ? 'on' : ''}" data-toggle="notif"
@@ -12381,6 +12507,32 @@ function placeTopbar(){
   try { drawTrail(); tidyPh(); } catch(e){ console.warn('topbar', e); }
 }
 
+/* THE ROLE SWITCHER SITS BESIDE THE PAGE'S KEBAB (Maryam, 25 Sep 2026: "i wanted
+   it with the menu icon on the page"), not the app bar. After the page renders,
+   inject the "View as …" dropdown into the person-detail head's action area
+   (`.idhead-act`, before the kebab). Only a multi-role person's detail page has
+   one (staff are single-role, so nothing shows there). Delegated clicks
+   (data-toggle="roleSw" / data-go) are handled globally, so injecting after the
+   render is fine; `roleSwitch()` reads `S.roleSw` for its open state. */
+function placeRoleSwitch(){
+  try {
+    const u = switchPerson();
+    if(!u || personRoleViews(u).length < 2) return;
+    const html = roleSwitch();
+    if(!html) return;
+    let host = device.querySelector('.idhead-act');
+    if(!host){
+      const idh = device.querySelector('.idhead');
+      if(idh){ host = document.createElement('span'); host.className = 'idhead-act'; idh.appendChild(host); }
+    }
+    if(!host) return;
+    const wrap = document.createElement('div');
+    wrap.innerHTML = html;
+    const el = wrap.firstElementChild;
+    if(el) host.insertBefore(el, host.firstChild);
+  } catch(e){ console.warn('roleswitch', e); }
+}
+
 /* ======================================================================
    RENDER
    ====================================================================== */
@@ -12595,6 +12747,7 @@ function render(){
   dsStagger(device.querySelector('.page'));
 
   placeTopbar();
+  placeRoleSwitch();
   placeRowMenu();
 
   /* the thread ends at the bottom, and the caret goes back — only when this
