@@ -3885,3 +3885,32 @@ details (piv1–piv4, incl. piv2's Failed transcript) / Levels & Tracks — no t
 commit writes decision + letters) and the candidate override end-to-end (differ-gate, confirmation
 prompt with the exact copy, history row Source = Admin override, audit before/after + reason). No
 horizontal overflow at 375.
+
+### Levelling surfaced as its own module — 25 Sep 2026 (same day, reversing keep-scattered)
+
+Maryam: "let's introduce a levelling module and take levels & buckets module in it as well." So the
+keep-scattered decision was reversed the same day: a **Levelling** module (`ic:'chart'`) now sits in
+the rail right after Interviews, holding **Level Change Log / Level Approval Queue / Levels & Tracks**
+(+ hidden change/approval drill-ins). **Levels & Buckets** left Cohort Management (`V.cohorts` drops
+`levels:`), and the **Awaiting-Approval tab left Interviews** — `marketBookings` is the single
+"Upcoming Interviews" register, the queue is the standalone `levellingQueue`, and `marketApproval`
+moved to `levelling/approval/<id>` (back arrow → `levelling/queue`).
+
+The two surfaces skipped under keep-scattered are now built. **5.1 Level Change Log** (`levellingLog`)
+reads a platform-wide `LEVEL_LOG` written by `decideApproval` / `docandoverridedo` (`pushLevelLog`,
+authored-placeholder seed §74) — the nine story columns (From/To with letters, Direction, Proposed by,
+Decided on, Approved by + role, Source, Date), Source + Direction filters, name/email search, a row
+opening the detail and an Override row action; date-range filtering is a follow-up (Optional in the
+story). **5.4 Level Change Detail** (`levellingChange`) is read-only: decision facts, both proposals
+side by side with the decided one marked, the report (+ a permission-gated AI-raw-score slot), and the
+internal override reason. The per-candidate `candLevellingPanel` history + override stays on the
+candidate detail. The standing "only hidden modules are Levelling and Vetting" ruling is amended to
+**Vetting only**.
+
+**Verification.** Signed in over http; the rail shows Levelling (Log / Queue / Levels & Tracks) with
+Levels gone from Cohort Management and no approval tab on Interviews. Real-navigation sweep across the
+log, queue, levels, three approval details (incl. piv2 Failed transcript), two change details,
+Interviews, cohorts and two candidate details — no thrown error, no `console.warn`. The log renders all
+nine columns with blank From on a first interview, blank Proposed-by/Decided-on on an admin override,
+and Direction "Held" for a letters-only change; the change detail shows the proposals, report and
+override reason read-only.

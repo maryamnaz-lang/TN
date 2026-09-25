@@ -509,6 +509,34 @@ input:-webkit-autofill:focus{
 .app button.sw:focus-visible{outline:none}
 .app button.sw:focus-visible::after{box-shadow:0 1px 3px var(--thumb-shadow),0 0 0 8px var(--brand-tint-2)}
 </style>
+<style id="admin-roleswitch">
+/* THE APP-BAR ROLE SWITCHER (Maryam, 25 Sep 2026) — a dropdown beside the menu
+   icon on a multi-role person's detail page, for reading the same person as each
+   role they hold. A compact pill trigger + a downward menu (every admin dropdown
+   opens downward, 12 Sep 2026). Plain `:hover` here — this file's hovers are live
+   (the DS's are disarmed, trap 6). */
+.app .roleswitch{position:relative; flex:none; display:flex; align-items:center; margin-left:var(--s02); min-width:0}
+.app .roleswitch-t{display:inline-flex; align-items:center; gap:var(--s02); max-width:220px; height:34px; padding:0 var(--s03); background:var(--layer-01); border:1px solid var(--border-subtle-02); border-radius:var(--radius); color:var(--text-primary); font-size:var(--t-label-size); line-height:var(--t-label-lh); font-weight:var(--t-w-strong); white-space:nowrap; cursor:pointer; transition:background var(--dur-short) var(--ease-standard)}
+.app .roleswitch-t .rsw-l{overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.app .roleswitch-t:hover{background:var(--overlay-hover)}
+.app .roleswitch-t.on{background:var(--overlay-selected)}
+.app .roleswitch-t .rsw-c{flex:none; width:16px; height:16px; color:var(--icon-secondary); transition:transform var(--dur-short) var(--ease-standard)}
+.app .roleswitch-t .rsw-c svg{width:16px; height:16px; display:block}
+.app .roleswitch-t.on .rsw-c{transform:rotate(180deg)}
+.app .roleswitch-menu{position:absolute; top:calc(100% + var(--s02)); left:0; z-index:60; min-width:230px; max-width:calc(100vw - var(--s05)); background:var(--layer-01); border:1px solid var(--rule); box-shadow:0 8px 24px rgba(17,17,17,.12); padding:var(--s02); display:none}
+.app .roleswitch-menu.on{display:block}
+.app .rsw-i{display:flex; align-items:center; gap:var(--s03); width:100%; padding:var(--s03); background:transparent; border:0; text-align:left; cursor:pointer; color:var(--text-primary); font-size:var(--t-body-size); line-height:var(--t-body-lh); font-weight:var(--t-w-book); border-radius:var(--radius)}
+.app .rsw-i .rsw-i-l{flex:1; white-space:nowrap}
+.app .rsw-i:hover{background:var(--overlay-hover)}
+.app .rsw-i.on{color:var(--accent-text); font-weight:var(--t-w-strong)}
+.app .rsw-i .rsw-i-mk{flex:none; display:inline-flex; width:16px; height:16px; color:var(--accent-text)}
+.app .rsw-i .rsw-i-mk svg{width:16px; height:16px; display:block}
+@container app (max-width:599.98px){
+  /* on a phone the app bar is tight — let the switcher shrink and the breadcrumb
+     ellipsize (crumb-bar is flex:1 min-width:0), so nothing overflows. */
+  .app .roleswitch-t{max-width:150px}
+}
+</style>
 <style id="admin-rail-tip">
 /* THE COLLAPSED RAIL NAMES EVERY ICON ON HOVER AND ON KEYBOARD FOCUS (design
    QA, 23 Sep 2026: "hover over each icon in the collapsed sidebar, verify a
@@ -524,7 +552,11 @@ input:-webkit-autofill:focus{
   .app[data-rail="shut"] .sidenav .sn-item[data-tip]:not(.sn-parent)::after{
     content:attr(data-tip); position:absolute; left:calc(100% + var(--s03)); top:50%;
     transform:translate(-4px,-50%); z-index:60; pointer-events:none; white-space:nowrap; width:max-content; max-width:none; overflow:visible;
-    padding:var(--s02) var(--s04); background:var(--gray-100); color:var(--on-dark);
+    /* the collapsed-rail LEAF label matches the parent flyout panel (§120.1c `.sn-subs`) —
+       a white chip with the hairline + soft shadow, not a solid black pill (Maryam, 25 Sep
+       2026: "the hover ui should be the one we were using previously"). */
+    padding:var(--s03) var(--s05); background:var(--layer-01); color:var(--text-primary);
+    border:1px solid var(--rule); box-shadow:0 8px 24px rgba(17,17,17,.12); text-align:center;
     font-size:var(--t-label-size); line-height:var(--t-label-lh); font-weight:var(--t-w-book);
     opacity:0; visibility:hidden; transition:opacity .12s ease, transform .12s ease, visibility 0s .12s}
   .app[data-rail="shut"] .sidenav .sn-item[data-tip]:not(.sn-parent):hover::after,
@@ -637,6 +669,11 @@ input:-webkit-autofill:focus{
    lift it to s06. Top padding is already s06, matching Roles. */
 .app .sec:has(.perm-tbl){padding-top:var(--s06)}
 .app .sec:has(.perm-tbl) > .sec-h{margin-bottom:var(--s06)}
+/* INFORMATION ICON (story 4.1): a quiet inline info glyph next to a reserved
+   permission's label and the Super Admin column head, carrying its reason as a
+   native title tooltip. Helper grey so it reads as a hint, not a mark. */
+.app .perm-info{display:inline-flex;vertical-align:middle;color:var(--text-helper);cursor:help;line-height:0}
+.app .perm-info svg{display:block}
 
 /* TAL SUMMARY HIDDEN PORTAL-WIDE (Maryam, 17 Sep 2026, #admin-nosum). With the
    "Summary by Tal" band gone from `head()`, a list-page head band is only an empty
@@ -1012,6 +1049,11 @@ input:-webkit-autofill:focus{
 
 /* --- Interview transcript link (right end of a collapsed interview record) --- */
 .app .iv-tx-link{margin-left:auto; background:none; border:0; cursor:pointer; padding:0; color:var(--accent-text); font-size:13.5px; white-space:nowrap}
+/* the Transcript fact card's "Ready →" link on the Level Change detail (Maryam,
+   25 Sep 2026) — accent ink with a trailing arrow, sitting inside a `.facts` cell
+   value. */
+.app .lc-tx{display:inline-flex; align-items:center; gap:var(--s02); color:var(--accent-text); cursor:pointer; text-decoration:none}
+.app .lc-tx svg{width:16px; height:16px; color:var(--accent-text)}
 
 /* --- Static scenes row (three interview scenes): keep the candidate side's
    FIXED 240px cards sitting close together (.scv is flex:none width:240px in the
@@ -1511,16 +1553,28 @@ const ROLE_BY_K={}; ROLES.forEach(r => ROLE_BY_K[r.k]=r);
    (the Program/Business wall, the staff-detail capability chips) is a separate
    SA-journey surface and is left intact. A permission key is `module:action`
    for a module action, or the bare key for a sensitive/reserved one. */
+/* The action set per module is EXACTLY the Permission Catalogue (story 4.1): a
+   dash in the catalogue means the permission does not exist, so it is not in the
+   list and draws no matrix row. Notes from the catalogue:
+   - Levelling carries View only — every level decision is made under the
+     sensitive Approve candidate level.
+   - Marketplace / Interviews carry View + Edit only (no Create, no Delete).
+   - Cohorts carries no Delete — an unwanted cohort is cancelled through
+     intervention (7.6) and stays on the list as Cancelled.
+   - Users carries no Delete — deleting an external account is governed by the
+     sensitive Accounts: Delete.
+   - Finance carries no Create or Delete — discount codes are created under
+     Change fee, refunds under Approve refund. */
 const PERM_MODULES = [
   ['dashboard', 'Dashboard', ['view']],
   ['staff', 'Staff', ['view', 'create', 'edit', 'delete']],
-  ['users', 'Users', ['view', 'create', 'edit', 'delete']],
+  ['users', 'Users', ['view', 'create', 'edit']],
   ['roles', 'Roles', ['view', 'create', 'edit', 'delete']],
-  ['levelling', 'Levelling', ['view', 'create', 'edit', 'delete']],
-  ['marketplace', 'Marketplace', ['view', 'create', 'edit', 'delete']],
-  ['cohorts', 'Cohorts', ['view', 'create', 'edit', 'delete']],
-  ['interviews', 'Interviews', ['view', 'create', 'edit', 'delete']],
-  ['finance', 'Finance', ['view', 'create', 'edit', 'delete']],
+  ['levelling', 'Levelling', ['view']],
+  ['marketplace', 'Marketplace', ['view', 'edit']],
+  ['cohorts', 'Cohorts', ['view', 'create', 'edit']],
+  ['interviews', 'Interviews', ['view', 'edit']],
+  ['finance', 'Finance', ['view', 'edit']],
   ['audit', 'Audit Log', ['view']],
   ['onboarding', 'Onboarding Questions', ['view', 'edit']],
   ['settings', 'Settings', ['view', 'edit']]
@@ -1533,7 +1587,7 @@ const PERM_SENSITIVE = [
   ['setrange', 'Set assessment range'], ['playrecording', 'Play a recording']
 ];
 const PERM_RESERVED = [
-  ['grantsa', 'Grant or revoke Super Admin'], ['overridetraining', 'Override the training-module gate']
+  ['grantsa', 'Grant or revoke Super Admin'], ['overridetraining', 'Override the training-module listing gate']
 ];
 const permAllKeys = () => { const k = []; PERM_MODULES.forEach(([m, , acts]) => acts.forEach(a => k.push(m + ':' + a))); PERM_SENSITIVE.forEach(([kk]) => k.push(kk)); PERM_RESERVED.forEach(([kk]) => k.push(kk)); return k; };
 const permIsReserved = pk => PERM_RESERVED.some(([kk]) => kk === pk);
@@ -2232,7 +2286,12 @@ const MODULES=[
  {k:'agents', t:'Talent Agents', ic:'agents', subs:[
    {k:'agents', t:'Talent Agents'}, {k:'detail', t:'Agent', hidden:true}, {k:'interview', t:'Interview', hidden:true}]},
  {k:'cohorts', t:'Cohort Management', ic:'cohorts', subs:[
-   {k:'cohorts', t:'Cohorts'}, {k:'assign', t:'Cohort Leaders'}, {k:'detail', t:'Cohort', hidden:true}, {k:'levels', t:'Levels & Buckets'}]},
+   {k:'cohorts', t:'Cohorts'}, {k:'assign', t:'Cohort Leaders'}, {k:'detail', t:'Cohort', hidden:true},
+   /* the leader's own per-person profile, opened by the app-bar ROLE SWITCHER
+      (Maryam, 25 Sep 2026) — a candidate who also leads a cohort has no other
+      single-page leadership view, so this is its target. Hidden (reached from the
+      switcher, not the rail). */
+   {k:'leaderdetail', t:'Cohort Leader', hidden:true}]},
  /* COURSE CATALOGUE IS ITS OWN TOP-LEVEL MODULE below Cohort Management (Maryam,
     16 Sep 2026: "make course catalogue a separate module below this cohort
     management module"). One visible sub, so the rail draws it as a single item
@@ -2242,7 +2301,14 @@ const MODULES=[
  {k:'catalogue', t:'Course Catalogue', ic:'book', subs:[
    {k:'catalogue', t:'Course Catalogue'}, {k:'coursedetail', t:'Course', hidden:true}]},
  {k:'market', t:'Interviews', ic:'market', subs:[
-   {k:'bookings', t:'Interviews'}, {k:'recordings', t:'Recordings & Transcripts'}, {k:'recording', t:'Transcript', hidden:true}, {k:'approval', t:'Level approval', hidden:true}]},
+   {k:'bookings', t:'Interviews'}, {k:'recordings', t:'Recordings & Transcripts'}, {k:'recording', t:'Transcript', hidden:true}]},
+ /* LEVELLING (Epic 5, Maryam 25 Sep 2026) — surfaced as its own module after Interviews.
+    The level change log (5.1), the approval queue (5.2, moved out of Interviews) and Levels
+    & Tracks (5.5, moved out of Cohort Management), with the change detail (5.4) and the
+    approval detail as hidden drill-ins. */
+ {k:'levelling', t:'Levelling', ic:'chart', subs:[
+   {k:'log', t:'Levelling Log'}, {k:'queue', t:'Level Approval Queue'}, {k:'levels', t:'Levels & Tracks'},
+   {k:'change', t:'Level change', hidden:true}, {k:'approval', t:'Level approval', hidden:true}]},
  /* ONBOARDING QUESTIONS — the intake quiz builder (Maryam, 22 Sep 2026). One
     visible sub (the questions list, drawn as a single rail leaf); `edit` is the
     hidden full-page question editor reached from a row / Add Question. */
@@ -2309,7 +2375,7 @@ const firstSub = m => (m.subs.find(s => !s.hidden) || m.subs[0]).k;
 const S = {
   mod:'home', sub:'home', id:null,        /* where you are */
   gper:{},                                /* per-chart period filter (weekly/monthly/yearly) */
-  nav:false, notif:false, acct:false,     /* overlays */
+  nav:false, notif:false, acct:false, roleSw:false, /* overlays (roleSw: the app-bar role switcher) */
   confirm:null, _confirm:null, sheet:null,/* dialogs */
   /* THE BACK STACK — a detail page's back arrow returns to the screen you came
      FROM, not a hardcoded list (Maryam, 21 Sep 2026: an interview opened from
@@ -5969,8 +6035,13 @@ function usersRoles(){
   const cols = permRoleCols();
   const usersWith = k => USERS.filter(u => u.roles.includes(k)).length;
   const editing = !!S.editPerms;
-  const lockCell = `<td class="num pm-off" title="Held by Super Admin only, cannot be granted to another role">${pmNo}</td>`;
-  const permRow = (pk, label, reserved) => `<tr><td>${esc(label)}</td>${cols.map(r => {
+  /* Information Icon (story 4.1): a small `info` glyph carrying its reason as a
+     tooltip — on each reserved row's label and on the Super Admin column head. */
+  const permInfo = msg => `<span class="perm-info" title="${esc(msg)}" tabindex="0" aria-label="${esc(msg)}"><svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">${inner('info')}</svg></span>`;
+  const RESERVED_MSG = 'This permission is held by Super Admin only and cannot be granted to another role.';
+  const SA_COL_MSG = 'Super Admin holds every permission and cannot be restricted.';
+  const lockCell = `<td class="num pm-off" title="${esc(RESERVED_MSG)}">${pmNo}</td>`;
+  const permRow = (pk, label, reserved) => `<tr><td>${esc(label)}${reserved ? ' ' + permInfo(RESERVED_MSG) : ''}</td>${cols.map(r => {
     const isSA = r.k === 'admin';
     const on = PERMSET[r.k] && PERMSET[r.k].has(pk);
     if(reserved && !isSA) return lockCell;
@@ -6004,7 +6075,7 @@ function usersRoles(){
         ? `<span style="display:flex;align-items:center;gap:var(--s05)"><button class="btn btn-g btn-sm noic" data-act="cancelperms">Cancel</button><button class="btn btn-p btn-sm noic" data-act="saveperms"${permsChanged() ? '' : ' disabled'}>Update Permissions</button></span>`
         : '<button class="btn btn-g btn-sm noic" data-act="editperms">' + I.edit + ' Edit Permissions</button>')}
     <div class="tbl-wrap"><table class="tbl perm-tbl">
-      <tr><th>Permission</th>${cols.map(r => `<th class="num">${esc(r.short)}</th>`).join('')}</tr>
+      <tr><th>Permission</th>${cols.map(r => `<th class="num">${esc(r.short)}${r.k === 'admin' ? ' ' + permInfo(SA_COL_MSG) : ''}</th>`).join('')}</tr>
       ${body}
     </table></div>
   </section>`;
@@ -6684,8 +6755,10 @@ function recordLevelChange(c, o){
   c.history.unshift({from:o.from, fromLetters:o.fromLetters || [], to:o.to, toLetters:o.toLetters || [],
     by:o.by || ME.name, when:o.when || today(), kind:o.kind || 'review', decidedOn:o.decidedOn || '', source:o.source || ''});
 }
-/* Up / Down / Held (5.1) — a change that moves only the letters reads Held. */
+/* Up / Down / Held (5.1) — a change that moves only the letters reads Held. A FIRST
+   interview has no prior level (from is blank), so there is no direction at all. */
 const levelDirection = (from, to) => {
+  if(!from) return '';   /* first interview — no prior level to move from */
   const a = LVL_CODES.indexOf(from), b = LVL_CODES.indexOf(to);
   return b > a ? 'Up' : b < a ? 'Down' : 'Held';
 };
@@ -7427,6 +7500,10 @@ ACTIONS.docandoverridedo = () => {
   recordLevelChange(c, {from, fromLetters, to:p.level, toLetters:p.letters, by:ME.name, kind:'override', source:'Admin override'});
   c.level = p.level; c.letters = p.letters; c.bucket = bucketOf(p.level);
   const u = USER_BY_ID[c.id]; if(u){ u.level = p.level; }
+  /* platform-wide log row (5.1): Source Admin override, Proposed by / Decided on blank. */
+  pushLevelLog({candId:c.id, cand:c.name, email:emailOf(c.name), from, fromLetters, to:p.level, toLetters:p.letters,
+    direction:levelDirection(from, p.level), proposedBy:'', decidedOn:'', approvedBy:ME.name, approvedRole:'Super Admin',
+    source:'', date:today(), reason:p.reason});   /* admin correction is tied to no interview — Source blank (25 Sep 2026) */
   /* candidate notification (no reason) is hifi candidate-portal scope — stubbed here. */
   audit('Overrode candidate level', `${c.name} · ${levelLetters(from, fromLetters)} → ${levelLetters(p.level, p.letters)} · ${p.reason}`, 'Candidates', 'high', {from, to:p.level});
   toast(`${c.name} set to ${levelLetters(p.level, p.letters)}`);
@@ -7484,11 +7561,12 @@ function candidatesDetail(){
     </div>
   </section>
 
-  ${''/* LEVELLING panel — RE-SURFACED for Epic 5 (Maryam, 25 Sep 2026). With no
-         consolidated level-change log built (keep-scattered), the candidate detail is
-         the home for both the per-candidate level history (5.1) and the Override row
-         action (5.3). This reverses the 24 Sep "hide leveling section". */}
-  ${candLevellingPanel(c)}
+  ${''/* LEVELLING panel — HIDDEN again (Maryam, 25 Sep 2026: "hide the levelling
+         section"). The Level Change Log is a full Levelling module now, so the
+         per-candidate level history/override no longer needs a home on the candidate
+         detail. `candLevellingPanel` stays defined — drop the `''` wrapper to
+         restore it. This reverses the same-day Epic 5 re-surfacing above. */}
+  ${'' && candLevellingPanel(c)}
   ${candCohortsPanel(c)}
 
   ${''/* COURSES the candidate is taking and has taken, with each completed
@@ -7945,6 +8023,31 @@ const pendingApprovals = () => PAST_IVS.filter(p => !p.decision);
    items surfaced first (5.2). */
 const pendingApprovalsSorted = () => pendingApprovals().slice().sort((a, b) => (b.overdue ? 1 : 0) - (a.overdue ? 1 : 0));
 
+/* ==== THE LEVEL CHANGE LOG (Epic 5.1) ================================
+   The platform-wide log of every APPROVED (live) level change, across every candidate.
+   A row is written when a reviewer approves/overrides an interview (`decideApproval`) or
+   an admin overrides a live level (`docandoverridedo`). Each row carries the from/to level
+   + letters, the direction, who proposed and who approved (with role), the Decided-on and
+   the Source, and — for the 5.4 change detail — the evidence (both proposals, the report,
+   the reason). `from` is blank on a first interview (no prior level). AUTHORED PLACEHOLDER
+   seed (§74). `LEVEL_SEQ` gives each row a stable id. */
+let LEVEL_SEQ = 100;
+const LEVEL_LOG = [];
+function pushLevelLog(r){ r.id = 'lc' + (++LEVEL_SEQ); LEVEL_LOG.unshift(r); return r; }
+;(function seedLevelLog(){
+  const rows = [
+    {cand:'Maryam Naz', from:'E1', fromLetters:[], to:'E2', toLetters:['A', 'L', 'E'], proposedBy:'Nadia Haddad', decidedOn:'Agent proposal', approvedBy:'Nadia Haddad', approvedRole:'Reviewer', source:'Re-interview', date:'12 Aug 2026',
+     agentLevel:'E2', agentLetters:['A', 'L', 'E'], talLevel:'E2', talLetters:['A', 'L'], reasoning:'Reads from consequence to people; three dated examples.', strengths:'Clear ownership of outcomes.', growth:'Coaching rather than fixing.', aiRaw:'0.71'},
+    {cand:'Jordan Vale', from:'E5', fromLetters:['E'], to:'B1', toLetters:['E', 'L'], proposedBy:'Priya Raman', decidedOn:'Tal proposal', approvedBy:'Derek Sole', approvedRole:'Super Admin', source:'Re-interview', date:'2 Aug 2026',
+     agentLevel:'E5', agentLetters:['E'], talLevel:'B1', talLetters:['E', 'L'], reasoning:'Frames trade-offs across teams; closes cleanly under pressure.', strengths:'Holds two priorities at once.', growth:'Tighten how a decision is closed.', aiRaw:'0.83'},
+    {cand:'Ava Stone', from:'', fromLetters:[], to:'E2', toLetters:['L'], proposedBy:'Dana Whitfield', decidedOn:'Reviewer override', approvedBy:'Derek Sole', approvedRole:'Super Admin', source:'First interview', date:'28 Jul 2026', reason:'Transcript shows one clear coaching example the report understated.',
+     agentLevel:'E2', agentLetters:['L', 'A'], talLevel:'E2', talLetters:['L'], reasoning:'Separates decision from result.', strengths:'Honest about misses.', growth:'Bring a second person into the work.', aiRaw:'0.64'},
+    {cand:'Kai Andersen', from:'E3', fromLetters:['T1'], to:'E3', toLetters:['T1', 'L'], proposedBy:'', decidedOn:'', approvedBy:'Derek Sole', approvedRole:'Super Admin', source:'', date:'20 Jul 2026', reason:'Adding Leader after the cohort feedback; level unchanged.'}
+  ];
+  /* reversed so the array ends newest-first (unshift), matching runtime decisions. */
+  rows.slice().reverse().forEach(r => { r.direction = levelDirection(r.from, r.to); pushLevelLog(r); });
+})();
+
 /* A ROW OF THE INTERVIEW EVALUATION CARDS (the candidate portal's signed-summary
    look, in the design system this portal links) — one green Strengths, one violet
    Growth areas, one blue agent note. */
@@ -8248,7 +8351,7 @@ PAGESUM['catalogue/catalogue'] = () => {
   const live = COURSES.filter(c => c.status === 'live').length;
   return `${live} of ${COURSES.length} courses are live, from ${money(Math.min(...COURSES.map(c => c.price)))} to ${money(Math.max(...COURSES.map(c => c.price)))}. <b>Foundations of Leadership is the $100 entry course</b>; more can be imported from the library.`;
 };
-PAGESUM['cohorts/levels'] = () => `Three buckets — Explorer, Builder, Trailblazer — each with five levels. A candidate climbs by re-interviewing, and <b>the bucket decides which cohorts they can lead</b>.`;
+PAGESUM['levelling/levels'] = () => `Three buckets — Explorer, Builder, Trailblazer — each with five levels. A candidate climbs by re-interviewing, and <b>the bucket decides which cohorts they can lead</b>.`;
 
 const leaderOpts = () => [['Unassigned', 'Unassigned'], ...USERS.filter(u => u.roles.includes('leader') || u.roles.includes('agent')).map(u => [u.name, u.name, agentFace(u.name)])];
 KINDS.cohort = {
@@ -8763,8 +8866,60 @@ ACTIONS.dobuckets = () => { const v = readForm(); BUCKETS.forEach((b, i) => {
   if(v['lv' + i] != null && v['lv' + i] !== '') b.levels = Math.max(1, Math.min(12, parseInt(v['lv' + i], 10) || 1));
 }); audit('Edited bucket', 'Levels & buckets', 'Cohort Management', 'info'); toast('Bucket saved'); };
 
+/* THE COHORT-LEADER DETAIL (Maryam, 25 Sep 2026) — a leader's own single-page
+   profile, opened by the app-bar ROLE SWITCHER for a person who both is (usually)
+   a candidate AND leads a cohort. That person has no other standalone leadership
+   view, so the switcher's "View as Cohort Leader" lands here. Keyed by the USERS
+   id (`S.id`), the same as every other person-detail page. Read-only: leader
+   admin (allot / remove) lives on the Cohort Leaders table; the one destructive
+   action offered here reuses that flow's `rmleader` replacement-picker sheet. */
+function cohortsLeaderDetail(){
+  const u = USER_BY_ID[S.id] || USERS.find(x => (x.roles || []).includes('leader')) || USERS[0];
+  DETAIL_LABEL = u.name;
+  const bare = n => String(n || '').replace(/\s*\(.*\)/, '').trim();
+  const led = COHORTS.filter(c => bare(c.leader) === u.name);
+  const active = led.filter(c => c.status !== 'archived');
+  const isMod = !!u.addedBy;
+  const member = (u.cohorts || []).filter(c => /\(member\)/i.test(c)).map(c => bare(c));
+  const lvl = (u.level && u.level !== '—') ? u.level : 'Not levelled';
+  const menu = (u.roles || []).includes('leader')
+    ? rowActs([['close', 'Remove as Cohort Leader', `data-sheet="rmleader:${u.id}"`]])
+    : '';
+  return `
+  ${detailHead('cohorts/assign')}
+  <section class="sec">
+    <div class="idhead">
+      <span class="idphoto"><img src="${agentFace(u.name)}" alt="" class="idhead-ph"></span>
+      <div class="idhead-b">
+        <span class="idname-row"><span class="idname">${esc(u.name)}</span></span>
+        <span class="idmeta">${isMod ? 'Moderator &middot; admin-added' : 'Cohort leader &middot; volunteer'}${u.email ? ' &middot; ' + esc(u.email) : ''}</span>
+      </div>
+      ${menu ? `<span class="idhead-act">${menu}</span>` : ''}
+    </div>
+    <div class="facts pf-facts">
+      ${admFact(I.group, '--mk-1', 'Cohorts led', active.length)}
+      ${admFact(I.shield, '--mk-2', 'Leader type', isMod ? 'Moderator' : 'Volunteer')}
+      ${admFact(I.chart, '--mk-3', 'Level', lvl)}
+      ${admFact(I.user, '--mk-4', 'Member of', member.length ? member.join(', ') : '—')}
+    </div>
+  </section>
+
+  <section class="sec">
+    ${secHead('Cohorts led')}
+    ${led.length ? table(
+      [{label:'Cohort'}, {label:'Track'}, {label:'Started'}, {label:'Progress'}, {label:'Status'}],
+      led.map(c => ({id:c.id, go:'cohorts/detail/' + c.id, cells:[
+        esc(c.name), esc(c.track || '—'),
+        c.start ? esc(mdy(c.start)) : '—',
+        c.status === 'draft' ? 'Not started' : c.status === 'archived' ? `Ended at week ${c.week}` : `Week ${c.week} of 13`,
+        tag(c.status)
+      ]})), {select:false, paginate:false})
+      : emptyState('cohorts', 'No cohorts yet', `${esc((u.name || '').split(' ')[0])} does not lead a cohort right now.`)}
+  </section>`;
+}
+
 V.cohorts = () => modView({cohorts:cohortsList, assign:cohortsAssign,
-  detail:cohortsDetail, levels:cohortsLevels});
+  detail:cohortsDetail, leaderdetail:cohortsLeaderDetail});   /* Levels & Buckets moved to the Levelling module (Epic 5, 25 Sep 2026); leaderdetail is the role switcher's leader target (25 Sep 2026) */
 /* Course Catalogue is its own module now (see MODULES). Same two views, moved
    under the `catalogue` module key so its routes are catalogue/catalogue and
    catalogue/coursedetail. */
@@ -8959,49 +9114,59 @@ KINDS.booking = {
 const lvlChip = lvl => `<span class="tag sm">${esc(lvl || '—')}</span>`;
 /* a level chip carrying its TALENT letters: "E3 (L, A)" (Epic 5). */
 const lvlLtrChip = (lvl, arr) => `<span class="tag sm">${esc(lvl || '—')}${arr && arr.length ? ' (' + esc(lettersLabel(arr)) + ')' : ''}</span>`;
+/* THE INTERVIEWS MODULE is now the UPCOMING register only — the Awaiting-Approval tab moved
+   to the Levelling module's Approval Queue (Epic 5, Maryam 25 Sep 2026), so the two-tab strip
+   is gone and this is a single read-only table. */
 function marketBookings(){
   const q = getFilter('q', ''), kf = getFilter('bkkind', 'all'), af = getFilter('bkagent', 'all');
-  const tab = getFilter('bktab', 'upcoming');
   const kmatch = k => kf === 'all' ? true : kf === 're' ? agIvIsRe(k) : !agIvIsRe(k);
-  const upCount = BOOKINGS.filter(b => bkStage(b) === 'booked').length;
-  const pending = pendingApprovals();
   const up = BOOKINGS
     .filter(b => bkStage(b) === 'booked')
     .filter(b => kmatch(b.kind)).filter(b => af === 'all' ? true : b.agent === af)
     .filter(b => hit(q, b.cand, b.agent, b.kind))
     .slice().sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')));
+  const typeFilter = filterDd('bkkind', 'all', [['all', 'All'], ['first', 'First interview'], ['re', 'Re-interview']], 'Type');
+  const agentFilter = filterDd('bkagent', 'all', [['all', 'All'], ...agentNames().map(n => [n, n])], 'Talent agent');
+  return `
+  <section class="sec">
+    ${searchHead('Upcoming Interviews', 'Every interview candidates have booked with a talent agent, soonest first.',
+      exportBtn('Interviews'), 'Search by candidate or agent')}
+    ${lstTools('Search by candidate or agent', `${typeFilter} ${agentFilter}`)}
+    ${up.length ? table(
+      [{label:'Candidate'}, {label:'Agent'}, {label:'Type'}, {label:'Scheduled'}, {label:'Fee', num:true}, {label:'Escrow'}],
+      up.map(b => ({cells:[
+        personCell(b.cand, ''), personCell(b.agent, ''),
+        esc(b.kind.replace(/\s*\([^)]*\)/, '')), esc(b.slot),
+        b.fee ? money(b.fee) : 'Free', escrowTag(b.escrow)
+      ]})), {select:false})
+      : emptyState('video', 'No interviews match', q || kf !== 'all' || af !== 'all' ? 'Nothing matches the current filters.' : 'No booked interviews right now.')}
+  </section>`;
+}
+/* THE LEVEL APPROVAL QUEUE (Epic 5.2) — the submitted interviews awaiting a decision, moved
+   out of Interviews. Ordered by the 24h deadline (overdue first), searchable, filtered by
+   Type and Talent agent; a row opens the approval detail. */
+function levellingQueue(){
+  const q = getFilter('q', ''), kf = getFilter('bkkind', 'all'), af = getFilter('bkagent', 'all');
+  const kmatch = k => kf === 'all' ? true : kf === 're' ? agIvIsRe(k) : !agIvIsRe(k);
   const ap = pendingApprovalsSorted()
     .filter(p => kmatch(p.kind)).filter(p => af === 'all' ? true : p.agent === af)
     .filter(p => hit(q, p.cand, p.agent, p.kind));
   const typeFilter = filterDd('bkkind', 'all', [['all', 'All'], ['first', 'First interview'], ['re', 'Re-interview']], 'Type');
   const agentFilter = filterDd('bkagent', 'all', [['all', 'All'], ...agentNames().map(n => [n, n])], 'Talent agent');
-  const upPane = up.length ? table(
-    [{label:'Candidate'}, {label:'Agent'}, {label:'Type'}, {label:'Scheduled'}, {label:'Fee', num:true}, {label:'Escrow'}],
-    up.map(b => ({cells:[
-      personCell(b.cand, ''), personCell(b.agent, ''),
-      esc(b.kind.replace(/\s*\([^)]*\)/, '')), esc(b.slot),
-      b.fee ? money(b.fee) : 'Free', escrowTag(b.escrow)
-    ]})), {select:false})
-    : emptyState('video', 'No interviews match', q || kf !== 'all' || af !== 'all' ? 'Nothing matches the current filters.' : 'No booked interviews right now.');
-  const apPane = ap.length ? table(
-    [{label:'Candidate'}, {label:'Agent'}, {label:'Recommended level'}, {label:'Tal’s suggestion'}, {label:'Report filed'}, {label:'Deadline'}, ACT_COL],
-    ap.map(iv => ({id:iv.id, go:'market/approval/' + iv.id, cells:[
-      personCell(iv.cand, ''), personCell(iv.agent, ''),
-      lvlLtrChip(iv.agentLevel, iv.agentLetters), lvlLtrChip(iv.talLevel, iv.talLetters), esc(iv.filed || iv.submitted || iv.when),
-      `${esc(iv.deadline || '—')}${iv.overdue ? ' ' + tag('failed', 'Overdue') : ''}`,
-      rowActs([['check', 'Review & decide', `data-go="market/approval/${iv.id}"`]])
-    ]})), {select:false})
-    : emptyState('check', 'Nothing awaiting approval', q || kf !== 'all' || af !== 'all' ? 'Nothing matches the current filters.' : 'Every submitted interview has been decided.');
   return `
   <section class="sec">
-    ${searchHead(tab === 'approval' ? 'Awaiting Approval' : 'Upcoming Interviews',
-      tab === 'approval'
-        ? 'Interviews the agent has submitted with a recording, a level recommendation and their notes. Open one to read Tal’s take, then approve or override the level.'
-        : 'Every interview candidates have booked with a talent agent, soonest first.',
-      exportBtn('Interviews'), 'Search by candidate or agent')}
-    ${filterStrip('bktab', 'upcoming', [['upcoming', 'Upcoming', upCount], ['approval', 'Awaiting Approval', pending.length]])}
+    ${searchHead('Level Approval Queue', 'Interviews the agent has submitted with a recording, a level recommendation and their notes. Open one to read Tal’s take, then approve or override the level.',
+      exportBtn('Level changes'), 'Search by candidate or agent')}
     ${lstTools('Search by candidate or agent', `${typeFilter} ${agentFilter}`)}
-    ${tab === 'approval' ? apPane : upPane}
+    ${ap.length ? table(
+      [{label:'Candidate'}, {label:'Agent'}, {label:'Recommended level'}, {label:'Tal’s suggestion'}, {label:'Report filed'}, {label:'Deadline'}, ACT_COL],
+      ap.map(iv => ({id:iv.id, go:'levelling/approval/' + iv.id, cells:[
+        personCell(iv.cand, ''), personCell(iv.agent, ''),
+        lvlLtrChip(iv.agentLevel, iv.agentLetters), lvlLtrChip(iv.talLevel, iv.talLetters), esc(iv.filed || iv.submitted || iv.when),
+        `${esc(iv.deadline || '—')}${iv.overdue ? ' ' + tag('failed', 'Overdue') : ''}`,
+        rowActs([['check', 'Review & decide', `data-go="levelling/approval/${iv.id}"`]])
+      ]})), {select:false})
+      : emptyState('check', 'Nothing awaiting approval', q || kf !== 'all' || af !== 'all' ? 'Nothing matches the current filters.' : 'Every submitted interview has been decided.')}
   </section>`;
 }
 /* THE LEVEL-APPROVAL DETAIL — an Awaiting-Approval row opens here. The agent has
@@ -9012,7 +9177,7 @@ function marketBookings(){
    queue. (Maryam, 21 Sep 2026) */
 function marketApproval(){
   const iv = PAST_IVS.find(x => x.id === S.id);
-  if(!iv) return `${detailHead('market/bookings')}
+  if(!iv) return `${detailHead('levelling/queue')}
     <section class="sec">${emptyState('check', 'Not found', 'This interview is no longer awaiting approval.')}</section>`;
   DETAIL_LABEL = `${iv.cand} — level approval`;
   const first = esc(String(iv.cand).split(' ')[0]);
@@ -9030,7 +9195,7 @@ function marketApproval(){
      to carry. Read-only where the agent's screen is a form (the admin approves, it
      does not write the recommendation). Wrapped in `.iv-detail-body` for the same
      wider inter-section spacing as the interview detail. */
-  return `${detailHead('market/bookings')}
+  return `${detailHead('levelling/queue')}
   <div class="iv-detail-body">
   <section class="sec">
     ${aiHead('Level approval', `${esc(iv.cand)} · ${esc(iv.agent)} · ${esc(iv.when)}`)}
@@ -9123,12 +9288,22 @@ function decideApproval(iv, o){
   iv.decision = o.decision; iv.finalLevel = o.level; iv.finalLetters = o.letters;
   if(o.reason) iv.decisionNote = `Reason: ${o.reason}`;
   const c = candByName(iv.cand);
+  let from = '', fromLetters = [];
   if(c){
-    const from = c.level, fromLetters = (c.letters || []).slice();
+    from = c.level; fromLetters = (c.letters || []).slice();
     recordLevelChange(c, {from, fromLetters, to:o.level, toLetters:o.letters, by:ME.name, kind:o.historyKind, decidedOn:o.decidedOn, source:o.source});
     c.level = o.level; c.letters = o.letters; c.bucket = bucketOf(o.level);
     const u = USER_BY_ID[c.id]; if(u) u.level = o.level;
   }
+  /* write the platform-wide change-log row (5.1) with the evidence for the 5.4 detail. */
+  pushLevelLog({candId:c ? c.id : null, cand:iv.cand, email:emailOf(iv.cand), from, fromLetters, to:o.level, toLetters:o.letters,
+    direction:levelDirection(from, o.level), proposedBy:iv.agent,
+    /* SOURCE FOLLOWS THE DATA, not iv.kind: a candidate with a prior level is being
+       RE-interviewed (a move); only a blank prior level is a first interview. This keeps
+       the log honest — you can never get a From→To move labelled "First interview". */
+    decidedOn:o.decidedOn, approvedBy:ME.name, approvedRole:'Super Admin', source:from ? 'Re-interview' : 'First interview', date:today(),
+    agentLevel:iv.agentLevel, agentLetters:iv.agentLetters, talLevel:iv.talLevel, talLetters:iv.talLetters,
+    reason:o.reason || '', reasoning:(iv.tal || '').replace(/<[^>]+>/g, ' ').trim(), strengths:iv.strengths, growth:iv.growth, aiRaw:iv.aiRaw || '0.68', ivId:iv.id});
   audit(o.decision === 'override' ? 'Overrode interview level' : 'Approved interview level',
     `${iv.cand} → ${levelLetters(o.level, o.letters)} · decided: ${o.decidedOn}${o.reason ? ' · ' + o.reason : ''} (agent ${levelLetters(iv.agentLevel, iv.agentLetters)}, Tal ${iv.talLevel ? levelLetters(iv.talLevel, iv.talLetters) : 'none'})`,
     'Marketplace & Interviews', 'high', {from:'', to:o.level});
@@ -9177,6 +9352,125 @@ ACTIONS.dooverridelvl = key => {
   decideApproval(iv, {decision:'override', level:v.level, letters, reason:v.reason,
     decidedOn:'Reviewer override', source:'Reviewer override', historyKind:'override'});
 };
+
+/* THE LEVEL CHANGE LOG (Epic 5.1) — every approved (live) change across every candidate,
+   newest first, filtered by Source and Direction and searchable by name/email. A row opens
+   the read-only change detail (5.4); Override (5.3) is offered on a live candidate not
+   currently awaiting a decision. Date-range filtering is a follow-up (the seed dates are
+   free-text; the story marks the range Optional). */
+function levellingLog(){
+  const q = getFilter('q', ''), sf = getFilter('lcsrc', 'all'), df = getFilter('lcdir', 'all');
+  const pendById = new Set(pendingApprovals().map(p => (candByName(p.cand) || {}).id).filter(Boolean));
+  const rows = LEVEL_LOG
+    .filter(r => sf === 'all' ? true : r.source === sf)
+    .filter(r => df === 'all' ? true : r.direction === df)
+    .filter(r => hit(q, r.cand, r.email || ''));
+  const srcDd = filterDd('lcsrc', 'all', [['all', 'All'], ['First interview', 'First interview'], ['Re-interview', 'Re-interview']], 'Source');
+  const dirDd = filterDd('lcdir', 'all', [['all', 'All'], ['Up', 'Up'], ['Down', 'Down'], ['Held', 'Held']], 'Direction');
+  return `
+  <section class="sec">
+    ${searchHead('Levelling Log', 'Every level change that has gone live, across every candidate — who moved, who proposed it, who approved it and when it took effect.',
+      exportBtn('Level changes'), 'Search by candidate name or email')}
+    ${lstTools('Search by candidate name or email', `${srcDd} ${dirDd}`)}
+    ${rows.length ? table(
+      [{label:'Candidate'}, {label:'From'}, {label:'To'}, {label:'Direction'}, {label:'Proposed by'}, {label:'Approved by'}, {label:'Source'}, {label:'Date'}, ACT_COL],
+      rows.map(r => {
+        const canOverride = r.candId && !pendById.has(r.candId);
+        const acts = [['view', 'View', `data-go="levelling/change/${r.id}"`]];
+        if(canOverride) acts.push(['edit', 'Override', `data-sheet="candoverride:${r.candId}"`]);
+        return {id:r.id, go:'levelling/change/' + r.id, cells:[
+          personCell(r.cand, r.email || ''),
+          r.from ? esc(levelLetters(r.from, r.fromLetters)) : '—',
+          esc(levelLetters(r.to, r.toLetters)),
+          r.direction ? esc(r.direction) : '—',
+          r.proposedBy ? esc(r.proposedBy) : '—',
+          esc(r.approvedBy),
+          r.source ? esc(r.source) : '—',
+          esc(r.date),
+          rowActs(acts)
+        ]};
+      }), {select:false})
+      : emptyState('chart', 'No level changes', q || sf !== 'all' || df !== 'all' ? 'Nothing matches the current filters.' : 'No approved level changes yet.')}
+  </section>`;
+}
+/* THE LEVEL CHANGE DETAIL (Epic 5.4) — read-only. The decision, both proposals side by side
+   with the decided one marked, the report, and any override reason. Append-only: no control
+   changes the record (a correction is a new override row, 5.3). */
+function levellingChange(){
+  const r = LEVEL_LOG.find(x => x.id === S.id);
+  if(!r) return `${detailHead('levelling/log')}
+    <section class="sec">${emptyState('chart', 'Not found', 'This level change is no longer on the record.')}</section>`;
+  DETAIL_LABEL = `${r.cand} — level change`;
+  const hasProps = !!r.agentLevel;
+  const mark = which => r.decidedOn === which ? ' ✓ decided' : '';
+  /* THE TOP OF THE PAGE IS THE CANDIDATE IDENTITY HEADER (Maryam, 25 Sep 2026: "the top of
+     the level page should show candidate details instead of level change heading") — the
+     candidate detail's own `.idhead` (round portrait, name + verified seal, standing + email),
+     not an aiHead. Resolve the live candidate where we have one; else build from the log row. */
+  const c = (r.candId && CAND_BY_ID[r.candId]) || candByName(r.cand) || null;
+  const cName = c ? c.name : r.cand;
+  const cBucket = c ? c.bucket : bucketOf(r.to);
+  const cLevel = c ? c.level : r.to;
+  const cEmail = c ? emailOf(c.name) : (r.email || '');
+  return `${detailHead('levelling/log')}
+  <div class="iv-detail-body">
+  <section class="sec">
+    <div class="idhead">
+      <span class="idphoto"><img src="${agentFace(cName)}" alt="" class="idhead-ph"></span>
+      <div class="idhead-b">
+        <span class="idname-row"><span class="idname">${esc(cName)}</span><span class="idverify" title="Verified candidate" aria-label="Verified"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" style="display:block">${inner('verified')}</svg></span></span>
+        <span class="idmeta">${esc(cBucket)} &middot; ${esc(cLevel)}${cEmail ? ' &middot; ' + esc(cEmail) : ''}</span>
+      </div>
+    </div>
+    ${(() => {
+      /* THE LEVEL CHANGE IS AN 8-CARD GRID (Maryam, 25 Sep 2026) — the whole read
+         at a glance in one attached `.facts pf-facts` band (two rows of four ≥900,
+         §105.1a). The two person cards (Talent Agent = who proposed / interviewed,
+         Approved by) carry the person's photo left of the name (`.cl-lead`); the
+         Transcript card carries a trailing arrow to the transcript page. This
+         replaces the old 4-card band + the Approved-by / Source / Proposed-by kv. */
+      const face = name => name ? `<span class="cl-lead"><span class="cl-lead-ph"><img src="${agentFace(name)}" alt=""></span>${esc(name)}</span>` : '—';
+      const htmlCell = (icon, mk, label, htmlVal) => `<div style="--mk:var(${mk})"><span class="l pf-l">${icon}${label}</span><span class="v">${htmlVal}</span></div>`;
+      /* the transcript page for this candidate's interview; a specific recording
+         where we can match a booking, else the Recordings & Transcripts register.
+         `r.transcript` is authored placeholder (§74) — "Ready" until real state lands. */
+      const bk = BOOKINGS.find(b => b.cand === r.cand);
+      const txRoute = bk ? 'market/recording/' + bk.id : 'market/recordings';
+      const txVal = `<a class="lc-tx" data-go="${txRoute}">${esc(r.transcript || 'Ready')} ${I.arrowRight}</a>`;
+      return `<div class="facts pf-facts">
+      ${admFact(I.chart, '--mk-4', 'Levelling', r.from ? esc(r.from) + ' to ' + esc(r.to) : esc(r.to))}
+      ${htmlCell(I.user, '--mk-1', 'Talent Agent', face(r.proposedBy))}
+      ${htmlCell(I.verified, '--mk-2', 'Approved by', face(r.approvedBy))}
+      ${admFact(I.growth, '--mk-3', 'Direction', r.direction || '—')}
+      ${admFact(I.flag, '--mk-4', 'Acronyms', lettersLabel(r.toLetters) || '—')}
+      ${admFact(I.calendar, '--mk-1', 'Date', r.date)}
+      ${admFact(I.video, '--mk-2', 'Source', r.source || '—')}
+      ${htmlCell(I.document, '--mk-3', 'Transcript', txVal)}
+    </div>`;
+    })()}
+  </section>
+  ${hasProps ? `<section class="sec">
+    ${secHead('The two proposals')}
+    <div class="facts pf-facts">
+      ${admFact(I.video, '--mk-4', 'Agent proposal' + mark('Agent proposal'), levelLetters(r.agentLevel, r.agentLetters))}
+      ${admFact(I.chat, '--mk-3', 'Tal proposal' + mark('Tal proposal'), r.talLevel ? levelLetters(r.talLevel, r.talLetters) : 'Not recorded')}
+    </div>
+  </section>` : ''}
+  ${(r.reasoning || r.strengths || r.growth) ? `<section class="sec">
+    ${secHead('The report')}
+    ${kv([
+      ...(r.reasoning ? [['Reasoning', r.reasoning]] : []),
+      ...(r.strengths ? [['Strengths', r.strengths]] : []),
+      ...(r.growth ? [['Growth areas', r.growth]] : []),
+      ...(r.aiRaw ? [['AI raw score', r.aiRaw + '  (visible with the View AI raw score permission)']] : [])
+    ])}
+  </section>` : ''}
+  ${r.reason ? `<section class="sec">
+    ${secHead(r.source === 'Admin override' ? 'Override reason' : 'Reviewer override reason')}
+    <p class="t-desc">${esc(r.reason)} <span class="t-caption">Internal — never shown to the candidate or the agent.</span></p>
+  </section>` : ''}
+  </div>`;
+}
 /* 8.2 — RESOLVE A FAILED INTERVIEW. Offered only on an overdue Held booking or a
    Not-held one. Chase the agent (a nudge, no state change) or Refund and close
    (full refund from escrow, booking → Resolved, nothing recovered from the
@@ -9448,7 +9742,11 @@ ACTIONS.dltranscript = key => {
   audit('Opened interview transcript', `${b.cand} with ${b.agent}`, 'Marketplace & Interviews', 'high'); toast('Transcript downloaded');
 };
 
-V.market = () => modView({bookings:marketBookings, recordings:marketRecordings, recording:marketRecordingDetail, approval:marketApproval});
+V.market = () => modView({bookings:marketBookings, recordings:marketRecordings, recording:marketRecordingDetail});
+/* THE LEVELLING MODULE (Epic 5, Maryam 25 Sep 2026) — the level change log (5.1), the
+   approval queue (5.2), Levels & Tracks (5.5, `cohortsLevels` reused), the change detail
+   (5.4) and the approval detail (`marketApproval`, moved here from Interviews). */
+V.levelling = () => modView({log:levellingLog, queue:levellingQueue, levels:cohortsLevels, change:levellingChange, approval:marketApproval});
 
 /* ══════════════════════════════════════════════════════════════════════════
    ONBOARDING QUESTIONS — the intake-quiz FORM BUILDER (Maryam, 22 Sep 2026).
@@ -11753,6 +12051,53 @@ function acctMenu(){
 
 const crumbBar = () => `<nav class="crumb-bar" aria-label="Breadcrumb"><ol class="crumb-trail"></ol></nav>`;
 
+/* ======================================================================
+   THE ROLE SWITCHER (Maryam, 25 Sep 2026) — a dropdown beside the menu icon
+   that appears ONLY on a person's detail page when that person holds more than
+   one role, so the Super Admin can read the same person's per-role profiles from
+   one place: "View as Candidate / Cohort Leader / Talent Agent / a Staff". It is
+   a NAVIGATOR between the existing per-role detail pages, not impersonation (the
+   read-only `S.viewAs` "View As" of SA-11 is a separate concept). The list only
+   ever offers the roles the person actually holds, so a single-role person shows
+   nothing.
+   ====================================================================== */
+const ROLE_VIEWS = [
+  {role:'candidate', label:'View as Candidate',     mod:'candidates', sub:'detail',       route:u => 'candidates/detail/' + u.id},
+  {role:'leader',    label:'View as Cohort Leader', mod:'cohorts',    sub:'leaderdetail', route:u => 'cohorts/leaderdetail/' + u.id},
+  {role:'agent',     label:'View as Talent Agent',  mod:'agents',     sub:'detail',       route:u => 'agents/detail/' + u.id},
+  {role:'staff',     label:'View as a Staff',       mod:'users',      sub:'staffdetail',  route:u => 'users/staffdetail/' + u.id}
+];
+/* the person whose detail page we are on, or null if this is not a person-detail
+   page — every such page keys on the USERS id via `S.id` (candidate/agent ids
+   match their USERS id). */
+function switchPerson(){
+  const on = {'candidates/detail':1, 'agents/detail':1, 'users/staffdetail':1, 'cohorts/leaderdetail':1};
+  if(!on[S.mod + '/' + S.sub]) return null;
+  return USER_BY_ID[S.id] || null;
+}
+/* the role-views a person can be seen through — staff = an internal account, the
+   product roles by the roles array. */
+const personRoleViews = u => ROLE_VIEWS.filter(rv => rv.role === 'staff' ? !!u.internal : (u.roles || []).includes(rv.role));
+function roleSwitch(){
+  const u = switchPerson();
+  if(!u) return '';
+  const views = personRoleViews(u);
+  if(views.length < 2) return '';                       /* one role — nothing to switch */
+  const cur = views.find(rv => rv.mod === S.mod && rv.sub === S.sub);
+  const label = cur ? cur.label : 'View as…';
+  return `<div class="roleswitch">
+    <button class="roleswitch-t ${S.roleSw ? 'on' : ''}" data-toggle="roleSw"
+      aria-haspopup="menu" aria-expanded="${S.roleSw ? 'true' : 'false'}" title="Switch which role you view this person as">
+      <span class="rsw-l">${esc(label)}</span>
+      <svg class="rsw-c" viewBox="0 0 24 24" aria-hidden="true">${inner('chevDown')}</svg>
+    </button>
+    <div class="roleswitch-menu ${S.roleSw ? 'on' : ''}" role="menu" aria-label="View this person as">
+      ${views.map(rv => { const isOn = rv === cur; return `<button class="rsw-i${isOn ? ' on' : ''}" role="menuitem"${isOn ? ' aria-current="true"' : ''} data-go="${rv.route(u)}">
+        <span class="rsw-i-l">${esc(rv.label)}</span>${isOn ? `<span class="rsw-i-mk">${I.check}</span>` : ''}</button>`; }).join('')}
+    </div>
+  </div>`;
+}
+
 function shell(){
   return `
   <header class="shell">
@@ -11760,6 +12105,7 @@ function shell(){
       aria-label="${S.nav ? 'Collapse' : 'Expand'} navigation" aria-expanded="${S.nav ? 'true' : 'false'}" aria-controls="admin-sidenav">${S.nav ? I.close
       : `<span class="nav-t-mark">${TN_MARK}</span><span class="nav-t-menu">${I.menu}</span>`}</button>
     <button class="shell-logo" data-go="home/home" aria-label="TalentNext home"><img src="${LOGO_K}" alt="TalentNext"></button>
+    ${roleSwitch()}
     ${crumbBar()}
     <div class="shell-right">
       <button class="shell-act ${S.notif ? 'on' : ''}" data-toggle="notif"
@@ -11995,7 +12341,8 @@ function detailListSub(m){
   const map = {users:'users', vetting:'applications', candidates:'candidates', agents:'agents',
     cohorts:'cohorts', employers:'employers', crm:'leads'};
   const dmap = {appdetail:'applications', staffdetail:'users', coursedetail:'catalogue',
-    leaddetail:'leads', campaigndetail:'campaigns', import:'users', empverifydetail:'empverify'};
+    leaddetail:'leads', campaigndetail:'campaigns', import:'users', empverifydetail:'empverify',
+    leaderdetail:'assign'};
   /* an internal staff record's list is the Staff directory, not All Users. */
   if(S.sub === 'staffdetail' && (USER_BY_ID[S.id] || {}).internal) return m._sub.staff || null;
   const k = dmap[S.sub] || map[m.k];
@@ -12352,7 +12699,7 @@ function go(dest, keepNav){
      have to reopen after every press is not a tree. On a phone it is a drawer
      over the page and shuts, as it always did. */
   if(!keepNav) S.nav = false;
-  S.notif = false; S.acct = false; S.tal = false; S.editPerms = false; S.rowMenu = null; S.pgOpen = null; S.fdOpen = null;
+  S.notif = false; S.acct = false; S.tal = false; S.editPerms = false; S.rowMenu = null; S.pgOpen = null; S.fdOpen = null; S.roleSw = false;
   render();
   const main = device.querySelector('.main');
   if(main) main.scrollTop = 0;
@@ -12370,7 +12717,7 @@ function goBack(fallback){
   S.mod = mod;
   S.sub = (sub && MOD_BY_K[mod]._sub[sub]) ? sub : firstSub(MOD_BY_K[mod]);
   S.id = id || null;
-  S.nav = false; S.notif = false; S.acct = false; S.tal = false; S.editPerms = false; S.rowMenu = null; S.pgOpen = null; S.fdOpen = null;
+  S.nav = false; S.notif = false; S.acct = false; S.tal = false; S.editPerms = false; S.rowMenu = null; S.pgOpen = null; S.fdOpen = null; S.roleSw = false;
   render();
   const main = device.querySelector('.main');
   if(main) main.scrollTop = 0;
@@ -12597,6 +12944,8 @@ device.addEventListener('click', e => {
   const t = e.target.closest('[data-go],[data-back],[data-toggle],[data-close],[data-confirm],[data-do],[data-readall],[data-tab],[data-filter],[data-act],[data-sheet],[data-sort],[data-rowmenu],[data-ivopen],[data-crsopen],[data-pg],[data-pgsize],[data-pgddtoggle],[data-fdtoggle],[data-payopen],[data-paytab],[data-payclose],[data-improleopen],[data-improleset],[data-sel],[data-selall],[data-selclearall]');
 
   if(S.acct && !e.target.closest('.acct-t, .acct-menu')){ S.acct = false; render(); }
+  /* the app-bar ROLE SWITCHER closes on any click outside its trigger or menu */
+  if(S.roleSw && !e.target.closest('.roleswitch-t, .roleswitch-menu')){ S.roleSw = false; render(); }
   /* §125 — an open row menu closes on any click outside its trigger or list.
      The list is included by name because `placeRowMenu` moves it out of the
      `.rowmenu` wrapper into `.main`. */
