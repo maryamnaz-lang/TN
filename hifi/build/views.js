@@ -7979,7 +7979,11 @@ V.report = (f) => `<main class="main"><div class="page">
   ${(() => { const k = S.iv === 're' ? 're' : 'level';
     return sceneDone(k)
     ? `<div class="sec sec-scene">
-    <div class="sec-h"><h2>Scenes</h2><span class="t-helper-01">${(sceneKeep(k)||[]).length > 3 ? 'The full interview, all scenes' : 'The three you kept'}</span></div>
+    ${''/* THE SCENES HEADING CARRIES NO HELPER CAPTION (Maryam, 24 Sep 2026:
+          "remove the text 'The three you kept'"). It was a `.t-helper-01` span
+          reading "The three you kept" / "The full interview, all scenes"; the
+          section is self-evidently the kept scenes, so the caption was furniture. */}
+    <div class="sec-h"><h2>Scenes</h2></div>
     ${sceneRow(k)}
   </div>`
     : `<div class="sec">

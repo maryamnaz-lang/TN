@@ -1414,7 +1414,16 @@ css = '\n'.join((here / f).read_text() for f in
                  # `.ask-thread` (the chat scroller, §53) and `.sn-main` were
                  # never hidden the way §12 hides `.main`; this does. Crosses to
                  # the DS.
-                 '136-scrollbar.css',])
+                 '136-scrollbar.css',
+                 # §137 — THE MOBILE REPORT FLOW (Maryam, 24 Sep 2026). A batch
+                 # of phone-only (max-width:599.98) corrections to the report page:
+                 # the page name moves off the header and above the Tal summary
+                 # (`.mob-ph`, placeMobTitle in ai11.js), a shorter Tal dock, the
+                 # black card at 16px, and the ladder's ahead levels coloured. Last,
+                 # so it wins over §97's card padding, §117/§70's dock height and
+                 # §15's quiet-ahead ladder. States no type (that is §63). hifi-only
+                 # — in build-ds.py's NOT_IN_DS (the candidate report's own flow).
+                 '137-mobileflow.css',])
 # ==========================================================================
 # NO HOVER
 # The state layer was fighting the layout everywhere it appeared: a wash on a

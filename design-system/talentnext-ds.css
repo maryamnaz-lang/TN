@@ -6010,9 +6010,9 @@ button.btn-p:active,
 @container app (min-width:900px){
   .app .page .sec:has(> .scene-pick) > .sec-h{padding-left:0; padding-right:0}
 }
-.app .scene-row{display:grid; grid-template-columns:minmax(0,1fr); gap:var(--s06)}
+.app .scene-row{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:var(--s03)}
 @container app (min-width:672px){
-  .app .scene-row{grid-template-columns:repeat(3,minmax(0,1fr)); gap:var(--s05)}
+  .app .scene-row{gap:var(--s05)}
 }
 .app .scene-pick{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--s06) var(--s04)}
 @container app (min-width:672px){

@@ -1,0 +1,67 @@
+/* ==========================================================================
+   137. THE MOBILE REPORT FLOW — Maryam, 24 Sep 2026
+
+   A batch of phone-only corrections to the report page (`#day34/report`) she was
+   reviewing at ~375px. Every rule here is scoped to a phone (`@container app
+   (max-width:599.98px)`, the seam §78.2 already treats as the phone) so desktop
+   and tablet are untouched — the report's desktop two-column band, its 32px black
+   card and quiet ladder all stay exactly as they were. Six asks:
+
+     1. NO PAGE NAME IN THE HEADER — show it above the Tal summary instead. The
+        `.mob-ph` title `placeMobTitle` (ai11.js) stamps above the head band, and
+        the whole header trail is dropped on a phone. Type is `.t-h1` (§63 owns
+        it); only display and layout are here.
+     2. A SHORTER, CLEANER TAL DOCK. The floating pill drops from 64 to 56 and its
+        side padding from 24 to 16; the travelling comet's corner radius moves with
+        it (§117's own note says the next height change must), and the review
+        capsule that floats above the dock re-pins to the new height.
+     3. (the "three you kept" caption — views.js, not CSS.)
+     4. (the kept scenes in one row — §38, not here.)
+     5. THE BLACK CARD PAYS 16, NOT 32, on a phone — §97 gives `.lvl-hero` `--s07`
+        all round, which is a desktop frame on a phone.
+     6. THE LADDER'S AHEAD LEVELS ARE COLOURED, not grey. §15's "the levels behind
+        you are quiet, the one you are on is the only solid mark" is reversed here
+        for the phone: the rungs ahead take a faint accent so the whole ladder
+        reads as one coloured scale. On (100%) over done (~42%) over ahead (~22%)
+        keeps the progress legible.
+
+   hifi-only — it is in `build-ds.py`'s `NOT_IN_DS`: this is the candidate report's
+   own mobile flow, not a design-system component, and the shared dock/ladder on
+   the other portals are left where they are. It states no type (that is §63), so
+   it is free to sit last.
+   ========================================================================== */
+
+/* ---- 1. no page heading on a phone; the summary attaches to the header ---- */
+/* Maryam, 24 Sep 2026 ("remove the heading and attach the summary section with
+   the header"). A module page with a Tal summary carries no title on a phone —
+   not in the bar, not above the band. `markMobHead` (ai11.js) stamps `.mobph-on`
+   on such a page and this drops the header trail; with nothing above the band,
+   the summary wash meets the header on its own (the content already begins at the
+   header's bottom edge — the frame's 16px is its own padding, not a content gap).
+   The `.mob-ph` title element is no longer created; its old styling is gone. */
+@container app (max-width:599.98px){
+  .app:has(.view-col .page.mobph-on) .crumb-bar{display:none}
+}
+
+/* ---- 2. a shorter Tal dock, and the two things sized to it ---- */
+@container app (max-width:599.98px){
+  .app .askdock > .askline{min-height:56px;padding:var(--s04) var(--s05)}
+  /* §117.24's note: the comet's rect is inset 1px, so a full corner is
+     height/2 - 1 — 27 at 56, was 31 at 64 */
+  .app .ai-run rect{rx:27px}
+  /* §130 pins the review capsule one dock-height off the floor; follow the
+     dock down from 66 to 56 so the gap above it stays the same */
+  .app .rev-float{bottom:calc(var(--s05) + 56px + var(--s04))}
+}
+
+/* ---- 5. the black level card pays a phone's gutter ---- */
+@container app (max-width:599.98px){
+  .app .page > .lvl-hero,
+  .app .modhead .lvl-hero{padding:var(--s05)}
+}
+
+/* ---- 6. the ladder's ahead levels take colour ---- */
+@container app (max-width:599.98px){
+  .app .lvl-hero .ladder i:not(.done):not(.on){
+    background-color:var(--accent);opacity:.22}
+}

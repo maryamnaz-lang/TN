@@ -7514,9 +7514,9 @@ button.btn-p:active,
   .app .page .sec:has(> .scene-pick) > .sec-h{padding-left:0;padding-right:0}
 }
 .app .scene-row{
-  display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s06)}
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s03)}
 @container app (min-width:672px){
-  .app .scene-row{grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s05)}
+  .app .scene-row{gap:var(--s05)}
 }
 .app .scene-pick{
   display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
@@ -14879,6 +14879,22 @@ button.btn-p:active,
   height:0;
   display:none;
 }
+@container app (max-width:599.98px){
+  .app:has(.view-col .page.mobph-on) .crumb-bar{display:none}
+}
+@container app (max-width:599.98px){
+  .app .askdock > .askline{min-height:56px;padding:var(--s04) var(--s05)}
+  .app .ai-run rect{rx:27px}
+  .app .rev-float{bottom:calc(var(--s05) + 56px + var(--s04))}
+}
+@container app (max-width:599.98px){
+  .app .page > .lvl-hero,
+  .app .modhead .lvl-hero{padding:var(--s05)}
+}
+@container app (max-width:599.98px){
+  .app .lvl-hero .ladder i:not(.done):not(.on){
+    background-color:var(--accent);opacity:.22}
+}
 
 </style>
 </head>
@@ -19564,7 +19580,11 @@ V.report = (f) => `<main class="main"><div class="page">
   ${(() => { const k = S.iv === 're' ? 're' : 'level';
     return sceneDone(k)
     ? `<div class="sec sec-scene">
-    <div class="sec-h"><h2>Scenes</h2><span class="t-helper-01">${(sceneKeep(k)||[]).length > 3 ? 'The full interview, all scenes' : 'The three you kept'}</span></div>
+    ${''/* THE SCENES HEADING CARRIES NO HELPER CAPTION (Maryam, 24 Sep 2026:
+          "remove the text 'The three you kept'"). It was a `.t-helper-01` span
+          reading "The three you kept" / "The full interview, all scenes"; the
+          section is self-evidently the kept scenes, so the caption was furniture. */}
+    <div class="sec-h"><h2>Scenes</h2></div>
     ${sceneRow(k)}
   </div>`
     : `<div class="sec">
@@ -31381,6 +31401,16 @@ function tidyPh(page){
     ph.querySelectorAll('.ph-top > *').length === 1);
 }
 
+function markMobHead(page){
+  page.classList.remove('mobph-on');
+  const old = page.querySelector(':scope > .mob-ph');
+  if(old) old.remove();
+  const band = page.querySelector(':scope > .modhead');
+  if(!band || !band.querySelector('.ai-aura.talsum')) return;
+  if(page.querySelector('.ph-you')) return;
+  page.classList.add('mobph-on');
+}
+
 function placeTopbar(){
   const trail = device.querySelector('.shell .crumb-trail');
   const page  = device.querySelector('.view-col .page');
@@ -31390,6 +31420,7 @@ function placeTopbar(){
   stripPageHead(page);
   drawTrail(trail, parts);
   tidyPh(page);
+  markMobHead(page);
 }
 
 let _pfRO = null;

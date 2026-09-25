@@ -279,6 +279,34 @@ function tidyPh(page){
     ph.querySelectorAll('.ph-top > *').length === 1);
 }
 
+/* THE MODULE PAGE HAS NO HEADING ON A PHONE, AND THE SUMMARY ATTACHES TO THE
+   HEADER — Maryam, 24 Sep 2026 ("remove the heading and attach the summary
+   section with the header").
+
+   The story here ran in two steps. §78.2 first collapsed the header trail to the
+   page's name on a phone; she then moved that name OFF the bar and above the Tal
+   summary as a `.mob-ph` title; and now she wants NO heading at all on a phone —
+   not in the bar, not above the summary — with the Tal summary band sitting
+   straight under the header. So the element is gone and only the MARK survives:
+   this stamps `.mobph-on` on the page, which §137 reads to drop the header trail
+   below 600. Removing the title is all it takes to attach the summary — the page
+   content already begins at the header's bottom edge, so with nothing above the
+   band the wash meets the bar.
+
+   SCOPED TO A PAGE WITH A SUMMARY BAND, and never a dashboard — the same test as
+   before: `.modhead .ai-aura.talsum` present, `.ph-you` (the dashboard greeting)
+   absent. A dashboard keeps its own head and its bar name. */
+function markMobHead(page){
+  page.classList.remove('mobph-on');
+  /* clean up the title element earlier builds inserted, in case one lingers */
+  const old = page.querySelector(':scope > .mob-ph');
+  if(old) old.remove();
+  const band = page.querySelector(':scope > .modhead');
+  if(!band || !band.querySelector('.ai-aura.talsum')) return;
+  if(page.querySelector('.ph-you')) return;
+  page.classList.add('mobph-on');
+}
+
 function placeTopbar(){
   const trail = device.querySelector('.shell .crumb-trail');
   const page  = device.querySelector('.view-col .page');
@@ -292,6 +320,7 @@ function placeTopbar(){
   stripPageHead(page);
   drawTrail(trail, parts);
   tidyPh(page);
+  markMobHead(page);
 }
 
 /* --------------------------------------------------------------------------

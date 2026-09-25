@@ -256,10 +256,16 @@
    672px is where §15 already turns the interview row's kit strip from one
    column into three, so the two blocks on this page change shape together.
    -------------------------------------------------------------------------- */
+/* THE KEPT SCENES ARE ONE ROW AT EVERY WIDTH — Maryam, 24 Sep 2026 ("show all
+   the scenes in a single row"). They used to stack to a single COLUMN below
+   672 (the seam §15 turns the interview kit strip on), which put three stills
+   one under the other on a phone. Three is few enough to read side by side at
+   any width, so the grid is three columns throughout; only the gap steps down
+   on a phone so the narrow cards keep a little air without wrapping. */
 .app .scene-row{
-  display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s06)}
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s03)}
 @container app (min-width:672px){
-  .app .scene-row{grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s05)}
+  .app .scene-row{gap:var(--s05)}
 }
 
 /* --------------------------------------------------------------------------

@@ -1884,6 +1884,13 @@ NOT_IN_DS = {
     # exactly the "a family the box never writes" case. The base `__AUTHART__`
     # panel still crosses (§57), so the design-system front door is unchanged.
     '132-authslide.css': "one portal's onboarding-photo slider; only hifi emits the markup — see the layer's note",
+    # §137 is the candidate report's own phone flow: the `.mob-ph` title
+    # `placeMobTitle` (ai11.js) stamps, the report's `.lvl-hero` black card and
+    # its `.ladder`, and the review capsule that floats above the dock. The dock
+    # height it also trims IS shared, but the rest is report-specific hifi markup
+    # and passes the other portals never run — shipping the file would put a
+    # `.mob-ph`/`.lvl-hero` phone flow on portals that build neither. hifi-only.
+    '137-mobileflow.css': "the candidate report's phone flow (.mob-ph/.lvl-hero/ladder); hifi-only markup and passes — see the layer's note",
 }
 
 
