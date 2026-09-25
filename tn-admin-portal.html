@@ -1309,6 +1309,20 @@ input:-webkit-autofill:focus{
 .app .rowmenu-t{padding-left:var(--s02); padding-right:var(--s02)}
 /* Bare date-popup wrapper */
 .app .dcal{width:100%}
+/* TALENT LETTERS multi-select (Epic 5, 25 Sep 2026) — a candidate holds 1–6 of the
+   six letters alongside their level. Chips are radius-0 like the platform; an
+   accent-tint fill + accent edge marks a picked letter, matching the row-select
+   affordance. DOM-only toggle (no render, trap 9) so the reason textarea survives. */
+.app .ltr-pick{display:flex; flex-wrap:wrap; gap:var(--s03); margin-top:var(--s02)}
+.app .ltr-chip{display:inline-flex; align-items:center; gap:var(--s02); padding:var(--s02) var(--s04); border:1px solid var(--rule); background:var(--background); cursor:pointer; color:var(--text-secondary); font:inherit; line-height:1.2}
+.app .ltr-chip b{color:var(--text-primary); font-weight:var(--t-w-strong)}
+.app .ltr-chip.on{border-color:var(--accent); background:color-mix(in srgb, var(--accent) 8%, var(--background)); color:var(--accent-text)}
+.app .ltr-chip.on b{color:var(--accent-text)}
+/* per-level rows on Levels & Tracks (5.5): a description slot (awaiting client
+   content until the rubric lands) and the E5+ leading-rights line. */
+.app .lvl-block-d{display:block; color:var(--text-secondary); margin-top:var(--s02)}
+.app .lvl-block-d.awaiting{color:var(--text-helper); font-style:normal}
+.app .lvl-block-lead{display:block; margin-top:var(--s02)}
 </style>
 </head>
 <body>
@@ -6623,6 +6637,65 @@ const LEVELS_MVP = LEVELS.filter(l => l[0] !== 'T');
 const levelOpts = cur => (cur && cur[0] === 'T' && !LEVELS_MVP.includes(cur)) ? [...LEVELS_MVP, cur] : LEVELS_MVP;
 const levelIx = l => LEVELS.indexOf(l);
 const bucketOf = lvl => lvl[0] === 'B' ? 'Builder' : lvl[0] === 'T' ? 'Trailblazer' : 'Explorer';
+
+/* ==== TALENT LETTERS (Epic 5, Maryam 25 Sep 2026) =====================
+   A candidate's standing is a TRACK + a LEVEL + a COMBINABLE set of 1–6 TALENT
+   letters, shown as "B3 (A, L, T)" — the letters coexist with the level, they are
+   not exclusive with it (Maryam, 25 Sep 2026). The six letters spell TALENT; the
+   word repeats T (Top Performer / Team Player), so each is a DISTINCT keyed entry
+   with a display char — the duplicate-T display ambiguity is a CLIENT-CONTENT flag.
+   Letters print in FIXED TALENT order whatever order they were chosen in. The six
+   MEANINGS are client content (authored placeholder §74). This SUPERSEDES the single
+   free-string `talType` persona for a candidate's HELD standing (talType stays only
+   as the read Tal names on the approval screen). Threaded through 5.1/5.2/5.3. */
+const TALENT_LETTERS = [
+  {k:'T1', ltr:'T', name:'Top Performer', meaning:'Consistently clears the bar the level sets.'},
+  {k:'A',  ltr:'A', name:'Athlete',       meaning:'Trains, recovers and shows up to a standard.'},
+  {k:'L',  ltr:'L', name:'Leader',        meaning:'Develops others and owns a group outcome.'},
+  {k:'E',  ltr:'E', name:'Entrepreneur',  meaning:'Starts things and carries the risk of them.'},
+  {k:'N',  ltr:'N', name:'Not Sure',      meaning:'Capable, still finding the lane.'},
+  {k:'T2', ltr:'T', name:'Team Player',   meaning:'Makes the people around them better.'}
+];
+const LETTER_ORDER = TALENT_LETTERS.map(x => x.k);
+const letterMeta = k => TALENT_LETTERS.find(x => x.k === k) || {ltr:k, name:k, meaning:''};
+/* fixed-order display letters: ['L','T1','A'] -> "T, A, L" */
+const lettersLabel = arr => (arr || []).slice().sort((a, b) => LETTER_ORDER.indexOf(a) - LETTER_ORDER.indexOf(b)).map(k => letterMeta(k).ltr).join(', ');
+/* "B3 (A, L, T)" — level, plus the letters where any are held */
+const levelLetters = (lvl, arr) => `${esc(lvl || '—')}${arr && arr.length ? ` (${lettersLabel(arr)})` : ''}`;
+/* full standing: "Builder — B3 (A, L, T)" */
+const standingLabel = c => `${esc(bucketOf(c.level))} — ${levelLetters(c.level, c.letters)}`;
+/* the 1–6 letters multi-select for the override / reviewer-override sheets. A hidden
+   [data-f="letters"] carries the comma-joined keys so readForm reads it like any
+   field and syncSheetSubmit's generic gate can require it; the chips toggle DOM-only
+   (data-ltrtoggle, no render — trap 9). */
+function lettersPicker(sel){
+  sel = sel || [];
+  return `<div class="f"><label>TALENT letters <span class="req-star">*</span></label>
+    <input type="hidden" data-f="letters" value="${esc(sel.join(','))}">
+    <div class="ltr-pick">${TALENT_LETTERS.map(x => `<button type="button" class="ltr-chip${sel.includes(x.k) ? ' on' : ''}" data-ltrtoggle="${x.k}" title="${esc(x.name)} — ${esc(x.meaning)}"><b>${x.ltr}</b><span>${esc(x.name)}</span></button>`).join('')}</div>
+    <span class="t-desc">Pick one to six. The letters are shown in TALENT order; meanings are client content.</span></div>`;
+}
+const readLetters = v => (v && v.letters ? String(v.letters).split(',').filter(Boolean) : []);
+/* keep-scattered level history (5.1): write one change row onto the candidate. Rows
+   carry the letters, the Decided-on and the Source alongside from/to, so the
+   per-candidate history reads back the same evidence the log would have. */
+function recordLevelChange(c, o){
+  if(!c) return; levelHistory(c);
+  c.history.unshift({from:o.from, fromLetters:o.fromLetters || [], to:o.to, toLetters:o.toLetters || [],
+    by:o.by || ME.name, when:o.when || today(), kind:o.kind || 'review', decidedOn:o.decidedOn || '', source:o.source || ''});
+}
+/* Up / Down / Held (5.1) — a change that moves only the letters reads Held. */
+const levelDirection = (from, to) => {
+  const a = LVL_CODES.indexOf(from), b = LVL_CODES.indexOf(to);
+  return b > a ? 'Up' : b < a ? 'Down' : 'Held';
+};
+/* AUTHORED-PLACEHOLDER LETTERS on the seed candidates (§74) — the seed has no real
+   TALENT reads, so each candidate gets a stable, distinct subset until real data. */
+;(function seedLetters(){
+  const SETS = [['L'], ['L', 'A'], ['T1', 'L'], ['E', 'L'], ['A', 'N'], ['L', 'A', 'E'], ['T1'], ['E']];
+  CANDS.forEach((c, i) => { if(!c.letters) c.letters = SETS[(c.name.charCodeAt(0) + i) % SETS.length].slice(); });
+})();
+
 const agentNames = () => USERS.filter(u => u.roles.includes('agent')).map(u => u.name);
 
 PAGESUM['candidates/candidates'] = () => {
@@ -7252,21 +7325,35 @@ function candCourses(){
    history + Override), Cohorts (their cohort with progress, linking through) and
    Payments (their transactions). The Activity panel stays out — the Audit Log
    module is hidden. */
+/* THE LEVELLING PANEL — the keep-scattered home (Epic 5, Maryam 25 Sep 2026) for
+   both the per-candidate level history (5.1) and the Override row action (5.3), no
+   consolidated log built. It shows the candidate's STANDING (track + level + letters),
+   and every change on the record with its Decided-on and Source. Override is offered
+   only on a LIVE (approved) level, and NEVER while a proposed level is awaiting a
+   reviewer (5.3) — that level is settled in the approval queue, not corrected here. */
 function candLevellingPanel(c){
   const rung = (LVL_CODES.indexOf(c.level) + 1) || 2;
   const hist = levelHistory(c);
   const levelled = c.agent && c.agent !== '—';
+  const awaiting = pendingApprovals().some(p => p.cand === c.name);
+  const act = levelled && !awaiting
+    ? `<button class="btn btn-g btn-sm noic" data-sheet="candoverride:${c.id}">Override Level</button>`
+    : '';
+  const histRow = h => cardRow('chart',
+    `${levelLetters(h.from, h.fromLetters)} → ${levelLetters(h.to, h.toLetters)}`,
+    [h.by || 'TalentNext', h.when, h.decidedOn, h.source || (h.kind === 'override' ? 'Admin override' : '')].filter(Boolean).map(esc).join(' · '), '');
   return `<section class="sec">
-    ${aiHead('Levelling', 'The approved level, how it was reached, and every change on the record.',
-      `<button class="btn btn-g btn-sm noic" data-sheet="candoverride:${c.id}">Override Level</button>`)}
+    ${aiHead('Levelling', 'The approved standing, how it was reached, and every change on the record.', act)}
+    ${awaiting ? `<p class="t-desc" style="margin-bottom:var(--s05)">A level is awaiting approval for this candidate. It is settled in the approval queue, so it cannot be overridden here yet.</p>` : ''}
     ${kv([
-      ['Current level', `${esc(c.bucket)} — ${esc(c.level)}`],
+      ['Current standing', levelled ? standingLabel(c) : 'Not yet levelled'],
+      ['TALENT letters', c.letters && c.letters.length ? lettersLabel(c.letters) : 'None yet'],
       ['Position', levelled ? `Rung ${rung} of 15` : 'Not yet levelled'],
       ['Interviewer', levelled ? esc(c.agent) : '—'],
       ['Set by', levelled ? 'TalentNext' : '—']
     ])}
     ${hist.length
-      ? `<div class="tile-stack" style="margin-top:var(--s06)">${hist.map(h => cardRow('chart', `${esc(h.from)} → ${esc(h.to)}`, `${esc(h.by || 'TalentNext')}${h.when ? ' · ' + esc(h.when) : ''}${h.kind === 'override' ? ' · override' : ''}`, '')).join('')}</div>`
+      ? `<div class="tile-stack" style="margin-top:var(--s06)">${hist.map(histRow).join('')}</div>`
       : `<p class="t-desc" style="margin-top:var(--s05)">No level changes recorded yet.</p>`}
   </section>`;
 }
@@ -7296,23 +7383,53 @@ function candPaymentsPanel(c){
       : emptyState('wallet', 'No transactions', 'No course or interview payments on record for this candidate.')}
   </section>`;
 }
+/* SET-EQUALITY for the letters gate — order-independent. */
+const sameLetterSet = (a, b) => { a = a || []; b = b || []; return a.length === b.length && a.every(x => b.includes(x)); };
+/* OVERRIDE A CANDIDATE LEVEL (Epic 5.3, Maryam 25 Sep 2026). The full ladder E1–T5
+   pre-selected to the current level, the 1–6 letters pre-selected to the current
+   letters, a required reason. Apply Override is disabled until the level OR the letters
+   differ (gateFn). Apply opens a CONFIRMATION PROMPT (the two-step S._pending pattern)
+   before it commits; on commit it replaces level + letters as one set, writes a history
+   row with Source = Admin override (Proposed by / Decided on blank), and audits
+   before/after + reason. The candidate notification is candidate-portal (hifi) scope and
+   is STUBBED here (admin-side only). */
 SHEETS.candoverride = id => {
   const c = CAND_BY_ID[id] || (USER_BY_ID[id] && CAND_BY_ID[USER_BY_ID[id].id]);
   if(!c) return {title:'Override level', body:'', ok:''};
-  return {title:`Override the level for ${c.name}`, ok:'Set Level', act:'docandoverride:' + id,
-    body: fieldHtml({k:'level', l:'New level', t:'select', req:1, opts:levelOpts(c.level).map(l => [l, l])}, c.level)
+  return {title:`Override the level for ${c.name}`, ok:'Apply Override', act:'docandoverride:' + id,
+    gate:true, disabled:true,
+    gateFn: v => { const L = readLetters(v); return !v.reason || !v.level || !L.length || (v.level === c.level && sameLetterSet(L, c.letters)); },
+    body: kv([['Current standing', standingLabel(c)], ['Set by', c.agent && c.agent !== '—' ? 'TalentNext (interviewed by ' + esc(c.agent) + ')' : '—']])
+      + fieldHtml({k:'level', l:'New level', t:'select', req:1, opts:LVL_CODES}, c.level)
+      + lettersPicker(c.letters)
       + fieldHtml({k:'reason', l:'Reason', t:'textarea', req:1, max:500, ph:'Why the level is being overridden. Internal only.'})
-      + sheetHelp('The override lands immediately and is kept on the candidate’s level history. TalentNext sets the level from the interview; an override is the admin’s correction of it.')};
+      + sheetHelp('The override replaces the level and letters as one set and is kept on the candidate’s level history. TalentNext sets the level from the interview; an override is the admin’s correction of it.')};
 };
 ACTIONS.docandoverride = key => {
   const c = CAND_BY_ID[key.split(':')[1]]; const v = readForm(); if(!c) return;
+  const letters = readLetters(v);
   if(!v.level){ toast('Choose a level', 'warn'); return 'keep'; }
+  if(!letters.length){ toast('Pick at least one TALENT letter', 'warn'); return 'keep'; }
   if(!v.reason){ toast('A reason is required', 'warn'); return 'keep'; }
-  const from = c.level; if(v.level === from){ toast('That is already this candidate’s level', 'warn'); return 'keep'; }
-  levelHistory(c); c.history.unshift({from, to:v.level, by:ME.name, when:today(), kind:'override'});
-  c.level = v.level; const u = USER_BY_ID[c.id]; if(u) u.level = v.level;
-  audit('Overrode candidate level', `${c.name} · ${from} → ${v.level} · ${v.reason}`, 'Candidates', 'high', {from, to:v.level});
-  toast(`${c.name} set to ${v.level}`); S.sheet = null;
+  if(v.level === c.level && sameLetterSet(letters, c.letters)){ toast('Change the level or the letters to continue', 'warn'); return 'keep'; }
+  /* two-step: stash the form, then confirm (the sheet is gone by the time the
+     confirmation commits — trap "a two-step action carries its form in S._pending"). */
+  S._pending = {id:c.id, level:v.level, letters, reason:v.reason};
+  S.sheet = null;
+  askConfirm({mk:'chart', title:`Override ${c.name}’s level?`,
+    body:`Change ${esc(c.name)} from ${standingLabel(c)} to ${bucketOf(v.level)} — ${levelLetters(v.level, letters)}? They will be notified.`,
+    ok:'Apply Override', act:'docandoverridedo'});
+};
+ACTIONS.docandoverridedo = () => {
+  const p = S._pending; S._pending = null; S.confirm = null; if(!p) return;
+  const c = CAND_BY_ID[p.id]; if(!c) return;
+  const from = c.level, fromLetters = (c.letters || []).slice();
+  recordLevelChange(c, {from, fromLetters, to:p.level, toLetters:p.letters, by:ME.name, kind:'override', source:'Admin override'});
+  c.level = p.level; c.letters = p.letters; c.bucket = bucketOf(p.level);
+  const u = USER_BY_ID[c.id]; if(u){ u.level = p.level; }
+  /* candidate notification (no reason) is hifi candidate-portal scope — stubbed here. */
+  audit('Overrode candidate level', `${c.name} · ${levelLetters(from, fromLetters)} → ${levelLetters(p.level, p.letters)} · ${p.reason}`, 'Candidates', 'high', {from, to:p.level});
+  toast(`${c.name} set to ${levelLetters(p.level, p.letters)}`);
 };
 
 function candidatesDetail(){
@@ -7357,7 +7474,7 @@ function candidatesDetail(){
            Level" (Maryam, 15 Sep 2026). Same data the candidate sees. */}
     <div class="facts pf-facts">
       ${admFact(I.growth, '--mk-4', 'Track', c.bucket + ' track')}
-      ${admFact(I.chart, '--mk-3', 'Current Level', c.bucket + ' – ' + c.level)}
+      ${admFact(I.chart, '--mk-3', 'Current Level', c.bucket + ' – ' + levelLetters(c.level, c.letters))}
       ${admFact(I.trophy, '--mk-2', 'Points', p.points.toLocaleString())}
       ${admFact(I.book, '--mk-1', 'Total courses taken', p.courses)}
       ${admFact(I.user, '--mk-1', 'Current role', p.role)}
@@ -7367,9 +7484,11 @@ function candidatesDetail(){
     </div>
   </section>
 
-  ${''/* LEVELLING panel is HIDDEN (Maryam, 24 Sep 2026: "hide leveling section");
-         `candLevellingPanel` stays defined, just not drawn. COHORTS panel stays. */}
-  ${''/* candLevellingPanel(c) */}
+  ${''/* LEVELLING panel — RE-SURFACED for Epic 5 (Maryam, 25 Sep 2026). With no
+         consolidated level-change log built (keep-scattered), the candidate detail is
+         the home for both the per-candidate level history (5.1) and the Override row
+         action (5.3). This reverses the 24 Sep "hide leveling section". */}
+  ${candLevellingPanel(c)}
   ${candCohortsPanel(c)}
 
   ${''/* COURSES the candidate is taking and has taken, with each completed
@@ -7808,15 +7927,23 @@ function pastIvs(a){ return PAST_IVS.filter(p => p.agent === a.name); }
      approval screen's "Tal's read" (mirroring the talent agent evaluation screen,
      Maryam 22 Sep 2026). Authored placeholder (§74 — no transcript pass in this
      build). */
+  /* Epic 5 (25 Sep 2026): each proposal carries its own TALENT LETTERS
+     (agentLetters / talLetters), a TRANSCRIPT status (Ready / Failed — 5.2's Failed
+     path is drawn for piv2), and the report-filed time + 24h approval DEADLINE with
+     an `overdue` marker (5.2 orders the queue by deadline; a past-deadline item stays
+     and reads Overdue). All authored placeholder (§74). */
   const M = {
-    piv1: {agentLevel:'E3', talLevel:'E3', submitted:'20 Aug 2026', decision:null, talType:'Leader'},
-    piv2: {agentLevel:'E2', talLevel:'E2', submitted:'10 Aug 2026', decision:null, talType:'Team Player'},
-    piv3: {agentLevel:'E4', talLevel:'E4', submitted:'12 Aug 2026', decision:'approved', finalLevel:'E4', talType:'Top Performer'},
-    piv4: {agentLevel:'E3', talLevel:'E2', submitted:'9 Aug 2026',  decision:null, talType:'Athlete'}
+    piv1: {agentLevel:'E3', talLevel:'E3', agentLetters:['L', 'A'], talLetters:['L'], submitted:'20 Aug 2026', filed:'20 Aug 2026, 4:10 PM', deadline:'21 Aug 2026, 4:10 PM', overdue:true, transcript:'Ready', decision:null, talType:'Leader'},
+    piv2: {agentLevel:'E2', talLevel:'E2', agentLetters:['T2'], talLetters:['T2'], submitted:'Today', filed:'Today, 9:15 AM', deadline:'Tomorrow, 9:15 AM', overdue:false, transcript:'Failed', decision:null, talType:'Team Player'},
+    piv3: {agentLevel:'E4', talLevel:'E4', agentLetters:['T1', 'L'], talLetters:['T1', 'L'], submitted:'12 Aug 2026', filed:'12 Aug 2026, 1:00 PM', deadline:'13 Aug 2026, 1:00 PM', overdue:false, transcript:'Ready', decision:'approved', finalLevel:'E4', finalLetters:['T1', 'L'], talType:'Top Performer'},
+    piv4: {agentLevel:'E3', talLevel:'E2', agentLetters:['A', 'L'], talLetters:['A'], submitted:'9 Aug 2026', filed:'9 Aug 2026, 2:30 PM', deadline:'10 Aug 2026, 2:30 PM', overdue:true, transcript:'Ready', decision:null, talType:'Athlete'}
   };
-  PAST_IVS.forEach(p => Object.assign(p, M[p.id] || {agentLevel:'E2', talLevel:'E2', submitted:p.when, decision:null, talType:'Leader'}));
+  PAST_IVS.forEach(p => Object.assign(p, M[p.id] || {agentLevel:'E2', talLevel:'E2', agentLetters:['L'], talLetters:['L'], submitted:p.when, filed:p.when, deadline:p.when, overdue:false, transcript:'Ready', decision:null, talType:'Leader'}));
 })();
 const pendingApprovals = () => PAST_IVS.filter(p => !p.decision);
+/* the queue is ordered by the 24h approval deadline, earliest first, with overdue
+   items surfaced first (5.2). */
+const pendingApprovalsSorted = () => pendingApprovals().slice().sort((a, b) => (b.overdue ? 1 : 0) - (a.overdue ? 1 : 0));
 
 /* A ROW OF THE INTERVIEW EVALUATION CARDS (the candidate portal's signed-summary
    look, in the design system this portal links) — one green Strengths, one violet
@@ -7904,7 +8031,7 @@ function reInterviewExtras(iv){
     ${aiHead('Candidate profile', `Everything on record for ${first}, the same view as their candidate page.`)}
     <div class="facts pf-facts">
       ${admFact(I.growth, '--mk-4', 'Track', c.bucket + ' track')}
-      ${admFact(I.chart, '--mk-3', 'Current Level', c.bucket + ' – ' + c.level)}
+      ${admFact(I.chart, '--mk-3', 'Current Level', c.bucket + ' – ' + levelLetters(c.level, c.letters))}
       ${admFact(I.trophy, '--mk-2', 'Points', (p.points || 0).toLocaleString())}
       ${admFact(I.book, '--mk-1', 'Total courses taken', p.courses)}
       ${admFact(I.user, '--mk-1', 'Current role', p.role)}
@@ -8569,6 +8696,15 @@ const BUCKETS = [
    "Explorer E1") centred with the candidate count below. The number of levels is
    editable from the bucket's Edit sheet (`b.levels`), so a bucket can gain or
    lose levels. */
+/* PER-LEVEL DESCRIPTIONS (Epic 5.5) — the rubric descriptions are CLIENT CONTENT. None
+   are supplied yet, so every level renders its code + count + leading rights and the
+   description reads "awaiting client content" (the story's default treatment). Fill this
+   map (e.g. LEVEL_DESC.E1 = '…') as the rubric lands. */
+const LEVEL_DESC = {};
+/* LEADING RIGHTS follow story 3.3's E5+ rule — E5 and every Builder / Trailblazer level
+   may lead a cohort; below E5 cannot. Shown here as read-only reference (marking a
+   cohort leader happens in 3.3, not on this screen). */
+const levelCanLead = code => LVL_CODES.indexOf(code) >= LVL_CODES.indexOf('E5');
 function cohortsLevels(){
   const countAt = lvl => CANDS.filter(c => c.level === lvl).length;
   /* Count by level PREFIX, not the bucket's name — a bucket the admin renamed
@@ -8589,9 +8725,12 @@ function cohortsLevels(){
     <div class="lvl-blocks" style="--lvl-cols:${Math.min(levels, 5)}">
       ${Array.from({length: levels}, (_, n) => {
         const code = b.pfx + (n + 1), c = countAt(code);
+        const desc = LEVEL_DESC[code], lead = levelCanLead(code);
         return `<div class="lvl-block">
           <span class="lvl-block-code t-h1">${code}</span>
           <span class="lvl-block-n t-desc">${c} candidate${c === 1 ? '' : 's'}</span>
+          <span class="lvl-block-d t-desc${desc ? '' : ' awaiting'}">${desc ? esc(desc) : 'Description awaiting client content'}</span>
+          <span class="lvl-block-lead">${lead ? tag('active', 'Can lead a cohort') : '<span class="t-desc">Cannot lead yet</span>'}</span>
         </div>`;
       }).join('')}
     </div>
@@ -8818,6 +8957,8 @@ KINDS.booking = {
    take beside the agent's recommendation and approves or overrides the level. The
    search + Type + Talent-agent filters serve both tabs. */
 const lvlChip = lvl => `<span class="tag sm">${esc(lvl || '—')}</span>`;
+/* a level chip carrying its TALENT letters: "E3 (L, A)" (Epic 5). */
+const lvlLtrChip = (lvl, arr) => `<span class="tag sm">${esc(lvl || '—')}${arr && arr.length ? ' (' + esc(lettersLabel(arr)) + ')' : ''}</span>`;
 function marketBookings(){
   const q = getFilter('q', ''), kf = getFilter('bkkind', 'all'), af = getFilter('bkagent', 'all');
   const tab = getFilter('bktab', 'upcoming');
@@ -8829,7 +8970,7 @@ function marketBookings(){
     .filter(b => kmatch(b.kind)).filter(b => af === 'all' ? true : b.agent === af)
     .filter(b => hit(q, b.cand, b.agent, b.kind))
     .slice().sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')));
-  const ap = pending
+  const ap = pendingApprovalsSorted()
     .filter(p => kmatch(p.kind)).filter(p => af === 'all' ? true : p.agent === af)
     .filter(p => hit(q, p.cand, p.agent, p.kind));
   const typeFilter = filterDd('bkkind', 'all', [['all', 'All'], ['first', 'First interview'], ['re', 'Re-interview']], 'Type');
@@ -8843,10 +8984,11 @@ function marketBookings(){
     ]})), {select:false})
     : emptyState('video', 'No interviews match', q || kf !== 'all' || af !== 'all' ? 'Nothing matches the current filters.' : 'No booked interviews right now.');
   const apPane = ap.length ? table(
-    [{label:'Candidate'}, {label:'Agent'}, {label:'Recommended level'}, {label:'Tal’s suggestion'}, {label:'Submitted'}, ACT_COL],
+    [{label:'Candidate'}, {label:'Agent'}, {label:'Recommended level'}, {label:'Tal’s suggestion'}, {label:'Report filed'}, {label:'Deadline'}, ACT_COL],
     ap.map(iv => ({id:iv.id, go:'market/approval/' + iv.id, cells:[
       personCell(iv.cand, ''), personCell(iv.agent, ''),
-      lvlChip(iv.agentLevel), lvlChip(iv.talLevel), esc(iv.submitted || iv.when),
+      lvlLtrChip(iv.agentLevel, iv.agentLetters), lvlLtrChip(iv.talLevel, iv.talLetters), esc(iv.filed || iv.submitted || iv.when),
+      `${esc(iv.deadline || '—')}${iv.overdue ? ' ' + tag('failed', 'Overdue') : ''}`,
       rowActs([['check', 'Review & decide', `data-go="market/approval/${iv.id}"`]])
     ]})), {select:false})
     : emptyState('check', 'Nothing awaiting approval', q || kf !== 'all' || af !== 'all' ? 'Nothing matches the current filters.' : 'Every submitted interview has been decided.');
@@ -8875,6 +9017,8 @@ function marketApproval(){
   DETAIL_LABEL = `${iv.cand} — level approval`;
   const first = esc(String(iv.cand).split(' ')[0]);
   const decided = !!iv.decision, finalLvl = iv.finalLevel || iv.agentLevel;
+  const finalLetters = iv.finalLetters || iv.agentLetters || [];
+  const src = agIvIsRe(iv.kind) ? 'Re-interview' : 'First interview';
   const talType = iv.talType || 'Leader';
   /* THE SCREEN MIRRORS THE TALENT AGENT EVALUATION SCREEN (Maryam, 22 Sep 2026:
      "improve ... just like talent agent evaluation screen") — same flow, top to
@@ -8913,14 +9057,26 @@ function marketApproval(){
     <div class="tal-eval"><div class="ai-body">${iv.tal.replace(/<\/p>\s*<p[^>]*>/g, ' ')}
       <p class="mt5">Tal reads ${first} as a <b>${esc(talType)}</b>.</p></div></div>
   </section>
+  ${/* THE TRANSCRIPT ON THE REVIEW SCREEN (Epic 5.2) — the reviewer reads what was
+       actually said before settling the level. Opening it writes an audit line (5.2).
+       A Failed transcript states that none exists and the decision actions stay
+       available so the reviewer settles on the agent report. Reuses `ivTranscript`. */''}
+  <section class="sec">
+    ${secHead('Interview transcript')}
+    ${iv.transcript === 'Failed'
+      ? `<p class="t-desc">No transcript exists for this interview. The recording failed to transcribe, so settle the level on the agent report below.</p>`
+      : (S.ivTxOpen === iv.id
+          ? `<button class="btn btn-g btn-sm noic" data-act="ivtxclose">Hide transcript</button>${ivTranscript(iv)}`
+          : `<button class="btn btn-g btn-sm noic" data-act="ivtxopen:${iv.id}">Read the transcript</button>`)}
+  </section>
   <section class="sec">
     ${aiHead('Recommended level', decided
       ? (iv.decision === 'approved' ? 'Approved — the agent’s recommendation stands.' : 'Overridden — you set a different level.')
       : 'The agent’s recommendation and Tal’s suggestion. Approve to confirm, or override to set a different level.')}
     <div class="facts pf-facts">
-      ${admFact(I.video, '--mk-4', 'Agent’s recommendation', iv.agentLevel)}
-      ${admFact(I.chat, '--mk-3', 'Tal’s suggestion', iv.talLevel)}
-      ${decided ? admFact(I.check, '--mk-2', 'Final level', finalLvl) : admFact(I.calendar, '--mk-2', 'Submitted', iv.submitted || iv.when)}
+      ${admFact(I.video, '--mk-4', 'Agent’s recommendation', levelLetters(iv.agentLevel, iv.agentLetters))}
+      ${admFact(I.chat, '--mk-3', 'Tal’s suggestion', iv.talLevel ? levelLetters(iv.talLevel, iv.talLetters) : '—')}
+      ${decided ? admFact(I.check, '--mk-2', 'Final level', levelLetters(finalLvl, finalLetters)) : admFact(I.calendar, '--mk-2', 'Report filed', iv.filed || iv.submitted || iv.when)}
       ${admFact(I.starOutline, '--mk-1', 'Candidate rating', iv.rating ? iv.rating + '.0' : '—')}
     </div>
     ${/* THE LADDER FOLLOWS THE TALENT AGENT EVALUATION SCREEN (Maryam, 22 Sep 2026:
@@ -8941,43 +9097,85 @@ function marketApproval(){
   </section>
   <section class="sec">
     ${decided
-      ? `<p class="t-desc">${iv.decision === 'approved' ? `You approved ${esc(finalLvl)}.` : `You set ${esc(finalLvl)}, overriding the recommendation.`}${iv.decisionNote ? ' ' + esc(iv.decisionNote) : ''}</p>`
-      : `<div class="btn-row">
-          <button class="btn btn-p noic ic-l" data-act="askapprovelvl:${iv.id}">${I.checkFilled}Approve Evaluation</button>
-          <button class="btn btn-g noic" data-sheet="overridelvl:${iv.id}">Override Level</button>
+      ? `<p class="t-desc">${iv.decision === 'approved' ? `You approved ${esc(levelLetters(finalLvl, finalLetters))}.` : `You set ${esc(levelLetters(finalLvl, finalLetters))}, overriding the recommendation.`}${iv.decisionNote ? ' ' + esc(iv.decisionNote) : ''}</p>`
+      : `${/* THREE ACTIONS (Epic 5.2): approve the agent's proposal, approve Tal's
+             proposal (offered only when a Tal proposal exists), or reviewer override
+             (level + letters + reason). */''}<div class="btn-row">
+          <button class="btn btn-p noic ic-l" data-act="askapproveagent:${iv.id}">${I.checkFilled}Approve agent proposal</button>
+          ${iv.talLevel ? `<button class="btn btn-g noic" data-act="askapprovetal:${iv.id}">Approve Tal proposal</button>` : ''}
+          <button class="btn btn-g noic" data-sheet="overridelvl:${iv.id}">Reviewer override</button>
         </div>`}
   </section>
   </div>`;
 }
-ACTIONS.askapprovelvl = key => {
+ACTIONS.ivtxopen = key => {
   const iv = PAST_IVS.find(x => x.id === key.split(':')[1]); if(!iv) return;
-  askConfirm({mk:'check', title:`Approve ${iv.agentLevel} for ${iv.cand}?`,
-    body:`This confirms the agent’s recommended level. ${iv.cand}’s level is set to ${iv.agentLevel}, and both the candidate and the agent are notified.`,
-    ok:'Approve Level', act:`doapprovelvl:${iv.id}`});
+  S.ivTxOpen = iv.id;
+  /* every transcript opened from the queue writes an audit line (5.2). */
+  audit('Opened interview transcript', `${iv.cand} — interview with ${iv.agent}`, 'Marketplace & Interviews', 'notice');
 };
-ACTIONS.doapprovelvl = key => {
+ACTIONS.ivtxclose = () => { S.ivTxOpen = null; };
+/* COMMIT A LEVEL DECISION (Epic 5.2). Sets the candidate's level AND letters as one
+   result, records a keep-scattered history row carrying the Decided-on and the Source
+   (5.1), and audits both proposals + any reason. The Level Report release and the
+   candidate notification are hifi candidate-portal scope and are STUBBED here. */
+function decideApproval(iv, o){
+  iv.decision = o.decision; iv.finalLevel = o.level; iv.finalLetters = o.letters;
+  if(o.reason) iv.decisionNote = `Reason: ${o.reason}`;
+  const c = candByName(iv.cand);
+  if(c){
+    const from = c.level, fromLetters = (c.letters || []).slice();
+    recordLevelChange(c, {from, fromLetters, to:o.level, toLetters:o.letters, by:ME.name, kind:o.historyKind, decidedOn:o.decidedOn, source:o.source});
+    c.level = o.level; c.letters = o.letters; c.bucket = bucketOf(o.level);
+    const u = USER_BY_ID[c.id]; if(u) u.level = o.level;
+  }
+  audit(o.decision === 'override' ? 'Overrode interview level' : 'Approved interview level',
+    `${iv.cand} → ${levelLetters(o.level, o.letters)} · decided: ${o.decidedOn}${o.reason ? ' · ' + o.reason : ''} (agent ${levelLetters(iv.agentLevel, iv.agentLetters)}, Tal ${iv.talLevel ? levelLetters(iv.talLevel, iv.talLetters) : 'none'})`,
+    'Marketplace & Interviews', 'high', {from:'', to:o.level});
+  toast(`${iv.cand} set to ${levelLetters(o.level, o.letters)}`);
+}
+ACTIONS.askapproveagent = key => {
+  const iv = PAST_IVS.find(x => x.id === key.split(':')[1]); if(!iv) return;
+  askConfirm({mk:'check', title:`Approve the agent’s ${iv.agentLevel} for ${iv.cand}?`,
+    body:`This confirms the agent’s proposal. ${iv.cand}’s level and letters are set to ${levelLetters(iv.agentLevel, iv.agentLetters)}. The candidate and the agent are notified.`,
+    ok:'Approve', act:`doapproveagent:${iv.id}`});
+};
+ACTIONS.doapproveagent = key => {
   const iv = PAST_IVS.find(x => x.id === key.split(':')[1]); S.confirm = null; if(!iv) return;
-  iv.decision = 'approved'; iv.finalLevel = iv.agentLevel;
-  const c = candByName(iv.cand); if(c) c.level = iv.agentLevel;
-  audit('Approved interview level', `${iv.cand} → ${iv.agentLevel} (interviewed by ${iv.agent})`, 'Marketplace & Interviews', 'high');
-  toast(`${iv.cand} set to ${iv.agentLevel}`);
+  decideApproval(iv, {decision:'approved', level:iv.agentLevel, letters:(iv.agentLetters || []).slice(),
+    decidedOn:'Agent proposal', source:agIvIsRe(iv.kind) ? 'Re-interview' : 'First interview', historyKind:'review'});
+};
+ACTIONS.askapprovetal = key => {
+  const iv = PAST_IVS.find(x => x.id === key.split(':')[1]); if(!iv || !iv.talLevel) return;
+  askConfirm({mk:'check', title:`Approve Tal’s ${iv.talLevel} for ${iv.cand}?`,
+    body:`This settles the result on Tal’s proposal. ${iv.cand}’s level and letters are set to ${levelLetters(iv.talLevel, iv.talLetters)}. The candidate and the agent are notified.`,
+    ok:'Approve', act:`doapprovetal:${iv.id}`});
+};
+ACTIONS.doapprovetal = key => {
+  const iv = PAST_IVS.find(x => x.id === key.split(':')[1]); S.confirm = null; if(!iv || !iv.talLevel) return;
+  decideApproval(iv, {decision:'approved', level:iv.talLevel, letters:(iv.talLetters || []).slice(),
+    decidedOn:'Tal proposal', source:agIvIsRe(iv.kind) ? 'Re-interview' : 'First interview', historyKind:'review'});
 };
 SHEETS.overridelvl = id => {
   const iv = PAST_IVS.find(x => x.id === id); if(!iv) return {title:'Override', body:'', ok:''};
-  return {title:`Override the level for ${iv.cand}`, ok:'Set Level', act:`dooverridelvl:${iv.id}`,
-    body:`${kv([['Agent’s recommendation', iv.agentLevel], ['Tal’s suggestion', iv.talLevel]])}
+  return {title:`Reviewer override for ${iv.cand}`, ok:'Set Level', act:`dooverridelvl:${iv.id}`,
+    gate:true, disabled:true,
+    gateFn: v => { const L = readLetters(v); return !v.level || !L.length || !v.reason; },
+    body:`${kv([['Agent’s proposal', levelLetters(iv.agentLevel, iv.agentLetters)], ['Tal’s proposal', iv.talLevel ? levelLetters(iv.talLevel, iv.talLetters) : '—']])}
       ${fieldHtml({k:'level', l:'Set level to', t:'select', req:1, opts:LVL_CODES}, iv.agentLevel)}
-      ${fieldHtml({k:'reason', l:'Reason', t:'textarea', req:1, ph:'Required — written to the audit log'})}
-      <p class="t-desc">Overriding replaces the agent’s recommendation. ${esc(iv.cand)}’s level is set to your choice and both parties are notified.</p>`};
+      ${lettersPicker(iv.agentLetters)}
+      ${fieldHtml({k:'reason', l:'Reason', t:'textarea', req:1, max:500, ph:'Required — written to the audit log'})}
+      <p class="t-desc">Overriding substitutes the result the reviewer approves. ${esc(iv.cand)}’s level and letters are set to your choice and both parties are notified.</p>`};
 };
 ACTIONS.dooverridelvl = key => {
   const iv = PAST_IVS.find(x => x.id === key.split(':')[1]); const v = readForm(); if(!iv) return;
-  if(!v.reason){ toast('A reason is required', 'warn'); return 'keep'; }
-  iv.decision = 'override'; iv.finalLevel = v.level; iv.decisionNote = `Reason: ${v.reason}`;
-  const c = candByName(iv.cand); if(c) c.level = v.level;
+  const letters = readLetters(v);
+  if(!v.level){ toast('Select a level', 'warn'); return 'keep'; }
+  if(!letters.length){ toast('Select at least one TALENT letter', 'warn'); return 'keep'; }
+  if(!v.reason){ toast('Enter a reason for the override', 'warn'); return 'keep'; }
   S.sheet = null;
-  audit('Overrode interview level', `${iv.cand} → ${v.level} (agent recommended ${iv.agentLevel}) · ${v.reason}`, 'Marketplace & Interviews', 'high');
-  toast(`${iv.cand} set to ${v.level}`);
+  decideApproval(iv, {decision:'override', level:v.level, letters, reason:v.reason,
+    decidedOn:'Reviewer override', source:'Reviewer override', historyKind:'override'});
 };
 /* 8.2 — RESOLVE A FAILED INTERVIEW. Offered only on an overdue Held booking or a
    Not-held one. Chase the agent (a nudge, no state change) or Refund and close
@@ -12226,6 +12424,23 @@ device.addEventListener('click', e => {
     const tr = fdd.querySelector('[data-formddtoggle]'); if(tr) tr.setAttribute('aria-expanded', 'false');
     const sb = fds.closest('.sheet-b'); if(sb) sb.classList.remove('dd-open');
     syncSheetSubmit();
+    return;
+  }
+  /* TALENT-LETTERS multi-select toggle (Epic 5) — DOM-only, no render (trap 9), so the
+     reason textarea survives. Toggle the key in the hidden [data-f="letters"] input and
+     the chip's .on (cap at six), then keep the submit gate in step. */
+  const ltr = e.target.closest('[data-ltrtoggle]');
+  if(ltr){
+    const wrap = ltr.closest('.f'), hid = wrap && wrap.querySelector('input[data-f="letters"]');
+    if(hid){
+      const k = ltr.dataset.ltrtoggle;
+      const set = hid.value ? hid.value.split(',').filter(Boolean) : [];
+      const i = set.indexOf(k);
+      if(i < 0){ if(set.length < 6) set.push(k); } else set.splice(i, 1);
+      hid.value = set.join(',');
+      ltr.classList.toggle('on', set.includes(k));
+      try { syncSheetSubmit(); } catch(err){ console.warn('lettersgate', err); }
+    }
     return;
   }
   /* a click outside an open form dropdown closes it (DOM-only, no render) */

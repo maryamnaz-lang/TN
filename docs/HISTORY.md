@@ -3846,3 +3846,42 @@ gone. `sacase` shipped reading `S.id` and rendered empty; the 60-page, 19-sheet 
 `console.warn` and no horizontal overflow at 390, 744 and 1280; the View As bar wraps its button
 under the sentence below 600; the auth split fires at 1280. Both builds pass with the new layer
 (`layer coverage: 126 of 128`, the two declined as before).
+
+## Epic 5 (Levelling) alignment — 25 Sep 2026 (tn-admin-portal.html)
+
+Maryam asked to align the levelling module with the Epic 5 user stories (5.1–5.5), gap by gap.
+The gap analysis found the surfaces scattered (approval under Interviews, the ladder under Cohort
+Management, the per-candidate history in a hidden candidate panel) and no platform-wide change
+log; the TALENT construct was a single `talType` persona, not the story's 1–6 letters.
+
+**Two gating decisions.** (1) **Keep scattered, fill gaps** — no new `Levelling` rail module;
+fill the log / detail / override / validation functionality in place. So the standing "only hidden
+modules are Levelling and Vetting" line still holds (Levelling is still not a rail module). (2)
+**Adopt the 1–6 TALENT letters** — a candidate holds a track + a level + a combinable set of 1–6
+letters, coexisting (Maryam: "a candidate could have both multiple acronyms/letters or
+level+track"), shown `Builder — B3 (A, L, T)`. The six letters (`TALENT_LETTERS`) spell TALENT and
+repeat **T** (Top Performer / Team Player) — a client display-ambiguity flag; meanings are client
+content (authored placeholder §74).
+
+**Per story.** 5.1: no consolidated log; `candLevellingPanel` re-surfaced on the candidate detail
+(reversing 24 Sep) as the home for the per-candidate history + override, rows carrying letters,
+Decided-on and Source; the Audit Log stays the cross-candidate trail; no CSV export. 5.2: the
+approval queue orders by 24h deadline (`pendingApprovalsSorted`, overdue-first) with report-filed
++ Deadline (red Overdue) columns and letters on the chips; the detail gained a third **Approve Tal
+proposal** action (hidden with no Tal proposal), a **transcript reader** (`ivtxopen`/`ivtxclose`,
+Failed handling, audit-on-open), and 1–6 letters on the reviewer override; `decideApproval` sets
+level + letters and writes a history row with Decided-on + Source. 5.3: `candoverride` uses the
+full E1–T5 ladder + a letters multi-select (both pre-selected), a differ-gate (`gateFn`), a
+confirmation prompt (`S._pending` → `docandoverridedo`), and is suppressed while a level awaits
+approval; the commit records Source = Admin override. 5.4: no dedicated read-only detail (nothing
+to open a "View" from); the decided approval + the history row cover the audit need. 5.5:
+`cohortsLevels` gained per-level descriptions ("awaiting client content") and E5+ leading rights
+(`levelCanLead`, story 3.3); the Edit Bucket feature was KEPT (a deliberate divergence from 5.5's
+strict read-only). The candidate Level Report release + notification are hifi scope and stubbed.
+
+**Verification.** Signed in over http and swept home / candidate details / the approval queue and
+details (piv1–piv4, incl. piv2's Failed transcript) / Levels & Tracks — no thrown error and no
+`console.warn`. Exercised the reviewer override (letters pre-filled, gate releases on reason,
+commit writes decision + letters) and the candidate override end-to-end (differ-gate, confirmation
+prompt with the exact copy, history row Source = Admin override, audit before/after + reason). No
+horizontal overflow at 375.
