@@ -105,21 +105,19 @@ function nilField(id, label, type, ph, span){
    views.js which loads before this) rather than retyped; the quiz's own email
    field is a prototype input that does not persist. Authored placeholder (§74). */
 const NIL_EMAIL = (typeof PF !== 'undefined' && PF.general && PF.general.email) || 'you@example.com';
-/* The classic Gmail mark (the red "M" envelope Maryam attached), reproduced as
-   inline SVG so it needs no asset — a BRAND LOGO in its own colours, exempt from
-   the stroke family. For a pixel-exact match to her file, drop the PNG in
-   `hifi/build/` and embed it in build.py; this is the vector stand-in. */
-const GMAIL_MARK = `<svg viewBox="0 0 48 36" role="img" aria-label="Gmail" xmlns="http://www.w3.org/2000/svg">
-  <path fill="#ffffff" stroke="#e6e6e6" stroke-width=".6" d="M3.4 1.8h41.2c.9 0 1.6.7 1.6 1.6v29.2c0 .9-.7 1.6-1.6 1.6H3.4c-.9 0-1.6-.7-1.6-1.6V3.4c0-.9.7-1.6 1.6-1.6z"/>
-  <path fill="#ececec" d="M2 4.2 12 12v22H3.4c-.9 0-1.4-.7-1.4-1.6z"/>
-  <path fill="#ececec" d="M46 4.2 36 12v22h8.6c.9 0 1.4-.7 1.4-1.6z"/>
-  <path fill="#dd4b39" d="M7.5 34V5.2c0-1.4 1.6-2.2 2.7-1.3L24 15 37.8 3.9c1.1-.9 2.7-.1 2.7 1.3V34h-5.2V13.1L24 21.6 12.7 13.1V34z"/>
+/* The mail mark is Hugeicons' `mail-01` (stroke-rounded, 24-box), reproduced as
+   inline SVG so it needs no asset. Maryam asked to drop the Gmail brand logo for
+   a generic Hugeicons mail icon (27 Sep 2026). A stroke glyph, so it reads in the
+   NIL navy (`currentColor`, set on `.nil-modal-logo`) rather than brand colours. */
+const MAIL_MARK = `<svg viewBox="0 0 24 24" role="img" aria-label="Email" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+  <path d="M2 6l6.913 3.917c2.549 1.444 3.625 1.444 6.174 0L22 6"/>
+  <path d="M2.016 13.476c.065 3.065.098 4.598 1.229 5.734 1.131 1.135 2.705 1.174 5.854 1.253 1.94.049 3.862.049 5.802 0 3.149-.079 4.723-.118 5.854-1.253 1.131-1.136 1.164-2.669 1.229-5.734.021-.986.021-1.966 0-2.951-.065-3.066-.098-4.599-1.229-5.734-1.131-1.136-2.705-1.175-5.854-1.254-1.94-.049-3.862-.049-5.802 0-3.149.079-4.723.118-5.854 1.254-1.131 1.135-1.164 2.668-1.229 5.734-.021.985-.021 1.965 0 2.951z"/>
 </svg>`;
 function nilResultModal(){
   return `<div class="nil-modal-scrim" data-nilclose="scrim">
     <div class="nil-modal" role="dialog" aria-modal="true" aria-labelledby="nil-modal-h">
       <button class="nil-modal-x" data-nilclose="x" aria-label="Close">${I.close}</button>
-      <span class="nil-modal-logo">${GMAIL_MARK}</span>
+      <span class="nil-modal-logo">${MAIL_MARK}</span>
       <h2 id="nil-modal-h" class="nil-modal-h">Check your email</h2>
       <p class="nil-modal-d">We sent a confirmation link to <b>${NIL_EMAIL}</b>. Click the link in the email to finish setting up your account.</p>
       <button class="nil-modal-btn" data-nilclose="btn">Close</button>

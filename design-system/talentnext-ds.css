@@ -14,7 +14,7 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 6200.  Rules dropped as product-specific: 222.
+   Rules kept: 6205.  Rules dropped as product-specific: 222.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
@@ -9026,6 +9026,14 @@ button.btn-p:active,
 @container app (min-width:900px){
   .app .ob-logo img{height:38px}
 }
+@container app (min-width:900px){
+  .app .ob-open:not(.ob-open-live){--ob-rail:100px; padding-inline:calc(var(--ob-rail) + var(--s06))}
+  .app .ob-open:not(.ob-open-live)::before,
+  .app .ob-open:not(.ob-open-live)::after{content:""; position:absolute; top:0; bottom:0; width:1px; background:var(--rule); pointer-events:none}
+  .app .ob-open:not(.ob-open-live)::before{left:var(--ob-rail)}
+  .app .ob-open:not(.ob-open-live)::after{right:var(--ob-rail)}
+}
+.app .ob-open:not(.ob-open-live){background-image:none}
 .app .ob-prog{width:100%; max-width:720px; flex:none; display:flex; flex-direction:column; align-items:flex-start; gap:var(--s04)}
 .app .ob-prog-h{margin:0}
 .app .ob-prog-bar{display:flex; gap:var(--s03); width:100%}

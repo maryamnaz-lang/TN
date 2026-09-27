@@ -6646,7 +6646,7 @@ button.btn-p:active,
   background:transparent;border:0;color:var(--nil-navy);cursor:pointer;
 }
 .nil .nil-modal-x svg{width:24px;height:24px;color:var(--nil-navy)}
-.nil .nil-modal-logo{width:68px;height:auto;display:flex;align-items:center;justify-content:center}
+.nil .nil-modal-logo{width:56px;height:auto;display:flex;align-items:center;justify-content:center;color:var(--nil-navy)}
 .nil .nil-modal-logo svg{width:100%;height:auto}
 .nil .nil-modal-h{
   font-family:var(--font-sans);font-weight:600;
@@ -12881,6 +12881,16 @@ button.btn-p:active,
 .app .ob-logo{display:flex;align-items:center}
 .app .ob-logo img{display:block;height:36px;width:auto}
 @container app (min-width:900px){.app .ob-logo img{height:38px}}
+@container app (min-width:900px){
+  .app .ob-open:not(.ob-open-live){--ob-rail:100px;padding-inline:calc(var(--ob-rail) + var(--s06))}
+  .app .ob-open:not(.ob-open-live)::before,
+  .app .ob-open:not(.ob-open-live)::after{
+    content:"";position:absolute;top:0;bottom:0;width:1px;
+    background:var(--rule);pointer-events:none}
+  .app .ob-open:not(.ob-open-live)::before{left:var(--ob-rail)}
+  .app .ob-open:not(.ob-open-live)::after{right:var(--ob-rail)}
+}
+.app .ob-open:not(.ob-open-live){background-image:none}
 .app .ob-prog{
   width:100%;max-width:720px;flex:none;
   display:flex;flex-direction:column;align-items:flex-start;gap:var(--s04)}
@@ -18255,19 +18265,21 @@ login: () => `${authShell()}
 
 forgot: () => `${authShell('login')}
 <main class="main"><div class="page form-page">
-  ${ph('Reset Password','Enter the email for the verification code.')}
+  ${ph('Reset Password','Enter your email address to receive password reset instructions.')}
   <div class="sec">
     <div class="f last"><label for="fem">Email address</label>
       <input class="inp fill" id="fem" type="email" value="maryam.naz@tkxel.io"></div>
   </div>
-  ${''/* SEND CODE HAS A LOADING BEAT (Maryam, 18 Sep 2026). `data-send` swaps the
-        button to "Sending..." and disables it, then advances to the verification
-        screen after a short pause — the handler mutates the button and does NOT
-        render() in the interval, so the loading label survives the wait (trap 9
-        only bites a re-render). The flow is forgot -> (Sending...) -> fcode ->
-        reset; the old `sent` "Check your email" screen is off this path. */}
+  ${''/* CONTINUE HAS A LOADING BEAT (Maryam, 18 Sep 2026; 27 Sep 2026). `data-send`
+        swaps the button to "Sending..." and disables it, then advances after a
+        short pause — the handler mutates the button and does NOT render() in the
+        interval, so the loading label survives the wait (trap 9 only bites a
+        re-render). The verification-code step is HIDDEN (Maryam, 27 Sep 2026):
+        the flow is forgot -> (Sending...) -> reset, straight to Set New Password;
+        `fcode` (and the old `sent` "Check your email") stay defined but off the
+        path. */}
   <div class="sec">
-    <button class="btn btn-p btn-full" data-send="fcode">Send Code ${I.arrowRight}</button>
+    <button class="btn btn-p btn-full" data-send="reset">Continue ${I.arrowRight}</button>
   </div>
 </div></main>`,
 
@@ -18320,12 +18332,12 @@ reset: () => `${authShell('login')}
         CTA and no "Back to log in" closing row. The create screen owns the
         pre-filled/pre-ticked composition; this one is stripped to the two
         fields and the button. */}
-  ${ph('Set New Password','Set a strong password for your account.')}
+  ${ph('Set New Password','Create a strong password for your account.')}
   <div class="sec">
-    <div class="f-row"><div class="f"><label for="rpw">New password</label>
+    <div class="f-row"><div class="f"><label for="rpw">Password</label>
       <div class="pw-wrap"><input class="inp fill" id="rpw" type="password" value="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022">
         <button class="pw-eye" data-eye="rpw" aria-label="Show password">${I.view}</button></div></div>
-    <div class="f last"><label for="rpw2">Confirm new password</label>
+    <div class="f last"><label for="rpw2">Confirm Password</label>
       <div class="pw-wrap"><input class="inp fill" id="rpw2" type="password" placeholder="Re-enter password">
         <button class="pw-eye" data-eye="rpw2" aria-label="Show password">${I.view}</button></div></div></div>
   </div>
@@ -26030,17 +26042,15 @@ function nilField(id, label, type, ph, span){
 }
 
 const NIL_EMAIL = (typeof PF !== 'undefined' && PF.general && PF.general.email) || 'you@example.com';
-const GMAIL_MARK = `<svg viewBox="0 0 48 36" role="img" aria-label="Gmail" xmlns="http://www.w3.org/2000/svg">
-  <path fill="#ffffff" stroke="#e6e6e6" stroke-width=".6" d="M3.4 1.8h41.2c.9 0 1.6.7 1.6 1.6v29.2c0 .9-.7 1.6-1.6 1.6H3.4c-.9 0-1.6-.7-1.6-1.6V3.4c0-.9.7-1.6 1.6-1.6z"/>
-  <path fill="#ececec" d="M2 4.2 12 12v22H3.4c-.9 0-1.4-.7-1.4-1.6z"/>
-  <path fill="#ececec" d="M46 4.2 36 12v22h8.6c.9 0 1.4-.7 1.4-1.6z"/>
-  <path fill="#dd4b39" d="M7.5 34V5.2c0-1.4 1.6-2.2 2.7-1.3L24 15 37.8 3.9c1.1-.9 2.7-.1 2.7 1.3V34h-5.2V13.1L24 21.6 12.7 13.1V34z"/>
+const MAIL_MARK = `<svg viewBox="0 0 24 24" role="img" aria-label="Email" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+  <path d="M2 6l6.913 3.917c2.549 1.444 3.625 1.444 6.174 0L22 6"/>
+  <path d="M2.016 13.476c.065 3.065.098 4.598 1.229 5.734 1.131 1.135 2.705 1.174 5.854 1.253 1.94.049 3.862.049 5.802 0 3.149-.079 4.723-.118 5.854-1.253 1.131-1.136 1.164-2.669 1.229-5.734.021-.986.021-1.966 0-2.951-.065-3.066-.098-4.599-1.229-5.734-1.131-1.136-2.705-1.175-5.854-1.254-1.94-.049-3.862-.049-5.802 0-3.149.079-4.723.118-5.854 1.254-1.131 1.135-1.164 2.668-1.229 5.734-.021.985-.021 1.965 0 2.951z"/>
 </svg>`;
 function nilResultModal(){
   return `<div class="nil-modal-scrim" data-nilclose="scrim">
     <div class="nil-modal" role="dialog" aria-modal="true" aria-labelledby="nil-modal-h">
       <button class="nil-modal-x" data-nilclose="x" aria-label="Close">${I.close}</button>
-      <span class="nil-modal-logo">${GMAIL_MARK}</span>
+      <span class="nil-modal-logo">${MAIL_MARK}</span>
       <h2 id="nil-modal-h" class="nil-modal-h">Check your email</h2>
       <p class="nil-modal-d">We sent a confirmation link to <b>${NIL_EMAIL}</b>. Click the link in the email to finish setting up your account.</p>
       <button class="nil-modal-btn" data-nilclose="btn">Close</button>

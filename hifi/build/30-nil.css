@@ -440,7 +440,9 @@
   background:transparent;border:0;color:var(--nil-navy);cursor:pointer;
 }
 .nil .nil-modal-x svg{width:24px;height:24px;color:var(--nil-navy)}
-.nil .nil-modal-logo{width:68px;height:auto;display:flex;align-items:center;justify-content:center}
+/* The mail mark is now a stroke glyph (Hugeicons mail-01), so it reads in the NIL
+   navy via currentColor and sits a step smaller than the old filled brand logo. */
+.nil .nil-modal-logo{width:56px;height:auto;display:flex;align-items:center;justify-content:center;color:var(--nil-navy)}
 .nil .nil-modal-logo svg{width:100%;height:auto}
 .nil .nil-modal-h{
   font-family:var(--font-sans);font-weight:600;

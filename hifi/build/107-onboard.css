@@ -1393,6 +1393,37 @@
 .app .ob-logo img{display:block;height:36px;width:auto}
 @container app (min-width:900px){.app .ob-logo img{height:38px}}
 
+/* ------------------------------------------------------------------ 107.r ---
+   THE TWO SIDE RAILS — Maryam, 27 Sep 2026
+
+   Two full-height vertical hairlines framing the welcome door, one near each
+   frame edge, DESKTOP ONLY and on the STEP-0 door alone (the welcome/voice
+   intro, `.ob-open:not(.ob-open-live)`) — not the live chat thread, not the
+   stepped survey (its own `.ob-survey` composition owns its top bar). The
+   wordmark sits AFTER the left line: the door's horizontal padding grows past
+   the rail inset so the logo — and everything centred below it — clears the
+   line by `--s06`. `--rule` #efefef, the platform's one hairline (§12), drawn
+   as absolute `::before`/`::after` on `.ob-open` (already `position:relative`,
+   §0). At 1px in the far gutters they never meet the centred content, so their
+   default paint order over it is moot. Below 900 there is no room for a framed
+   margin, so nothing is drawn — the padding override and the lines both live in
+   the query. */
+@container app (min-width:900px){
+  .app .ob-open:not(.ob-open-live){--ob-rail:100px;padding-inline:calc(var(--ob-rail) + var(--s06))}
+  .app .ob-open:not(.ob-open-live)::before,
+  .app .ob-open:not(.ob-open-live)::after{
+    content:"";position:absolute;top:0;bottom:0;width:1px;
+    background:var(--rule);pointer-events:none}
+  .app .ob-open:not(.ob-open-live)::before{left:var(--ob-rail)}
+  .app .ob-open:not(.ob-open-live)::after{right:var(--ob-rail)}
+}
+/* THE GROUND IS PLAIN WHITE ON THIS DOOR — Maryam, 27 Sep 2026: "hide the bg blur
+   gradients from the page." The two accent bands (the top/bottom wash above) are
+   switched off on the welcome/voice door only, leaving the `--layer-01` white;
+   the live chat thread and the stepped survey keep their own grounds. All widths.
+   The `:not(.ob-open-live)` beats the base rule on specificity, so order is moot. */
+.app .ob-open:not(.ob-open-live){background-image:none}
+
 /* ------------------------------------------------------------------ 107.p ---
    THE PROGRESS BAR — Maryam, 9 Sep 2026, with a reference
 

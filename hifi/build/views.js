@@ -6290,19 +6290,21 @@ login: () => `${authShell()}
 
 forgot: () => `${authShell('login')}
 <main class="main"><div class="page form-page">
-  ${ph('Reset Password','Enter the email for the verification code.')}
+  ${ph('Reset Password','Enter your email address to receive password reset instructions.')}
   <div class="sec">
     <div class="f last"><label for="fem">Email address</label>
       <input class="inp fill" id="fem" type="email" value="maryam.naz@tkxel.io"></div>
   </div>
-  ${''/* SEND CODE HAS A LOADING BEAT (Maryam, 18 Sep 2026). `data-send` swaps the
-        button to "Sending..." and disables it, then advances to the verification
-        screen after a short pause — the handler mutates the button and does NOT
-        render() in the interval, so the loading label survives the wait (trap 9
-        only bites a re-render). The flow is forgot -> (Sending...) -> fcode ->
-        reset; the old `sent` "Check your email" screen is off this path. */}
+  ${''/* CONTINUE HAS A LOADING BEAT (Maryam, 18 Sep 2026; 27 Sep 2026). `data-send`
+        swaps the button to "Sending..." and disables it, then advances after a
+        short pause — the handler mutates the button and does NOT render() in the
+        interval, so the loading label survives the wait (trap 9 only bites a
+        re-render). The verification-code step is HIDDEN (Maryam, 27 Sep 2026):
+        the flow is forgot -> (Sending...) -> reset, straight to Set New Password;
+        `fcode` (and the old `sent` "Check your email") stay defined but off the
+        path. */}
   <div class="sec">
-    <button class="btn btn-p btn-full" data-send="fcode">Send Code ${I.arrowRight}</button>
+    <button class="btn btn-p btn-full" data-send="reset">Continue ${I.arrowRight}</button>
   </div>
 </div></main>`,
 
@@ -6361,12 +6363,12 @@ reset: () => `${authShell('login')}
         CTA and no "Back to log in" closing row. The create screen owns the
         pre-filled/pre-ticked composition; this one is stripped to the two
         fields and the button. */}
-  ${ph('Set New Password','Set a strong password for your account.')}
+  ${ph('Set New Password','Create a strong password for your account.')}
   <div class="sec">
-    <div class="f-row"><div class="f"><label for="rpw">New password</label>
+    <div class="f-row"><div class="f"><label for="rpw">Password</label>
       <div class="pw-wrap"><input class="inp fill" id="rpw" type="password" value="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022">
         <button class="pw-eye" data-eye="rpw" aria-label="Show password">${I.view}</button></div></div>
-    <div class="f last"><label for="rpw2">Confirm new password</label>
+    <div class="f last"><label for="rpw2">Confirm Password</label>
       <div class="pw-wrap"><input class="inp fill" id="rpw2" type="password" placeholder="Re-enter password">
         <button class="pw-eye" data-eye="rpw2" aria-label="Show password">${I.view}</button></div></div></div>
   </div>
