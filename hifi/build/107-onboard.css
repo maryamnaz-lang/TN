@@ -1393,35 +1393,13 @@
 .app .ob-logo img{display:block;height:36px;width:auto}
 @container app (min-width:900px){.app .ob-logo img{height:38px}}
 
-/* ------------------------------------------------------------------ 107.r ---
-   THE TWO SIDE RAILS — Maryam, 27 Sep 2026
-
-   Two full-height vertical hairlines framing the welcome door, one near each
-   frame edge, DESKTOP ONLY and on the STEP-0 door alone (the welcome/voice
-   intro, `.ob-open:not(.ob-open-live)`) — not the live chat thread, not the
-   stepped survey (its own `.ob-survey` composition owns its top bar). The
-   wordmark sits AFTER the left line: the door's horizontal padding grows past
-   the rail inset so the logo — and everything centred below it — clears the
-   line by `--s06`. `--rule` #efefef, the platform's one hairline (§12), drawn
-   as absolute `::before`/`::after` on `.ob-open` (already `position:relative`,
-   §0). At 1px in the far gutters they never meet the centred content, so their
-   default paint order over it is moot. Below 900 there is no room for a framed
-   margin, so nothing is drawn — the padding override and the lines both live in
-   the query. */
-@container app (min-width:900px){
-  .app .ob-open:not(.ob-open-live){--ob-rail:100px;padding-inline:calc(var(--ob-rail) + var(--s06))}
-  .app .ob-open:not(.ob-open-live)::before,
-  .app .ob-open:not(.ob-open-live)::after{
-    content:"";position:absolute;top:0;bottom:0;width:1px;
-    background:var(--rule);pointer-events:none}
-  .app .ob-open:not(.ob-open-live)::before{left:var(--ob-rail)}
-  .app .ob-open:not(.ob-open-live)::after{right:var(--ob-rail)}
-}
 /* THE GROUND IS PLAIN WHITE ON THIS DOOR — Maryam, 27 Sep 2026: "hide the bg blur
    gradients from the page." The two accent bands (the top/bottom wash above) are
    switched off on the welcome/voice door only, leaving the `--layer-01` white;
    the live chat thread and the stepped survey keep their own grounds. All widths.
-   The `:not(.ob-open-live)` beats the base rule on specificity, so order is moot. */
+   The `:not(.ob-open-live)` beats the base rule on specificity, so order is moot.
+   (The side rails themselves are §107.r at the foot of this file — they run the
+   whole onboarding flow, not just this door.) */
 .app .ob-open:not(.ob-open-live){background-image:none}
 
 /* ------------------------------------------------------------------ 107.p ---
@@ -2052,10 +2030,15 @@
   from{width:var(--ob-from,0)}
   to{width:var(--ob-to,0)}}
 
-/* the brand row: wordmark left, "You're almost there!" right, under the bar */
+/* the brand row: wordmark left, "You're almost there!" right, under the bar.
+   TOP PADDING IS --s07 TO MATCH THE DOOR (Maryam, 28 Sep 2026: "the logo ... does
+   not have the same positioning like other onboarding screens"). The welcome door
+   sits its wordmark at --s07 (32) from the top (`.ob-open`'s own padding-top); the
+   survey/completion head used --s06 (24), so the logo was 8px higher than on the
+   door. Aligned to --s07 so every onboarding logo sits at the same top offset. */
 .app .ob-sv-head{
   flex:none;display:flex;align-items:center;justify-content:space-between;
-  gap:var(--s04);padding:var(--s06) var(--s06) 0}
+  gap:var(--s04);padding:var(--s07) var(--s06) 0}
 .app .ob-sv-hint{
   color:var(--text-secondary);
   font-size:var(--t-desc-size);line-height:normal}
@@ -2189,3 +2172,42 @@
   88%  {clip-path:polygon(57.07% 4.37%, 46.79% 4.37%, 86.38% 49.87%, 64.78% 74.55%, 75.58% 74.55%, 96.92% 49.61%);opacity:0}
   89%  {clip-path:polygon(29.56% 22.88%, 18.77% 23.14%, 42.67% 49.87%, 2.57% 95.12%, 13.37% 95.12%, 53.21% 49.87%);opacity:0}
   100% {clip-path:polygon(29.56% 22.88%, 18.77% 23.14%, 42.67% 49.87%, 2.57% 95.12%, 13.37% 95.12%, 53.21% 49.87%);opacity:1}}
+
+/* ------------------------------------------------------------------ 107.r ---
+   THE TWO SIDE RAILS — WHOLE ONBOARDING FLOW — Maryam, 27 Sep 2026
+
+   Two full-height vertical hairlines, one 100px in from each frame edge, on
+   EVERY onboarding screen (Maryam, 27 Sep 2026: "set the left and right side
+   lines on whole tal onboarding flow"): the welcome/voice door and the live
+   chat (`.ob-open`, all its states) AND the stepped survey / completion / loader
+   (`.ob-survey`, `.ob-done`, `.ob-loading`). `--rule` #efefef, the platform's one
+   hairline (§12), drawn as absolute `::before`/`::after` on each root (both are
+   `position:relative`). DESKTOP ONLY — below 900 there is no room for a framed
+   margin, so this whole block lives in the container query and nothing draws.
+
+   The content clears the left line by `--s06`, per root:
+   - `.ob-open`: its own `padding-inline` grows past the rail (logo + the centred
+     column below it move in together).
+   - `.ob-survey`: the brand row (`.ob-sv-head`, wordmark left / hint right) takes
+     the same inset, and the centred question column (`.ob-sv-wrap`, max 720) is
+     kept inside the rails by padding `.ob-survey .main` — which is why this block
+     sits at the foot of the file, later than §2063's `.ob-survey .main{padding:0}`
+     of equal weight, so it wins on order. The 4px top progress bar (`.ob-sv-top`,
+     absolute against the un-padded `.ob-survey`) stays full width by design.
+   At 1px in the far gutters the lines never meet the centred content. */
+@container app (min-width:900px){
+  .app .ob-open,
+  .app .ob-survey{--ob-rail:100px}
+
+  .app .ob-open::before, .app .ob-open::after,
+  .app .ob-survey::before, .app .ob-survey::after{
+    content:"";position:absolute;top:0;bottom:0;width:1px;
+    background:var(--rule);pointer-events:none;z-index:1}
+  .app .ob-open::before, .app .ob-survey::before{left:var(--ob-rail)}
+  .app .ob-open::after,  .app .ob-survey::after{right:var(--ob-rail)}
+
+  /* content clears the left line */
+  .app .ob-open{padding-inline:calc(var(--ob-rail) + var(--s06))}
+  .app .ob-survey .ob-sv-head{padding-inline:calc(var(--ob-rail) + var(--s06))}
+  .app .ob-survey .main{padding-inline:var(--ob-rail)}
+}

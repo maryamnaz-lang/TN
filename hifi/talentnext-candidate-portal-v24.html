@@ -6646,7 +6646,7 @@ button.btn-p:active,
   background:transparent;border:0;color:var(--nil-navy);cursor:pointer;
 }
 .nil .nil-modal-x svg{width:24px;height:24px;color:var(--nil-navy)}
-.nil .nil-modal-logo{width:56px;height:auto;display:flex;align-items:center;justify-content:center;color:var(--nil-navy)}
+.nil .nil-modal-logo{width:28px;height:auto;display:flex;align-items:center;justify-content:center;color:var(--nil-navy)}
 .nil .nil-modal-logo svg{width:100%;height:auto}
 .nil .nil-modal-h{
   font-family:var(--font-sans);font-weight:600;
@@ -12881,15 +12881,6 @@ button.btn-p:active,
 .app .ob-logo{display:flex;align-items:center}
 .app .ob-logo img{display:block;height:36px;width:auto}
 @container app (min-width:900px){.app .ob-logo img{height:38px}}
-@container app (min-width:900px){
-  .app .ob-open:not(.ob-open-live){--ob-rail:100px;padding-inline:calc(var(--ob-rail) + var(--s06))}
-  .app .ob-open:not(.ob-open-live)::before,
-  .app .ob-open:not(.ob-open-live)::after{
-    content:"";position:absolute;top:0;bottom:0;width:1px;
-    background:var(--rule);pointer-events:none}
-  .app .ob-open:not(.ob-open-live)::before{left:var(--ob-rail)}
-  .app .ob-open:not(.ob-open-live)::after{right:var(--ob-rail)}
-}
 .app .ob-open:not(.ob-open-live){background-image:none}
 .app .ob-prog{
   width:100%;max-width:720px;flex:none;
@@ -13068,7 +13059,7 @@ button.btn-p:active,
   to{width:var(--ob-to,0)}}
 .app .ob-sv-head{
   flex:none;display:flex;align-items:center;justify-content:space-between;
-  gap:var(--s04);padding:var(--s06) var(--s06) 0}
+  gap:var(--s04);padding:var(--s07) var(--s06) 0}
 .app .ob-sv-hint{
   color:var(--text-secondary);
   font-size:var(--t-desc-size);line-height:normal}
@@ -13163,6 +13154,20 @@ button.btn-p:active,
   88%  {clip-path:polygon(57.07% 4.37%, 46.79% 4.37%, 86.38% 49.87%, 64.78% 74.55%, 75.58% 74.55%, 96.92% 49.61%);opacity:0}
   89%  {clip-path:polygon(29.56% 22.88%, 18.77% 23.14%, 42.67% 49.87%, 2.57% 95.12%, 13.37% 95.12%, 53.21% 49.87%);opacity:0}
   100% {clip-path:polygon(29.56% 22.88%, 18.77% 23.14%, 42.67% 49.87%, 2.57% 95.12%, 13.37% 95.12%, 53.21% 49.87%);opacity:1}}
+@container app (min-width:900px){
+  .app .ob-open,
+  .app .ob-survey{--ob-rail:100px}
+  .app .ob-open::before, .app .ob-open::after,
+  .app .ob-survey::before, .app .ob-survey::after{
+    content:"";position:absolute;top:0;bottom:0;width:1px;
+    background:var(--rule);pointer-events:none;z-index:1}
+  .app .ob-open::before, .app .ob-survey::before{left:var(--ob-rail)}
+  .app .ob-open::after,  .app .ob-survey::after{right:var(--ob-rail)}
+  
+  .app .ob-open{padding-inline:calc(var(--ob-rail) + var(--s06))}
+  .app .ob-survey .ob-sv-head{padding-inline:calc(var(--ob-rail) + var(--s06))}
+  .app .ob-survey .main{padding-inline:var(--ob-rail)}
+}
 .app .eo-course{
   display:flex;flex-direction:column;
   gap:var(--sec-h-gap)}
@@ -26043,8 +26048,8 @@ function nilField(id, label, type, ph, span){
 
 const NIL_EMAIL = (typeof PF !== 'undefined' && PF.general && PF.general.email) || 'you@example.com';
 const MAIL_MARK = `<svg viewBox="0 0 24 24" role="img" aria-label="Email" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
-  <path d="M2 6l6.913 3.917c2.549 1.444 3.625 1.444 6.174 0L22 6"/>
-  <path d="M2.016 13.476c.065 3.065.098 4.598 1.229 5.734 1.131 1.135 2.705 1.174 5.854 1.253 1.94.049 3.862.049 5.802 0 3.149-.079 4.723-.118 5.854-1.253 1.131-1.136 1.164-2.669 1.229-5.734.021-.986.021-1.966 0-2.951-.065-3.066-.098-4.599-1.229-5.734-1.131-1.136-2.705-1.175-5.854-1.254-1.94-.049-3.862-.049-5.802 0-3.149.079-4.723.118-5.854 1.254-1.131 1.135-1.164 2.668-1.229 5.734-.021.985-.021 1.965 0 2.951z"/>
+  <path d="M2 6L8.91302 9.91697C11.4616 11.361 12.5384 11.361 15.087 9.91697L22 6"/>
+  <path d="M2.01577 13.4756C2.08114 16.5412 2.11383 18.0739 3.24496 19.2094C4.37608 20.3448 5.95033 20.3843 9.09883 20.4634C11.0393 20.5122 12.9607 20.5122 14.9012 20.4634C18.0497 20.3843 19.6239 20.3448 20.755 19.2094C21.8862 18.0739 21.9189 16.5412 21.9842 13.4756C22.0053 12.4899 22.0053 11.5101 21.9842 10.5244C21.9189 7.45886 21.8862 5.92609 20.755 4.79066C19.6239 3.65523 18.0497 3.61568 14.9012 3.53657C12.9607 3.48781 11.0393 3.48781 9.09883 3.53657C5.95033 3.61568 4.37608 3.65523 3.24496 4.79066C2.11383 5.92609 2.08114 7.45886 2.01577 10.5244C1.99475 11.5101 1.99475 12.4899 2.01577 13.4756Z"/>
 </svg>`;
 function nilResultModal(){
   return `<div class="nil-modal-scrim" data-nilclose="scrim">
@@ -31941,6 +31946,14 @@ function obDoneScreen(){
   S.obBarFrom = 100;
   return `<div class="ob-survey ob-done">
     <div class="ob-sv-top"><i style="--ob-from:${from}%;--ob-to:100%"></i></div>
+    ${''/* THE WORDMARK ROW (Maryam, 28 Sep 2026: "show the logo on this screen as
+          well, keep things consistent"). Same `.ob-sv-head` the survey steps carry
+          — logo top-left — but NO "You're almost there!" hint: the journey is done
+          on this screen, so that copy would contradict "You're all set". The row is
+          `space-between`, so a lone logo sits left as it should. */}
+    <div class="ob-sv-head">
+      <span class="ob-logo"><img src="${LOGO_K}" alt="TalentNext"></span>
+    </div>
     <main class="main"><div class="ob-sv-wrap">
       <div class="ob-sv-orb">${borbMark('tal-mk', true)}</div>
       <h1 class="ob-sv-title">You&rsquo;re all set</h1>

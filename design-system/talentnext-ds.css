@@ -14,7 +14,7 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 6205.  Rules dropped as product-specific: 222.
+   Rules kept: 6208.  Rules dropped as product-specific: 222.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
@@ -9026,13 +9026,6 @@ button.btn-p:active,
 @container app (min-width:900px){
   .app .ob-logo img{height:38px}
 }
-@container app (min-width:900px){
-  .app .ob-open:not(.ob-open-live){--ob-rail:100px; padding-inline:calc(var(--ob-rail) + var(--s06))}
-  .app .ob-open:not(.ob-open-live)::before,
-  .app .ob-open:not(.ob-open-live)::after{content:""; position:absolute; top:0; bottom:0; width:1px; background:var(--rule); pointer-events:none}
-  .app .ob-open:not(.ob-open-live)::before{left:var(--ob-rail)}
-  .app .ob-open:not(.ob-open-live)::after{right:var(--ob-rail)}
-}
 .app .ob-open:not(.ob-open-live){background-image:none}
 .app .ob-prog{width:100%; max-width:720px; flex:none; display:flex; flex-direction:column; align-items:flex-start; gap:var(--s04)}
 .app .ob-prog-h{margin:0}
@@ -9121,7 +9114,7 @@ button.btn-p:active,
 .app .ob-sv-top{position:absolute; top:0; left:0; right:0; z-index:2; height:4px; background:var(--rule)}
 .app .ob-sv-top > i{display:block; height:100%; width:var(--ob-to,0); background:var(--accent); animation:ob-bar-fill .5s cubic-bezier(.22,1,.36,1)}
 @keyframes ob-bar-fill{from{width:var(--ob-from,0)} to{width:var(--ob-to,0)}}
-.app .ob-sv-head{flex:none; display:flex; align-items:center; justify-content:space-between; gap:var(--s04); padding:var(--s06) var(--s06) 0}
+.app .ob-sv-head{flex:none; display:flex; align-items:center; justify-content:space-between; gap:var(--s04); padding:var(--s07) var(--s06) 0}
 .app .ob-sv-hint{color:var(--text-secondary); font-size:var(--t-desc-size); line-height:normal}
 .app .ob-survey .main{flex:1 1 auto; min-width:0; display:flex; justify-content:center; align-items:center; padding:0; overflow:auto}
 .app .ob-sv-wrap{width:100%; max-width:720px; box-sizing:border-box; padding:var(--s07) var(--s06); display:flex; flex-direction:column}
@@ -9157,6 +9150,21 @@ button.btn-p:active,
 .app .tn-loader__blade--b{animation-delay:calc(var(--tn-loader-duration) * -0.333333)}
 .app .tn-loader__blade--c{animation-delay:calc(var(--tn-loader-duration) * -0.666667)}
 @keyframes tn-relay{0%   {clip-path:polygon(29.56% 22.88%, 18.77% 23.14%, 42.67% 49.87%, 2.57% 95.12%, 13.37% 95.12%, 53.21% 49.87%);opacity:1} 33%  {clip-path:polygon(62.21% 35.22%, 51.67% 35.48%, 64.52% 49.87%, 24.68% 95.12%, 35.22% 95.12%, 75.06% 50.13%);opacity:1} 66%  {clip-path:polygon(57.07% 4.37%, 46.79% 4.37%, 86.38% 49.87%, 64.78% 74.55%, 75.58% 74.55%, 96.92% 49.61%);opacity:1} 88%  {clip-path:polygon(57.07% 4.37%, 46.79% 4.37%, 86.38% 49.87%, 64.78% 74.55%, 75.58% 74.55%, 96.92% 49.61%);opacity:0} 89%  {clip-path:polygon(29.56% 22.88%, 18.77% 23.14%, 42.67% 49.87%, 2.57% 95.12%, 13.37% 95.12%, 53.21% 49.87%);opacity:0} 100% {clip-path:polygon(29.56% 22.88%, 18.77% 23.14%, 42.67% 49.87%, 2.57% 95.12%, 13.37% 95.12%, 53.21% 49.87%);opacity:1}}
+@container app (min-width:900px){
+  .app .ob-open,
+  .app .ob-survey{--ob-rail:100px}
+  .app .ob-open::before,
+  .app .ob-open::after,
+  .app .ob-survey::before,
+  .app .ob-survey::after{content:""; position:absolute; top:0; bottom:0; width:1px; background:var(--rule); pointer-events:none; z-index:1}
+  .app .ob-open::before,
+  .app .ob-survey::before{left:var(--ob-rail)}
+  .app .ob-open::after,
+  .app .ob-survey::after{right:var(--ob-rail)}
+  .app .ob-open{padding-inline:calc(var(--ob-rail) + var(--s06))}
+  .app .ob-survey .ob-sv-head{padding-inline:calc(var(--ob-rail) + var(--s06))}
+  .app .ob-survey .main{padding-inline:var(--ob-rail)}
+}
 
 /* ---- 108-enrolcourse.css ---- */
 .app .eo-course{display:flex; flex-direction:column; gap:var(--sec-h-gap)}

@@ -1653,6 +1653,14 @@ function obDoneScreen(){
   S.obBarFrom = 100;
   return `<div class="ob-survey ob-done">
     <div class="ob-sv-top"><i style="--ob-from:${from}%;--ob-to:100%"></i></div>
+    ${''/* THE WORDMARK ROW (Maryam, 28 Sep 2026: "show the logo on this screen as
+          well, keep things consistent"). Same `.ob-sv-head` the survey steps carry
+          — logo top-left — but NO "You're almost there!" hint: the journey is done
+          on this screen, so that copy would contradict "You're all set". The row is
+          `space-between`, so a lone logo sits left as it should. */}
+    <div class="ob-sv-head">
+      <span class="ob-logo"><img src="${LOGO_K}" alt="TalentNext"></span>
+    </div>
     <main class="main"><div class="ob-sv-wrap">
       <div class="ob-sv-orb">${borbMark('tal-mk', true)}</div>
       <h1 class="ob-sv-title">You&rsquo;re all set</h1>
