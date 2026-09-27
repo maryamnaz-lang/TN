@@ -38,6 +38,22 @@ in `hifi/` is somebody the candidate books, in `tn-agent-portal.html` it is the 
 | `--star` | `#ffcb05` | the rating star, always, never the accent |
 | `--cal-iv` / `--cal-reiv` / `--cal-open` | `#cce7cb` / `#e0c0ff` / `#e9dedc` | calendar slot fills — first interview / re-interview / open (a SET, like the journey's states) |
 
+**State, semantic, layer & data-viz tokens** — `01-foundation.css:172, 299-301, 322, 340, 345-346, 351-355, 375, 414-415, 429`; `12-tone.css:63, 67, 72`. These already ship and are referenced throughout §3 and the dated log; consolidated here so the whole set reads in one place. Values only — nothing new, nothing renamed. (Added 28 Sep 2026 during a DESIGN.md × code audit; the tokens themselves predate it.)
+
+| Token | Value | Role |
+|---|---|---|
+| `--layer-01` / `--layer-02` / `--layer-accent-01` | `#ffffff` / `#f7f7f7` / `#dcdad3` | app/card ground / the quiet grey chip ground (integrations icon chip, 21 Sep) / the light accent track behind an unreached ladder or priority rung (§59) |
+| `--gray-10..40` | `#f5f4f0` / `#e1e0dc` / `#c7c6c3` / `#a9a8a5` | the very-light ring the leader "Progress by Chapter" not-done marks use is `--gray-20` (§15); `--gray-30` shares the `--border-subtle-02` value |
+| `--icon-primary` | `#111111` | the ink a DECORATIVE category mark reads (§29/§3, "a decorative mark is INK"); on a dark card it flips to `--on-dark` |
+| `--on-dark` / `--on-dark-2` / `--on-accent` | `#ffffff` / `#c7c6c3` / `#ffffff` | inks on a `--gray-100` black card / secondary-and-helper on dark (both collapse to this, §63 §6a) / the ink on an `--accent` fill (the `.conf` disc glyph, §134) |
+| `--support-success` / `--support-success-ink` | `#24a148` / `#1a7f37` | the done/verified green; `-ink` is the AA text weight (the `.statw` green, the verified tick) |
+| `--support-attention` / `--support-error` | `#96540a` / `#da1e28` | the amber / red state inks (`.statw` warn / error). Status is plain coloured text, never a chip (§126) |
+| `--in-progress` | `#b34d00` | the amber a chapter or level in flight is marked with — a STATE colour, not a description grey |
+| `--link` / `--link-hover` | `#0371a4` / `#025c86` | the platform's one blue — the `.idphoto-edit` pencil badge (§111); a generic action stays `--accent-text`, never this |
+| `--overlay-selected` | `rgba(17,17,17,.08)` | the ground under a selected dropdown option / row (`.dd-opt.on`) |
+| `--dv-1` / `--dv-2` / `--dv-3` / `--dv-4` | `#cfded4` / `#8fbca6` / `#3d8a6e` / `#1e5546` | the data-viz GREEN ramp for `donut` / `hbars` (§120.1f) — categorical charts, NEVER the brand red |
+| `--dv-gold` / `--dv-hi` | `#a8791b` / `#c2703d` | the two WARM ramp members, for a gold or high marker; still not the brand red (this is the dv scale beyond the green 1–4) |
+
 **Type** — `63-typography.css:140-236`; face `11-type.css:294` (**Plus Jakarta Sans**)
 
 | Role | size / lh | Role | size / lh |
@@ -610,3 +626,5 @@ has the promote/drop note · `--ai-amber`, `.cert-btn` read by nothing · `PF.ge
 `location` / `phone` / `tz` are retained but no longer surfaced (the General edit form dropped them, 7 Sep) · `tn-portals.html` and
 the frozen `tn-admin.html` are not on the design system (`tn-admin-portal.html`, the hi-fi Super
 Admin portal, is).
+
+**Token-discipline drift found in a DESIGN.md × code audit (28 Sep 2026), not yet fixed** — the hand-written portals are otherwise clean (the agent portal carries 12 hex literals, most of them in comments; the admin portal 50, mostly `#fff` / `#111` and social brand-logo colours). The live exceptions: the admin dashboard charts hardcode `#FF4626` (the earnings cost bars) and `#6B6B6B` (the "Cohort leaders" / "Scene purchases" series — the code even labels it "no token, literal") instead of a `--dv-*` member, and the `#FF4626` red also breaks §120.1f's "the dv ramp is green, NEVER the brand red" — a `--dv-hi` / `--dv-gold` or a new cost token is the fix · a handful of token VALUES are written as hexes rather than `var()` in the admin portal — `#efefef` (should be `var(--rule)`), `#f7f7f7` (`var(--layer-02)`), `#c7c6c3` (`var(--border-subtle-02)`), a couple of `#828282` (`var(--text-secondary)`) — the "never hardcode a hex; read the token" rule (§3) · the agent portal's unreached ladder-rung tiles read `#efefef` rather than `var(--rule)` (a dated 22 Sep decision, still a literal) · `.pbrk-dot` (the admin payout-breakdown legend swatch) uses `border-radius:3px`, a radius not in the stated exception set (999 / 16 / 8 / 5 / 4) · NOT drift, checked and cleared: the admin bulk-import `#impText` textarea's `ui-monospace` (legitimate — it is a data-paste field, §5 allows mono for code/data), the social brand-logo hexes (`#FF0000` YouTube, `#010101` TikTok, `#e4405f` / `#1877f2` / `#0a66c2`), the comet-gradient stops `#ff6e24` / `#ff3733`, and the dropped-magenta `#d551d7` (comment only, already dead) · the three frozen prototypes (`tn-portals.html`, `tn-admin.html`, `tn-candidate-portal.html`) do not link the design system and predate it, so their 80–1300 raw hexes are out of scope by design, not drift.
