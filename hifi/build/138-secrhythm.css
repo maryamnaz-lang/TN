@@ -39,30 +39,41 @@
    ONE unbroken compound after `.page > .sec` — every `:not()` is glued to the
    one before it, because a space would read as a descendant combinator. */
 @container app (min-width:900px){
-  .app:not(:has(> .auth-card)):not(:has(> .ob-open)):not(:has(> .ob-survey)):not(:has(> .call)):not(:has(> .nil)) .page > .sec:not(:last-child):not(.dark-card):not(.tint):not(.found):not(.sec-joined):not(.lead-bar):not(.sec-cs):not(:has(> .stats)):not(:has(> .facts)):not(:has(> .tile-stack)):not(:has(> .tile)):not(:has(> .cardrow)):not(:has(> .gcard)):not(:has(> .kv)):not(:has(> .qa)):not(:has(> .stat)):not(:has(> .certban)):not(:has(> .note)):not(:has(> .tbl-wrap)):not(:has(> .plate)):not(:has(> .lvl-hero)):not(:has(> .cs)):not(:has(> .lead-b)):not(:has(> .signed)):not(:has(> .pf-tgs)):not(:has(> .pf-facts)):not(:has(+ .sec.tint)):not(:has(+ .sec.sec-rep)):not(:has(+ .sec-qa)):not(:has(+ .sec.dark-card))::after{display:block}
+  .app:not(:has(> .auth-card)):not(:has(> .ob-open)):not(:has(> .ob-survey)):not(:has(> .call)):not(:has(> .nil)) .page > .sec:not(:last-child):not(.dark-card):not(.tint):not(.found):not(.sec-joined):not(.lead-bar):not(.sec-cs):not(:has(> .stats)):not(:has(> .facts)):not(:has(> .tile-stack)):not(:has(> .tile)):not(:has(> .cardrow)):not(:has(> .gcard)):not(:has(> .kv)):not(:has(> .qa)):not(:has(> .stat)):not(:has(> .certban)):not(:has(> .note)):not(:has(> .tbl-wrap)):not(:has(> .plate)):not(:has(> .lvl-hero)):not(:has(> .lcal-row)):not(:has(> .cs)):not(:has(> .lead-b)):not(:has(> .signed)):not(:has(> .pf-tgs)):not(:has(> .pf-facts)):not(:has(+ .sec.tint)):not(:has(+ .sec.sec-rep)):not(:has(+ .sec-qa)):not(:has(+ .sec.dark-card))::after{display:block}
 }
 
 /* -- a card/block section never closes with a line (all widths) -------------
    Turns §10's mobile "ruled paper" off under a block, and reinforces desktop.
    `:is()` keeps it one selector; disjoint from the re-enabler above (that one
    is all `:not(block)`, this one all `:is(block)`). */
-.app .page > .sec:is(.dark-card,:has(> .stats),:has(> .facts),:has(> .tile-stack),:has(> .tile),:has(> .cardrow),:has(> .gcard),:has(> .kv),:has(> .qa),:has(> .stat),:has(> .certban),:has(> .note),:has(> .tbl-wrap),:has(> .plate),:has(> .lvl-hero))::after{display:none}
+.app .page > .sec:is(.dark-card,:has(> .stats),:has(> .facts),:has(> .tile-stack),:has(> .tile),:has(> .cardrow),:has(> .gcard),:has(> .kv),:has(> .qa),:has(> .stat),:has(> .certban),:has(> .note),:has(> .tbl-wrap),:has(> .plate),:has(> .lvl-hero),:has(> .lcal-row))::after{display:none}
 
 /* -- no trailing divider after the last section (all widths) ----------------
    Overrides §10's `.page > :last-child::after{opacity:1}`. */
 .app .page > .sec:last-child::after{display:none}
 
-/* -- a dark card followed by a block is a 20px block pair -------------------
-   §101 collapses block pairs to 20, but its set is stats/facts/tile/certban/
-   note/dark-card — it does NOT include quick actions (`.sec-qa`) or the wider
-   block set. So on the candidate DASHBOARD (every stage) the pulse card ->
-   Quick Actions fell through to §75.194, which hands the pair only the card's
-   16px margin. §75.169 already drops qa's own top hairline after a card, so the
-   line is gone; this pays the missing 4px so the pair reads as a proper 20px
-   block gap. Mirrors §101's "one edge pays": the card's bottom margin goes to
-   nothing and the block under it pays the whole 20 on top (else 16 + 20 = 36).
-   (0,5,0)+, later than §75.194's (0,5,0), so it wins on order. 28 Sep 2026. */
-.app .page > .sec.dark-card:has(+ .sec-qa),
-.app .page > .sec.dark-card:has(+ .sec:is(:has(> .tile-stack), :has(> .cardrow), :has(> .gcard), :has(> .kv), :has(> .stat), :has(> .tbl-wrap), :has(> .plate), :has(> .lvl-hero))){margin-bottom:0}
-.app .page > .sec.dark-card + .sec-qa,
-.app .page > .sec.dark-card + .sec:is(:has(> .tile-stack), :has(> .cardrow), :has(> .gcard), :has(> .kv), :has(> .stat), :has(> .tbl-wrap), :has(> .plate), :has(> .lvl-hero)){padding-top:20px}
+/* -- a dark card -> a HEADED section is 32px, not the old reduced gap ---------
+   The rule: 32px between sections, and 20px ONLY when the next section is a bare
+   block/cards row with no heading or text (Maryam, 28 Sep 2026). §101 already
+   handles the 20px case — its "second block" test is `:has(> .stats:first-child)`,
+   i.e. a block as the FIRST child, which means no heading above it. A section
+   that leads with a heading (Quick Actions, "Choose your scenes", …) after a
+   dark card is an ORDINARY section and takes the full 32.
+   §75.194 zeroes that section's top padding (the 1-Sep "reduce the space to the
+   cards" reduction); this restores it to --s05 (16), which with the card's own
+   --s05 (16) bottom margin makes 32. Supersedes §75.194 for the headed case per
+   the 28 Sep rhythm; the bare-block case still falls to §101's 20. No divider
+   either way — a dark card draws none, and §75.169 drops qa's own hairline.
+   (0,6,0), later than and above §75.194's (0,5,0). */
+.app .page > .sec.dark-card + .sec:has(> .sec-h){padding-top:var(--s05)}
+
+/* -- the LAST block row in a run pays 32 to the next headed section ----------
+   A run of bare block/card rows sits 20 apart (§101); the run ENDS at a headed
+   section, and the gap there is 32, not the 24 some figure bands leave on their
+   bottom (the leader dashboard's `.stats-lead` band → "Attention Required" is
+   the case: 24 + 16 = 40). A block/card section (not a dark card — its gap is a
+   margin) that is directly followed by a HEADED section returns its bottom to
+   --s05 (16), so 16 + the heading section's 16 top = 32. Block→block pairs are
+   `:has(+ .sec > .sec-h)`-excluded (the next has no heading), so §101's 20 stands.
+   Maryam, 28 Sep 2026. */
+.app .page > .sec:not(.dark-card):is(:has(> .stats),:has(> .facts),:has(> .certban),:has(> .tile-stack),:has(> .tile),:has(> .cardrow),:has(> .gcard),:has(> .kv),:has(> .stat),:has(> .note),:has(> .plate),:has(> .lcal-row)):has(+ .sec > .sec-h){padding-bottom:var(--s05)}

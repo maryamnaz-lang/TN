@@ -7,7 +7,7 @@
 
 <!-- The design system, exactly as the starter / tn-new-portal link it. No portal
      file and no design-system layer is touched by this page. -->
-<link rel="stylesheet" href="design-system/talentnext-ds.css">
+<link rel="stylesheet" href="design-system/talentnext-ds.css?b=3af8f401">
 
 <style>
 /* HOST GEOMETRY ONLY. Every colour/size/space below is a token; the only extra
@@ -17,7 +17,31 @@
   container-type:inline-size;container-name:app;
   overflow:hidden;background:var(--background)}
 
+/* CARDS SIT DIRECTLY UNDER THEIR HEADING. The DS draws a hairline + 32px gap
+   above every `.signed` block (`.sec > .signed{border-top;padding-top:--s07}`);
+   this removes both so the Strengths/Growth and coaching rows pull up to the
+   heading. */
+.app .page .sec > .signed{border-top:0; padding-top:0}
+
+/* ONE DIVIDER BETWEEN THE TWO SECTIONS — above Coaching guidance, inset by the
+   page gutter like the product's own section rules. */
+.app .page .sec.emp-divide{position:relative; padding-top:var(--s07)}
+.app .page .sec.emp-divide::before{content:''; position:absolute; top:0;
+  left:var(--pad-x); right:var(--pad-x); border-top:1px solid var(--rule)}
+
+/* BRAND MARK ONLY. Hide the full wordmark; show just the chevron icon in the
+   app bar's left cell, centred over the rail so it lines up with the rail icons. */
+.app .shell-logo{display:none}
+.app .nav-t-mark{display:grid; place-items:center}
+.app .nav-t-menu{display:none}
+
+/* CARD DETAILS. The Strong/Focus tags are rounded accent pills with white text;
+   the icon sits closer to its content (gap reduced from --s05). */
+.app .page .sig-tag{background:var(--accent); color:var(--on-accent); border-radius:999px}
+.app .page .sig-c{gap:var(--s03)}
+
 @container app (min-width:900px){
+  .app .shell-act.nav-t{width:var(--rail-w-nav)}
   /* THE FACTS ROW IS THREE ACROSS. `.pf-facts` is a fixed FOUR-column grid at
      desktop (§105.1a); with three facts that leaves an empty cell, so this pins
      it to three, the way the admin's `.crs-facts` modifier does. */
@@ -40,7 +64,7 @@
   <div class="app" id="app"></div>
 </div>
 
-<script src="design-system/talentnext-ds.js"></script>
+<script src="design-system/talentnext-ds.js?b=3af8f401"></script>
 <script>
 /* This IS the Super Admin interview-detail page, with the employer's content:
    back arrow + title -> Employee / Talent agent / When facts (icons) -> the
@@ -69,11 +93,18 @@ const NAV = [
 const fact = (icon, label, val) =>
   `<div style="--mk:var(--text-primary)"><span class="l pf-l">${icon}${label}</span><span class="v">${val}</span></div>`;
 
+/* A person value: a small round photo + the name, for the Employee / Talent agent
+   facts. `.av-ph` is the DS photo disc (initials behind the image). */
+const personVal = (name, img, ini) =>
+  `<span class="v" style="display:flex;align-items:center;gap:var(--s03)"><span class="av-ph" style="width:24px;height:24px;flex:none"><i>${ini}</i><img src="${img}" alt=""></span>${name}</span>`;
+const factPerson = (icon, label, valHtml) =>
+  `<div style="--mk:var(--text-primary)"><span class="l pf-l">${icon}${label}</span>${valHtml}</div>`;
+
 /* Strengths + Growth areas — the exact `ivEvalBlock` cards, tags kept, `--mk`
    inked so the whole card is black-and-grey (the tag reads as a grey chip). */
 const evalBlock = `<div class="signed iv-eval">
     <div class="sig-pair">
-      <div class="sig-c" style="--mk:var(--text-primary)"><i class="sig-ic">${I.star}</i>
+      <div class="sig-c" style="--mk:var(--text-primary)"><i class="sig-ic">${I.starOutline}</i>
         <div class="sig-b"><div class="sig-top"><span class="sig-t">Strengths</span><span class="sig-tag">Strong</span></div>
           <p class="sig-p">${first} reasons from consequences to people, not policy. They can walk through a real reorganization call by call, with three worked examples that each carry a date and a name.</p></div></div>
       <div class="sig-c" style="--mk:var(--text-primary)"><i class="sig-ic">${I.growth}</i>
@@ -106,9 +137,8 @@ document.getElementById('app').innerHTML = `
     </button>
     <a class="shell-logo"><img src="${LOGO_K}" alt="TalentNext"></a>
     <div class="shell-right">
-      <span class="shell-name">${OWNER}</span>
       <button class="shell-act" aria-label="Notifications">${I.notification}</button>
-      <span class="av sm shell-avatar av-ph"><i>MR</i><img src="${AV.samuel}" alt=""></span>
+      <span class="av sm shell-avatar av-ph"><i>MR</i><img src="${AV.hana}" alt=""></span>
     </div>
   </header>
 
@@ -132,8 +162,8 @@ document.getElementById('app').innerHTML = `
 
         <section class="sec">
           <div class="facts pf-facts emp-facts">
-            ${fact(I.user, 'Employee', EMP)}
-            ${fact(I.user, 'Talent agent', AGENT)}
+            ${factPerson(I.user, 'Employee', personVal(EMP, AV.owen, 'JW'))}
+            ${factPerson(I.user, 'Talent agent', personVal(AGENT, AV.samuel, 'DB'))}
             ${fact(I.calendar, 'When', '20 Aug 2026')}
           </div>
         </section>
@@ -143,7 +173,7 @@ document.getElementById('app').innerHTML = `
           ${evalBlock}
         </section>
 
-        <section class="sec">
+        <section class="sec emp-divide">
           ${dsAiHead({title: 'Coaching guidance', desc: 'Ways to support ' + first + ' in your regular one-to-ones.'})}
           ${coachBlock}
         </section>

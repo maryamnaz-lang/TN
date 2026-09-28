@@ -14,7 +14,7 @@
      The <style> block is PROTOTYPE CHROME AND NOTHING ELSE (the device frame,
      the viewport picker, the wordmark size, a toast host) — no product rule.
      ========================================================================== -->
-<link rel="stylesheet" href="design-system/talentnext-ds.css?b=787bdecb">
+<link rel="stylesheet" href="design-system/talentnext-ds.css?b=3af8f401">
 <style id="admin-auth-slider">
 /* THE FRONT DOOR IS A SLIDER — ported verbatim from the candidate portal's
    §132 (hifi/build/132-authslide.css). That layer is hifi-only
@@ -713,6 +713,13 @@ input:-webkit-autofill:focus{
    combinator beat the `.iv-detail-body > .sec + .sec` margin; scoped so the interview-
    detail and Settings strips are untouched. */
 .app .iv-detail-body > .sec.iv-tabs.iv-tabs-tight{margin-top:0; padding-top:var(--s04)}
+/* .lc-body's uniform 16/16 section padding re-inflated the gap ABOVE the tab strip on the
+   level-approval page (it gave the head and the strip a 16px bottom padding the tuned
+   .iv-tabs rules had zeroed). Restore those zeros so above == below again (Maryam,
+   28 Sep 2026). Scoped to lc-body pages carrying a tab strip; the change detail has none. */
+.app .lc-body.iv-detail-body > .sec:has(+ .sec.iv-tabs){padding-bottom:0; margin-bottom:0}
+.app .lc-body.iv-detail-body > .sec.iv-tabs{padding-top:var(--s02); padding-bottom:0; margin-top:0}
+.app .lc-body.iv-detail-body > .sec.iv-tabs > .cs{margin-top:0}
 /* THE LEVEL-APPROVAL ACTION ROW (Maryam, 25 Sep 2026): the Approve-Tal and Reviewer-
    override ghosts carry a VISIBLE light-grey outline — the ghost's default --rule
    (#efefef) edge is near-invisible on white, so `.appr-out` steps it to the findable
@@ -1145,16 +1152,27 @@ input:-webkit-autofill:focus{
   .app .lvl-blocks{grid-template-columns:repeat(var(--lvl-cols,5),minmax(0,1fr))}
 }
 .app .lvl-block{
+  position:relative;
   display:flex; flex-direction:column; align-items:center; justify-content:center;
   gap:var(--s03); min-height:150px; padding:var(--s06) var(--s04);
   background:var(--background); border:1px solid var(--rule); border-radius:var(--radius);
   text-align:center}
+/* per-block pencil (top-right) — opens that level's / acronym's own edit sheet */
+.app .lvl-edit-ic{position:absolute; top:var(--s03); right:var(--s03); width:26px; height:26px;
+  display:grid; place-items:center; padding:0; border:0; background:transparent;
+  color:var(--text-secondary); cursor:pointer; border-radius:999px}
+.app .lvl-edit-ic svg{width:16px; height:16px}
+.app .lvl-edit-ic:hover{color:var(--accent-text); background:var(--surface-2)}
 .app .lvl-block-code{line-height:1}
 
 /* --- Bucket Edit sheet: a clear gap under the description label, and a compact
    "− N +" stepper sitting on the RIGHT of the "Number of levels" heading (Maryam,
    17 Sep 2026 — plus/minus, on one row with the label). --- */
 .app .lvl-edit .lbl{margin-bottom:var(--s03)}
+/* the per-level "Can lead a cohort" toggle stack in the track edit sheet */
+.app .lvl-leadtog{display:flex; flex-direction:column; gap:var(--s03)}
+.app .lvl-leadtog .tg{margin:0}
+.app .lvl-leadtog .tb{display:flex; align-items:baseline; gap:var(--s03)}
 .app .nstep-f{display:flex; align-items:center; justify-content:space-between; gap:var(--s05)}
 .app .nstep-f .lbl{margin-bottom:0}
 .app .nstep{display:inline-flex; align-items:center; gap:var(--s02)}
@@ -1180,11 +1198,14 @@ input:-webkit-autofill:focus{
    2026: "make the colored three cards light grey cards with black icon and
    heading, desc should have the desc color"). Admin-local, scoped to `.iv-eval`
    so the candidate portal's signed-summary cards keep their colour. */
-.app .iv-eval .sig-c{background:var(--surface-2); border:1px solid var(--rule)}
+.app .iv-eval .sig-c{background:var(--surface-2); border:1px solid var(--rule); gap:var(--s03)}
 .app .iv-eval .sig-ic{color:var(--icon-primary)}
 .app .iv-eval .sig-t{color:var(--text-primary)}
 .app .iv-eval .sig-p{color:var(--text-secondary)}
-.app .iv-eval .sig-tag{color:var(--text-secondary); background:color-mix(in srgb, var(--text-secondary) 12%, var(--layer-01))}
+/* THE "Strong" / "Focus" TAGS are rounded, accent-filled with white text (Maryam,
+   28 Sep 2026) — not the neutral tinted chip; the mark-to-content gap is tightened
+   above (`.sig-c` gap --s03). */
+.app .iv-eval .sig-tag{border-radius:999px; color:var(--on-accent); background:var(--accent)}
 
 /* --- A headed section's heading sits FLUSH with its content on both sides
    (Maryam 15 Sep 2026: padding:0, not the double-inset padding:0 var(--pad-x)) --- */
@@ -1407,7 +1428,7 @@ input:-webkit-autofill:focus{
    six letters alongside their level. Chips are radius-0 like the platform; an
    accent-tint fill + accent edge marks a picked letter, matching the row-select
    affordance. DOM-only toggle (no render, trap 9) so the reason textarea survives. */
-.app .ltr-pick{display:flex; flex-wrap:wrap; gap:var(--s03); margin-top:var(--s02)}
+.app .ltr-pick{display:flex; flex-wrap:wrap; gap:var(--s03); margin-top:var(--s04)}
 .app .ltr-chip{display:inline-flex; align-items:center; gap:var(--s02); padding:var(--s02) var(--s04); border:1px solid var(--rule); border-radius:999px; background:var(--background); cursor:pointer; color:var(--text-secondary); font:inherit; line-height:1.2}
 /* THE OVERRIDE MODAL LAYS ITS SECTIONS OUT ON ONE 32px RHYTHM (Maryam, 25 Sep 2026:
    "each section should have 32px gap") — a flat column so the kv block and the closing
@@ -1439,7 +1460,7 @@ input:-webkit-autofill:focus{
   </div>
 </div>
 
-<script src="design-system/talentnext-ds.js?b=787bdecb"></script>
+<script src="design-system/talentnext-ds.js?b=3af8f401"></script>
 <script>
 /* ==========================================================================
    THE SUPER ADMIN PORTAL
@@ -2180,7 +2201,7 @@ const DECISIONS=[
  {t:'Who grants Super Admin, and for how long', d:'Bootstrap the first admin at go-live out of band, a time-boxed grant with auto-expiry, or Tkxel holding it through build and pilot. With one holder the second-approver rule cannot be satisfied.', area:'Users', owner:'Derek', src:'SA-01 A1–A3 · E1', ic:'lock', go:'users/roles', sev:'high', sa:'SA-01', kind:'open', blocks:'the approver step of the grant sheet — a sole admin grants single-approver, logged high'},
  {t:'Staff sign-in is undecided', d:'Step-up auth at the point of action rather than only at login, role switching for a multi-role holder, read-only mobile. Lost MFA device recovery, a break-glass credential for an SSO outage, alert-or-block on an anomalous sign-in — none ruled.', area:'System', owner:'Umair', src:'SA-02 A1–A3 · E1–E3', ic:'lock', go:'settings/security', sev:'high', sa:'SA-02', kind:'blocked', blocks:'the sign-in screen beyond email + password + code, and every recovery path'},
  {t:'Console model: one portal or several', d:'Model A, one portal with role-scoped views, against Model B, multiple portals plus a switcher. No KPIs are defined for any persona, and six MVP dashboards have no data layer named.', area:'System', owner:'Umair', src:'SA-03 A1–A2 · E1–E2', ic:'home', go:'home/home', sev:'high', sa:'SA-03', kind:'blocked', blocks:'which figures the dashboard shows — the ones here are read off the seed, not signed off'},
- {t:'Level override: disclosure, criteria and the Trailblazer bucket', d:'Does the candidate see an override? E1→E2 promotion criteria are undefined. Trailblazer is out of MVP but stays in the data model. AI employment-decision law may compel a decision trail.', area:'Candidates', owner:'Derek', src:'SA-04 E1–E5', ic:'route', go:'candidates/candidates', sev:'med', sa:'SA-04', kind:'open', blocks:'whether the disclosure switch on the override sheet notifies anyone'},
+ {t:'Level override: disclosure, criteria and the Trailblazer track', d:'Does the candidate see an override? E1→E2 promotion criteria are undefined. Trailblazer is out of MVP but stays in the data model. AI employment-decision law may compel a decision trail.', area:'Candidates', owner:'Derek', src:'SA-04 E1–E5', ic:'route', go:'candidates/candidates', sev:'med', sa:'SA-04', kind:'open', blocks:'whether the disclosure switch on the override sheet notifies anyone'},
  {t:'Score override waits on the double-blind carve-out', d:'Void a score and grant a free re-interview, void without penalising the agent share, or batch-recalibrate on a faulty model version — but whether the re-interviewer sees the prior recording (blinded or unblinded) is unruled, and a Twilio recording may already be past retention.', area:'Candidates', owner:'Derek', src:'SA-05 A1–A3 · E1–E2', ic:'eye', go:'candidates/candidates', sev:'high', sa:'SA-05', kind:'blocked', blocks:'the view a re-interviewer is given after a void'},
  {t:'Refund rules wait on the settlement model', d:'Clawback from the platform share first, cohort refunds pro-rated by intent price, the sponsoring employer as payer, goodwill credit instead of cash. No threshold above which a Super Admin is required; a chargeback may already be in flight; the agent payout may already have settled.', area:'Finance', owner:'Reed', src:'SA-06 A1–A4 · E1–E3', ic:'scale', go:'finance/refunds', sev:'high', sa:'SA-06', kind:'blocked', blocks:'the refund approval threshold and the clawback order'},
  {t:'Cohort price by intent, sponsored pricing and the first-interview discount', d:'A cohort price per stated intent with no figures set; Signal sponsored pricing is an action with Derek; the discounted first interview is absorbed by Reed. Reed decides, the Super Admin only executes; in-flight enrolments must not retro-bill; USD-only at MVP is unconfirmed.', area:'Finance', owner:'Reed', src:'SA-08 A1, A3–A4 · E1–E3', ic:'money', go:'finance/feeconfig', sev:'med', sa:'SA-08', kind:'open', blocks:'three fee lines that read “Not set”'},
@@ -2375,7 +2396,7 @@ const MODULES=[
     & Tracks (5.5, moved out of Cohort Management), with the change detail (5.4) and the
     approval detail as hidden drill-ins. */
  {k:'levelling', t:'Levelling', ic:'chart', subs:[
-   {k:'log', t:'Levelling Log'}, {k:'queue', t:'Level Approvals'}, {k:'levels', t:'Levels & Tracks'},
+   {k:'log', t:'Levelling Log'}, {k:'queue', t:'Level Approvals'}, {k:'levels', t:'Tracks, Levels & Acronyms'},
    {k:'change', t:'Level change', hidden:true}, {k:'approval', t:'Level approval', hidden:true}]},
  /* ONBOARDING QUESTIONS — the intake quiz builder (Maryam, 22 Sep 2026). One
     visible sub (the questions list, drawn as a single rail leaf); `edit` is the
@@ -3934,7 +3955,7 @@ const talq = () => {
         null, ['Verify employers', 'vetting/empverify']]
     ],
     candidates: [
-      ['How are candidates spread across buckets?', `${CANDS.filter(c => c.bucket === 'Explorer').length} Explorer, ${CANDS.filter(c => c.bucket === 'Builder').length} Builder and ${CANDS.filter(c => c.bucket === 'Trailblazer').length} Trailblazer, ${CANDS.length} in all. ${CANDS.filter(c => c.agent === '—').length} have no assessing agent yet.`,
+      ['How are candidates spread across tracks?', `${CANDS.filter(c => c.bucket === 'Explorer').length} Explorer, ${CANDS.filter(c => c.bucket === 'Builder').length} Builder and ${CANDS.filter(c => c.bucket === 'Trailblazer').length} Trailblazer, ${CANDS.length} in all. ${CANDS.filter(c => c.agent === '—').length} have no assessing agent yet.`,
         null, ['Open the directory', 'candidates/candidates']]
     ],
     agents: [
@@ -7553,17 +7574,46 @@ const sameLetterSet = (a, b) => { a = a || []; b = b || []; return a.length === 
    row with Source = Admin override (Proposed by / Decided on blank), and audits
    before/after + reason. The candidate notification is candidate-portal (hifi) scope and
    is STUBBED here (admin-side only). */
+/* THE CANDIDATE'S CURRENT STANDING (for the override modal) — resolved from the most
+   recent LEVEL_LOG row for this candidate (newest first via unshift), which carries the
+   letters, the date it became current, the proposing agent and the approving reviewer.
+   A candidate with an approved log row is HUMAN-APPROVED (show agent + reviewer); one with
+   none is QUIZ-DERIVED (Source "Preliminary quiz", no agent/approver). c.letters is
+   backfilled from the log row the first time so the disabled-until-differs gate compares
+   against the true current set. */
+function candStanding(c){
+  const row = LEVEL_LOG.find(r => r.cand === c.name);   /* newest first */
+  if(c.letters == null) c.letters = row ? (row.toLetters || []).slice() : [];
+  const humanApproved = !!(row && row.approvedBy);
+  return {
+    letters: c.letters || [],
+    date: row ? row.date : ((levelHistory(c)[0] && levelHistory(c)[0].when) || '—'),
+    humanApproved,
+    proposedBy: humanApproved ? (row.proposedBy || '—') : '',
+    approvedBy: humanApproved ? row.approvedBy : ''
+  };
+}
 SHEETS.candoverride = id => {
   const c = CAND_BY_ID[id] || (USER_BY_ID[id] && CAND_BY_ID[USER_BY_ID[id].id]);
   if(!c) return {title:'Override level', body:'', ok:''};
+  const st = candStanding(c);
+  /* Read-only context: candidate name + email, then the current level with its letters,
+     the date it became current, and its source (quiz vs human-approved). */
+  const ctx = [
+    ['Candidate', esc(c.name)],
+    ['Email', esc(emailOf(c.name) || candEmail(c.name))],
+    ['Current level', esc(levelLetters(c.level, st.letters))],
+    ['Became current', esc(st.date)],
+    ['Source', st.humanApproved ? 'Human-approved' : 'Preliminary quiz']
+  ];
+  if(st.humanApproved){ ctx.push(['Proposed by', esc(st.proposedBy)], ['Approved by', esc(st.approvedBy)]); }
   return {title:`Override the level for ${c.name}`, ok:'Apply Override', act:'docandoverride:' + id,
     gate:true, disabled:true,
     gateFn: v => { const L = readLetters(v); return !v.reason || !v.level || !L.length || (v.level === c.level && sameLetterSet(L, c.letters)); },
-    body: kv([['Current standing', standingLabel(c)], ['Set by', c.agent && c.agent !== '—' ? 'TalentNext (interviewed by ' + esc(c.agent) + ')' : '—']])
+    body: kv(ctx)
       + fieldHtml({k:'level', l:'New level', t:'select', req:1, opts:LVL_CODES}, c.level)
-      + lettersPicker(c.letters)
-      + fieldHtml({k:'reason', l:'Reason', t:'textarea', req:1, max:500, ph:'Why the level is being overridden. Internal only.'})
-      + sheetHelp('The override replaces the level and letters as one set and is kept on the candidate’s level history. TalentNext sets the level from the interview; an override is the admin’s correction of it.')};
+      + lettersPicker(c.letters, {hideHint:true})
+      + fieldHtml({k:'reason', l:'Reason', t:'textarea', req:1, max:500, ph:'Why the level is being overridden. Internal only, written to the audit log.'})};
 };
 ACTIONS.docandoverride = key => {
   const c = CAND_BY_ID[key.split(':')[1]]; const v = readForm(); if(!c) return;
@@ -8131,7 +8181,7 @@ function pushLevelLog(r){ r.id = 'lc' + (++LEVEL_SEQ); LEVEL_LOG.unshift(r); ret
      §5). The talent agent (`proposedBy`) and the approver (`approvedBy`) are DIFFERENT
      people (Maryam, 25 Sep 2026) — the agent interviews and proposes, a reviewer/admin approves. */
   const rows = [
-    {cand:'Maryam Naz', from:'E1', fromLetters:[], to:'E2', toLetters:['A', 'L', 'E'], proposedBy:'Dana Whitfield', decidedOn:'Agent proposal', approvedBy:'Nadia Haddad', approvedRole:'Reviewer', source:'Re-interview', date:'12 Aug 2026', filed:'12 Aug 2026, 4:10 PM', rating:5, talType:'Leader',
+    {cand:'Maryam Naz', from:'E1', fromLetters:['A', 'L'], to:'E2', toLetters:['A', 'L', 'E'], proposedBy:'Dana Whitfield', decidedOn:'Agent proposal', approvedBy:'Nadia Haddad', approvedRole:'Reviewer', source:'Re-interview', date:'12 Aug 2026', filed:'12 Aug 2026, 4:10 PM', rating:5, talType:'Leader',
      agentLevel:'E2', agentLetters:['A', 'L', 'E'], talLevel:'E2', talLetters:['A', 'L'], reasoning:'Reads from consequence to people; three dated examples.', strengths:'Clear ownership of the outcomes she owns, with three examples that each carry a date and a name.', growth:'Coaching rather than fixing. She still solves a problem herself where developing someone else would be the next move.', note:'She talks cautiously, but she has already run a reorganization and can explain every call she made in it. That is a solid E2 with E3 in reach.', aiRaw:'0.71',
      tal:'<p>Tal suggests <b>Explorer – E2</b>. Maryam reads as someone who <b>reasons from consequence, not policy</b>: she starts from the people a decision lands on and works back.</p><p>What earns E2: <b>three dated examples</b> she can walk through call by call. What would move it to E3 is coaching a report through a hard call rather than solving it herself.</p>'},
     {cand:'Jordan Vale', from:'E5', fromLetters:['E'], to:'B1', toLetters:['E', 'L'], proposedBy:'Priya Raman', decidedOn:'Tal proposal', approvedBy:'Derek Sole', approvedRole:'Super Admin', source:'Re-interview', date:'2 Aug 2026', filed:'2 Aug 2026, 1:00 PM', rating:5, talType:'Leader',
@@ -8152,7 +8202,7 @@ function pushLevelLog(r){ r.id = 'lc' + (++LEVEL_SEQ); LEVEL_LOG.unshift(r); ret
    Growth areas, one blue agent note. */
 const ivEvalBlock = iv => `<div class="signed iv-eval">
     <div class="sig-pair">
-      <div class="sig-c" style="--mk:var(--mk-2)"><i class="sig-ic">${I.star}</i>
+      <div class="sig-c" style="--mk:var(--mk-2)"><i class="sig-ic">${I.starOutline}</i>
         <div class="sig-b"><div class="sig-top"><span class="sig-t">Strengths</span><span class="sig-tag">Strong</span></div><p class="sig-p">${esc(iv.strengths)}</p></div></div>
       <div class="sig-c" style="--mk:var(--mk-3)"><i class="sig-ic">${I.growth}</i>
         <div class="sig-b"><div class="sig-top"><span class="sig-t">Growth areas</span><span class="sig-tag">Focus</span></div><p class="sig-p">${esc(iv.growth)}</p></div></div>
@@ -8450,7 +8500,7 @@ PAGESUM['catalogue/catalogue'] = () => {
   const live = COURSES.filter(c => c.status === 'live').length;
   return `${live} of ${COURSES.length} courses are live, from ${money(Math.min(...COURSES.map(c => c.price)))} to ${money(Math.max(...COURSES.map(c => c.price)))}. <b>Foundations of Leadership is the $100 entry course</b>; more can be imported from the library.`;
 };
-PAGESUM['levelling/levels'] = () => `Three buckets — Explorer, Builder, Trailblazer — each with five levels. A candidate climbs by re-interviewing, and <b>the bucket decides which cohorts they can lead</b>.`;
+PAGESUM['levelling/levels'] = () => `Three tracks — Explorer, Builder, Trailblazer — each with five levels. A candidate climbs by re-interviewing, and <b>the track decides which cohorts they can lead</b>.`;
 
 const leaderOpts = () => [['Unassigned', 'Unassigned'], ...USERS.filter(u => u.roles.includes('leader') || u.roles.includes('agent')).map(u => [u.name, u.name, agentFace(u.name)])];
 KINDS.cohort = {
@@ -8544,7 +8594,7 @@ function cohortsAssign(){
     ])}
     ${lstTools('Search the queue')}
     ${rows.length ? table(
-      [{label:'Cohort Leader'}, {label:'Level'}, {label:'Bucket'}, {label:'Cohorts led', num:true}, {label:'Current cohort'}, ACT_COL],
+      [{label:'Cohort Leader'}, {label:'Level'}, {label:'Track'}, {label:'Cohorts led', num:true}, {label:'Current cohort'}, ACT_COL],
       rows.map(r => { const cur = leaderCohorts(r.name); return {id:r.id, cells:[
         personCell(r.name, r.email || ''),
         esc(r.level), esc(r.bucket), r.led ? String(r.led) : '—',
@@ -8886,9 +8936,9 @@ function cohortsCourseDetail(){
    overrides it (the seed's courses carry a track and no explicit map). */
 const courseLevels = c => c.levels || LEVELS_MVP.filter(l => l[0] === (c.track || 'Explorer')[0]);
 const BUCKETS = [
-  {name:'Explorer', pfx:'E', desc:'The entry bucket. Everyone starts here and levels up by re-interviewing.', can:'Can lead nothing yet.'},
+  {name:'Explorer', pfx:'E', desc:'The entry track. Everyone starts here and levels up by re-interviewing.', can:'Can lead nothing yet.'},
   {name:'Builder', pfx:'B', desc:'Reached by finishing an Explorer cohort.', can:'A Builder can lead an Explorer cohort.'},
-  {name:'Trailblazer', pfx:'T', desc:'The top bucket. Deep experience across the loop.', can:'A Trailblazer can lead an Explorer and Builder cohort.'}
+  {name:'Trailblazer', pfx:'T', desc:'The top track. Deep experience across the loop.', can:'A Trailblazer can lead an Explorer and Builder cohort.'}
 ];
 /* THE LEVELS PAGE IS TABBED (Maryam, 17 Sep 2026): the three buckets sit behind
    a `.cs` tab strip (`lvlb`), one bucket per view. The selected bucket shows its
@@ -8907,6 +8957,17 @@ const LEVEL_DESC = {};
    may lead a cohort; below E5 cannot. Shown here as read-only reference (marking a
    cohort leader happens in 3.3, not on this screen). */
 const levelCanLead = code => LVL_CODES.indexOf(code) >= LVL_CODES.indexOf('E5');
+/* WHETHER A LEVEL MAY LEAD A COHORT is an admin toggle per level (Maryam, 28 Sep 2026:
+   "the 'Can lead a cohort' should be a toggle in the edit modal"). `LEVEL_LEAD` holds
+   the admin's overrides by level code; a code with no override falls back to story 3.3's
+   E5+ default (`levelCanLead`). */
+const LEVEL_LEAD = {};
+const canLevelLead = code => (code in LEVEL_LEAD) ? LEVEL_LEAD[code] : levelCanLead(code);
+/* THE ACRONYM (TALENT letter) DESCRIPTIONS are CLIENT CONTENT (Maryam, 28 Sep 2026:
+   "each acronym has a desc, for now add dummy desc i will provide you the content later").
+   Keyed by the letter's `k` (T1/A/L/E/N/T2). Fill this map as the copy lands; until then
+   every block reads the placeholder, like `LEVEL_DESC`. */
+const ACRONYM_DESC = {};
 function cohortsLevels(){
   const countAt = lvl => CANDS.filter(c => c.level === lvl).length;
   /* Count by level PREFIX, not the bucket's name — a bucket the admin renamed
@@ -8918,23 +8979,37 @@ function cohortsLevels(){
   const levels = b.levels || 5;
   return `
   <section class="sec lvl-top sec-noline">
-    ${aiHead('Levels & buckets', 'The levelling system every candidate moves through, and what each bucket may lead.')}
+    ${aiHead('Tracks, levels & acronyms', 'The levelling system every candidate moves through, and what each track may lead.')}
     ${filterStrip('lvlb', BUCKETS[0].name, BUCKETS.map(x => [x.name, x.name, countBucket(x)]))}
   </section>
   <section class="sec lvl-body">
-    ${aiHead(esc(b.name), esc(b.desc) + ' ' + esc(b.can),
-      `<button class="btn btn-g btn-sm noic" data-sheet="editbucket:${i}">${I.edit} Edit</button>`)}
+    ${aiHead(esc(b.name), esc(b.desc) + ' ' + esc(b.can))}
     <div class="lvl-blocks" style="--lvl-cols:${Math.min(levels, 5)}">
       ${Array.from({length: levels}, (_, n) => {
         const code = b.pfx + (n + 1), c = countAt(code);
-        const desc = LEVEL_DESC[code], lead = levelCanLead(code);
+        const desc = LEVEL_DESC[code], lead = canLevelLead(code);
         return `<div class="lvl-block">
+          <button class="lvl-edit-ic" data-sheet="editlevel:${code}" aria-label="Edit ${code}">${I.edit}</button>
           <span class="lvl-block-code t-h1">${code}</span>
           <span class="lvl-block-n t-desc">${c} candidate${c === 1 ? '' : 's'}</span>
           <span class="lvl-block-d t-desc${desc ? '' : ' awaiting'}">${desc ? esc(desc) : 'Description awaiting client content'}</span>
           <span class="lvl-block-lead">${lead ? tag('active', 'Can lead a cohort') : '<span class="t-desc">Cannot lead yet</span>'}</span>
         </div>`;
       }).join('')}
+    </div>
+  </section>
+  ${/* THE ACRONYMS — the six TALENT letters (T A L E N T) as blocks, each with its
+       name and a description (client content, ACRONYM_DESC; placeholder until it
+       lands). Same `.lvl-block` tile as the levels above. (Maryam, 28 Sep 2026) */''}
+  <section class="sec">
+    ${aiHead('Acronyms', 'The six TALENT letters a candidate can carry alongside their level.')}
+    <div class="lvl-blocks" style="--lvl-cols:6">
+      ${TALENT_LETTERS.map(x => { const d = ACRONYM_DESC[x.k]; return `<div class="lvl-block">
+        <button class="lvl-edit-ic" data-sheet="editacronym:${x.k}" aria-label="Edit ${x.ltr} — ${esc(x.name)}">${I.edit}</button>
+        <span class="lvl-block-code t-h1">${esc(x.ltr)}</span>
+        <span class="lvl-block-n t-desc">${esc(x.name)}</span>
+        <span class="lvl-block-d t-desc${d ? '' : ' awaiting'}">${d ? esc(d) : 'Description awaiting client content'}</span>
+      </div>`; }).join('')}
     </div>
   </section>`;
 }
@@ -8951,8 +9026,14 @@ function numStep(key, val, min, max){
       <button type="button" class="nstep-b" data-nstep="${key}:up" aria-label="Add a level"><svg viewBox="0 0 24 24" aria-hidden="true">${inner('add')}</svg></button>
     </div></div>`;
 }
-SHEETS.editbucket = (arg) => { const i = +arg, b = BUCKETS[i]; if(!b) return null; return {title:`Edit ${b.name}`,
-  body: `<div class="lvl-edit">${fieldHtml({k:'n' + i, l:'Bucket name', t:'text'}, b.name)}${fieldHtml({k:'d' + i, l:'Description', t:'textarea'}, b.desc)}${numStep('lv' + i, b.levels || 5, 1, 12)}</div>`,
+SHEETS.editbucket = (arg) => { const i = +arg, b = BUCKETS[i]; if(!b) return null;
+  const levels = b.levels || 5;
+  /* Per-level "Can lead a cohort" toggles — DOM-only (`data-f`, read by readForm, no
+     render so numStep and the toggles survive edits, trap 9). One per current level. */
+  const leadTog = code => `<label class="tg"><div class="tb"><b>${code}</b><span class="t-desc">Can lead a cohort</span></div><input type="checkbox" data-f="lead_${code}" value="1"${canLevelLead(code) ? ' checked' : ''}><span class="sw"></span></label>`;
+  const toggles = Array.from({length: levels}, (_, n) => leadTog(b.pfx + (n + 1))).join('');
+  return {title:`Edit ${b.name}`,
+  body: `<div class="lvl-edit">${fieldHtml({k:'n' + i, l:'Track name', t:'text', ro:true}, b.name)}${fieldHtml({k:'d' + i, l:'Description', t:'textarea'}, b.desc)}${numStep('lv' + i, levels, 1, 12)}<div class="f"><span class="lbl">Cohort leading</span><div class="lvl-leadtog">${toggles}</div></div></div>`,
   ok:'Save', act:'dobuckets'}; };
 ACTIONS.dobuckets = () => { const v = readForm(); BUCKETS.forEach((b, i) => {
   const nm = v['n' + i] != null ? v['n' + i].trim() : '';
@@ -8963,7 +9044,33 @@ ACTIONS.dobuckets = () => { const v = readForm(); BUCKETS.forEach((b, i) => {
   }
   if(v['d' + i] != null) b.desc = v['d' + i];
   if(v['lv' + i] != null && v['lv' + i] !== '') b.levels = Math.max(1, Math.min(12, parseInt(v['lv' + i], 10) || 1));
-}); audit('Edited bucket', 'Levels & buckets', 'Cohort Management', 'info'); toast('Bucket saved'); };
+});
+/* the per-level "Can lead a cohort" toggles — a checkbox reads as [] (off) or ['1']
+   (on) via readForm; only levels whose toggle is in the open form are written. */
+BUCKETS.forEach(b => { for(let n = 0; n < (b.levels || 5); n++){ const code = b.pfx + (n + 1);
+  if(v['lead_' + code] !== undefined) LEVEL_LEAD[code] = v['lead_' + code].length > 0; } });
+audit('Edited track', 'Tracks, levels & acronyms', 'Cohort Management', 'info'); toast('Track saved'); };
+/* PER-BLOCK EDIT (Maryam, 28 Sep 2026: "an edit icon on each block ... edit the desc of
+   that block, with the toggle option as well ... do this for acronyms as well, but we
+   wont have a toggle on these modals"). Each level tile and acronym tile carries its own
+   pencil that opens a one-block sheet. A LEVEL sheet edits that level's description and
+   its "Can lead a cohort" toggle; an ACRONYM sheet edits that letter's description only
+   (the letter + name are the fixed field label). Both are DOM-only (`data-f`, readForm),
+   no render (trap 9). The old section-wide editbucket/editacronyms sheets are unused now
+   (kept defined, reversible). */
+SHEETS.editlevel = code => ({title:`Edit ${code}`,
+  body: `<div class="lvl-edit">${fieldHtml({k:'ldesc', l:'Description', t:'textarea'}, LEVEL_DESC[code] || '')}<div class="f"><span class="lbl">Cohort leading</span><div class="lvl-leadtog"><label class="tg"><div class="tb"><b>${code}</b><span class="t-desc">Can lead a cohort</span></div><input type="checkbox" data-f="llead" value="1"${canLevelLead(code) ? ' checked' : ''}><span class="sw"></span></label></div></div></div>`,
+  ok:'Save', act:`dolevel:${code}`});
+ACTIONS.dolevel = key => { const code = key.split(':')[1]; const v = readForm();
+  if(v.ldesc != null) LEVEL_DESC[code] = v.ldesc.trim();
+  LEVEL_LEAD[code] = (v.llead || []).length > 0;
+  audit('Edited level', code, 'Cohort Management', 'info'); toast(`${code} saved`); };
+SHEETS.editacronym = k => { const x = letterMeta(k); return {title:`Edit ${x.ltr} — ${x.name}`,
+  body: `<div class="lvl-edit">${fieldHtml({k:'adesc', l:`${x.ltr} — ${x.name}`, t:'textarea'}, ACRONYM_DESC[k] || '')}</div>`,
+  ok:'Save', act:`doacronym:${k}`}; };
+ACTIONS.doacronym = key => { const k = key.split(':')[1]; const v = readForm();
+  if(v.adesc != null) ACRONYM_DESC[k] = v.adesc.trim();
+  audit('Edited acronym', letterMeta(k).name, 'Cohort Management', 'info'); toast('Acronym saved'); };
 
 /* THE COHORT-LEADER DETAIL (Maryam, 25 Sep 2026) — a leader's own single-page
    profile, opened by the app-bar ROLE SWITCHER for a person who both is (usually)
@@ -9124,6 +9231,10 @@ ACTIONS.doremove = key => {
    recordings register with consent, retention and status (8.3).
    ====================================================================== */
 const emailOf = n => (USERS.find(u => u.name === n) || {}).email || '';
+/* Every candidate reads an email (Maryam, 28 Sep 2026): the real address where the
+   account exists, else a stable placeholder derived from the name (`first.last@…`)
+   so a synthesised candidate never shows a blank second line. */
+const candEmail = n => emailOf(n) || (n ? String(n).trim().toLowerCase().replace(/[^a-z\s]/g, '').replace(/\s+/g, '.') + '@talentnext.io' : '');
 const candByName = n => CANDS.find(c => c.name === n);
 /* A booking's stage follows events: paid → Booked, the recording → Held, the
    evaluation → Reported; a scheduled time that passed with no recording → Not
@@ -9270,13 +9381,16 @@ function levellingQueue(){
       exportBtn('Level changes'), 'Search by candidate or agent')}
     ${lstTools('Search by candidate or agent', `${typeFilter} ${agentFilter}`)}
     ${ap.length ? table(
-      [{label:'Candidate'}, {label:'Agent'}, {label:'Recommended level'}, {label:'Report filed'}, {label:'Due Time'}, ACT_COL],
+      [{label:'Candidate'}, {label:'Agent'}, {label:'Interview Date'}, {label:'Agent Proposed'}, {label:'Tal Proposed'}, {label:'Report filed'}, {label:'Due Time'}, ACT_COL],
       ap.map(iv => ({id:iv.id, go:'levelling/approval/' + iv.id, cells:[
-        personCell(iv.cand, ''), personCell(iv.agent, ''),
-        esc(levelLetters(iv.agentLevel, iv.agentLetters)), esc(iv.filed || iv.submitted || iv.when),
+        personCell(iv.cand, candEmail(iv.cand)), personCell(iv.agent, ''),
+        esc(iv.when || '—'),
+        esc(levelLetters(iv.agentLevel, iv.agentLetters)),
+        esc(iv.talLevel ? levelLetters(iv.talLevel, iv.talLetters) : '—'),
+        esc(iv.filed || iv.submitted || iv.when),
         dueTime(iv),
         rowActs([['check', 'Review & decide', `data-go="levelling/approval/${iv.id}"`]])
-      ]})), {select:false})
+      ]})), {bulk: queueBulk})
       : emptyState('check', 'Nothing awaiting approval', q || kf !== 'all' || af !== 'all' ? 'Nothing matches the current filters.' : 'Every submitted interview has been decided.')}
   </section>`;
 }
@@ -9311,7 +9425,7 @@ function marketApproval(){
      the recommendation). Wrapped in `.iv-detail-body`, the proven tabs+spacing wrapper. */
   const tab = getFilter('apptab', 'recommendation');
   return `${detailHead('levelling/queue')}
-  <div class="iv-detail-body">
+  <div class="iv-detail-body lc-body">
   <section class="sec">
     ${aiHead('Level approval', `${esc(iv.cand)} · ${esc(iv.agent)} · ${esc(iv.when)}`)}
   </section>
@@ -9474,6 +9588,51 @@ ACTIONS.levellingexport = () => {
   audit('Exported levelling log', `${rows.length} row${rows.length === 1 ? '' : 's'}`, 'Levelling', 'notice');
   toast(`Exporting ${rows.length} row${rows.length === 1 ? '' : 's'}. A download link will reach your notifications, valid 7 days.`);
 };
+/* THE LEVELLING LOG BULK BAR (Maryam, 28 Sep 2026) — a non-KIND table, so it drives
+   its own bar via `opts.bulk`: a single selection offers View + Delete (matching the
+   row kebab), a multi-selection offers Delete All. `asklcdel` / `dolcdel` remove a
+   single log row; `bulklcdel` / `dobulklcdel` remove the selection. */
+function lcBulk(ids){
+  if(ids.length === 1) return [
+    ['view', 'View', `data-go="levelling/change/${ids[0]}"`],
+    ['delete', 'Delete', `data-act="asklcdel:${ids[0]}"`, 'danger']];
+  return [['delete', 'Delete All', 'data-act="bulklcdel"', 'danger']];
+}
+/* The approvals queue gives its checkboxes a purpose without a destructive action —
+   a pending approval is reviewed one at a time, so a single selection opens it and a
+   multi-selection offers nothing (the bar falls back to the hidden dock). */
+function queueBulk(ids){
+  if(ids.length === 1) return [['check', 'Review & decide', `data-go="levelling/approval/${ids[0]}"`]];
+  return [];
+}
+ACTIONS.asklcdel = key => {
+  const r = LEVEL_LOG.find(x => x.id === key.split(':')[1]); if(!r) return;
+  askConfirm({mk:'warning', title:'Delete this level change?', danger:true, ok:'Delete',
+    body:`The ${r.from ? esc(r.from) + ' to ' : ''}${esc(r.to)} change for ${esc(r.cand)} is removed from the levelling log. This cannot be undone.`,
+    act:`dolcdel:${r.id}`});
+};
+ACTIONS.dolcdel = key => {
+  const id = key.split(':')[1];
+  const i = LEVEL_LOG.findIndex(x => x.id === id);
+  if(i >= 0){ const r = LEVEL_LOG[i]; LEVEL_LOG.splice(i, 1); audit('Deleted level change', `${r.cand} — ${r.to}`, 'Levelling', 'high'); toast('Level change deleted'); }
+  S.confirm = null;
+  /* if the deleted record's own detail page is open, return to the log rather than
+     leaving a "Not found" view behind. */
+  if(location.hash.indexOf('levelling/change/' + id) >= 0) go('levelling/log');
+};
+ACTIONS.bulklcdel = () => {
+  const ctx = bulkCtx(); if(!ctx) return;
+  S._pending = {ids: ctx.ids.slice(), selKey: ctx.key};
+  askConfirm({mk:'warning', title:`Delete ${ctx.ids.length} level changes?`, danger:true, ok:'Delete All',
+    body:`All ${ctx.ids.length} selected level changes are removed from the levelling log. This cannot be undone.`,
+    act:'dobulklcdel'});
+};
+ACTIONS.dobulklcdel = () => {
+  const p = S._pending || {}; S._pending = null; S.confirm = null; if(!p.ids) return;
+  let n = 0; p.ids.forEach(id => { const i = LEVEL_LOG.findIndex(x => x.id === id); if(i >= 0){ const r = LEVEL_LOG[i]; LEVEL_LOG.splice(i, 1); audit('Deleted level change', `${r.cand} — ${r.to}`, 'Levelling', 'high'); n++; } });
+  if(p.selKey) S.sel[p.selKey] = {};
+  toast(`${n} level change${n === 1 ? '' : 's'} deleted`);
+};
 function levellingLog(){
   const q = getFilter('q', ''), sf = getFilter('lcsrc', 'all'), df = getFilter('lcdir', 'all');
   const pendById = new Set(pendingApprovals().map(p => (candByName(p.cand) || {}).id).filter(Boolean));
@@ -9488,11 +9647,14 @@ function levellingLog(){
     ${rows.length ? table(
       [{label:'Candidate'}, {label:'From'}, {label:'To'}, {label:'Direction'}, {label:'Proposed by'}, {label:'Approved by'}, {label:'Source'}, {label:'Date'}, ACT_COL],
       rows.map(r => {
-        const canOverride = r.candId && !pendById.has(r.candId);
+        /* Override is always offered after View (Maryam, 28 Sep 2026). Resolve the
+           candidate id from the row's candId, else by name — seed rows carry no candId. */
+        const cid = r.candId || (candByName(r.cand) || {}).id;
         const acts = [['view', 'View', `data-go="levelling/change/${r.id}"`]];
-        if(canOverride) acts.push(['edit', 'Override', `data-sheet="candoverride:${r.candId}"`]);
+        if(cid) acts.push(['edit', 'Override', `data-sheet="candoverride:${cid}"`]);
+        acts.push(['delete', 'Delete', `data-act="asklcdel:${r.id}"`, 'danger']);
         return {id:r.id, go:'levelling/change/' + r.id, cells:[
-          personCell(r.cand, r.email || ''),
+          personCell(r.cand, r.email || candEmail(r.cand)),
           r.from ? esc(levelLetters(r.from, r.fromLetters)) : '—',
           esc(levelLetters(r.to, r.toLetters)),
           r.direction ? esc(r.direction) : '—',
@@ -9502,7 +9664,7 @@ function levellingLog(){
           esc(r.date),
           rowActs(acts)
         ]};
-      }), {select:false})
+      }), {bulk: lcBulk})
       : emptyState('chart', 'No level changes', q || sf !== 'all' || df !== 'all' ? 'Nothing matches the current filters.' : 'No approved level changes yet.')}
   </section>`;
 }
@@ -9525,6 +9687,11 @@ function levellingChange(){
   const cBucket = c ? c.bucket : bucketOf(r.to);
   const cLevel = c ? c.level : r.to;
   const cEmail = c ? emailOf(c.name) : (r.email || '');
+  /* The head carries a kebab (like every other detail page): Override (opens the same
+     candoverride modal) and Delete (removes this log row). (Maryam, 28 Sep 2026) */
+  const headActs = [];
+  if(c) headActs.push(['edit', 'Override', `data-sheet="candoverride:${c.id}"`]);
+  headActs.push(['delete', 'Delete', `data-act="asklcdel:${r.id}"`, 'danger']);
   return `${detailHead('levelling/log')}
   <div class="iv-detail-body lc-body">
   <section class="sec">
@@ -9534,6 +9701,7 @@ function levellingChange(){
         <span class="idname-row"><span class="idname">${esc(cName)}</span><span class="idverify" title="Verified candidate" aria-label="Verified"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" style="display:block">${inner('verified')}</svg></span></span>
         <span class="idmeta">${esc(cBucket)} &middot; ${esc(cLevel)}${cEmail ? ' &middot; ' + esc(cEmail) : ''}</span>
       </div>
+      <span class="idhead-act">${rowActs(headActs)}</span>
     </div>
     ${(() => {
       /* THE LEVEL CHANGE IS AN 8-CARD GRID (Maryam, 25 Sep 2026) — the whole read
@@ -10193,7 +10361,7 @@ function employersUnlocks(){
   </section>`;
 }
 const ACCESS_RULES = [
-  {k:'Level & bucket', v:'yes'}, {k:'Interview summary', v:'yes'}, {k:'SCENES highlight reel', v:'consent'},
+  {k:'Level & track', v:'yes'}, {k:'Interview summary', v:'yes'}, {k:'SCENES highlight reel', v:'consent'},
   {k:'Verified competencies', v:'yes'}, {k:'Full interview recording', v:'unlock'}, {k:'Contact details', v:'no'}
 ];
 SHEETS.editaccess = () => ({title:'What an employer can see',
