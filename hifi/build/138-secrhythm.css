@@ -51,3 +51,18 @@
 /* -- no trailing divider after the last section (all widths) ----------------
    Overrides §10's `.page > :last-child::after{opacity:1}`. */
 .app .page > .sec:last-child::after{display:none}
+
+/* -- a dark card followed by a block is a 20px block pair -------------------
+   §101 collapses block pairs to 20, but its set is stats/facts/tile/certban/
+   note/dark-card — it does NOT include quick actions (`.sec-qa`) or the wider
+   block set. So on the candidate DASHBOARD (every stage) the pulse card ->
+   Quick Actions fell through to §75.194, which hands the pair only the card's
+   16px margin. §75.169 already drops qa's own top hairline after a card, so the
+   line is gone; this pays the missing 4px so the pair reads as a proper 20px
+   block gap. Mirrors §101's "one edge pays": the card's bottom margin goes to
+   nothing and the block under it pays the whole 20 on top (else 16 + 20 = 36).
+   (0,5,0)+, later than §75.194's (0,5,0), so it wins on order. 28 Sep 2026. */
+.app .page > .sec.dark-card:has(+ .sec-qa),
+.app .page > .sec.dark-card:has(+ .sec:is(:has(> .tile-stack), :has(> .cardrow), :has(> .gcard), :has(> .kv), :has(> .stat), :has(> .tbl-wrap), :has(> .plate), :has(> .lvl-hero))){margin-bottom:0}
+.app .page > .sec.dark-card + .sec-qa,
+.app .page > .sec.dark-card + .sec:is(:has(> .tile-stack), :has(> .cardrow), :has(> .gcard), :has(> .kv), :has(> .stat), :has(> .tbl-wrap), :has(> .plate), :has(> .lvl-hero)){padding-top:20px}

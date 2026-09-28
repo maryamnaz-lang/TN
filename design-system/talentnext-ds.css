@@ -14,7 +14,7 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 6227.  Rules dropped as product-specific: 222.
+   Rules kept: 6225.  Rules dropped as product-specific: 222.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
@@ -7431,10 +7431,8 @@ button.btn-p:active,
 .app .qzp-r-v{font-size:var(--t-compact-size); line-height:var(--t-compact-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-compact-ls); text-transform:none; color:var(--text-secondary)}
 .app .qzp-r-tag{font-size:var(--t-eyebrow-size); line-height:var(--t-eyebrow-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-eyebrow-ls); text-transform:none; color:var(--accent-text)}
 .app .qzp-cta{font-size:var(--t-compact-size); line-height:var(--t-compact-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-compact-ls); text-transform:none; color:var(--link)}
-.app .dark-card .btn.btn-p[disabled]{color:var(--on-dark-2)}
-.app .plate .btn.btn-p[disabled]{color:var(--on-dark-2)}
-.app .lcal.lcal-next .btn.btn-p{color:var(--text-primary)}
-.app .lcal.lcal-next .btn.btn-p[disabled]{color:var(--text-disabled)}
+.app .dark-card .btn.btn-p[disabled]{color:var(--on-accent)}
+.app .plate .btn.btn-p[disabled]{color:var(--on-accent)}
 .app .lcal.lcal-next .lcal-slot-day{color:var(--on-dark)}
 .app .page .pulse .stand .stand-l{font-size:var(--t-compact-size); line-height:var(--t-compact-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-compact-ls); text-transform:none; color:var(--text-primary)}
 .app .page .pulse .stand .stand-v{font-size:var(--t-h3-size); line-height:var(--t-h3-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h3-ls); text-transform:none; color:var(--text-primary)}
@@ -8339,10 +8337,10 @@ button.btn-p:active,
 .app .qzp-cta:hover:where(.__nh) span{text-decoration:underline}
 
 /* ---- 81-joingate.css ---- */
-.app .dark-card .btn.btn-p[disabled]{background-color:var(--on-dark-fill); background-image:none; border-color:transparent; --on-brand-color:0}
-.app .dark-card .btn.btn-p[disabled] svg{fill:currentColor}
-.app .plate .btn.btn-p[disabled]{background-color:var(--on-dark-fill); background-image:none; border-color:transparent; --on-brand-color:0}
-.app .plate .btn.btn-p[disabled] svg{fill:currentColor}
+.app .dark-card .btn.btn-p[disabled]{background-color:var(--accent); background-image:var(--accent-grad); border-color:transparent; --on-brand-color:1}
+.app .dark-card .btn.btn-p[disabled] svg{fill:var(--on-accent)}
+.app .plate .btn.btn-p[disabled]{background-color:var(--accent); background-image:var(--accent-grad); border-color:transparent; --on-brand-color:1}
+.app .plate .btn.btn-p[disabled] svg{fill:var(--on-accent)}
 
 /* ---- 82-enroldark.css ---- */
 .app .sec.eo.dark-card{gap:var(--s06)}
@@ -9325,7 +9323,7 @@ button.btn-p:active,
 .app .lcal-f > .tile-arrow{width:16px; height:16px}
 .app .lcal.lcal-next{border-color:transparent; background-color:var(--gray-100); background-image:var(--dark-haze); background-repeat:no-repeat}
 .app .lcal.lcal-next{flex-direction:row; align-items:stretch; gap:0; padding:0}
-.app .lcal-slot{flex:none; align-self:stretch; aspect-ratio:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; padding:var(--s04); text-align:center; background-color:var(--accent)}
+.app .lcal-slot{flex:none; align-self:stretch; aspect-ratio:1; margin:-1px 0 -1px -1px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; padding:var(--s04); text-align:center; background-color:color-mix(in srgb, var(--on-dark) 5%, transparent)}
 .app .lcal-slot-ic{line-height:0; margin-bottom:2px}
 .app .lcal-slot-ic svg{width:18px; height:18px; display:block}
 .app .lcal-next > .lcal-body{flex:1 1 auto; min-width:0; display:flex; flex-direction:column; align-items:stretch; gap:var(--s04); padding:var(--s05)}
@@ -9335,9 +9333,6 @@ button.btn-p:active,
 .app .lcal-faces{display:inline-flex; flex:none; align-items:center}
 .app .lcal-faces .av-ph{box-shadow:0 0 0 2px var(--gray-100)}
 .app .lcal-faces .av-ph + .av-ph{margin-left:-8px}
-.app .lcal.lcal-next .btn.btn-p,
-.app .lcal.lcal-next .btn.btn-p[disabled]{background-color:var(--background); background-image:none; border-color:transparent}
-.app .lcal.lcal-next .btn.btn-p svg{fill:currentColor}
 
 /* ---- 114-agenttable.css ---- */
 .app .agt{padding:0 var(--pad-x)}
@@ -10064,3 +10059,7 @@ button.btn-p:active,
 }
 .app .page > .sec:is(.dark-card, :has(> .stats), :has(> .facts), :has(> .tile-stack), :has(> .tile), :has(> .cardrow), :has(> .gcard), :has(> .kv), :has(> .qa), :has(> .stat), :has(> .certban), :has(> .note), :has(> .tbl-wrap), :has(> .plate), :has(> .lvl-hero))::after{display:none}
 .app .page > .sec:last-child::after{display:none}
+.app .page > .sec.dark-card:has(+ .sec-qa),
+.app .page > .sec.dark-card:has(+ .sec:is(:has(> .tile-stack), :has(> .cardrow), :has(> .gcard), :has(> .kv), :has(> .stat), :has(> .tbl-wrap), :has(> .plate), :has(> .lvl-hero))){margin-bottom:0}
+.app .page > .sec.dark-card + .sec-qa,
+.app .page > .sec.dark-card + .sec:is(:has(> .tile-stack), :has(> .cardrow), :has(> .gcard), :has(> .kv), :has(> .stat), :has(> .tbl-wrap), :has(> .plate), :has(> .lvl-hero)){padding-top:20px}

@@ -5,31 +5,28 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>TalentNext — employer development report</title>
 
-<!-- The design system, exactly as the starter / tn-new-portal link it. Serve over
-     http (a browser blocks a linked stylesheet on file://). No portal file and no
-     design-system layer is touched by this page. -->
-<link rel="stylesheet" href="design-system/talentnext-ds.css?b=145df367">
+<!-- The design system, exactly as the starter / tn-new-portal link it. No portal
+     file and no design-system layer is touched by this page. -->
+<link rel="stylesheet" href="design-system/talentnext-ds.css">
 
 <style>
-/* HOST GEOMETRY ONLY — the four declarations the starter requires, plus two
-   local opt-outs. Nothing here is design: every colour/size/space is a token. */
+/* HOST GEOMETRY ONLY. Every colour/size/space below is a token; the only extra
+   is a 3-column override for the facts row. */
 .host{
   position:relative;width:100%;height:100dvh;
   container-type:inline-size;container-name:app;
   overflow:hidden;background:var(--background)}
 
-/* No rail on an owner's report, so suppress the rail divider `.app::after`
-   draws at the collapsed rail position (the DS does the same on its rail-less
-   scenes, e.g. `.app:has(> .auth-card)`). Layout plumbing, not design. */
-.app::after{content:none}
-
-/* LABEL-COLUMN OPT-OUT for the two wrappers this page introduces, restated
-   inside the container query exactly as the starter documents. `.signed` is a
-   shipped DS component but is not on §10.15's auto-opt-out list, so a heading
-   above it would otherwise take the 184px spine. This makes the report stack
-   heading-above-content — the same way the admin interview screen presents
-   these very cards. */
 @container app (min-width:900px){
+  /* THE FACTS ROW IS THREE ACROSS. `.pf-facts` is a fixed FOUR-column grid at
+     desktop (§105.1a); with three facts that leaves an empty cell, so this pins
+     it to three, the way the admin's `.crs-facts` modifier does. */
+  .app .facts.pf-facts.emp-facts{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .app .facts.pf-facts.emp-facts > div:last-child:nth-child(odd){grid-column:auto}
+
+  /* LABEL-COLUMN OPT-OUT for the `.signed` sections (not on §10.15's auto list),
+     restated in the container query as the starter documents — heading above
+     content, exactly as the interview screen presents these cards. */
   .sec:has(> .signed){display:block;
     padding-left:var(--pad-x);padding-right:var(--pad-x)}
   .sec:has(> .signed) > .sec-h{
@@ -43,111 +40,112 @@
   <div class="app" id="app"></div>
 </div>
 
-<script src="design-system/talentnext-ds.js?b=145df367"></script>
+<script src="design-system/talentnext-ds.js"></script>
 <script>
-/* ONE PAGE, no rail, no state. An owner opens this report from an email link;
-   it is a document, not a portal. Everything below is a real DS component —
-   the shell, `.ph`, `.facts`, `.ai-aura`, and the `.signed` / `.sig-*`
-   strengths / growth / note cards (the same `ivEvalBlock` markup the admin
-   interview screen uses).
+/* This IS the Super Admin interview-detail page, with the employer's content:
+   back arrow + title -> Employee / Talent agent / When facts (icons) -> the
+   agent's evaluation (Strengths + Growth areas) -> Coaching guidance. Every
+   component is the product's own — `.facts.pf-facts` cells, `dsAiHead` headings
+   with descriptions, the `ivEvalBlock` cards with their tags — neutralised to the
+   platform's black-and-grey.
 
-   WHAT THIS VIEW DELIBERATELY DOES NOT SHOW (client, slide 10):
-     - no readiness alerts
-     - no level, ladder, E-code, score, or Tal level rationale
-   The owner sees development guidance, not the scoring behind it. */
+   NOT SHOWN (client, slide 10): readiness alerts; any level, ladder, score or
+   Tal level rationale; no Tal/AI evaluation. The owner sees development guidance. */
 
-const OWNER   = 'Marcus Reed';          /* the signed-in franchise owner */
-const COMPANY = 'Signal';               /* their franchise */
-const EMP     = 'Maryam Naz';           /* the employee they sponsored */
-const first   = EMP.split(' ')[0];
+const OWNER = 'Marcus Reed';    /* signed-in franchise owner */
+const EMP   = 'John Willson';   /* the employee they sponsored */
+const AGENT = 'Derek Branch';   /* the talent agent who interviewed them */
+const first = EMP.split(' ')[0];
 
-/* The strengths / development pair — the exact `ivEvalBlock` markup, worded as
-   development, with no level or score. */
+const NAV = [
+  ['dashboard', 'Dashboard', false],
+  ['user',      'Employees', true],
+  ['document',  'Reports',   false],
+  ['settings',  'Settings',  false],
+];
+
+/* A facts cell, the admin's `admFact` shape: an inked icon + label, value below.
+   `--mk` pinned to the ink token so the mark is black (no hue). */
+const fact = (icon, label, val) =>
+  `<div style="--mk:var(--text-primary)"><span class="l pf-l">${icon}${label}</span><span class="v">${val}</span></div>`;
+
+/* Strengths + Growth areas — the exact `ivEvalBlock` cards, tags kept, `--mk`
+   inked so the whole card is black-and-grey (the tag reads as a grey chip). */
 const evalBlock = `<div class="signed iv-eval">
     <div class="sig-pair">
-      <div class="sig-c" style="--mk:var(--mk-2)"><i class="sig-ic">${I.star}</i>
+      <div class="sig-c" style="--mk:var(--text-primary)"><i class="sig-ic">${I.star}</i>
         <div class="sig-b"><div class="sig-top"><span class="sig-t">Strengths</span><span class="sig-tag">Strong</span></div>
-          <p class="sig-p">${first} reasons from consequences to people, not policy. She can walk through a real reorganization call by call, with three worked examples that each carry a date and a name.</p></div></div>
-      <div class="sig-c" style="--mk:var(--mk-3)"><i class="sig-ic">${I.growth}</i>
-        <div class="sig-b"><div class="sig-top"><span class="sig-t">Development areas</span><span class="sig-tag">Focus</span></div>
-          <p class="sig-p">Delegation, and coaching rather than fixing. She still tends to solve a problem herself where handing it to someone else, and developing them, would stretch her further.</p></div></div>
+          <p class="sig-p">${first} reasons from consequences to people, not policy. They can walk through a real reorganization call by call, with three worked examples that each carry a date and a name.</p></div></div>
+      <div class="sig-c" style="--mk:var(--text-primary)"><i class="sig-ic">${I.growth}</i>
+        <div class="sig-b"><div class="sig-top"><span class="sig-t">Growth areas</span><span class="sig-tag">Focus</span></div>
+          <p class="sig-p">Delegation, and coaching rather than fixing. They still tend to solve a problem themselves where handing it to someone else, and developing them, would stretch them further.</p></div></div>
     </div>
   </div>`;
 
-/* Coaching guidance — the anchor of this view, and the part the internal
-   screens do not have. Three moves the owner can bring into a 1:1, each with a
-   line to actually say. Built from the same `.sig-c` single-card the agent's
-   note uses. */
+/* Coaching guidance — three moves the owner can bring into a 1:1, each with a
+   line to actually say. Same `.sig-c` single card, ink, no tag. */
 const COACHING = [
-  ['Give her a problem to coach, not solve',
+  ['Give them a problem to coach, not solve',
    `Next time something lands that a team member could own, ask ${first} to run the conversation and debrief with you after. Try: &ldquo;I&rsquo;d like you to take this one, then walk me through how it went.&rdquo;`],
   ['Name the delegation out loud',
-   `She takes work on quietly. In your next one-to-one, point to one thing you&rsquo;d like her to hand off and agree who picks it up. Try: &ldquo;What&rsquo;s one thing on your list someone else on the team could carry?&rdquo;`],
-  ['Ask for the conversation she&rsquo;s putting off',
-   `She is at her best reasoning from the people a decision affects. Ask about a hard conversation she has been avoiding and offer to prepare it together. Try: &ldquo;Which conversation have you been meaning to have but haven&rsquo;t yet?&rdquo;`],
+   `They take work on quietly. In your next one-to-one, point to one thing you&rsquo;d like them to hand off and agree who picks it up. Try: &ldquo;What&rsquo;s one thing on your list someone else on the team could carry?&rdquo;`],
+  ['Ask for the conversation they&rsquo;re putting off',
+   `They are at their best reasoning from the people a decision affects. Ask about a hard conversation they have been avoiding and offer to prepare it together. Try: &ldquo;Which conversation have you been meaning to have but haven&rsquo;t yet?&rdquo;`],
 ];
 const coachBlock = `<div class="signed">
-    ${COACHING.map(([t, p]) => `<div class="sig-c" style="--mk:var(--mk-1)"><i class="sig-ic">${I.chat}</i>
+    ${COACHING.map(([t, p]) => `<div class="sig-c" style="--mk:var(--text-primary)"><i class="sig-ic">${I.chat}</i>
       <div class="sig-b"><div class="sig-top"><span class="sig-t">${t}</span></div>
         <p class="sig-p">${p}</p></div></div>`).join('')}
   </div>`;
 
 document.getElementById('app').innerHTML = `
   <header class="shell">
+    <button class="shell-act nav-t" aria-label="Menu">
+      <span class="nav-t-mark">${TN_MARK}</span>
+      <span class="nav-t-menu">${I.menu}</span>
+    </button>
     <a class="shell-logo"><img src="${LOGO_K}" alt="TalentNext"></a>
     <div class="shell-right">
       <span class="shell-name">${OWNER}</span>
+      <button class="shell-act" aria-label="Notifications">${I.notification}</button>
       <span class="av sm shell-avatar av-ph"><i>MR</i><img src="${AV.samuel}" alt=""></span>
     </div>
   </header>
 
   <div class="shell-body">
+    <nav class="sidenav">
+      <div class="sn-main">
+        ${NAV.map(([ic, label, on]) => `<a class="sn-item${on ? ' on' : ''}">${I[ic]}<span>${label}</span></a>`).join('')}
+      </div>
+    </nav>
+    <div class="scrim"></div>
+
     <main class="main">
       <div class="page">
 
         <div class="ph">
-          <span class="eyebrow">Development report</span>
-          <h1>${EMP}</h1>
-          <p class="lead">A read from ${first}&rsquo;s TalentNext interview, shared with you as her
-            sponsor. Written to support the conversations you&rsquo;re already having with her, not to
-            score her.</p>
+          <div class="ph-top">
+            <button class="ph-back" aria-label="Back">${I.arrowLeft}</button>
+          </div>
+          <h1>Employee report</h1>
         </div>
 
         <section class="sec">
-          <div class="sec-h"><h2>The interview</h2></div>
-          <div class="facts">
-            <div><span class="l">Held</span><span class="v">Aug 20, 2026</span></div>
-            <div><span class="l">Format</span><span class="v">45-minute recorded interview</span></div>
-            <div><span class="l">Sponsored by</span><span class="v">${COMPANY}</span></div>
-            <div><span class="l">Prepared for</span><span class="v">${OWNER}</span></div>
+          <div class="facts pf-facts emp-facts">
+            ${fact(I.user, 'Employee', EMP)}
+            ${fact(I.user, 'Talent agent', AGENT)}
+            ${fact(I.calendar, 'When', '20 Aug 2026')}
           </div>
         </section>
 
         <section class="sec">
-          <div class="ai-aura">
-            <div class="ai-head"><span class="ai-label bare">Tal</span></div>
-            <div class="ai-body"><p>${first} came across as someone who thinks from the people a
-              decision lands on and works back to it. She is already running real work, and speaks
-              about it plainly. The clearest place to grow her is handing things off and coaching
-              others through them, rather than carrying them herself.</p></div>
-          </div>
-        </section>
-
-        <section class="sec">
-          <div class="sec-h"><h2>Strengths and development</h2></div>
+          ${dsAiHead({title: AGENT + '’s evaluation', desc: 'What the agent recorded after the interview.'})}
           ${evalBlock}
         </section>
 
         <section class="sec">
-          <div class="sec-h"><h2>Coaching guidance</h2></div>
+          ${dsAiHead({title: 'Coaching guidance', desc: 'Ways to support ' + first + ' in your regular one-to-ones.'})}
           ${coachBlock}
-        </section>
-
-        <section class="sec">
-          <div class="note"><span>${I.info}</span><div class="nb"><b>About this report</b>A
-            development read from ${first}&rsquo;s TalentNext interview, shared with ${COMPANY} as her
-            sponsor. It is guidance for your coaching conversations, not a score, a rating, or a
-            hiring decision.</div></div>
         </section>
 
       </div>

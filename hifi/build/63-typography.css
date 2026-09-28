@@ -3041,29 +3041,14 @@
    Kräftig, from §7 — and a state may not change the type. Only the colour is a
    property of the state, so only the colour is here.
 
-   (0,5,0), for the reason §81's own note gives: §75.3's `color:var(--on-accent)`
-   on this button is (0,4,0) and would otherwise keep the label white on a pale
-   grey wash — 1.9:1, the one contrast failure this whole change could have
-   shipped. §7b's trap, on a state selector rather than on a component. */
-.app .dark-card .btn.btn-p[disabled]{color:var(--on-dark-2)}
-/* AND `.plate` IS THE SECOND HOST, ADDED 3 SEP 2026 WITH §81.2. The gate is on
-   by default now, so the `consult` dashboard's consultant-call plate draws a
-   disabled accent button — and a plate is the other black card, sharing this
-   one's ground and ink register and none of its classes (§6a's note is the same
-   discovery from the ink side). Restated rather than joined to the selector
-   above it so the two grounds are two rules, which is what §81 does. (0,5,0)
-   against §15.1893's `.app .plate .btn-p svg` and §19's fill on the label. */
-.app .plate .btn.btn-p[disabled]{color:var(--on-dark-2)}
+   REVERSED (Maryam, 28 Sep 2026): a disabled Join now KEEPS the accent ground
+   (§81 no longer greys it), so its label is WHITE `--on-accent` like the live
+   button, not the supporting grey. The old `--on-dark-2` was the ink for §81's
+   grey wash; with the wash gone the grey would read on the accent fill instead.
+   Both hosts (dark-card, plate) take white. */
+.app .dark-card .btn.btn-p[disabled]{color:var(--on-accent)}
+.app .plate .btn.btn-p[disabled]{color:var(--on-accent)}
 
-/* 20b. AND THE UPCOMING-CALLS BLACK CARD FLIPS BACK TO LIGHT-GROUND INK
-   (Maryam, 28 Sep 2026). §113.4 fills that one Join WHITE instead of §81's grey
-   wash / §75.3's accent gradient, so §20's `--on-dark-2` label would be a light
-   grey on white — the same contrast trap §20 fixed, mirrored. The white button
-   takes the light-ground inks: `--text-primary` live, `--text-disabled` while
-   the call is shut. (0,6,0) with the extra `.lcal.lcal-next` step beats §20's
-   (0,5,0); §81's `currentColor` arrow follows. */
-.app .lcal.lcal-next .btn.btn-p{color:var(--text-primary)}
-.app .lcal.lcal-next .btn.btn-p[disabled]{color:var(--text-disabled)}
 /* 20c. THE RED BLOCK'S "Today" IS SOLID WHITE, NOT THE CARD'S SUPPORTING INK
    (Maryam, 28 Sep 2026: "the text on the red block should be solid white only").
    `.lcal-slot-day` is a `.t-desc`, which §6a inks `--on-dark-2` on a dark card —

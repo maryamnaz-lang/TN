@@ -64,17 +64,25 @@
    state is exactly the one step of specificity this needs — and it is stated on
    `.dark-card` rather than on `.crow-dark` because the next black card with a
    gated action gets it free, which is §75's whole argument for the component. */
+/* REVERSED — A DISABLED JOIN STAYS THE ACCENT BUTTON, IT DOES NOT GREY (Maryam,
+   28 Sep 2026: "by disabled button i meant the button is in accent color state
+   but disabled since it is not clickable ... i am seeing this odd button state
+   on almost all portals, please implement this change everywhere"). The grey
+   `--on-dark-fill` wash above was the whole of §81, and it is the "odd state"
+   she is naming across the portals. The button now KEEPS §75.3's accent gradient
+   and `--on-accent` ink while `disabled`; `[disabled]` still carries §02.108's
+   `pointer-events:none`, so it looks live and cannot be pressed — which is
+   exactly the read §81's own opening note called the natural one before it chose
+   to grey it. So this restates the accent ON the state selector (beating §02.108
+   and matching §75.3/§19/§15) rather than overriding it. `joinLive`/`joinArm`
+   still add and remove `disabled`; only its LOOK changed. Crosses to the DS, so
+   every portal's gated Join follows. The matching ink is §63 §20. */
 .app .dark-card .btn.btn-p[disabled]{
-  background-color:var(--on-dark-fill);
-  background-image:none;
+  background-color:var(--accent);
+  background-image:var(--accent-grad);
   border-color:transparent;
-  --on-brand-color:0}
-/* THE ARROW FOLLOWS THE WORDS. §75.3 sets `fill:var(--on-accent)` on this
-   button's svg at (0,4,0) — white, which was correct while the ground was
-   orange and is a white arrow on a grey wash here. `currentColor` rather than a
-   named token, so the one `color` declaration in §63 §20 draws the glyph and
-   the label together and there is no second place to keep in step. */
-.app .dark-card .btn.btn-p[disabled] svg{fill:currentColor}
+  --on-brand-color:1}
+.app .dark-card .btn.btn-p[disabled] svg{fill:var(--on-accent)}
 
 /* ------------------------------------------------------------------- 81.2 ---
    AND THE OTHER BLACK CARD IS `.plate`
@@ -104,12 +112,14 @@
    and the next one to gate an action should get this free rather than discover
    that a `disabled` button on a plate is invisible.
    -------------------------------------------------------------------------- */
+/* SAME REVERSAL FOR THE PLATE (28 Sep 2026) — it keeps §19/§15's accent while
+   disabled rather than the grey wash. */
 .app .plate .btn.btn-p[disabled]{
-  background-color:var(--on-dark-fill);
-  background-image:none;
+  background-color:var(--accent);
+  background-image:var(--accent-grad);
   border-color:transparent;
-  --on-brand-color:0}
-.app .plate .btn.btn-p[disabled] svg{fill:currentColor}
+  --on-brand-color:1}
+.app .plate .btn.btn-p[disabled] svg{fill:var(--on-accent)}
 
 /* AND NOTHING IS STATED FOR A GATED JOIN ON A WHITE GROUND, because §02.108
    already draws one correctly and this is where a reader will look for the
