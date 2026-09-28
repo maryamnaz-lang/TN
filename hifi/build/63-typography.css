@@ -3055,6 +3055,23 @@
    against §15.1893's `.app .plate .btn-p svg` and §19's fill on the label. */
 .app .plate .btn.btn-p[disabled]{color:var(--on-dark-2)}
 
+/* 20b. AND THE UPCOMING-CALLS BLACK CARD FLIPS BACK TO LIGHT-GROUND INK
+   (Maryam, 28 Sep 2026). §113.4 fills that one Join WHITE instead of §81's grey
+   wash / §75.3's accent gradient, so §20's `--on-dark-2` label would be a light
+   grey on white — the same contrast trap §20 fixed, mirrored. The white button
+   takes the light-ground inks: `--text-primary` live, `--text-disabled` while
+   the call is shut. (0,6,0) with the extra `.lcal.lcal-next` step beats §20's
+   (0,5,0); §81's `currentColor` arrow follows. */
+.app .lcal.lcal-next .btn.btn-p{color:var(--text-primary)}
+.app .lcal.lcal-next .btn.btn-p[disabled]{color:var(--text-disabled)}
+/* 20c. THE RED BLOCK'S "Today" IS SOLID WHITE, NOT THE CARD'S SUPPORTING INK
+   (Maryam, 28 Sep 2026: "the text on the red block should be solid white only").
+   `.lcal-slot-day` is a `.t-desc`, which §6a inks `--on-dark-2` on a dark card —
+   the right grey on the black ground, but on the accent block both lines should
+   read solid white. The time (`.t-h3`) is already `--on-dark`; this lifts the
+   day to match. (0,4,0) beats §6a's `.app .dark-card .t-desc` (0,3,0). */
+.app .lcal.lcal-next .lcal-slot-day{color:var(--on-dark)}
+
 /* ==========================================================================
    22. THE STANDING COLUMN LOSES A TIER — §72's `.stand` inside `.pulse`
    Maryam, 31 Aug 2026: "reduce the right size content font sizes and make this

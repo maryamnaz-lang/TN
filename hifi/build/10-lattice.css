@@ -121,8 +121,14 @@
    Even padding, one measure. The grid does the separating, so sections no
    longer need to shout with extra space.
    -------------------------------------------------------------------------- */
-.sec{padding:var(--s06) var(--gutter);background:transparent}
-.sec.tight{padding:var(--s05) var(--gutter)}
+/* 28 Sep 2026 (Maryam): the section rhythm is 32, not 48. `--s05` (16) top and
+   bottom makes 16 + 16 = 32 between two plain sections, platform-wide. This is
+   the lowest-specificity carrier of the rhythm, so every per-section override
+   (0,4,0)+ still wins, and §75/§101 retune the block cases (dark-card margin,
+   the 20px block-pair gap). Was `--s06` (the 1 Sep 48px rhythm). See DESIGN.md
+   §3 Shape and rhythm and §138. */
+.sec{padding:var(--s05) var(--gutter);background:transparent}
+.sec.tight{padding:var(--s04) var(--gutter)}
 /* content-first: tonal bands are gone. Structure comes from the rules. */
 .sec.tint,.sec.warm,.cool{background:transparent}
 .ph{padding:var(--s07) var(--gutter) var(--s06)}

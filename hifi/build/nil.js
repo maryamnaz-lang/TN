@@ -105,18 +105,19 @@ function nilField(id, label, type, ph, span){
    views.js which loads before this) rather than retyped; the quiz's own email
    field is a prototype input that does not persist. Authored placeholder (§74). */
 const NIL_EMAIL = (typeof PF !== 'undefined' && PF.general && PF.general.email) || 'you@example.com';
-/* The mail mark is Hugeicons' `mail-01` (stroke-rounded, 24-box), reproduced as
-   inline SVG so it needs no asset. Maryam asked to drop the Gmail brand logo for
-   a generic Hugeicons mail icon (27 Sep 2026). A stroke glyph, so it reads in the
-   NIL navy (`currentColor`, set on `.nil-modal-logo`) rather than brand colours.
-   THE COORDINATES ARE HUGEICONS' EXACT, FULL-PRECISION VALUES (Maryam, 28 Sep 2026:
-   "use exact icon and reduce its size to 28px"). The first cut rounded the corner
-   curves, which pulled the body's rounded sides in so the flap crease overshot them
-   — the "lines coming out of the shape". The exact path keeps the flap endpoints on
-   the body edge; §30-nil sizes it to 28px. */
+/* The mail mark is a clean stroke-rounded envelope (24-box), reproduced as inline
+   SVG so it needs no asset. Maryam asked to drop the Gmail brand logo for a generic
+   mail icon (27 Sep 2026); a stroke glyph, so it reads in the NIL navy
+   (`currentColor`, set on `.nil-modal-logo`).
+   NOT Hugeicons' `mail-01` — that glyph puts its flap crease at y=6, INSIDE the
+   body's top-corner curve, so the crease endpoints overshoot the rounded sides
+   ("the lines are still coming out of the icon", Maryam 28 Sep 2026). This envelope
+   (the Lucide `mail` geometry, same stroke language) drops the crease to y=7, below
+   the rx=2 corner, so the endpoints land on the straight vertical sides and nothing
+   pokes out. §30-nil sizes it to 28px. */
 const MAIL_MARK = `<svg viewBox="0 0 24 24" role="img" aria-label="Email" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
-  <path d="M2 6L8.91302 9.91697C11.4616 11.361 12.5384 11.361 15.087 9.91697L22 6"/>
-  <path d="M2.01577 13.4756C2.08114 16.5412 2.11383 18.0739 3.24496 19.2094C4.37608 20.3448 5.95033 20.3843 9.09883 20.4634C11.0393 20.5122 12.9607 20.5122 14.9012 20.4634C18.0497 20.3843 19.6239 20.3448 20.755 19.2094C21.8862 18.0739 21.9189 16.5412 21.9842 13.4756C22.0053 12.4899 22.0053 11.5101 21.9842 10.5244C21.9189 7.45886 21.8862 5.92609 20.755 4.79066C19.6239 3.65523 18.0497 3.61568 14.9012 3.53657C12.9607 3.48781 11.0393 3.48781 9.09883 3.53657C5.95033 3.61568 4.37608 3.65523 3.24496 4.79066C2.11383 5.92609 2.08114 7.45886 2.01577 10.5244C1.99475 11.5101 1.99475 12.4899 2.01577 13.4756Z"/>
+  <rect x="2" y="4" width="20" height="16" rx="2"/>
+  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
 </svg>`;
 function nilResultModal(){
   return `<div class="nil-modal-scrim" data-nilclose="scrim">

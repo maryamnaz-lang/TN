@@ -182,3 +182,85 @@
   background-color:var(--gray-100);
   background-image:var(--dark-haze);
   background-repeat:no-repeat}
+
+/* ------------------------------------------------------------------ 113.4 ---
+   THE BLACK CARD, REDRAWN — Maryam, 28 Sep 2026
+
+   Four asks on the one dashboard call card: the scheduled time in a square
+   accent block on the LEFT (day over time, centred), a LIVE COUNTDOWN where the
+   date used to sit at the top right, the member count under the title, and a
+   WHITE disabled-primary Join. So the black card stops being the light cards'
+   column and becomes a row: the accent block, then a body column that holds the
+   header, the count and the pinned foot. The light cells (§113.2) are untouched.
+
+   THE BLOCK IS A SQUARE OFF THE CARD'S OWN HEIGHT. `align-self:stretch` gives it
+   the row height (the body is the taller child and sets it), and `aspect-ratio:1`
+   reads its width back off that height — so it is square at whatever height the
+   title, count and foot come to, with no number to re-derive when the copy
+   changes (trap 20). `--accent` ground; the two lines inherit `--on-dark` white
+   from §63 §6a like every other string on the card, so no colour is set here. */
+/* THE RED BLOCK BLEEDS TO THREE EDGES (Maryam, 28 Sep 2026: "zero padding from
+   top, left and bottom"). The card drops its own `--s05` padding and its gap;
+   the accent slot then sits flush to the card's top, left and bottom (stretched
+   by `align-items:stretch`), and the BODY carries the padding instead — so its
+   `--s05` left padding is the one gap between the red block's right edge and the
+   text. */
+.app .lcal.lcal-next{
+  flex-direction:row;
+  align-items:stretch;
+  gap:0;
+  padding:0}
+.app .lcal-slot{
+  flex:none;
+  align-self:stretch;
+  aspect-ratio:1;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:2px;
+  padding:var(--s04);
+  text-align:center;
+  background-color:var(--accent)}
+/* THE CALENDAR MARK ABOVE "Today" (28 Sep 2026). A stroke glyph on
+   `currentColor`, so it takes the slot's white ink (§6a) with no colour set. */
+.app .lcal-slot-ic{line-height:0;margin-bottom:2px}
+.app .lcal-slot-ic svg{width:18px;height:18px;display:block}
+/* THE BODY IS THE COLUMN THE LIGHT CELL USED TO BE — header, count, then the
+   foot pinned by §113.2's `margin-top:auto` on `.lcal-f`, which now resolves
+   inside this inner column rather than on the card. It owns the padding the card
+   dropped. */
+.app .lcal-next > .lcal-body{
+  flex:1 1 auto;min-width:0;
+  display:flex;flex-direction:column;align-items:stretch;
+  gap:var(--s04);
+  padding:var(--s05)}
+/* THE LIVE COUNTDOWN takes the header's right end on an auto margin, where the
+   date's word-over-figure block sat on the light card. The clock mark leads the
+   digits (28 Sep 2026); tabular figures (set inline) so it does not jitter. */
+.app .lcal-timerbox{
+  margin-left:auto;flex:none;
+  display:inline-flex;align-items:center;gap:var(--s02);
+  white-space:nowrap}
+.app .lcal-timerbox svg{width:15px;height:15px;flex:none}
+/* THE COUNT ROW leads with two overlapped roster photos (28 Sep 2026). The
+   discs carry a card-ground ring so they read as a stack on the black card, and
+   the second tucks under the first. `.t-desc` still collapses to `--on-dark-2`
+   (§6a), so the count stays the card's supporting ink. */
+.app .lcal-seatsrow{
+  display:flex;align-items:center;gap:var(--s03);min-width:0}
+.app .lcal-faces{display:inline-flex;flex:none;align-items:center}
+.app .lcal-faces .av-ph{box-shadow:0 0 0 2px var(--gray-100)}
+.app .lcal-faces .av-ph + .av-ph{margin-left:-8px}
+
+/* THE JOIN IS A WHITE PRIMARY (Maryam, 28 Sep 2026: "a disabled primary button,
+   white bg"). §81.1 fills the disabled dark-card Join a grey `--on-dark-fill`
+   wash and §75.3 fills the live one the accent gradient; both are replaced here
+   by the card's own white. (0,6,0) with the extra `.lcal.lcal-next` step beats
+   §81.1's (0,5,0) whatever the layer order, and (0,5,0) beats §75.3's (0,4,0).
+   The label ink is §63's to set and the exception is stated there (§63 §20b);
+   the arrow follows it through `currentColor`. */
+.app .lcal.lcal-next .btn.btn-p,
+.app .lcal.lcal-next .btn.btn-p[disabled]{
+  background-color:var(--background);
+  background-image:none;
+  border-color:transparent}
+.app .lcal.lcal-next .btn.btn-p svg{fill:currentColor}

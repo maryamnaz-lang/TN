@@ -1,0 +1,53 @@
+/* ==========================================================================
+   138. SECTION RHYTHM — a divider after every non-block section
+
+   Maryam, 28 Sep 2026: "on all module pages I need 32px between each section,
+   with a divider line after each section — except if a section has a card or
+   blocks, then the next section starts after 32px (or 20px between two block
+   sections) with no divider." Platform-wide, all four portals, via the DS.
+
+   The 32px and the 20px live in the layers that STATE the rhythm — §10's base
+   `.sec` padding (`--s05`), §75's `.dark-card` margin (`--s05`), §101's
+   block-pair gap (20px). This layer owns only the DIVIDER model, because §14
+   states it inside `@container app (min-width:900px)` at (0,7,0)+, and CLAUDE.md
+   trap 4 says nothing later can outweigh that from outside the tier — so the
+   change is made INSIDE the same tier here, additively.
+
+   THE MODEL, AND WHY IT IS OPT-IN. §10 draws a full-bleed `.sec::after` hairline
+   under every section (mobile "ruled paper"); §14 turns them all off at desktop
+   and re-enables ONLY before a heading. Maryam's rule drops the heading gate: a
+   divider now falls after EVERY section that is not a card/block. Written as an
+   OPT-IN re-enabler (`:not()` chain) rather than an enable-all-then-suppress,
+   because a missing exclusion here costs a MISSING divider (harmless) whereas
+   the inverse would grow a STRAY line on a special component (ugly). The chain
+   carries the block/card set AND §14's own legitimate join exclusions, so the
+   two models agree on what closes itself.
+
+   WIDTHS. Desktop (below): the re-enabler, scene-guarded exactly as §14 guards
+   its rail. Mobile: §10's base already draws the non-block dividers, so only the
+   block-suppress and the last-child rule (both unconditional, further down) are
+   needed there. The result is identical at every width: a line after a non-block
+   section, none after a block, none after the last.
+
+   PER-PAGE EXCEPTIONS ARE UNTOUCHED BY STRUCTURE. The deliberate rhythms
+   (`.iv-detail-body` 72, `.lc-body` flat/no-divider) wrap their sections one
+   level below `.page`, so `.page > .sec` never reaches them; authtight auth
+   cards keep their own `!important` 32. See DESIGN.md §3 Shape and rhythm.
+   ========================================================================== */
+
+/* -- the divider after every non-block section (desktop; §14's tier) --------
+   ONE unbroken compound after `.page > .sec` — every `:not()` is glued to the
+   one before it, because a space would read as a descendant combinator. */
+@container app (min-width:900px){
+  .app:not(:has(> .auth-card)):not(:has(> .ob-open)):not(:has(> .ob-survey)):not(:has(> .call)):not(:has(> .nil)) .page > .sec:not(:last-child):not(.dark-card):not(.tint):not(.found):not(.sec-joined):not(.lead-bar):not(.sec-cs):not(:has(> .stats)):not(:has(> .facts)):not(:has(> .tile-stack)):not(:has(> .tile)):not(:has(> .cardrow)):not(:has(> .gcard)):not(:has(> .kv)):not(:has(> .qa)):not(:has(> .stat)):not(:has(> .certban)):not(:has(> .note)):not(:has(> .tbl-wrap)):not(:has(> .plate)):not(:has(> .lvl-hero)):not(:has(> .cs)):not(:has(> .lead-b)):not(:has(> .signed)):not(:has(> .pf-tgs)):not(:has(> .pf-facts)):not(:has(+ .sec.tint)):not(:has(+ .sec.sec-rep)):not(:has(+ .sec-qa)):not(:has(+ .sec.dark-card))::after{display:block}
+}
+
+/* -- a card/block section never closes with a line (all widths) -------------
+   Turns §10's mobile "ruled paper" off under a block, and reinforces desktop.
+   `:is()` keeps it one selector; disjoint from the re-enabler above (that one
+   is all `:not(block)`, this one all `:is(block)`). */
+.app .page > .sec:is(.dark-card,:has(> .stats),:has(> .facts),:has(> .tile-stack),:has(> .tile),:has(> .cardrow),:has(> .gcard),:has(> .kv),:has(> .qa),:has(> .stat),:has(> .certban),:has(> .note),:has(> .tbl-wrap),:has(> .plate),:has(> .lvl-hero))::after{display:none}
+
+/* -- no trailing divider after the last section (all widths) ----------------
+   Overrides §10's `.page > :last-child::after{opacity:1}`. */
+.app .page > .sec:last-child::after{display:none}

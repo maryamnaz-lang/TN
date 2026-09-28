@@ -935,7 +935,6 @@ const leadCallCard = (k, o) => `<div class="sec dark-card crow-dark">
    dead control §60 refuses outright.
    ========================================================================== */
 const lcalCard = (k, lead) => {
-  const tag = lead ? 'div' : 'button';
   /* THE LIGHT CARDS OPEN THE COHORT, NOT THE CALLS PAGE. `data-go` alone can
      only name a view, so the cohort's own id rides beside it as `data-ldrco`
      and lead2's capture-phase listener sets `S.ldrCo` before `go()` runs —
@@ -951,16 +950,54 @@ const lcalCard = (k, lead) => {
      markup with two targets doing one job — §112's rule for `.row-cta`. It also
      reads correctly: on the first card the thing to do is Join, on the others
      it is to go and look. */
-  return `<${tag} class="lcal${lead ? ' lcal-next dark-card' : ''}"${
-    lead ? '' : ` data-go="leadCohort" data-ldrco="${k.co}"`}>
-    ${''/* THE TITLE LEADS THE HEADER ROW NOW, AND THE COHORT-NUMBER COVER IS GONE
+  if(lead){
+    /* THE BLACK CALL CARD, REDRAWN (Maryam, 28 Sep 2026, four asks on one card):
+       the scheduled time moves LEFT into a square accent block (day over time,
+       centred, both lines); the header's right slot now holds a LIVE COUNTDOWN
+       to the call (`.lcal-timer`, `callTimerArm`'s 1s clock, derived from the
+       clock like `joinArm`/`heldArm` so a background tick lands right — trap 17);
+       the member count sits under the title (`k.seats`, the same figure the
+       "Cohorts" stat cell counts); and the Join is a WHITE disabled primary
+       (§113.4 fills it white, §63 §20b inks the label dark — see both notes).
+       The accent block's day/time inherit `--on-dark` (white) from §63 §6a like
+       every other string on the card, so no colour is set here. */
+    const till = (typeof joinClock === 'function') ? joinClock(k.when) : null;
+    /* THE TWO FACES ARE THE FIRST TWO ROSTER PHOTOS, read off the cohort record
+       (the `lcall` record carries only the count). `avatar`/`AV` are globals
+       from views.js; `.lcal-faces` overlaps them with a card-ground ring so they
+       read as a stack on the black ground. */
+    const co = (typeof LEAD_COHORTS !== 'undefined') ? LEAD_COHORTS.find(c => c.id === k.co) : null;
+    const faces = co ? co.members.slice(0, 2).map(m => avatar({i:m.ini, img:AV[m.img]}, 22)).join('') : '';
+    return `<div class="lcal lcal-next dark-card">
+    <span class="lcal-slot">
+      <span class="lcal-slot-ic">${I.calendar}</span>
+      <span class="lcal-slot-day t-desc">${k.day}</span>
+      <span class="lcal-slot-tm t-h3">${k.time}</span>
+    </span>
+    <span class="lcal-body">
+      <span class="lcal-h">
+        <span class="lcal-t t-h3">${lcTitle(k)}</span>
+        ${''/* THE ICON IS A SIBLING OF `.lcal-timer`, NOT A CHILD — `callTimerArm`
+               writes the countdown with `textContent`, which would wipe an svg
+               inside the timer span. The box holds the clock mark + the digits. */}
+        <span class="lcal-timerbox">${I.time}<span class="lcal-timer t-h4"${till ? ` data-calltill="${till}" style="font-variant-numeric:tabular-nums"` : ''}>${till ? callTimerFmt(till - Date.now()) : k.time}</span></span>
+      </span>
+      <span class="lcal-seatsrow">
+        ${faces ? `<span class="lcal-faces">${faces}</span>` : ''}
+        <span class="lcal-seats t-desc">${k.seats} candidates</span>
+      </span>
+      <span class="lcal-f">
+        <span class="lcal-m t-desc">${k.mins} minutes</span>
+        ${act}
+      </span>
+    </span>
+  </div>`;
+  }
+  return `<button class="lcal" data-go="leadCohort" data-ldrco="${k.co}">
+    ${''/* THE TITLE LEADS THE HEADER ROW, AND THE COHORT-NUMBER COVER IS GONE
            (Maryam, 9 Sep 2026: "remove the cohort number from the all cards top
-           left and take the lower content like 'Cohort 41 call' part on top
-           left"). The `.gcard-art` badge sat where the title now sits; the title
-           came up out of `.lcal-b` into the header, opposite the date. The date
-           stays the word-over-figure block (`.lcal-when`) — measured at 62px, the
-           wider of "Tomorrow" and "5:00 PM" rather than their sum, so the header
-           does not wrap. §113.3's dead `.gcard-art` ground rule went with it. */}
+           left"). The date stays the word-over-figure block (`.lcal-when`) at the
+           right end. This light path is unchanged; the black card is above. */}
     <span class="lcal-h">
       <span class="lcal-t t-h3">${lcTitle(k)}</span>
       <span class="lcal-when">
@@ -968,26 +1005,11 @@ const lcalCard = (k, lead) => {
         <span class="lcal-tm t-h4">${k.time}</span>
       </span>
     </span>
-    ${''/* THE TRACK/WEEK SUB-LINE IS REMOVED and the title enlarged to `t-h3`
-           (Maryam, 16 Sep 2026: "remove explorer row and make the heading bigger
-           of cohort call"). The card is now the title + date header, then the
-           duration + Join foot; `.lcal-b`/`.lcal-d` went with the line, and the
-           enlarged title is the card's one heading. `k.level`/`k.week` stay on
-           the record. Restore the line by re-adding a `.lcal-b > .lcal-d`. */}
-    ${''/* THE FOOT IS THE DURATION AND ONE CONTROL, WHICH IS THE REFERENCE'S
-           OWN ROW AND ALSO WHAT FITS. `lcDetail`'s three facts — minutes, week
-           and chapter — were here first and the row wrapped: at the 268px cell
-           this grid produces, "60 minutes &middot; week 5 of 13" is 155 against
-           the 121 left beside a Join, so the button dropped to a second line
-           and the black card came out 44px taller than the two beside it. The
-           week moved up into the description, where it is a fact about the
-           COHORT rather than about the appointment; the chapter is on the
-           cohort's own page, which is what the card opens. */}
     <span class="lcal-f">
       <span class="lcal-m t-desc">${k.mins} minutes</span>
       ${act}
     </span>
-  </${tag}>`;
+  </button>`;
 };
 
 /* THE SENTENCE IS DERIVED AND SAYS THE ONE THING THE CARDS DO NOT — that these

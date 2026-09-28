@@ -1090,6 +1090,12 @@ LAYERS = [
     # / `.sn-main` / `.tal-body`. `.app`-scoped, so the agent portal's chat and
     # rail match. Crosses to every portal.
     '136-scrollbar.css',
+    # §138 — section rhythm: a divider after every non-block section (Maryam,
+    # 28 Sep 2026). The divider model half of the 32/20 rhythm; `.app`/`.page`
+    # -scoped, so the agent and admin portals get the same dividers. The 32/20
+    # spacing rides in via §10/§75/§101, which already cross. (§137 is skipped —
+    # it is hifi-only in NOT_IN_DS; §138 is not.) Crosses to every portal.
+    '138-secrhythm.css',
 ]
 
 # ==========================================================================

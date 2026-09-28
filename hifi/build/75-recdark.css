@@ -122,7 +122,12 @@
    of the same number rather than the only source of it. */
 .app .sec.dark-card{
   display:flex;flex-direction:column;gap:20px;
-  margin:var(--s06) var(--pad-x);
+  /* 28 Sep 2026 (Maryam): the card's own vertical margin is `--s05` (16) so a
+     standalone dark-card section sits 16 + 16 = 32 from its neighbours, on the
+     new 32px section rhythm (§10/§138). Was `--s06`. Its `--pad-x` side inset and
+     `--s07` interior padding are untouched; §101 still hands the card `20px` when
+     it is one of a block pair. */
+  margin:var(--s05) var(--pad-x);
   padding:var(--s07);
   background-color:var(--gray-100);
   /* THE HAZE IS §21.22a's TOKEN, NOT A SECOND COPY OF IT (4 Sep 2026). This

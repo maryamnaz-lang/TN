@@ -5058,6 +5058,32 @@ function heldArm(){
 }
 setInterval(heldArm, 1000);
 
+/* THE COUNTDOWN TO A COHORT CALL — the leader dashboard's black call card
+   (Maryam, 28 Sep 2026). `heldArm`'s pattern exactly (its note is the argument):
+   the text is a pure function of `Date.now()` and the element's own
+   `data-calltill` (the call's start epoch, from `joinClock`), so a tick that
+   lands late in a background tab (trap 17) arrives with the right answer and the
+   next render recomputes the same string — not DOM state (trap 9). Once the
+   start is reached the slot reads "Live now", which is the same moment
+   `joinLive`/`joinArm` open the Join beside it. */
+function callTimerFmt(ms){
+  if(ms <= 0) return 'Live now';
+  /* HOURS AND MINUTES ONLY (Maryam, 28 Sep 2026). The 1s tick still runs — it
+     just re-renders the same string within a minute — so no seconds column. */
+  const m = Math.floor(ms / 60000);
+  const p = n => String(n).padStart(2, '0');
+  return `${p(Math.floor(m / 60))}:${p(m % 60)}`;
+}
+function callTimerArm(){
+  const els = (typeof device !== 'undefined' && device)
+    ? device.querySelectorAll('.lcal-timer[data-calltill]') : [];
+  els.forEach(el => {
+    const t = +el.dataset.calltill;
+    if(t) el.textContent = callTimerFmt(t - Date.now());
+  });
+}
+setInterval(callTimerArm, 1000);
+
 /* ==========================================================================
    ONE ROW FOR ALL THREE CALLS — Maryam, 31 Aug 2026
 

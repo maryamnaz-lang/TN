@@ -1,5 +1,14 @@
 /* ==========================================================================
-   101. TWO BLOCKY ROWS ARE `--pad-x` APART — the block rhythm
+   101. TWO BLOCKY ROWS ARE 20px APART — the block rhythm
+
+   28 Sep 2026 (Maryam): the block-pair gap is a flat 20px now, not `--pad-x`.
+   The prose below still explains the MECHANISM in terms of `--pad-x` (one edge
+   pays the whole gap, keyed on the edge child) — that all stands; only the value
+   changed, from `--pad-x` (16/24/32 by width) to a flat 20. This pairs with the
+   32px section rhythm (§10/§138): two SUBJECTS are 32 apart, two OBJECTS 20.
+   See DESIGN.md §3 Shape and rhythm. Original title kept below for the argument.
+
+   ----- ORIGINAL: TWO BLOCKY ROWS ARE `--pad-x` APART -----------------------
 
    Maryam, 2 Sep 2026: "this is component level change, since we defined the
    section spaces from each other, but whenever there is a view where we get to
@@ -119,9 +128,9 @@
 
 /* and the second block's edge pays the whole of it */
 .app .page > .sec:is(.dark-card,:has(> .stats:last-child),:has(> .facts:last-child),:has(> .certban:last-child),:has(> .tile:last-child),:has(> .note:last-child)) + .sec.dark-card{
-  margin-top:var(--pad-x)}
+  margin-top:20px}
 .app .page > .sec:is(.dark-card,:has(> .stats:last-child),:has(> .facts:last-child),:has(> .certban:last-child),:has(> .tile:last-child),:has(> .note:last-child)) + .sec:is(:has(> .stats:first-child),:has(> .facts:first-child),:has(> .certban:first-child),:has(> .tile:first-child),:has(> .note:first-child)){
-  padding-top:var(--pad-x)}
+  padding-top:20px}
 
 @container app (min-width:900px){
   .app .page > .sec.dark-card:is(:has(+ .sec.dark-card),:has(+ .sec > .stats:first-child),:has(+ .sec > .facts:first-child),:has(+ .sec > .certban:first-child),:has(+ .sec > .tile:first-child),:has(+ .sec > .note:first-child)){
@@ -129,7 +138,7 @@
   .app .page > .sec:not(.dark-card):is(:has(> .stats:last-child),:has(> .facts:last-child),:has(> .certban:last-child),:has(> .tile:last-child),:has(> .note:last-child)):is(:has(+ .sec.dark-card),:has(+ .sec > .stats:first-child),:has(+ .sec > .facts:first-child),:has(+ .sec > .certban:first-child),:has(+ .sec > .tile:first-child),:has(+ .sec > .note:first-child)){
     padding-bottom:0}
   .app .page > .sec:is(.dark-card,:has(> .stats:last-child),:has(> .facts:last-child),:has(> .certban:last-child),:has(> .tile:last-child),:has(> .note:last-child)) + .sec.dark-card{
-    margin-top:var(--pad-x)}
+    margin-top:20px}
   .app .page > .sec:is(.dark-card,:has(> .stats:last-child),:has(> .facts:last-child),:has(> .certban:last-child),:has(> .tile:last-child),:has(> .note:last-child)) + .sec:is(:has(> .stats:first-child),:has(> .facts:first-child),:has(> .certban:first-child),:has(> .tile:first-child),:has(> .note:first-child)){
-    padding-top:var(--pad-x)}
+    padding-top:20px}
 }

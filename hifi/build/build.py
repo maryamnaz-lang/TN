@@ -1423,7 +1423,14 @@ css = '\n'.join((here / f).read_text() for f in
                  # so it wins over §97's card padding, §117/§70's dock height and
                  # §15's quiet-ahead ladder. States no type (that is §63). hifi-only
                  # — in build-ds.py's NOT_IN_DS (the candidate report's own flow).
-                 '137-mobileflow.css',])
+                 '137-mobileflow.css',
+                 # §138 — SECTION RHYTHM: a divider after every non-block section
+                 # (Maryam, 28 Sep 2026). Owns the DIVIDER model only (§10/§75/§101
+                 # carry the 32/20 spacing); an opt-in `:not()` re-enabler inside
+                 # §14's container tier plus an all-widths block-suppress and
+                 # last-child-off. Last, so it wins over §14's base-off and §10's
+                 # ruled-paper base. States no type (that is §63). Crosses to the DS.
+                 '138-secrhythm.css',])
 # ==========================================================================
 # NO HOVER
 # The state layer was fighting the layout everywhere it appeared: a wash on a

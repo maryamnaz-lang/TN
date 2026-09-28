@@ -1555,8 +1555,8 @@ svg.arrow,.tile-arrow,.card-go{
       linear-gradient(var(--rule),var(--rule)) left 4px top 0/1px 9px no-repeat,
       linear-gradient(var(--rule),var(--rule)) right 4px top 0/1px 9px no-repeat}
 }
-.sec{padding:var(--s06) var(--gutter);background:transparent}
-.sec.tight{padding:var(--s05) var(--gutter)}
+.sec{padding:var(--s05) var(--gutter);background:transparent}
+.sec.tight{padding:var(--s04) var(--gutter)}
 .sec.tint,.sec.warm,.cool{background:transparent}
 .ph{padding:var(--s07) var(--gutter) var(--s06)}
 .crumb{padding:var(--s04) var(--gutter);margin:0}
@@ -10006,6 +10006,9 @@ button.btn-p:active,
   text-transform:none;color:var(--link)}
 .app .dark-card .btn.btn-p[disabled]{color:var(--on-dark-2)}
 .app .plate .btn.btn-p[disabled]{color:var(--on-dark-2)}
+.app .lcal.lcal-next .btn.btn-p{color:var(--text-primary)}
+.app .lcal.lcal-next .btn.btn-p[disabled]{color:var(--text-disabled)}
+.app .lcal.lcal-next .lcal-slot-day{color:var(--on-dark)}
 .app .page .pulse .stand .stand-l{
   font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-compact-ls);
@@ -11442,7 +11445,7 @@ button.btn-p:active,
   border-top:0;padding-top:0}
 .app .sec.dark-card{
   display:flex;flex-direction:column;gap:20px;
-  margin:var(--s06) var(--pad-x);
+  margin:var(--s05) var(--pad-x);
   padding:var(--s07);
   background-color:var(--gray-100);
   background-image:var(--dark-haze);
@@ -12372,18 +12375,18 @@ button.btn-p:active,
 .app .page > .sec:not(.dark-card):is(:has(> .stats:last-child),:has(> .facts:last-child),:has(> .certban:last-child),:has(> .tile:last-child),:has(> .note:last-child)):is(:has(+ .sec.dark-card),:has(+ .sec > .stats:first-child),:has(+ .sec > .facts:first-child),:has(+ .sec > .certban:first-child),:has(+ .sec > .tile:first-child),:has(+ .sec > .note:first-child)){
   padding-bottom:0}
 .app .page > .sec:is(.dark-card,:has(> .stats:last-child),:has(> .facts:last-child),:has(> .certban:last-child),:has(> .tile:last-child),:has(> .note:last-child)) + .sec.dark-card{
-  margin-top:var(--pad-x)}
+  margin-top:20px}
 .app .page > .sec:is(.dark-card,:has(> .stats:last-child),:has(> .facts:last-child),:has(> .certban:last-child),:has(> .tile:last-child),:has(> .note:last-child)) + .sec:is(:has(> .stats:first-child),:has(> .facts:first-child),:has(> .certban:first-child),:has(> .tile:first-child),:has(> .note:first-child)){
-  padding-top:var(--pad-x)}
+  padding-top:20px}
 @container app (min-width:900px){
   .app .page > .sec.dark-card:is(:has(+ .sec.dark-card),:has(+ .sec > .stats:first-child),:has(+ .sec > .facts:first-child),:has(+ .sec > .certban:first-child),:has(+ .sec > .tile:first-child),:has(+ .sec > .note:first-child)){
     margin-bottom:0}
   .app .page > .sec:not(.dark-card):is(:has(> .stats:last-child),:has(> .facts:last-child),:has(> .certban:last-child),:has(> .tile:last-child),:has(> .note:last-child)):is(:has(+ .sec.dark-card),:has(+ .sec > .stats:first-child),:has(+ .sec > .facts:first-child),:has(+ .sec > .certban:first-child),:has(+ .sec > .tile:first-child),:has(+ .sec > .note:first-child)){
     padding-bottom:0}
   .app .page > .sec:is(.dark-card,:has(> .stats:last-child),:has(> .facts:last-child),:has(> .certban:last-child),:has(> .tile:last-child),:has(> .note:last-child)) + .sec.dark-card{
-    margin-top:var(--pad-x)}
+    margin-top:20px}
   .app .page > .sec:is(.dark-card,:has(> .stats:last-child),:has(> .facts:last-child),:has(> .certban:last-child),:has(> .tile:last-child),:has(> .note:last-child)) + .sec:is(:has(> .stats:first-child),:has(> .facts:first-child),:has(> .certban:first-child),:has(> .tile:first-child),:has(> .note:first-child)){
-    padding-top:var(--pad-x)}
+    padding-top:20px}
 }
 .app .aw-list.aw-grid{
   display:grid;gap:var(--s05);justify-content:start;
@@ -13422,6 +13425,44 @@ button.btn-p:active,
   background-color:var(--gray-100);
   background-image:var(--dark-haze);
   background-repeat:no-repeat}
+.app .lcal.lcal-next{
+  flex-direction:row;
+  align-items:stretch;
+  gap:0;
+  padding:0}
+.app .lcal-slot{
+  flex:none;
+  align-self:stretch;
+  aspect-ratio:1;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:2px;
+  padding:var(--s04);
+  text-align:center;
+  background-color:var(--accent)}
+.app .lcal-slot-ic{line-height:0;margin-bottom:2px}
+.app .lcal-slot-ic svg{width:18px;height:18px;display:block}
+.app .lcal-next > .lcal-body{
+  flex:1 1 auto;min-width:0;
+  display:flex;flex-direction:column;align-items:stretch;
+  gap:var(--s04);
+  padding:var(--s05)}
+.app .lcal-timerbox{
+  margin-left:auto;flex:none;
+  display:inline-flex;align-items:center;gap:var(--s02);
+  white-space:nowrap}
+.app .lcal-timerbox svg{width:15px;height:15px;flex:none}
+.app .lcal-seatsrow{
+  display:flex;align-items:center;gap:var(--s03);min-width:0}
+.app .lcal-faces{display:inline-flex;flex:none;align-items:center}
+.app .lcal-faces .av-ph{box-shadow:0 0 0 2px var(--gray-100)}
+.app .lcal-faces .av-ph + .av-ph{margin-left:-8px}
+.app .lcal.lcal-next .btn.btn-p,
+.app .lcal.lcal-next .btn.btn-p[disabled]{
+  background-color:var(--background);
+  background-image:none;
+  border-color:transparent}
+.app .lcal.lcal-next .btn.btn-p svg{fill:currentColor}
 .app .agt{padding:0 var(--pad-x)}
 .app .agt-r{
   display:grid;
@@ -14910,6 +14951,11 @@ button.btn-p:active,
   .app .lvl-hero .ladder i:not(.done):not(.on){
     background-color:var(--accent);opacity:.22}
 }
+@container app (min-width:900px){
+  .app:not(:has(> .auth-card)):not(:has(> .ob-open)):not(:has(> .ob-survey)):not(:has(> .call)):not(:has(> .nil)) .page > .sec:not(:last-child):not(.dark-card):not(.tint):not(.found):not(.sec-joined):not(.lead-bar):not(.sec-cs):not(:has(> .stats)):not(:has(> .facts)):not(:has(> .tile-stack)):not(:has(> .tile)):not(:has(> .cardrow)):not(:has(> .gcard)):not(:has(> .kv)):not(:has(> .qa)):not(:has(> .stat)):not(:has(> .certban)):not(:has(> .note)):not(:has(> .tbl-wrap)):not(:has(> .plate)):not(:has(> .lvl-hero)):not(:has(> .cs)):not(:has(> .lead-b)):not(:has(> .signed)):not(:has(> .pf-tgs)):not(:has(> .pf-facts)):not(:has(+ .sec.tint)):not(:has(+ .sec.sec-rep)):not(:has(+ .sec-qa)):not(:has(+ .sec.dark-card))::after{display:block}
+}
+.app .page > .sec:is(.dark-card,:has(> .stats),:has(> .facts),:has(> .tile-stack),:has(> .tile),:has(> .cardrow),:has(> .gcard),:has(> .kv),:has(> .qa),:has(> .stat),:has(> .certban),:has(> .note),:has(> .tbl-wrap),:has(> .plate),:has(> .lvl-hero))::after{display:none}
+.app .page > .sec:last-child::after{display:none}
 
 </style>
 </head>
@@ -17644,6 +17690,22 @@ function heldArm(){
   });
 }
 setInterval(heldArm, 1000);
+
+function callTimerFmt(ms){
+  if(ms <= 0) return 'Live now';
+  const m = Math.floor(ms / 60000);
+  const p = n => String(n).padStart(2, '0');
+  return `${p(Math.floor(m / 60))}:${p(m % 60)}`;
+}
+function callTimerArm(){
+  const els = (typeof device !== 'undefined' && device)
+    ? device.querySelectorAll('.lcal-timer[data-calltill]') : [];
+  els.forEach(el => {
+    const t = +el.dataset.calltill;
+    if(t) el.textContent = callTimerFmt(t - Date.now());
+  });
+}
+setInterval(callTimerArm, 1000);
 
 const CALL_ROW = {
   iv: () => {
@@ -26048,8 +26110,8 @@ function nilField(id, label, type, ph, span){
 
 const NIL_EMAIL = (typeof PF !== 'undefined' && PF.general && PF.general.email) || 'you@example.com';
 const MAIL_MARK = `<svg viewBox="0 0 24 24" role="img" aria-label="Email" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
-  <path d="M2 6L8.91302 9.91697C11.4616 11.361 12.5384 11.361 15.087 9.91697L22 6"/>
-  <path d="M2.01577 13.4756C2.08114 16.5412 2.11383 18.0739 3.24496 19.2094C4.37608 20.3448 5.95033 20.3843 9.09883 20.4634C11.0393 20.5122 12.9607 20.5122 14.9012 20.4634C18.0497 20.3843 19.6239 20.3448 20.755 19.2094C21.8862 18.0739 21.9189 16.5412 21.9842 13.4756C22.0053 12.4899 22.0053 11.5101 21.9842 10.5244C21.9189 7.45886 21.8862 5.92609 20.755 4.79066C19.6239 3.65523 18.0497 3.61568 14.9012 3.53657C12.9607 3.48781 11.0393 3.48781 9.09883 3.53657C5.95033 3.61568 4.37608 3.65523 3.24496 4.79066C2.11383 5.92609 2.08114 7.45886 2.01577 10.5244C1.99475 11.5101 1.99475 12.4899 2.01577 13.4756Z"/>
+  <rect x="2" y="4" width="20" height="16" rx="2"/>
+  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
 </svg>`;
 function nilResultModal(){
   return `<div class="nil-modal-scrim" data-nilclose="scrim">
@@ -26463,21 +26525,44 @@ const leadCallCard = (k, o) => `<div class="sec dark-card crow-dark">
   </div>`;
 
 const lcalCard = (k, lead) => {
-  const tag = lead ? 'div' : 'button';
   const act = lead
     ? `<button class="btn btn-p btn-sm noic" data-call="cohort" data-joinwhen="${k.when}" data-joinmins="${k.mins}"${
         joinLive(k.when, k.mins) ? '' : ` disabled title="${joinShut(k.when)}"`}>Join call ${I.arrowRight}</button>`
     : `<svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg>`;
-  return `<${tag} class="lcal${lead ? ' lcal-next dark-card' : ''}"${
-    lead ? '' : ` data-go="leadCohort" data-ldrco="${k.co}"`}>
-    ${''/* THE TITLE LEADS THE HEADER ROW NOW, AND THE COHORT-NUMBER COVER IS GONE
+  if(lead){
+    const till = (typeof joinClock === 'function') ? joinClock(k.when) : null;
+    const co = (typeof LEAD_COHORTS !== 'undefined') ? LEAD_COHORTS.find(c => c.id === k.co) : null;
+    const faces = co ? co.members.slice(0, 2).map(m => avatar({i:m.ini, img:AV[m.img]}, 22)).join('') : '';
+    return `<div class="lcal lcal-next dark-card">
+    <span class="lcal-slot">
+      <span class="lcal-slot-ic">${I.calendar}</span>
+      <span class="lcal-slot-day t-desc">${k.day}</span>
+      <span class="lcal-slot-tm t-h3">${k.time}</span>
+    </span>
+    <span class="lcal-body">
+      <span class="lcal-h">
+        <span class="lcal-t t-h3">${lcTitle(k)}</span>
+        ${''/* THE ICON IS A SIBLING OF `.lcal-timer`, NOT A CHILD — `callTimerArm`
+               writes the countdown with `textContent`, which would wipe an svg
+               inside the timer span. The box holds the clock mark + the digits. */}
+        <span class="lcal-timerbox">${I.time}<span class="lcal-timer t-h4"${till ? ` data-calltill="${till}" style="font-variant-numeric:tabular-nums"` : ''}>${till ? callTimerFmt(till - Date.now()) : k.time}</span></span>
+      </span>
+      <span class="lcal-seatsrow">
+        ${faces ? `<span class="lcal-faces">${faces}</span>` : ''}
+        <span class="lcal-seats t-desc">${k.seats} candidates</span>
+      </span>
+      <span class="lcal-f">
+        <span class="lcal-m t-desc">${k.mins} minutes</span>
+        ${act}
+      </span>
+    </span>
+  </div>`;
+  }
+  return `<button class="lcal" data-go="leadCohort" data-ldrco="${k.co}">
+    ${''/* THE TITLE LEADS THE HEADER ROW, AND THE COHORT-NUMBER COVER IS GONE
            (Maryam, 9 Sep 2026: "remove the cohort number from the all cards top
-           left and take the lower content like 'Cohort 41 call' part on top
-           left"). The `.gcard-art` badge sat where the title now sits; the title
-           came up out of `.lcal-b` into the header, opposite the date. The date
-           stays the word-over-figure block (`.lcal-when`) — measured at 62px, the
-           wider of "Tomorrow" and "5:00 PM" rather than their sum, so the header
-           does not wrap. §113.3's dead `.gcard-art` ground rule went with it. */}
+           left"). The date stays the word-over-figure block (`.lcal-when`) at the
+           right end. This light path is unchanged; the black card is above. */}
     <span class="lcal-h">
       <span class="lcal-t t-h3">${lcTitle(k)}</span>
       <span class="lcal-when">
@@ -26485,26 +26570,11 @@ const lcalCard = (k, lead) => {
         <span class="lcal-tm t-h4">${k.time}</span>
       </span>
     </span>
-    ${''/* THE TRACK/WEEK SUB-LINE IS REMOVED and the title enlarged to `t-h3`
-           (Maryam, 16 Sep 2026: "remove explorer row and make the heading bigger
-           of cohort call"). The card is now the title + date header, then the
-           duration + Join foot; `.lcal-b`/`.lcal-d` went with the line, and the
-           enlarged title is the card's one heading. `k.level`/`k.week` stay on
-           the record. Restore the line by re-adding a `.lcal-b > .lcal-d`. */}
-    ${''/* THE FOOT IS THE DURATION AND ONE CONTROL, WHICH IS THE REFERENCE'S
-           OWN ROW AND ALSO WHAT FITS. `lcDetail`'s three facts — minutes, week
-           and chapter — were here first and the row wrapped: at the 268px cell
-           this grid produces, "60 minutes &middot; week 5 of 13" is 155 against
-           the 121 left beside a Join, so the button dropped to a second line
-           and the black card came out 44px taller than the two beside it. The
-           week moved up into the description, where it is a fact about the
-           COHORT rather than about the appointment; the chapter is on the
-           cohort's own page, which is what the card opens. */}
     <span class="lcal-f">
       <span class="lcal-m t-desc">${k.mins} minutes</span>
       ${act}
     </span>
-  </${tag}>`;
+  </button>`;
 };
 
 const leadCallsSec = () => {
