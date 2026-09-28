@@ -1082,6 +1082,15 @@ input:-webkit-autofill:focus{
 .app .fdate-ic{flex:none; width:20px; height:20px; color:var(--icon-secondary)}
 .app .fdate-pop{display:none; position:absolute; top:calc(100% + var(--s02)); right:0; z-index:60; width:266px; background:var(--background); border:1px solid var(--rule); box-shadow:0 8px 24px rgba(17,17,17,.12); padding:var(--s04)}
 .app .fdate.on .fdate-pop{display:block}
+/* THE LEVELLING-LOG DATE-RANGE FILTER (Epic 5.1) — two of our own month-grid pickers in
+   the toolbar (never a native date input, §3), styled as inline pills beside the .fdd
+   filters. */
+.app .lc-drange{display:inline-flex; gap:var(--s03); align-items:center; flex-wrap:wrap}
+.app .fdate-filter{display:inline-flex; align-items:center}
+.app .fdate-filter .fdate-t{display:inline-flex; align-items:center; gap:var(--s02); min-height:36px; padding:var(--s02) var(--s04); white-space:nowrap; width:auto}
+.app .fdate-filter .fdate-ic{width:16px; height:16px}
+.app .fdate-filter .fdate-x{display:inline-flex; align-items:center; justify-content:center; margin-left:calc(-1 * var(--s02)); width:24px; height:36px; border:0; background:transparent; cursor:pointer; color:var(--icon-secondary)}
+.app .fdate-filter .fdate-x svg{width:14px; height:14px}
 .app .dcal-h{display:flex; align-items:center; justify-content:space-between; margin-bottom:var(--s03)}
 .app .dcal-m{font-size:13.5px; font-weight:var(--t-w-strong); color:var(--text-primary)}
 .app .dcal-nav{background:none; border:0; cursor:pointer; padding:4px; display:inline-flex; color:var(--icon-primary)}
@@ -1157,11 +1166,15 @@ input:-webkit-autofill:focus{
   gap:var(--s03); min-height:150px; padding:var(--s06) var(--s04);
   background:var(--background); border:1px solid var(--rule); border-radius:var(--radius);
   text-align:center}
-/* per-block pencil (top-right) — opens that level's / acronym's own edit sheet */
-.app .lvl-edit-ic{position:absolute; top:var(--s03); right:var(--s03); width:26px; height:26px;
-  display:grid; place-items:center; padding:0; border:0; background:transparent;
+/* per-block pencil (top-right) — HIDDEN for now (Maryam, 28 Sep 2026); the edit
+   sheets stay wired, restore by dropping this display:none. */
+.app .lvl-edit-ic{display:none; position:absolute; top:var(--s03); right:var(--s03); width:26px; height:26px;
+  place-items:center; padding:0; border:0; background:transparent;
   color:var(--text-secondary); cursor:pointer; border-radius:999px}
 .app .lvl-edit-ic svg{width:16px; height:16px}
+/* the level code (E1…) and the acronym letter (T A L E N T) read in the accent, not black
+   (Maryam, 28 Sep 2026). */
+.app .lvl-block-code{color:var(--accent)}
 .app .lvl-edit-ic:hover{color:var(--accent-text); background:var(--surface-2)}
 .app .lvl-block-code{line-height:1}
 
@@ -2372,8 +2385,15 @@ const MODULES=[
    {k:'applications', t:'Agent Applications'}, {k:'appdetail', t:'Application', hidden:true}, {k:'empverify', t:'Employer Verification'}, {k:'empverifydetail', t:'Employer', hidden:true}]},
  {k:'candidates', t:'Candidates', ic:'candidates', subs:[
    {k:'candidates', t:'All Candidates'}, {k:'detail', t:'Candidate', hidden:true}]},
- {k:'agents', t:'Talent Agents', ic:'agents', subs:[
-   {k:'agents', t:'Talent Agents'}, {k:'detail', t:'Agent', hidden:true}, {k:'interview', t:'Interview', hidden:true}]},
+ /* TALENT AGENTS & MARKETPLACE (Epic 6, Maryam 28 Sep 2026). One module, two
+    visible submodules honouring Maryam's intent (which reverses the stories' own
+    naming): "All Agents" is the WHOLE directory — every talent agent whether
+    listed or not, the account-admin home (invite / edit / deactivate / delete)
+    carrying the full story-6.1 columns because it holds every listing state; and
+    "Marketplace" is the LISTED-ONLY, ranked bookable roster — what candidates see
+    and in what order. `detail`/`interview` stay hidden drill-ins. */
+ {k:'agents', t:'Talent Agents & Marketplace', ic:'agents', subs:[
+   {k:'agents', t:'All Agents'}, {k:'marketplace', t:'Marketplace'}, {k:'detail', t:'Agent', hidden:true}, {k:'interview', t:'Interview', hidden:true}]},
  {k:'cohorts', t:'Cohort Management', ic:'cohorts', subs:[
    {k:'cohorts', t:'Cohorts'}, {k:'assign', t:'Cohort Leaders'}, {k:'detail', t:'Cohort', hidden:true},
    /* the leader's own per-person profile, opened by the app-bar ROLE SWITCHER
@@ -2638,6 +2658,38 @@ function filterDd(key, def, opts, label){
     <div class="fdd-menu" role="listbox">${opts.map(([v, l]) =>
       `<button class="fdd-opt${v === cur ? ' on' : ''}" role="option" aria-selected="${v === cur ? 'true' : 'false'}" data-filter="${key}:${v}">${esc(l)}</button>`).join('')}</div>
   </div>`;
+}
+/* A FILTER-SCOPED DATE PICKER (Epic 5.1 date range) — OUR month-grid picker (never a
+   native date input, §3), but writing the page FILTER state via setFilter + render()
+   instead of a form hidden input. Reuses `dateGrid` for the grid; the open/nav/set/clear
+   are handled by the `.fdate-filter` branches in the click router. `label` prefixes the
+   trigger ("From" / "To"); no date reads "Any". A hidden [data-dfval] carries the picked
+   ISO so month-nav keeps the selected-day highlight without a form input. */
+function filterDate(key, label){
+  const cur = getFilter(key, '');
+  const iso = /^\d{4}-\d{2}-\d{2}$/.test(cur) ? cur : '';
+  const now = new Date();
+  const [vy, vm] = iso ? iso.split('-').map(Number) : [now.getFullYear(), now.getMonth() + 1];
+  return `<div class="fdate fdate-filter">
+    <input type="hidden" data-dfval value="${esc(iso)}">
+    <button type="button" class="inp fdate-t" data-datetoggle="${key}" aria-haspopup="dialog" aria-expanded="false">
+      <svg class="fdate-ic" viewBox="0 0 24 24" aria-hidden="true">${inner('calendar')}</svg>
+      <span class="fdate-val${iso ? '' : ' fdate-ph'}">${esc(label)}: ${iso ? dpFmt(iso) : 'Any'}</span></button>
+    ${iso ? `<button type="button" class="fdate-x" data-dfclear="${key}" aria-label="Clear ${esc(label)} date">${I.close}</button>` : ''}
+    <div class="fdate-pop">${dateGrid(key, vy, vm - 1, iso)}</div>
+  </div>`;
+}
+/* Parse a level-log date to comparable ISO. Rows carry free-text "12 Aug 2026" (seed) or
+   MM-DD-YYYY (`today()`, runtime); both map to yyyy-mm-dd so a range compares
+   lexicographically. An unparseable date is never excluded (5.1's "returns every date"). */
+const MON3 = {jan:'01', feb:'02', mar:'03', apr:'04', may:'05', jun:'06', jul:'07', aug:'08', sep:'09', oct:'10', nov:'11', dec:'12'};
+function logDateISO(s){
+  if(!s) return ''; s = String(s).split(',')[0].trim();
+  let m = s.match(/^(\d{1,2})\s+([A-Za-z]{3,})\s+(\d{4})$/);
+  if(m){ const mo = MON3[m[2].slice(0, 3).toLowerCase()]; if(mo) return `${m[3]}-${mo}-${String(m[1]).padStart(2, '0')}`; }
+  m = s.match(/^(\d{2})-(\d{2})-(\d{4})$/); if(m) return `${m[3]}-${m[1]}-${m[2]}`;
+  m = s.match(/^(\d{4})-(\d{2})-(\d{2})$/); if(m) return s;
+  return '';
 }
 /* does a record match the page's search? case-insensitive, any field */
 const hit = (q, ...fields) => { q = String(q || '').trim().toLowerCase(); if(!q) return true;
@@ -6140,11 +6192,15 @@ function usersRoles(){
     if(!editing) return `<td class="num ${on ? 'pm-on' : 'pm-off'}">${on ? pmYes : pmNo}</td>`;
     return `<td class="num ${on ? 'pm-on' : 'pm-off'}"><button class="btn btn-g btn-sm" data-act="toggleperm:${r.k}:${pk}" aria-pressed="${on}" aria-label="${esc(r.name)}: ${esc(PERM_ACT_LABEL[a])}, ${on ? 'granted' : 'not granted'}">${on ? I.checkFilled : I.checkOutline}</button></td>`;
   };
-  /* one grid per module — module name top-left, all four actions as columns, roles as rows. */
-  const moduleGrid = (mkey, label, acts) => `
+  /* ONE GRID PER ROLE (Maryam, 28 Sep 2026, off her sketch: "each permissions table
+     should be dependent on role not a module") — the role name in the top-left header
+     cell, all four CRUD actions across the top, every MODULE as a row, a tick where the
+     role holds that module's action and a dash otherwise. This reverses the 25 Sep
+     one-grid-per-module layout. `cellFor` is unchanged (role + module + action). */
+  const roleGrid = r => `
     <div class="tbl-wrap perm-wrap"><table class="tbl perm-grid">
-      <tr><th class="perm-grid-name">${esc(label)}</th>${ALL_ACTS.map(a => `<th class="num">${esc(PERM_ACT_LABEL[a])}</th>`).join('')}</tr>
-      ${roles.map(r => `<tr><td>${esc(r.name)}</td>${ALL_ACTS.map(a => cellFor(r, mkey, a, acts)).join('')}</tr>`).join('')}
+      <tr><th class="perm-grid-name">${esc(r.name)}</th>${ALL_ACTS.map(a => `<th class="num">${esc(PERM_ACT_LABEL[a])}</th>`).join('')}</tr>
+      ${PERM_MODULES.map(([m, label, acts]) => `<tr><td>${esc(label)}</td>${ALL_ACTS.map(a => cellFor(r, m, a, acts)).join('')}</tr>`).join('')}
     </table></div>`;
   const govRows = list => list.map(([pk, l, gov, reserved]) =>
     `<tr><td>${esc(l)}${reserved ? ' ' + permInfo(RESERVED_MSG) : ''}</td><td>${esc(gov || '')}</td></tr>`
@@ -6165,28 +6221,15 @@ function usersRoles(){
   </section>
 
   <section class="sec">
-    ${aiHead('Permissions', 'Each module lists what every role can do. A tick is a granted permission; the Super Admin holds them all.',
+    ${aiHead('Permissions', 'Each role lists what it can do across every module. A tick is a granted permission; the Super Admin holds them all.',
       editing
         ? `<span style="display:flex;align-items:center;gap:var(--s05)"><button class="btn btn-g btn-sm noic" data-act="cancelperms">Cancel</button><button class="btn btn-p btn-sm noic" data-act="saveperms"${permsChanged() ? '' : ' disabled'}>Update Permissions</button></span>`
         : '<button class="btn btn-g btn-sm noic" data-act="editperms">' + I.edit + ' Edit Permissions</button>')}
-    ${PERM_MODULES.map(([m, label, acts]) => moduleGrid(m, label, acts)).join('')}
-  </section>
-
-  <section class="sec">
-    ${aiHead('Sensitive permissions', 'Each is a permission of its own rather than folded into a module’s Edit.')}
-    <div class="tbl-wrap"><table class="tbl perm-gov">
-      <tr><th>Permission</th><th>Governs</th></tr>
-      ${govRows(PERM_SENSITIVE)}
-    </table></div>
-  </section>
-
-  <section class="sec">
-    ${aiHead('Reserved to Super Admin', 'Held by Super Admin only and grantable to no other role.')}
-    <div class="tbl-wrap"><table class="tbl perm-gov">
-      <tr><th>Permission</th><th>Governs</th></tr>
-      ${govRows(PERM_RESERVED.map(([k, l, g]) => [k, l, g, true]))}
-    </table></div>
+    ${roles.map(r => roleGrid(r)).join('')}
   </section>`;
+  /* The "Sensitive permissions" and "Reserved to Super Admin" governance tables were
+     removed (Maryam, 28 Sep 2026). PERM_SENSITIVE / PERM_RESERVED / govRows stay defined
+     (PERMSET still seeds from them), just not drawn. */
 }
 /* Enter edit mode with a clean slate — `S.permsDirty` gates the "Update
    Permissions" button, which stays disabled until a capability is toggled
@@ -7823,21 +7866,72 @@ const rangeCovers = (r, lvl) => LADDER.indexOf(lvl) >= LADDER.indexOf(r[0]) && L
    `erasure`/`deactivatedOn` while pausing a listing (`agpause`) does not. The
    deactivated check takes precedence over notlisted (deactivating sets onboarded:false). */
 const agDeactivated = a => a.status === 'inactive' && (a.erasure || a.deactivatedOn);
+/* THE LISTING GATE (story 6.4) — the four inputs, evaluated TOGETHER (not in
+   sequence), so more than one can fail at once and every failing reason is shown.
+   Listing state is derived from these, never set by hand: an active, ungated
+   agent is Listed; one an admin paused is Paused; one an active agent whose gates
+   fail is Not listed. `agAccountActive` is account-level (a paused agent still has
+   an active account — pause only hides the LISTING); only a deactivated/invited
+   account fails the account gate. */
+const agAccountActive = a => a.status !== 'invited' && !agDeactivated(a);
+const agPayoutOnFile = a => !!(a.payoutMethod || (typeof PAYOUTS !== 'undefined' && PAYOUTS.some(p => p.agent === a.name && p.method && p.method !== '—')));
+const agProfileOK = a => a.profileOK !== false && !!a.fee;
+const agTraining = a => a.training || 'complete';         /* complete | notcomplete | overridden */
+/* Training passes the gate when Complete OR Overridden by a Super Admin (6.2). */
+const agTrainingGateOK = a => agTraining(a) !== 'notcomplete';
+function gateReasons(a){
+  const r = [];
+  if(!agAccountActive(a)) r.push('Account is not active');
+  if(!agPayoutOnFile(a)) r.push('No payout destination on file');
+  if(!agTrainingGateOK(a)) r.push('LightspeedVT training not complete');
+  if(!agProfileOK(a)) r.push('Public profile or fee not complete');
+  return r;
+}
+const agListable = a => gateReasons(a).length === 0;
+/* THE THREE LISTING STATES (6.1) plus Invited and Deactivated (own tabs). Listing
+   state is gate-derived, not the account status: Listed (gates pass), Paused (an
+   admin took them out — `paused:true`), Not listed (active account, a gate fails). */
 const agState = a => a.status === 'invited' ? 'invited'
   : (agDeactivated(a) ? 'deactivated'
-  : (a.onboarded === false ? 'notlisted'
-  : (a.status === 'active' ? 'listed' : 'paused')));
+  : (a.paused || a.status === 'inactive' ? 'paused'
+  : (agListable(a) ? 'listed' : 'notlisted')));
 const AG_STATE = {listed:['active', 'Listed'], paused:['inactive', 'Paused'], notlisted:['', 'Not listed'], invited:['warn', 'Invited'], deactivated:['inactive', 'Deactivated']};
 const agStateTag = a => { const [v, l] = AG_STATE[agState(a)]; return tag(v, l); };
+
+/* ===== THE AGENT SCORE (stories 6.1 / 6.3) ==============================
+   ONE score in stars out of 5, to one decimal — the only rating candidates see.
+   Built from two parts, each out of 5: the client rubric (70%) and the average
+   candidate rating (30%, `a.rating`). The system computes it; a staff member
+   approves or overrides it once a quarter. Until the first quarterly review is
+   approved (`scoreApproved === false`), the agent shows the STARTING score set at
+   invite, on the same scale, marked "Starting score". All authored placeholder
+   (§74 — the seed has no rubric telemetry): `a.rubric`, `a.candRatings`,
+   `a.scoreApproved`, `a.scoreAt`, `a.startingScore`, `a.scoreHistory`. */
+const round1 = n => Math.round(n * 10) / 10;
+const agRubric = a => a.rubric != null ? a.rubric : a.rating || 0;
+/* the computed (proposed) score off the two components — what 6.3 reviews. */
+const agProposedScore = a => round1(agRubric(a) * 0.7 + (a.rating || 0) * 0.3);
+/* the CURRENT score shown everywhere: the approved score, else the starting score. */
+const agScore = a => a.scoreApproved === false
+  ? (a.startingScore != null ? a.startingScore : (a.rating || 0))
+  : (a.approvedScore != null ? a.approvedScore : agProposedScore(a));
+const scoreLabel = n => n >= 4.3 ? 'Excellent' : n >= 3.5 ? 'Strong' : n >= 2.8 ? 'Developing' : 'Needs review';
+/* the quarter end after the invite — where the first calculated score is due. */
+const agQuarterEnd = a => a.quarterEnd || 'Dec 31, 2026';
 /* THE RANKING IS BY CANDIDATE RATING ALONE, recalculated WEEKLY — it is not live
    (6.1). Only Listed agents carry a rank. We freeze it once at load and state
    when it was last recalculated and when it next falls, on the Monday–Sunday
    cycle payouts already use. Ties break on interviews conducted. */
+/* THE RANKING IS BY AGENT SCORE, highest first, recalculated WEEKLY — not live
+   (6.1). Only Listed agents carry a rank; Paused and Not listed show a blank rank
+   and are left out of the ordering. We freeze it once at load and state when it
+   was last recalculated and when it next falls, on the Monday–Sunday cycle payouts
+   already use. Ties break on interviews conducted. */
 let RANK_LAST = '', RANK_NEXT = '';
 function freezeRanking(){
   AGENTS().forEach(a => a.rank = null);
   AGENTS().filter(a => agState(a) === 'listed')
-    .sort((a, b) => b.rating - a.rating || b.interviewed - a.interviewed)
+    .sort((a, b) => agScore(b) - agScore(a) || b.interviewed - a.interviewed)
     .forEach((a, i) => a.rank = i + 1);
   const now = new Date(), dow = now.getDay();
   const mon = new Date(now); mon.setDate(now.getDate() - ((dow + 6) % 7)); mon.setHours(0, 0, 0, 0);
@@ -7845,9 +7939,22 @@ function freezeRanking(){
   const fmt = d => d.toLocaleDateString('en-US', {month:'short', day:'numeric'});
   RANK_LAST = fmt(mon); RANK_NEXT = fmt(next);
 }
-(function seedRanges(){
-  const seed = {u1:['E3', 'B2'], u2:['E1', 'E4'], u3:['B1', 'T1'], u13:['E1', 'E3'], u14:['E2', 'B1'], u45:['E1', 'E3']};
-  AGENTS().forEach(a => { if(!a.range) a.range = seed[a.id] || ['E1', 'E3']; });
+/* SEED the marketplace fields — assessment range, the score components, training
+   status and payout destination. All authored placeholder (§74). The set is built
+   to exercise every story branch: u1/u3/u14 fully listed with an approved score;
+   u2 a listed agent whose first quarterly review has not landed (a STARTING score);
+   u13 listed via a training-gate OVERRIDE; u45 NOT listed with two failing gates
+   (no payout destination AND training not complete). */
+(function seedMarket(){
+  const seed = {
+    u1:  {range:['E3', 'B2'], rubric:4.9, candRatings:58, scoreApproved:true,  approvedScore:4.9, scoreAt:'Jun 30, 2026', training:'complete',   payoutMethod:'Bank •••• 4471'},
+    u2:  {range:['E1', 'E4'], rubric:4.6, candRatings:24, scoreApproved:false, startingScore:4.6, quarterEnd:'Sep 30, 2026', training:'complete', payoutMethod:'Bank •••• 8123'},
+    u3:  {range:['B1', 'T1'], rubric:4.8, candRatings:47, scoreApproved:true,  approvedScore:4.7, scoreAt:'Jun 30, 2026', training:'complete',   payoutMethod:'Bank •••• 2290'},
+    u13: {range:['E1', 'E3'], rubric:4.3, candRatings:16, scoreApproved:true,  approvedScore:4.4, scoreAt:'Jun 30, 2026', training:'overridden', trainingBy:'Derek Sole', trainingAt:'Aug 14, 2026', payoutMethod:'Bank •••• 5561'},
+    u14: {range:['E2', 'B1'], rubric:4.7, candRatings:33, scoreApproved:true,  approvedScore:4.7, scoreAt:'Jun 30, 2026', training:'complete',   payoutMethod:'Bank •••• 6702'},
+    u45: {range:['E1', 'E3'], rubric:0,   candRatings:0,  scoreApproved:false, startingScore:3.5, quarterEnd:'Dec 31, 2026', training:'notcomplete' /* no payoutMethod → two failing gates */}
+  };
+  AGENTS().forEach(a => { const s = seed[a.id]; if(s) Object.assign(a, s); if(!a.range) a.range = ['E1', 'E3']; if(a.rubric == null) a.rubric = a.rating || 0; });
   freezeRanking();
 })();
 
@@ -7855,8 +7962,54 @@ PAGESUM['agents/agents'] = () => {
   const a = AGENTS();
   const nl = a.filter(x => agState(x) === 'notlisted').length;
   const top = a.find(x => x.rank === 1);
-  return `${a.length} talent agents, ${a.filter(x => agState(x) === 'listed').length} listed${nl ? ` and ${nl} not listed yet` : ''}. Ranking is by candidate rating alone, recalculated weekly${top ? ` — <b>${esc(top.name)} leads</b>` : ''}. Agents set their own fee; it is shown here but not editable.`;
+  return `${a.length} talent agents, ${a.filter(x => agState(x) === 'listed').length} listed${nl ? ` and ${nl} not listed yet` : ''}. Ranking is by Agent Score, recalculated weekly${top ? ` — <b>${esc(top.name)} leads</b>` : ''}. Agents set their own fee; it is shown here but not editable.`;
 };
+PAGESUM['agents/marketplace'] = () => {
+  const listed = AGENTS().filter(x => agState(x) === 'listed');
+  const top = listed.find(x => x.rank === 1);
+  return `<b>${listed.length} agents live in the marketplace</b>, ranked by Agent Score${top ? ` — ${esc(top.name)} at the top` : ''}. This is what candidates see and in what order; the ranking was last recalculated ${RANK_LAST} and next falls ${RANK_NEXT}.`;
+};
+
+/* ---- SHARED MARKETPLACE CELLS (stories 6.1 / 6.3) ------------------------- */
+/* The Agent Score cell: the star score + its label, the calculation date beneath,
+   or the "Starting score" marker until the first quarterly review lands. */
+function agScoreCell(a){
+  const n = agScore(a), lab = scoreLabel(n);
+  const sub = a.scoreApproved === false
+    ? `Starting score, set at invite · first due ${esc(agQuarterEnd(a))}`
+    : `Calculated ${esc(a.scoreAt || '—')}`;
+  return `<div style="white-space:nowrap">${starMark} ${n.toFixed(1)} <span class="t-desc">${esc(lab)}</span></div><div class="t-caption">${sub}</div>`;
+}
+/* The two components, each out of 5, with the number of candidate ratings. */
+function agComponentsCell(a){
+  return `<div>Rubric ${agRubric(a).toFixed(1)}/5</div><div class="t-caption">Candidate rating ${(a.rating || 0).toFixed(1)}/5 · ${a.candRatings || 0} rating${a.candRatings === 1 ? '' : 's'}</div>`;
+}
+/* Training — Complete / Not complete / Overridden, with the overriding admin and
+   date beneath an Overridden value (6.1). */
+function agTrainCell(a){
+  const t = agTraining(a);
+  if(t === 'overridden') return `${tag('', 'Overridden')}<div class="t-caption">by ${esc(a.trainingBy || ME.name)} · ${esc(a.trainingAt || '—')}</div>`;
+  if(t === 'notcomplete') return tag('pending', 'Not complete');
+  return tag('completed', 'Complete');
+}
+/* The ranking-recalculation banner, shown above both listings (6.1). */
+function rankBanner(){
+  return `<p class="t-desc" style="margin-bottom:var(--s05)">Ranking is by Agent Score, highest first, recalculated weekly on the Monday–Sunday cycle. Last recalculated <b>${RANK_LAST}</b>; next falls <b>${RANK_NEXT}</b>. Only listed agents carry a rank.</p>`;
+}
+/* The marketplace row actions common to both listings: View, Pause / Restore, Set
+   Assessment Range, Review Agent Score, and — Super Admin only, only where training
+   is not complete — Override Training Gate (6.1 / 6.2). */
+function agMarketActs(a){
+  const st = agState(a);
+  return [
+    ['view', 'View', `data-go="agents/detail/${a.id}"`],
+    ...(st === 'listed' ? [['pause', 'Pause Listing', `data-sheet="agpause:${a.id}"`]] : []),
+    ...(st === 'paused' ? [['play', 'Restore Listing', `data-sheet="agrestore:${a.id}"`]] : []),
+    ['route', 'Set Assessment Range', `data-sheet="agrange:${a.id}"`],
+    ['star', 'Review Agent Score', `data-sheet="agscore:${a.id}"`],
+    ...(agTraining(a) === 'notcomplete' ? [['check', 'Override Training Gate', `data-sheet="agoverride:${a.id}"`]] : [])
+  ];
+}
 
 KINDS.agent = {
   label:'talent agent', an:'a', mod:'Talent Agents', after:'agents/agents',
@@ -7905,18 +8058,28 @@ KINDS.agent = {
     : {title:`Resume ${a.name}’s listing?`, body:'The listing is visible to candidates again at the same fee.', ok:'Resume Listing', log:'Resumed agent listing', done:`${a.name} listed again`}
 };
 
-function agentsAll(){
-  const q = getFilter('q', ''), sf = getFilter('agstate', 'all'), rf = getFilter('agrange', 'all');
-  const count = s => AGENTS().filter(a => agState(a) === s).length;
-  const list = AGENTS()
+/* ALL AGENTS (Maryam 28 Sep 2026) — the WHOLE agent directory, every listing
+   state, and the account-admin home (invite / edit / deactivate / delete). It
+   carries the full story-6.1 columns because it holds every state, so its Listing
+   state and Training filters are meaningful and the "who is being held back" story
+   reads here. The bookable-only, ranked view lives on Marketplace. */
+function agentsRowsFiltered(){
+  const q = getFilter('q', ''), sf = getFilter('agstate', 'all'), rf = getFilter('agrange', 'all'), tf = getFilter('agtrain', 'all');
+  return AGENTS()
     .filter(a => sf === 'all' ? true : agState(a) === sf)
+    .filter(a => tf === 'all' ? true : agTraining(a) === tf)
     .filter(a => rf === 'all' ? true : rangeCovers(agRange(a), rf))
     .filter(a => hit(q, a.name, a.email, a.job))
     .slice().sort((a, b) => (a.rank || 99) - (b.rank || 99) || a.name.localeCompare(b.name));
+}
+function agentsAll(){
+  const q = getFilter('q', ''), sf = getFilter('agstate', 'all'), rf = getFilter('agrange', 'all'), tf = getFilter('agtrain', 'all');
+  const count = s => AGENTS().filter(a => agState(a) === s).length;
+  const list = agentsRowsFiltered();
   return `
   <section class="sec">
-    ${searchHead('Agent directory', 'Every talent agent, listed or not. They set their own fee; a candidate’s first interview is free.',
-      `${exportBtn('Talent agents')} ${addBtn('agent', 'Invite Talent Agent')}`, 'Search by name or email')}
+    ${searchHead('All Agents', 'Every talent agent, listed or not — invite, edit and manage accounts here. They set their own fee; a candidate’s first interview is free.',
+      `<button class="btn btn-g btn-sm noic" data-act="agentsexport">${I.download} Export</button> ${addBtn('agent', 'Invite Talent Agent')}`, 'Search by name or email')}
     ${filterStrip('agstate', 'all', [
       ['all', 'All', AGENTS().length],
       ['listed', 'Listed', count('listed')],
@@ -7925,16 +8088,21 @@ function agentsAll(){
       ['invited', 'Invited', count('invited')],
       ['deactivated', 'Deactivated', count('deactivated')]
     ])}
-    ${lstTools('Search by name or email', filterDd('agrange', 'all', [['all', 'Any level'], ...LADDER.map(l => [l, l])], 'Assesses'))}
+    ${lstTools('Search by name or email',
+      filterDd('agtrain', 'all', [['all', 'Any training'], ['complete', 'Complete'], ['notcomplete', 'Not complete'], ['overridden', 'Overridden']], 'Training') +
+      filterDd('agrange', 'all', [['all', 'Any level'], ...LADDER.map(l => [l, l])], 'Assesses'))}
+    ${rankBanner()}
     ${list.length ? table(
-      [{label:'Agent'}, {label:'Rank', num:true}, {label:'Rating', num:true}, {label:'Interviewed', num:true}, {label:'Assessment range'}, {label:'Fee', num:true}, {label:'Listing'}, ACT_COL],
+      [{label:'Rank', num:true}, {label:'Agent'}, {label:'Agent Score'}, {label:'Components'}, {label:'Interviews conducted', num:true}, {label:'Training'}, {label:'Assessment range'}, {label:'Fee', num:true}, {label:'Listing state'}, ACT_COL],
       list.map(a => ({id:a.id, go:'agents/detail/' + a.id, cells:[
-        personCell(a.name, a.email),
         a.rank ? String(a.rank) : '—',
-        a.rating ? ratingCell(a.rating) : '—',
+        personCell(a.name, a.email),
+        a.status === 'invited' ? '—' : agScoreCell(a),
+        a.status === 'invited' ? '—' : agComponentsCell(a),
         String(a.interviewed),
+        a.status === 'invited' ? '—' : agTrainCell(a),
         rangeLabel(agRange(a)),
-        a.fee ? money(a.fee) : '—',   /* no fee yet — the agent sets it from their side (Maryam, 24 Sep 2026) */
+        a.fee ? money(a.fee) : '—',
         a.status === 'invited' ? extInviteStatus(a) : agStateTag(a),
         a.status === 'invited'
           ? rowActs([
@@ -7943,19 +8111,63 @@ function agentsAll(){
               ['close', 'Cancel invite', `data-act="staffcancelinvite:${a.id}"`]
             ])
           : rowActs([
-              /* Agent menu (Maryam, 24 Sep 2026): View, Edit, Pause/Restore Listing,
-                 Deactivate, Delete. Set assessment range moved onto the Edit sheet. */
-              ['view', 'View', `data-go="agents/detail/${a.id}"`],
+              /* Marketplace actions (6.1/6.2) + the account-admin actions this
+                 directory owns (Edit / Deactivate / Delete). */
+              ...agMarketActs(a),
               ['edit', 'Edit', `data-sheet="rec:agent:${a.id}"`],
-              ...(agState(a) === 'listed' ? [['pause', 'Pause Listing', `data-sheet="agpause:${a.id}"`]] : []),
-              ...(agState(a) === 'paused' ? [['play', 'Restore Listing', `data-sheet="agrestore:${a.id}"`]] : []),
               (a.status === 'active' || a.status === 'ok') ? ['deactivate', 'Deactivate', `data-sheet="deactext:${a.id}"`] : ['play', 'Reactivate', `data-sheet="reactext:${a.id}"`],
               ['delete', 'Delete', `data-sheet="delext:${a.id}"`]
             ])
       ]})), {selectKind:'agent'})
-      : emptyState('agents', 'No agents match', q || sf !== 'all' || rf !== 'all' ? 'Nothing matches the current filters.' : 'No agents yet.')}
+      : emptyState('agents', 'No agents match', q || sf !== 'all' || rf !== 'all' || tf !== 'all' ? 'Nothing matches the current filters.' : 'No agents yet.')}
   </section>`;
 }
+
+/* MARKETPLACE (Maryam 28 Sep 2026) — the LISTED-ONLY, ranked bookable roster:
+   exactly what candidates see and in what order. No account-lifecycle actions
+   here (those live on All Agents); the row actions are the marketplace ones
+   (Pause, Set range, Review score, Override training). Read-focused. */
+function marketplaceView(){
+  const q = getFilter('q', ''), rf = getFilter('agrange', 'all');
+  const list = AGENTS()
+    .filter(a => agState(a) === 'listed')
+    .filter(a => rf === 'all' ? true : rangeCovers(agRange(a), rf))
+    .filter(a => hit(q, a.name, a.email, a.job))
+    .slice().sort((a, b) => (a.rank || 99) - (b.rank || 99) || a.name.localeCompare(b.name));
+  return `
+  <section class="sec">
+    ${searchHead('Marketplace', 'The agents live in the candidate-facing marketplace, ranked by Agent Score. This is who candidates are shown, and in what order.',
+      `<button class="btn btn-g btn-sm noic" data-act="marketexport">${I.download} Export</button>`, 'Search by name or email')}
+    ${lstTools('Search by name or email', filterDd('agrange', 'all', [['all', 'Any level'], ...LADDER.map(l => [l, l])], 'Assesses'))}
+    ${rankBanner()}
+    ${list.length ? table(
+      [{label:'Rank', num:true}, {label:'Agent'}, {label:'Agent Score'}, {label:'Components'}, {label:'Interviews conducted', num:true}, {label:'Assessment range'}, {label:'Fee', num:true}, ACT_COL],
+      list.map(a => ({id:a.id, go:'agents/detail/' + a.id, cells:[
+        a.rank ? String(a.rank) : '—',
+        personCell(a.name, a.email),
+        agScoreCell(a),
+        agComponentsCell(a),
+        String(a.interviewed),
+        rangeLabel(agRange(a)),
+        a.fee ? money(a.fee) : '—',
+        rowActs(agMarketActs(a))
+      ]})), {selectKind:'agent'})
+      : emptyState('agents', 'No listed agents', q || rf !== 'all' ? 'Nothing matches the current filters.' : 'No agents are listed in the marketplace yet.')}
+  </section>`;
+}
+ACTIONS.agentsexport = () => {
+  const rows = agentsRowsFiltered();
+  if(!rows.length){ toast('Nothing to export in this filter', 'warn'); return; }
+  if(rows.length > EXPORT_ROW_LIMIT){ toast(`This export is larger than the ${EXPORT_ROW_LIMIT} row limit. Narrow your filters and try again.`, 'warn'); return; }
+  audit('Exported talent agents', `${rows.length} row${rows.length === 1 ? '' : 's'}`, 'Talent Agents & Marketplace', 'notice');
+  toast(`Exporting ${rows.length} row${rows.length === 1 ? '' : 's'}. A download link will reach your notifications, valid 7 days.`);
+};
+ACTIONS.marketexport = () => {
+  const rows = AGENTS().filter(a => agState(a) === 'listed');
+  if(!rows.length){ toast('No listed agents to export', 'warn'); return; }
+  audit('Exported marketplace listings', `${rows.length} listed agent${rows.length === 1 ? '' : 's'}`, 'Talent Agents & Marketplace', 'notice');
+  toast(`Exporting ${rows.length} listing${rows.length === 1 ? '' : 's'}. A download link will reach your notifications, valid 7 days.`);
+};
 
 /* ---- AGENT DETAIL PANELS (story 3.8, Maryam 24 Sep 2026) ------------------
    Listing details (commission, industries, intents, availability), a Reports
@@ -8007,6 +8219,44 @@ function agentReportsPanel(a){
   </section>`;
 }
 
+/* MARKETPLACE STANDING + LISTING ELIGIBILITY (stories 6.1 / 6.3 / 6.4) — the Agent
+   Score candidates see, its two components and status, the training gate, the
+   marketplace rank, and the 6.4 Listable / Not listable verdict with every blocking
+   reason. Its header actions are the marketplace ones (Review score, Set range,
+   Override training). Not drawn for an invited (not-yet-accepted) account. */
+function agentMarketPanel(a){
+  if(a.status === 'invited') return '';
+  const reasons = gateReasons(a), listable = !reasons.length, n = agScore(a);
+  const trainTxt = agTraining(a) === 'overridden'
+    ? `Overridden by ${esc(a.trainingBy || ME.name)} · ${esc(a.trainingAt || '—')}`
+    : (agTraining(a) === 'notcomplete' ? 'Not complete' : 'Complete');
+  return `<section class="sec">
+    ${aiHead('Marketplace standing', 'The Agent Score candidates see, the training gate, and why this agent is or is not listed.',
+      rowActs([
+        ['star', 'Review Agent Score', `data-sheet="agscore:${a.id}"`],
+        ['route', 'Set Assessment Range', `data-sheet="agrange:${a.id}"`],
+        ...(agState(a) === 'listed' ? [['pause', 'Pause Listing', `data-sheet="agpause:${a.id}"`]] : []),
+        ...(agState(a) === 'paused' ? [['play', 'Restore Listing', `data-sheet="agrestore:${a.id}"`]] : []),
+        ...(agTraining(a) === 'notcomplete' ? [['check', 'Override Training Gate', `data-sheet="agoverride:${a.id}"`]] : [])
+      ]))}
+    ${stats([
+      ['star', 'Agent Score', `${starMark} ${n.toFixed(1)}`, scoreLabel(n)],
+      ['video', 'Interviews conducted', String(a.interviewed), 'lifetime'],
+      ['chart', 'Marketplace rank', a.rank ? '#' + a.rank : '—', a.rank ? 'by Agent Score' : 'not ranked'],
+      ['route', 'Assessment range', rangeLabel(agRange(a)), 'shown to candidates']
+    ])}
+    ${kv([
+      ['Score components', `Rubric ${agRubric(a).toFixed(1)}/5 · Candidate rating ${(a.rating || 0).toFixed(1)}/5 (${a.candRatings || 0})`],
+      ['Score status', a.scoreApproved === false ? `Starting score — first quarterly review due ${esc(agQuarterEnd(a))}` : `Approved ${esc(a.scoreAt || '—')}`],
+      ['LightspeedVT training', trainTxt],
+      ['Listing state', AG_STATE[agState(a)][1]]
+    ])}
+    <div style="margin-top:var(--s05)">${listable ? tag('active', 'Listable') : tag('', 'Not listable')}</div>
+    ${reasons.length ? `<p class="t-desc" style="margin-top:var(--s02)">Blocking: ${esc(reasons.join('; '))}.</p>` : ''}
+    <p class="help mt5">The assessment range and the Agent Score are not listing gates — a low score changes ranking, never listability. Only the training gate can be overridden, and only by a Super Admin.</p>
+  </section>`;
+}
+
 function agentsDetail(){
   const a = USER_BY_ID[S.id] || AGENTS()[0];
   DETAIL_LABEL = a.name;
@@ -8055,9 +8305,10 @@ function agentsDetail(){
     ])}
   </section>
 
-  ${''/* LISTING DETAILS (story 3.8) is HIDDEN (Maryam, 24 Sep 2026: "hide listing
-        details section"); `agentListingPanel` stays defined, just not drawn. */}
-  ${''/* agentListingPanel(a) */}
+  ${''/* MARKETPLACE STANDING + LISTING ELIGIBILITY (Epic 6, Maryam 28 Sep 2026):
+        the Agent Score, training gate and the 6.4 Listable/Not-listable verdict.
+        The old "Listing details" panel (story 3.8) stays hidden. */}
+  ${agentMarketPanel(a)}
 
   ${''/* the Payouts section is only drawn when there is something to release
         (Maryam, 18 Sep 2026: "when there is nothing to release do not even show
@@ -8187,11 +8438,26 @@ function pushLevelLog(r){ r.id = 'lc' + (++LEVEL_SEQ); LEVEL_LOG.unshift(r); ret
     {cand:'Jordan Vale', from:'E5', fromLetters:['E'], to:'B1', toLetters:['E', 'L'], proposedBy:'Priya Raman', decidedOn:'Tal proposal', approvedBy:'Derek Sole', approvedRole:'Super Admin', source:'Re-interview', date:'2 Aug 2026', filed:'2 Aug 2026, 1:00 PM', rating:5, talType:'Leader',
      agentLevel:'E5', agentLetters:['E'], talLevel:'B1', talLetters:['E', 'L'], reasoning:'Frames trade-offs across teams; closes cleanly under pressure.', strengths:'Holds two competing priorities in view and can say what each one costs. Examples span more than one team.', growth:'Tighten how a decision is closed. He explores well but the ending is sometimes left open.', note:'Reads a room and a roadmap at once. Comfortable stepping into Builder.', aiRaw:'0.83',
      tal:'<p>Tal suggests <b>Builder – B1</b>. Jordan <b>frames a trade-off across teams</b> and names what each option costs.</p><p>What earns B1: examples that <b>span more than one team</b> and a decision he can defend call by call.</p>'},
-    {cand:'Ava Stone', from:'', fromLetters:[], to:'E2', toLetters:['L'], proposedBy:'Dana Whitfield', decidedOn:'Reviewer override', approvedBy:'Derek Sole', approvedRole:'Super Admin', source:'First interview', date:'28 Jul 2026', filed:'28 Jul 2026, 2:30 PM', rating:4, talType:'Team Player', reason:'Transcript shows one clear coaching example the report understated.',
+    {cand:'Ava Stone', from:'E1', fromLetters:['N'], to:'E2', toLetters:['L'], proposedBy:'Dana Whitfield', decidedOn:'Reviewer override', approvedBy:'Derek Sole', approvedRole:'Super Admin', source:'First interview', date:'28 Jul 2026', filed:'28 Jul 2026, 2:30 PM', rating:4, talType:'Team Player', reason:'Transcript shows one clear coaching example the report understated.',
      agentLevel:'E2', agentLetters:['L', 'A'], talLevel:'E2', talLetters:['L'], reasoning:'Separates decision from result.', strengths:'Clear about the outcomes she owns and honest about the ones she missed.', growth:'Bring a second person into the work. Most examples are her acting alone.', note:'Solid and self-aware. One example of coaching a report would move her above E2.', aiRaw:'0.64',
      tal:'<p>Tal suggests <b>Explorer – E2</b>. Ava is <b>clear about the outcomes she owns</b> and honest about the ones she missed.</p><p>What holds it at E2: most examples are <b>her acting alone</b>. Bringing a second person into the work is the next move.</p>'},
     {cand:'Kai Andersen', from:'E3', fromLetters:['T1'], to:'E3', toLetters:['T1', 'L'], proposedBy:'', decidedOn:'', approvedBy:'Derek Sole', approvedRole:'Super Admin', source:'', date:'20 Jul 2026', filed:'20 Jul 2026', rating:5, talType:'Leader', reason:'Adding Leader after the cohort feedback; level unchanged.',
-     tal:'<p>Tal keeps the level at <b>Explorer – E3</b> and adds the <b>Leader</b> letter after the cohort feedback.</p><p>The read did not change; the letter recognises how he carried the group.</p>'}
+     tal:'<p>Tal keeps the level at <b>Explorer – E3</b> and adds the <b>Leader</b> letter after the cohort feedback.</p><p>The read did not change; the letter recognises how he carried the group.</p>'},
+    /* PRELIMINARY-QUIZ ROWS (Epic 5.1/5.4) — a candidate's first levelling record is the
+       quiz result becoming current: From blank, To the quiz-derived level + letters, no
+       proposing agent, Decided on "Preliminary quiz result", Approved by "System", Source
+       "Preliminary quiz". The 5.4 detail reads `quiz` (the derived result + the supporting
+       answers) as its evidence — there is no interview, agent proposal or transcript.
+       AUTHORED PLACEHOLDER (§74). Ava's quiz (2 Jul) precedes her 28 Jul first interview,
+       so her interview row moves E1 -> E2 — the story's "the first human-approved result
+       uses the quiz-derived level and TALENT letters" as its From. Noah and Mia are
+       quiz-only (not yet interviewed), so the quiz level is their current live level. */
+    {cand:'Ava Stone', from:'', fromLetters:[], to:'E1', toLetters:['N'], proposedBy:'', decidedOn:'Preliminary quiz result', approvedBy:'System', approvedRole:'System', source:'Preliminary quiz', date:'2 Jul 2026',
+     quiz:{result:'Explorer – E1', answers:[['Where are you right now?', 'In a job I want to move up in'], ['Which of these sounds most like you?', 'Not Sure'], ['How many years have you been working?', '1 to 3']]}},
+    {cand:'Noah Park', from:'', fromLetters:[], to:'E1', toLetters:['N'], proposedBy:'', decidedOn:'Preliminary quiz result', approvedBy:'System', approvedRole:'System', source:'Preliminary quiz', date:'10 Jul 2026', email:'noah@park.dev',
+     quiz:{result:'Explorer – E1', answers:[['Where are you right now?', 'Between things'], ['Which of these sounds most like you?', 'Athlete'], ['How many years have you been working?', 'Under 1']]}},
+    {cand:'Mia Torres', from:'', fromLetters:[], to:'E2', toLetters:['A', 'L'], proposedBy:'', decidedOn:'Preliminary quiz result', approvedBy:'System', approvedRole:'System', source:'Preliminary quiz', date:'5 Jul 2026', email:'mia@torres.dev',
+     quiz:{result:'Explorer – E2', answers:[['Where are you right now?', 'Running something of my own, or trying to start it'], ['Which of these sounds most like you?', 'Entrepreneur'], ['How many years have you been working?', '3 to 7']]}}
   ];
   /* reversed so the array ends newest-first (unshift), matching runtime decisions. */
   rows.slice().reverse().forEach(r => { r.direction = levelDirection(r.from, r.to); pushLevelLog(r); });
@@ -8413,7 +8679,7 @@ function agentsInterview(){
   </section>`}`;
 }
 
-V.agents = () => modView({agents:agentsAll, detail:agentsDetail, interview:agentsInterview});
+V.agents = () => modView({agents:agentsAll, marketplace:marketplaceView, detail:agentsDetail, interview:agentsInterview});
 
 /* ---- MARKETPLACE ACTIONS (Epic 6) --------------------------------------------
    Set an agent's assessment range (6.3) and pause / restore a listing with a
@@ -8439,7 +8705,7 @@ ACTIONS.doagrange = key => {
   const before = agRange(a);
   if(before[0] === v.from && before[1] === v.to){ toast('Pick a different range', 'warn'); return 'keep'; }
   a.range = [v.from, v.to];
-  audit('Set agent assessment range', `${a.name} — ${rangeLabel(before)} → ${rangeLabel(a.range)} · ${v.reason}`, 'Talent Agents', 'notice', {from: rangeLabel(before), to: rangeLabel(a.range)});
+  audit('Set agent assessment range', `${a.name} — ${rangeLabel(before)} → ${rangeLabel(a.range)} · ${v.reason}`, 'Talent Agents & Marketplace', 'notice', {from: rangeLabel(before), to: rangeLabel(a.range)});
   toast(`${a.name} now assesses ${rangeLabel(a.range)}`);
 };
 
@@ -8459,9 +8725,9 @@ ACTIONS.askagpause = key => {
 };
 ACTIONS.doagpause = key => {
   const a = USER_BY_ID[key.split(':')[1]]; const v = S._pending || {}; S._pending = null; S.confirm = null; if(!a) return;
-  a.status = 'inactive'; freezeRanking();
-  audit('Paused agent listing', `${a.name} · ${v.reason || ''}`, 'Talent Agents', 'high');
-  toast(`${a.name}’s listing paused`);
+  a.status = 'inactive'; a.paused = true; freezeRanking();
+  audit('Paused agent listing', `${a.name} · ${v.reason || ''}`, 'Talent Agents & Marketplace', 'high');
+  toast(`${a.name}’s listing paused. Their booked interviews still go ahead.`);
 };
 
 SHEETS.agrestore = id => {
@@ -8479,9 +8745,86 @@ ACTIONS.askagrestore = key => {
 };
 ACTIONS.doagrestore = key => {
   const a = USER_BY_ID[key.split(':')[1]]; const v = S._pending || {}; S._pending = null; S.confirm = null; if(!a) return;
-  a.status = 'active'; freezeRanking();
-  audit('Restored agent listing', `${a.name} · ${v.reason || ''}`, 'Talent Agents', 'high');
-  toast(`${a.name}’s listing restored`);
+  /* Restore commits only where EVERY other listing gate passes (6.2); if another
+     gate is failing the restore is refused and the blocking reasons are shown. The
+     manual pause is not one of the gates, so it is filtered out. */
+  a.status = 'active'; a.paused = false;
+  const blocking = gateReasons(a);
+  if(blocking.length){
+    a.status = 'inactive'; a.paused = true;
+    toast(`Cannot restore — ${blocking.join('; ')}.`, 'warn');
+    audit('Restore refused — listing gate failing', `${a.name} · ${blocking.join('; ')}`, 'Talent Agents & Marketplace', 'notice');
+    freezeRanking(); return;
+  }
+  freezeRanking();
+  audit('Restored agent listing', `${a.name} · ${v.reason || ''}`, 'Talent Agents & Marketplace', 'high');
+  toast(`${a.name}’s listing restored. They regain a rank at the next weekly recalculation.`);
+};
+
+/* ===== 6.2 OVERRIDE TRAINING GATE (Super Admin only) =====================
+   Lift the LightspeedVT training gate deliberately and on the record. It affects
+   ONLY that gate — the account, payout and profile gates still block listing. The
+   override stays until normal training completion replaces it. */
+SHEETS.agoverride = id => {
+  const a = USER_BY_ID[id]; if(!a) return {title:'Override training gate', body:'', ok:''};
+  return {title:`Override training gate — ${a.name}`, ok:'Override and List', act:'askagoverride:' + id,
+    gate:true, disabled:true, gateFn: v => !String(v.reason || '').trim(),
+    body:`${kv([['Agent', esc(a.name)], ['Email', esc(a.email)], ['LightspeedVT training', 'Not complete']])}
+      ${fieldHtml({k:'reason', l:'Reason', t:'textarea', req:1, ph:'Required — recorded against your account; never shown to the agent'})}
+      <p class="t-desc">Lists this agent without completing the LightspeedVT training module. The Training column will read <b>Overridden</b> with your name and the date. The account, payout-destination and profile-and-fee gates still apply — the agent is listed only where those also pass. The override stays until normal training completion replaces it.</p>`};
+};
+ACTIONS.askagoverride = key => {
+  const a = USER_BY_ID[key.split(':')[1]]; const v = readForm(); if(!a) return;
+  if(!String(v.reason || '').trim()){ toast('A reason is required', 'warn'); return 'keep'; }
+  S._pending = {reason: v.reason};
+  askConfirm({mk:'warning', title:`List ${a.name} without completing the LightspeedVT training module?`, body:'This is recorded against your account.', ok:'Override and List', act:'doagoverride:' + a.id});
+};
+ACTIONS.doagoverride = key => {
+  const a = USER_BY_ID[key.split(':')[1]]; const v = S._pending || {}; S._pending = null; S.confirm = null; if(!a) return;
+  a.training = 'overridden'; a.trainingBy = ME.name; a.trainingAt = scoreDateNow(); freezeRanking();
+  audit('Overrode training gate', `${a.name} · ${v.reason || ''}`, 'Talent Agents & Marketplace', 'high');
+  toast(agListable(a) ? `${a.name}’s training gate overridden — listing is now open.` : `${a.name}’s training gate overridden. Another gate still blocks listing.`);
+};
+
+/* ===== 6.3 REVIEW AN AGENT'S SCORE (Quarterly Agent Score Review) =========
+   The system proposes the quarterly Agent Score (rubric 70% + candidate rating
+   30%, out of 5). A staff member Approves it (accept the proposal) or Overrides it
+   (a replacement 1.0–5.0 with a reason). Leaving the pre-filled proposed score and
+   saving is an Approve; changing it is an Override, and the reason field gates the
+   button. The prior approved score is kept in history; the rank follows at the
+   next weekly recalculation, not immediately (6.1). */
+const scoreDateNow = () => new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+SHEETS.agscore = id => {
+  const a = USER_BY_ID[id]; if(!a) return {title:'Review Agent Score', body:'', ok:''};
+  const prop = agProposedScore(a), lab = scoreLabel(prop);
+  const starting = a.scoreApproved === false;
+  return {title:`Review Agent Score — ${a.name}`, ok:'Save Agent Score', act:'doagscore:' + id,
+    gate:true, disabled:false,
+    gateFn: v => { const n = Number(v.score); if(!(n >= 1 && n <= 5)) return true; return round1(n) !== prop && !String(v.reason || '').trim(); },
+    body:`${kv([
+        ['Proposed score', `${starMark} ${prop.toFixed(1)} — ${esc(lab)}`],
+        ['Rubric (70%)', `${agRubric(a).toFixed(1)}/5`],
+        ['Candidate rating (30%)', `${(a.rating || 0).toFixed(1)}/5 · ${a.candRatings || 0} rating${a.candRatings === 1 ? '' : 's'}`],
+        ['Source period', 'This quarter'],
+        ['Current score', starting ? `Starting score ${(a.startingScore != null ? a.startingScore : a.rating || 0).toFixed(1)} (set at invite)` : `${(a.approvedScore != null ? a.approvedScore : prop).toFixed(1)} · approved ${esc(a.scoreAt || '—')}`]
+      ])}
+      ${fieldHtml({k:'score', l:'Approved score (1.0–5.0)', t:'number', req:1, ph:'Leave the proposed score to approve; change it to override'}, prop.toFixed(1))}
+      ${fieldHtml({k:'reason', l:'Reason (required to override)', t:'textarea', ph:'Internal — recorded on the agent, never shown to them. Required only if you change the score.'})}
+      <p class="t-desc">The client rubric is scored out of 5 and weighted 70%; the average candidate rating out of 5 is weighted 30%. The approved score becomes the current Agent Score and the prior score stays in history. The rank follows at the next weekly recalculation.</p>`};
+};
+ACTIONS.doagscore = key => {
+  const a = USER_BY_ID[key.split(':')[1]]; const v = readForm(); if(!a) return;
+  const prop = agProposedScore(a), n = round1(Number(v.score));
+  if(!(n >= 1 && n <= 5)){ toast('The score must be between 1.0 and 5.0', 'warn'); return 'keep'; }
+  const override = n !== prop;
+  if(override && !String(v.reason || '').trim()){ toast('A reason is required to override the score', 'warn'); return 'keep'; }
+  a.scoreHistory = a.scoreHistory || [];
+  if(a.approvedScore != null) a.scoreHistory.push({score:a.approvedScore, at:a.scoreAt});
+  a.approvedScore = n; a.scoreApproved = true; a.scoreAt = scoreDateNow();
+  audit(override ? 'Overrode agent score' : 'Approved agent score',
+    `${a.name} — proposed ${prop.toFixed(1)}${override ? `, set ${n.toFixed(1)} · ${v.reason}` : ', approved'}`,
+    'Talent Agents & Marketplace', 'high', {from: prop.toFixed(1), to: n.toFixed(1)});
+  toast(`${a.name}’s Agent Score ${override ? 'overridden' : 'approved'} at ${n.toFixed(1)}. Rank follows at the next weekly recalculation.`);
 };
 
 /* ======================================================================
@@ -9570,9 +9913,13 @@ ACTIONS.dooverridelvl = key => {
    free-text; the story marks the range Optional). */
 function levellingRowsFiltered(){
   const q = getFilter('q', ''), sf = getFilter('lcsrc', 'all'), df = getFilter('lcdir', 'all');
+  const from = getFilter('lcfrom', ''), to = getFilter('lcto', '');   /* Epic 5.1 date range (Optional) */
   return LEVEL_LOG
     .filter(r => sf === 'all' ? true : r.source === sf)
     .filter(r => df === 'all' ? true : r.direction === df)
+    /* date range combines with the other filters; empty from/to returns every date, and
+       an unparseable row date is never excluded (5.1). */
+    .filter(r => { if(!from && !to) return true; const d = logDateISO(r.date); if(!d) return true; return (!from || d >= from) && (!to || d <= to); })
     .filter(r => hit(q, r.cand, r.email || ''));
 }
 /* CSV EXPORT — exactly the visible columns for the current filtered set, mirroring the
@@ -9593,10 +9940,16 @@ ACTIONS.levellingexport = () => {
    row kebab), a multi-selection offers Delete All. `asklcdel` / `dolcdel` remove a
    single log row; `bulklcdel` / `dobulklcdel` remove the selection. */
 function lcBulk(ids){
-  if(ids.length === 1) return [
-    ['view', 'View', `data-go="levelling/change/${ids[0]}"`],
-    ['delete', 'Delete', `data-act="asklcdel:${ids[0]}"`, 'danger']];
-  return [['delete', 'Delete All', 'data-act="bulklcdel"', 'danger']];
+  /* a log cannot be deleted (Maryam, 28 Sep 2026) — a single selection offers View
+     (and Override where the candidate resolves); there is no bulk action on many. */
+  if(ids.length === 1){
+    const r = LEVEL_LOG.find(x => x.id === ids[0]);
+    const cid = r && (r.candId || (candByName(r.cand) || {}).id);
+    const out = [['view', 'View', `data-go="levelling/change/${ids[0]}"`]];
+    if(cid) out.push(['edit', 'Override', `data-sheet="candoverride:${cid}"`]);
+    return out;
+  }
+  return [];
 }
 /* The approvals queue gives its checkboxes a purpose without a destructive action —
    a pending approval is reviewed one at a time, so a single selection opens it and a
@@ -9635,15 +9988,23 @@ ACTIONS.dobulklcdel = () => {
 };
 function levellingLog(){
   const q = getFilter('q', ''), sf = getFilter('lcsrc', 'all'), df = getFilter('lcdir', 'all');
+  const from = getFilter('lcfrom', ''), to = getFilter('lcto', '');
   const pendById = new Set(pendingApprovals().map(p => (candByName(p.cand) || {}).id).filter(Boolean));
   const rows = levellingRowsFiltered();
-  const srcDd = filterDd('lcsrc', 'all', [['all', 'All'], ['First interview', 'First interview'], ['Re-interview', 'Re-interview']], 'Source');
+  /* Source options are the story's full set (5.1): Preliminary quiz is now a live source
+     (the quiz result that became a candidate's first level). Reviewer/Admin-override rows
+     record their interview / blank Source per the standing ruling, so those two are not
+     offered here. */
+  const srcDd = filterDd('lcsrc', 'all', [['all', 'All'], ['Preliminary quiz', 'Preliminary quiz'], ['First interview', 'First interview'], ['Re-interview', 'Re-interview']], 'Source');
   const dirDd = filterDd('lcdir', 'all', [['all', 'All'], ['Up', 'Up'], ['Down', 'Down'], ['Held', 'Held']], 'Direction');
+  /* THE DATE RANGE (Epic 5.1) — a from and a to date, both our own pickers, Optional and
+     empty by default; they combine with Source, Direction and search. */
+  const dateRange = `<span class="lc-drange">${filterDate('lcfrom', 'From')}${filterDate('lcto', 'To')}</span>`;
   return `
   <section class="sec">
     ${searchHead('Levelling Log', 'Every level change that has gone live, across every candidate — who moved, who proposed it, who approved it and when it took effect.',
       `<button class="btn btn-g btn-sm noic" data-act="levellingexport">${I.download} Export</button>`, 'Search by candidate name or email')}
-    ${lstTools('Search by candidate name or email', `${srcDd} ${dirDd}`)}
+    ${lstTools('Search by candidate name or email', `${srcDd} ${dirDd} ${dateRange}`)}
     ${rows.length ? table(
       [{label:'Candidate'}, {label:'From'}, {label:'To'}, {label:'Direction'}, {label:'Proposed by'}, {label:'Approved by'}, {label:'Source'}, {label:'Date'}, ACT_COL],
       rows.map(r => {
@@ -9652,7 +10013,7 @@ function levellingLog(){
         const cid = r.candId || (candByName(r.cand) || {}).id;
         const acts = [['view', 'View', `data-go="levelling/change/${r.id}"`]];
         if(cid) acts.push(['edit', 'Override', `data-sheet="candoverride:${cid}"`]);
-        acts.push(['delete', 'Delete', `data-act="asklcdel:${r.id}"`, 'danger']);
+        /* a log is a record of what happened — it cannot be deleted (Maryam, 28 Sep 2026). */
         return {id:r.id, go:'levelling/change/' + r.id, cells:[
           personCell(r.cand, r.email || candEmail(r.cand)),
           r.from ? esc(levelLetters(r.from, r.fromLetters)) : '—',
@@ -9665,7 +10026,7 @@ function levellingLog(){
           rowActs(acts)
         ]};
       }), {bulk: lcBulk})
-      : emptyState('chart', 'No level changes', q || sf !== 'all' || df !== 'all' ? 'Nothing matches the current filters.' : 'No approved level changes yet.')}
+      : emptyState('chart', 'No level changes', q || sf !== 'all' || df !== 'all' || from || to ? 'Nothing matches the current filters.' : 'No approved level changes yet.')}
   </section>`;
 }
 /* THE LEVEL CHANGE DETAIL (Epic 5.4) — read-only. The decision, both proposals side by side
@@ -9677,6 +10038,7 @@ function levellingChange(){
     <section class="sec">${emptyState('chart', 'Not found', 'This level change is no longer on the record.')}</section>`;
   DETAIL_LABEL = `${r.cand} — level change`;
   const hasProps = !!r.agentLevel;
+  const isQuiz = r.source === 'Preliminary quiz';   /* quiz-derived first level (5.4) */
   const mark = which => r.decidedOn === which ? ' ✓ decided' : '';
   /* THE TOP OF THE PAGE IS THE CANDIDATE IDENTITY HEADER (Maryam, 25 Sep 2026: "the top of
      the level page should show candidate details instead of level change heading") — the
@@ -9687,11 +10049,10 @@ function levellingChange(){
   const cBucket = c ? c.bucket : bucketOf(r.to);
   const cLevel = c ? c.level : r.to;
   const cEmail = c ? emailOf(c.name) : (r.email || '');
-  /* The head carries a kebab (like every other detail page): Override (opens the same
-     candoverride modal) and Delete (removes this log row). (Maryam, 28 Sep 2026) */
+  /* The head carries a kebab (like every other detail page): Override opens the same
+     candoverride modal. A log cannot be deleted (Maryam, 28 Sep 2026), so no Delete. */
   const headActs = [];
   if(c) headActs.push(['edit', 'Override', `data-sheet="candoverride:${c.id}"`]);
-  headActs.push(['delete', 'Delete', `data-act="asklcdel:${r.id}"`, 'danger']);
   return `${detailHead('levelling/log')}
   <div class="iv-detail-body lc-body">
   <section class="sec">
@@ -9701,7 +10062,7 @@ function levellingChange(){
         <span class="idname-row"><span class="idname">${esc(cName)}</span><span class="idverify" title="Verified candidate" aria-label="Verified"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" style="display:block">${inner('verified')}</svg></span></span>
         <span class="idmeta">${esc(cBucket)} &middot; ${esc(cLevel)}${cEmail ? ' &middot; ' + esc(cEmail) : ''}</span>
       </div>
-      <span class="idhead-act">${rowActs(headActs)}</span>
+      ${headActs.length ? `<span class="idhead-act">${rowActs(headActs)}</span>` : ''}
     </div>
     ${(() => {
       /* THE LEVEL CHANGE IS AN 8-CARD GRID (Maryam, 25 Sep 2026) — the whole read
@@ -9710,14 +10071,16 @@ function levellingChange(){
          Approved by) carry the person's photo left of the name (`.cl-lead`); the
          Transcript card carries a trailing arrow to the transcript page. This
          replaces the old 4-card band + the Approved-by / Source / Proposed-by kv. */
-      const face = name => name ? `<span class="lc-face"><span class="lc-face-ph"><img src="${agentFace(name)}" alt=""></span>${esc(name)}</span>` : '—';
+      /* System (a quiz-derived approval) is not a person — name only, no photo disc. */
+      const face = name => !name ? '—' : name === 'System' ? esc(name) : `<span class="lc-face"><span class="lc-face-ph"><img src="${agentFace(name)}" alt=""></span>${esc(name)}</span>`;
       const htmlCell = (icon, mk, label, htmlVal) => `<div style="--mk:var(${mk})"><span class="l pf-l">${icon}${label}</span><span class="v">${htmlVal}</span></div>`;
       /* the transcript page for this candidate's interview; a specific recording
          where we can match a booking, else the Recordings & Transcripts register.
          `r.transcript` is authored placeholder (§74) — "Ready" until real state lands. */
       const bk = BOOKINGS.find(b => b.cand === r.cand);
       const txRoute = bk ? 'market/recording/' + bk.id : 'market/recordings';
-      const txVal = `<a class="lc-tx" data-go="${txRoute}">${esc(r.transcript || 'Ready')} ${I.arrowRight}</a>`;
+      /* a quiz-derived level has no interview, so no transcript to open. */
+      const txVal = isQuiz ? '—' : `<a class="lc-tx" data-go="${txRoute}">${esc(r.transcript || 'Ready')} ${I.arrowRight}</a>`;
       return `<div class="facts pf-facts">
       ${admFact(I.chart, '--mk-4', 'Levelling', r.from ? esc(r.from) + ' to ' + esc(r.to) : esc(r.to))}
       ${htmlCell(I.user, '--mk-1', 'Talent Agent', face(r.proposedBy))}
@@ -9730,6 +10093,15 @@ function levellingChange(){
     </div>`;
     })()}
   </section>
+  ${/* THE PRELIMINARY-QUIZ EVIDENCE (Epic 5.4) — a quiz-derived row has no proposals,
+       report or transcript; its evidence is the quiz result and the supporting answers.
+       This stands in place of the "Tal's read + agent evaluation" section, which returns
+       nothing for a quiz row (no `tal`, no `agentLevel`). */
+    isQuiz ? `<section class="sec sec-noline">
+    ${aiHead('Preliminary quiz result', 'The levelling quiz result that became this candidate’s first level, and the answers behind it.')}
+    ${kv([['Quiz result', esc((r.quiz && r.quiz.result) || levelLetters(r.to, r.toLetters))], ['Approved by', 'System'], ['Recorded', esc(r.date)]])}
+    ${r.quiz && r.quiz.answers && r.quiz.answers.length ? `<div class="tile-stack" style="margin-top:var(--s06)">${r.quiz.answers.map(a => cardRow('document', esc(a[0]), esc(a[1]), '')).join('')}</div>` : ''}
+  </section>` : ''}
   ${/* TAL'S READ + THE TALENT AGENT'S PROPOSED EVALUATION (Maryam, 25 Sep 2026) —
        this replaces the old "The two proposals" fact pair AND "The report" kv, and
        mirrors the Approval detail / Talent Agent evaluation screen: a flowing "Tal's
@@ -13115,6 +13487,10 @@ device.addEventListener('click', e => {
   if(!e.target.closest('.fdd.fdd-form')){
     device.querySelectorAll('.fdd.fdd-form.on').forEach(x => { x.classList.remove('on'); const s = x.closest('.sheet-b'); if(s && !device.querySelector('.fdate.on')) s.classList.remove('dd-open'); const tr = x.querySelector('[data-formddtoggle]'); if(tr) tr.setAttribute('aria-expanded', 'false'); });
   }
+  /* THE FILTER DATE CLEAR (Epic 5.1) — a `.fdate-filter` × empties that date and
+     returns the full range; writes the page filter and re-renders. */
+  const dfx = e.target.closest('[data-dfclear]');
+  if(dfx){ setFilter(dfx.dataset.dfclear, ''); return render(); }
   /* OUR DATE PICKER — open/close, month nav and day pick, all DOM-only (never
      render(), which reads the form back from the DOM); the viewed month lives in
      the popup's `data-ym`. */
@@ -13135,12 +13511,17 @@ device.addEventListener('click', e => {
     const [yy, mm] = cal.dataset.ym.split('-').map(Number);   /* mm is 1-12 */
     let mi = mm - 1 + Number(dir), y = yy;
     if(mi < 0){ mi = 11; y--; } else if(mi > 11){ mi = 0; y++; }
-    const hid = fdate.querySelector('input[data-f]');
+    /* form picker carries [data-f]; the filter picker carries [data-dfval] — either
+       feeds the selected-day highlight so month-nav keeps it. */
+    const hid = fdate.querySelector('input[data-f]') || fdate.querySelector('input[data-dfval]');
     pop.innerHTML = dateGrid(key, y, mi, hid ? hid.value : '');
     return;
   }
   const dsx = e.target.closest('[data-dateset]');
   if(dsx){
+    /* FILTER date pick (Epic 5.1) — write the page filter and re-render, rather than a
+       form hidden input. Handled before the form branch below. */
+    if(dsx.closest('.fdate-filter')){ const rawf = dsx.dataset.dateset, ci = rawf.indexOf(':'); setFilter(rawf.slice(0, ci), rawf.slice(ci + 1)); return render(); }
     const raw = dsx.dataset.dateset, i = raw.indexOf(':'), iso = raw.slice(i + 1);
     const fdate = dsx.closest('.fdate'), hid = fdate.querySelector('input[data-f]'), vl = fdate.querySelector('.fdate-val'), tr = fdate.querySelector('[data-datetoggle]');
     if(hid) hid.value = iso;
