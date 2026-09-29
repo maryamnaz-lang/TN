@@ -1588,7 +1588,10 @@ const TAGV = {
   inactive:'red', rejected:'red', down:'red', open:'red', flagged:'red', passed:'',
   /* neutral-ish */ applied:'', feedback:'green', 'n/a':'',
   /* the Super Admin journey's states (7 Sep 2026) */ reassign:'warn', expired:'red', offboarded:'red', voided:'red', permanent:'green', 'time-boxed':'warn', credit:'green',
-  /* staff deletion lifecycle (story 1.8) — in flight (amber) then done (red). */ deleting:'warn', deleted:'red'
+  /* staff deletion lifecycle (story 1.8) — in flight (amber) then done (red). */ deleting:'warn', deleted:'red',
+  /* cohort lifecycle (Epic 7, Maryam 29 Sep 2026): Forming (enrolling, amber),
+     Running (under way, green — `completed` green already ships above), Cancelled
+     (terminal, red). */ forming:'warn', running:'green', cancelled:'red'
 };
 /* `held` DISPLAYS as "Pending" — the hold word is removed from the UI while the
    status key stays (Maryam, 15 Sep 2026: "the hold state will be removed from
@@ -1970,11 +1973,27 @@ const LEVELQ=[
  {id:'l5', name:'Grace Kim', from:'E2', to:'E3', talTo:'E2', agent:'Dana Whitfield', rec:'Promote', when:'Yesterday', status:'pending'},
  {id:'l6', name:'Diego Alvarez', from:'B1', to:'B1', talTo:'B1', agent:'Naomi Frost', rec:'Hold at level', when:'3 days ago', status:'pending'}
 ];
+/* EPIC 7 — THE FOUR-STATE COHORT LIFECYCLE (7.2/7.4, Maryam 29 Sep 2026):
+   Forming (enrolling, start ahead or missed) → Running (day 1–90) → Completed (the
+   cohort's own `completeDelay` days after day 90) → Cancelled (terminal, via
+   intervention). A cohort is NEVER linked to a course (the naming/linkage flow was
+   updated — cohorts stay generic "Cohort N"), so `chapters` / `min` / `cap` /
+   `completeDelay` live on the cohort itself, not inherited from a course. `leadFrom`
+   is the assignment date, `leadHist` the replacement history, `completedOn` the date
+   a Completed cohort closed. The seed carries a row in every state, a missed-start
+   case (ch5: past start, no leader), a below-minimum case (ch4/ch6) and a
+   replacement history (ch3). `evalStart` (7.4) is NOT run at load, so these authored
+   states stand; it fires on the human triggers (assign leader / add member / move
+   start). Today is 2026-09-29. */
 const COHORTS=[
- {id:'ch1', name:'Cohort 1', track:'Explorer', leader:'Bruno Sella (Builder)', size:10, week:12, day:84, start:'2026-05-19', status:'active', sessions:[{id:'ch1s1', title:'Kick-off and goals', week:1, dur:60, mode:'Live'}, {id:'ch1s2', title:'Mid-cycle levelling check-in', week:6, dur:45, mode:'Live'}, {id:'ch1s3', title:'Portfolio workshop', week:9, dur:90, mode:'Workshop'}]},
- {id:'ch2', name:'Cohort 2', track:'Explorer', leader:'Maryam Naz (Builder)', size:7, week:1, day:3, start:'2026-08-07', status:'active', sessions:[{id:'ch2s1', title:'Kick-off and goals', week:1, dur:60, mode:'Live'}, {id:'ch2s2', title:'Interview prep clinic', week:4, dur:60, mode:'Workshop'}]},
- {id:'ch3', name:'Cohort 3', track:'Builder', leader:'Dana Whitfield (Trailblazer)', size:6, week:5, day:32, start:'2026-07-08', status:'active', sessions:[{id:'ch3s1', title:'Kick-off and goals', week:1, dur:60, mode:'Live'}, {id:'ch3s2', title:'Systems design deep-dive', week:5, dur:90, mode:'Workshop'}, {id:'ch3s3', title:'Async retro', week:8, dur:30, mode:'Async'}]},
- {id:'ch4', name:'Cohort 4', track:'Explorer', leader:'Bruno Sella (Builder)', size:0, week:0, day:0, start:'2026-08-18', status:'draft', sessions:[]}
+ {id:'ch1', name:'Cohort 1', leader:'Bruno Sella (Builder)', min:5, cap:12, chapters:12, week:12, day:84, start:'2026-05-19', status:'running', completeDelay:7, leadFrom:'2026-05-12', leadHist:[], sessions:[{id:'ch1s1', title:'Kick-off and goals', week:1, dur:60, mode:'Live'}, {id:'ch1s2', title:'Mid-cycle levelling check-in', week:6, dur:45, mode:'Live'}, {id:'ch1s3', title:'Portfolio workshop', week:9, dur:90, mode:'Workshop'}]},
+ {id:'ch2', name:'Cohort 2', leader:'Maryam Naz (Builder)', min:5, cap:10, chapters:12, week:1, day:3, start:'2026-08-07', status:'running', completeDelay:7, leadFrom:'2026-08-01', leadHist:[], sessions:[{id:'ch2s1', title:'Kick-off and goals', week:1, dur:60, mode:'Live'}, {id:'ch2s2', title:'Interview prep clinic', week:4, dur:60, mode:'Workshop'}]},
+ {id:'ch3', name:'Cohort 3', leader:'Dana Whitfield (Trailblazer)', min:5, cap:12, chapters:14, week:5, day:32, start:'2026-07-08', status:'running', completeDelay:7, leadFrom:'2026-07-20', leadHist:[{from:'Elena Fischer (Trailblazer)', to:'Dana Whitfield (Trailblazer)', on:'2026-07-20', reason:'Original leader stepped back for a family matter; Dana took the cohort mid-cycle.'}], sessions:[{id:'ch3s1', title:'Kick-off and goals', week:1, dur:60, mode:'Live'}, {id:'ch3s2', title:'Systems design deep-dive', week:5, dur:90, mode:'Workshop'}, {id:'ch3s3', title:'Async retro', week:8, dur:30, mode:'Async'}]},
+ {id:'ch4', name:'Cohort 4', leader:'Unassigned', min:6, cap:12, chapters:12, week:0, day:0, start:'2026-10-12', status:'forming', completeDelay:7, leadFrom:null, leadHist:[], sessions:[]},
+ {id:'ch5', name:'Cohort 5', leader:'Unassigned', min:1, cap:10, chapters:12, week:0, day:0, start:'2026-09-20', status:'forming', completeDelay:7, leadFrom:null, leadHist:[], sessions:[]},
+ {id:'ch6', name:'Cohort 6', leader:'Marcus Reyes (Builder)', min:8, cap:12, chapters:12, week:0, day:0, start:'2026-10-05', status:'forming', completeDelay:7, leadFrom:'2026-09-22', leadHist:[], sessions:[{id:'ch6s1', title:'Kick-off and goals', week:1, dur:60, mode:'Live'}]},
+ {id:'ch7', name:'Cohort 7', leader:'Elena Fischer (Trailblazer)', min:5, cap:12, chapters:12, week:13, day:90, start:'2026-05-01', status:'completed', completeDelay:7, leadFrom:'2026-04-25', leadHist:[], completedOn:'2026-08-06', sessions:[{id:'ch7s1', title:'Kick-off and goals', week:1, dur:60, mode:'Live'}, {id:'ch7s2', title:'Closing showcase', week:13, dur:90, mode:'Workshop'}]},
+ {id:'ch8', name:'Cohort 8', leader:'Unassigned', min:5, cap:10, chapters:12, week:0, day:0, start:'2026-08-25', status:'cancelled', completeDelay:7, leadFrom:null, leadHist:[], cancelledOn:'2026-08-24', cancelReason:'Could not reach the minimum by its start date and no leader was available.', sessions:[]}
 ];
 function syncCohortSizes(){ COHORTS.forEach(c => { c.size = CANDS.filter(x => x.cohort === c.name).length; }); }
 syncCohortSizes();
@@ -1984,14 +2003,22 @@ const COURSES=[
     should be real course names, not builder 1 or explorer 2"). The track/price
     progression is unchanged — the names are professional-development titles that
     read as real courses. Distinct from COURSE_LIB below (the import library). */
- {id:'co1', name:'Foundations of Leadership', track:'Explorer', price:100, days:90, status:'live'},
- {id:'co2', name:'Leading High-Performing Teams', track:'Builder', price:180, days:90, status:'live'},
- {id:'co3', name:'Executive Strategy & Vision', track:'Trailblazer', price:260, days:90, status:'draft'},
- {id:'co4', name:'Communicating with Impact', track:'Explorer', price:120, days:90, status:'live'},
- {id:'co5', name:'Influencing Without Authority', track:'Builder', price:200, days:90, status:'live'},
- {id:'co6', name:'Communication Essentials', track:'Explorer', price:90, days:90, status:'live'},
- {id:'co7', name:'Team Leadership', track:'Builder', price:210, days:90, status:'live'},
- {id:'co8', name:'Leading Through Change', track:'Trailblazer', price:280, days:90, status:'draft'}
+ /* EPIC 7 (Maryam, 29 Sep 2026): a course now carries the Track / Levels / Intent /
+    Description / Chapters / LMS course it is recommended on (7.1) — these are Tal's
+    ranking inputs (18.1), NEVER an enrolment gate; any candidate with a level may
+    enrol on any Live course. Cohorts are NOT linked to courses, so none of this
+    reaches a cohort. Trailblazer is out of the V1 catalogue (7.1), so the two former
+    Trailblazer courses are Builder now. `desc`/`levels`/`intent`/`chapters`/`lsvt`
+    are authored placeholder where the seed had none (§74). Status: live / draft /
+    archived. */
+ {id:'co1', name:'Foundations of Leadership', track:'Explorer', levels:['E1', 'E2', 'E3'], intent:['role', 'another'], chapters:12, lsvt:'Leadership Foundations (LSVT)', desc:'Builds the everyday operating habits a first leadership role asks for: taking work end to end, handing it over cleanly, and saying the hard thing early. For people stepping up in the job they are already in.', price:100, days:90, status:'live'},
+ {id:'co2', name:'Leading High-Performing Teams', track:'Builder', levels:['B1', 'B2', 'B3'], intent:['role', 'another'], chapters:14, lsvt:'Team Dynamics (LSVT)', desc:'Develops the craft of holding a team steady through conflict, coaching rather than fixing, and running a weekly rhythm people leave knowing what to do. For those already leading who want the team to carry more.', price:180, days:90, status:'live'},
+ {id:'co3', name:'Executive Strategy & Vision', track:'Builder', levels:['B3', 'B4', 'B5'], intent:['ownership'], chapters:12, lsvt:'Strategic Thinking (LSVT)', desc:'Turns a leader outward: setting direction under incomplete information, telling a decision you can reverse from one you cannot, and carrying a team through a change nobody chose. For people building toward ownership.', price:260, days:90, status:'draft'},
+ {id:'co4', name:'Communicating with Impact', track:'Explorer', levels:['E1', 'E2', 'E3', 'E4', 'E5'], intent:['role', 'another', 'ownership'], chapters:10, lsvt:'Communication & Influence (LSVT)', desc:'Sharpens how a message lands: opening a hard conversation without an ambush, giving feedback that changes what happens next, and reading what a room is not saying. Useful at every level and every intent.', price:120, days:90, status:'live'},
+ {id:'co5', name:'Influencing Without Authority', track:'Builder', levels:['B2', 'B3', 'B4'], intent:['role', 'another'], chapters:12, lsvt:'Coaching for Performance (LSVT)', desc:'The skill of moving work through people who do not report to you: building trust at speed, managing up, and making small commitments in public and keeping them. For those leading across a business, not just down a line.', price:200, days:90, status:'live'},
+ {id:'co6', name:'Communication Essentials', track:'Explorer', levels:['E1', 'E2'], intent:['role'], chapters:8, lsvt:'Communication & Influence (LSVT)', desc:'The groundwork of being understood at work: saying what you mean in one sentence other people repeat, listening for what matters, and giving your manager the version of a problem they can act on. The entry course.', price:90, days:90, status:'live'},
+ {id:'co7', name:'Team Leadership', track:'Builder', levels:['B1', 'B2', 'B3', 'B4'], intent:['role', 'another'], chapters:13, lsvt:'Team Dynamics (LSVT)', desc:'Everything a group needs from the person in front of it: delegation without drop-off, repair after a working relationship breaks, and holding the line while two people are still angry. For established team leads.', price:210, days:90, status:'live'},
+ {id:'co8', name:'Leading Through Change', track:'Builder', levels:['B4', 'B5'], intent:['ownership', 'another'], chapters:12, lsvt:'Change Leadership (LSVT)', desc:'How to keep the work going while the ground moves: saying what you know and what you do not, taking the heat out of a disagreement without avoiding it, and leading people through a change they did not choose. The senior Builder course.', price:280, days:90, status:'draft'}
 ];
 const COURSE_BY_ID={}; COURSES.forEach(c => COURSE_BY_ID[c.id]=c);
 const COURSE_LIB=[
@@ -2414,7 +2441,8 @@ const MODULES=[
  {k:'catalogue', t:'Course Catalogue', ic:'book', subs:[
    {k:'catalogue', t:'Course Catalogue'}, {k:'coursedetail', t:'Course', hidden:true}]},
  {k:'market', t:'Interviews', ic:'market', subs:[
-   {k:'bookings', t:'Interviews'}, {k:'recordings', t:'Recordings & Transcripts'}, {k:'recording', t:'Transcript', hidden:true}]},
+   {k:'bookings', t:'Interviews'}, {k:'recordings', t:'Recordings & Transcripts'},
+   {k:'booking', t:'Booking', hidden:true}, {k:'recording', t:'Transcript', hidden:true}]},
  /* LEVELLING (Epic 5, Maryam 25 Sep 2026) — surfaced as its own module after Interviews.
     The level change log (5.1), the approval queue (5.2, moved out of Interviews) and Levels
     & Tracks (5.5, moved out of Cohort Management), with the change detail (5.4) and the
@@ -2669,14 +2697,16 @@ function filterDd(key, def, opts, label){
    are handled by the `.fdate-filter` branches in the click router. `label` prefixes the
    trigger ("From" / "To"); no date reads "Any". A hidden [data-dfval] carries the picked
    ISO so month-nav keeps the selected-day highlight without a form input. */
-function filterDate(key, label){
+function filterDate(key, label, w){
   const cur = getFilter(key, '');
   const iso = /^\d{4}-\d{2}-\d{2}$/.test(cur) ? cur : '';
   const now = new Date();
   const [vy, vm] = iso ? iso.split('-').map(Number) : [now.getFullYear(), now.getMonth() + 1];
+  /* `w` fixes the trigger's width (Maryam 29 Sep 2026: "give 100px width to each
+     from and to fields"); omitted, the field sizes to its content as before. */
   return `<div class="fdate fdate-filter">
     <input type="hidden" data-dfval value="${esc(iso)}">
-    <button type="button" class="inp fdate-t" data-datetoggle="${key}" aria-haspopup="dialog" aria-expanded="false">
+    <button type="button" class="inp fdate-t" data-datetoggle="${key}" aria-haspopup="dialog" aria-expanded="false"${w ? ` style="width:${w}px"` : ''}>
       <svg class="fdate-ic" viewBox="0 0 24 24" aria-hidden="true">${inner('calendar')}</svg>
       <span class="fdate-val${iso ? '' : ' fdate-ph'}">${esc(label)}: ${iso ? dpFmt(iso) : 'Any'}</span></button>
     ${iso ? `<button type="button" class="fdate-x" data-dfclear="${key}" aria-label="Clear ${esc(label)} date">${I.close}</button>` : ''}
@@ -3154,12 +3184,16 @@ function table(cols, rows, opts){
       .replace(/<br\s*\/?>/gi, '\n').replace(/<\/(div|p|li|tr)>/gi, '\n')
       .replace(/<[^>]*>/g, '').replace(/&[a-z]+;/gi, 'x').trim();
     const lineMax = s => strip(s).split('\n').reduce((m, l) => Math.max(m, l.trim().length), 0);
-    let body = 0;
-    for(const r of ordered) body = Math.max(body, lineMax((r.cells || [])[i]));
+    let body = 0, avatar = 0;
+    for(const r of ordered){ const cell = (r.cells || [])[i]; body = Math.max(body, lineMax(cell));
+      /* a person cell carries a ~28px photo disc + gap the text estimate cannot see,
+         so its column needs the disc's width on top of the widest line — else the
+         name wraps to two lines (Maryam 29 Sep 2026). */
+      if(!avatar && /pcell/.test(String(cell == null ? '' : cell))) avatar = 44; }
     const sortable = !c.act && c.sort !== false && c.label;
     const head = String(c.label || '').length * 7.7 + (sortable ? 18 : 0);
-    const w = Math.max(body * 6.7, head) + 16 /* cell padding */ + 4;
-    return Math.round(Math.min(Math.max(w, 72), 340));
+    const w = Math.max(body * 6.7, head) + 16 /* cell padding */ + 4 + avatar;
+    return Math.round(Math.min(Math.max(w, 72), 360));
   });
   const colSum = colW.reduce((s, w) => s + w, 0);
   /* PAGINATION (§127, Maryam 7 Sep 2026). A table shows one page at a time —
@@ -3601,6 +3635,7 @@ function fieldHtml(f, v){
      always have placeholder text like the Email address field"). Falls back to a
      hint off the label when the field defines none. Selects/checks don't take one. */
   const ph = f.ph || ('Enter ' + String(f.l || '').toLowerCase());
+  if(f.t === 'html') return typeof f.html === 'function' ? f.html(val) : (f.html || '');
   if(f.t === 'select') return formDd(f, val);
   if(f.t === 'date') return formDate(f, val);
   if(f.t === 'stars') return `<div class="f">${lbl}${starPick(f.k, val)}${f.hint ? `<span class="f-hint">${esc(f.hint)}</span>` : ''}</div>`;
@@ -4023,7 +4058,7 @@ const talq = () => {
     cohorts: [
       ['Which cohorts need a leader?', `${COHORTS.filter(c => c.leader === 'Unassigned').map(c => c.name).join(', ') || 'None'}. ${LEADER_REQS.filter(r => r.stage === 'feedback').length} leaders are recommended and ready to allot.`,
         null, ['Allot a leader', 'cohorts/assign']],
-      ['How full are the cohorts?', COHORTS.filter(c => c.status === 'active').map(c => `${c.name} ${c.size}/10`).join(', ') + '. Every cohort caps at 10 and runs the 90-day loop.',
+      ['How full are the cohorts?', COHORTS.filter(c => c.status === 'running').map(c => `${c.name} ${cohortSize(c)}/${c.cap || 12}`).join(', ') + '. Each cohort runs the 90-day loop.',
         null, ['Open cohorts', 'cohorts/cohorts']]
     ],
     market: [
@@ -4401,9 +4436,9 @@ function homeOverview(){
   const uInactive = people.filter(u => u.status === 'inactive').length;
   const uTot = people.length;
   /* CANDIDATES + COHORTS */
-  const activeCohorts = COHORTS.filter(c => c.status === 'active').length;
-  const draftCohorts = COHORTS.filter(c => c.status === 'draft').length;
-  const liveCohorts = COHORTS.filter(c => c.status === 'active');
+  const activeCohorts = COHORTS.filter(c => c.status === 'running').length;
+  const draftCohorts = COHORTS.filter(c => c.status === 'forming').length;
+  const liveCohorts = COHORTS.filter(c => c.status === 'running');
   const inCohort = CANDS.filter(c => c.cohort && c.cohort !== '—').length;
   const byBucket = BUCKETS.map(b => [b.name, CANDS.filter(c => c.bucket === b.name).length]);
   /* COURSE CATALOGUE */
@@ -4440,7 +4475,7 @@ function homeOverview(){
      quick-action card, whose copy may not carry live queue data — §98.3), and a
      row is drawn only when its count > 0 (§60 — never draw a control that cannot
      act). Every route lands on a LIVE module. */
-  const cohortsNoLeader = COHORTS.filter(c => c.leader === 'Unassigned' && c.status === 'active').length;
+  const cohortsNoLeader = COHORTS.filter(c => c.leader === 'Unassigned' && c.status === 'forming').length;
   const leadReady = LEADER_REQS.filter(r => r.stage === 'feedback').length;
   const ivOverdue = BOOKINGS.filter(bkOverdue).length;
   const heldPo = heldPayouts();
@@ -4504,7 +4539,7 @@ function homeOverview(){
       ['candidates', 'Candidates', String(activeCands), `in ${activeCohorts} cohort${activeCohorts === 1 ? '' : 's'}`],
       ['group', 'Cohort leaders', String(cohortLeaderCount), `${moderatorCount} moderator${moderatorCount === 1 ? '' : 's'}`],
       ['agents', 'Talent agents', String(agentListed), 'listed & bookable'],
-      ['cohorts', 'Active cohorts', String(activeCohorts), `${draftCohorts} in draft`],
+      ['cohorts', 'Running cohorts', String(activeCohorts), `${draftCohorts} forming`],
       ['book', 'Courses', String(COURSES.length), `${liveCourses} live · ${draftCourses} draft`],
       ['money', 'Gross payment', money(gross), 'this window'],
       ['bank', 'In escrow', money(inprog), 'not yet settled'],
@@ -5907,7 +5942,9 @@ ACTIONS.doremoveleader = key => {
    the staff machinery that was already built.
    ====================================================================== */
 const GRACE_DAYS = 30, ERASE_DAYS = 30;
-const isoPlus = (iso, n) => new Date(new Date(iso).getTime() + n * 864e5).toISOString().slice(0, 10);
+/* isoPlus is declared later as a hoisted function declaration (it also guards
+   against a malformed date); a second `const isoPlus` here is a duplicate that
+   throws "Identifier 'isoPlus' has already been declared", so it is removed. */
 const isoDaysLeft = iso => Math.ceil((new Date(iso).getTime() - Date.now()) / 864e5);
 /* erasure state for the directory column + filter (story 3.1): None while the
    account is only deactivated (erasure has not begun) or active; Deletion in
@@ -6859,6 +6896,21 @@ ACTIONS.dodecline = key => { const e = EMP_BY_ID[key.split(':')[1]]; if(e){ e.ve
    ====================================================================== */
 const yn = v => v ? '<span class="tag sm green">Yes</span>' : '<span class="tag sm">No</span>';
 const LEVELS = ['E1', 'E2', 'E3', 'B1', 'B2', 'B3', 'T1', 'T2', 'T3'];
+/* EPIC 7 (Maryam, 29 Sep 2026) — shared course-catalogue constants. The three
+   onboarding intents (14.3) a course can serve, reused as the course Intent field
+   and its filter; a course carries one, some or all three. These are Tal's
+   recommendation inputs (18.1), never an enrolment gate. */
+const INTENTS = [['role', 'Develop in my current role'], ['another', 'Develop for another role'], ['ownership', 'Develop for ownership']];
+const INTENT_LABEL = k => (INTENTS.find(x => x[0] === k) || [, ''])[1];
+const intentSummary = arr => !arr || !arr.length ? '—' : (arr.length === INTENTS.length ? 'All intents' : arr.map(INTENT_LABEL).join(', '));
+/* The five V1-track rungs for a course's Levels field/column — Explorer E1–E5 or
+   Builder B1–B5. Trailblazer is out of the V1 catalogue (7.1), so a course's track
+   is only ever Explorer or Builder. */
+const COURSE_TRACKS = ['Explorer', 'Builder'];
+const courseRungs = track => [1, 2, 3, 4, 5].map(n => (track === 'Builder' ? 'B' : 'E') + n);
+/* The LMS (LightspeedVT) courses the course form maps to (7.1 "Learning platform
+   course") — authored placeholder (§74): the real list comes from the LMS. */
+const LS_COURSES = ['Leadership Foundations (LSVT)', 'Communication & Influence (LSVT)', 'Team Dynamics (LSVT)', 'Coaching for Performance (LSVT)', 'Strategic Thinking (LSVT)', 'Change Leadership (LSVT)', 'Decision-Making Under Uncertainty (LSVT)', 'Executive Presence (LSVT)'];
 /* TRAILBLAZER IS OUT OF MVP AND STAYS IN THE DATA MODEL (SA-04 E4): the three
    T levels are kept on the records (Yuki Tanaka is T1 in the seed) and are not
    OFFERED by a picker. `levelOpts(cur)` is the MVP list plus the record's own
@@ -7982,27 +8034,24 @@ PAGESUM['agents/marketplace'] = () => {
 /* The Agent Score cell: the star score + its label, the calculation date beneath,
    or the "Starting score" marker until the first quarterly review lands. */
 function agScoreCell(a){
-  const n = agScore(a), lab = scoreLabel(n);
-  const sub = a.scoreApproved === false
-    ? `Starting score, set at invite · first due ${esc(agQuarterEnd(a))}`
-    : `Calculated ${esc(a.scoreAt || '—')}`;
-  return `<div style="white-space:nowrap">${starMark} ${n.toFixed(1)} <span class="t-desc">${esc(lab)}</span></div><div class="t-caption">${sub}</div>`;
+  const n = agScore(a);
+  return `<div style="white-space:nowrap">${starMark} ${n.toFixed(1)}</div>`;
 }
-/* The two components, each out of 5, with the number of candidate ratings. */
+/* The two components, each out of 5. */
 function agComponentsCell(a){
-  return `<div>Rubric ${agRubric(a).toFixed(1)}/5</div><div class="t-caption">Candidate rating ${(a.rating || 0).toFixed(1)}/5 · ${a.candRatings || 0} rating${a.candRatings === 1 ? '' : 's'}</div>`;
+  return `<div>Rubric ${agRubric(a).toFixed(1)}/5</div>`;
 }
 /* Training — Complete / Not complete / Overridden, with the overriding admin and
    date beneath an Overridden value (6.1). */
 function agTrainCell(a){
   const t = agTraining(a);
-  if(t === 'overridden') return `${tag('', 'Overridden')}<div class="t-caption">by ${esc(a.trainingBy || ME.name)} · ${esc(a.trainingAt || '—')}</div>`;
+  if(t === 'overridden') return tag('', 'Overridden');
   if(t === 'notcomplete') return tag('pending', 'Not complete');
   return tag('completed', 'Complete');
 }
 /* The ranking-recalculation banner, shown above both listings (6.1). */
 function rankBanner(){
-  return `<p class="t-desc" style="margin-bottom:var(--s05)">Ranking is by Agent Score, highest first, recalculated weekly on the Monday–Sunday cycle. Last recalculated <b>${RANK_LAST}</b>; next falls <b>${RANK_NEXT}</b>. Only listed agents carry a rank.</p>`;
+  return '';
 }
 /* The marketplace row actions common to both listings: View, Pause / Restore, Set
    Assessment Range, Review Agent Score, and — Super Admin only, only where training
@@ -8013,8 +8062,8 @@ function agMarketActs(a){
     ['view', 'View', `data-go="agents/detail/${a.id}"`],
     ...(st === 'listed' ? [['pause', 'Pause Listing', `data-sheet="agpause:${a.id}"`]] : []),
     ...(st === 'paused' ? [['play', 'Restore Listing', `data-sheet="agrestore:${a.id}"`]] : []),
-    ['route', 'Set Assessment Range', `data-sheet="agrange:${a.id}"`],
-    ['star', 'Review Agent Score', `data-sheet="agscore:${a.id}"`],
+    ['flag', 'Set Assessment Range', `data-sheet="agrange:${a.id}"`],
+    ['starOutline', 'Review Agent Score', `data-sheet="agscore:${a.id}"`],
     ...(agTraining(a) === 'notcomplete' ? [['check', 'Override Training Gate', `data-sheet="agoverride:${a.id}"`]] : [])
   ];
 }
@@ -8103,12 +8152,11 @@ function agentsAll(){
       filterDd('agrange', 'all', [['all', 'Any level'], ...LADDER.map(l => [l, l])], 'Assesses'))}
     ${rankBanner()}
     ${list.length ? table(
-      [{label:'Agent'}, {label:'Rank', num:true}, {label:'Agent Score'}, {label:'Components'}, {label:'Interviews conducted', num:true}, {label:'Training'}, {label:'Assessment range'}, {label:'Fee', num:true}, {label:'Listing state'}, ACT_COL],
+      [{label:'Agent'}, {label:'Rank', num:true}, {label:'Agent Score'}, {label:'Interviews', num:true}, {label:'Training'}, {label:'Assesses'}, {label:'Fee', num:true}, {label:'State'}, ACT_COL],
       list.map(a => ({id:a.id, go:'agents/detail/' + a.id, cells:[
         personCell(a.name, a.email),
         a.rank ? String(a.rank) : '—',
         a.status === 'invited' ? '—' : agScoreCell(a),
-        a.status === 'invited' ? '—' : agComponentsCell(a),
         String(a.interviewed),
         a.status === 'invited' ? '—' : agTrainCell(a),
         rangeLabel(agRange(a)),
@@ -8151,12 +8199,11 @@ function marketplaceView(){
     ${lstTools('Search by name or email', filterDd('agrange', 'all', [['all', 'Any level'], ...LADDER.map(l => [l, l])], 'Assesses'))}
     ${rankBanner()}
     ${list.length ? table(
-      [{label:'Agent'}, {label:'Rank', num:true}, {label:'Agent Score'}, {label:'Components'}, {label:'Interviews conducted', num:true}, {label:'Assessment range'}, {label:'Fee', num:true}, ACT_COL],
+      [{label:'Agent'}, {label:'Rank', num:true}, {label:'Agent Score'}, {label:'Interviews', num:true}, {label:'Assesses'}, {label:'Fee', num:true}, ACT_COL],
       list.map(a => ({id:a.id, go:'agents/detail/' + a.id, cells:[
         personCell(a.name, a.email),
         a.rank ? String(a.rank) : '—',
         agScoreCell(a),
-        agComponentsCell(a),
         String(a.interviewed),
         rangeLabel(agRange(a)),
         a.fee ? money(a.fee) : '—',
@@ -8841,9 +8888,9 @@ ACTIONS.doagscore = key => {
    COHORT MANAGEMENT
    ====================================================================== */
 PAGESUM['cohorts/cohorts'] = () => {
-  const active = COHORTS.filter(c => c.status === 'active').length;
-  const unled = COHORTS.filter(c => c.leader === 'Unassigned').length;
-  return `${active} cohorts are running${unled ? `, and <b>${unled} ${unled === 1 ? 'has' : 'have'} no leader yet</b>` : ''}. Every cohort caps at 10 members and runs the 90-day loop.`;
+  const running = COHORTS.filter(c => c.status === 'running').length;
+  const attn = COHORTS.filter(cohortNeedsAttn).length;
+  return `${running} cohort${running === 1 ? ' is' : 's are'} running${attn ? `, and <b>${attn} need${attn === 1 ? 's' : ''} attention</b> — short of people or a leader before the start date` : ''}. Each cohort forms, runs the 90-day loop, then completes.`;
 };
 PAGESUM['cohorts/assign'] = () => {
   const rec = LEADER_REQS.filter(r => r.stage === 'feedback').length;
@@ -8856,69 +8903,141 @@ PAGESUM['catalogue/catalogue'] = () => {
 PAGESUM['levelling/levels'] = () => `Three tracks — Explorer, Builder, Trailblazer — each with five levels. A candidate climbs by re-interviewing, and <b>the track decides which cohorts they can lead</b>.`;
 
 const leaderOpts = () => [['Unassigned', 'Unassigned'], ...USERS.filter(u => u.roles.includes('leader') || u.roles.includes('agent')).map(u => [u.name, u.name, agentFace(u.name)])];
+/* ==================== EPIC 7 — COHORT LIFECYCLE HELPERS (7.4) ==================== */
+const todayISO = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+const COHORT_ACTIVE = c => c.status === 'forming' || c.status === 'running';
+/* whole days from today to an ISO date; negative means the date has passed */
+function daysUntil(iso){ if(!/^\d{4}-\d{2}-\d{2}$/.test(iso || '')) return null; const [y, m, d] = iso.split('-').map(Number); const t = new Date(); t.setHours(0, 0, 0, 0); return Math.round((new Date(y, m - 1, d) - t) / 864e5); }
+const cohortSize = c => CANDS.filter(x => x.cohort === c.name).length;
+const cohortHasLeader = c => !!c.leader && c.leader !== 'Unassigned';
+const leaderName = c => cohortHasLeader(c) ? c.leader.replace(/\s*\(.*\)/, '') : '';
+/* the chapter a Running cohort is on, from its day and chapter count */
+const cohortChapter = c => Math.min(c.chapters || 12, Math.max(1, Math.ceil((c.day || 1) / (90 / (c.chapters || 12)))));
+/* progress line ("Day 34 of 90, chapter 4 of 12"), blank until the cohort Runs */
+const cohortProgress = c => c.status === 'running' ? `Day ${c.day} of 90, chapter ${cohortChapter(c)} of ${c.chapters || 12}` : '';
+/* `isoPlus(iso, days)` — the ONE declaration (a hoisted function so its earlier
+   callers in the account-lifecycle block resolve it); guards a malformed date and
+   adds days on local components. Declared once here; do NOT re-add a `const isoPlus`
+   elsewhere — a second declaration throws "Identifier 'isoPlus' has already been
+   declared" and blanks the whole portal. */
+function isoPlus(iso, days){ if(!/^\d{4}-\d{2}-\d{2}$/.test(iso || '')) return ''; const [y, m, d] = iso.split('-').map(Number); const dt = new Date(y, m - 1, d); dt.setDate(dt.getDate() + days); return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`; }
+/* day 90 (the last day) and the Completed date (day 90 + the cohort's own delay). */
+const cohortLastDay = c => isoPlus(c.start, 89);
+const cohortCompletedDate = c => c.completedOn || isoPlus(cohortLastDay(c), c.completeDelay == null ? 7 : c.completeDelay);
+/* a Forming cohort whose start date has passed without starting — the reason it did
+   not fire (below the minimum / without a leader / both), or null (7.4). */
+function cohortMissed(c){ if(c.status !== 'forming') return null; const du = daysUntil(c.start); if(du == null || du >= 0) return null; const low = cohortSize(c) < (c.min || 0), noLead = !cohortHasLeader(c); if(!low && !noLead) return null; return low && noLead ? 'below the minimum and without a leader' : low ? 'below the minimum' : 'without a leader'; }
+/* needs-attention (7.2): no leader, OR below the minimum with a start inside 7 days
+   (a missed start counts — it is inside 7 days on the wrong side). Forming only. */
+function cohortNeedsAttn(c){ if(c.status !== 'forming') return false; if(!cohortHasLeader(c)) return true; const du = daysUntil(c.start); return cohortSize(c) < (c.min || 0) && du != null && du <= 7; }
+/* the start-date cell marker for a Forming cohort (7.2): a missed start, else the
+   shortfall "N short, starts in X days". */
+function cohortStartNote(c){ if(c.status !== 'forming') return ''; const du = daysUntil(c.start), short = (c.min || 0) - cohortSize(c); if(du != null && du < 0) return `<span class="tag sm red">Missed start</span>`; if(short > 0) return `<span class="tag sm warn">${short} short${du != null ? `, starts in ${du} day${du === 1 ? '' : 's'}` : ''}</span>`; return ''; }
+/* 7.4 — re-evaluate a Forming cohort's start conditions; flip it to Running the moment
+   it is at/above minimum, has a leader and its start date has arrived. Called after
+   assign-leader, add-member and move-start (never at load, so the seeded states stand).
+   Returns true if it started. */
+function evalStart(c){ if(!c || c.status !== 'forming') return false; if(cohortSize(c) < (c.min || 0) || !cohortHasLeader(c)) return false; const du = daysUntil(c.start); if(du == null || du > 0) return false; c.status = 'running'; c.day = Math.max(1, -du + 1); c.week = Math.max(1, Math.ceil(c.day / 7)); audit('Cohort started', `${c.name} reached its minimum with a leader in place`, 'Cohort Management', 'notice', {from:'forming', to:'running'}); toast(`${c.name} started`); return true; }
+/* Awaiting-cohort auto-placement (7.6): a candidate waiting with no cohort place is put
+   into the next suitable cohort (Forming/Running, below max) when one opens — keeps the
+   paid place, carries progress, no new payment. */
+function placeAwaiting(){ const waiting = CANDS.filter(x => x.cohort === 'Awaiting'); if(!waiting.length) return; waiting.forEach(m => { const dest = COHORTS.find(c => COHORT_ACTIVE(c) && cohortSize(c) < (c.cap || 10)); if(dest){ m.cohort = dest.name; audit('Awaiting candidate placed', `${m.name} → ${dest.name}`, 'Cohort Management', 'notice'); } }); syncCohortSizes(); }
 KINDS.cohort = {
   label:'cohort', mod:'Cohort Management', after:'cohorts/cohorts',
   find: id => COHORT_BY_ID[id], name: c => c.name, detail: c => 'cohorts/detail/' + c.id,
-  /* A cohort is NOT based on a track or a course (Maryam, 15 Sep 2026) — the Track
-     field/column is gone from every cohort flow. A cohort is just a named peer group
-     with a leader and its own `sessions` outline, empty on create and built on the
-     detail. (The `track` key lingers in the seed data, unread by the UI.) */
+  /* A cohort is NEVER linked to a course (Maryam, 29 Sep 2026) — no course, no track.
+     `min` / `cap` / `chapters` / `completeDelay` live on the cohort itself. A leader is
+     placed through Assign Leader (7.5), not this form, so a cohort forms leaderless and
+     waits until one is assigned. */
   fields: c => [
-    {k:'name', l:'Cohort name', t:'text', req:1, ph:'e.g. Cohort 6'},
-    {k:'leader', l:'Leader', t:'select', opts:leaderOpts(), def:'Unassigned'},
-    {k:'cap', l:'Maximum members', t:'number', req:1, def:10, ph:'e.g. 10'},
+    {k:'name', l:'Cohort name', t:'text', req:1, ph:'e.g. Cohort 9'},
+    {k:'min', l:'Minimum members', t:'number', req:1, def:5, ph:'e.g. 5'},
+    {k:'cap', l:'Maximum members', t:'number', req:1, def:12, ph:'e.g. 12'},
+    {k:'chapters', l:'Chapters', t:'number', req:1, def:12, ph:'1 to 90'},
+    {k:'completeDelay', l:'Completed delay (days)', t:'number', req:1, def:7, ph:'0 to 30'},
     {k:'start', l:'Cohort starts on', t:'date', req:1}
   ],
-  help:'A new cohort is created as a draft. Build its session outline on the cohort before you start it. It caps at the maximum you set and begins the 90-day loop when you start it.',
+  help:'A new cohort is created Forming and opens for enrolment. Assign a leader (7.5) and build its session outline before its start date. It needs the minimum plus a leader to start, caps at the maximum, and Completes the set number of days after day 90.',
   okNew:'Create Cohort',
-  create: v => { const c = {id:newId('ch', COHORTS), name:v.name, leader:v.leader, cap:Number(v.cap) || 10, size:0, week:0, day:0, start:v.start, status:'draft', sessions:[]};
-    COHORTS.push(c); COHORT_BY_ID[c.id] = c; return c; },
-  update: (c, v) => { CANDS.forEach(x => { if(x.cohort === c.name) x.cohort = v.name; }); c.name = v.name; c.leader = v.leader; if(v.cap) c.cap = Number(v.cap); c.start = v.start; },
+  create: v => { const c = {id:newId('ch', COHORTS), name:v.name, leader:'Unassigned', min:Number(v.min) || 5, cap:Number(v.cap) || 12, chapters:Number(v.chapters) || 12, completeDelay:(v.completeDelay === '' || v.completeDelay == null) ? 7 : Number(v.completeDelay), size:0, week:0, day:0, start:v.start, status:'forming', leadFrom:null, leadHist:[], sessions:[]};
+    COHORTS.push(c); COHORT_BY_ID[c.id] = c; placeAwaiting(); return c; },
+  update: (c, v) => { CANDS.forEach(x => { if(x.cohort === c.name) x.cohort = v.name; }); c.name = v.name; if(v.min) c.min = Number(v.min); if(v.cap) c.cap = Number(v.cap); if(v.chapters) c.chapters = Number(v.chapters); if(v.completeDelay !== '' && v.completeDelay != null) c.completeDelay = Number(v.completeDelay); c.start = v.start; },
   remove: c => { CANDS.forEach(x => { if(x.cohort === c.name) x.cohort = '—'; }); COHORTS.splice(COHORTS.indexOf(c), 1); delete COHORT_BY_ID[c.id]; },
-  guard: c => c.status === 'active' && c.size ? `${c.name} is running with ${c.size} members — archive it instead` : null,
-  delWarn: c => `${c.name} is removed and its ${c.size} member${c.size === 1 ? '' : 's'} return to no cohort.`,
-  status: (c, val) => val === 'archived'
-    ? {title:`Archive ${c.name}?`, body:`The cohort ends now, at week ${c.week}. Members keep their level and history; the cohort no longer appears as running.`, ok:'Archive', danger:true, log:'Archived cohort', done:`${c.name} archived`, apply: x => { x.status = 'archived'; }}
-    : {title:`Start ${c.name}?`, body:`This begins the 90-day cycle and moves ${c.name} from draft to active. Leader: ${c.leader === 'Unassigned' ? 'unassigned' : c.leader.replace(/\s*\(.*\)/, '')} · start ${c.start}.`, ok:'Start Cohort', log:'Started cohort', done:`${c.name} started`, apply: x => { x.status = 'active'; x.week = Math.max(1, x.week); x.day = Math.max(1, x.day); }}
+  guard: c => (c.status === 'running' && cohortSize(c)) ? `${c.name} is running with ${cohortSize(c)} member${cohortSize(c) === 1 ? '' : 's'} — cancel it through intervention instead` : null,
+  delWarn: c => `${c.name} is removed and its ${cohortSize(c)} member${cohortSize(c) === 1 ? '' : 's'} return to no cohort.`,
+  status: (c, val) => val === 'completed'
+    ? {title:`Mark ${c.name} completed?`, body:'The cohort closes now. Members keep their level and history.', ok:'Mark Completed', log:'Completed cohort', done:`${c.name} completed`, apply: x => { x.status = 'completed'; x.completedOn = todayISO(); x.day = 90; x.week = 13; }}
+    : {title:`Start ${c.name} now?`, body:`This begins the 90-day cycle. Leader: ${leaderName(c) || 'unassigned'} · ${cohortSize(c)} of ${c.cap} members · start ${dpFmt(c.start) || c.start}.`, ok:'Start Cohort', log:'Started cohort', done:`${c.name} started`, apply: x => { x.status = 'running'; x.day = Math.max(1, x.day); x.week = Math.max(1, x.week); }}
 };
 
+/* EPIC 7 — COHORT LIST (7.2, Maryam 29 Sep 2026). Columns Cohort / Status / Start
+   date / Members / Leader / Progress; a below-minimum or missed-start marker rides
+   the start-date cell; a Needs-attention toggle sits under the status strip. Default
+   sort is start-soonest-first; a row opens the detail. Cohorts are NOT linked to a
+   course, so there is no course line or Course filter. */
 function cohortsList(){
   const sf = getFilter('cstatus', 'all'), q = getFilter('q', '');
-  const rows = COHORTS.filter(c => sf === 'all' ? true : sf === 'unled' ? c.leader === 'Unassigned' : c.status === sf).filter(c => hit(q, c.name, c.leader));
+  const rows = COHORTS
+    .filter(c => sf === 'all' ? true : c.status === sf)
+    .filter(c => hit(q, c.name, leaderName(c)))
+    .slice().sort((a, b) => String(a.start).localeCompare(String(b.start)));
+  const cnt = s => COHORTS.filter(c => c.status === s).length;
   return `
   <section class="sec">
-    ${searchHead('Cohorts', 'Every running and draft cohort. A row opens the roster, the leader and the sessions.',
+    ${searchHead('Cohorts', 'Every cohort with its stage, headcount, leader and progress. A row opens the roster, the leader and the sessions.',
       `${exportBtn('Cohorts')} ${addBtn('cohort', 'Add New Cohort')}`, 'Search cohorts')}
     ${filterStrip('cstatus', 'all', [
       ['all', 'All', COHORTS.length],
-      ['active', 'Active', COHORTS.filter(c => c.status === 'active').length],
-      ['draft', 'Draft', COHORTS.filter(c => c.status === 'draft').length],
-      ['archived', 'Archived', COHORTS.filter(c => c.status === 'archived').length],
-      ['unled', 'No leader', COHORTS.filter(c => c.leader === 'Unassigned').length]
+      ['forming', 'Forming', cnt('forming')],
+      ['running', 'Running', cnt('running')],
+      ['completed', 'Completed', cnt('completed')],
+      ['cancelled', 'Cancelled', cnt('cancelled')]
     ])}
     ${lstTools('Search cohorts')}
     ${rows.length ? table(
-      [{label:'Cohort'}, {label:'Leader'}, {label:'Progress'}, {label:'Members', num:true}, {label:'Status'}, ACT_COL],
-      rows.map(c => ({id:c.id, go:'cohorts/detail/' + c.id, sv:[, , c.day], cells:[
+      [{label:'Cohort'}, {label:'Status'}, {label:'Start date'}, {label:'Members', num:true}, {label:'Leader'}, {label:'Progress'}, ACT_COL],
+      rows.map(c => { const note = cohortStartNote(c); return {id:c.id, go:'cohorts/detail/' + c.id, cells:[
         esc(c.name),
-        c.leader === 'Unassigned' ? '<span class="tag sm warn">Unassigned</span>' : esc(c.leader),
-        c.status === 'draft' ? 'Not started' : c.status === 'archived' ? `Ended week ${c.week}` : `Week ${c.week} · day ${c.day}`,
-        `${c.size} / ${c.cap || 10}`,
         tag(c.status),
-        rowActs([editBtn('cohort', c.id),
-          ...(c.status === 'draft' ? [['play', 'Start cohort', `data-act="askstatus:cohort:${c.id}:active"`]] : c.status === 'active' ? [['pause', 'Archive', `data-act="askstatus:cohort:${c.id}:archived"`]] : []),
-          delBtn('cohort', c.id)])
-      ]})), {selectKind:'cohort'})
+        `${dpFmt(c.start) || c.start}${note ? `<div style="margin-top:var(--s02)">${note}</div>` : ''}`,
+        `${cohortSize(c)} / ${c.cap || 12}`,
+        cohortHasLeader(c) ? esc(leaderName(c)) : '<span class="tag sm warn">Unassigned</span>',
+        cohortProgress(c) || '—',
+        rowActs([
+          ['launch', 'View', `data-go="cohorts/detail/${c.id}"`],
+          COHORT_ACTIVE(c) ? [cohortHasLeader(c) ? 'renew' : 'user', cohortHasLeader(c) ? 'Change leader' : 'Assign leader', `data-sheet="assignlead:${c.id}"`] : null,
+          COHORT_ACTIVE(c) ? ['edit', 'Intervene', `data-sheet="intervene:${c.id}"`] : null,
+          editBtn('cohort', c.id),
+          delBtn('cohort', c.id)
+        ])
+      ]}; }), {selectKind:'cohort'})
       : emptyState('cohorts', 'No cohorts match', 'Nothing in this filter yet.')}
   </section>`;
 }
 
 const LEADER_STAGE_LABEL = {feedback:'All', scheduled:'Interview Pending', applied:'Awaiting Interviews'};
-/* THE COHORT(S) A LEADER CURRENTLY LEADS — any non-archived cohort whose `leader`
-   string (minus its "(bucket)" suffix) is this person (Maryam, 15 Sep 2026). A
-   candidate-leader leads one at a time; a moderator may lead several, so this
-   returns a list. */
-const leaderCohorts = name => COHORTS.filter(c => c.status !== 'archived' && c.leader.replace(/\s*\(.*\)/, '').trim() === name);
+/* THE COHORT(S) A LEADER CURRENTLY LEADS — any ACTIVE (Forming/Running) cohort whose
+   `leader` string (minus its "(bucket)" suffix) is this person. A leader is free
+   again once their cohort Completes or is Cancelled. */
+const leaderCohorts = name => COHORTS.filter(c => COHORT_ACTIVE(c) && c.leader.replace(/\s*\(.*\)/, '').trim() === name);
+/* 7.5 — the eligible-leader pool for Assign/Change Leader: every account holding the
+   Cohort Leader capability that is NOT currently leading an active cohort (candidate
+   OR staff, never an agent). Combines USERS with the `leader` role and the approved
+   applicants in the leaders queue (LEADER_REQS stage 'feedback'), deduped by name.
+   `exceptName` keeps the cohort's current leader in the list on a change. Each entry:
+   {name, kind:'Candidate'|'Staff', level, img}. */
+function leaderPool(exceptName){
+  const free = name => name === exceptName || leaderCohorts(name).length === 0;
+  const out = [], seen = new Set();
+  const add = (name, kind, level) => { if(seen.has(name) || !free(name)) return; seen.add(name); out.push({name, kind, level, img:agentFace(name)}); };
+  USERS.filter(u => u.roles.includes('leader') && u.status !== 'inactive').forEach(u => {
+    const isCand = u.roles.includes('candidate'), cand = CAND_BY_ID[u.id];
+    add(u.name, isCand ? 'Candidate' : 'Staff', isCand && cand ? cand.level : '');
+  });
+  LEADER_REQS.filter(r => r.stage === 'feedback').forEach(r => add(r.name, 'Candidate', r.level));
+  return out;
+}
+const leaderAssignOpts = exceptName => leaderPool(exceptName).map(p => [p.name, `${p.name} · ${p.kind}${p.level ? ' · ' + p.level : ''}`, p.img]);
 function cohortsAssign(){
   /* THREE STAGES, RENAMED (Maryam, 15 Sep 2026): an approved leader is not a
      recommendation, so `feedback` is now the "All" pool with NO pitch/feedback
@@ -8994,54 +9113,73 @@ ACTIONS.doaddsess = key => { const c = COHORT_BY_ID[key.split(':')[1]]; if(!c) r
   audit('Added session to cohort', `${c.name} — ${v.title}`, 'Cohort Management', 'info'); toast('Session added'); };
 ACTIONS.delsess = key => { const [, cid, sid] = key.split(':'); const c = COHORT_BY_ID[cid]; if(!c || !c.sessions) return; const i = c.sessions.findIndex(s => s.id === sid); if(i >= 0){ const nm = c.sessions[i].title; c.sessions.splice(i, 1); audit('Removed session', `${c.name} — ${nm}`, 'Cohort Management', 'info'); toast('Session removed'); } };
 
+/* a candidate's handle (@firstname) and their course progress line — authored
+   placeholder (§74): the seed has no per-member LMS telemetry. */
+const memHandle = m => '@' + String(m.name || '').trim().split(/\s+/)[0].toLowerCase();
+const nameHash = s => [...String(s || '')].reduce((a, ch) => a + ch.charCodeAt(0), 0);
+function memProgress(m, c){ if(c.status === 'completed') return '100%'; if(c.status !== 'running') return 'Not started'; return Math.max(4, Math.min(100, Math.round((c.day / 90) * 100) - (nameHash(m.name) % 12))) + '%'; }
 function cohortsDetail(){
   const c = COHORT_BY_ID[S.id] || COHORTS[0];
   DETAIL_LABEL = c.name;
-  /* A cohort is a named peer group with a leader and its own `sessions` outline
-     (built at creation, edited here). It is NOT based on a track or a course
-     (Maryam, 15 Sep 2026) — no track subtitle, no Track fact. */
+  /* EPIC 7 — COHORT DETAIL (7.3, Maryam 29 Sep 2026). A cohort is NEVER linked to a
+     course; the header shows the lifecycle state, dates and capacity, a leader panel
+     with the assignment date + replacement history, a members table, and the LMS
+     progress note. Every action is governed by its own module's permission. */
   const roster = CANDS.filter(x => x.cohort === c.name);
-  const draft = c.status === 'draft';
-  const cap = c.cap || 10;
-  const full = roster.length >= cap;
-  const sum = `<b>${esc(c.name)}</b> is led by ${c.leader === 'Unassigned' ? 'nobody yet' : esc(c.leader.replace(/\s*\(.*\)/, ''))}. ${draft ? 'It has not started. Starting it begins the 90-day cycle.' : c.status === 'archived' ? `It ended at week ${c.week}.` : `Week ${c.week} of 13, ${roster.length} of 10 members.`}`;
+  const forming = c.status === 'forming', running = c.status === 'running';
+  const cap = c.cap || 12, min = c.min || 0, size = roster.length;
+  const full = size >= cap;
+  const missed = cohortMissed(c);
+  const ready = forming && size >= min && cohortHasLeader(c);
   return `
-  ${detailHead('cohorts/cohorts', sum)}
+  ${detailHead('cohorts/cohorts')}
   <section class="sec">
-    ${''/* Header actions in a kebab (Maryam, 18 Sep 2026); the state tag
-           (Active · week N / Archived) stays visible beside it. */}
-    ${aiHead(esc(c.name), c.leader === 'Unassigned' ? 'No leader yet'
-        : `<span class="cl-lead"><span class="cl-lead-ph"><img src="${agentFace(c.leader.replace(/\s*\(.*\)/, ''))}" alt=""></span>Led by ${esc(c.leader.replace(/\s*\(.*\)/, ''))}</span>`,
-      `<span style="display:flex;align-items:center;gap:var(--s03)">${
-        c.status === 'archived' ? tag('archived', 'Archived')
-          : draft ? '' : `<span class="tag sm green">Active · week ${c.week}</span>`}
+    ${aiHead(esc(c.name), `${size} of ${cap} members${missed ? '' : forming ? ` · starts ${dpFmt(c.start) || c.start}` : running ? ` · ${cohortProgress(c)}` : c.status === 'completed' ? ` · completed ${dpFmt(cohortCompletedDate(c))}` : ''}`,
+      `<span style="display:flex;align-items:center;gap:var(--s03)">${tag(c.status)}
        ${rowActs([
-         ['edit', 'Edit', `data-sheet="rec:cohort:${c.id}"`],
-         draft ? ['delete', 'Delete', `data-act="askdel:cohort:${c.id}"`] : null,
-         draft ? ['play', 'Start Cohort', `data-act="askstatus:cohort:${c.id}:active"`] : null,
-         (!draft && c.status !== 'archived') ? ['deactivate', 'Archive', `data-act="askstatus:cohort:${c.id}:archived"`] : null
+         COHORT_ACTIVE(c) ? [cohortHasLeader(c) ? 'renew' : 'user', cohortHasLeader(c) ? 'Change Leader' : 'Assign Leader', `data-sheet="assignlead:${c.id}"`] : null,
+         COHORT_ACTIVE(c) ? ['edit', 'Intervene', `data-sheet="intervene:${c.id}"`] : null,
+         ready ? ['play', 'Start Cohort', `data-act="askstatus:cohort:${c.id}:running"`] : null,
+         running ? ['check', 'Mark Completed', `data-act="askstatus:cohort:${c.id}:completed"`] : null,
+         ['edit', 'Edit Details', `data-sheet="rec:cohort:${c.id}"`],
+         ['delete', 'Delete', `data-act="askdel:cohort:${c.id}"`]
        ])}</span>`)}
-    ${''/* THE FOUR FIGURES AS A FACTS BAND, not rows — the Length row is dropped
-          (Maryam, 15 Sep 2026). The candidate-detail `pf-facts` 4-across grid. */}
+    ${missed ? note('warn', 'Missed its start date', `The start date of ${dpFmt(c.start) || c.start} passed while the cohort was ${missed}. It starts automatically once it reaches the minimum of ${min} and has a leader in place.`) : ''}
     <div class="facts pf-facts">
-      ${admFact(I.user, '--mk-4', 'Leader', c.leader === 'Unassigned' ? 'Unassigned' : c.leader)}
-      ${admFact(I.calendar, '--mk-3', 'Cohort starts on', dpFmt(c.start) || c.start)}
-      ${admFact(I.growth, '--mk-2', 'Progress', draft ? 'Not started' : `Week ${c.week} · day ${c.day} of ${(c.weeks || 12) * 7 + 6}`)}
-      ${admFact(I.group, '--mk-1', 'Members', `${roster.length} / ${cap}`)}
+      ${admFact(I.calendar, '--mk-3', running || c.status === 'completed' ? 'Started' : 'Cohort starts on', dpFmt(c.start) || c.start)}
+      ${admFact(I.growth, '--mk-2', 'Progress', cohortProgress(c) || (forming ? 'Not started' : c.status === 'completed' ? `Completed day 90` : 'Cancelled'))}
+      ${admFact(I.group, '--mk-1', 'Members', `${size} / ${cap}${size < min ? ` · min ${min}` : ''}`)}
+      ${admFact(I.check, '--mk-4', 'Completed date', c.status === 'cancelled' ? '—' : dpFmt(cohortCompletedDate(c)))}
     </div>
   </section>
 
-  ${''/* The Interventions section (extend / merge / move / dissolve) was removed
-        on the cohort detail (Maryam, 15 Sep 2026). The sheets/actions behind it
-        stay defined for a later surface. */}
+  <section class="sec">
+    ${aiHead('Leader', cohortHasLeader(c) ? `Assigned ${dpFmt(c.leadFrom) || 'at creation'}` : 'No leader assigned',
+      COHORT_ACTIVE(c) ? `<button class="btn acc-link btn-sm noic" data-sheet="assignlead:${c.id}">${cohortHasLeader(c) ? I.renew + ' Change Leader' : I.add + ' Assign Leader'}</button>` : '')}
+    ${cohortHasLeader(c)
+      ? `<div class="tile-stack">${memRow(leaderName(c), `Cohort leader${c.leadFrom ? ` · since ${dpFmt(c.leadFrom)}` : ''}`, '', null, agentFace(leaderName(c)))}</div>`
+      : emptyState('users', 'No leader assigned', COHORT_ACTIVE(c) ? 'This cohort cannot start without a leader. Assign one before its start date.' : 'This cohort holds no leader.')}
+    ${(c.leadHist && c.leadHist.length) ? `<div style="margin-top:var(--s05)">
+      <p class="t-label" style="color:var(--text-secondary);margin-bottom:var(--s03)">Replacement history</p>
+      ${c.leadHist.map(h => `<p class="t-desc" style="margin-bottom:var(--s03)"><b style="color:var(--text-primary)">${esc(dpFmt(h.on) || h.on)}</b> · ${esc(h.from.replace(/\s*\(.*\)/, ''))} → ${esc(h.to.replace(/\s*\(.*\)/, ''))}${h.reason ? ` — ${esc(h.reason)}` : ''}</p>`).join('')}
+    </div>` : ''}
+  </section>
 
   <section class="sec">
-    ${aiHead('Cohort Members', full ? `Cohort full · ${cap} / ${cap}.` : `${roster.length} of ${cap} members.`,
-      full ? '' : `<button class="btn acc-link btn-sm noic" data-sheet="addmember">${I.add} Add Member</button>`)}
-    ${roster.length ? `<div class="tile-stack">
-      ${roster.map(m => memRow(m.name, `${esc(m.level)} · ${esc(m.bucket)} · ${esc(memCourse(m))} · last active ${esc(m.last)}`,
-        rowActs([['launch', 'Open record', `data-go="candidates/detail/${m.id}"`], ['renew', 'Move', `data-sheet="moveco:${c.id}:${m.id}"`], ['delete', 'Remove from cohort', `data-act="askremove:${c.id}:${m.id}"`]]), null, agentFace(m.name))).join('')}
-    </div>` : emptyState('users', 'No members yet', `Add candidates to the roster; the cohort caps at ${cap}.`)}
+    ${aiHead('Cohort Members', size ? `${size} of ${cap} member${size === 1 ? '' : 's'}. Course progress is read from LightspeedVT, last read just now.` : `${size} of ${cap} members.`,
+      (COHORT_ACTIVE(c)) ? `<button class="btn acc-link btn-sm noic" data-sheet="addmember:${c.id}">${I.add} Add Member</button>` : '')}
+    ${size ? table(
+      [{label:'Candidate'}, {label:'Handle'}, {label:'Level'}, {label:'Enrolled'}, {label:'Progress'}, {label:'State'}, ACT_COL],
+      roster.map(m => ({id:m.id, cells:[
+        personCell(m.name, ''), esc(memHandle(m)), esc(m.level || '—'), dpFmt(m.enrolled || c.start) || '—', memProgress(m, c),
+        '<span class="tag sm green">Active</span>',
+        rowActs([
+          ['launch', 'Open record', `data-go="candidates/detail/${m.id}"`],
+          COHORT_ACTIVE(c) ? ['renew', 'Move to another cohort', `data-sheet="moveco:${c.id}:${m.id}"`] : null,
+          COHORT_ACTIVE(c) ? ['delete', 'Remove from cohort', `data-sheet="removemem:${c.id}:${m.id}"`] : null
+        ])
+      ]})), {select:false})
+      : emptyState('users', 'No members yet', `Add candidates to the roster; the cohort caps at ${cap}.`)}
   </section>
 
   <section class="sec">
@@ -9060,124 +9198,242 @@ function cohortsDetail(){
         s.date ? esc(dpFmt(s.date) + (s.time ? ' · ' + s.time : '')) : (s.week ? 'Week ' + s.week : '—'),
         s.dur + ' min', esc(s.mode || '—'), rowActs([['delete', 'Remove session', `data-act="delsess:${c.id}:${s.id}"`]])]})),
       {select:false})
-      : emptyState('calendar', 'No sessions yet', draft ? 'Build the session outline before you start the cohort.' : 'Add the first session to this cohort.')}
+      : emptyState('calendar', 'No sessions yet', forming ? 'Build the session outline before the cohort starts.' : 'Add the first session to this cohort.')}
   </section>`;
 }
-SHEETS.addmember = () => {
-  const c = COHORT_BY_ID[S.id];
-  const free = CANDS.filter(x => x.cohort === '—' && x.status === 'active');
-  /* SA-12 A1 — FORCE ADD: a candidate already placed elsewhere, or suspended,
-     can be added past the eligibility rule; the option says so and the add is
-     logged at high severity. The eligibility rule itself is the open ruling. */
-  const forced = CANDS.filter(x => !(x.cohort === '—' && x.status === 'active') && x.cohort !== (c || {}).name);
-  return {title:`Add a member to ${c ? c.name : 'the cohort'}`,
-    body:`${fieldHtml({k:'cand', l:'Candidate', t:'select', opts: [...(free.length ? free.map(x => [x.id, `${x.name} · ${x.level}`]) : [['', 'Every active candidate is already in a cohort']]), ...forced.map(x => [x.id, `${x.name} · ${x.level} · ${x.status === 'inactive' ? 'suspended' : 'in ' + x.cohort} — force add`])]})}
-      <p class="t-desc">Candidates without a cohort are offered first. An entry marked “force add” bypasses eligibility (SA-12 A1) — they leave their current cohort or their suspension is noted — and is logged at high severity.</p>`,
-    ok:'Add To Roster', act:'doaddmember:' + (c ? c.id : '')};
+/* ==================== EPIC 7 — ASSIGN A COHORT LEADER (7.5) ==================== */
+/* Cohort-centric Assign/Change Leader. The pool is every account holding the Cohort
+   Leader capability not currently leading an active cohort (candidate or staff, never
+   an agent — `leaderAssignOpts`). A first assignment commits directly; a change asks a
+   reason and a confirmation. On assign the start conditions are re-evaluated (a cohort
+   waiting only on a leader starts). Opened as `assignlead:<cohortId>`. */
+SHEETS.assignlead = arg => {
+  const c = COHORT_BY_ID[String(arg).split(':')[0]] || COHORT_BY_ID[S.id];
+  if(!c) return {title:'Assign leader', body:'', ok:''};
+  if(!COHORT_ACTIVE(c)) return {title:`Leader — ${c.name}`, ok:'', body: note('', 'Not available', 'A leader can only be assigned on a Forming or Running cohort.')};
+  const changing = cohortHasLeader(c), cur = changing ? leaderName(c) : '';
+  const opts = leaderAssignOpts(cur);
+  if(!opts.length) return {title:`${changing ? 'Change' : 'Assign'} leader — ${c.name}`, ok:'',
+    body: note('warn', 'No leader is free', 'Every cohort leader is already leading an active cohort. A leader becomes free when their cohort completes or is cancelled.')};
+  return {title:`${changing ? 'Change' : 'Assign'} leader — ${c.name}`, ok: changing ? 'Change Leader' : 'Assign Leader', act:'askassignlead:' + c.id,
+    body:`<p class="t-desc" style="margin-bottom:var(--s05)">${esc(c.name)} · starts ${dpFmt(c.start) || c.start} · ${cohortSize(c)} of ${c.cap || 12} members.</p>
+      ${fieldHtml({k:'leader', l:'Leader', t:'select', req:1, ph:'Choose a leader', opts}, changing ? cur : undefined)}
+      ${changing ? fieldHtml({k:'reason', l:'Reason', t:'textarea', req:1, ph:'Why the cohort is changing leader'}) : ''}
+      <p class="t-desc">${changing ? 'Both leaders are notified and the cohort sees the change. The incoming leader takes it immediately; the outgoing leader keeps read-only access to the discussion and their own private threads, and their private notes stay with them.' : 'The leader is placed on the cohort and it appears in their leader portal. The cohort’s members are notified.'} A leader holds one active cohort at a time.</p>`};
 };
-ACTIONS.doaddmember = key => { const c = COHORT_BY_ID[key.split(':')[1]]; const v = readForm(); const m = CAND_BY_ID[v.cand]; if(!c || !m){ toast('Pick a candidate', 'warn'); return 'keep'; }
-  const forced = !(m.cohort === '—' && m.status === 'active'); const from = m.cohort;
+function assignLeaderCommit(c, name, reason){
+  if(!c || !name) return;
+  const p = leaderPool(leaderName(c)).find(x => x.name === name);
+  const suffix = p && p.level ? ({E:'Explorer', B:'Builder', T:'Trailblazer'}[p.level[0]] || '') : '';
+  const changing = cohortHasLeader(c), from = c.leader;
+  c.leader = suffix ? `${name} (${suffix})` : name;
+  c.leadFrom = todayISO();
+  if(changing) c.leadHist = [...(c.leadHist || []), {from, to:c.leader, on:todayISO(), reason:reason || ''}];
+  const u = USERS.find(x => x.name === name); if(u && !u.roles.includes('leader')) u.roles.push('leader');
+  const ri = LEADER_REQS.findIndex(r => r.name === name); if(ri >= 0) LEADER_REQS.splice(ri, 1);
+  audit(changing ? 'Changed cohort leader' : 'Assigned cohort leader', `${name} → ${c.name}${changing ? ` (was ${from.replace(/\s*\(.*\)/, '')})` : ''}${reason ? ` · ${reason}` : ''}`, 'Cohort Management', changing ? 'high' : 'notice', changing ? {from:from.replace(/\s*\(.*\)/, ''), to:name} : undefined);
+  evalStart(c);
+  toast(`${name} now leads ${c.name}`);
+}
+ACTIONS.askassignlead = key => { const c = COHORT_BY_ID[key.split(':')[1]]; const v = readForm(); if(!c) return; if(!v.leader){ toast('Choose a leader', 'warn'); return 'keep'; }
+  const changing = cohortHasLeader(c);
+  if(changing){ if(!v.reason){ toast('A reason is required', 'warn'); return 'keep'; }
+    S._pending = v; askConfirm({mk:'renew', title:`Change leader on ${c.name}?`, body:`Replace ${leaderName(c)} with ${v.leader} on ${c.name}? Both will be notified and the cohort will see the change.`, ok:'Change Leader', act:'doassignlead:' + c.id}); return; }
+  assignLeaderCommit(c, v.leader); };
+ACTIONS.doassignlead = key => { const c = COHORT_BY_ID[key.split(':')[1]]; const v = S._pending || {}; S._pending = null; S.confirm = null; if(!c) return; assignLeaderCommit(c, v.leader, v.reason); };
+
+/* ==================== EPIC 7 — COHORT INTERVENTION (7.6) ==================== */
+/* Intervene opens a chooser offering only the interventions available for the cohort's
+   state; each opens its own sub-sheet. No merge/dissolve (7.6: "there is no merging of
+   cohorts"). Opened as `intervene:<cohortId>`. */
+SHEETS.intervene = arg => {
+  const c = COHORT_BY_ID[String(arg).split(':')[0]] || COHORT_BY_ID[S.id]; if(!c) return {title:'Intervene', body:'', ok:''};
+  if(!COHORT_ACTIVE(c)) return {title:`Intervene — ${c.name}`, ok:'', body: note('', 'Nothing to do', 'A cohort can only be intervened on while it is Forming or Running.')};
+  const items = [
+    ...(c.status === 'forming' ? [['calendar', 'Move start date', 'movestart:' + c.id, 'Reschedule the cohort to another date.']] : []),
+    ['renew', 'Move a candidate', 'moveco:' + c.id, 'Move someone to another cohort, keeping their place and progress.'],
+    ['close', 'Remove a candidate', 'removemem:' + c.id, 'Take someone out; their course fee is not returned.'],
+    ['add', 'Add a candidate', 'addmember:' + c.id, 'Bring a candidate with a level and no cohort place in.'],
+    ['delete', 'Cancel the cohort', 'cancelco:' + c.id, 'End the cohort and move its members. This cannot be undone.']
+  ];
+  return {title:`Intervene — ${c.name}`, ok:'',
+    body:`<p class="t-desc" style="margin-bottom:var(--s05)">Only the interventions available for a ${cap(c.status)} cohort are shown.</p>
+      <div class="tile-stack">${items.map(([ic, label, sheet, desc]) => `<button type="button" class="cardrow clk" data-sheet="${sheet}" style="width:100%;text-align:left;cursor:pointer">
+        <span class="cardrow-ic">${I[ic] || I.edit}</span>
+        <span class="cardrow-b"><span class="cardrow-t">${label}</span><span class="cardrow-d">${desc}</span></span>
+        <svg class="chev" viewBox="0 0 24 24" aria-hidden="true">${inner('chevDown')}</svg></button>`).join('')}</div>`};
+};
+/* Move start date (Forming) — no course to draw dates from, so a free date pick. */
+SHEETS.movestart = arg => { const c = COHORT_BY_ID[String(arg).split(':')[0]]; if(!c) return {title:'Move start date', body:'', ok:''};
+  return {title:`Move start date — ${c.name}`, ok:'Move Start Date', act:'domovestart:' + c.id,
+    body:`${fieldHtml({k:'start', l:'New start date', t:'date', req:1}, c.start)}
+      ${fieldHtml({k:'reason', l:'Reason', t:'textarea', req:1, ph:'Why the start date is moving'})}
+      <p class="t-desc">The cohort stays open to enrolment until the new date, and every member is notified.</p>`};
+};
+ACTIONS.domovestart = key => { const c = COHORT_BY_ID[key.split(':')[1]]; const v = readForm(); if(!c) return; if(!v.start){ toast('Pick a date', 'warn'); return 'keep'; } if(!v.reason){ toast('A reason is required', 'warn'); return 'keep'; }
+  const from = c.start; c.start = v.start;
+  audit('Moved cohort start date', `${c.name}: ${dpFmt(from)} → ${dpFmt(v.start)} · ${v.reason}`, 'Cohort Management', 'high', {from, to:v.start});
+  toast(`${c.name} start moved to ${dpFmt(v.start)}`); evalStart(c); };
+/* Add a candidate (Forming/Running) — a candidate with a level and no cohort place;
+   may take the cohort past its maximum; joins at the current chapter. */
+SHEETS.addmember = arg => {
+  const c = COHORT_BY_ID[String(arg).split(':')[0]] || COHORT_BY_ID[S.id]; if(!c) return {title:'Add candidate', body:'', ok:''};
+  const free = CANDS.filter(x => (x.cohort === '—' || x.cohort === 'Awaiting') && x.level && x.status !== 'inactive');
+  return {title:`Add a candidate to ${c.name}`, ok: free.length ? 'Add Candidate' : '', act:'doaddmember:' + c.id,
+    body: free.length ? `${fieldHtml({k:'cand', l:'Candidate', t:'select', req:1, ph:'Choose a candidate', opts: free.map(x => [x.id, `${x.name} · ${x.level}${x.cohort === 'Awaiting' ? ' · awaiting a cohort' : ''}`])})}
+      ${fieldHtml({k:'reason', l:'Reason', t:'textarea', req:1, ph:'Why this candidate is being added'})}
+      <p class="t-desc">Only candidates who hold a level and no cohort place are listed. A cohort may be taken past its maximum this way. A candidate added to a started cohort joins at the current chapter with no progress of their own.</p>`
+      : note('warn', 'No candidate to add', 'Every candidate with a level already holds a cohort place.')};
+};
+ACTIONS.doaddmember = key => { const c = COHORT_BY_ID[key.split(':')[1]]; const v = readForm(); const m = CAND_BY_ID[v.cand]; if(!c || !m){ toast('Pick a candidate', 'warn'); return 'keep'; } if(!v.reason){ toast('A reason is required', 'warn'); return 'keep'; }
   m.cohort = c.name; syncCohortSizes();
-  audit(forced ? 'Force-added to cohort (eligibility bypassed)' : 'Added to cohort', `${m.name} → ${c.name}${forced ? ` · was ${from === '—' ? 'suspended' : 'in ' + from}` : ''}`, 'Cohort Management', forced ? 'high' : 'notice', {from, to:c.name});
-  toast(`${m.name} ${forced ? 'force-added' : 'added'} to ${c.name}`); };
-/* SA-12 A5 — extend or reschedule. 12 versus 13 weeks is the open ruling; both are
-   offered and the choice is logged. */
-SHEETS.extend = id => {
-  const c = COHORT_BY_ID[id]; if(!c) return {title:'Extend', body:'', ok:''};
-  return {title:`Extend or reschedule ${c.name}`, ok:'Continue', act:'askextend:' + c.id,
-    body:`${fieldHtml({k:'weeks', l:'Length', t:'select', opts:[['12', '12 weeks — the 90-day loop'], ['13', '13 weeks — extended by one (open ruling)']]}, String(c.weeks || 12))}
-      ${fieldHtml({k:'start', l:'Cohort starts on', t:'date'}, c.start)}
-      ${fieldHtml({k:'reason', l:'Reason', t:'textarea', req:1})}
-      <p class="t-desc">A changed start moves every session; a 13th week is the extension the journey leaves open (SA-12 A5). Members are told from their portal.</p>`};
+  audit('Added candidate to cohort', `${m.name} → ${c.name} · ${v.reason}`, 'Cohort Management', 'notice', {from:'—', to:c.name});
+  toast(`${m.name} added to ${c.name}`); evalStart(c); };
+/* Remove a candidate (Forming/Running) — reason, then a confirmation; the fee is not
+   returned. Opened member-locked as `removemem:<cohortId>:<memberId>`. */
+SHEETS.removemem = arg => { const [cid, mid] = String(arg).split(':'); const c = COHORT_BY_ID[cid]; const m = CAND_BY_ID[mid]; if(!c || !m) return {title:'Remove', body:'', ok:''};
+  return {title:`Remove ${m.name} from ${c.name}`, ok:'Continue', act:'askremovemem:' + cid + ':' + mid,
+    body:`${fieldHtml({k:'reason', l:'Reason', t:'textarea', req:1, ph:'Why this candidate is being removed'})}
+      <p class="t-desc">They lose their place and their course fee is not returned. They can be added to another cohort later.</p>`};
 };
-ACTIONS.askextend = key => { const c = COHORT_BY_ID[key.split(':')[1]]; const v = readForm(); if(!c) return; if(!v.reason){ toast('A reason is required', 'warn'); return 'keep'; }
-  S._pending = v; askConfirm({mk:'warning', title:`Change ${c.name}’s schedule?`, body:`${c.name} runs ${v.weeks} weeks from ${v.start}. Logged at high severity.`, ok:'Apply', act:'doextend:' + c.id}); };
-ACTIONS.doextend = key => { const c = COHORT_BY_ID[key.split(':')[1]]; const v = S._pending || {}; S._pending = null; S.confirm = null; if(!c) return;
-  const from = `${c.weeks || 12} weeks from ${c.start}`; c.weeks = Number(v.weeks) || 12; if(v.start) c.start = v.start;
-  audit(c.weeks === 13 ? 'Extended cohort to 13 weeks' : 'Rescheduled cohort', `${c.name} — ${v.reason}`, 'Cohort Management', 'high', {from, to:`${c.weeks} weeks from ${c.start}`}); toast(`${c.name} rescheduled`); };
-/* SA-12 A3 — merge an under-filled cohort into another, or dissolve it. */
-SHEETS.mergeco = id => {
-  const c = COHORT_BY_ID[id]; if(!c) return {title:'Merge', body:'', ok:''};
-  const targets = COHORTS.filter(x => x.id !== c.id && x.status === 'active' && x.size + c.size <= 10);
-  return {title:`Merge ${c.name} into another cohort`, ok: targets.length ? 'Continue' : '', act:'askmergeco:' + c.id,
-    body: targets.length ? `${fieldHtml({k:'into', l:'Into', t:'select', opts: targets.map(x => [x.id, `${x.name} · ${x.size}/10 · week ${x.week}`])})}
-      ${fieldHtml({k:'reason', l:'Reason', t:'textarea', req:1, ph:'e.g. Under-filled at week 1'})}
-      <p class="t-desc">Every member moves across; ${esc(c.name)} is archived. Only a cohort with room is offered.</p>` : note('warn', 'No cohort can take them', `No active cohort has room for ${c.size} more. Dissolve instead, or move members one at a time.`)};
-};
-ACTIONS.askmergeco = key => { const c = COHORT_BY_ID[key.split(':')[1]]; const v = readForm(); const t = COHORT_BY_ID[v.into]; if(!c || !t){ toast('Pick a cohort', 'warn'); return 'keep'; } if(!v.reason){ toast('A reason is required', 'warn'); return 'keep'; }
-  S._pending = v; askConfirm({mk:'warning', title:`Merge ${c.name} into ${t.name}?`, body:`${c.size} member${c.size === 1 ? '' : 's'} move to ${t.name}; ${c.name} is archived at week ${c.week}. This can’t be undone.`, ok:'Merge Cohorts', danger:true, act:'domergeco:' + c.id}); };
-ACTIONS.domergeco = key => { const c = COHORT_BY_ID[key.split(':')[1]]; const v = S._pending || {}; S._pending = null; S.confirm = null; const t = COHORT_BY_ID[v.into]; if(!c || !t) return;
-  CANDS.forEach(x => { if(x.cohort === c.name) x.cohort = t.name; }); c.status = 'archived'; syncCohortSizes();
-  audit('Merged cohorts', `${c.name} → ${t.name} · ${v.reason}`, 'Cohort Management', 'high', {from:c.name, to:t.name}); toast(`${c.name} merged into ${t.name}`); go('cohorts/detail/' + t.id); };
-ACTIONS.askdissolve = key => { const c = COHORT_BY_ID[key.split(':')[1]]; if(!c) return;
-  askConfirm({mk:'warning', title:`Dissolve ${c.name}?`, body:`Its ${c.size} member${c.size === 1 ? '' : 's'} return to no cohort and keep their level; the cohort is archived at week ${c.week}. Logged at high severity. This can’t be undone.`, ok:'Dissolve', danger:true, act:'dodissolve:' + c.id}); };
-ACTIONS.dodissolve = key => { const c = COHORT_BY_ID[key.split(':')[1]]; S.confirm = null; if(!c) return; const n = c.size;
-  CANDS.forEach(x => { if(x.cohort === c.name) x.cohort = '—'; }); c.status = 'archived'; syncCohortSizes();
-  audit('Dissolved cohort', `${c.name} — ${n} member${n === 1 ? '' : 's'} released`, 'Cohort Management', 'high', {from:'active', to:'archived'}); toast(`${c.name} dissolved`); };
-/* SA-12 A4 — rebalance by moving one member; no E4 or E5 is guaranteed per cohort. */
+ACTIONS.askremovemem = key => { const [, cid, mid] = key.split(':'); const c = COHORT_BY_ID[cid]; const m = CAND_BY_ID[mid]; const v = readForm(); if(!c || !m) return; if(!v.reason){ toast('A reason is required', 'warn'); return 'keep'; }
+  S._pending = {reason:v.reason, cid, mid}; askConfirm({mk:'warning', title:`Remove ${m.name} from ${c.name}?`, body:'They lose their place and their course fee is not returned.', ok:'Remove', danger:true, act:'doremovemem'}); };
+ACTIONS.doremovemem = () => { const p = S._pending || {}; S._pending = null; S.confirm = null; const c = COHORT_BY_ID[p.cid], m = CAND_BY_ID[p.mid]; if(!c || !m) return; m.cohort = '—'; syncCohortSizes();
+  audit('Removed candidate from cohort (fee forfeited)', `${m.name} ✕ ${c.name} · ${p.reason}`, 'Cohort Management', 'high', {from:c.name, to:'—'}); toast(`${m.name} removed from ${c.name}`); };
+/* Move a candidate to another cohort (Forming/Running) — destination is any active
+   cohort below its maximum (no course to match on). Keeps the paid place and progress.
+   Opened as `moveco:<cohortId>` (pick a member) or `moveco:<cohortId>:<memberId>`. */
 SHEETS.moveco = arg => {
-  /* Opened from the cohort ("moveco:ch1", pick a member) OR from a member row
-     ("moveco:ch1:u4", that member is locked) — Maryam, 15 Sep 2026. */
   const [cid, mid] = String(arg).split(':');
   const c = COHORT_BY_ID[cid]; if(!c) return {title:'Move', body:'', ok:''};
   const roster = CANDS.filter(x => x.cohort === c.name);
-  const targets = COHORTS.filter(x => x.id !== c.id && x.status !== 'archived' && x.size < (x.cap || 10));
+  const targets = COHORTS.filter(x => x.id !== c.id && COHORT_ACTIVE(x) && cohortSize(x) < (x.cap || 12));
   const m = mid ? CAND_BY_ID[mid] : null;
   const canDo = (m || roster.length) && targets.length;
-  return {title: m ? `Move ${m.name} to another cohort` : `Move a member out of ${c.name}`, ok: canDo ? 'Continue' : '', act:'askmoveco:' + c.id,
+  return {title: m ? `Move ${m.name} to another cohort` : `Move a candidate out of ${c.name}`, ok: canDo ? 'Continue' : '', act:'askmoveco:' + c.id,
     body: canDo ? `${m
-        ? `<label class="f"><span class="lbl">Member</span><div class="inp" style="pointer-events:none;background:var(--surface-2)">${esc(m.name)} &middot; ${esc(m.level)}</div><input type="hidden" data-f="cand" value="${esc(m.id)}"></label>`
-        : fieldHtml({k:'cand', l:'Member', t:'select', opts: roster.map(x => [x.id, `${x.name} · ${x.level}`])})}
-      ${fieldHtml({k:'into', l:'To', t:'select', opts: targets.map(x => [x.id, `${x.name} · ${x.size}/${x.cap || 10}`])})}
-      <p class="t-desc">Rebalancing (SA-12 A4). The journey does not guarantee an E4 or E5 in every cohort, so a move across levels is allowed and logged.</p>` : note('', 'Nothing to move', 'Either the roster is empty or no other cohort has room.')};
+        ? `<label class="f"><span class="lbl">Candidate</span><div class="inp" style="pointer-events:none;background:var(--surface-2)">${esc(m.name)} &middot; ${esc(m.level || '')}</div><input type="hidden" data-f="cand" value="${esc(m.id)}"></label>`
+        : fieldHtml({k:'cand', l:'Candidate', t:'select', req:1, ph:'Choose a candidate', opts: roster.map(x => [x.id, `${x.name} · ${x.level}`])})}
+      ${fieldHtml({k:'into', l:'Destination cohort', t:'select', req:1, ph:'Choose a cohort', opts: targets.map(x => [x.id, `${x.name} · ${cap(x.status)} · ${x.status === 'running' ? `day ${x.day} of 90` : `starts ${dpFmt(x.start)}`} · ${cohortSize(x)}/${x.cap || 12}`])})}
+      ${fieldHtml({k:'reason', l:'Reason', t:'textarea', req:1, ph:'Why this candidate is moving'})}
+      <p class="t-desc">The candidate keeps the place they paid for — no money moves — and carries their progress into the destination.</p>` : note('', 'Nothing to move', 'Either the roster is empty or no other cohort has room.')};
 };
-ACTIONS.askmoveco = key => { const c = COHORT_BY_ID[key.split(':')[1]]; const v = readForm(); const m = CAND_BY_ID[v.cand]; const t = COHORT_BY_ID[v.into]; if(!c || !m || !t){ toast('Pick a member and a cohort', 'warn'); return 'keep'; }
-  S._pending = v; askConfirm({mk:'check', title:`Move ${m.name} to ${t.name}?`, body:`${m.name} leaves ${c.name} and takes a seat in ${t.name} from its next session.`, ok:'Move', act:'domoveco:' + c.id}); };
+ACTIONS.askmoveco = key => { const c = COHORT_BY_ID[key.split(':')[1]]; const v = readForm(); const m = CAND_BY_ID[v.cand]; const t = COHORT_BY_ID[v.into]; if(!c || !m || !t){ toast('Pick a candidate and a cohort', 'warn'); return 'keep'; } if(!v.reason){ toast('A reason is required', 'warn'); return 'keep'; }
+  S._pending = v; askConfirm({mk:'check', title:`Move ${m.name} to ${t.name}?`, body:`${m.name} leaves ${c.name} and joins ${t.name}, keeping their paid place and their progress.`, ok:'Move', act:'domoveco:' + c.id}); };
 ACTIONS.domoveco = key => { const c = COHORT_BY_ID[key.split(':')[1]]; const v = S._pending || {}; S._pending = null; S.confirm = null; const m = CAND_BY_ID[v.cand]; const t = COHORT_BY_ID[v.into]; if(!c || !m || !t) return;
-  m.cohort = t.name; syncCohortSizes(); audit('Moved member between cohorts', `${m.name}: ${c.name} → ${t.name}`, 'Cohort Management', 'high', {from:c.name, to:t.name}); toast(`${m.name} moved to ${t.name}`); };
+  m.cohort = t.name; syncCohortSizes(); audit('Moved candidate between cohorts', `${m.name}: ${c.name} → ${t.name} · ${v.reason || ''}`, 'Cohort Management', 'high', {from:c.name, to:t.name}); toast(`${m.name} moved to ${t.name}`); evalStart(t); };
+/* Cancel the cohort (Forming/Running) — every member gets an editable proposed
+   destination (an active cohort below max, else Awaiting cohort); on commit the cohort
+   is Cancelled, members are moved or set Awaiting, and any leader is released. */
+SHEETS.cancelco = arg => { const c = COHORT_BY_ID[String(arg).split(':')[0]]; if(!c) return {title:'Cancel', body:'', ok:''};
+  const roster = CANDS.filter(x => x.cohort === c.name);
+  const targets = COHORTS.filter(x => x.id !== c.id && COHORT_ACTIVE(x) && cohortSize(x) < (x.cap || 12));
+  const destOpts = [...targets.map(x => [x.id, `${x.name} · ${cap(x.status)} · ${cohortSize(x)}/${x.cap || 12}`]), ['await', 'Awaiting cohort — placed automatically later']];
+  const suggested = targets.length ? targets[0].id : 'await';
+  return {title:`Cancel ${c.name}`, ok:'Continue', act:'askcancelco:' + c.id,
+    body:`${roster.length ? `<p class="t-label" style="color:var(--text-secondary);margin-bottom:var(--s03)">Every member must be dealt with first. Choose where each one goes.</p>
+      ${roster.map(m => fieldHtml({k:'dest_' + m.id, l:`${m.name} · ${m.level || ''}`, t:'select', opts:destOpts}, suggested)).join('')}` : `<p class="t-desc" style="margin-bottom:var(--s04)">This cohort has no members.</p>`}
+      ${fieldHtml({k:'reason', l:'Reason', t:'textarea', req:1, ph:'Why the cohort is being cancelled'})}
+      <p class="t-desc">A member with a chosen cohort keeps their paid place and carries their progress. A member with no suitable cohort moves to Awaiting cohort and is placed automatically when one opens. This cannot be undone.</p>`};
+};
+ACTIONS.askcancelco = key => { const c = COHORT_BY_ID[key.split(':')[1]]; const v = readForm(); if(!c) return; if(!v.reason){ toast('A reason is required', 'warn'); return 'keep'; }
+  const roster = CANDS.filter(x => x.cohort === c.name);
+  const moved = roster.filter(m => (v['dest_' + m.id] || 'await') !== 'await').length, awaiting = roster.length - moved;
+  S._pending = v; askConfirm({mk:'warning', title:`Cancel ${c.name}?`, body:`${moved} candidate${moved === 1 ? '' : 's'} will be moved to another cohort and ${awaiting} paid enrolment${awaiting === 1 ? '' : 's'} will move to Awaiting cohort. This cannot be undone.`, ok:'Cancel Cohort', danger:true, act:'docancelco:' + c.id}); };
+ACTIONS.docancelco = key => { const c = COHORT_BY_ID[key.split(':')[1]]; const v = S._pending || {}; S._pending = null; S.confirm = null; if(!c) return;
+  const roster = CANDS.filter(x => x.cohort === c.name);
+  roster.forEach(m => { const d = v['dest_' + m.id] || 'await'; const t = COHORT_BY_ID[d]; m.cohort = (t && d !== 'await') ? t.name : 'Awaiting'; });
+  const relLeader = leaderName(c);
+  c.status = 'cancelled'; c.cancelledOn = todayISO(); c.cancelReason = v.reason; c.leader = 'Unassigned';
+  syncCohortSizes();
+  audit('Cancelled cohort', `${c.name} · ${roster.length} member${roster.length === 1 ? '' : 's'} dealt with${relLeader ? ` · ${relLeader} released` : ''} · ${v.reason}`, 'Cohort Management', 'high', {from:'active', to:'cancelled'});
+  toast(`${c.name} cancelled`); go('cohorts/detail/' + c.id); };
 
+/* EPIC 7 — the level checkboxes for a course's chosen track (E1–E5 / B1–B5), rebuilt
+   DOM-only when the Track dropdown changes (see the `data-formddset` hook). */
+function courseLevelChecks(track, selected){
+  if(!track) return `<p class="t-desc">Choose a track first.</p>`;
+  return courseRungs(track).map(r => `<label class="cbx"><input type="checkbox" data-f="levels" value="${r}"${(selected || []).includes(r) ? ' checked' : ''}><span class="box">${I.check}</span><span class="txt">${r}</span></label>`).join('');
+}
 KINDS.course = {
   label:'course', mod:'Cohort Management', after:'catalogue/catalogue',
   find: id => COURSE_BY_ID[id], name: c => c.name, detail: c => 'catalogue/coursedetail/' + c.id,
-  /* NO TRACK, NO LEVEL-MAP in the edit window (Maryam, 15 Sep 2026): anyone can take
-     a course, so which track it is for and which levels it maps to are no longer
-     shown on the detail page or edited here — the form is name / price / length /
-     status. The seed's `track`/`levels` keys are left untouched on the record (the
-     catalogue column and the cover derivation still read `track`); create defaults a
-     track so a course still resolves a cover and its (unshown) mapping. */
-  fields: [
-    {k:'name', l:'Course name', t:'text', req:1},
-    {k:'price', l:'Price ($)', t:'number', req:1, def:100},
-    {k:'days', l:'Length (days)', t:'number', def:90},
-    {k:'status', l:'Status', t:'select', opts:[['draft', 'Draft — not on sale'], ['live', 'Live — bookable']], def:'draft'}
+  /* EPIC 7 (Maryam, 29 Sep 2026): the full 7.1 catalogue. Track / Levels / Intent /
+     Description are Tal's recommendation inputs (18.1), NOT enrolment gates — any
+     candidate with a level may enrol on any Live course. Levels are gated on the
+     chosen track and clear when it changes. Price is editable on CREATE; changing it
+     later needs the step-up flow (Change price on the detail), so it is read-only when
+     editing. Trailblazer is out of the V1 catalogue. */
+  fields: c => [
+    {k:'name', l:'Course name', t:'text', req:1, max:100, ph:'e.g. Foundations of Leadership'},
+    {k:'desc', t:'html', req:1, html:`<label class="f"><span class="lbl">Description <span class="req-star" aria-hidden="true">*</span></span>
+      <textarea class="inp" data-f="desc" rows="4" maxlength="1000" placeholder="What the course develops, in the words a candidate would recognise.">${esc((c && c.desc) || '')}</textarea>
+      <span class="f-hint">Tal reads this description when it chooses which course to recommend. Describe what the course develops, in the words a candidate would recognise.</span></label>`},
+    {k:'track', l:'Track', t:'select', req:1, ph:'Choose a track', opts: COURSE_TRACKS.map(t => [t, t])},
+    {k:'levels', t:'html', req:1, html:`<div class="f"><span class="lbl">Levels <span class="req-star" aria-hidden="true">*</span></span>
+      <div class="mt4 course-levels" data-track="${(c && c.track) || ''}">${courseLevelChecks(c && c.track, c && c.levels)}</div>
+      <span class="f-hint">The rungs of the chosen track this course is aimed at. Pick one or more; they need not be consecutive.</span></div>`},
+    {k:'intent', l:'Intent', t:'checks', req:1, opts: INTENTS},
+    {k:'_len', t:'html', html:`<label class="f"><span class="lbl">Length</span><input class="inp pfe-ro" value="90 days" readonly tabindex="-1"><span class="f-hint">Every course runs 90 days. This is fixed platform-wide.</span></label>`},
+    {k:'chapters', t:'html', req:1, def:12, html:`<label class="f"><span class="lbl">Chapter count <span class="req-star" aria-hidden="true">*</span></span>
+      <input class="inp" data-f="chapters" type="number" min="1" max="90" value="${(c && c.chapters) || 12}" placeholder="1 to 90" oninput="{var n=Math.max(1,Math.min(90,Number(this.value)||1));var el=document.getElementById('chDeriv');if(el)el.textContent='90 days over '+n+' chapters, about '+(90/n).toFixed(1)+' days per chapter';try{syncSheetSubmit()}catch(e){}}">
+      <span class="f-hint" id="chDeriv">90 days over ${(c && c.chapters) || 12} chapters, about ${(90 / ((c && c.chapters) || 12)).toFixed(1)} days per chapter</span></label>`},
+    {k:'lsvt', l:'Learning platform course', t:'select', req:1, ph:'Choose the learning platform course', opts: LS_COURSES.map(x => [x, x])},
+    {k:'price', l:'Price ($)', t:'number', req:1, def:100, ro: !!c},
+    {k:'status', l:'Status', t:'select', req:1, opts:[['draft', 'Draft — not visible to candidates'], ['live', 'Live — open for enrolment']], def:'draft'}
   ],
-  help:'A course sets its own price and runs 90 days. Candidates enrol in it individually. The content itself stays in the LMS vendor’s console and is not edited here.',
+  help:'Track, Levels, Intent and Description are what Tal ranks a course on when it recommends one — they never restrict who may enrol. A course runs 90 days. Its chapters live in the learning platform; the count set here drives the pacing shown to candidates.',
   okNew:'Add Course',
-  create: v => { const c = {id:newId('co', COURSES), name:v.name, track:'Explorer', price:v.price, days:Number(v.days) || 90, status:v.status}; COURSES.push(c); COURSE_BY_ID[c.id] = c; return c; },
-  update: (c, v) => { c.name = v.name; c.price = v.price; c.days = Number(v.days) || 90; c.status = v.status; },
+  create: v => { const c = {id:newId('co', COURSES), name:v.name, desc:v.desc || '', track:v.track || 'Explorer', levels:Array.isArray(v.levels) ? v.levels : [], intent:Array.isArray(v.intent) ? v.intent : [], chapters:Number(v.chapters) || 12, lsvt:v.lsvt || '', price:Number(v.price) || 0, days:90, status:v.status || 'draft'}; COURSES.push(c); COURSE_BY_ID[c.id] = c; return c; },
+  update: (c, v) => { c.name = v.name; c.desc = v.desc; c.track = v.track; c.levels = Array.isArray(v.levels) ? v.levels : c.levels; c.intent = Array.isArray(v.intent) ? v.intent : c.intent; c.chapters = Number(v.chapters) || c.chapters; c.lsvt = v.lsvt; c.days = 90; c.status = v.status; /* price is changed through the step-up flow, never here */ },
   remove: c => { COURSES.splice(COURSES.indexOf(c), 1); delete COURSE_BY_ID[c.id]; },
   delWarn: c => `${c.name} leaves the catalogue.`,
-  status: (c, val) => val === 'live'
-    ? {title:`Publish ${c.name}?`, body:`The course goes on sale at ${money(c.price)} and can be enrolled in.`, ok:'Publish', log:'Published course', done:`${c.name} is live`}
-    : {title:`Retire ${c.name}?`, body:'No new cohort can run it. Cohorts already running it finish their cycle.', ok:'Retire', danger:true, log:'Retired course', done:`${c.name} retired`, apply: x => { x.status = 'draft'; }}
+  status: (c, val) => val === 'archived'
+    ? {title:`Archive ${c.name}?`, body:'The course closes to new enrolment and no longer appears to candidates. Any cohort already running is unaffected.', ok:'Archive', danger:true, log:'Archived course', done:`${c.name} archived`, apply: x => { x.status = 'archived'; }}
+    : val === 'live'
+    ? {title:`Publish ${c.name}?`, body:`The course goes live at ${money(c.price)} and candidates can enrol.`, ok:'Publish', log:'Published course', done:`${c.name} is live`, apply: x => { x.status = 'live'; }}
+    : {title:`Move ${c.name} to draft?`, body:'It is hidden from candidates and cannot be enrolled on.', ok:'To Draft', danger:true, log:'Course to draft', done:`${c.name} is a draft`, apply: x => { x.status = 'draft'; }}
 };
+/* 7.1 — a course price change needs the Change fee permission, a reason and a step-up
+   code (story 1.4). So price is read-only in the edit form and changed here instead. */
+SHEETS.courseprice = arg => { const c = COURSE_BY_ID[String(arg).split(':')[0]]; if(!c) return {title:'Change price', body:'', ok:''};
+  return {title:`Change price — ${c.name}`, ok:'Continue', act:'askcourseprice:' + c.id,
+    body:`${fieldHtml({k:'price', l:'New price ($)', t:'number', req:1, def:c.price})}
+      ${fieldHtml({k:'reason', l:'Reason', t:'textarea', req:1, ph:'Why the price is changing'})}
+      <p class="t-desc">Changing a price needs a fresh security code (step-up) and applies to new enrolments only.</p>`};
+};
+ACTIONS.askcourseprice = key => { const c = COURSE_BY_ID[key.split(':')[1]]; const v = readForm(); if(!c) return; if(v.price === '' || v.price == null){ toast('Enter a price', 'warn'); return 'keep'; } if(!v.reason){ toast('A reason is required', 'warn'); return 'keep'; }
+  S._pending = {id:c.id, price:v.price, reason:v.reason}; askConfirm({stepup:true, mk:'warning', title:`Change ${c.name} price?`, body:`New enrolments will be charged ${money(Number(v.price))}. ${money(c.price)} → ${money(Number(v.price))}.`, ok:'Change Price', act:'docourseprice'}); };
+ACTIONS.docourseprice = () => { const p = S._pending || {}; S._pending = null; S.confirm = null; const c = COURSE_BY_ID[p.id]; if(!c) return; const from = c.price; c.price = Number(p.price);
+  audit('Changed course price', `${c.name} · ${p.reason}`, 'Cohort Management', 'high', {from:money(from), to:money(c.price)}); toast(`${c.name} price changed`); };
 function cohortsCatalogue(){
-  const q = getFilter('q', '');
-  const rows = COURSES.filter(c => hit(q, c.name, c.track, c.status));
+  const q = getFilter('q', ''), fs = getFilter('cstat', 'all'), ft = getFilter('ctrack', 'all'), fi = getFilter('cintent', 'all');
+  const rows = COURSES
+    .filter(c => fs === 'all' ? true : c.status === fs)
+    .filter(c => ft === 'all' ? true : c.track === ft)
+    .filter(c => fi === 'all' ? true : (c.intent || []).includes(fi))
+    .filter(c => hit(q, c.name));
+  const cnt = s => COURSES.filter(c => c.status === s).length;
   return `
   <section class="sec">
-    ${searchHead('Course catalogue', 'The courses a cohort can run. A course sets its own price and runs 90 days.',
-      `<button class="btn btn-p btn-sm noic" data-act="toast:Opening LightSpeed to add a course (prototype)">${I.add} Add Course</button>`, 'Search courses')}
-    ${filterStrip('cstat', 'all', [['all', 'All', COURSES.length], ['live', 'Live', COURSES.filter(c => c.status === 'live').length], ['draft', 'Draft', COURSES.filter(c => c.status === 'draft').length]])}
-    ${lstTools('Search courses')}
-    ${table(
-      [{label:'Course'}, {label:'Track'}, {label:'Price', num:true}, {label:'Length'}, {label:'Status'}, ACT_COL],
-      rows.filter(c => { const f = getFilter('cstat', 'all'); return f === 'all' || c.status === f; }).map(c => ({go:'catalogue/coursedetail/' + c.id, cells:[
-        esc(c.name), esc(c.track), money(c.price), c.days + ' days', tag(c.status),
-        rowActs([editBtn('course', c.id),
-          c.status === 'live' ? ['pause', 'Retire', `data-act="askstatus:course:${c.id}:draft"`] : ['play', 'Publish', `data-act="askstatus:course:${c.id}:live"`],
+    ${searchHead('Course catalogue', 'The courses candidates can enrol on, the chapter count each runs over, and the track, levels and intents Tal recommends it on.',
+      `${addBtn('course', 'Add Course')}`, 'Search courses')}
+    ${lstTools('Search courses',
+      filterDd('cstat', 'all', [['all', 'All statuses'], ['live', `Live (${cnt('live')})`], ['draft', `Draft (${cnt('draft')})`], ['archived', `Archived (${cnt('archived')})`]], 'Status')
+      + filterDd('ctrack', 'all', [['all', 'All tracks'], ...COURSE_TRACKS.map(t => [t, t])], 'Track')
+      + filterDd('cintent', 'all', [['all', 'All intents'], ...INTENTS], 'Intent'))}
+    ${rows.length ? table(
+      [{label:'Course'}, {label:'Track'}, {label:'Levels'}, {label:'Intent'}, {label:'Status'}, {label:'Length'}, {label:'Chapters', num:true}, {label:'Price', num:true}, ACT_COL],
+      rows.map(c => ({go:'catalogue/coursedetail/' + c.id, cells:[
+        esc(c.name), esc(c.track), esc((c.levels || []).join(', ') || '—'), esc(intentSummary(c.intent)), tag(c.status), '90 days', String(c.chapters || 12), money(c.price),
+        rowActs([
+          ['launch', 'View', `data-go="catalogue/coursedetail/${c.id}"`],
+          editBtn('course', c.id),
+          ['wallet', 'Change price', `data-sheet="courseprice:${c.id}"`],
+          c.status === 'live' ? ['pause', 'Archive', `data-act="askstatus:course:${c.id}:archived"`] : ['play', 'Publish', `data-act="askstatus:course:${c.id}:live"`],
           delBtn('course', c.id)])
-      ]})))}
+      ]})))
+      : emptyState('book', 'No courses match', 'Nothing in this filter yet.')}
   </section>`;
 }
 
@@ -9261,25 +9517,34 @@ function cohortsCourseDetail(){
       <span class="crs-idphoto">${cover ? `<img src="${cover}" alt="">` : ''}</span>
       <div class="idhead-b">
         <span class="idname-row"><span class="idname">${esc(c.name)}</span></span>
+        <span class="idmeta">${esc(c.track || '')}${(c.levels || []).length ? ' · ' + esc((c.levels || []).join(', ')) : ''}</span>
       </div>
-      ${''/* Header actions in a kebab (Maryam, 18 Sep 2026). */}
+      ${''/* Header actions in a kebab (Maryam, 18 Sep 2026); the state tag stays
+             visible beside it. Change price runs the step-up flow (7.1). */}
       <span class="idhead-act" style="display:flex;align-items:center;gap:var(--s03)">
+        ${tag(c.status)}
         ${rowActs([
           ['edit', 'Edit', `data-sheet="rec:course:${c.id}"`],
-          c.status === 'live' ? null : ['check', 'Publish', `data-act="askstatus:course:${c.id}:live"`],
+          ['wallet', 'Change price', `data-sheet="courseprice:${c.id}"`],
+          c.status === 'live' ? ['pause', 'Archive', `data-act="askstatus:course:${c.id}:archived"`] : ['play', 'Publish', `data-act="askstatus:course:${c.id}:live"`],
           ['delete', 'Delete Course', `data-act="askdel:course:${c.id}"`]
         ])}
       </span>
     </div>
-    ${''/* PRICE / LENGTH / STATUS as three blocks in a row — the candidate-detail
-           fact band, three across (Maryam, 15 Sep 2026). Track, Maps-to-levels and
-           Content rows removed. */}
-    <div class="facts pf-facts crs-facts">
-      ${admFact(I.wallet, '--mk-2', 'Price', money(c.price))}
-      ${admFact(I.time, '--mk-3', 'Length', c.days + ' days')}
+    ${''/* EPIC 7 (Maryam 29 Sep 2026) — the recommendation inputs as an 8-cell fact
+           band (Track / Levels / Intent / Length / Chapters / LMS / Price / Status). */}
+    <div class="facts pf-facts">
+      ${admFact(I.growth, '--mk-1', 'Track', esc(c.track || '—'))}
+      ${admFact(I.chart, '--mk-2', 'Levels', esc((c.levels || []).join(', ') || '—'))}
+      ${admFact(I.flag, '--mk-3', 'Intent', esc(intentSummary(c.intent)))}
+      ${admFact(I.time, '--mk-4', 'Length', '90 days')}
+      ${admFact(I.book, '--mk-1', 'Chapters', String(c.chapters || 12))}
+      ${admFact(I.launch, '--mk-2', 'Learning platform', esc(c.lsvt || '—'))}
+      ${admFact(I.wallet, '--mk-3', 'Price', money(c.price))}
       <div style="--mk:var(--mk-4)"><span class="l pf-l">${I.verified}Status</span><span class="v">${tag(c.status)}</span></div>
     </div>
   </section>
+  ${c.desc ? `<section class="sec">${secHead('Description')}<p class="t-desc" style="max-width:72ch">${esc(c.desc)}</p></section>` : ''}
   ${''/* THE COURSE OUTLINE — the candidate portal's chapter accordion (Maryam,
         15 Sep 2026). Authored placeholder chapters until real per-course data. */}
   ${courseOutline()}`;
@@ -9437,7 +9702,7 @@ function cohortsLeaderDetail(){
   DETAIL_LABEL = u.name;
   const bare = n => String(n || '').replace(/\s*\(.*\)/, '').trim();
   const led = COHORTS.filter(c => bare(c.leader) === u.name);
-  const active = led.filter(c => c.status !== 'archived');
+  const active = led.filter(c => COHORT_ACTIVE(c));
   const isMod = !!u.addedBy;
   const member = (u.cohorts || []).filter(c => /\(member\)/i.test(c)).map(c => bare(c));
   const lvl = (u.level && u.level !== '—') ? u.level : 'Not levelled';
@@ -9470,7 +9735,7 @@ function cohortsLeaderDetail(){
       led.map(c => ({id:c.id, go:'cohorts/detail/' + c.id, cells:[
         esc(c.name), esc(c.track || '—'),
         c.start ? esc(mdy(c.start)) : '—',
-        c.status === 'draft' ? 'Not started' : c.status === 'archived' ? `Ended at week ${c.week}` : `Week ${c.week} of 13`,
+        cohortProgress(c) || (c.status === 'forming' ? 'Not started' : cap(c.status)),
         tag(c.status)
       ]})), {select:false, paginate:false})
       : emptyState('cohorts', 'No cohorts yet', `${esc((u.name || '').split(' ')[0])} does not lead a cohort right now.`)}
@@ -9501,7 +9766,7 @@ ACTIONS.doinvitelead = () => { const v = readForm(); const c = CAND_BY_ID[v.cand
   audit('Invited cohort leader', c.name, 'Cohort Management', 'notice'); toast(`${c.name} invited to lead`); };
 SHEETS.allot = () => {
   const r = LR_BY_ID[S.id];
-  const open = COHORTS.filter(c => (c.leader === 'Unassigned' || c.status === 'draft') && c.status !== 'archived');
+  const open = COHORTS.filter(c => COHORT_ACTIVE(c) && c.leader === 'Unassigned');
   return {title:`Allot ${r ? r.name : 'this leader'}`,
     body:`${fieldHtml({k:'cohort', l:'Cohort', t:'select', opts: open.length ? open.map(c => [c.id, c.name]) : [['', 'No cohort is waiting for a leader']]})}
       <p class="t-desc">${r ? esc(r.name) : 'This leader'} is a ${r ? esc(r.bucket) : ''} and can lead a cohort. The assignment is written to the audit log.</p>`,
@@ -9509,9 +9774,9 @@ SHEETS.allot = () => {
 };
 ACTIONS.askallot = key => { S.id = key.split(':')[1]; S.sheet = 'allot'; };
 ACTIONS.doallot = key => { const r = LR_BY_ID[key.split(':')[1]]; const v = readForm(); const c = COHORT_BY_ID[v.cohort]; if(!r || !c){ toast('Pick a cohort', 'warn'); return 'keep'; }
-  c.leader = `${r.name} (${r.bucket})`; LEADER_REQS.splice(LEADER_REQS.indexOf(r), 1);
+  c.leader = `${r.name} (${r.bucket})`; c.leadFrom = todayISO(); LEADER_REQS.splice(LEADER_REQS.indexOf(r), 1);
   const u = USERS.find(x => x.name === r.name); if(u && !u.roles.includes('leader')) u.roles.push('leader');
-  audit('Assigned cohort leader', `${r.name} → ${c.name}`, 'Cohort Management', 'notice'); toast(`${r.name} now leads ${c.name}`); };
+  audit('Assigned cohort leader', `${r.name} → ${c.name}`, 'Cohort Management', 'notice'); evalStart(c); toast(`${r.name} now leads ${c.name}`); };
 ACTIONS.askleaddecl = key => { const r = LR_BY_ID[key.split(':')[1]]; if(!r) return;
   askConfirm({mk:'warning', title:`Decline ${r.name}?`, body:'They are told the decision and can apply again after their next level review.', ok:'Decline', danger:true, act:'doleaddecl:' + r.id}); };
 ACTIONS.doleaddecl = key => { const r = LR_BY_ID[key.split(':')[1]]; if(r){ LEADER_REQS.splice(LEADER_REQS.indexOf(r), 1); audit('Declined leader application', r.name, 'Cohort Management', 'notice'); toast(`${r.name} declined`); } S.confirm = null; };
@@ -9589,61 +9854,103 @@ const emailOf = n => (USERS.find(u => u.name === n) || {}).email || '';
    so a synthesised candidate never shows a blank second line. */
 const candEmail = n => emailOf(n) || (n ? String(n).trim().toLowerCase().replace(/[^a-z\s]/g, '').replace(/\s+/g, '.') + '@talentnext.io' : '');
 const candByName = n => CANDS.find(c => c.name === n);
-/* A booking's stage follows events: paid → Booked, the recording → Held, the
-   evaluation → Reported; a scheduled time that passed with no recording → Not
-   held; a failed one dealt with through Resolve → Resolved. */
+/* A booking's stage follows events (Epic 8.1): paid → Booked, the recording →
+   Held, the agent files their report → Awaiting approval, a reviewer settles the
+   level → Reported; a scheduled time that passed with no recording → Not held; a
+   failed one dealt with through Resolve → Awaiting candidate (a rebooking credit
+   is live), then Resolved once the credit is used or expires. Seven stages, in the
+   story's own order. */
 const bkStage = b => b.stage || 'booked';
-const BK_STAGE = {booked:'Booked', held:'Held', reported:'Reported', nothld:'Not held', resolved:'Resolved'};
-const bkStageTag = b => { const s = bkStage(b);
-  return tag(s === 'reported' ? 'active' : s === 'held' ? 'pending' : (s === 'nothld' || s === 'resolved') ? 'inactive' : '', BK_STAGE[s]); };
+const BK_STAGE = {booked:'Booked', held:'Held', await:'Awaiting approval', reported:'Reported', nothld:'Not held', awaitcand:'Awaiting candidate', resolved:'Resolved'};
+const BK_STAGE_ORDER = ['booked', 'held', 'await', 'reported', 'nothld', 'awaitcand', 'resolved'];
+const BK_STAGE_HUE = {booked:'', held:'pending', await:'pending', reported:'active', nothld:'inactive', awaitcand:'pending', resolved:''};
+const bkStageTag = b => { const s = bkStage(b); return tag(BK_STAGE_HUE[s] || '', BK_STAGE[s]); };
+/* Deadlines (8.1), authored placeholders — real Settings controls own these (§74):
+   the agent's report is due REPORT_DEADLINE_HRS after the interview was held; a
+   reviewer has APPROVAL_DEADLINE_HRS to settle once the agent filed; a rebooking
+   credit runs for REBOOK_WINDOW days. */
+const REPORT_DEADLINE_HRS = 24, APPROVAL_DEADLINE_HRS = 24, REBOOK_WINDOW = 14;
 const bkOverdue = b => bkStage(b) === 'held' && b.overdue;
-const bkNeedsAttention = b => bkOverdue(b) || bkStage(b) === 'nothld';
+const bkApprovalOverdue = b => bkStage(b) === 'await' && b.apprOverdue;
+/* Needs attention (8.1): Held with the report overdue, Awaiting approval with the
+   approval overdue, or Not held. */
+const bkNeedsAttention = b => bkOverdue(b) || bkApprovalOverdue(b) || bkStage(b) === 'nothld';
+const overdueSpan = (word, days) => `<span class="statw err">${word} ${days} day${days === 1 ? '' : 's'} overdue</span>`;
+/* Report due only applies at Held; Approval due only at Awaiting approval. */
 const bkReportDue = b => bkStage(b) !== 'held' ? '—'
-  : b.overdue ? `<span class="statw err">Report ${b.overdueDays} day${b.overdueDays === 1 ? '' : 's'} overdue</span>` : 'Within 24h';
+  : b.overdue ? overdueSpan('Report', b.overdueDays) : 'Within 24h';
+const bkApprovalDue = b => bkStage(b) !== 'await' ? '—'
+  : b.apprOverdue ? overdueSpan('Approval', b.apprOverdueDays) : 'Within 24h';
+/* Escrow reads In escrow / Paid / Returned on the register (8.1, story 9.3),
+   mapped from the internal held / released / refunded. */
+const BK_ESCROW = {held:['pending', 'In escrow'], released:['paid', 'Paid'], refunded:['', 'Returned']};
+const bkEscrowTag = e => { const m = BK_ESCROW[e]; return m ? tag(m[0], m[1]) : '—'; };
 const escrowTag = e => e === 'held' ? '<span class="tag sm green">Held</span>' : e === 'released' ? '<span class="tag sm">Released</span>' : e === 'refunded' ? '<span class="tag sm">Refunded</span>' : '<span class="tag sm">n/a</span>';
-/* RECORDINGS — a recording exists once the interview was held. SCENES consent
-   governs employer visibility only; status is Available / Deleted / Expired. */
+/* Fee facts (8.1): the total booking value, the candidate-paid amount and the
+   funding source. A first interview on the automatic 100% discount was paid at 0. */
+const bkFirst = b => /first/i.test(String(b.kind || ''));
+const bkFunding = b => bkFirst(b) ? 'First-interview discount' : 'Candidate';
+const bkPaid = b => bkFirst(b) ? 0 : (b.fee || 0);
+/* The scheduled date + time, platform convention (Maryam 29 Sep 2026): MM-DD-YYYY
+   and a bare 12-hour time — no timezone label in the prototype. */
+function slot12(slot){
+  const m = String(slot || '').match(/(\d{1,2}):(\d{2})/);
+  if(!m) return String(slot || '');
+  let h = +m[1]; const ap = h < 12 ? 'AM' : 'PM'; h = h % 12 || 12;
+  return `${h}:${m[2]} ${ap}`;
+}
+const bkWhen = b => `${dpFmt(b.date) || esc(b.date || '')}${b.slot ? ' · ' + slot12(b.slot) : ''}`;
+/* RECORDINGS (8.4) — a recording exists once the interview was held. It is kept
+   until a Super Admin deletes it BY HAND: there is no retention clock and nothing
+   expires on a date, so Status is Available or Deleted only. SCENES consent
+   (Given / Withdrawn / Not asked) governs whether the clips cut from it are used
+   across the platform. */
 const scenesConsent = b => b.scenesWithdrawn ? 'Withdrawn' : ((candByName(b.cand) || {}).consent && candByName(b.cand).consent.scenes ? 'Given' : 'Not asked');
 const empVisible = b => scenesConsent(b) === 'Given' ? 'On' : 'Off';
-const recStatus = b => b.recDeleted ? 'Deleted' : b.recExpired ? 'Expired' : 'Available';
+const recStatus = b => b.recDeleted ? 'Deleted' : 'Available';
 
 (function seedInterviews(){
-  const cycle = ['reported', 'held', 'booked', 'nothld', 'reported', 'held', 'resolved', 'booked', 'held'];
-  const now = new Date();
+  /* A spread that exercises every 8.1 stage: Booked, Held (some report-overdue),
+     Awaiting approval (some approval-overdue), Reported, Not held (a Resolve demo),
+     Awaiting candidate (a rebooking-credit demo) and Resolved (§74). */
+  const cycle = ['reported', 'held', 'booked', 'nothld', 'await', 'held', 'resolved', 'held', 'awaitcand', 'reported'];
   BOOKINGS.forEach((b, i) => {
     if(!b.stage) b.stage = b.status === 'cancelled' ? 'resolved' : b.status === 'pending' ? 'booked' : cycle[i % cycle.length];
     const s = b.stage;
     if(b.fee){
-      if(s === 'reported') b.escrow = 'released';
-      else if(s === 'resolved') b.escrow = 'refunded';
-      else if(b.escrow !== 'refunded') b.escrow = 'held';
+      if(s === 'reported') b.escrow = 'released';         // Paid
+      else if(s === 'resolved') b.escrow = 'refunded';    // Returned
+      else if(b.escrow !== 'refunded') b.escrow = 'held'; // In escrow (booked/held/await/awaitcand/nothld)
     }
     if(s === 'held'){ b.overdue = (i % 2 === 0); b.overdueDays = b.overdue ? 1 + (i % 3) : 0; }
-    b.recExists = (s === 'held' || s === 'reported' || (s === 'resolved' && i % 3 === 0));
+    if(s === 'await'){ b.apprOverdue = (i % 2 === 0); b.apprOverdueDays = b.apprOverdue ? 1 + (i % 3) : 0; b.filed = dpFmt(b.date); }
+    if(s === 'awaitcand'){ b.creditAmt = b.fee || 0; b.creditSource = bkFunding(b); b.creditDays = REBOOK_WINDOW; b.creditStart = dpFmt(b.date); }
+    /* a recording exists once the interview was held (Held / Awaiting approval /
+       Reported, and a few Resolved that were resolved after being held). */
+    b.recExists = (s === 'held' || s === 'await' || s === 'reported' || (s === 'resolved' && i % 3 === 0));
     if(b.recExists){
       b.recLen = `${28 + (i * 7) % 25}:${String((i * 13) % 60).padStart(2, '0')}`;
-      b.transcript = i % 11 === 0 ? 'Generating' : i % 19 === 0 ? 'Failed' : 'Ready';
-      const d = b.date ? new Date(b.date + 'T00:00:00') : new Date();
-      const ret = new Date(d); ret.setMonth(ret.getMonth() + 24);
-      b.retDate = ret; b.retention = ret.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
-      b.recExpired = ret < now;
-      b.expiringSoon = !b.recExpired && (ret - now) < 30 * 864e5;
+      /* transcript states, at least one Failed and one Generating for the demo
+         (§74). A Failed transcript means Tal read nothing — no Tal proposal, no
+         SCENES (8.4). */
+      b.transcript = (i % 7 === 3) ? 'Failed' : (i % 11 === 0) ? 'Generating' : 'Ready';
     }
   });
-  /* one Deleted and one Expired row for the demo (§74 — the seed has no telemetry) */
+  /* one Deleted row for the demo — the recording is gone, but the row stays as a
+     record that the interview happened (8.4). */
   const rec = BOOKINGS.filter(b => b.recExists);
-  if(rec[2]) rec[2].recDeleted = true;
-  if(rec[4]){ const r = new Date(now); r.setMonth(r.getMonth() - 2); rec[4].retDate = r; rec[4].retention = r.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}); rec[4].recExpired = true; }
+  if(rec[1]) rec[1].recDeleted = true;
 })();
 
 PAGESUM['market/bookings'] = () => {
   const attn = BOOKINGS.filter(bkNeedsAttention).length;
-  return `${BOOKINGS.length} interviews on the register. <b>${attn} need attention</b> — held with the report overdue, or the time passed with no interview. The register is a record; a stuck one is dealt with through Resolve.`;
+  return `${BOOKINGS.length} interviews on the register. <b>${attn} need attention</b>: held with the report overdue, the approval overdue, or the time passed with no interview. The register is a record. A not-held one is dealt with through Resolve.`;
 };
 PAGESUM['market/recordings'] = () => {
   const rec = BOOKINGS.filter(b => b.recExists);
-  const soon = rec.filter(b => b.expiringSoon).length;
-  return `${rec.filter(b => recStatus(b) === 'Available').length} recordings available, kept 24 months then deleted automatically${soon ? `; <b>${soon} expiring within 30 days</b>` : ''}. Playing one is logged. Withdrawing SCENES consent stops employers seeing the clips; deleting leaves the level unchanged.`;
+  const avail = rec.filter(b => recStatus(b) === 'Available').length;
+  const failed = rec.filter(b => b.transcript === 'Failed').length;
+  return `${avail} recording${avail === 1 ? '' : 's'} available, kept until you delete them. Playing one is logged. ${failed ? `<b>${failed} transcript${failed === 1 ? '' : 's'} failed</b>, so Tal read nothing there. ` : ''}Withdrawing SCENES consent stops the clips being used. Deleting leaves the level unchanged.`;
 };
 
 KINDS.booking = {
@@ -9677,32 +9984,58 @@ KINDS.booking = {
 const lvlChip = lvl => `<span class="tag sm">${esc(lvl || '—')}</span>`;
 /* a level chip carrying its TALENT letters: "E3 (L, A)" (Epic 5). */
 const lvlLtrChip = (lvl, arr) => `<span class="tag sm">${esc(lvl || '—')}${arr && arr.length ? ' (' + esc(lettersLabel(arr)) + ')' : ''}</span>`;
-/* THE INTERVIEWS MODULE is now the UPCOMING register only — the Awaiting-Approval tab moved
-   to the Levelling module's Approval Queue (Epic 5, Maryam 25 Sep 2026), so the two-tab strip
-   is gone and this is a single read-only table. */
+/* THE INTERVIEW REGISTER (Epic 8.1, Maryam 29 Sep 2026) — every interview and the
+   stage it reached: a record, and a route into Resolve for one that could not take
+   place. All seven stages show. The Level Approval Queue in the Levelling module
+   stays the surface where a reviewer settles a level, so an Awaiting-approval row
+   here is read-only (View + Resolve only, and Resolve only on Not held). Columns:
+   Candidate / Agent / Kind / Scheduled / Stage / Fee (total + candidate-paid +
+   source) / Escrow (In escrow / Paid / Returned) / Report due / Approval due.
+   Filters: Stage, Kind, a Needs-attention toggle and a scheduled-date range; search
+   on names + emails; default sort is Scheduled, most recent first. */
 function marketBookings(){
-  const q = getFilter('q', ''), kf = getFilter('bkkind', 'all'), af = getFilter('bkagent', 'all');
+  const q = getFilter('q', ''), sf = getFilter('bkstage', 'all'), kf = getFilter('bkkind', 'all');
+  const from = getFilter('bkfrom', ''), to = getFilter('bkto', '');
   const kmatch = k => kf === 'all' ? true : kf === 're' ? agIvIsRe(k) : !agIvIsRe(k);
-  const up = BOOKINGS
-    .filter(b => bkStage(b) === 'booked')
-    .filter(b => kmatch(b.kind)).filter(b => af === 'all' ? true : b.agent === af)
-    .filter(b => hit(q, b.cand, b.agent, b.kind))
-    .slice().sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')));
+  /* THE STAGE FILTER IS A TAB STRIP, not a dropdown (Maryam 29 Sep 2026: "i need the
+     stages as tabs") — the list-page pattern (heading → `.cs.lst-filt` strip → toolbar),
+     each tab carrying a live count. `base` is everything BUT the stage filter, so the
+     counts reflect the other active filters (Type / date / search). The Needs-attention
+     toggle was removed (Maryam 29 Sep 2026: "remove need attention button"); the
+     `bkNeedsAttention` helper stays for the dashboard/page-summary. */
+  const base = BOOKINGS
+    .filter(b => kmatch(b.kind))
+    .filter(b => { const d = b.date || ''; return (!from || d >= from) && (!to || d <= to); })
+    .filter(b => hit(q, b.cand, b.agent, emailOf(b.cand), emailOf(b.agent)));
+  const rows = base
+    .filter(b => sf === 'all' ? true : bkStage(b) === sf)
+    .slice().sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
+  const stageTabs = [['all', 'All', base.length], ...BK_STAGE_ORDER.map(s => [s, BK_STAGE[s], base.filter(b => bkStage(b) === s).length])];
   const typeFilter = filterDd('bkkind', 'all', [['all', 'All'], ['first', 'First interview'], ['re', 'Re-interview']], 'Type');
-  const agentFilter = filterDd('bkagent', 'all', [['all', 'All'], ...agentNames().map(n => [n, n])], 'Talent agent');
+  const dateFilter = `${filterDate('bkfrom', 'From', 100)} ${filterDate('bkto', 'To', 100)}`;
   return `
   <section class="sec">
-    ${searchHead('Upcoming Interviews', 'Every interview candidates have booked with a talent agent, soonest first.',
-      exportBtn('Interviews'), 'Search by candidate or agent')}
-    ${lstTools('Search by candidate or agent', `${typeFilter} ${agentFilter}`)}
-    ${up.length ? table(
-      [{label:'Candidate'}, {label:'Agent'}, {label:'Type'}, {label:'Scheduled'}, {label:'Fee', num:true}, {label:'Escrow'}],
-      up.map(b => ({cells:[
-        personCell(b.cand, ''), personCell(b.agent, ''),
-        esc(b.kind.replace(/\s*\([^)]*\)/, '')), esc(b.slot),
-        b.fee ? money(b.fee) : 'Free', escrowTag(b.escrow)
+    ${searchHead('Interview register', 'Every interview and the stage it reached. A record, and a route into resolving one that could not take place.',
+      `<button class="btn btn-g btn-sm noic" data-act="bookingsexport">${I.download} Export</button>`, 'Search by candidate or agent')}
+    ${filterStrip('bkstage', 'all', stageTabs)}
+    ${lstTools('Search by candidate or agent', `${typeFilter} ${dateFilter}`)}
+    ${rows.length ? table(
+      [{label:'Candidate'}, {label:'Agent'}, {label:'Type'}, {label:'Scheduled'}, {label:'Stage'}, {label:'Fee', num:true}, {label:'Escrow'}, {label:'Report due'}, {label:'Approval due'}, ACT_COL],
+      rows.map(b => ({id:b.id, go:'market/booking/' + b.id, cells:[
+        personCell(b.cand, candEmail(b.cand)), personCell(b.agent, ''),
+        esc(agIvIsRe(b.kind) ? 'Re-interview' : 'First interview'),
+        `${esc(dpFmt(b.date) || b.date || '—')}<div class="t-caption">${esc(slot12(b.slot))}</div>`,
+        bkStageTag(b),
+        b.fee ? money(b.fee) : 'Free',
+        bkEscrowTag(b.escrow),
+        bkReportDue(b),
+        bkApprovalDue(b),
+        rowActs([
+          ['view', 'View', `data-go="market/booking/${b.id}"`],
+          ...(bkStage(b) === 'nothld' ? [['renew', 'Resolve', `data-sheet="resolve:${b.id}"`]] : [])
+        ])
       ]})), {select:false})
-      : emptyState('video', 'No interviews match', q || kf !== 'all' || af !== 'all' ? 'Nothing matches the current filters.' : 'No booked interviews right now.')}
+      : emptyState('video', 'No interviews match', q || sf !== 'all' || kf !== 'all' || from || to ? 'Nothing matches the current filters.' : 'No interviews on the register yet.')}
   </section>`;
 }
 /* THE LEVEL APPROVAL QUEUE (Epic 5.2) — the submitted interviews awaiting a decision, moved
@@ -10148,80 +10481,190 @@ function levellingChange(){
   </section>` : ''}
   </div>`;
 }
-/* 8.2 — RESOLVE A FAILED INTERVIEW. Offered only on an overdue Held booking or a
-   Not-held one. Chase the agent (a nudge, no state change) or Refund and close
-   (full refund from escrow, booking → Resolved, nothing recovered from the
-   agent). Every resolution carries a reason to the audit log at High severity. */
+/* ── 8.2 THE BOOKING DETAIL — one interview with its recording, report and payment,
+   read-only. Reached from a register row's View. Every action it offers is owned by
+   another story (Resolve, open the recording/transcript); nothing here moves money
+   or changes a booking on its own. The Payment panel is in two parts: the booking
+   facts (total, candidate-paid, source, escrow) shown to anyone with Interviews:
+   View, and the linked transaction (reference + agent-share / platform-commission
+   split) shown only with Finance: View. This portal is a single Super Admin holding
+   every permission (screens-only ruling), so both parts show. */
+function marketBooking(){
+  const b = BOOKINGS.find(x => x.id === S.id);
+  if(!b) return `${detailHead('market/bookings')}
+    <section class="sec">${emptyState('video', 'Booking not found', 'This interview is no longer on the register.')}</section>`;
+  DETAIL_LABEL = `${b.cand} with ${b.agent}`;
+  const s = bkStage(b);
+  const failedTx = b.transcript === 'Failed';
+  const txn = TXNS.find(t => t.cat === 'interview' && t.who === b.cand) || null;
+  const plat = b.fee ? Math.round(b.fee * 0.2) : 0, share = (b.fee || 0) - plat;
+  /* Recording (8.4 states drive this): none / deleted / available + transcript. */
+  const recBody = !b.recExists
+    ? `<p class="t-desc">The interview did not take place, so there is no recording.</p>`
+    : b.recDeleted
+      ? `<p class="t-desc">The recording and its transcript were deleted here. The row remains as a record that the interview happened.</p>`
+      : kv([
+          ['Recording', `${tag('active', 'Available')} · ${esc(b.recLen || '—')}`],
+          ['Transcript', failedTx
+            ? `${tag('failed', 'Failed')}<div class="t-caption">No transcript, so this interview was not evaluated by Tal.</div>`
+            : tag(b.transcript)],
+          ['SCENES consent', tag(scenesConsent(b) === 'Given' ? 'active' : scenesConsent(b) === 'Withdrawn' ? 'inactive' : '', scenesConsent(b))]
+        ]);
+  /* Report (8.2): outstanding + deadline at Held, awaiting a reviewer at Awaiting
+     approval, settled at Reported; the rebooking credit at Awaiting candidate. */
+  const reportBody =
+    s === 'booked' ? `<p class="t-desc">The interview has not taken place yet.</p>`
+    : s === 'held' ? kv([['Report', b.overdue ? overdueSpan('Report', b.overdueDays) : `Outstanding, due within ${REPORT_DEADLINE_HRS}h of the interview`]])
+    : s === 'await' ? kv([['Report', `Filed ${esc(b.filed || '—')}`], ['Approval', b.apprOverdue ? overdueSpan('Approval', b.apprOverdueDays) : `Awaiting a reviewer, within ${APPROVAL_DEADLINE_HRS}h`]])
+    : s === 'reported' ? kv([['Report', `Filed ${esc(b.filed || b.date || '—')}`], ['Level', tag('active', 'Settled and live on the record')]])
+    : s === 'nothld' ? `<p class="t-desc">No interview took place, so no report is due. Resolve this booking to issue the candidate a rebooking credit.</p>`
+    : s === 'awaitcand' ? kv([['Rebooking credit', `${b.creditAmt ? money(b.creditAmt) : 'Free rebooking'} · ${esc(b.creditSource || bkFunding(b))}`], ['Window', `${b.creditDays || REBOOK_WINDOW} days from ${esc(b.creditStart || '—')}`]])
+    : `<p class="t-desc">This booking is resolved and needs nothing further.</p>`;
+  const kebab = rowActs([
+    ...(b.recExists && !b.recDeleted ? [['play', 'Open recording', `data-act="recplay:${b.id}"`]] : []),
+    ...(s === 'nothld' ? [['renew', 'Resolve', `data-sheet="resolve:${b.id}"`]] : [])
+  ]);
+  return `${detailHead('market/bookings')}
+  <section class="sec">
+    ${aiHead('Interview booking', `${esc(b.cand)} with ${esc(b.agent)}`,
+      `<span style="display:flex;align-items:center;gap:var(--s03)">${bkStageTag(b)}${kebab}</span>`)}
+  </section>
+  <section class="sec">
+    ${secHead('Booking')}
+    ${kv([
+      ['Candidate', `${esc(b.cand)} · ${esc(candEmail(b.cand))}`],
+      ['Agent', `${esc(b.agent)} · ${esc(emailOf(b.agent))}`],
+      ['Scheduled', esc(bkWhen(b))],
+      ['Stage', bkStageTag(b)],
+      ['Type', esc(agIvIsRe(b.kind) ? 'Re-interview' : 'First interview')],
+      ['Reschedule history', b.rescheduled ? esc(b.rescheduled) : 'None'],
+      ['Stated topic', esc(b.topic || 'Not recorded')]
+    ])}
+  </section>
+  <section class="sec">
+    ${secHead('Recording')}
+    ${recBody}
+  </section>
+  <section class="sec">
+    ${secHead('Report')}
+    ${reportBody}
+  </section>
+  <section class="sec">
+    ${secHead('Payment')}
+    ${kv([
+      ['Total booking value', b.fee ? money(b.fee) : 'Free'],
+      ['Candidate paid', money(bkPaid(b))],
+      ['Funding source', bkFunding(b)],
+      ['Escrow', bkEscrowTag(b.escrow)]
+    ])}
+    ${b.fee ? kv([
+      ['Transaction', txn ? esc(txn.ref) : 'No linked transaction'],
+      ['Agent share', money(share)],
+      ['Platform commission', `${money(plat)} · 20%`]
+    ]) : `<p class="t-desc">Complimentary first interview — nothing to settle.</p>`}
+    <p class="t-caption">The transaction, agent share and commission are Finance data, shown here because a Super Admin holds Finance: View.</p>
+  </section>`;
+}
+
+/* ── 8.3 RESOLVE A FAILED INTERVIEW — offered ONLY on a Not-held booking. Never on
+   Held, even report-overdue (the agent still owes the report and their payout stays
+   in escrow until they file); never on Awaiting approval (that is with a reviewer).
+   Resolving issues the candidate a rebooking credit worth the booking's full funded
+   value, on the same funding source, moves the booking to Awaiting candidate and
+   leaves the payment in escrow while the credit is live. The candidate's rebooking
+   screen, applying the credit to a replacement, the automatic REBOOK_WINDOW-day
+   expiry, and the automatic issuance when an agent cancels or is deactivated
+   (stories 3.4 / 3.6 / 13.12) are candidate-portal + backend behaviour and are not
+   built here. Every resolution carries an internal reason to the audit log (High). */
 SHEETS.resolve = id => {
   const b = BOOKINGS.find(x => x.id === id); if(!b) return {title:'Resolve', body:'', ok:''};
-  const held = bkStage(b) === 'held';
+  if(bkStage(b) !== 'nothld') return {title:'Resolve', ok:'', body: note('warn', 'Not available', 'Resolve is offered only on a Not-held interview. A held interview still needs its report; an awaiting-approval one is with a reviewer.')};
+  const escrowLbl = (BK_ESCROW[b.escrow] || ['', '—'])[1];
   return {title:`Resolve — ${b.cand} with ${b.agent}`, ok:'Apply', act:'doresolve:' + id,
     body:`${kv([
-        ['Candidate', `${esc(b.cand)} · ${esc(emailOf(b.cand))}`],
+        ['Candidate', `${esc(b.cand)} · ${esc(candEmail(b.cand))}`],
         ['Agent', `${esc(b.agent)} · ${esc(emailOf(b.agent))}`],
-        ['Interview', `${esc(b.kind)} · ${esc(b.slot)} · ${held ? 'held' : 'not held'}`],
-        ['Report', held ? `Outstanding, ${b.overdueDays} day${b.overdueDays === 1 ? '' : 's'} overdue` : 'No interview took place'],
-        ['Payment', `${b.fee ? money(b.fee) : 'Free'} · ${b.escrow} in escrow`]
+        ['Interview', `${esc(b.kind)} · ${esc(bkWhen(b))}`],
+        ['Interview status', tag('inactive', 'Not held')],
+        ['Payment', `${b.fee ? money(b.fee) : 'Free'} · paid ${money(bkPaid(b))} · ${bkFunding(b)} · ${escrowLbl}`],
+        ['Resolution', 'Issue rebooking credit']
       ])}
-      ${fieldHtml({k:'outcome', l:'Outcome', t:'select', opts:[['', 'Choose an outcome…'], ...(held ? [['chase', 'Chase the agent']] : []), ['refund', 'Refund and close']]}, '')}
-      ${fieldHtml({k:'reason', l:'Reason', t:'textarea', req:1, ph:'Required — written to the audit log; never shown to the candidate or agent'})}`};
+      ${fieldHtml({k:'reason', l:'Reason', t:'textarea', req:1, ph:'Required — written to the audit log; never shown to the candidate or agent'})}
+      <p class="t-desc">A rebooking credit worth the booking's full funded value, on the same funding source, valid ${REBOOK_WINDOW} days. The payment stays in escrow while the credit is live; the original agent is not paid.</p>`};
 };
 ACTIONS.doresolve = key => {
   const b = BOOKINGS.find(x => x.id === key.split(':')[1]); const v = readForm(); if(!b) return;
-  if(!v.outcome){ toast('Choose an outcome', 'warn'); return 'keep'; }
   if(!v.reason){ toast('A reason is required', 'warn'); return 'keep'; }
-  if(v.outcome === 'chase'){
-    audit('Chased agent for outstanding report', `${b.cand} with ${b.agent} · ${v.reason}`, 'Marketplace & Interviews', 'high');
-    toast(`${b.agent} chased for the report`); return;
-  }
   S._pending = {reason: v.reason};
-  askConfirm({mk:'warning', title:`Refund ${b.cand} ${b.fee ? money(b.fee) : 'the fee'} and close this interview?`, body:'They will be free to book again and the agent will not be paid. The refund comes out of escrow, so nothing is recovered from the agent.', ok:'Refund and Close', danger:true, act:'dorefundclose:' + b.id});
+  const free = bkFirst(b);
+  askConfirm(free
+    ? {mk:'renew', title:`Give ${b.cand} a free rebooking?`, body:`They have ${REBOOK_WINDOW} days to book it.`, ok:'Issue Credit', act:'doissuecredit:' + b.id}
+    : {mk:'renew', title:`Issue ${b.cand} a rebooking credit of ${money(b.fee)}?`, body:`They have ${REBOOK_WINDOW} days to use it.`, ok:'Issue Credit', act:'doissuecredit:' + b.id});
 };
-ACTIONS.dorefundclose = key => {
+ACTIONS.doissuecredit = key => {
   const b = BOOKINGS.find(x => x.id === key.split(':')[1]); const v = S._pending || {}; S._pending = null; S.confirm = null; if(!b) return;
-  b.stage = 'resolved'; b.status = 'cancelled'; if(b.escrow === 'held') b.escrow = 'refunded';
-  audit('Resolved failed interview — refunded and closed', `${b.cand} with ${b.agent}${b.fee ? ' · ' + money(b.fee) : ''} · ${v.reason}`, 'Marketplace & Interviews', 'high', {from:'held', to:'resolved'});
-  toast(`${b.cand} refunded${b.fee ? ' ' + money(b.fee) : ''} — interview closed`);
+  b.stage = 'awaitcand';
+  b.creditAmt = b.fee || 0; b.creditSource = bkFunding(b); b.creditDays = REBOOK_WINDOW; b.creditStart = today();
+  /* the payment stays in escrow while the credit is live — escrow untouched. */
+  audit('Resolved failed interview — issued rebooking credit', `${b.cand} with ${b.agent} · ${bkFirst(b) ? 'free rebooking' : money(b.creditAmt)} · ${REBOOK_WINDOW}-day window · ${v.reason}`, 'Marketplace & Interviews', 'high', {from:'nothld', to:'awaitcand'});
+  /* the candidate and the original agent are notified in-app, and the candidate's
+     rebooking screen is where the credit is used — both candidate-portal scope,
+     stubbed here (this admin flow issues the credit and moves the stage). */
+  toast(bkFirst(b) ? `${b.cand} given a free rebooking — ${REBOOK_WINDOW} days` : `${b.cand} issued a ${money(b.creditAmt)} rebooking credit — ${REBOOK_WINDOW} days`);
 };
 
 const recStatusTag = b => { const s = recStatus(b); return tag(s === 'Available' ? 'active' : '', s); };
 const scenesTag = b => { const s = scenesConsent(b); return tag(s === 'Given' ? 'active' : s === 'Withdrawn' ? 'inactive' : '', s); };
 function marketRecordings(){
-  /* The register is now a lean list — Candidate / Agent / Interview / Length /
-     Transcript — and a row OPENS the interview transcript (Maryam, 15 Sep 2026:
-     "these rows should be clickable ... show the interview scenes and transcript").
-     The SCENES-consent, employer-visibility, retention and status columns are
-     dropped from the table (their state still drives the row's kebab actions and
-     lives on in the data); the "Expiring soon" toggle and the consent/status
-     filters are removed too — search only. */
-  const q = getFilter('q', '');
-  const recs = BOOKINGS.filter(b => b.recExists).filter(b => hit(q, b.cand, b.agent, emailOf(b.cand)));
+  /* ── 8.4 MANAGE RECORDINGS — every interview recording with its consent state,
+     transcript state and status. The register shows that a recording exists, not any
+     of its content. A recording is kept until a Super Admin deletes it by hand: there
+     is no retention clock and nothing expires on a date, so Status is Available or
+     Deleted only. Columns: Candidate (name + email) / Agent / Interview (date + kind)
+     / Length / Transcript / SCENES consent / Status. Filters: SCENES consent, Status,
+     Transcript and a date range against the interview date; search on candidate name +
+     email and agent name. Row actions: Play, Transcript, Withdraw SCENES consent
+     (where Given) and Delete recording (where Available). A Failed transcript carries
+     the "not evaluated by Tal" line on the row. */
+  const q = getFilter('q', ''), cf = getFilter('recscenes', 'all'), stf = getFilter('recstatus', 'all'), tf = getFilter('rectr', 'all');
+  const from = getFilter('recfrom', ''), to = getFilter('recto', '');
+  const recs = BOOKINGS.filter(b => b.recExists)
+    .filter(b => cf === 'all' ? true : scenesConsent(b) === cf)
+    .filter(b => stf === 'all' ? true : recStatus(b) === stf)
+    .filter(b => tf === 'all' ? true : (b.transcript || '') === tf)
+    .filter(b => { const d = b.date || ''; return (!from || d >= from) && (!to || d <= to); })
+    .filter(b => hit(q, b.cand, b.agent, emailOf(b.cand)))
+    .slice().sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
+  const consentFilter = filterDd('recscenes', 'all', [['all', 'All'], ['Given', 'Given'], ['Withdrawn', 'Withdrawn'], ['Not asked', 'Not asked']], 'SCENES consent');
+  const statusFilter = filterDd('recstatus', 'all', [['all', 'All'], ['Available', 'Available'], ['Deleted', 'Deleted']], 'Status');
+  const trFilter = filterDd('rectr', 'all', [['all', 'All'], ['Generating', 'Generating'], ['Ready', 'Ready'], ['Failed', 'Failed']], 'Transcript');
+  const dateFilter = `${filterDate('recfrom', 'From')} ${filterDate('recto', 'To')}`;
   return `
   <section class="sec">
-    ${searchHead('Recordings & Transcripts', 'Every interview recording and its transcript. A row opens the interview transcript; the register shows that a recording exists — not its content.', exportBtn('Recordings'), 'Search by candidate or agent')}
-    ${lstTools('Search by candidate or agent', '')}
+    ${searchHead('Recordings & Transcripts', 'Every interview recording with its consent state, transcript and status. The register shows that a recording exists, not its content.',
+      `<button class="btn btn-g btn-sm noic" data-act="recordingsexport">${I.download} Export</button>`, 'Search by candidate or agent')}
+    ${lstTools('Search by candidate or agent', `${consentFilter} ${statusFilter} ${trFilter} ${dateFilter}`)}
     ${recs.length ? table(
-      /* A "Scenes" column shows how many clips are kept from each interview
-         (Maryam, 21 Sep 2026) — the same count the recording's Scenes tab lists
-         (`admScenes` = `ADM_SCENE_SET` per interview with an agent), so the table
-         and the tab agree. */
-      [{label:'Candidate'}, {label:'Agent'}, {label:'Interview'}, {label:'Length', num:true}, {label:'Scenes'}, {label:'Transcript'}, ACT_COL],
-      recs.map(b => { const avail = recStatus(b) === 'Available';
-        const scenes = (b.agent && b.agent !== '—') ? ADM_SCENE_SET.length : 0;
-        return {id:b.id, go:'market/recording/' + b.id, cells:[
-          personCell(b.cand, emailOf(b.cand)),
+      [{label:'Candidate'}, {label:'Agent'}, {label:'Interview'}, {label:'Length', num:true}, {label:'Transcript'}, {label:'SCENES consent'}, {label:'Status'}, ACT_COL],
+      recs.map(b => { const avail = recStatus(b) === 'Available', ready = b.transcript === 'Ready', given = scenesConsent(b) === 'Given';
+        return {id:b.id, go: avail ? 'market/recording/' + b.id : null, cells:[
+          personCell(b.cand, candEmail(b.cand)),
           personCell(b.agent),
-          `${esc(b.slot)} · ${esc(b.kind)}`,
+          `${esc(bkWhen(b).split(' · ')[0])}<div class="t-caption">${esc(agIvIsRe(b.kind) ? 'Re-interview' : 'First interview')}</div>`,
           esc(b.recLen || '—'),
-          `${scenes} scene${scenes === 1 ? '' : 's'}`,
-          b.transcript ? tag(b.transcript) : '—',
+          b.transcript === 'Failed'
+            ? `${tag('failed', 'Failed')}<div class="t-caption">No transcript, so this interview was not evaluated by Tal.</div>`
+            : (b.transcript ? tag(b.transcript) : '—'),
+          scenesTag(b),
+          recStatusTag(b),
           rowActs([
-            ['play', 'View', `data-go="market/recording/${b.id}"`],
-            ...(avail && b.transcript === 'Ready' ? [['download', 'Download', `data-act="dltranscript:${b.id}"`]] : []),
-            ...(avail ? [['delete', 'Delete', `data-sheet="recdelete:${b.id}"`]] : [])
+            ...(avail ? [['play', 'Play', `data-act="recplay:${b.id}"`]] : []),
+            ...(avail && ready ? [['view', 'Transcript', `data-act="rectx:${b.id}"`]] : []),
+            ...(given ? [['renew', 'Withdraw SCENES consent', `data-sheet="recwithdraw:${b.id}"`]] : []),
+            ...(avail ? [['delete', 'Delete recording', `data-sheet="recdelete:${b.id}"`]] : [])
           ])
-        ]}; }))
-      : emptyState('video', 'No recordings match', q ? 'Nothing matches the current search.' : 'No recordings yet.')}
+        ]}; }), {select:false})
+      : emptyState('video', 'No recordings match', q || cf !== 'all' || stf !== 'all' || tf !== 'all' || from || to ? 'Nothing matches the current filters.' : 'No recordings yet.')}
   </section>`;
 }
 /* THE INTERVIEW TRANSCRIPT — a detail page a recordings row opens, mirroring the
@@ -10281,6 +10724,10 @@ function marketRecordingDetail(){
   if(!b) return `${detailHead('market/recordings')}
     <section class="sec">${emptyState('video', 'Recording not found', 'This recording is no longer in the register.')}</section>`;
   DETAIL_LABEL = `${b.cand} — recording`;
+  /* A deleted recording keeps its row but has no content to play (8.4). */
+  if(b.recDeleted) return `${detailHead('market/recordings')}
+    <section class="sec">${aiHead('Interview recording', `${esc(b.cand)} with ${esc(b.agent)} · ${esc(b.kind)} · ${esc(bkWhen(b))}`)}</section>
+    <section class="sec">${emptyState('video', 'Recording deleted', 'The recording and its transcript were deleted here. The row remains as a record that the interview happened; the candidate’s level is unaffected.')}</section>`;
   const A = String(b.agent).split(' ')[0], C = String(b.cand).split(' ')[0];
   /* THREE TABS (Maryam, 21 Sep 2026: "there should be 3 tabs, Recording / Scenes /
      Transcript ... show scenes of the interview as well"). Recording is the
@@ -10337,27 +10784,37 @@ function marketRecordingDetail(){
   </section>
   ${tab === 'scenes' ? scenesPane : tab === 'transcript' ? transcriptPane : recordingPane}`;
 }
-/* PLAYBACK IS LOGGED (8.3): a High-severity audit line is written when playback
-   starts, then the prototype player opens. */
+/* PLAYBACK AND TRANSCRIPT OPENS ARE LOGGED (8.4): a High-severity audit line is
+   written when playback starts or a transcript is opened, then the recording detail
+   opens on the right tab. */
 ACTIONS.recplay = key => {
   const b = BOOKINGS.find(x => x.id === key.split(':')[1]); if(!b) return;
   audit('Played interview recording', `${b.cand} with ${b.agent}`, 'Marketplace & Interviews', 'high');
-  S.sheet = 'recording:' + b.id;
+  (S.filter['market/recording'] = S.filter['market/recording'] || {}).rectab = 'recording';
+  go('market/recording/' + b.id);
 };
-/* WITHDRAW SCENES CONSENT (8.3) — reason, confirm, then clips stop reaching any
-   employer. The recording and the level are untouched. */
+ACTIONS.rectx = key => {
+  const b = BOOKINGS.find(x => x.id === key.split(':')[1]); if(!b) return;
+  audit('Opened interview transcript', `${b.cand} with ${b.agent}`, 'Marketplace & Interviews', 'high');
+  (S.filter['market/recording'] = S.filter['market/recording'] || {}).rectab = 'transcript';
+  go('market/recording/' + b.id);
+};
+/* WITHDRAW SCENES CONSENT (8.4) — reason, confirm, then every SCENE cut from the
+   interview stops being used across the platform and is hidden from the candidate's
+   own profile. The recording and the level are untouched; the candidate is notified
+   in-app unless their account is deleted (notification stubbed). */
 SHEETS.recwithdraw = id => {
   const b = BOOKINGS.find(x => x.id === id); if(!b) return {title:'Withdraw consent', body:'', ok:''};
   return {title:`Withdraw SCENES consent — ${b.cand}`, ok:'Withdraw Consent', danger:true, act:'askrecwithdraw:' + id,
-    body:`${kv([['Candidate', `${esc(b.cand)} · ${esc(emailOf(b.cand))}`], ['Interview', `${esc(b.slot)} · ${esc(b.kind)}`], ['Employer visibility', empVisible(b)]])}
+    body:`${kv([['Candidate', `${esc(b.cand)} · ${esc(candEmail(b.cand))}`], ['Interview', `${esc(bkWhen(b))}`], ['SCENES consent', scenesConsent(b)]])}
       ${fieldHtml({k:'reason', l:'Reason', t:'textarea', req:1, ph:'Required — written to the audit log'})}
-      <p class="t-desc">Every clip cut from this interview stops being visible to any employer immediately. The recording itself and the candidate’s level are untouched.</p>`};
+      <p class="t-desc">Every SCENE cut from this interview stops being used immediately and is hidden from the candidate’s profile. The recording itself and the candidate’s level are unaffected.</p>`};
 };
 ACTIONS.askrecwithdraw = key => {
   const b = BOOKINGS.find(x => x.id === key.split(':')[1]); const v = readForm(); if(!b) return;
   if(!v.reason){ toast('A reason is required', 'warn'); return 'keep'; }
   S._pending = {reason: v.reason};
-  askConfirm({mk:'warning', title:`Withdraw SCENES consent for ${b.cand}?`, body:'Their clips stop being visible to employers immediately.', ok:'Withdraw Consent', danger:true, act:'dorecwithdraw:' + b.id});
+  askConfirm({mk:'warning', title:`Withdraw SCENES consent for ${b.cand}?`, body:'Their SCENES stop being used immediately. The recording and their level are unaffected.', ok:'Withdraw Consent', danger:true, act:'dorecwithdraw:' + b.id});
 };
 ACTIONS.dorecwithdraw = key => {
   const b = BOOKINGS.find(x => x.id === key.split(':')[1]); const v = S._pending || {}; S._pending = null; S.confirm = null; if(!b) return;
@@ -10365,14 +10822,16 @@ ACTIONS.dorecwithdraw = key => {
   audit('Withdrew SCENES consent', `${b.cand} · ${v.reason || ''}`, 'Marketplace & Interviews', 'high');
   toast(`SCENES consent withdrawn for ${b.cand}`);
 };
-/* DELETE RECORDING (8.3) — reason, confirm, then the recording/transcript/clips
-   go; the row remains as Deleted and the level stands. */
+/* DELETE RECORDING (8.4) — reason, confirm, then the recording, its transcript and
+   every SCENE cut from it are deleted at the platform and at Twilio; the row stays as
+   Deleted and the candidate's settled level and any filed report both stand. The
+   candidate is notified in-app unless their account is deleted (notification stubbed). */
 SHEETS.recdelete = id => {
   const b = BOOKINGS.find(x => x.id === id); if(!b) return {title:'Delete recording', body:'', ok:''};
   return {title:`Delete recording — ${b.cand} with ${b.agent}`, ok:'Delete Recording', danger:true, act:'askrecdelete:' + id,
-    body:`${kv([['Candidate', `${esc(b.cand)} · ${esc(emailOf(b.cand))}`], ['Interview', `${esc(b.slot)} · ${esc(b.kind)}`], ['Retention', b.retention || '—']])}
+    body:`${kv([['Candidate', `${esc(b.cand)} · ${esc(candEmail(b.cand))}`], ['Interview', `${esc(bkWhen(b))}`], ['Transcript', b.transcript || '—']])}
       ${fieldHtml({k:'reason', l:'Reason', t:'textarea', req:1, ph:'Required — written to the audit log'})}
-      <p class="t-desc">The recording, its transcript and every clip cut from it are deleted ahead of the 24-month retention. The candidate’s level and the agent’s report both stand.</p>`};
+      <p class="t-desc">The recording, its transcript and every SCENE cut from it are deleted at the platform and at Twilio. This cannot be undone. The candidate’s level and the agent’s report both stand.</p>`};
 };
 ACTIONS.askrecdelete = key => {
   const b = BOOKINGS.find(x => x.id === key.split(':')[1]); const v = readForm(); if(!b) return;
@@ -10419,7 +10878,37 @@ ACTIONS.dltranscript = key => {
   audit('Opened interview transcript', `${b.cand} with ${b.agent}`, 'Marketplace & Interviews', 'high'); toast('Transcript downloaded');
 };
 
-V.market = () => modView({bookings:marketBookings, recordings:marketRecordings, recording:marketRecordingDetail});
+V.market = () => modView({bookings:marketBookings, booking:marketBooking, recordings:marketRecordings, recording:marketRecordingDetail});
+/* CSV EXPORT (8.1 / 8.4 screen action) — exactly the visible columns for the current
+   filtered set. Toast-only, no browser download (the 25 Sep convention): refuse above
+   the Settings row limit, write one audit line, and confirm with the app's own toast,
+   which narrates the story's model (an in-app notification link, valid 7 days). */
+ACTIONS.bookingsexport = () => {
+  const rows = BOOKINGS.filter(b => {
+    const sf = getFilter('bkstage', 'all'), kf = getFilter('bkkind', 'all'), attn = getFilter('bkattn', 'off') === 'on';
+    const from = getFilter('bkfrom', ''), to = getFilter('bkto', ''), q = getFilter('q', '');
+    const kmatch = k => kf === 'all' ? true : kf === 're' ? agIvIsRe(k) : !agIvIsRe(k);
+    const d = b.date || '';
+    return (sf === 'all' || bkStage(b) === sf) && kmatch(b.kind) && (!attn || bkNeedsAttention(b))
+      && (!from || d >= from) && (!to || d <= to) && hit(q, b.cand, b.agent, emailOf(b.cand), emailOf(b.agent));
+  });
+  if(!rows.length){ toast('Nothing to export in this filter', 'warn'); return; }
+  if(rows.length > EXPORT_ROW_LIMIT){ toast(`This export is larger than the ${EXPORT_ROW_LIMIT} row limit. Narrow your filters and try again.`, 'warn'); return; }
+  audit('Exported interview register', `${rows.length} row${rows.length === 1 ? '' : 's'}`, 'Marketplace & Interviews', 'notice');
+  toast(`Exporting ${rows.length} row${rows.length === 1 ? '' : 's'}. A download link will reach your notifications, valid 7 days.`);
+};
+ACTIONS.recordingsexport = () => {
+  const rows = BOOKINGS.filter(b => b.recExists).filter(b => {
+    const cf = getFilter('recscenes', 'all'), stf = getFilter('recstatus', 'all'), tf = getFilter('rectr', 'all');
+    const from = getFilter('recfrom', ''), to = getFilter('recto', ''), q = getFilter('q', ''); const d = b.date || '';
+    return (cf === 'all' || scenesConsent(b) === cf) && (stf === 'all' || recStatus(b) === stf) && (tf === 'all' || (b.transcript || '') === tf)
+      && (!from || d >= from) && (!to || d <= to) && hit(q, b.cand, b.agent, emailOf(b.cand));
+  });
+  if(!rows.length){ toast('Nothing to export in this filter', 'warn'); return; }
+  if(rows.length > EXPORT_ROW_LIMIT){ toast(`This export is larger than the ${EXPORT_ROW_LIMIT} row limit. Narrow your filters and try again.`, 'warn'); return; }
+  audit('Exported recordings register', `${rows.length} row${rows.length === 1 ? '' : 's'}`, 'Marketplace & Interviews', 'notice');
+  toast(`Exporting ${rows.length} row${rows.length === 1 ? '' : 's'}. A download link will reach your notifications, valid 7 days.`);
+};
 /* THE LEVELLING MODULE (Epic 5, Maryam 25 Sep 2026) — the level change log (5.1), the
    approval queue (5.2), Levels & Tracks (5.5, `cohortsLevels` reused), the change detail
    (5.4) and the approval detail (`marketApproval`, moved here from Interviews). */
@@ -11911,11 +12400,11 @@ const REPORTS = {
       ['Payouts held for agents', heldPayouts()]],
     todo: () => [['Applications awaiting vetting', openApps()], ['Payouts to release', heldPayouts()]]},
   cohorts: {short:'Cohorts', go:'cohorts/cohorts', mods:['Cohort Management', 'Cohorts'],
-    sum: () => `<b>${COHORTS.filter(c => c.status === 'active').length} cohorts running</b>, ${COHORTS.filter(c => c.status === 'draft').length} in draft.`,
-    happening: () => [['Active cohorts', COHORTS.filter(c => c.status === 'active').length],
-      ['In draft', COHORTS.filter(c => c.status === 'draft').length],
-      ['Members enrolled', COHORTS.filter(c => c.status === 'active').reduce((n, c) => n + c.size, 0)]],
-    todo: () => [['Cohorts without a leader', COHORTS.filter(c => c.status === 'active' && c.leader === 'Unassigned').length]]},
+    sum: () => `<b>${COHORTS.filter(c => c.status === 'running').length} cohorts running</b>, ${COHORTS.filter(c => c.status === 'forming').length} forming.`,
+    happening: () => [['Running cohorts', COHORTS.filter(c => c.status === 'running').length],
+      ['Forming', COHORTS.filter(c => c.status === 'forming').length],
+      ['Members enrolled', COHORTS.filter(COHORT_ACTIVE).reduce((n, c) => n + cohortSize(c), 0)]],
+    todo: () => [['Cohorts without a leader', COHORTS.filter(c => c.status === 'forming' && c.leader === 'Unassigned').length]]},
   market: {short:'Marketplace', go:'market/bookings', mods:['Marketplace & Interviews'],
     sum: () => `<b>${BOOKINGS.length} interviews</b> this window; ${BOOKINGS.filter(b => !b.paid || b.status === 'pending').length} still awaiting pay.`,
     happening: () => [['Interviews', BOOKINGS.length], ['Confirmed', BOOKINGS.filter(b => b.status === 'active').length],
@@ -13473,6 +13962,13 @@ device.addEventListener('click', e => {
     fdd.classList.remove('on');
     const tr = fdd.querySelector('[data-formddtoggle]'); if(tr) tr.setAttribute('aria-expanded', 'false');
     const sb = fds.closest('.sheet-b'); if(sb) sb.classList.remove('dd-open');
+    /* EPIC 7 (Maryam 29 Sep 2026) — changing the course Track rebuilds its Levels
+       checkboxes for the new track and clears the selection (7.1), DOM-only, no render
+       so the rest of the half-typed course form survives (trap 9). */
+    if(hid && hid.dataset.f === 'track'){
+      const lv = (fds.closest('.sheet, .peek-form') || device).querySelector('.course-levels');
+      if(lv){ lv.dataset.track = hid.value; lv.innerHTML = courseLevelChecks(hid.value, []); }
+    }
     syncSheetSubmit();
     return;
   }
