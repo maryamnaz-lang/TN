@@ -993,9 +993,15 @@ input:-webkit-autofill:focus{
    a modal is not, so restate the bare glyph here. */
 .app .clr-stack .cardrow-ic{background:none; border:0; width:auto; height:auto}
 .app .clr-stack .cardrow-ic svg{width:18px; height:18px; color:var(--icon-primary)}   /* the standard page-icon size (§29) */
-/* the replacement-leader picker sits BELOW the cohort text and runs FULL WIDTH
-   (Maryam, 24 Sep 2026: "the field should be full width") */
-.app .clr-repl{margin-top:var(--s04)}
+/* Each clearing task (escrow / cohort) is its own block; the stack spaces them
+   apart (Maryam, 29 Sep 2026: "give gap between the sections") and never scrolls
+   sideways. A task's own cardrow keeps no extra chrome. */
+.app .clr-stack{display:flex; flex-direction:column; gap:var(--s05); min-width:0}
+.app .clr-stack .cardrow{padding:0}
+.app .clr-item{min-width:0}
+/* the replacement-leader picker sits BELOW the cohort row and runs FULL WIDTH —
+   a sibling of the cardrow, not a child of its text column (Maryam, 29 Sep 2026) */
+.app .clr-repl{margin-top:var(--s04); width:100%; min-width:0}
 .app .clr-repl .f{margin:0}
 .app .clr-repl .lbl{display:none}
 /* A GATED DANGER BUTTON reads as DISABLED, not full red (Maryam, 24 Sep 2026: the
@@ -1021,6 +1027,12 @@ input:-webkit-autofill:focus{
   .app .main .sec.set-head > .sec-h{margin-bottom:0 !important}
   .app .main .sec.set-tabs + .sec{padding-top:var(--s06)}
 }
+/* The Cancel / Close button in every system modal (and side-slider) carries a
+   light-grey #efefef ground (Maryam, 29 Sep 2026) rather than a transparent one
+   — it reads as a real button beside the filled primary. Scoped to the footer
+   (`.sheet-f`) so a page-body ghost button is untouched. (0,3,1) beats the DS
+   `.app .btn-s`. */
+.app .sheet-f .btn.btn-s{background:var(--rule)}
 </style>
 <style id="admin-recovered">
 /* ==========================================================================
@@ -1578,9 +1590,15 @@ const TAGV = {
      `refunded` reads as done (green — it no longer falls through to plain text),
      and `failed` is a problem (red). `pending`/`paid` already map above. */
   received:'green', refunded:'green', failed:'red',
+  /* Epic 9 finance register statuses (Maryam, 29 Sep 2026): a money txn is
+     Succeeded/Pending/Failed, a rebooking credit Active/Used/Expired. `active`
+     (green), `expired` (red) and `pending`/`failed` already map; add the rest. */
+  succeeded:'green', used:'',
   /* transcript states (Maryam, 21 Sep 2026): a ready transcript is done (green),
      one still generating is in progress (amber); `failed` is already red above. */
   ready:'green', generating:'warn',
+  /* a training gate lifted by hand reads as a caution, amber (Maryam, 29 Sep 2026) */
+  overridden:'warn',
   /* waiting */ held:'warn', pending:'warn', review:'warn', requested:'warn', invited:'warn',
   processing:'warn', sent:'warn', overdue:'warn', unmatched:'warn', shortlisted:'warn',
   reviewing:'warn', scheduled:'warn', draft:'warn', degraded:'warn', 'in progress':'warn',
@@ -1720,11 +1738,60 @@ const permRoleCols = () => [
   ...ROLES.filter(r => r.kind === 'internal' && !roleIsBuiltin(r.k))
 ];
 
-/* DEPARTMENTS (Epic 1, story 1.1 / 1.7 / 1.8). The doc flags the option list as
-   "pending from the client" — so this is AUTHORED PLACEHOLDER, flagged. Edit /
-   Add-staff read it for the Department dropdown; the Staff directory filters on
-   it. When the real list lands, replace this array. */
-const DEPARTMENTS = ['Operations', 'Talent Success', 'Trust & Safety', 'Finance', 'Engineering'];
+/* DEPARTMENTS (Epic 1, story 1.1 / 1.7 / 1.8; Departments GROUP of story 11.1).
+   The doc flags the option list as "pending from the client" — so this is AUTHORED
+   PLACEHOLDER, flagged. Each record is {name, status} where status is 'active' or
+   'retired' (11.1: a department is RETIRED, never hard-deleted, because staff
+   records point at it by name). A retired department stays on staff already
+   assigned but leaves the dropdown for NEW assignments. 11.1 says the list ships
+   empty; this prototype keeps a seeded set because Epic 1's staff seed is already
+   assigned to these departments — the empty-state path still fires when the active
+   list is empty. `deptNames()` = every name (active + retired, for the staff
+   directory filter which may show a retired dept in use); `activeDepts()` = the
+   names offered for a NEW assignment. A staff `u.dept` stores the NAME string. */
+const DEPARTMENTS = [
+  {name:'Operations', status:'active'}, {name:'Talent Success', status:'active'},
+  {name:'Trust & Safety', status:'active'}, {name:'Finance', status:'active'},
+  {name:'Engineering', status:'active'}];
+const deptNames = () => DEPARTMENTS.map(d => d.name);
+const activeDepts = () => DEPARTMENTS.filter(d => d.status !== 'retired').map(d => d.name);
+
+/* ======================================================================
+   PLATFORM SETTINGS (story 11.1). The single place the platform's standing
+   values live, so a deadline / limit / fee rule can be corrected without a
+   release. Every value below is the one "currently in force" and pre-fills its
+   field; each ships at the story's default. A change applies to what happens
+   AFTER it is saved (nothing here recalculates a decision already made), so the
+   consumers read these live where a real constant already exists
+   (EXPORT_ROW_LIMIT / REPORT_DEADLINE_HRS / REBOOK_WINDOW below mirror them);
+   the rest (auto sign-out, attendance, Tal ceiling, payout run) have no live
+   engine in the prototype and are screens-only. AUTHORED where the story gives a
+   default (§74). */
+const SETTINGS = {
+  autoSignout:30,        /* Sessions — minutes idle before a STAFF session ends (5–240). Candidates/agents never time out (14.4). */
+  exportLimit:50000,     /* Exports — max rows in a filtered set before a file is generated (1,000–250,000). */
+  reportDeadline:24,     /* Interviews — hours an agent has to file a report after an interview is held (1–168). */
+  rebookWindow:14,       /* Interviews — days a candidate has to use a rebooking credit / free rebooking (1–60). */
+  attendanceMin:5,       /* Cohorts — minutes in the room (cumulative) to count as attended (1–60). */
+  leaderReconnect:10,    /* Cohorts — minutes a room stays open after the leader drops before it closes (1–60). */
+  talLimit:25,           /* Tal — questions per candidate per day through Ask Tal (5–200). */
+  payoutDelay:3,         /* Money — working days after a report is filed before escrow becomes releasable (0–30). */
+  payoutRunDay:'Monday', /* Money — the weekday the payout run executes at 00:00 (SA time zone). */
+  closureGrace:30        /* Account closure — days an external account stays Deactivated before auto-Delete (7–90). */
+};
+/* the reviewer's fixed 24-hour review window is NOT configurable (11.1). The
+   candidate's report-ready promise is DERIVED: report deadline + this window. */
+const REVIEW_WINDOW_HRS = 24;
+
+/* WORKING DAYS (11.1's holiday calendar) — the days the payout release delay
+   counts against. Weekends are excluded as a standing rule and are never listed
+   here. AUTHORED PLACEHOLDER (§74). */
+let HOLIDAYS = [
+  {date:'2026-01-01', name:"New Year's Day"},
+  {date:'2026-05-25', name:'Spring Bank Holiday'},
+  {date:'2026-12-25', name:'Christmas Day'},
+  {date:'2026-12-28', name:'Boxing Day (substitute)'}
+];
 
 /* THE FIVE INTERNAL STAFF ROLES the doc's Change-Role and Add-Staff dropdowns
    offer, in the doc's order (1.3): Reviewer, Supervisor, Manager of Agents,
@@ -2011,14 +2078,14 @@ const COURSES=[
     Trailblazer courses are Builder now. `desc`/`levels`/`intent`/`chapters`/`lsvt`
     are authored placeholder where the seed had none (§74). Status: live / draft /
     archived. */
- {id:'co1', name:'Foundations of Leadership', track:'Explorer', levels:['E1', 'E2', 'E3'], intent:['role', 'another'], chapters:12, lsvt:'Leadership Foundations (LSVT)', desc:'Builds the everyday operating habits a first leadership role asks for: taking work end to end, handing it over cleanly, and saying the hard thing early. For people stepping up in the job they are already in.', price:100, days:90, status:'live'},
- {id:'co2', name:'Leading High-Performing Teams', track:'Builder', levels:['B1', 'B2', 'B3'], intent:['role', 'another'], chapters:14, lsvt:'Team Dynamics (LSVT)', desc:'Develops the craft of holding a team steady through conflict, coaching rather than fixing, and running a weekly rhythm people leave knowing what to do. For those already leading who want the team to carry more.', price:180, days:90, status:'live'},
- {id:'co3', name:'Executive Strategy & Vision', track:'Builder', levels:['B3', 'B4', 'B5'], intent:['ownership'], chapters:12, lsvt:'Strategic Thinking (LSVT)', desc:'Turns a leader outward: setting direction under incomplete information, telling a decision you can reverse from one you cannot, and carrying a team through a change nobody chose. For people building toward ownership.', price:260, days:90, status:'draft'},
- {id:'co4', name:'Communicating with Impact', track:'Explorer', levels:['E1', 'E2', 'E3', 'E4', 'E5'], intent:['role', 'another', 'ownership'], chapters:10, lsvt:'Communication & Influence (LSVT)', desc:'Sharpens how a message lands: opening a hard conversation without an ambush, giving feedback that changes what happens next, and reading what a room is not saying. Useful at every level and every intent.', price:120, days:90, status:'live'},
- {id:'co5', name:'Influencing Without Authority', track:'Builder', levels:['B2', 'B3', 'B4'], intent:['role', 'another'], chapters:12, lsvt:'Coaching for Performance (LSVT)', desc:'The skill of moving work through people who do not report to you: building trust at speed, managing up, and making small commitments in public and keeping them. For those leading across a business, not just down a line.', price:200, days:90, status:'live'},
- {id:'co6', name:'Communication Essentials', track:'Explorer', levels:['E1', 'E2'], intent:['role'], chapters:8, lsvt:'Communication & Influence (LSVT)', desc:'The groundwork of being understood at work: saying what you mean in one sentence other people repeat, listening for what matters, and giving your manager the version of a problem they can act on. The entry course.', price:90, days:90, status:'live'},
- {id:'co7', name:'Team Leadership', track:'Builder', levels:['B1', 'B2', 'B3', 'B4'], intent:['role', 'another'], chapters:13, lsvt:'Team Dynamics (LSVT)', desc:'Everything a group needs from the person in front of it: delegation without drop-off, repair after a working relationship breaks, and holding the line while two people are still angry. For established team leads.', price:210, days:90, status:'live'},
- {id:'co8', name:'Leading Through Change', track:'Builder', levels:['B4', 'B5'], intent:['ownership', 'another'], chapters:12, lsvt:'Change Leadership (LSVT)', desc:'How to keep the work going while the ground moves: saying what you know and what you do not, taking the heat out of a disagreement without avoiding it, and leading people through a change they did not choose. The senior Builder course.', price:280, days:90, status:'draft'}
+ {id:'co1', name:'Foundations of Leadership', track:'Explorer', levels:['E1', 'E2', 'E3'], intent:'role', chapters:12, lsvt:'Leadership Foundations (LSVT)', desc:'Builds the everyday operating habits a first leadership role asks for: taking work end to end, handing it over cleanly, and saying the hard thing early. For people stepping up in the job they are already in.', price:100, days:90, status:'live'},
+ {id:'co2', name:'Leading High-Performing Teams', track:'Builder', levels:['B1', 'B2', 'B3'], intent:'role', chapters:14, lsvt:'Team Dynamics (LSVT)', desc:'Develops the craft of holding a team steady through conflict, coaching rather than fixing, and running a weekly rhythm people leave knowing what to do. For those already leading who want the team to carry more.', price:180, days:90, status:'live'},
+ {id:'co3', name:'Executive Strategy & Vision', track:'Builder', levels:['B3', 'B4', 'B5'], intent:'ownership', chapters:12, lsvt:'Strategic Thinking (LSVT)', desc:'Turns a leader outward: setting direction under incomplete information, telling a decision you can reverse from one you cannot, and carrying a team through a change nobody chose. For people building toward ownership.', price:260, days:90, status:'draft'},
+ {id:'co4', name:'Communicating with Impact', track:'Explorer', levels:['E1', 'E2', 'E3', 'E4', 'E5'], intent:'another', chapters:10, lsvt:'Communication & Influence (LSVT)', desc:'Sharpens how a message lands: opening a hard conversation without an ambush, giving feedback that changes what happens next, and reading what a room is not saying. Useful at every level and every intent.', price:120, days:90, status:'live'},
+ {id:'co5', name:'Influencing Without Authority', track:'Builder', levels:['B2', 'B3', 'B4'], intent:'another', chapters:12, lsvt:'Coaching for Performance (LSVT)', desc:'The skill of moving work through people who do not report to you: building trust at speed, managing up, and making small commitments in public and keeping them. For those leading across a business, not just down a line.', price:200, days:90, status:'live'},
+ {id:'co6', name:'Communication Essentials', track:'Explorer', levels:['E1', 'E2'], intent:'role', chapters:8, lsvt:'Communication & Influence (LSVT)', desc:'The groundwork of being understood at work: saying what you mean in one sentence other people repeat, listening for what matters, and giving your manager the version of a problem they can act on. The entry course.', price:90, days:90, status:'live'},
+ {id:'co7', name:'Team Leadership', track:'Builder', levels:['B1', 'B2', 'B3', 'B4'], intent:'role', chapters:13, lsvt:'Team Dynamics (LSVT)', desc:'Everything a group needs from the person in front of it: delegation without drop-off, repair after a working relationship breaks, and holding the line while two people are still angry. For established team leads.', price:210, days:90, status:'live'},
+ {id:'co8', name:'Leading Through Change', track:'Builder', levels:['B4', 'B5'], intent:'ownership', chapters:12, lsvt:'Change Leadership (LSVT)', desc:'How to keep the work going while the ground moves: saying what you know and what you do not, taking the heat out of a disagreement without avoiding it, and leading people through a change they did not choose. The senior Builder course.', price:280, days:90, status:'draft'}
 ];
 const COURSE_BY_ID={}; COURSES.forEach(c => COURSE_BY_ID[c.id]=c);
 const COURSE_LIB=[
@@ -2079,36 +2146,69 @@ const BOOKINGS=[
  {id:'bk14', cand:'Grace Kim',     agent:'Priya Raman',   slot:'Mon 10:00', date:'2026-08-17', fee:200, escrow:'held', paid:true, kind:'Re-interview', status:'active', stage:'booked'},
  {id:'bk15', cand:'Diego Alvarez', agent:'Dana Whitfield', slot:'Tue 14:00', date:'2026-08-18', fee:180, escrow:'held', paid:true, kind:'Re-interview', status:'active', stage:'booked'}
 ];
+/* EPIC 9 — THE FINANCIAL REGISTER (Maryam, 29 Sep 2026, stories 9.1/9.2). Every
+   movement of money and rebooking credit, one row each. The register reads the
+   NEW fields (type / party / partyEmail / stripeRef / funder / sp split / cause /
+   cr credit); the legacy keys (cat / dir / amt / status / who / party / kind /
+   method / fee / date) are kept so the dashboard revenue tiles, inProgress(),
+   grossProcessed() and the candidate payments panel keep working unchanged.
+   Types (Maryam's ruling): Course fee · Interview fee · Scenes · Payout ·
+   Rebooking credit — the four the story names PLUS Scenes (her 20 Sep tab kept);
+   no Refund type. Status is Succeeded/Pending/Failed for money, Active/Used/Expired
+   for a rebooking credit. `sp` (split) rides interview + payout rows only, and
+   share + commission add back to `amt` (the gross) exactly. `funder` is Candidate
+   or Platform on interviews + payouts, absent on a course/scene fee. A first
+   interview is the platform-funded 100% discount — party Platform, funder Platform,
+   the candidate pays zero, the agent's full fee goes into escrow. `cr` (credit)
+   rides a rebooking-credit row. Amounts/refs are authored placeholder (§74). */
 const TXNS=[
- {id:'t1',  ref:'TXN-8841', when:'Today 09:12', date:'2026-08-12', who:'Maryam Naz',     party:'Candidate', kind:'Course — Foundations of Leadership',            cat:'course',    amt:100, dir:'in',  method:'Visa •4242',       fee:3.20, rail:'Stripe → In progress', status:'received'},
- {id:'t2',  ref:'TXN-8840', when:'Today 08:40', date:'2026-08-12', who:'Jordan Vale',     party:'Candidate', kind:'Interview — Priya Raman',        cat:'interview', amt:225, dir:'in',  method:'Visa •1180',       fee:6.83, rail:'Stripe → In progress', status:'pending'},
- {id:'t3',  ref:'TXN-8839', when:'Today 08:05', date:'2026-08-12', who:'BrightPath',      party:'Employer',  kind:'Interview unlock — E. Novak',    cat:'unlock',    amt:40,  dir:'in',  method:'Visa •9002',       fee:1.46, rail:'Stripe → In progress', status:'held'},
- {id:'t17', ref:'TXN-8838', when:'Today 07:50', date:'2026-08-12', who:'Sophia Ali',      party:'Candidate', kind:'Interview scenes ×2',            cat:'scene',     amt:30,  dir:'in',  method:'Visa •4242',       fee:0.98, rail:'Stripe → In progress', status:'pending'},
- {id:'t4',  ref:'TXN-8836', when:'Yest 18:03',  date:'2026-08-11', who:'Ava Thompson',    party:'Candidate', kind:'Course — Foundations of Leadership',            cat:'course',    amt:100, dir:'in',  method:'Mastercard •5100', fee:3.20, rail:'Stripe → In progress', status:'pending'},
- {id:'t5',  ref:'TXN-8834', when:'Yest 15:22',  date:'2026-08-11', who:'Emma Novak',      party:'Candidate', kind:'Re-interview — Dana Whitfield',  cat:'interview', amt:180, dir:'in',  method:'Amex •3007',       fee:5.52, rail:'Stripe → In progress', status:'failed'},
- {id:'t6',  ref:'TXN-8830', when:'Yest 12:03',  date:'2026-08-11', who:'Dana Whitfield',  party:'Talent agent', kind:'Agent payout',         cat:'payout',    amt:144, dir:'out', method:'Bank ••6789',      fee:0,    rail:'In progress → Bank',   status:'paid'},
- {id:'t7',  ref:'TXN-8827', when:'Yest 10:41',  date:'2026-08-11', who:'Meridian Labs',   party:'Employer',  kind:'Interview unlock ×3',            cat:'unlock',    amt:120, dir:'in',  method:'Visa •7781',       fee:3.78, rail:'Stripe → In progress', status:'settled'},
- {id:'t8',  ref:'TXN-8822', when:'10 Aug',      date:'2026-08-10', who:'Oliver Grant',    party:'Candidate', kind:'Interview — Dana Whitfield',    cat:'interview', amt:195, dir:'in',  method:'Visa •4242',       fee:5.96, rail:'Stripe → In progress', status:'received'},
- {id:'t18', ref:'TXN-8820', when:'10 Aug',      date:'2026-08-10', who:'Liam Chen',       party:'Candidate', kind:'Interview scene ×1',             cat:'scene',     amt:15,  dir:'in',  method:'Mastercard •8823', fee:0.59, rail:'Stripe → In progress', status:'received'},
- {id:'t9',  ref:'TXN-8818', when:'10 Aug',      date:'2026-08-10', who:'Marcus Ozoro',    party:'Talent agent', kind:'Agent payout',         cat:'payout',    amt:120, dir:'out', method:'Bank ••2231',      fee:0,    rail:'In progress → Bank',   status:'pending'},
- {id:'t10', ref:'TXN-8814', when:'9 Aug',       date:'2026-08-09', who:'Sophia Ali',      party:'Candidate', kind:'Interview — Marcus Ozoro',      cat:'interview', amt:150, dir:'in',  method:'Mastercard •6621', fee:4.65, rail:'Stripe → In progress', status:'received'},
- {id:'t11', ref:'TXN-8809', when:'9 Aug',       date:'2026-08-09', who:'NovaHealth',      party:'Employer',  kind:'Interview unlock — S. Ali',      cat:'unlock',    amt:40,  dir:'in',  method:'ACH ••4410',       fee:0.40, rail:'Stripe → In progress', status:'settled'},
- {id:'t19', ref:'TXN-8806', when:'9 Aug',       date:'2026-08-09', who:'Kai Andersen',    party:'Candidate', kind:'Interview scenes ×3',            cat:'scene',     amt:45,  dir:'in',  method:'ACH ••4410',       fee:0.45, rail:'Stripe → In progress', status:'received'},
- {id:'t12', ref:'TXN-8802', when:'8 Aug',       date:'2026-08-08', who:'Priya Raman',     party:'Talent agent', kind:'Agent payout',         cat:'payout',    amt:180, dir:'out', method:'Bank ••5540',      fee:0,    rail:'In progress → Bank',   status:'failed'},
- {id:'t13', ref:'TXN-8797', when:'8 Aug',       date:'2026-08-08', who:'Liam Chen',       party:'Candidate', kind:'Course — Foundations of Leadership',            cat:'course',    amt:100, dir:'in',  method:'Visa •8823',       fee:3.20, rail:'Stripe → In progress', status:'received'},
- {id:'t14', ref:'TXN-8790', when:'7 Aug',       date:'2026-08-07', who:'Ava Thompson',    party:'Candidate', kind:'Course refund (partial)',        cat:'refund',    amt:50,  dir:'out', method:'Visa •5100',       fee:0,    rail:'Stripe → Card',        status:'refunded'},
- {id:'t15', ref:'TXN-8781', when:'6 Aug',       date:'2026-08-06', who:'Meridian Labs',   party:'Employer',  kind:'Placement fee — R. Osei',        cat:'placement', amt:0,   dir:'in',  method:'—',                fee:0,    rail:'—',                    status:'blocked'},
- {id:'t16', ref:'TXN-8779', when:'6 Aug',       date:'2026-08-06', who:'BrightPath',      party:'Employer',  kind:'Placement fee — J. Vale',        cat:'placement', amt:0,   dir:'in',  method:'—',                fee:0,    rail:'—',                    status:'blocked'}
+ {id:'t1',  ref:'TXN-9042', stripeRef:'ch_3Rk8vA', when:'Sep 28', date:'2026-09-28', time:'2:14 PM', type:'course',    cat:'course',    who:'Maryam Naz',   party:'Candidate',    email:'maryam.naz@gmail.com',   kind:'Course — Foundations of Leadership', desc:'Foundations of Leadership · 90-day cycle', amt:100, dir:'in',  method:'Visa •4242',       fee:3.20, status:'succeeded', cause:{l:'Course enrolment', go:'candidates/candidates'}},
+ {id:'t2',  ref:'TXN-9040', stripeRef:'ch_3Rk7pQ', when:'Sep 28', date:'2026-09-28', time:'9:40 AM', type:'interview', cat:'interview', who:'Jordan Vale',  party:'Candidate',    email:'jordan.vale@gmail.com',  kind:'Interview with Priya Raman', desc:'Interview · Priya Raman', amt:225, dir:'in',  method:'Visa •1180',       fee:6.83, status:'pending',   funder:'Candidate', agent:'Priya Raman', sp:{fee:225, share:180, pct:20, com:45}, cause:{l:'Interview booking', go:'market/bookings'}},
+ {id:'t3',  ref:'TXN-9038', stripeRef:'ch_3Rk6mZ', when:'Sep 27', date:'2026-09-27', time:'7:50 AM', type:'scene',     cat:'scene',     who:'Sophia Ali',   party:'Candidate',    email:'sophia.ali@gmail.com',   kind:'Interview scenes ×2', desc:'2 saved scenes, beyond the free set', amt:30,  dir:'in',  method:'Visa •4242',       fee:0.98, status:'pending',   cause:{l:'Interview', go:'market/bookings'}},
+ {id:'t4',  ref:'TXN-9036', stripeRef:'ch_3Rk5jY', when:'Sep 27', date:'2026-09-27', time:'6:03 PM', type:'course',    cat:'course',    who:'Ava Thompson', party:'Candidate',    email:'ava.thompson@gmail.com', kind:'Course — Foundations of Leadership', desc:'Foundations of Leadership · 90-day cycle', amt:100, dir:'in',  method:'Mastercard •5100', fee:3.20, status:'pending',   cause:{l:'Course enrolment', go:'candidates/candidates'}},
+ {id:'t14', ref:'TXN-9034', stripeRef:'ch_3Rk4hX', when:'Sep 26', date:'2026-09-26', time:'4:20 PM', type:'interview', cat:'interview', who:'TALENTnext',   party:'Platform',     email:'',                       kind:'First interview — Grace Kim with Marcus Ozoro', desc:'First interview · Grace Kim · Marcus Ozoro · 100% discount', amt:95, dir:'in', method:'Platform funded', fee:0, status:'succeeded', funder:'Platform', agent:'Marcus Ozoro', sp:{fee:95, share:76, pct:20, com:19}, cause:{l:'Interview booking', go:'market/bookings'}},
+ {id:'t5',  ref:'TXN-9032', stripeRef:'ch_3Rk3gW', when:'Sep 26', date:'2026-09-26', time:'3:22 PM', type:'interview', cat:'interview', who:'Emma Novak',   party:'Candidate',    email:'emma.novak@gmail.com',   kind:'Re-interview with Dana Whitfield', desc:'Re-interview · Dana Whitfield', amt:180, dir:'in',  method:'Amex •3007',       fee:5.52, status:'failed',    funder:'Candidate', agent:'Dana Whitfield', sp:{fee:180, share:144, pct:20, com:36}, cause:{l:'Interview booking', go:'market/bookings'}},
+ {id:'t6',  ref:'TXN-9030', stripeRef:'po_1Rk2fV', when:'Sep 26', date:'2026-09-26', time:'12:03 AM', type:'payout',   cat:'payout',    who:'Marcus Ozoro', party:'Talent agent', email:'marcus.ozoro@gmail.com', kind:'Payout — interview with Sophia Ali', desc:'Payout · interview with Sophia Ali', amt:150, dir:'out', method:'Bank ••2231', fee:0, status:'succeeded', funder:'Candidate', agent:'Marcus Ozoro', sp:{fee:150, share:120, pct:20, com:30}, cause:{l:'Payout run', go:'finance/payouts'}},
+ {id:'t7',  ref:'TXN-9028', stripeRef:'ch_3Rk1eU', when:'Sep 25', date:'2026-09-25', time:'10:41 AM', type:'interview', cat:'interview', who:'Oliver Grant', party:'Candidate',   email:'oliver.grant@gmail.com', kind:'Interview with Dana Whitfield', desc:'Interview · Dana Whitfield', amt:195, dir:'in',  method:'Visa •4242',       fee:5.96, status:'succeeded', funder:'Candidate', agent:'Dana Whitfield', sp:{fee:195, share:156, pct:20, com:39}, cause:{l:'Interview booking', go:'market/bookings'}},
+ {id:'t18', ref:'TXN-9026', stripeRef:'ch_3Rk0dT', when:'Sep 25', date:'2026-09-25', time:'8:15 AM', type:'scene',     cat:'scene',     who:'Liam Chen',    party:'Candidate',    email:'liam.chen@gmail.com',    kind:'Interview scene ×1', desc:'1 saved scene, beyond the free set', amt:15,  dir:'in',  method:'Mastercard •8823', fee:0.59, status:'succeeded', cause:{l:'Interview', go:'market/bookings'}},
+ {id:'t9',  ref:'TXN-9024', stripeRef:'po_1Rj9cS', when:'Sep 24', date:'2026-09-24', time:'12:00 AM', type:'payout',   cat:'payout',    who:'Liam Foster',  party:'Talent agent', email:'liam.foster@gmail.com',  kind:'Payout — interview with Nathan Brooks', desc:'Payout · interview with Nathan Brooks', amt:165, dir:'out', method:'Bank ••3390', fee:0, status:'pending',   funder:'Candidate', agent:'Liam Foster', sp:{fee:165, share:132, pct:20, com:33}, cause:{l:'Payout run', go:'finance/payouts'}},
+ {id:'t10', ref:'TXN-9022', stripeRef:'ch_3Rj8bR', when:'Sep 24', date:'2026-09-24', time:'9:12 AM', type:'interview', cat:'interview', who:'Sophia Ali',   party:'Candidate',    email:'sophia.ali@gmail.com',   kind:'Interview with Marcus Ozoro', desc:'Interview · Marcus Ozoro', amt:150, dir:'in',  method:'Mastercard •6621', fee:4.65, status:'succeeded', funder:'Candidate', agent:'Marcus Ozoro', sp:{fee:150, share:120, pct:20, com:30}, cause:{l:'Interview booking', go:'market/bookings'}},
+ {id:'t19', ref:'TXN-9020', stripeRef:'ch_3Rj7aQ', when:'Sep 23', date:'2026-09-23', time:'2:30 PM', type:'scene',     cat:'scene',     who:'Kai Andersen', party:'Candidate',    email:'kai.andersen@gmail.com', kind:'Interview scenes ×3', desc:'3 saved scenes, beyond the free set', amt:45,  dir:'in',  method:'Visa •9931',       fee:1.36, status:'succeeded', cause:{l:'Interview', go:'market/bookings'}},
+ {id:'t12', ref:'TXN-9018', stripeRef:'po_1Rj6ZP', when:'Sep 23', date:'2026-09-23', time:'12:00 AM', type:'payout',   cat:'payout',    who:'Priya Raman',  party:'Talent agent', email:'priya.raman@gmail.com',  kind:'Payout — interview with Emma Novak', desc:'Payout · interview with Emma Novak', amt:225, dir:'out', method:'Bank ••5540', fee:0, status:'failed',    funder:'Candidate', agent:'Priya Raman', sp:{fee:225, share:180, pct:20, com:45}, cause:{l:'Payout run', go:'finance/payouts'}},
+ {id:'t13', ref:'TXN-9016', stripeRef:'ch_3Rj5YO', when:'Sep 22', date:'2026-09-22', time:'11:04 AM', type:'course',   cat:'course',    who:'Liam Chen',    party:'Candidate',    email:'liam.chen@gmail.com',    kind:'Course — Foundations of Leadership', desc:'Foundations of Leadership · 90-day cycle', amt:100, dir:'in',  method:'Visa •8823',       fee:3.20, status:'succeeded', cause:{l:'Course enrolment', go:'candidates/candidates'}},
+ {id:'t20', ref:'TXN-9014', stripeRef:'po_1Rj4XN', when:'Sep 22', date:'2026-09-22', time:'12:00 AM', type:'payout',    cat:'payout',    who:'Marcus Ozoro', party:'Talent agent', email:'marcus.ozoro@gmail.com', kind:'Payout — first interview with Grace Kim', desc:'Payout · first interview with Grace Kim', amt:95, dir:'out', method:'Bank ••2231', fee:0, status:'succeeded', funder:'Platform', agent:'Marcus Ozoro', sp:{fee:95, share:76, pct:20, com:19}, cause:{l:'Payout run', go:'finance/payouts'}},
+ /* REBOOKING CREDITS (Epic 8's Not-held → Resolved flow, surfaced here as its own
+    transaction type). `cr` carries the original amount, what was applied to a
+    replacement, any unused balance returned to the original funding source and the
+    remaining active amount; the row links both the source and the replacement
+    booking. Active / Used / Expired. Authored placeholder (§74). */
+ {id:'t21', ref:'RBC-4007', stripeRef:'—', when:'Sep 21', date:'2026-09-21', time:'10:20 AM', type:'rbcredit', cat:'rbcredit', who:'Diego Alvarez', party:'Candidate', email:'diego.alvarez@gmail.com', kind:'Rebooking credit — interview not held', desc:'Interview not held — the agent could not attend', amt:95, dir:'in', method:'—', fee:0, status:'active', funder:'Candidate', cr:{original:95, applied:0, returned:0, remaining:95, expiry:'2026-10-21', source:'BKG-3181', sourceGo:'market/bookings', replacement:'', replacementGo:''}, cause:{l:'Source booking BKG-3181', go:'market/bookings'}},
+ {id:'t22', ref:'RBC-4004', stripeRef:'—', when:'Sep 18', date:'2026-09-18', time:'3:48 PM', type:'rbcredit', cat:'rbcredit', who:'Noor Adib', party:'Candidate', email:'noor.adib@gmail.com', kind:'Rebooking credit — applied to replacement', desc:'Applied in full to a replacement booking', amt:150, dir:'in', method:'—', fee:0, status:'used', funder:'Candidate', cr:{original:150, applied:150, returned:0, remaining:0, expiry:'2026-10-18', source:'BKG-3140', sourceGo:'market/bookings', replacement:'BKG-3166', replacementGo:'market/bookings'}, cause:{l:'Source BKG-3140 → replacement BKG-3166', go:'market/bookings'}},
+ {id:'t23', ref:'RBC-4001', stripeRef:'—', when:'Sep 12', date:'2026-09-12', time:'12:00 AM', type:'rbcredit', cat:'rbcredit', who:'Yusuf Demir', party:'Candidate', email:'yusuf.demir@gmail.com', kind:'Rebooking credit — expired, balance returned', desc:'Window lapsed — balance returned to the card', amt:120, dir:'in', method:'—', fee:0, status:'expired', funder:'Candidate', cr:{original:120, applied:0, returned:120, remaining:0, expiry:'2026-09-12', source:'BKG-3098', sourceGo:'market/bookings', replacement:'', replacementGo:''}, cause:{l:'Source booking BKG-3098', go:'market/bookings'}}
 ];
+const TXN_BY_ID={}; TXNS.forEach(t => TXN_BY_ID[t.id]=t);
+/* EPIC 9 — ESCROW & PAYOUTS (Maryam, 29 Sep 2026, story 9.3). ONE ROW PER
+   INTERVIEW (was per-period). An interview fee sits in escrow from booking;
+   it becomes payable the payout-release delay (Settings, working days, ships at
+   3) after the agent's report is filed, and goes out on the weekly run to the
+   agent's verified destination. `state` is escrow / paid / returned; `releases`
+   is the ISO date the payout is due (BLANK = report outstanding = blocked);
+   `releasedOn` is set once paid. `runFailed` and `noDest` are ROW MARKINGS, not
+   states — a payout the last run could not complete, or an agent with no
+   destination; both stay In escrow. `funder` (Candidate/Platform) is who put the
+   money into escrow — a first interview reads Platform. Legacy keys kept so the
+   dashboard gauge, owedAgents(), heldPayouts() and the agent-detail earnings
+   panel read on unchanged: status (escrow→held, paid→settled, returned), net
+   (=agent share), gross, method, agent. Authored placeholder (§74). */
 const PAYOUTS=[
- {id:'p1', ref:'PO-2201', agent:'Dana Whitfield', period:'Aug 4–10', interviews:1, gross:180, split:'20/80', net:144, method:'Bank ••6789', when:'Released', date:'2026-08-11', status:'settled'},
- {id:'p2', ref:'PO-2202', agent:'Priya Raman',    period:'Aug 4–10', interviews:1, gross:225, split:'20/80', net:180, method:'Bank ••5540', when:'Awaiting settlement', date:'2026-08-14', status:'held'},
- {id:'p3', ref:'PO-2203', agent:'Marcus Ozoro',   period:'Aug 4–10', interviews:1, gross:150, split:'20/80', net:120, method:'Bank ••2231', when:'Released', date:'2026-08-10', status:'settled'},
- {id:'p4', ref:'PO-2204', agent:'Dana Whitfield', period:'Aug 11–17', interviews:1, gross:195, split:'20/80', net:156, method:'Bank ••6789', when:'Scheduled Aug 18', date:'2026-08-18', status:'held'},
- {id:'p5', ref:'PO-2205', agent:'Sofia Reyes',    period:'Aug 11–17', interviews:2, gross:330, split:'20/80', net:264, method:'Bank ••7712', when:'Awaiting settlement', date:'2026-08-18', status:'held'},
- {id:'p6', ref:'PO-2206', agent:'Marcus Ozoro',   period:'Aug 11–17', interviews:1, gross:0,   split:'—',     net:0,   method:'—',           when:'First-interview discount', date:'—', status:'settled'},
- {id:'p7', ref:'PO-2207', agent:'Liam Foster',    period:'Aug 4–10', interviews:1, gross:165, split:'20/80', net:132, method:'Bank ••3390', when:'Released', date:'2026-08-11', status:'settled'},
- {id:'p8', ref:'PO-2208', agent:'Priya Raman',    period:'Aug 11–17', interviews:1, gross:180, split:'20/80', net:144, method:'Bank ••5540', when:'Awaiting settlement', date:'—', status:'held'}
+ {id:'p1', ref:'PO-2311', agent:'Dana Whitfield', agentEmail:'dana.whitfield@gmail.com', candidate:'Oliver Grant', ivDate:'2026-09-25', ivKind:'Interview',    gross:195, agentShare:156, commissionPct:20, funder:'Candidate', state:'escrow', releases:'2026-10-02', releasedOn:'', reportFiled:true,  runFailed:null, noDest:false, method:'Bank ••6789', bookingRef:'BKG-3201', net:156, status:'held',    when:'Payable on the next run', date:'2026-10-02', period:'—', interviews:1, split:'20/80'},
+ {id:'p2', ref:'PO-2310', agent:'Priya Raman',    agentEmail:'priya.raman@gmail.com',    candidate:'Jordan Vale',  ivDate:'2026-09-24', ivKind:'Interview',    gross:225, agentShare:180, commissionPct:20, funder:'Candidate', state:'escrow', releases:'',            releasedOn:'', reportFiled:false, runFailed:null, noDest:false, method:'Bank ••5540', bookingRef:'BKG-3199', net:180, status:'held',    when:'Report outstanding', date:'—', period:'—', interviews:1, split:'20/80'},
+ {id:'p3', ref:'PO-2308', agent:'Marcus Ozoro',   agentEmail:'marcus.ozoro@gmail.com',   candidate:'Sophia Ali',   ivDate:'2026-09-20', ivKind:'Interview',    gross:150, agentShare:120, commissionPct:20, funder:'Candidate', state:'paid',   releases:'2026-09-26', releasedOn:'2026-09-26', reportFiled:true, runFailed:null, noDest:false, method:'Bank ••2231', bookingRef:'BKG-3190', net:120, status:'settled', when:'Paid', date:'2026-09-26', period:'—', interviews:1, split:'20/80'},
+ {id:'p4', ref:'PO-2307', agent:'Priya Raman',    agentEmail:'priya.raman@gmail.com',    candidate:'Emma Novak',   ivDate:'2026-09-19', ivKind:'Re-interview', gross:225, agentShare:180, commissionPct:20, funder:'Candidate', state:'escrow', releases:'2026-09-26', releasedOn:'', reportFiled:true,  runFailed:'Insufficient funds at the receiving bank', noDest:false, method:'Bank ••5540', bookingRef:'BKG-3188', net:180, status:'held', when:'Last run failed', date:'2026-09-26', period:'—', interviews:1, split:'20/80'},
+ {id:'p5', ref:'PO-2306', agent:'Sofia Reyes',    agentEmail:'sofia.reyes@gmail.com',    candidate:'Kai Andersen', ivDate:'2026-09-18', ivKind:'Interview',    gross:165, agentShare:132, commissionPct:20, funder:'Candidate', state:'escrow', releases:'2026-10-02', releasedOn:'', reportFiled:true,  runFailed:null, noDest:true,  method:'—',           bookingRef:'BKG-3185', net:132, status:'held',    when:'No payout destination', date:'2026-10-02', period:'—', interviews:1, split:'20/80'},
+ {id:'p6', ref:'PO-2304', agent:'Marcus Ozoro',   agentEmail:'marcus.ozoro@gmail.com',   candidate:'Grace Kim',    ivDate:'2026-09-16', ivKind:'Interview',    gross:95,  agentShare:76,  commissionPct:20, funder:'Platform',  state:'paid',   releases:'2026-09-22', releasedOn:'2026-09-22', reportFiled:true, runFailed:null, noDest:false, method:'Bank ••2231', bookingRef:'BKG-3180', net:76,  status:'settled', when:'Paid', date:'2026-09-22', period:'—', interviews:1, split:'20/80'},
+ {id:'p7', ref:'PO-2303', agent:'Liam Foster',    agentEmail:'liam.foster@gmail.com',    candidate:'Nathan Brooks',ivDate:'2026-09-15', ivKind:'Interview',    gross:165, agentShare:132, commissionPct:20, funder:'Candidate', state:'escrow', releases:'2026-10-02', releasedOn:'', reportFiled:true,  runFailed:null, noDest:false, method:'Bank ••3390', bookingRef:'BKG-3176', net:132, status:'held',    when:'Payable on the next run', date:'2026-10-02', period:'—', interviews:1, split:'20/80'},
+ {id:'p8', ref:'PO-2301', agent:'Dana Whitfield', agentEmail:'dana.whitfield@gmail.com', candidate:'Noor Adib',    ivDate:'2026-09-12', ivKind:'Re-interview', gross:150, agentShare:120, commissionPct:20, funder:'Candidate', state:'returned', releases:'', releasedOn:'', reportFiled:false, runFailed:null, noDest:false, method:'Bank ••6789', bookingRef:'BKG-3140', net:120, status:'returned', when:'Redirected to a rebooking credit', date:'2026-09-12', period:'—', interviews:1, split:'20/80'}
 ];
 const FEES=[
  {k:'course',    t:'Course fee',           v:'$100',      unit:'per cycle',   note:'Foundations of Leadership, upfront for the 90-day cycle',         state:'set',  effective:'2026-06-01', by:'Umair'},
@@ -2134,6 +2234,26 @@ const FEE_HISTORY=[
  {when:'1 Jun',  who:'Umair Khan',      what:'Set course fee',          detail:'$100 upfront per 90-day cycle'},
  {when:'1 Jun',  who:'Umair Khan',      what:'Set interview unlock',    detail:'$40 per full-interview unlock'}
 ];
+/* EPIC 9 — FEE SETTINGS (Maryam, 29 Sep 2026, story 9.4). Commission is set PER
+   AGENT (Epic 6, on the agent record) — there is NO platform-wide rate. Fee
+   Settings is the READ-ONLY record of every fee value ever set or changed on the
+   platform: each per-agent commission, and the two Money values held in Settings
+   (payout release delay, payout run day). It cannot be edited or cleared by anyone.
+   `valueType` is 'commission' | 'delay' | 'runday'; a first-time commission reads
+   From "Not set". `changecommission`/`setcommission` (on the agent record) push a
+   row here. Authored placeholder (§74). */
+const FEE_LOG=[
+ {id:'fl1', valueType:'commission', agent:'Dana Whitfield', agentEmail:'dana.whitfield@gmail.com', from:'20%', to:'18%', changedBy:'Reed Castellano', role:'Super Admin', on:'2026-09-20, 10:12 AM', reason:'Retention — top-ranked agent, three cohorts running, lowered on review.'},
+ {id:'fl2', valueType:'commission', agent:'Priya Raman',    agentEmail:'priya.raman@gmail.com',    from:'Not set', to:'20%', changedBy:'Reed Castellano', role:'Super Admin', on:'2026-09-14, 3:40 PM',  reason:'Standard commission set at grant of the Talent Agent role.'},
+ {id:'fl3', valueType:'commission', agent:'Marcus Ozoro',   agentEmail:'marcus.ozoro@gmail.com',   from:'Not set', to:'20%', changedBy:'Reed Castellano', role:'Super Admin', on:'2026-09-10, 9:05 AM',  reason:'Standard commission set at invite.'},
+ {id:'fl4', valueType:'runday',     agent:'',                agentEmail:'',                         from:'Thursday', to:'Monday', changedBy:'Reed Castellano', role:'Super Admin', on:'2026-09-08, 4:22 PM', reason:'Moved the weekly payout run to Monday so it clears at the start of the week.'},
+ {id:'fl5', valueType:'delay',      agent:'',                agentEmail:'',                         from:'Not set', to:'3 working days', changedBy:'Reed Castellano', role:'Super Admin', on:'2026-09-01, 11:00 AM', reason:'Set the release delay after a report is filed, per the settlement model.'},
+ {id:'fl6', valueType:'commission', agent:'Sofia Reyes',    agentEmail:'sofia.reyes@gmail.com',    from:'Not set', to:'22%', changedBy:'Reed Castellano', role:'Super Admin', on:'2026-08-28, 2:15 PM',  reason:'Set at invite; higher rate agreed for a specialist range.'},
+ {id:'fl7', valueType:'commission', agent:'Liam Foster',    agentEmail:'liam.foster@gmail.com',    from:'Not set', to:'20%', changedBy:'Reed Castellano', role:'Super Admin', on:'2026-08-20, 10:40 AM', reason:'Standard commission set at invite.'}
+];
+/* The two Money values (payout release delay, payout run day) live in the Platform
+   Settings `SETTINGS` object (Epic 11.1, `SETTINGS.payoutDelay` / `.payoutRunDay`);
+   Fee Settings reads them live and their change history is FEE_LOG above. */
 const INVOICES=[
  {id:'iv1', num:'INV-2026-0142', party:'Meridian Labs', partyType:'Employer',  type:'Interview unlocks', qty:3, amount:120, issued:'2026-08-11', due:'2026-08-25', status:'sent',    method:'Invoice / ACH'},
  {id:'iv2', num:'INV-2026-0141', party:'BrightPath',    partyType:'Employer',  type:'Interview unlocks', qty:1, amount:40,  issued:'2026-08-05', due:'2026-08-19', status:'paid',    method:'Visa •9002'},
@@ -2153,12 +2273,37 @@ const REFUNDS=[
  {id:'rf6', party:'OrbitalHR',    partyType:'Employer',  txnRef:'TXN-8102', type:'Chargeback', amount:40,  reason:'Card issuer chargeback — no evidence supplied in time',    status:'lost',       when:'18 Jul', date:'2026-07-18'}
 ];
 const FIN_BALANCE={available:1284, inTransit:588, reserved:1140, pendingIn:405};
+/* EPIC 9 — SETTLEMENT RECONCILIATION (Maryam, 29 Sep 2026, story 9.8). A batch is
+   one payout run sent to the provider, holding every payout released in that run.
+   The platform ingests Stripe's settlement report and rebuilds the comparison;
+   this prototype SIMULATES the ingest (a "Re-check with provider" action + seeded
+   states). `status`: sent (nothing confirmed) / settled (all confirmed, totals
+   agree) / part (some confirmed, no disagreement) / discrepancy (reported, totals
+   or an item disagree) / failed (rejected in full). `providerTotal` is null until
+   the provider reports (an outage never shows as a false difference). `reviewed`
+   records a person looked at a discrepancy — it changes no figure and resolves
+   nothing. `ingestErr` surfaces an ingestion/provider failure on the batch.
+   `list` items carry a match indicator and link to their transaction. Authored
+   placeholder (§74). */
 const SETTLEMENTS=[
- {id:'st1', ref:'po_1Qk8', when:'11 Aug', date:'2026-08-11', gross:340, fees:10.31, net:329.69, count:4, method:'Bank ••1120', status:'reconciled'},
- {id:'st2', ref:'po_1Qj4', when:'8 Aug',  date:'2026-08-08', gross:260, fees:7.85,  net:252.15, count:3, method:'Bank ••1120', status:'reconciled'},
- {id:'st3', ref:'po_1Qh9', when:'6 Aug',  date:'2026-08-06', gross:190, fees:5.91,  net:184.09, count:2, method:'Bank ••1120', status:'pending'},
- {id:'st4', ref:'po_1Qg2', when:'4 Aug',  date:'2026-08-04', gross:225, fees:6.98,  net:218.02, count:3, method:'Bank ••1120', status:'unmatched'}
+ {id:'st1', ref:'BATCH-0093', providerRef:'po_batch_1Rk8vA', sent:'2026-09-26', sentTime:'12:00 AM', platformTotal:196, providerTotal:196, status:'settled', reviewed:null, ingestErr:null, list:[
+   {recipient:'Marcus Ozoro', forWhat:'First interview · Grace Kim', platformAmt:76, providerAmt:76, platformState:'Paid', providerState:'Paid', match:'matched', txId:'t20'},
+   {recipient:'Marcus Ozoro', forWhat:'Interview · Sophia Ali', platformAmt:120, providerAmt:120, platformState:'Paid', providerState:'Paid', match:'matched', txId:'t6'}]},
+ {id:'st2', ref:'BATCH-0092', providerRef:'po_batch_1Rj4XN', sent:'2026-09-19', sentTime:'12:00 AM', platformTotal:468, providerTotal:288, status:'part', reviewed:null, ingestErr:null, list:[
+   {recipient:'Dana Whitfield', forWhat:'Interview · Oliver Grant', platformAmt:156, providerAmt:156, platformState:'Paid', providerState:'Paid', match:'matched', txId:''},
+   {recipient:'Liam Foster', forWhat:'Interview · Nathan Brooks', platformAmt:132, providerAmt:132, platformState:'Paid', providerState:'Paid', match:'matched', txId:'t9'},
+   {recipient:'Priya Raman', forWhat:'Interview · Jordan Vale', platformAmt:180, providerAmt:null, platformState:'Paid', providerState:'—', match:'missing', txId:''}]},
+ {id:'st3', ref:'BATCH-0091', providerRef:'po_batch_1Rh9cS', sent:'2026-09-12', sentTime:'12:00 AM', platformTotal:276, providerTotal:270, status:'discrepancy', reviewed:{by:'Reed Castellano', on:'2026-09-13', note:'Provider under-reported one item by $6 — Stripe FX rounding, accepted after review.'}, ingestErr:null, list:[
+   {recipient:'Dana Whitfield', forWhat:'Interview · Oliver Grant', platformAmt:156, providerAmt:156, platformState:'Paid', providerState:'Paid', match:'matched', txId:''},
+   {recipient:'Marcus Ozoro', forWhat:'Interview · Sophia Ali', platformAmt:120, providerAmt:114, platformState:'Paid', providerState:'Paid', match:'amount', txId:'t6'}]},
+ {id:'st4', ref:'BATCH-0090', providerRef:'po_batch_1Rg2ZP', sent:'2026-09-05', sentTime:'12:00 AM', platformTotal:312, providerTotal:null, status:'sent', reviewed:null, ingestErr:null, list:[
+   {recipient:'Sofia Reyes', forWhat:'Interview · Kai Andersen', platformAmt:132, providerAmt:null, platformState:'Pending', providerState:'—', match:'pending', txId:''},
+   {recipient:'Priya Raman', forWhat:'Re-interview · Emma Novak', platformAmt:180, providerAmt:null, platformState:'Pending', providerState:'—', match:'pending', txId:''}]},
+ {id:'st5', ref:'BATCH-0089', providerRef:'po_batch_1Rf1YO', sent:'2026-08-29', sentTime:'12:00 AM', platformTotal:264, providerTotal:0, status:'failed', reviewed:null, ingestErr:'Provider rejected the batch: the settlement account could not be reached.', list:[
+   {recipient:'Dana Whitfield', forWhat:'Interview · Noor Adib', platformAmt:120, providerAmt:0, platformState:'Paid', providerState:'Failed', match:'state', txId:''},
+   {recipient:'Priya Raman', forWhat:'Interview · Emma Novak', platformAmt:144, providerAmt:0, platformState:'Paid', providerState:'Failed', match:'state', txId:''}]}
 ];
+const SETTLE_BY_ID={}; SETTLEMENTS.forEach(s => SETTLE_BY_ID[s.id]=s);
 const LEAD_STAGES=['Landing','Quiz started','Quiz done','Result revealed','Contact captured','Converted'];
 const leadStageIx = s => { const i = LEAD_STAGES.indexOf(s); return i < 0 ? 0 : i; };
 const LEADS=[
@@ -2456,12 +2601,17 @@ const MODULES=[
  {k:'onboarding', t:'Onboarding Questions', ic:'document', subs:[
    {k:'questions', t:'Questions'}]},
  {k:'finance', t:'Finance & Settlement', ic:'finance', subs:[
-   /* Only Transactions and Payouts are surfaced for now (Maryam, 16 Sep 2026:
-      "only keep transactions and payouts sub modules for now, hide the other sub
-      modules"). The rest stay defined and deep-link reachable, just off the rail;
-      drop `hidden` to bring one back. Overview is hidden, so the module's first
-      visible sub is Transactions. */
-   {k:'overview', t:'Overview', hidden:true}, {k:'transactions', t:'Transactions'}, {k:'payouts', t:'Payouts'}, {k:'invoices', t:'Invoices & Billing', hidden:true}, {k:'refunds', t:'Refunds & Disputes', hidden:true}, {k:'reconciliation', t:'Reconciliation', hidden:true}, {k:'feeconfig', t:'Fee Configuration', hidden:true}]},
+   /* EPIC 9 — FINANCE (Maryam, 29 Sep 2026, stories 9.1–9.4 + 9.8). The rail now
+      surfaces the four the stories name: Transactions, Payouts, Fee Settings and
+      Reconciliation. `transaction` (9.2 detail) and `batch` (9.8 batch detail) are
+      hidden drill-ins opened from a row. Overview, Invoices & Billing and Refunds &
+      Disputes are retired (off the rail) — the stories don't cover them, and
+      employers (all of Invoices) are out of the system; they stay defined + deep-link
+      reachable, drop `hidden` to bring one back. Fee Configuration is superseded by
+      Fee Settings (9.4) and kept hidden. First visible sub is Transactions. */
+   {k:'transactions', t:'Transactions'}, {k:'payouts', t:'Payouts'}, {k:'feesettings', t:'Fee Settings'}, {k:'reconciliation', t:'Reconciliation'},
+   {k:'transaction', t:'Transaction', hidden:true}, {k:'batch', t:'Settlement batch', hidden:true},
+   {k:'overview', t:'Overview', hidden:true}, {k:'invoices', t:'Invoices & Billing', hidden:true}, {k:'refunds', t:'Refunds & Disputes', hidden:true}, {k:'feeconfig', t:'Fee Configuration', hidden:true}]},
  /* CRM & Attribution hidden wholesale for now (Maryam, 16 Sep 2026: "hide
     complete crm and attribution module"), like Vetting — the module and its
     pages stay defined and deep-link reachable, just off the rail. */
@@ -2504,8 +2654,20 @@ const MODULES=[
     below renders the tab strip in-page from these same subs. This is the ONE
     module that reverses "the rail is the only sub-navigator" (§120), to mirror
     the candidate profile. */
- {k:'settings', t:'Settings', ic:'profile', footer:true, subs:[
-   {k:'general', t:'General', hidden:true}, {k:'profile', t:'My Profile', hidden:true}, {k:'notifications', t:'Notifications', hidden:true}, {k:'security', t:'Login & Security', hidden:true}, {k:'payments', t:'Payments & Cards', hidden:true}]}
+ /* SETTINGS carries the GEAR icon (Maryam, 29 Sep 2026: "change the profile icon
+    of settings into a settings gear icon"), and holds only the settings the module
+    owns as inner tabs — Platform (story 11.1), Notification Templates (story 11.2),
+    Notifications (your own prefs) and Login & Security. My Profile and General
+    Settings are their OWN standalone pages now (the two `profile` / `general`
+    modules below), reached from the top-header account dropdown, not tabs here. */
+ {k:'settings', t:'Settings', ic:'settings', footer:true, subs:[
+   {k:'platform', t:'Platform', hidden:true}, {k:'templates', t:'Notification Templates', hidden:true}, {k:'notifications', t:'Notifications', hidden:true}, {k:'security', t:'Login & Security', hidden:true}]},
+ /* MY PROFILE (story 2.4) and GENERAL SETTINGS are standalone pages, off the rail
+    (hidden), opened from the account-menu chevron. Each is its own module with a
+    single view so its route is deep-linkable and its breadcrumb reads its own
+    name (Maryam, 29 Sep 2026). */
+ {k:'profile', t:'My Profile', ic:'profile', hidden:true, subs:[{k:'profile', t:'My Profile'}]},
+ {k:'general', t:'General Settings', ic:'settings', hidden:true, subs:[{k:'general', t:'General Settings'}]}
 ];
 const MOD_BY_K={}; MODULES.forEach(m => { MOD_BY_K[m.k]=m; m._sub={}; m.subs.forEach(s => m._sub[s.k]=s); });
 const firstSub = m => (m.subs.find(s => !s.hidden) || m.subs[0]).k;
@@ -2526,6 +2688,8 @@ const S = {
      Same idea as the candidate portal's `S.hist` (§78). */
   hist:[],
   qEdit:null,                             /* the onboarding question being edited (a working copy) */
+  setDraft:null,                          /* Platform Settings staged CRUD — {dept, hol} working copies (story 11.1) */
+  tplEdit:null, tplField:'body',          /* the notification template being edited + which field the caret is in (story 11.2) */
   /* THE SHARED STRIPE "ADD PAYMENT METHOD" MODAL — `payModal` open flag, `payTab`
      its Card / US-bank state. Both feed `dsPayForm` from the design system, the
      same modal the candidate, leader and agent portals open. */
@@ -3738,7 +3902,7 @@ function validateSheet(rules, exceptId){
    (trap 9); a save re-renders, so the new values become the defaults and the
    button greys itself. Runs after every render and on every input/pick. */
 function syncSettingsSave(){
-  if(S.mod !== 'settings') return;
+  if(S.mod !== 'settings' && S.mod !== 'general' && S.mod !== 'profile') return;
   device.querySelectorAll('.page .sec').forEach(sec => {
     const fields = [...sec.querySelectorAll('[data-f]')]; if(!fields.length) return;
     const dirty = fields.some(el => (el.type === 'checkbox' || el.type === 'radio')
@@ -3900,7 +4064,9 @@ const overdueInv = () => INVOICES.filter(i => i.status === 'overdue').length;
 const openRefunds = () => REFUNDS.filter(r => r.status === 'requested' || r.status === 'processing').length;
 const contactLeads = () => LEADS.filter(l => l.stage === 'Contact captured').length;
 const unverifiedEmp = () => EMPLOYERS.filter(e => e.verify !== 'ok').length;
-const unmatchedSettle = () => SETTLEMENTS.filter(s => s.status === 'unmatched').length;
+/* A settlement batch that "needs a look" = a discrepancy or a failed batch (Epic 9,
+   9.8). Feeds the dashboard attention count and the reconciliation summary. */
+const unmatchedSettle = () => SETTLEMENTS.filter(s => s.status === 'discrepancy' || s.status === 'failed').length;
 
 /* THE "NEEDS YOUR ATTENTION" BLACK CARD — Maryam, 11 Sep 2026: "instead of being
    in each row I need one action item with details at one time" — so the card is
@@ -4079,7 +4245,7 @@ const talq = () => {
         ['Open payouts', 'finance/payouts']],
       ['What is overdue?', `${overdueInv()} invoices, ${money(INVOICES.filter(i => i.status === 'overdue').reduce((n, i) => n + i.amount, 0))} in total. ${openRefunds()} refunds or disputes are open.`,
         null, ['Open invoices', 'finance/invoices']],
-      ['Is the ledger reconciled?', `${SETTLEMENTS.filter(s => s.status === 'reconciled').length} of ${SETTLEMENTS.length} batches match; ${unmatchedSettle()} unmatched. Stripe settles to the platform bank in batches.`,
+      ['Is the ledger reconciled?', `${SETTLEMENTS.filter(s => s.status === 'settled').length} of ${SETTLEMENTS.length} settlement batches match; ${unmatchedSettle()} need${unmatchedSettle() === 1 ? 's' : ''} a look. Stripe settles to the platform bank in batches.`,
         null, ['Reconciliation', 'finance/reconciliation']]
     ],
     crm: [
@@ -4100,7 +4266,7 @@ const talq = () => {
       ['Is two-factor on?', `${SEC.twofa ? 'Yes, required for staff, on for your account.' : 'Off for your account, though it is required for staff.'} You can end any other session from Login & Security.`,
         null, ['Login & Security', 'settings/security']],
       ['Where do dates and currency get set?', 'General settings. They change how the admin reads, not what a candidate sees.',
-        null, ['General', 'settings/general']]
+        null, ['General', 'general/general']]
     ]
   };
 };
@@ -4195,6 +4361,7 @@ function askDock(){
    `BULK_STATUS` entry (roles) shows only Edit / Delete. */
 const BULK_STATUS = {
   cohort: {val:'archived', label:'Archive', icon:'pause'},
+  course: {val:'archived', label:'Archive', icon:'pause'},
   agent:  {val:'inactive', label:'Pause',   icon:'pause'},
   cand:   {val:'inactive', label:'Deactivate', icon:'deactivate'}
 };
@@ -5382,7 +5549,7 @@ function usersStaff(){
     ${filterStrip('status', 'all', STAFF_STATUS_TABS)}
     ${lstTools('Search by name or email',
       filterDd('role', 'all', [['all', 'All roles'], ...staffRoleOpts(false)], 'Role')
-      + filterDd('dept', 'all', [['all', 'All'], ...DEPARTMENTS.map(d => [d, d])], 'Department'))}
+      + filterDd('dept', 'all', [['all', 'All'], ...deptNames().map(d => [d, d])], 'Department'))}
     ${rows.length ? table(
       [{label:'Name'}, {label:'Role'}, {label:'Job title'}, {label:'Department'}, {label:'Status'}, {label:'Last signed in'}, {label:'Added'}, ACT_COL],
       rows.map(u => ({id:u.id, go:'users/staffdetail/' + u.id, sv:[u.name], cells:[
@@ -5403,7 +5570,7 @@ function usersStaff(){
    filters and search return. The story's background generation + a 7-day download
    link are narrated (prototype ruling: the flow, not the send); the file itself is
    produced for real. Refused above the row limit; every export logs an audit line. */
-const EXPORT_ROW_LIMIT = 5000;   /* authored placeholder — a real Settings control owns this (story 1.5) */
+let EXPORT_ROW_LIMIT = SETTINGS.exportLimit;   /* the Exports group of story 11.1 owns this; it reassigns on Save */
 const csvCell = v => { const s = String(v == null ? '' : v); return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
 function staffRowsFiltered(){
   const rf = getFilter('role', 'all'), sf = getFilter('status', 'all'), df = getFilter('dept', 'all'), q = getFilter('q', '');
@@ -5430,10 +5597,10 @@ ACTIONS.staffexport = () => {
    (story 1.1 / 1.6): "No departments have been added yet. Staff cannot be
    invited until at least one exists." */
 function deptField(val){
-  if(!DEPARTMENTS.length) return `<label class="f"><span class="lbl">Department <span class="req-star" aria-hidden="true">*</span></span>
+  if(!activeDepts().length) return `<label class="f"><span class="lbl">Department <span class="req-star" aria-hidden="true">*</span></span>
     <button type="button" class="inp fdd-t" disabled aria-disabled="true" style="width:100%;justify-content:space-between;min-height:40px;opacity:.55;cursor:not-allowed"><span class="fdd-val fdd-ph">No departments yet</span></button>
     <span class="f-msg">No departments have been added yet. Staff cannot be invited until at least one exists.</span></label>`;
-  return fieldHtml({k:'dept', l:'Department', t:'select', req:1, ph:'Select a department', opts:DEPARTMENTS.map(d => [d, d])}, val);
+  return fieldHtml({k:'dept', l:'Department', t:'select', req:1, ph:'Select a department', opts:activeDepts().map(d => [d, d])}, val);
 }
 /* Validation rule sets for the staff sheets (Epic 1). Phone is OPTIONAL and only
    light-checked (email is the sole sign-in factor — Maryam, 23 Sep 2026). */
@@ -5467,7 +5634,7 @@ SHEETS.addstaff = () => {
   };
 };
 ACTIONS.sendinvite = () => {
-  if(!DEPARTMENTS.length){ toast('Add a department in Settings before inviting staff', 'warn'); return 'keep'; }
+  if(!activeDepts().length){ toast('Add a department in Settings before inviting staff', 'warn'); return 'keep'; }
   const {ok, v} = validateSheet(STAFF_ADD_RULES());
   if(!ok) return 'stay';
   if(v.role === 'admin' && !isSA(ME)){ markFieldErr('role', 'Only a Super Admin can assign the Super Admin role.'); return 'stay'; }
@@ -6032,22 +6199,20 @@ function clearingUI(u, id){
   const held = heldEscrow(u), led = leaderCohorts(u.name);
   if(!held.length && !led.length) return note;
   const rows = [];
-  held.forEach(p => rows.push(cardRow('wallet', `Escrow ${esc(p.ref)}`, `${money(p.net)} held for ${esc(p.period)}`,
-    `<button class="btn acc-link btn-sm noic" data-act="clearpayout:${u.id}:${p.id}">Release ${I.arrowRight}</button>`)));
-  /* A LEADER'S LIVE COHORTS carry a replacement-leader picker BELOW the cohort text
-     (Maryam, 24 Sep 2026: "choose a new leader field should be below, not on the same
-     row") — the picker sits inside the row body under the description. The cohort task
-     shows ONLY when this person actually leads a cohort. */
+  held.forEach(p => rows.push(`<div class="clr-item">${cardRow('wallet', `Escrow ${esc(p.ref)}`, `${money(p.net)} held for ${esc(p.period)}`,
+    `<button class="btn acc-link btn-sm noic" data-act="clearpayout:${u.id}:${p.id}">Release ${I.arrowRight}</button>`)}</div>`));
+  /* A LEADER'S LIVE COHORTS carry a replacement-leader picker BELOW the cohort row,
+     FULL WIDTH — a sibling of the cardrow, not a child of its text column (Maryam,
+     29 Sep 2026). The cohort detail names its member count. The task shows ONLY when
+     this person actually leads a cohort. */
   const opts = leaderReplOpts(u);
   S.clearRepl = S.clearRepl || {};
-  led.forEach(c => rows.push(
-    `<div class="cardrow clr-cohort">
-      <span class="cardrow-ic">${ic('users')}</span>
-      <span class="cardrow-b"><span class="cardrow-t">${esc(c.name)}</span>
-        <span class="cardrow-d">Live cohort — choose a replacement leader</span>
-        <div class="clr-repl">${formDd({k:'repl_' + c.id, l:'', t:'select', ph:'Choose a leader', opts}, S.clearRepl[c.id] || '')}</div></span>
-    </div>`));
-  return note + `<div style="margin-top:var(--s05)">${note2Head('Clear before continuing')}<div class="tile-stack clr-stack">${rows.join('')}</div></div>`;
+  led.forEach(c => { const n = cohortSize(c); rows.push(
+    `<div class="clr-item">
+      ${cardRow('users', esc(c.name), `Live cohort · ${n} member${n === 1 ? '' : 's'} — choose a replacement leader`)}
+      <div class="clr-repl">${formDd({k:'repl_' + c.id, l:'', t:'select', ph:'Choose a leader', opts}, S.clearRepl[c.id] || '')}</div>
+    </div>`); });
+  return note + `<div style="margin-top:var(--s05)">${note2Head('Clear before continuing')}<div class="clr-stack">${rows.join('')}</div></div>`;
 }
 /* The deactivate/delete button is DISABLED until everything is cleared (Maryam, 24 Sep
    2026): a reason is written, no escrow is still held, and every live cohort has a
@@ -6902,7 +7067,9 @@ const LEVELS = ['E1', 'E2', 'E3', 'B1', 'B2', 'B3', 'T1', 'T2', 'T3'];
    recommendation inputs (18.1), never an enrolment gate. */
 const INTENTS = [['role', 'Develop in my current role'], ['another', 'Develop for another role'], ['ownership', 'Develop for ownership']];
 const INTENT_LABEL = k => (INTENTS.find(x => x[0] === k) || [, ''])[1];
-const intentSummary = arr => !arr || !arr.length ? '—' : (arr.length === INTENTS.length ? 'All intents' : arr.map(INTENT_LABEL).join(', '));
+/* A course carries ONE intent (Maryam, 29 Sep 2026 — single-select). Handles a legacy
+   array value gracefully so nothing breaks if an old record still holds one. */
+const intentSummary = v => Array.isArray(v) ? (v.length ? v.map(INTENT_LABEL).join(', ') : '—') : (v ? INTENT_LABEL(v) : '—');
 /* The five V1-track rungs for a course's Levels field/column — Explorer E1–E5 or
    Builder B1–B5. Trailblazer is out of the V1 catalogue (7.1), so a course's track
    is only ever Explorer or Builder. */
@@ -8045,7 +8212,7 @@ function agComponentsCell(a){
    date beneath an Overridden value (6.1). */
 function agTrainCell(a){
   const t = agTraining(a);
-  if(t === 'overridden') return tag('', 'Overridden');
+  if(t === 'overridden') return tag('overridden', 'Overridden');
   if(t === 'notcomplete') return tag('pending', 'Not complete');
   return tag('completed', 'Complete');
 }
@@ -8063,7 +8230,6 @@ function agMarketActs(a){
     ...(st === 'listed' ? [['pause', 'Pause Listing', `data-sheet="agpause:${a.id}"`]] : []),
     ...(st === 'paused' ? [['play', 'Restore Listing', `data-sheet="agrestore:${a.id}"`]] : []),
     ['flag', 'Set Assessment Range', `data-sheet="agrange:${a.id}"`],
-    ['starOutline', 'Review Agent Score', `data-sheet="agscore:${a.id}"`],
     ...(agTraining(a) === 'notcomplete' ? [['check', 'Override Training Gate', `data-sheet="agoverride:${a.id}"`]] : [])
   ];
 }
@@ -8170,9 +8336,9 @@ function agentsAll(){
             ])
           : rowActs([
               /* Marketplace actions (6.1/6.2) + the account-admin actions this
-                 directory owns (Edit / Deactivate / Delete). */
+                 directory owns (Deactivate / Delete). Edit lives on the agent
+                 detail page (Maryam, 29 Sep 2026). */
               ...agMarketActs(a),
-              ['edit', 'Edit', `data-sheet="rec:agent:${a.id}"`],
               (a.status === 'active' || a.status === 'ok') ? ['deactivate', 'Deactivate', `data-sheet="deactext:${a.id}"`] : ['play', 'Reactivate', `data-sheet="reactext:${a.id}"`],
               ['delete', 'Delete', `data-sheet="delext:${a.id}"`]
             ])
@@ -8292,6 +8458,8 @@ function agentMarketPanel(a){
       rowActs([
         ['star', 'Review Agent Score', `data-sheet="agscore:${a.id}"`],
         ['route', 'Set Assessment Range', `data-sheet="agrange:${a.id}"`],
+        /* Commission set/changed here on the agent record (9.4) — Change fee + step-up. */
+        ['money', a.commission != null ? 'Change Commission' : 'Set Commission', `data-sheet="commission:${a.id}"`],
         ...(agState(a) === 'listed' ? [['pause', 'Pause Listing', `data-sheet="agpause:${a.id}"`]] : []),
         ...(agState(a) === 'paused' ? [['play', 'Restore Listing', `data-sheet="agrestore:${a.id}"`]] : []),
         ...(agTraining(a) === 'notcomplete' ? [['check', 'Override Training Gate', `data-sheet="agoverride:${a.id}"`]] : [])
@@ -8305,6 +8473,7 @@ function agentMarketPanel(a){
     ${kv([
       ['Score components', `Rubric ${agRubric(a).toFixed(1)}/5 · Candidate rating ${(a.rating || 0).toFixed(1)}/5 (${a.candRatings || 0})`],
       ['Score status', a.scoreApproved === false ? `Starting score — first quarterly review due ${esc(agQuarterEnd(a))}` : `Approved ${esc(a.scoreAt || '—')}`],
+      ['Commission', `${a.commission != null ? a.commission + '% to the platform' : 'Not set — cannot be listed'}${a.commissionAt ? ' · since ' + esc(a.commissionAt) : ''}`],
       ['LightspeedVT training', trainTxt],
       ['Listing state', AG_STATE[agState(a)][1]]
     ])}
@@ -8749,11 +8918,10 @@ SHEETS.agrange = id => {
   const a = USER_BY_ID[id]; if(!a) return {title:'Set assessment range', body:'', ok:''};
   const r = agRange(a);
   return {title:`Set assessment range — ${a.name}`, ok:'Save Range', act:'doagrange:' + id,
-    body:`${kv([['Agent', esc(a.name)], ['Current range', rangeLabel(r)]])}
-      ${fieldHtml({k:'from', l:'From level', t:'select', opts: LADDER.map(l => [l, l])}, r[0])}
+    body:`${kv([['Agent', `<span style="display:inline-flex;align-items:center;gap:var(--s03)"><span class="pcell-av"><img src="${agentFace(a.name)}" alt="" loading="lazy"></span>${esc(a.name)}</span>`], ['Current range', rangeLabel(r)]])}
+      <div style="margin-top:var(--s06)">${fieldHtml({k:'from', l:'From level', t:'select', opts: LADDER.map(l => [l, l])}, r[0])}</div>
       ${fieldHtml({k:'to', l:'To level', t:'select', opts: LADDER.map(l => [l, l])}, r[1])}
-      ${fieldHtml({k:'reason', l:'Reason', t:'textarea', req:1, ph:'Required — written to the audit log; never shown to the agent'})}
-      <p class="t-desc">Guidance shown to candidates on the marketplace and the agent’s public profile. It restricts nothing — the agent may still interview at any level.</p>`};
+      ${fieldHtml({k:'reason', l:'Reason', t:'textarea', req:1, ph:'Required — written to the audit log; never shown to the agent'})}`};
 };
 ACTIONS.doagrange = key => {
   const a = USER_BY_ID[key.split(':')[1]]; const v = readForm(); if(!a) return;
@@ -8770,9 +8938,8 @@ SHEETS.agpause = id => {
   const a = USER_BY_ID[id]; if(!a) return {title:'Pause listing', body:'', ok:''};
   const n = agUpcoming(a);
   return {title:`Pause ${a.name}’s listing`, ok:'Pause Listing', danger:true, act:'askagpause:' + id,
-    body:`${kv([['Agent', esc(a.name)], ['Email', esc(a.email)], ['Upcoming interviews', `${n} in the diary`]])}
-      ${fieldHtml({k:'reason', l:'Reason', t:'textarea', req:1, ph:'Required — written to the audit log; never shown to the agent'})}
-      <p class="t-desc">They come out of the marketplace and cannot receive new bookings. Their ${n} upcoming interview${n === 1 ? '' : 's'} go ahead as booked, and they keep their diary, evaluations and earnings. Their rank clears at the next weekly recalculation.</p>`};
+    body:`${kv([['Agent', `<span style="display:inline-flex;align-items:center;gap:var(--s03)"><span class="pcell-av"><img src="${agentFace(a.name)}" alt="" loading="lazy"></span>${esc(a.name)}</span>`], ['Email', esc(a.email)], ['Upcoming interviews', `${n} in the diary`]])}
+      <div style="margin-top:var(--s06)">${fieldHtml({k:'reason', l:'Reason', t:'textarea', req:1, ph:'Required — written to the audit log; never shown to the agent'})}</div>`};
 };
 ACTIONS.askagpause = key => {
   const a = USER_BY_ID[key.split(':')[1]]; const v = readForm(); if(!a) return;
@@ -9373,7 +9540,7 @@ KINDS.course = {
     {k:'levels', t:'html', req:1, html:`<div class="f"><span class="lbl">Levels <span class="req-star" aria-hidden="true">*</span></span>
       <div class="mt4 course-levels" data-track="${(c && c.track) || ''}">${courseLevelChecks(c && c.track, c && c.levels)}</div>
       <span class="f-hint">The rungs of the chosen track this course is aimed at. Pick one or more; they need not be consecutive.</span></div>`},
-    {k:'intent', l:'Intent', t:'checks', req:1, opts: INTENTS},
+    {k:'intent', l:'Intent', t:'select', req:1, ph:'Choose an intent', opts: INTENTS},
     {k:'_len', t:'html', html:`<label class="f"><span class="lbl">Length</span><input class="inp pfe-ro" value="90 days" readonly tabindex="-1"><span class="f-hint">Every course runs 90 days. This is fixed platform-wide.</span></label>`},
     {k:'chapters', t:'html', req:1, def:12, html:`<label class="f"><span class="lbl">Chapter count <span class="req-star" aria-hidden="true">*</span></span>
       <input class="inp" data-f="chapters" type="number" min="1" max="90" value="${(c && c.chapters) || 12}" placeholder="1 to 90" oninput="{var n=Math.max(1,Math.min(90,Number(this.value)||1));var el=document.getElementById('chDeriv');if(el)el.textContent='90 days over '+n+' chapters, about '+(90/n).toFixed(1)+' days per chapter';try{syncSheetSubmit()}catch(e){}}">
@@ -9384,8 +9551,8 @@ KINDS.course = {
   ],
   help:'Track, Levels, Intent and Description are what Tal ranks a course on when it recommends one — they never restrict who may enrol. A course runs 90 days. Its chapters live in the learning platform; the count set here drives the pacing shown to candidates.',
   okNew:'Add Course',
-  create: v => { const c = {id:newId('co', COURSES), name:v.name, desc:v.desc || '', track:v.track || 'Explorer', levels:Array.isArray(v.levels) ? v.levels : [], intent:Array.isArray(v.intent) ? v.intent : [], chapters:Number(v.chapters) || 12, lsvt:v.lsvt || '', price:Number(v.price) || 0, days:90, status:v.status || 'draft'}; COURSES.push(c); COURSE_BY_ID[c.id] = c; return c; },
-  update: (c, v) => { c.name = v.name; c.desc = v.desc; c.track = v.track; c.levels = Array.isArray(v.levels) ? v.levels : c.levels; c.intent = Array.isArray(v.intent) ? v.intent : c.intent; c.chapters = Number(v.chapters) || c.chapters; c.lsvt = v.lsvt; c.days = 90; c.status = v.status; /* price is changed through the step-up flow, never here */ },
+  create: v => { const c = {id:newId('co', COURSES), name:v.name, desc:v.desc || '', track:v.track || 'Explorer', levels:Array.isArray(v.levels) ? v.levels : [], intent:v.intent || '', chapters:Number(v.chapters) || 12, lsvt:v.lsvt || '', price:Number(v.price) || 0, days:90, status:v.status || 'draft'}; COURSES.push(c); COURSE_BY_ID[c.id] = c; return c; },
+  update: (c, v) => { c.name = v.name; c.desc = v.desc; c.track = v.track; c.levels = Array.isArray(v.levels) ? v.levels : c.levels; c.intent = v.intent != null && v.intent !== '' ? v.intent : c.intent; c.chapters = Number(v.chapters) || c.chapters; c.lsvt = v.lsvt; c.days = 90; c.status = v.status; /* price is changed through the step-up flow, never here */ },
   remove: c => { COURSES.splice(COURSES.indexOf(c), 1); delete COURSE_BY_ID[c.id]; },
   delWarn: c => `${c.name} leaves the catalogue.`,
   status: (c, val) => val === 'archived'
@@ -9411,20 +9578,25 @@ function cohortsCatalogue(){
   const rows = COURSES
     .filter(c => fs === 'all' ? true : c.status === fs)
     .filter(c => ft === 'all' ? true : c.track === ft)
-    .filter(c => fi === 'all' ? true : (c.intent || []).includes(fi))
+    .filter(c => fi === 'all' ? true : (Array.isArray(c.intent) ? c.intent.includes(fi) : c.intent === fi))
     .filter(c => hit(q, c.name));
   const cnt = s => COURSES.filter(c => c.status === s).length;
   return `
   <section class="sec">
     ${searchHead('Course catalogue', 'The courses candidates can enrol on, the chapter count each runs over, and the track, levels and intents Tal recommends it on.',
       `${addBtn('course', 'Add Course')}`, 'Search courses')}
+    ${filterStrip('cstat', 'all', [
+      ['all', 'All', COURSES.length],
+      ['live', 'Live', cnt('live')],
+      ['draft', 'Draft', cnt('draft')],
+      ['archived', 'Archived', cnt('archived')]
+    ])}
     ${lstTools('Search courses',
-      filterDd('cstat', 'all', [['all', 'All statuses'], ['live', `Live (${cnt('live')})`], ['draft', `Draft (${cnt('draft')})`], ['archived', `Archived (${cnt('archived')})`]], 'Status')
-      + filterDd('ctrack', 'all', [['all', 'All tracks'], ...COURSE_TRACKS.map(t => [t, t])], 'Track')
+      filterDd('ctrack', 'all', [['all', 'All tracks'], ...COURSE_TRACKS.map(t => [t, t])], 'Track')
       + filterDd('cintent', 'all', [['all', 'All intents'], ...INTENTS], 'Intent'))}
     ${rows.length ? table(
       [{label:'Course'}, {label:'Track'}, {label:'Levels'}, {label:'Intent'}, {label:'Status'}, {label:'Length'}, {label:'Chapters', num:true}, {label:'Price', num:true}, ACT_COL],
-      rows.map(c => ({go:'catalogue/coursedetail/' + c.id, cells:[
+      rows.map(c => ({id:c.id, go:'catalogue/coursedetail/' + c.id, cells:[
         esc(c.name), esc(c.track), esc((c.levels || []).join(', ') || '—'), esc(intentSummary(c.intent)), tag(c.status), '90 days', String(c.chapters || 12), money(c.price),
         rowActs([
           ['launch', 'View', `data-go="catalogue/coursedetail/${c.id}"`],
@@ -9432,7 +9604,7 @@ function cohortsCatalogue(){
           ['wallet', 'Change price', `data-sheet="courseprice:${c.id}"`],
           c.status === 'live' ? ['pause', 'Archive', `data-act="askstatus:course:${c.id}:archived"`] : ['play', 'Publish', `data-act="askstatus:course:${c.id}:live"`],
           delBtn('course', c.id)])
-      ]})))
+      ]})), {selectKind:'course'})
       : emptyState('book', 'No courses match', 'Nothing in this filter yet.')}
   </section>`;
 }
@@ -9869,7 +10041,10 @@ const bkStageTag = b => { const s = bkStage(b); return tag(BK_STAGE_HUE[s] || ''
    the agent's report is due REPORT_DEADLINE_HRS after the interview was held; a
    reviewer has APPROVAL_DEADLINE_HRS to settle once the agent filed; a rebooking
    credit runs for REBOOK_WINDOW days. */
-const REPORT_DEADLINE_HRS = 24, APPROVAL_DEADLINE_HRS = 24, REBOOK_WINDOW = 14;
+/* REPORT_DEADLINE_HRS and REBOOK_WINDOW are owned by the Interviews group of
+   story 11.1 and reassign on its Save; APPROVAL_DEADLINE_HRS is the reviewer's
+   fixed 24-hour window and is NOT configurable (11.1). */
+let REPORT_DEADLINE_HRS = SETTINGS.reportDeadline; const APPROVAL_DEADLINE_HRS = 24; let REBOOK_WINDOW = SETTINGS.rebookWindow;
 const bkOverdue = b => bkStage(b) === 'held' && b.overdue;
 const bkApprovalOverdue = b => bkStage(b) === 'await' && b.apprOverdue;
 /* Needs attention (8.1): Held with the report overdue, Awaiting approval with the
@@ -11316,14 +11491,15 @@ const outstandingInv = () => INVOICES.filter(i => i.status === 'sent' || i.statu
 const openDisputes = openRefunds;
 
 PAGESUM['finance/overview'] = () => `${money(finIn())} processed and ${money(inProgress())} in progress. Settlement timing is a deliberate black box, <b>${heldPayouts()} payouts are pending</b>, and how agents are paid is still an open high-severity decision.`;
-PAGESUM['finance/transactions'] = () => `Every money movement — course fees, interview payments, employer unlocks and agent payouts. <b>Pending payments settle on the weekly cycle</b>; a placement charge is blocked until the fee is set.`;
-PAGESUM['finance/payouts'] = () => `${heldPayouts()} payouts are pending settlement. As Super Admin you can <b>release one ahead of the cycle</b>, and the release is written to the audit log.`;
+PAGESUM['finance/transactions'] = () => `Every movement of money and rebooking credit — course fees, interview fees, scenes, agent payouts and credits. <b>Each row traces back to what caused it</b>; a pending charge settles on the weekly cycle.`;
+PAGESUM['finance/payouts'] = () => `${heldPayouts()} payouts are in escrow. Escrow becomes payable ${SETTINGS.payoutDelay} working days after the report is filed and <b>goes out on the weekly run</b>; a blank release date is a report still outstanding.`;
+PAGESUM['finance/feesettings'] = () => `Commission is set per agent — there is no platform-wide rate. This is the <b>read-only record of every fee change</b>, and it cannot be edited or cleared.`;
 PAGESUM['finance/invoices'] = () => {
   const od = overdueInv(); const dr = INVOICES.filter(i => i.status === 'draft').length;
   return `<b>${od} invoice${od === 1 ? ' is' : 's are'} overdue</b> and ${dr} sit in draft — the drafts are placement fees, blocked until that fee is set.`;
 };
 PAGESUM['finance/refunds'] = () => `${REFUNDS.length} refunds and disputes, <b>${openRefunds()} open</b>. A course fee is refundable inside the 14-day window; a card chargeback is fought or lost with the issuer, not by us.`;
-PAGESUM['finance/reconciliation'] = () => `Stripe settles to the platform bank in batches. ${SETTLEMENTS.filter(s => s.status === 'reconciled').length} are reconciled and <b>${unmatchedSettle()} ${unmatchedSettle() === 1 ? 'is' : 'are'} unmatched</b> and need${unmatchedSettle() === 1 ? 's' : ''} a look.`;
+PAGESUM['finance/reconciliation'] = () => `Match what Stripe says it paid against what the platform released. ${SETTLEMENTS.filter(s => s.status === 'settled').length} settled and <b>${unmatchedSettle()} ${unmatchedSettle() === 1 ? 'batch needs' : 'batches need'} a look</b> before a difference becomes a missing payout.`;
 PAGESUM['finance/feeconfig'] = () => { const open = FEES.filter(f => f.state === 'open').length; return `Every price the platform charges, in one place. ${open ? `The <b>placement fee is the one still unset</b>, and` : `<b>Every fee is set</b>, and`} the platform's share of an interview payment is configured here.`; };
 
 function financeOverview(){
@@ -11422,85 +11598,171 @@ function methodMark(method){
   return svg ? `<span class="pay-mk" title="${esc(METHOD_LABEL[key] || b)}">${svg}</span>` : `<span class="t-caption">${esc(b)}</span>`;
 }
 
+/* ─── EPIC 9 FINANCE HELPERS (Maryam, 29 Sep 2026) ─────────────────────────── */
+const TX_TYPE_LABEL = {course:'Course fee', interview:'Interview fee', scene:'Scenes', payout:'Payout', rbcredit:'Rebooking credit'};
+/* Money txn status set (Succeeded/Pending/Failed) and rebooking-credit set
+   (Active/Used/Expired) — the story's exact words, coloured by meaning. */
+const TX_STATUS_META = {succeeded:['green', 'Succeeded'], pending:['warn', 'Pending'], failed:['red', 'Failed'], active:['green', 'Active'], used:['', 'Used'], expired:['', 'Expired']};
+const txStatusTag = t => { const m = TX_STATUS_META[t.status] || ['', cap(t.status)]; return `<span class="statw${m[0] ? ' ' + m[0] : ''}">${esc(m[1])}</span>`; };
+/* Party carries the account type beneath the name (9.1); the platform is not a
+   person, so it reads as a plain two-line cell with no invented face. */
+const txPartyCell = t => t.party === 'Platform' ? idCell(t.who, 'Platform') : personCell(t.who, t.party);
+/* The split — agent share + platform commission — rides interview + payout rows
+   only, and adds back to the gross exactly (9.1/9.2). */
+const txSplitCell = t => t.sp ? `${money(t.sp.share)} agent · ${money(t.sp.com)} platform` : '<span class="t-caption">—</span>';
+/* An ISO date is in range when it is between from/to (both optional, lexicographic
+   on yyyy-mm-dd); a row with no comparable date is never excluded. */
+const dateInRange = (iso, from, to) => { if(!/^\d{4}-\d{2}-\d{2}$/.test(iso || '')) return true; if(from && iso < from) return false; if(to && iso > to) return false; return true; };
+/* The seven totals for the current filtered set (9.1). Each reads off the rows the
+   view is showing: gross taken (money-in charges), held in escrow + released
+   (interview/payout shares), platform commission, and the three rebooking-credit
+   figures. Escrow/released come off the register's own interview + payout rows, so
+   a filtered view totals only what it shows. */
+function txTotals(rows){
+  const grossTaken = rows.filter(t => t.dir === 'in' && ['course', 'interview', 'scene'].includes(t.type)).reduce((n, t) => n + t.amt, 0);
+  const commission = rows.filter(t => t.type === 'payout' && t.sp).reduce((n, t) => n + t.sp.com, 0);
+  const escrow = rows.filter(t => t.type === 'interview' && t.sp && (t.status === 'succeeded' || t.status === 'pending')).reduce((n, t) => n + t.sp.share, 0);
+  const released = rows.filter(t => t.type === 'payout' && t.sp && t.status === 'succeeded').reduce((n, t) => n + t.sp.share, 0);
+  const cr = rows.filter(t => t.type === 'rbcredit');
+  const active = cr.filter(t => t.status === 'active').reduce((n, t) => n + (t.cr ? t.cr.remaining : 0), 0);
+  const applied = cr.reduce((n, t) => n + (t.cr ? t.cr.applied : 0), 0);
+  const returned = cr.reduce((n, t) => n + (t.cr ? t.cr.returned : 0), 0);
+  return {grossTaken, commission, escrow, released, active, applied, returned};
+}
+/* Every finance export is TOAST-ONLY (the 25 Sep convention): the row-limit check,
+   an audit line, and the app's own toast naming the 7-day notification link. No
+   file leaves the browser. */
+ACTIONS.finexport = key => {
+  const what = key.split(':')[1] || 'Finance';
+  audit('Exported ' + what.toLowerCase(), 'CSV of the current filtered view', 'Finance & Settlement', 'notice');
+  toast(`A download link for the ${what} export will reach your notifications, valid 7 days.`);
+};
+const finExportBtn = what => `<button class="btn btn-g btn-sm noic" data-act="finexport:${esc(what)}">${I.download} Export</button>`;
+
+/* EPIC 9.1 — THE FINANCIAL REGISTER. Read-only: nothing is created, edited or
+   reversed here; a row opens the transaction detail (9.2). Type is the primary
+   TAB STRIP (Maryam's ruling), Status / Party type / date range are dropdowns.
+   Columns are the story's: Reference (+Stripe ref) · Date · Type · Party (+account
+   type) · Description · Amount (gross) · Split (agent + platform, interview/payout
+   only) · Method (brand only) · Status. Totals for the filtered set sit below. */
 function financeTransactions(){
-  const cf = getFilter('txcat', 'all'), q = getFilter('q', '');
-  /* EMPLOYERS ARE NOT PART OF THE SYSTEM (Maryam, 20 Sep 2026, extending the 19 Sep
-     removal into Finance): every employer-party transaction is dropped from this
-     table — which empties the Unlocks and Placements tabs (both were all-employer),
-     so those tabs are gone too. `base` filters at the source, so the tab counts and
-     the rows agree; the "Candidate" column then only ever holds a real person. */
-  const base = TXNS.filter(t => t.party !== 'Employer');
-  /* Search by the brand word, never the full `t.method` — the last-four must not
-     be queryable either (Maryam, 20 Sep 2026). */
-  const rows = base.filter(t => cf === 'all' ? true : t.cat === cf).filter(t => hit(q, t.ref, t.who, t.kind, methodBrand(t.method)));
+  const cf = getFilter('txtype', 'all'), sf = getFilter('txstatus', 'all'), pf = getFilter('txparty', 'all');
+  const q = getFilter('q', ''), from = getFilter('txfrom', ''), to = getFilter('txto', '');
+  const base = TXNS;
+  const rows = base
+    .filter(t => cf === 'all' ? true : t.type === cf)
+    .filter(t => sf === 'all' ? true : t.status === sf)
+    .filter(t => pf === 'all' ? true : (pf === 'candidate' ? t.party === 'Candidate' : pf === 'agent' ? t.party === 'Talent agent' : t.party === 'Platform'))
+    .filter(t => dateInRange(t.date, from, to))
+    /* Search matches reference, Stripe reference, party name and email (9.1) —
+       never the card number (the brand word only, on `methodBrand`). */
+    .filter(t => hit(q, t.ref, t.stripeRef, t.who, t.email, t.desc, methodBrand(t.method)));
+  const T = txTotals(rows);
   return `
   <section class="sec">
-    ${searchHead('Transactions', 'Every charge, payout and refund. A pending payment settles on the weekly cycle.',
-      `${exportBtn('Transactions')} <button class="btn btn-g btn-sm noic" data-sheet="rec:refund:new">${I.add} Issue a Refund</button>`, 'Search by reference, person or method')}
-    ${filterStrip('txcat', 'all', [
+    ${searchHead('Transactions', 'Every movement of money and rebooking credit — each traced to what caused it.',
+      finExportBtn('Transactions'), 'Search by reference, person or method')}
+    ${filterStrip('txtype', 'all', [
       ['all', 'All', base.length],
-      ['course', 'Courses', base.filter(t => t.cat === 'course').length],
-      ['interview', 'Interviews', base.filter(t => t.cat === 'interview').length],
-      /* Scenes — a candidate buying additional saved scenes from their interview,
-         beyond the free set; tracked separately from the interview fee itself
-         (Maryam, 20 Sep 2026). Same row structure and `methodMark` treatment as
-         every other category. */
-      ['scene', 'Scenes', base.filter(t => t.cat === 'scene').length],
-      ['payout', 'Payouts', base.filter(t => t.cat === 'payout').length],
-      ['refund', 'Refunds', base.filter(t => t.cat === 'refund').length]
+      ['course', 'Course fees', base.filter(t => t.type === 'course').length],
+      ['interview', 'Interview fees', base.filter(t => t.type === 'interview').length],
+      /* Scenes kept (Maryam's ruling) alongside the story's four types. */
+      ['scene', 'Scenes', base.filter(t => t.type === 'scene').length],
+      ['payout', 'Payouts', base.filter(t => t.type === 'payout').length],
+      ['rbcredit', 'Rebooking credit', base.filter(t => t.type === 'rbcredit').length]
     ])}
-    ${lstTools('Search by reference, person or method')}
-    ${rows.length ? (() => {
-      /* THE INTERVIEWS TAB HAS ITS OWN COLUMNS (Maryam, 20 Sep 2026): the "Course"
-         column becomes "Interview" and shows the interview TYPE only ("Interview" /
-         "Re-interview" — the agent name stripped), and a new "Talent Agent" column
-         next to it names the agent who ran it, WITH their photo (`personCell`). The
-         kind is "Interview — <agent>"; split on the spaced dash so "Re-interview"
-         (whose own hyphen has no surrounding spaces) stays whole. Every other tab
-         keeps the plain "Course" column. */
-      const isIv = cf === 'interview';
-      const ivSplit = k => { const p = String(k).split(/\s[—–-]\s/); return [p[0], p[1] || '']; };
-      const cols = isIv
-        ? [{label:'Reference'}, {label:'Candidate'}, {label:'Interview'}, {label:'Talent Agent'}, {label:'Amount', num:true}, {label:'Method'}, {label:'Status'}, ACT_COL]
-        : [{label:'Reference'}, {label:'Candidate'}, {label:'Course'}, {label:'Amount', num:true}, {label:'Method'}, {label:'Status'}, ACT_COL];
-      return table(cols, rows.map(t => {
-        const [ivType, ivAgent] = ivSplit(t.kind);
-        /* the middle column(s): Interview + Talent Agent on the interviews tab, else
-           the plain Course description ("Course — " prefix stripped). */
-        const mid = isIv
-          ? [esc(ivType), personCell(ivAgent, '')]
-          : [esc(t.kind.replace(/^Course\s*[—–-]\s*/, ''))];
-        return {sv:[t.ref, t.who], cells:[
-          idCell(t.ref, t.when),
-          personCell(t.who, ''),
-          ...mid,
-          (t.dir === 'out' ? '−' : '') + (t.amt ? money(t.amt) : '—'),
-          methodMark(t.method),
-          /* A PAYOUT'S pending state reads "In progress", not "Pending" (Maryam,
-             21 Sep 2026): the money is on its way to the agent's bank, so the
-             payouts set is In progress · Paid · Failed. Scoped to the payout
-             category — the money-in charges (Courses/Interviews/Scenes) keep
-             "Pending" — and the amber `warn` hue is unchanged (both `pending`
-             and `in progress` map to it). */
-          tag(t.status, t.cat === 'payout' && t.status === 'pending' ? 'In progress' : null),
-          /* A FAILED transaction took no money (the charge never received, or the
-             payout never sent), so there is nothing to receipt or refund — the only
-             sensible action is to remove it from the ledger (Maryam, 20 Sep 2026:
-             "a failed payment means the payment didn't receive ... allow only delete
-             action on such transactions"). Every other row keeps Download receipt +
-             (for a money-in charge not already refunded) Refund. */
-          rowActs(t.status === 'failed'
-            ? [['delete', 'Delete', `data-act="asktxndel:${t.id}"`]]
-            : [['receipt', 'Download receipt', `data-act="toast:Receipt for ${esc(t.ref)} downloaded"`],
-               ...(t.dir === 'in' && t.amt && t.status !== 'refunded' ? [['renew', 'Refund', `data-act="startrefund:${t.id}"`]] : [])])
-        ]};
-      }), {bulk: () => [
-        ['download', 'Download All', `data-act="bulktxdl:all"`],
-        [ADM_ZIP, 'Download as zip', `data-act="bulktxdl:zip"`]
-      ]});
-    })()
+    ${lstTools('Search by reference, Stripe ref, person or email',
+      filterDd('txstatus', 'all', [['all', 'All'], ['succeeded', 'Succeeded'], ['pending', 'Pending'], ['failed', 'Failed'], ['active', 'Active'], ['used', 'Used'], ['expired', 'Expired']], 'Status')
+      + filterDd('txparty', 'all', [['all', 'All'], ['candidate', 'Candidate'], ['agent', 'Talent Agent'], ['platform', 'Platform']], 'Party type')
+      + filterDate('txfrom', 'From', 100) + filterDate('txto', 'To', 100))}
+    ${rows.length ? table(
+      [{label:'Reference'}, {label:'Date'}, {label:'Type'}, {label:'Party'}, {label:'Description'}, {label:'Amount', num:true}, {label:'Split'}, {label:'Method'}, {label:'Status'}],
+      rows.map(t => ({id:t.id, go:'finance/transaction/' + t.id, sv:[t.ref, t.who], cells:[
+        idCell(t.ref, t.stripeRef && t.stripeRef !== '—' ? t.stripeRef : ''),
+        idCell(dpFmt(t.date) || t.date, t.time || ''),
+        esc(TX_TYPE_LABEL[t.type] || t.type),
+        txPartyCell(t),
+        esc(t.desc || t.kind),
+        (t.dir === 'out' ? '−' : '') + (t.amt ? money(t.amt) : '—'),
+        txSplitCell(t),
+        methodMark(t.method),
+        txStatusTag(t)
+      ]})))
       : emptyState('wallet', 'No transactions match', 'Nothing in this filter yet.')}
+  </section>
+  <section class="sec">
+    ${secHead('Totals for this view')}
+    ${kv([
+      ['Gross taken', money(T.grossTaken), 'n'],
+      ['Held in escrow', money(T.escrow), 'n'],
+      ['Released to agents', money(T.released), 'n'],
+      ['Platform commission', money(T.commission), 'n'],
+      ['Active rebooking credit', money(T.active), 'n'],
+      ['Rebooking credit applied', money(T.applied), 'n'],
+      ['Credit returned to source', money(T.returned), 'n']
+    ])}
   </section>`;
+}
+
+/* EPIC 9.2 — THE TRANSACTION DETAIL (hidden `transaction` sub, opened from a row's
+   View). Read-only. Transaction facts + Split + Cause link. A rebooking-credit row
+   shows its credit breakdown instead of the fee split. */
+function financeTransaction(){
+  const t = TXN_BY_ID[S.id];
+  if(!t) return `${detailHead('finance/transactions')}
+    <section class="sec">${emptyState('wallet', 'Transaction not found', 'This transaction is no longer in the register.')}</section>`;
+  DETAIL_LABEL = t.ref;
+  const isCredit = t.type === 'rbcredit';
+  const settled = t.status === 'succeeded' ? (dpFmt(t.date) + (t.time ? ' · ' + t.time : '')) : t.status === 'pending' ? 'Not settled yet' : '—';
+  return `${detailHead('finance/transactions')}
+    <section class="sec">
+      ${aiHead(t.ref, `${TX_TYPE_LABEL[t.type] || t.type} · ${esc(t.desc || t.kind)}`)}
+    </section>
+    <section class="sec">
+      ${secHead('Transaction')}
+      ${kv([
+        ['Amount', money(t.amt) + ' USD', 'n'],
+        ['Status', txStatusTag(t)],
+        ['Created', dpFmt(t.date) + (t.time ? ' · ' + t.time : '')],
+        ['Settled', settled],
+        ...(t.method && t.method !== '—' ? [['Method', t.method]] : []),
+        ['Stripe reference', esc(t.stripeRef || '—')],
+        ...(t.funder ? [['Funder', t.funder]] : []),
+        ['Party', `${esc(t.who)} · ${esc(t.party)}`],
+        ...(t.email ? [['Email', esc(t.email)]] : []),
+        ...(t.status === 'failed' ? [['Provider reason', 'The card was declined by the issuer.']] : [])
+      ])}
+    </section>
+    ${isCredit ? `<section class="sec">
+      ${secHead('Rebooking credit')}
+      ${kv([
+        ['Original credit', money(t.cr.original), 'n'],
+        ['Applied to a replacement', money(t.cr.applied), 'n'],
+        ['Balance returned to source', money(t.cr.returned), 'n'],
+        ['Remaining active', money(t.cr.remaining), 'n'],
+        ['Expires', dpFmt(t.cr.expiry) || t.cr.expiry]
+      ])}
+    </section>
+    <section class="sec">
+      ${secHead('Cause')}
+      ${kv([
+        ['Source booking', t.cr.source ? `<a data-go="${t.cr.sourceGo}">${esc(t.cr.source)}</a>` : '—'],
+        ['Replacement booking', t.cr.replacement ? `<a data-go="${t.cr.replacementGo}">${esc(t.cr.replacement)}</a>` : '—']
+      ])}
+    </section>` : `${t.sp ? `<section class="sec">
+      ${secHead('Split')}
+      ${kv([
+        ['Agent fee', money(t.sp.fee), 'n'],
+        ['Agent share', money(t.sp.share), 'n'],
+        [`Platform commission (${t.sp.pct}%)`, money(t.sp.com), 'n'],
+        ['Net', money(t.type === 'payout' ? t.sp.share : t.sp.fee), 'n']
+      ])}
+      <p class="t-caption">Read as stored — the share and commission add back to the gross exactly. The split is unchanged by who funded the interview.</p>
+    </section>` : ''}
+    <section class="sec">
+      ${secHead('Cause')}
+      ${kv([['What caused this', t.cause ? `<a data-go="${t.cause.go}">${esc(t.cause.l)}</a>` : '—']])}
+    </section>`}`;
 }
 /* The per-ROW Refund action pre-fills the sheet with that charge (`S.refundTxn`,
    read by `KINDS.refund.fields`); the generic "Issue a Refund" button clears it so
@@ -11567,31 +11829,83 @@ KINDS.refund = {
   delWarn: r => 'The request is withdrawn and nothing is refunded.'
 };
 
+/* ─── EPIC 9.3 PAYOUT HELPERS ──────────────────────────────────────────────── */
+const PO_STATE_META = {escrow:['warn', 'In escrow'], paid:['green', 'Paid'], returned:['', 'Returned']};
+const poStateTag = p => { const m = PO_STATE_META[p.state] || ['', cap(p.state)]; return `<span class="statw${m[0] ? ' ' + m[0] : ''}">${esc(m[1])}</span>`; };
+/* Releases: the date the payout is due (or went out). BLANK = report outstanding =
+   blocked. The row MARKINGS ("Last run failed", "No payout destination") are not
+   states — they sit under the date and the state stays In escrow (9.3). */
+function poReleasesCell(p){
+  if(p.state === 'paid') return idCell(dpFmt(p.releasedOn) || '—', 'Paid');
+  if(p.state === 'returned') return '<span class="t-caption">—</span>';
+  if(!p.releases) return `<span class="statw warn">Report outstanding</span>`;
+  const mark = p.runFailed ? `<div class="t-caption" style="color:var(--support-error)">Last run failed: ${esc(p.runFailed)}</div>`
+    : p.noDest ? `<div class="t-caption" style="color:var(--support-attention)">No payout destination — the run skips it</div>` : '';
+  return `${dpFmt(p.releases)}${mark}`;
+}
+/* Payable on the next run: in escrow, a release date set, a destination on file, not
+   awaiting its report. A run-failed row IS retried, so it counts. */
+const poEligible = p => p.state === 'escrow' && !!p.releases && !p.noDest;
+function poTotals(rows){
+  const escrow = rows.filter(p => p.state === 'escrow').reduce((n, p) => n + p.agentShare, 0);
+  const blocked = rows.filter(p => p.state === 'escrow' && !p.releases).reduce((n, p) => n + p.agentShare, 0);
+  const nextRun = rows.filter(poEligible).reduce((n, p) => n + p.agentShare, 0);
+  return {escrow, blocked, nextRun};
+}
+
+/* EPIC 9.3 — ESCROW & PAYOUTS. State is the primary TAB STRIP; Funded-by + date
+   range are the toolbar filters. Read-only but for Release early (reason +
+   confirmation + step-up). A failure banner names any run that could not complete;
+   the weekly run is simulated by a prototype trigger. Totals for the filtered set
+   sit below. */
 function financePayouts(){
-  /* NO ALL TAB and NO REVIEW-HOLD (Maryam, 15 Sep 2026): the manual "hold for
-     review" is gone, so a payout is either pending settlement or settled. The
-     pending bucket keeps its `held` status key; its TAB is labelled "Payments".
-     Default to that tab (the All tab is removed). */
-  const q = getFilter('q', ''), sf = getFilter('pstat', 'held');
-  const rows = PAYOUTS.filter(p => p.status === sf).filter(p => hit(q, p.agent, p.ref, p.period, p.method));
+  const sf = getFilter('pstate', 'all'), ff = getFilter('pfund', 'all');
+  const q = getFilter('q', ''), from = getFilter('pfrom', ''), to = getFilter('pto', '');
+  const rows = PAYOUTS
+    .filter(p => sf === 'all' ? true : p.state === sf)
+    .filter(p => ff === 'all' ? true : (ff === 'candidate' ? p.funder === 'Candidate' : p.funder === 'Platform'))
+    .filter(p => dateInRange(p.ivDate, from, to))
+    .filter(p => hit(q, p.agent, p.agentEmail, p.candidate, p.ref));
+  const T = poTotals(rows);
+  const failed = PAYOUTS.filter(p => p.state === 'escrow' && p.runFailed);
+  const eligibleAll = PAYOUTS.filter(poEligible);
   return `
   <section class="sec">
-    ${searchHead('Payouts', 'An agent’s net share per interview, settled weekly. A pending payout can be released early.',
-      `${exportBtn('Payouts')} ${heldPayouts() ? `<button class="btn acc-link btn-sm noic" data-act="askreleaseall">Release All ${I.arrowRight}</button>` : ''}`, 'Search payouts')}
-    ${filterStrip('pstat', 'held', [
-      ['held', 'Payments', PAYOUTS.filter(p => p.status === 'held').length],
-      ['settled', 'Settled', PAYOUTS.filter(p => p.status === 'settled').length]
+    ${searchHead('Payouts', `An agent’s share per interview, out of escrow ${SETTINGS.payoutDelay} working days after the report on the weekly ${SETTINGS.payoutRunDay} run.`,
+      `${finExportBtn('Payouts')} ${eligibleAll.length ? `<button class="btn btn-g btn-sm noic" data-act="askrunweekly">${I.renew} Run Weekly Run</button>` : ''}`, 'Search by agent or candidate')}
+    ${failed.length ? note('warn', `A payout run could not complete ${failed.length} payment${failed.length === 1 ? '' : 's'}`, `The weekly run on ${dpFmt(failed[0].releases)} failed for ${failed.map(p => esc(p.agent)).join(', ')}. Those payouts stay In escrow and the next run will pick them up. The reason the provider gave is shown on each row.`) : ''}
+    ${filterStrip('pstate', 'all', [
+      ['all', 'All', PAYOUTS.length],
+      ['escrow', 'In escrow', PAYOUTS.filter(p => p.state === 'escrow').length],
+      ['paid', 'Paid', PAYOUTS.filter(p => p.state === 'paid').length],
+      ['returned', 'Returned', PAYOUTS.filter(p => p.state === 'returned').length]
     ])}
-    ${lstTools('Search payouts')}
-    <div class="tile-stack">
-      ${rows.length ? rows.map(p => cardRow('bank',
-        `${esc(p.agent)} <span class="tag sm bordered">${esc(p.ref)}</span> ${tag(p.status, p.status === 'held' ? 'In progress' : null)}`,
-        `${esc(p.period)} · ${p.interviews} interview${p.interviews === 1 ? '' : 's'} · ${p.net ? 'net ' + money(p.net) : esc(p.when)} · ${esc(p.method)}`,
-        p.status === 'held' && p.net
-          ? `<button class="btn acc-link btn-sm noic" data-act="askrelease:${p.id}">Release ${I.arrowRight}</button>`
-          : `<span class="v n">${p.net ? money(p.net) : '—'}</span>`)).join('')
-        : emptyState('bank', 'No payouts match', 'Nothing in this filter yet.')}
-    </div>
+    ${lstTools('Search by agent name, email or candidate',
+      filterDd('pfund', 'all', [['all', 'All'], ['candidate', 'Candidate'], ['platform', 'Platform']], 'Funded by')
+      + filterDate('pfrom', 'From', 100) + filterDate('pto', 'To', 100))}
+    ${rows.length ? table(
+      [{label:'Agent'}, {label:'Candidate'}, {label:'Interview'}, {label:'Amount', num:true}, {label:'Funded by'}, {label:'State'}, {label:'Releases'}, ACT_COL],
+      rows.map(p => ({id:p.id, sv:[p.agent, p.candidate], cells:[
+        personCell(p.agent, p.agentEmail),
+        personCell(p.candidate, ''),
+        idCell(dpFmt(p.ivDate) || p.ivDate, p.ivKind),
+        idCell(money(p.gross), money(p.agentShare) + ' to agent'),
+        esc(p.funder),
+        poStateTag(p),
+        poReleasesCell(p),
+        rowActs(p.state === 'escrow' && !p.noDest && p.agentShare
+          ? [['bank', 'Release early', `data-sheet="releaseearly:${p.id}"`]]
+          : [])
+      ]})), {select:false})
+      : emptyState('bank', 'No payouts match', 'Nothing in this filter yet.')}
+  </section>
+  <section class="sec">
+    ${secHead('Totals for this view')}
+    ${kv([
+      ['Held in escrow', money(T.escrow), 'n'],
+      ['Blocked by an outstanding report', money(T.blocked), 'n'],
+      ['Value of the next weekly run', money(T.nextRun), 'n']
+    ])}
   </section>`;
 }
 
@@ -11675,36 +11989,130 @@ ACTIONS.doevidence = () => { audit('Submitted chargeback evidence', 'Dispute', '
 ACTIONS.askconcede = key => { const r = REFUNDS.find(x => x.id === key.split(':')[1]); if(!r) return; askConfirm({mk:'warning', title:`Concede the ${money(r.amount)} dispute with ${r.party}?`, body:'The chargeback stands and the amount is not recovered. Use it when the evidence would not hold.', ok:'Concede', danger:true, act:'doconcede:' + r.id}); };
 ACTIONS.doconcede = key => { const r = REFUNDS.find(x => x.id === key.split(':')[1]); if(r){ r.status = 'lost'; audit('Conceded dispute', `${r.party} · ${money(r.amount)}`, 'Finance & Settlement', 'high'); toast('Dispute conceded'); } S.confirm = null; };
 
+/* ─── EPIC 9.8 RECONCILIATION HELPERS ──────────────────────────────────────── */
+const BATCH_STATUS_META = {sent:['warn', 'Sent'], settled:['green', 'Settled'], part:['warn', 'Part settled'], discrepancy:['red', 'Discrepancy'], failed:['red', 'Failed']};
+const batchStatusTag = s => { const m = BATCH_STATUS_META[s.status] || ['', cap(s.status)]; return `<span class="statw${m[0] ? ' ' + m[0] : ''}">${esc(m[1])}</span>`; };
+const MATCH_META = {matched:['green', 'Matched'], amount:['red', 'Amount differs'], state:['red', 'State differs'], missing:['warn', 'Missing at provider'], extra:['red', 'Not in platform'], pending:['', '—']};
+const matchTag = m => { const x = MATCH_META[m] || ['', cap(m)]; return `<span class="statw${x[0] ? ' ' + x[0] : ''}">${esc(x[1])}</span>`; };
+const batchDiff = s => s.providerTotal == null ? null : s.platformTotal - s.providerTotal;
+
+/* EPIC 9.8 — SETTLEMENT RECONCILIATION. The batch list; a row opens the batch
+   detail (hidden `batch` sub). Status is the primary TAB STRIP; date range + search
+   in the toolbar. An ingestion/provider failure surfaces here on the batch it
+   belongs to. Read-only but for Re-check (re-request the report) and Mark reviewed. */
 function financeReconciliation(){
-  const matched = SETTLEMENTS.filter(s => s.status === 'reconciled').length;
+  const sf = getFilter('bstatus', 'all'), q = getFilter('q', '');
+  const from = getFilter('bfrom', ''), to = getFilter('bto', '');
+  const rows = SETTLEMENTS
+    .filter(s => sf === 'all' ? true : s.status === sf)
+    .filter(s => dateInRange(s.sent, from, to))
+    .filter(s => hit(q, s.ref, s.providerRef));
+  const errs = SETTLEMENTS.filter(s => s.ingestErr);
   return `
   <section class="sec">
-    ${/* REMOVED (flow review, 11 Sep 2026): "Import Statement" was a no-op toast.
-         Stripe settlement batches sync automatically, so a hand-import button was
-         misleading. Run Auto-Match (which actually flips pending → reconciled) stays. */''}
-    ${aiHead('Reconciliation', 'Stripe settles to the platform bank in batches; each is matched against our payout records.',
-      `<button class="btn btn-p btn-sm noic" data-act="automatch">${I.renew} Run Auto-Match</button>`)}
-    ${stats([
-      ['check', 'Reconciled', String(matched), 'matched batches'],
-      ['time', 'Pending', String(SETTLEMENTS.filter(s => s.status === 'pending').length), 'awaiting match'],
-      ['alert', 'Unmatched', String(unmatchedSettle()), 'need a look'],
-      ['bank', 'Settled net', money2(SETTLEMENTS.reduce((n, s) => n + s.net, 0)), 'across batches']
+    ${searchHead('Reconciliation', 'Match what Stripe says it paid against what the platform released, so a difference is found before it becomes a missing payout.',
+      finExportBtn('Reconciliation'), 'Search by batch or provider reference')}
+    ${errs.length ? note('warn', `An ingestion could not complete on ${errs.length} batch${errs.length === 1 ? '' : 'es'}`, `${errs.map(s => `${esc(s.ref)}: ${esc(s.ingestErr)}`).join(' · ')}. The batch keeps its status until the report is re-checked.`) : ''}
+    ${filterStrip('bstatus', 'all', [
+      ['all', 'All', SETTLEMENTS.length],
+      ['sent', 'Sent', SETTLEMENTS.filter(s => s.status === 'sent').length],
+      ['settled', 'Settled', SETTLEMENTS.filter(s => s.status === 'settled').length],
+      ['part', 'Part settled', SETTLEMENTS.filter(s => s.status === 'part').length],
+      ['discrepancy', 'Discrepancy', SETTLEMENTS.filter(s => s.status === 'discrepancy').length],
+      ['failed', 'Failed', SETTLEMENTS.filter(s => s.status === 'failed').length]
     ])}
-  </section>
-  <section class="sec">
-    ${secHead('Settlement batches')}
-    ${table(
-      [{label:'Batch'}, {label:'When'}, {label:'Gross', num:true}, {label:'Fees', num:true}, {label:'Net', num:true}, {label:'Payouts', num:true}, {label:'Status'}, ACT_COL],
-      SETTLEMENTS.map(s => ({sv:[, s.date], cells:[
-        esc(s.ref), esc(s.when), money(s.gross), money2(s.fees), money2(s.net), String(s.count), tag(s.status),
-        s.status === 'reconciled' ? rowActs([['receipt', 'Download statement', `data-act="toast:Statement ${esc(s.ref)} downloaded"`]])
-          : rowActs([['check', 'Mark reconciled', `data-act="askmatch:${s.id}"`], ['flag', 'Flag to Stripe', `data-act="toast:${esc(s.ref)} flagged with Stripe support"`]])
-      ]})))}
+    ${lstTools('Search by batch or provider reference', filterDate('bfrom', 'From', 100) + filterDate('bto', 'To', 100))}
+    ${rows.length ? table(
+      [{label:'Batch'}, {label:'Sent'}, {label:'Items', num:true}, {label:'Platform total', num:true}, {label:'Provider total', num:true}, {label:'Difference', num:true}, {label:'Status'}],
+      rows.map(s => { const d = batchDiff(s); return {id:s.id, go:'finance/batch/' + s.id, sv:[s.ref], cells:[
+        idCell(s.ref, s.providerRef),
+        idCell(dpFmt(s.sent) || s.sent, s.sentTime || ''),
+        String(s.list.length),
+        money(s.platformTotal),
+        s.providerTotal == null ? '<span class="t-caption">Awaiting provider</span>' : money(s.providerTotal),
+        d == null ? '<span class="t-caption">—</span>' : (d === 0 ? money(0) : `<span class="statw red">${money(d)}</span>`),
+        batchStatusTag(s)
+      ]}; }))
+      : emptyState('bank', 'No settlement batches match', 'Nothing in this filter yet.')}
   </section>`;
 }
-ACTIONS.askmatch = key => { const s = SETTLEMENTS.find(x => x.id === key.split(':')[1]); if(!s) return; askConfirm({mk:'check', title:`Mark ${s.ref} reconciled?`, body:`${money2(s.net)} net across ${s.count} payouts is accepted as matched to the bank. A manual match is logged with your name.`, ok:'Mark Reconciled', act:'domatch:' + s.id}); };
-ACTIONS.domatch = key => { const s = SETTLEMENTS.find(x => x.id === key.split(':')[1]); if(s){ s.status = 'reconciled'; audit('Reconciled settlement manually', s.ref, 'Finance & Settlement', 'notice'); toast(`${s.ref} reconciled`); } S.confirm = null; };
-ACTIONS.automatch = () => { let n = 0; SETTLEMENTS.forEach(s => { if(s.status === 'pending'){ s.status = 'reconciled'; n++; } }); audit('Ran settlement auto-match', `${n} matched`, 'Finance & Settlement', 'info'); toast(n ? `${n} batch${n === 1 ? '' : 'es'} matched; unmatched ones still need a look` : 'Nothing new to match'); };
+/* EPIC 9.8 — BATCH DETAIL (hidden `batch` sub). Header + item list with a match
+   indicator, an All/Unmatched item filter, Re-check and Mark-reviewed. It re-sends
+   a payout, corrects nothing, writes no adjusting entry — a failed payout is
+   resolved in the payouts module. */
+function financeBatch(){
+  const s = SETTLE_BY_ID[S.id];
+  if(!s) return `${detailHead('finance/reconciliation')}
+    <section class="sec">${emptyState('bank', 'Batch not found', 'This settlement batch is no longer listed.')}</section>`;
+  DETAIL_LABEL = s.ref;
+  const d = batchDiff(s);
+  const itf = getFilter('bitem', 'all');
+  const items = s.list.filter(it => itf === 'all' ? true : it.match !== 'matched');
+  const acts = `${s.status !== 'settled' ? `<button class="btn btn-g btn-sm noic" data-act="recheck:${s.id}">${I.renew} Re-check With Provider</button>` : ''}${(s.status === 'discrepancy' || s.status === 'part' || s.status === 'failed') ? ` <button class="btn btn-g btn-sm noic" data-sheet="markreviewed:${s.id}">${I.check} Mark As Reviewed</button>` : ''}`;
+  return `${detailHead('finance/reconciliation')}
+    <section class="sec">
+      ${aiHead(s.ref, `${esc(s.providerRef)} · sent ${dpFmt(s.sent) || s.sent} · ${(BATCH_STATUS_META[s.status] || [,''])[1]}`, acts)}
+    </section>
+    ${s.ingestErr ? `<section class="sec">${note('warn', 'Ingestion failed', esc(s.ingestErr))}</section>` : ''}
+    ${s.reviewed ? `<section class="sec">${note('info', `Reviewed by ${esc(s.reviewed.by)} on ${dpFmt(s.reviewed.on) || s.reviewed.on}`, esc(s.reviewed.note))}</section>` : ''}
+    <section class="sec">
+      ${secHead('Batch')}
+      ${kv([
+        ['Batch reference', esc(s.ref)],
+        ['Provider reference', esc(s.providerRef)],
+        ['Sent', (dpFmt(s.sent) || s.sent) + (s.sentTime ? ' · ' + s.sentTime : '')],
+        ['Status', batchStatusTag(s)],
+        ['Items', String(s.list.length)],
+        ['Platform total', money(s.platformTotal), 'n'],
+        ['Provider total', s.providerTotal == null ? 'Awaiting provider' : money(s.providerTotal), 'n'],
+        ['Difference', d == null ? '—' : money(d), 'n']
+      ])}
+    </section>
+    <section class="sec sec-cs iv-tabs">
+      ${filterStrip('bitem', 'all', [['all', 'All items'], ['unmatched', 'Unmatched only']])}
+    </section>
+    <section class="sec">
+      ${items.length ? table(
+        [{label:'Recipient'}, {label:'For'}, {label:'Platform', num:true}, {label:'Provider', num:true}, {label:'Platform state'}, {label:'Provider state'}, {label:'Match'}],
+        items.map(it => ({go: it.txId ? 'finance/transaction/' + it.txId : null, cells:[
+          personCell(it.recipient, ''),
+          esc(it.forWhat),
+          money(it.platformAmt),
+          it.providerAmt == null ? '<span class="t-caption">—</span>' : money(it.providerAmt),
+          esc(it.platformState),
+          esc(it.providerState),
+          matchTag(it.match)
+        ]})), {select:false})
+        : emptyState('check', 'Nothing unmatched', 'Every item in this batch matched.')}
+    </section>`;
+}
+/* Re-check = re-request the report and rebuild the comparison (simulated). A batch
+   still Sent or Part-settled resolves to Settled once the provider reports clean; a
+   Discrepancy or Failed batch keeps its status (the figures still disagree). */
+ACTIONS.recheck = key => {
+  const s = SETTLE_BY_ID[key.split(':')[1]]; if(!s) return;
+  if(s.status === 'sent' || s.status === 'part'){
+    s.providerTotal = s.platformTotal; s.ingestErr = null;
+    s.list.forEach(it => { if(it.providerAmt == null){ it.providerAmt = it.platformAmt; it.providerState = it.platformState; it.match = 'matched'; } });
+    s.status = 'settled';
+    audit('Re-checked settlement batch', s.ref, 'Finance & Settlement', 'info'); toast(`${s.ref} re-checked — now settled`);
+  } else {
+    audit('Re-checked settlement batch', s.ref, 'Finance & Settlement', 'info'); toast(`${s.ref} re-checked — the difference still stands`);
+  }
+};
+/* Mark reviewed — records that a person looked at the discrepancy, with a note. It
+   changes no figure, resolves nothing and leaves the status alone (9.8). */
+SHEETS.markreviewed = id => ({title:'Mark as reviewed',
+  body:`<p class="t-desc" style="margin-bottom:var(--s04)">This records that you have looked at the batch. It changes no figure and resolves nothing.</p>
+    ${fieldHtml({k:'note', l:'Note', t:'textarea', req:1, ph:'What you found (1–500 characters).'})}`,
+  ok:'Mark Reviewed', act:'domarkreviewed:' + id});
+ACTIONS.domarkreviewed = key => {
+  const s = SETTLE_BY_ID[key.split(':')[1]]; if(!s) return;
+  const v = readForm(); const nt = (v.note || '').trim();
+  if(!nt){ toast('A note is required', 'warn'); return 'stay'; }
+  s.reviewed = {by:ME.name, on:todayISO(), note:nt};
+  audit('Marked settlement batch reviewed', s.ref, 'Finance & Settlement', 'notice'); toast(`${s.ref} marked reviewed`); S.sheet = null;
+};
 
 function financeFeeConfig(){
   const open = FEES.filter(f => f.state === 'open').length;
@@ -11752,19 +12160,153 @@ KINDS.fee = {
   delWarn: f => `${f.t} is no longer charged. Anything already billed under it stands.`
 };
 
-V.finance = () => modView({overview:financeOverview, transactions:financeTransactions, payouts:financePayouts,
-  invoices:financeInvoices, refunds:financeRefunds, reconciliation:financeReconciliation, feeconfig:financeFeeConfig});
-
-/* finance actions */
-ACTIONS.askrelease = key => {
-  const p = PAYOUTS.find(x => x.id === key.split(':')[1]); if(!p) return;
-  askConfirm({mk:'warning', stepup:true, title:`Release payout to ${p.agent}?`,
-    body:`You are releasing the payment of ${money(p.net)} to ${p.agent}. Please enter your password below to confirm this action.`,
-    ok:`Release ${money(p.net)}`, act:'dorelease:' + p.id});
+/* ─── EPIC 9.4 FEE SETTINGS ────────────────────────────────────────────────── */
+const FEE_VALUE_LABEL = {commission:'Agent commission', delay:'Payout release delay', runday:'Payout run day'};
+const feeISO = e => { const d = (e.on || '').split(',')[0].trim(); return /^\d{4}-\d{2}-\d{2}$/.test(d) ? d : ''; };
+const feeOnFmt = e => { const iso = feeISO(e); const tail = e.on && e.on.includes(',') ? e.on.split(',').slice(1).join(',').trim() : ''; return `${iso ? dpFmt(iso) : (e.on || '')}${tail ? ' · ' + tail : ''}`; };
+/* EPIC 9.4 — FEE SETTINGS. The read-only record of every fee value ever set or
+   changed: per-agent commissions and the two Settings money values (release delay,
+   run day). Value type is the primary TAB STRIP; date range + search in the toolbar.
+   Setting/changing a commission happens on the agent record (see the Talent Agents
+   detail) with Change fee + step-up; it pushes a row here. */
+function financeFeeSettings(){
+  const vf = getFilter('fvtype', 'all'), q = getFilter('q', '');
+  const from = getFilter('ffrom', ''), to = getFilter('fto', '');
+  const rows = FEE_LOG
+    .filter(e => vf === 'all' ? true : e.valueType === vf)
+    .filter(e => dateInRange(feeISO(e), from, to))
+    .filter(e => hit(q, e.agent, e.agentEmail, e.changedBy));
+  return `
+  <section class="sec">
+    ${searchHead('Fee Settings', 'The record of every fee value ever set or changed. It is read-only and cannot be edited or cleared by anyone.',
+      finExportBtn('Fee Settings'), 'Search by agent or who changed it')}
+    ${note('info', 'Commission is per agent — there is no platform-wide rate', 'Set or change a commission on the agent’s own record in Talent Agents (Change fee, with the step-up prompt). The payout release delay and run day live in Settings; their history is here.')}
+    ${filterStrip('fvtype', 'all', [
+      ['all', 'All', FEE_LOG.length],
+      ['commission', 'Agent commission', FEE_LOG.filter(e => e.valueType === 'commission').length],
+      ['delay', 'Payout release delay', FEE_LOG.filter(e => e.valueType === 'delay').length],
+      ['runday', 'Payout run day', FEE_LOG.filter(e => e.valueType === 'runday').length]
+    ])}
+    ${lstTools('Search by agent, email or who changed it', filterDate('ffrom', 'From', 100) + filterDate('fto', 'To', 100))}
+    ${rows.length ? table(
+      [{label:'Value'}, {label:'Agent'}, {label:'From'}, {label:'To'}, {label:'Changed by'}, {label:'Changed on'}, {label:'Reason'}],
+      rows.map(e => ({cells:[
+        esc(FEE_VALUE_LABEL[e.valueType] || e.valueType),
+        e.valueType === 'commission' ? personCell(e.agent, e.agentEmail) : '<span class="t-caption">—</span>',
+        esc(e.from),
+        `<b>${esc(e.to)}</b>`,
+        idCell(e.changedBy, e.role),
+        esc(feeOnFmt(e)),
+        esc(e.reason)
+      ]})), {select:false})
+      : emptyState('scale', 'No fee changes match', 'Nothing in this filter yet.')}
+  </section>
+  <section class="sec">
+    ${secHead('Current Settings values')}
+    ${kv([
+      ['Payout release delay', `${SETTINGS.payoutDelay} working days after a report is filed`],
+      ['Payout run day', esc(SETTINGS.payoutRunDay)]
+    ])}
+    <p class="t-caption">These two values are held in Settings; their change history is above.</p>
+  </section>`;
+}
+/* SET / CHANGE COMMISSION (9.4) — on the agent record. Change fee permission +
+   reason + the story's confirmation + step-up, then it commits, pushes a Fee
+   Settings row and an audit line. A two-step (S._pending). */
+SHEETS.commission = id => { const a = USER_BY_ID[id] || {}; const has = a.commission != null; return {
+  title:`${has ? 'Change' : 'Set'} commission — ${a.name || 'agent'}`,
+  body:`${kv([['Agent', esc(a.name || '—')], ['Current commission', has ? a.commission + '%' : 'Not set', 'n']])}
+    <p class="t-desc" style="margin:var(--s04) 0">The platform’s share of this agent’s fee, set for this agent only. It applies to interviews booked from now on; money already in escrow keeps the rate it was booked at.</p>
+    ${fieldHtml({k:'pct', l:'Commission (%)', t:'number', req:1, def: has ? a.commission : '', ph:'0 to 100'})}
+    ${fieldHtml({k:'reason', l:'Reason', t:'textarea', req:1, ph:'Recorded on the audit log and the fee-settings history (1–500 characters).'})}`,
+  ok:'Continue', act:'submitcommission:' + id}; };
+ACTIONS.submitcommission = key => {
+  const id = key.split(':')[1], a = USER_BY_ID[id]; if(!a) return;
+  const v = readForm(), pct = Number(v.pct), reason = (v.reason || '').trim();
+  if(v.pct === '' || v.pct == null || isNaN(pct) || pct < 0 || pct > 100){ toast('Enter a commission between 0 and 100', 'warn'); return 'stay'; }
+  if(!reason){ toast('A reason is required', 'warn'); return 'stay'; }
+  S._pending = {id, pct, reason}; const has = a.commission != null;
+  askConfirm({mk:'warning', stepup:true,
+    title: has ? `Change the commission for ${a.name} from ${a.commission}% to ${pct}%?` : `Set the commission for ${a.name} to ${pct}%?`,
+    body:'This applies to interviews booked from now on.',
+    ok:'Save Commission', act:'docommission:' + id});
 };
-ACTIONS.dorelease = key => { const p = PAYOUTS.find(x => x.id === key.split(':')[1]); if(p){ p.status = 'settled'; p.when = 'Released'; audit('Released payout', `${p.agent} — ${money(p.net)}`, 'Finance & Settlement', 'high'); toast(money(p.net) + ' released to ' + p.agent); } S.confirm = null; };
-ACTIONS.askreleaseall = () => askConfirm({mk:'warning', stepup:true, title:`Release all ${heldPayouts()} pending payouts?`, body:`${money(owedAgents())} leaves escrow now instead of on the weekly cycle. Each release is logged.`, ok:`Release ${money(owedAgents())}`, act:'doreleaseall'});
-ACTIONS.doreleaseall = () => { PAYOUTS.filter(p => p.status === 'held' && p.net).forEach(p => { p.status = 'settled'; p.when = 'Released'; audit('Released payout', `${p.agent} — ${money(p.net)}`, 'Finance & Settlement', 'high'); }); toast('All pending payouts released'); S.confirm = null; };
+ACTIONS.docommission = key => {
+  const id = key.split(':')[1], a = USER_BY_ID[id];
+  const p = (S._pending && S._pending.id === id) ? S._pending : {}; S._pending = null; S.confirm = null;
+  if(!a || p.pct == null) return;
+  const from = a.commission != null ? a.commission + '%' : 'Not set';
+  a.commission = p.pct; a.commissionAt = today();
+  FEE_LOG.unshift({id:newId('fl', FEE_LOG), valueType:'commission', agent:a.name, agentEmail:a.email, from, to:p.pct + '%', changedBy:ME.name, role:'Super Admin', on:`${todayISO()}, just now`, reason:p.reason});
+  audit('Changed agent commission', `${a.name} — ${from} → ${p.pct}%`, 'Finance & Settlement', 'high');
+  toast(`Commission for ${a.name} set to ${p.pct}%`);
+};
+
+V.finance = () => modView({transactions:financeTransactions, transaction:financeTransaction, payouts:financePayouts,
+  feesettings:financeFeeSettings, reconciliation:financeReconciliation, batch:financeBatch,
+  /* retired (off the rail, deep-link reachable) — Epic 9, 29 Sep 2026 */
+  overview:financeOverview, invoices:financeInvoices, refunds:financeRefunds, feeconfig:financeFeeConfig});
+
+/* ─── EPIC 9.3 PAYOUT ACTIONS ──────────────────────────────────────────────── */
+/* RELEASE EARLY (9.3) — reason (mandatory, 1–500) → the story's confirmation → the
+   step-up password (story 1.4) → the payment. A two-step: the sheet stores the
+   reason in S._pending; the confirm's `do` consumes it, moves the payout to Paid,
+   writes a Payout transaction to the register and an audit line. */
+SHEETS.releaseearly = id => {
+  const p = PAYOUTS.find(x => x.id === id) || {};
+  return {title:`Release ${p.agent || 'payout'} early`,
+    body:`${kv([['Agent', esc(p.agent || '—')], ['Candidate', esc(p.candidate || '—')], ['Agent share', money(p.agentShare || 0), 'n'], ['Destination', esc(p.method || '—')]])}
+      <p class="t-desc" style="margin:var(--s04) 0">This pays the agent before the weekly run. Money moves as soon as you confirm.</p>
+      ${fieldHtml({k:'reason', l:'Reason', t:'textarea', req:1, ph:'Why this is being released ahead of the run — recorded on the audit log (1–500 characters).'})}`,
+    ok:'Continue', act:'submitreleaseearly:' + id};
+};
+ACTIONS.submitreleaseearly = key => {
+  const id = key.split(':')[1]; const p = PAYOUTS.find(x => x.id === id); if(!p) return;
+  const v = readForm(); const reason = (v.reason || '').trim();
+  if(!reason){ toast('A reason is required', 'warn'); return 'stay'; }
+  S._pending = {id, reason};
+  askConfirm({mk:'warning', stepup:true, title:`Release ${money(p.agentShare)} to ${p.agent} now?`,
+    body:'This pays before the weekly run and cannot be undone.',
+    ok:`Release ${money(p.agentShare)}`, act:'dorelease:' + id});
+};
+ACTIONS.dorelease = key => {
+  const id = key.split(':')[1]; const p = PAYOUTS.find(x => x.id === id);
+  const reason = (S._pending && S._pending.id === id) ? S._pending.reason : '';
+  S._pending = null; S.confirm = null;
+  if(!p) return;
+  releasePayout(p, {early:true, reason});
+  toast(money(p.agentShare) + ' released to ' + p.agent);
+};
+/* Move one payout out of escrow: state Paid, write the Payout transaction to the
+   register (split preserved, funder carried), and an audit line. Shared by the
+   early release and the weekly run. */
+function releasePayout(p, o){
+  o = o || {}; p.state = 'paid'; p.status = 'settled'; p.releasedOn = todayISO(); p.when = 'Paid'; p.runFailed = null;
+  TXNS.unshift({id:newId('t', TXNS), ref:'TXN-' + (9044 + TXNS.length), stripeRef:'po_' + Math.random().toString(36).slice(2, 10),
+    when:'Just now', date:todayISO(), time:'', type:'payout', cat:'payout', who:p.agent, party:'Talent agent', email:p.agentEmail,
+    kind:`Payout — ${p.ivKind.toLowerCase()} with ${p.candidate}`, desc:`Payout · ${p.ivKind.toLowerCase()} with ${p.candidate}`,
+    amt:p.gross, dir:'out', method:p.method, fee:0, status:'succeeded', funder:p.funder,
+    agent:p.agent, sp:{fee:p.gross, share:p.agentShare, pct:p.commissionPct, com:p.gross - p.agentShare},
+    cause:{l:'Payout run', go:'finance/payouts'}});
+  TXN_BY_ID[TXNS[0].id] = TXNS[0];
+  audit(o.early ? 'Released payout early' : 'Released payout on the weekly run', `${p.agent} — ${money(p.agentShare)}${o.reason ? ' · ' + o.reason : ''}`, 'Finance & Settlement', 'high');
+}
+/* THE WEEKLY RUN (9.3) — simulated. The platform paying on its own schedule, so no
+   step-up. Pays every eligible escrow payout (release date set, destination on
+   file), including a run that previously failed (retried). A confirm names the
+   count and value first. */
+ACTIONS.askrunweekly = () => {
+  const el = PAYOUTS.filter(poEligible); if(!el.length){ toast('Nothing is eligible for the run'); return; }
+  const total = el.reduce((n, p) => n + p.agentShare, 0);
+  askConfirm({mk:'check', title:`Run the weekly payout run now?`,
+    body:`${el.length} payout${el.length === 1 ? '' : 's'} totalling ${money(total)} will go to their verified destinations. This simulates the ${SETTINGS.payoutRunDay} run.`,
+    ok:`Run · ${money(total)}`, act:'dorunweekly'});
+};
+ACTIONS.dorunweekly = () => {
+  const el = PAYOUTS.filter(poEligible); el.forEach(p => releasePayout(p, {early:false}));
+  audit('Ran the weekly payout run', `${el.length} payout${el.length === 1 ? '' : 's'} released`, 'Finance & Settlement', 'high');
+  toast(`${el.length} payout${el.length === 1 ? '' : 's'} released on the run`); S.confirm = null;
+};
 /* The manual review-hold (askhold / dohold / askclearhold / doclearhold) is
    removed with the hold state (Maryam, 15 Sep 2026). */
 ACTIONS.askpaid = key => {
@@ -12514,12 +13056,18 @@ const swList = (...rows) => `<div class="pf-tgs">${rows.join('')}</div>`;
 const settingsForm = fields => `<div class="mt4" data-form="1">${fields.map(f => fieldHtml(f, f.v)).join('')}</div>`;
 function readPageForm(){ const out = {}; device.querySelectorAll('.page [data-form] [data-f]').forEach(el => { out[el.dataset.f] = el.value.trim(); }); return out; }
 
-PAGESUM['settings/general'] = () => `The platform's identity and how dates, currency and the timezone read across the admin. These change the admin views, <b>not what a candidate sees</b>.`;
-PAGESUM['settings/profile'] = () => `Your own account, <b>${esc(ME.name)}, ${esc(staffRoleName(ME))}</b>. You can correct your name here. Your email, job title and role are managed in the Staff module.`;
+PAGESUM['general/general'] = () => `The platform's identity and how dates, currency and the timezone read across the admin. These change the admin views, <b>not what a candidate sees</b>.`;
+PAGESUM['profile/profile'] = () => `Your own account, <b>${esc(ME.name)}, ${esc(staffRoleName(ME))}</b>. You can correct your name here. Your email, job title and role are managed in the Staff module.`;
+PAGESUM['settings/platform'] = () => `The standing values the platform runs on, in nine groups. Change a deadline, a limit, a fee rule or a department here — <b>each group saves on its own</b> and applies to what happens next.`;
+PAGESUM['settings/templates'] = () => `Every in-app notification's wording and its on/off switch. Edit the copy, preview it, send yourself a test — <b>a saved change applies to notifications created next</b>.`;
 PAGESUM['settings/notifications'] = () => `What reaches you, by email and in the bell. <b>The vetting queue and settlement alerts</b> are the two worth keeping on.`;
 PAGESUM['settings/security'] = () => `Your own password, phone number and sessions. Two-factor is always on, your password is ${SEC.stepup === false ? 'not ' : ''}asked for again on the highest-severity actions, and you can <b>sign out every other session</b> from here.`;
-PAGESUM['settings/payments'] = () => `The cards and billing details the platform bills against. Full card numbers are never stored — <b>Stripe tokenises them</b>.`;
 
+/* GENERAL SETTINGS — a STANDALONE page now (Maryam, 29 Sep 2026), reached from the
+   account-menu chevron, not a Settings tab. It holds the admin's identity + display
+   settings (how the admin reads: name, support contact, timezone, language, date
+   format, currency). Payments & Cards was dropped from Settings (Maryam, 29 Sep
+   2026); Departments moved into the Platform Settings screen. */
 function settingsGeneral(){
   return `
   <section class="sec">
@@ -12537,67 +13085,12 @@ function settingsGeneral(){
       {k:'dates', l:'Date format', t:'select', opts:['MM-DD-YYYY', 'DD-MM-YYYY', 'YYYY-MM-DD'], v:GENERAL.dates},
       {k:'ccy', l:'Display currency', t:'select', opts:['USD ($)', 'GBP (£)', 'EUR (€)'], v:GENERAL.ccy}
     ])}
-  </section>
-  ${settingsDepartments()}`;
-}
-ACTIONS.savegeneral = () => { Object.assign(GENERAL, readPageForm()); audit('Saved general settings', 'Settings', 'Settings', 'notice'); toast('General settings saved'); };
-
-/* DEPARTMENTS MANAGER (story 11.1, referenced by 1.1 / 1.6 / 1.7 / 1.8). A lean
-   add / rename / remove list writing to the `DEPARTMENTS` array the staff Add /
-   Edit / filter dropdowns read. When the list is empty, staff cannot be invited
-   — the Add/Edit Department dropdown disables with the story's message. Each
-   write logs an audit line. (Maryam, 23 Sep 2026.) */
-const deptCount = name => USERS.filter(u => u.internal && u.dept === name).length;
-function settingsDepartments(){
-  const add = `<button class="btn acc-link btn-sm noic" data-sheet="adddept">${I.add} Add Department</button>`;
-  return `
-  <section class="sec">
-    ${aiHead('Departments', 'The departments a staff member can belong to. Add at least one before inviting staff.', add)}
-    ${DEPARTMENTS.length ? `<div class="tile-stack">
-      ${DEPARTMENTS.map((d, i) => { const n = deptCount(d);
-        return cardRow('group', esc(d), n ? `${n} staff member${n === 1 ? '' : 's'}` : 'No staff yet',
-          rowActs([
-            ['edit', 'Rename', `data-sheet="editdept:${i}"`],
-            ['delete', 'Remove', `data-act="askdeldept:${i}"`]
-          ])); }).join('')}
-    </div>`
-      : emptyState('group', 'No departments yet', 'Add a department before inviting staff. Staff cannot be invited until at least one exists.')}
   </section>`;
 }
-SHEETS.adddept = () => ({
-  title:'Add department',
-  body: fieldHtml({k:'name', l:'Department name', t:'text', req:1, ph:'e.g. Talent Success', max:60}),
-  ok:'Add Department',
-  act:'savedept'
-});
-SHEETS.editdept = i => {
-  const cur = DEPARTMENTS[+i]; if(cur == null) return {title:'Rename department', body:'', ok:''};
-  return {
-    title:`Rename ${cur}`,
-    body: fieldHtml({k:'name', l:'Department name', t:'text', req:1, max:60}, cur),
-    ok:'Save Changes',
-    act:'savedept:' + i
-  };
-};
-ACTIONS.savedept = key => {
-  const v = readForm(); const name = (v.name || '').trim();
-  if(!name){ toast('Enter a department name', 'warn'); return 'stay'; }
-  if(DEPARTMENTS.some((d, j) => d.toLowerCase() === name.toLowerCase() && String(j) !== String(key.split(':')[1] ?? ''))){ toast('That department already exists', 'warn'); return 'stay'; }
-  const idx = key.split(':')[1];
-  if(idx == null){ DEPARTMENTS.push(name); audit('Added department', name, 'Settings', 'notice'); toast(`${name} added`); }
-  else { const old = DEPARTMENTS[+idx]; DEPARTMENTS[+idx] = name; USERS.forEach(u => { if(u.dept === old) u.dept = name; }); audit('Renamed department', `${old} → ${name}`, 'Settings', 'notice', {from:old, to:name}); toast(`Renamed to ${name}`); }
-  S.sheet = null;
-};
-ACTIONS.askdeldept = key => {
-  const i = +key.split(':')[1]; const name = DEPARTMENTS[i]; if(name == null) return;
-  const n = deptCount(name);
-  if(n){ toast(`${n} staff member${n === 1 ? ' is' : 's are'} in ${name}. Move them first.`, 'warn'); return; }
-  askConfirm({mk:'warning', danger:true, title:`Remove ${name}?`, body:'It will no longer be offered when inviting or editing staff.', ok:'Remove', act:'dodeldept:' + i});
-};
-ACTIONS.dodeldept = key => {
-  const i = +key.split(':')[1]; const name = DEPARTMENTS[i]; if(name == null) return;
-  DEPARTMENTS.splice(i, 1); audit('Removed department', name, 'Settings', 'notice'); toast(`${name} removed`); S.confirm = null;
-};
+ACTIONS.savegeneral = () => { Object.assign(GENERAL, readPageForm()); audit('Saved general settings', 'Settings', 'Settings', 'notice'); toast('General settings saved'); };
+/* how many staff a department name holds — read by the Platform Settings
+   Departments group (story 11.1). */
+const deptCount = name => USERS.filter(u => u.internal && u.dept === name).length;
 
 /* 2.4 MY PROFILE — the actor's OWN record. Only first and last name are the
    person's to change; email, job, department and role are the organisation's
@@ -12815,16 +13308,498 @@ ACTIONS.askdelcard = key => { const c = CARDS.find(x => x.id === key.split(':')[
 ACTIONS.dodelcard = key => { const i = CARDS.findIndex(x => x.id === key.split(':')[1]); if(i >= 0){ const was = CARDS[i].def; CARDS.splice(i, 1); if(was && CARDS.length) CARDS[0].def = true; audit('Removed card', 'Payments & Cards', 'Settings', 'notice'); toast('Card removed'); } S.confirm = null; };
 ACTIONS.savebilling = () => { Object.assign(BILLING, readPageForm()); audit('Saved billing details', BILLING.company, 'Settings', 'notice'); toast('Billing details saved'); };
 
+/* ======================================================================
+   PLATFORM SETTINGS — story 11.1. Nine groups on one screen (the Platform tab of
+   the Settings module): Departments, Sessions, Exports, Interviews, Cohorts, Tal,
+   Money, Working days, Account closure. Each group SAVES ON ITS OWN — its Save is
+   grey until something in that group changed (syncSettingsSave, per `.sec`) and a
+   Save presents a confirmation naming each changed value's before → after. A
+   numeric setting is whole-numbers-only, min–max, pre-filled with the value in
+   force; the one error pattern is "Enter a whole number between [min] and [max]
+   [unit]." A change applies to what happens AFTER it is saved. The Money group
+   also carries the Change fee permission — a reason and a re-authentication step.
+
+   Screens-only where noted: this is a single-Super-Admin prototype (the standing
+   ruling), so Settings: View / Edit and Change fee are not enforced; the Money
+   reason + re-auth prompt IS shown. The wired values reassign their live
+   constants (EXPORT_ROW_LIMIT / REPORT_DEADLINE_HRS / REBOOK_WINDOW); the rest
+   have no live engine here and stand as configured values.
+   ====================================================================== */
+/* the numeric groups, in the story's order after Departments. `hint` may be a
+   function of SETTINGS so a derived line (the report-ready promise) stays live. */
+const SET_GROUPS = {
+  sessions:{title:'Sessions', desc:'How long a staff session may sit idle before it ends. A change applies to sessions started after it; one already running keeps the period it started under.', fields:[
+    {k:'autoSignout', l:'Auto sign-out period', unit:'minutes', min:5, max:240, hint:'Staff accounts only. Candidates and agents have no inactivity sign-out.'}]},
+  exports:{title:'Exports', desc:'Every export tests the size of its filtered set against this before a file is generated. A change applies to exports requested after it.', fields:[
+    {k:'exportLimit', l:'Export row limit', unit:'rows', min:1000, max:250000, hint:'An export already generating finishes.'}]},
+  interviews:{title:'Interviews', desc:'The report clock and the rebooking window. A change applies to interviews held / credits issued after it; one already running does not move.', fields:[
+    {k:'reportDeadline', l:'Report deadline', unit:'hours', min:1, max:168, hint:() => `How long an agent has to file a report after an interview is held. The candidate's report-ready promise is this plus the fixed ${REVIEW_WINDOW_HRS}-hour review window — currently ${SETTINGS.reportDeadline + REVIEW_WINDOW_HRS} hours.`},
+    {k:'rebookWindow', l:'Rebooking credit window', unit:'days', min:1, max:60, hint:'How long a candidate has to use a rebooking credit or free rebooking after a failed or cancelled interview.'}]},
+  cohorts:{title:'Cohorts', desc:'Session-room rules. A session captures these at the moment it is held and keeps them; a change applies to sessions held after it and never rewrites a register already written.', fields:[
+    {k:'attendanceMin', l:'Attendance minimum', unit:'minutes', min:1, max:60, hint:'Time in the room (counted cumulatively across the session) to count as having attended it.'},
+    {k:'leaderReconnect', l:'Leader reconnection gap', unit:'minutes', min:1, max:60, hint:'How long a room stays open after the leader’s connection drops before it closes and the register is written.'}]},
+  tal:{title:'Tal', desc:'The Ask Tal ceiling — each question is a call the platform pays for. Counted per candidate per calendar day in their own time zone. A change applies to days beginning after it.', fields:[
+    {k:'talLimit', l:'Tal question limit', unit:'questions per day', min:5, max:200, hint:'A suggestion chip counts against it. Tal’s compulsory onboarding conversation is outside this limit.'}]},
+  closure:{title:'Account closure and deactivation', desc:'How long an external account stays Deactivated after administrator deactivation or self-closure before it moves automatically to Deleted. A change applies to deactivations committed after it.', fields:[
+    {k:'closureGrace', l:'Closure grace period', unit:'days', min:7, max:90, hint:'Reactivating during the grace period cancels the move to Deleted. A staff account stays Deactivated indefinitely.'}]}
+};
+/* one numeric field — whole numbers only, pre-filled with the value in force. */
+function setNum(f){
+  const hint = typeof f.hint === 'function' ? f.hint() : f.hint;
+  return `<label class="f"><span class="lbl">${esc(f.l)} <span class="req-star" aria-hidden="true">*</span></span>
+    <input class="inp" data-f="${f.k}" type="number" inputmode="numeric" min="${f.min}" max="${f.max}" step="1" value="${SETTINGS[f.k]}" placeholder="A whole number between ${f.min} and ${f.max}" autocomplete="off">
+    ${hint ? `<span class="f-hint">${esc(hint)}</span>` : ''}</label>`;
+}
+function numGroup(g){
+  const G = SET_GROUPS[g];
+  return `<section class="sec" data-setgroup="${g}">
+    ${aiHead(G.title, G.desc, `<button class="btn btn-p btn-sm noic" data-act="setsave:${g}" disabled>Save</button>`)}
+    <div class="mt4">${G.fields.map(setNum).join('')}</div>
+  </section>`;
+}
+/* MONEY — payout release delay (numeric) + payout run day (our dropdown). Carries
+   a reason + re-authentication (11.1), so its Save routes through a reason sheet
+   then a step-up confirmation rather than the plain confirm the other groups use. */
+const PAYOUT_DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+function moneyGroup(){
+  return `<section class="sec" data-setgroup="money">
+    ${aiHead('Money', 'Escrow release timing and the weekly payout run. These carry the Change fee permission — a reason and a re-authentication step. A change applies to reports filed after it; escrow already releasable is unaffected.',
+      `<button class="btn btn-p btn-sm noic" data-act="setsave:money" disabled>Save</button>`)}
+    <div class="mt4">
+      ${setNum({k:'payoutDelay', l:'Payout release delay', unit:'working days', min:0, max:30, hint:'How long after a report is filed before escrow becomes releasable. Counted against the working-days calendar below.'})}
+      ${formDd({k:'payoutRunDay', l:'Payout run day', opts:PAYOUT_DAYS.map(d => [d, d])}, SETTINGS.payoutRunDay)}
+      <p class="t-desc mt5">The payout run executes at 12:00 AM on this day, in your time zone.</p>
+    </div>
+  </section>`;
+}
+
+/* DEPARTMENTS GROUP (11.1) — staged CRUD. Columns Department / Staff assigned /
+   Status. A department is RETIRED, never hard-deleted (staff records point at it).
+   Create/rename/retire/restore are staged in a working copy (`S.setDraft.dept`)
+   and do not take effect until the group Save is confirmed; leaving the page
+   discards them (go() clears `S.setDraft`). Names are unique across the whole list
+   incl. retired. */
+function deptDraft(){ if(!S.setDraft) S.setDraft = {}; if(!S.setDraft.dept) S.setDraft.dept = DEPARTMENTS.map(d => ({...d})); return S.setDraft.dept; }
+const deptSnap = list => JSON.stringify(list.map(d => ({name:d.name, status:d.status})));
+const deptDirty = () => S.setDraft && S.setDraft.dept && deptSnap(S.setDraft.dept) !== deptSnap(DEPARTMENTS);
+function departmentsGroup(){
+  const draft = deptDraft(); const dirty = deptDirty();
+  const active = draft.filter(d => d.status !== 'retired');
+  const acts = `<span style="display:flex;gap:var(--s03);align-items:center">${dirty ? `<button class="btn btn-s btn-sm noic" data-act="setdeptdiscard">Discard</button>` : ''}<button class="btn btn-p btn-sm noic" data-act="setsave:departments"${dirty ? '' : ' disabled'}>Save</button></span>`;
+  const rows = draft.map((d, i) => {
+    const n = deptCount(d.name);
+    const ra = d._new
+      ? [['delete', 'Remove', `data-act="setdeptremove:${i}"`], ['edit', 'Rename', `data-sheet="setdept:${i}"`]]
+      : d.status === 'retired'
+        ? [['renew', 'Restore', `data-act="setdeptrestore:${i}"`], ['edit', 'Rename', `data-sheet="setdept:${i}"`]]
+        : [['edit', 'Rename', `data-sheet="setdept:${i}"`], ['delete', 'Retire', `data-act="setdeptretire:${i}"`]];
+    return {cells:[
+      esc(d.name) + (d._new ? ' <span class="tag sm warn">New</span>' : ''),
+      n ? `${n} staff member${n === 1 ? '' : 's'}` : '—',
+      d.status === 'retired' ? tag('inactive', 'Retired') : tag('active', 'Active'),
+      rowActs(ra)]};
+  });
+  return `<section class="sec" data-setgroup="departments">
+    ${aiHead('Departments', 'The list that fills the Department dropdown on every staff invite and record. A retired department stays on staff already assigned but leaves the dropdown for new assignments. Changes are staged until you save this group.', acts)}
+    <div style="margin:var(--s04) 0"><button class="btn acc-link btn-sm noic" data-sheet="setdept:new">${I.add} Add Department</button></div>
+    ${active.length === 0 ? note('', 'No active departments', 'No departments have been added yet. Staff cannot be invited until at least one exists.') : ''}
+    ${draft.length ? table([{label:'Department'}, {label:'Staff assigned'}, {label:'Status'}, ACT_COL], rows, {select:false, paginate:false}) : emptyState('group', 'No departments yet', 'Add a department before inviting staff.')}
+  </section>`;
+}
+SHEETS.setdept = arg => {
+  const isNew = arg == null || arg === 'new';
+  const cur = isNew ? null : deptDraft()[+arg];
+  return {
+    title: isNew ? 'Add department' : `Rename ${cur ? cur.name : 'department'}`,
+    body: fieldHtml({k:'name', l:'Department name', t:'text', req:1, ph:'e.g. Talent Success', max:100}, cur ? cur.name : ''),
+    ok: isNew ? 'Add Department' : 'Save Changes',
+    act: 'setdeptstage:' + (isNew ? 'new' : arg)
+  };
+};
+ACTIONS.setdeptstage = key => {
+  const arg = key.split(':')[1]; const v = readForm(); const name = (v.name || '').trim();
+  const draft = deptDraft(); const idx = arg === 'new' ? null : +arg;
+  if(!name){ toast('Enter a department name', 'warn'); return 'stay'; }
+  if(name.length > 100){ toast('Keep the name under 100 characters', 'warn'); return 'stay'; }
+  if(draft.some((d, j) => d.name.toLowerCase() === name.toLowerCase() && j !== idx)){ toast('That department already exists', 'warn'); return 'stay'; }
+  if(idx == null) draft.push({name, status:'active', _new:true});
+  else draft[idx].name = name;
+  S.sheet = null;   /* staged only — commits on the group Save */
+};
+ACTIONS.setdeptretire = key => { const d = deptDraft()[+key.split(':')[1]]; if(d) d.status = 'retired'; };
+ACTIONS.setdeptrestore = key => { const d = deptDraft()[+key.split(':')[1]]; if(d) d.status = 'active'; };
+ACTIONS.setdeptremove = key => { const draft = deptDraft(); const i = +key.split(':')[1]; if(draft[i] && draft[i]._new) draft.splice(i, 1); };
+ACTIONS.setdeptdiscard = () => { if(S.setDraft) S.setDraft.dept = null; };
+/* the group Save — name each staged change, then commit on confirm */
+ACTIONS.setsave = key => {
+  const g = key.split(':')[1];
+  if(g === 'departments'){
+    const draft = deptDraft();
+    /* build a readable before → after list by comparing to the live array */
+    const liveNames = DEPARTMENTS.map(d => d.name);
+    const lines = [];
+    draft.forEach((d, i) => {
+      const live = DEPARTMENTS[i];
+      if(d._new){ lines.push(`Add “${d.name}”${d.status === 'retired' ? ' (retired)' : ''}`); }
+      else if(live){
+        if(live.name !== d.name) lines.push(`Rename “${live.name}” to “${d.name}”`);
+        if(live.status !== d.status) lines.push(`${d.status === 'retired' ? 'Retire' : 'Restore'} “${d.name}”`);
+      }
+    });
+    if(!lines.length){ toast('Nothing changed'); return; }
+    askConfirm({mk:'check', title:'Save department changes?', body: lines.join('<br>'), ok:'Save Changes', act:'setdeptcommit'});
+    return;
+  }
+  if(g === 'workingdays'){
+    const draft = holDraft(); const lines = holChangeLines(draft);
+    if(!lines.length){ toast('Nothing changed'); return; }
+    askConfirm({mk:'check', title:'Save working-days changes?', body: lines.join('<br>'), ok:'Save Changes', act:'setholcommit'});
+    return;
+  }
+  if(g === 'money') return moneySaveStart();
+  /* a numeric group */
+  const G = SET_GROUPS[g]; if(!G) return;
+  const changes = [], next = {};
+  for(const f of G.fields){
+    const el = device.querySelector(`[data-setgroup="${g}"] [data-f="${f.k}"]`); if(!el) continue;
+    const raw = (el.value || '').trim();
+    if(!/^-?\d+$/.test(raw) || +raw < f.min || +raw > f.max){ toast(`Enter a whole number between ${f.min} and ${f.max} ${f.unit}.`, 'warn'); return; }
+    const n = parseInt(raw, 10);
+    if(n !== SETTINGS[f.k]){ changes.push({l:f.l, from:SETTINGS[f.k], to:n, unit:f.unit}); next[f.k] = n; }
+  }
+  if(!changes.length){ toast('Nothing changed'); return; }
+  S._pending = {g, next, changes};
+  askConfirm({mk:'check', title:`Save ${G.title.toLowerCase()} changes?`, body: changeLines(changes), ok:'Save Changes', act:'setcommit'});
+};
+function changeLines(changes){
+  if(changes.length === 1){ const c = changes[0]; return `Change the ${esc(c.l.toLowerCase())} from ${c.from}${c.unit ? ' ' + esc(c.unit) : ''} to <b>${c.to}${c.unit ? ' ' + esc(c.unit) : ''}</b>?`; }
+  return changes.map(c => `${esc(c.l)}: ${c.from}${c.unit ? ' ' + esc(c.unit) : ''} → <b>${c.to}${c.unit ? ' ' + esc(c.unit) : ''}</b>`).join('<br>');
+}
+/* mirror the wired values onto their live constants after a commit */
+function applySettingsLive(){ EXPORT_ROW_LIMIT = SETTINGS.exportLimit; REPORT_DEADLINE_HRS = SETTINGS.reportDeadline; REBOOK_WINDOW = SETTINGS.rebookWindow; }
+ACTIONS.setcommit = () => {
+  const p = S._pending || {}; S._pending = null; S.confirm = null;
+  if(!p.next) return;
+  Object.assign(SETTINGS, p.next); applySettingsLive();
+  audit(`Updated ${SET_GROUPS[p.g] ? SET_GROUPS[p.g].title.toLowerCase() : p.g} settings`, p.changes.map(c => `${c.l}: ${c.from} → ${c.to}`).join('; '), 'Settings', 'notice');
+  toast('Settings saved');
+};
+ACTIONS.setdeptcommit = () => {
+  const draft = (S.setDraft && S.setDraft.dept) || null; S.confirm = null; if(!draft) return;
+  /* apply renames onto staff records, then replace the list (drop the _new flag) */
+  draft.forEach((d, i) => { const live = DEPARTMENTS[i]; if(live && live.name !== d.name) USERS.forEach(u => { if(u.dept === live.name) u.dept = d.name; }); });
+  DEPARTMENTS.length = 0; draft.forEach(d => DEPARTMENTS.push({name:d.name, status:d.status}));
+  if(S.setDraft) S.setDraft.dept = null;
+  audit('Updated departments', `${DEPARTMENTS.length} department${DEPARTMENTS.length === 1 ? '' : 's'}, ${activeDepts().length} active`, 'Settings', 'notice');
+  toast('Departments saved');
+};
+
+/* WORKING DAYS GROUP (11.1) — the holiday calendar the payout release delay counts
+   against. Columns Date / Name / Year. Staged CRUD like Departments. Weekends can
+   never be added (a standing rule). */
+function holDraft(){ if(!S.setDraft) S.setDraft = {}; if(!S.setDraft.hol) S.setDraft.hol = HOLIDAYS.map(h => ({...h})); return S.setDraft.hol; }
+const holSnap = list => JSON.stringify(list.slice().sort((a, b) => a.date < b.date ? -1 : 1).map(h => ({date:h.date, name:h.name})));
+const holDirty = () => S.setDraft && S.setDraft.hol && holSnap(S.setDraft.hol) !== holSnap(HOLIDAYS);
+function holChangeLines(draft){
+  const lines = [];
+  draft.forEach(h => { const was = HOLIDAYS.find(x => x.date === h.date); if(!was) lines.push(`Add ${dpFmt(h.date)} — ${esc(h.name)}`); else if(was.name !== h.name) lines.push(`Rename ${dpFmt(h.date)} to “${esc(h.name)}”`); });
+  HOLIDAYS.forEach(h => { if(!draft.find(x => x.date === h.date)) lines.push(`Remove ${dpFmt(h.date)} — ${esc(h.name)}`); });
+  return lines;
+}
+function workingDaysGroup(){
+  const draft = holDraft().slice().sort((a, b) => a.date < b.date ? -1 : 1); const dirty = holDirty();
+  const acts = `<span style="display:flex;gap:var(--s03);align-items:center">${dirty ? `<button class="btn btn-s btn-sm noic" data-act="setholdiscard">Discard</button>` : ''}<button class="btn btn-p btn-sm noic" data-act="setsave:workingdays"${dirty ? '' : ' disabled'}>Save</button></span>`;
+  const rows = draft.map(h => ({cells:[
+    dpFmt(h.date), esc(h.name), (h.date.split('-')[0]),
+    rowActs([['edit', 'Edit', `data-sheet="sethol:${h.date}"`], ['delete', 'Delete', `data-act="setholdel:${h.date}"`]])]}));
+  return `<section class="sec" data-setgroup="workingdays">
+    ${aiHead('Working days', 'The holiday calendar the payout release delay counts against. Weekends are excluded as a standing rule and cannot be added here. Changes are staged until you save this group.', acts)}
+    <div style="margin:var(--s04) 0"><button class="btn acc-link btn-sm noic" data-sheet="sethol:new">${I.add} Add Holiday</button></div>
+    ${draft.length ? table([{label:'Date'}, {label:'Name'}, {label:'Year'}, ACT_COL], rows, {select:false, paginate:false}) : emptyState('calendar', 'No holidays yet', 'Add a date to keep it out of the working-days count.')}
+  </section>`;
+}
+SHEETS.sethol = arg => {
+  const isNew = arg == null || arg === 'new';
+  const cur = isNew ? null : holDraft().find(h => h.date === arg);
+  return {
+    title: isNew ? 'Add holiday' : `Edit ${dpFmt(arg)}`,
+    body: fieldHtml({k:'date', l:'Date', t:'date', req:1}, cur ? cur.date : '')
+      + fieldHtml({k:'name', l:'Name', t:'text', req:1, ph:'e.g. Spring Bank Holiday', max:100}, cur ? cur.name : ''),
+    ok: isNew ? 'Add Holiday' : 'Save Changes',
+    act: 'setholstage:' + (isNew ? 'new' : arg)
+  };
+};
+ACTIONS.setholstage = key => {
+  const arg = key.slice(key.indexOf(':') + 1); const v = readForm();
+  const date = (v.date || '').trim(), name = (v.name || '').trim(); const draft = holDraft();
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(date)){ toast('Pick a date', 'warn'); return 'stay'; }
+  if(!name){ toast('Enter a name', 'warn'); return 'stay'; }
+  const day = new Date(date + 'T00:00:00').getDay();
+  if(day === 0 || day === 6){ toast('Weekends are already excluded and cannot be added.', 'warn'); return 'stay'; }
+  if(draft.some(h => h.date === date && date !== arg)){ toast('That date is already in the calendar', 'warn'); return 'stay'; }
+  if(arg === 'new') draft.push({date, name});
+  else { const h = draft.find(x => x.date === arg); if(h){ h.date = date; h.name = name; } }
+  S.sheet = null;
+};
+ACTIONS.setholdel = key => { const date = key.slice(key.indexOf(':') + 1); const draft = holDraft(); const i = draft.findIndex(h => h.date === date); if(i >= 0) draft.splice(i, 1); };
+ACTIONS.setholdiscard = () => { if(S.setDraft) S.setDraft.hol = null; };
+ACTIONS.setholcommit = () => {
+  const draft = (S.setDraft && S.setDraft.hol) || null; S.confirm = null; if(!draft) return;
+  HOLIDAYS = draft.map(h => ({date:h.date, name:h.name})).sort((a, b) => a.date < b.date ? -1 : 1);
+  if(S.setDraft) S.setDraft.hol = null;
+  audit('Updated working days', `${HOLIDAYS.length} holiday${HOLIDAYS.length === 1 ? '' : 's'} on the calendar`, 'Settings', 'notice');
+  toast('Working days saved');
+};
+
+/* MONEY SAVE — reason (1–500) then a re-authentication step, both required (11.1). */
+function moneySaveStart(){
+  const el = device.querySelector('[data-setgroup="money"] [data-f="payoutDelay"]');
+  const raw = (el ? el.value : '').trim();
+  if(!/^-?\d+$/.test(raw) || +raw < 0 || +raw > 30){ toast('Enter a whole number between 0 and 30 working days.', 'warn'); return; }
+  const n = parseInt(raw, 10);
+  const dayEl = device.querySelector('[data-setgroup="money"] [data-f="payoutRunDay"]');
+  const day = dayEl ? dayEl.value : SETTINGS.payoutRunDay;
+  const changes = [], next = {};
+  if(n !== SETTINGS.payoutDelay){ changes.push({l:'Payout release delay', from:SETTINGS.payoutDelay, to:n, unit:'working days'}); next.payoutDelay = n; }
+  if(day !== SETTINGS.payoutRunDay){ changes.push({l:'Payout run day', from:SETTINGS.payoutRunDay, to:day}); next.payoutRunDay = day; }
+  if(!changes.length){ toast('Nothing changed'); return; }
+  S._pending = {g:'money', next, changes};
+  S.sheet = 'moneyconfirm';   /* doAction renders */
+}
+SHEETS.moneyconfirm = () => {
+  const p = S._pending || {}; const changes = p.changes || [];
+  return {
+    title:'Confirm the money change',
+    body: `<p class="t-desc" style="margin-bottom:var(--s04)">${changeLines(changes)}</p>`
+      + `<label class="f"><span class="lbl">Reason <span class="req-star" aria-hidden="true">*</span></span>
+         <textarea class="inp" data-f="reason" rows="3" maxlength="500" placeholder="Why this change. Recorded on the audit line (1–500 characters)."></textarea></label>`,
+    ok:'Continue', act:'moneyReason'
+  };
+};
+ACTIONS.moneyReason = () => {
+  const v = readForm(); const reason = (v.reason || '').trim();
+  if(reason.length < 1 || reason.length > 500){ toast('Enter a reason (1–500 characters).', 'warn'); return 'stay'; }
+  if(!S._pending) return; S._pending.reason = reason; S.sheet = null;
+  askConfirm({stepup:true, mk:'check', title:'Confirm your identity', body:'Re-enter your current password to save this money change.', ok:'Save Changes', act:'moneyCommit'});
+};
+ACTIONS.moneyCommit = () => {
+  const p = S._pending || {}; S._pending = null; S.confirm = null; if(!p.next) return;
+  Object.assign(SETTINGS, p.next); applySettingsLive();
+  /* A change to the payout release delay or run day is a fee value, so it also lands
+     in the Fee Settings history (9.4). */
+  (p.changes || []).forEach(c => {
+    const vt = /release delay/i.test(c.l) ? 'delay' : /run day/i.test(c.l) ? 'runday' : null;
+    if(vt) FEE_LOG.unshift({id:newId('fl', FEE_LOG), valueType:vt, agent:'', agentEmail:'', from:`${c.from}${c.unit ? ' ' + c.unit : ''}`, to:`${c.to}${c.unit ? ' ' + c.unit : ''}`, changedBy:ME.name, role:'Super Admin', on:`${todayISO()}, just now`, reason:p.reason || ''});
+  });
+  audit('Updated money settings', p.changes.map(c => `${c.l}: ${c.from} → ${c.to}`).join('; ') + ` — ${p.reason || ''}`, 'Settings', 'high', {from: p.changes.map(c => `${c.l} ${c.from}`).join(', '), to: p.changes.map(c => `${c.l} ${c.to}`).join(', ')});
+  toast('Money settings saved');
+};
+
+function settingsPlatform(){
+  return departmentsGroup()
+    + numGroup('sessions') + numGroup('exports') + numGroup('interviews')
+    + numGroup('cohorts') + numGroup('tal') + moneyGroup()
+    + workingDaysGroup() + numGroup('closure');
+}
+
+/* ======================================================================
+   NOTIFICATION TEMPLATES — story 11.2. The IN-APP template set: manage each
+   approved event's wording and its on/off switch without a release. Templates
+   cannot be added or removed (a new event needs a release); email/SMS wording is
+   fixed in the build and Auth0's messages are outside this screen. Every template
+   ships On with a default supplied by Design — the defaults below are AUTHORED
+   PLACEHOLDER (§74), one short line per event, until Design's copy lands. Edits
+   (wording + on/off) stay pending in a working copy until Save.
+   ====================================================================== */
+const NT_TYPE = {C:'Condition-based', I:'Informational'};
+const NT_RCP = {staff:'Internal staff', agent:'Talent Agent', candidate:'Candidate', leader:'Cohort Leader'};
+/* sample values the Preview and a test notification substitute for placeholders */
+const NT_SAMPLE = {name:'Jordan Blake', first:'Jordan', staff:'Dana Whitfield', agent:'Priya Nair',
+  leader:'Bruno Adler', cohort:'Cohort 3', course:'Communicating with Impact', chapter:'Chapter 4',
+  level:'E3', date:'12-03-2026', time:'3:00 PM', amount:'$95', count:'3', department:'Talent Success',
+  role:'Reviewer', badge:'Fast Starter', points:'50', rank:'#12'};
+let NT_SEQ = 0;
+const ntDef = (recipient, rows) => rows.map(([name, type, sentWhen, title, body, ph]) =>
+  ({id:'nt' + (NT_SEQ++), recipient, name, type, sentWhen, title, body, ph: ph || [], on:true, by:null, at:null}));
+const NOTIF_TEMPLATES = [].concat(
+  ntDef('staff', [
+    ['Staff role changed', 'I', 'A staff member’s role is changed', 'A staff role was changed', '{staff}’s role is now {role}.', ['staff', 'role']],
+    ['Staff details changed', 'I', 'A staff member’s details are changed', 'Staff details were changed', '{staff}’s account details were updated.', ['staff']],
+    ['Password changed', 'I', 'Your password is changed', 'Your password was changed', 'Your password was changed. Every other session was signed out.', []],
+    ['Phone number changed', 'I', 'Your phone number is changed', 'Your phone number was changed', 'The number where your sign-in codes are sent was updated.', []],
+    ['Staff access restored', 'I', 'A deactivated staff account is restored', 'Staff access restored', '{staff}’s access has been restored.', ['staff']],
+    ['Staff member marked as a Cohort Leader', 'I', 'A staff member is marked as a Cohort Leader', 'Marked as a Cohort Leader', '{staff} can now lead a cohort.', ['staff']],
+    ['Cohort Leader marking removed', 'I', 'A staff member’s Cohort Leader marking is removed', 'Cohort Leader marking removed', '{staff} is no longer marked as a Cohort Leader.', ['staff']],
+    ['Requested export ready', 'I', 'An export you requested is ready', 'Your export is ready', 'The export you requested is ready to download for the next 7 days.', []],
+    ['Interview report overdue', 'C', 'A report passes its deadline', 'An interview report is overdue', '{agent}’s report for their interview with {name} is past its deadline.', ['agent', 'name']],
+    ['Interview not held and awaiting resolution', 'C', 'An interview is not held', 'An interview was not held', '{name}’s interview with {agent} was not held and is awaiting resolution.', ['name', 'agent']],
+    ['Candidate level awaiting approval for over 24 hours', 'C', 'A level waits over 24 hours for approval', 'A level is awaiting approval', '{name}’s level has been awaiting approval for over 24 hours.', ['name']],
+    ['Candidate level awaiting approval for over 48 hours', 'C', 'A level waits over 48 hours for approval', 'A level is awaiting approval (48h)', '{name}’s level has been awaiting approval for over 48 hours.', ['name']],
+    ['Cohort has no leader', 'C', 'A cohort has no leader assigned', 'A cohort has no leader', '{cohort} has no leader assigned.', ['cohort']],
+    ['Cohort reached its start date below minimum size', 'C', 'A cohort starts below its minimum size', 'A cohort started below its minimum', '{cohort} reached its start date below the minimum size.', ['cohort']],
+    ['Payout run failed', 'I', 'The scheduled payout run fails', 'The payout run failed', 'The scheduled payout run did not complete.', []],
+    ['Payout run completed with failures', 'I', 'The payout run finishes with some failures', 'Payout run completed with failures', 'The payout run finished, but {count} payouts failed.', ['count']],
+    ['Settlement discrepancy found', 'C', 'A settlement discrepancy is found', 'A settlement discrepancy was found', 'A settlement discrepancy needs review.', []],
+    ['Course lost its learning-platform mapping', 'C', 'A course loses its mapping', 'A course lost its mapping', '{course} is no longer mapped to the learning platform.', ['course']]
+  ]),
+  ntDef('leader', [
+    ['Assigned to lead a cohort', 'I', 'You are assigned a cohort', 'You were assigned a cohort', 'You are now leading {cohort}.', ['cohort']],
+    ['Cohort being led starts in seven days', 'I', 'Your cohort is seven days from its start', 'Your cohort starts in seven days', '{cohort} starts in seven days.', ['cohort']],
+    ['Candidate withdrew from a cohort being led', 'I', 'A candidate withdraws from your cohort', 'A candidate withdrew', '{name} withdrew from {cohort}.', ['name', 'cohort']],
+    ['Cohort being led was cancelled', 'I', 'Your cohort is cancelled', 'Your cohort was cancelled', '{cohort} has been cancelled.', ['cohort']]
+  ]),
+  ntDef('agent', [
+    ['Account access restored', 'I', 'Your deactivated account is restored', 'Your access was restored', 'Your account access has been restored.', []],
+    ['Interview slot booked', 'I', 'A candidate books one of your slots', 'An interview was booked', '{name} booked an interview with you on {date} at {time}.', ['name', 'date', 'time']],
+    ['Candidate rescheduled an interview', 'I', 'A candidate reschedules', 'An interview was rescheduled', '{name} moved their interview to {date} at {time}.', ['name', 'date', 'time']],
+    ['Candidate cancelled an interview', 'I', 'A candidate cancels', 'An interview was cancelled', '{name} cancelled their interview.', ['name']],
+    ['Interview reminder, 24 hours before', 'I', '24 hours before an interview', 'Interview tomorrow', 'Your interview with {name} is in 24 hours, on {date} at {time}.', ['name', 'date', 'time']],
+    ['Interview reminder, one hour before', 'I', 'One hour before an interview', 'Interview in one hour', 'Your interview with {name} starts in one hour.', ['name']],
+    ['Interview report due', 'C', 'A filed report is still outstanding', 'An interview report is due', 'Your report for {name}’s interview is due within {count} hours.', ['name', 'count']],
+    ['Interview report overdue', 'C', 'Your report passes its deadline', 'An interview report is overdue', 'Your report for {name}’s interview is past its deadline.', ['name']],
+    ['Agent’s proposed level approved', 'I', 'Your proposed level is approved', 'Your proposed level was approved', 'Your proposed level for {name} was approved.', ['name']],
+    ['Marketplace listing paused', 'I', 'Your listing is paused', 'Your listing was paused', 'Your marketplace listing has been paused.', []],
+    ['Marketplace listing restored', 'I', 'Your listing is restored', 'Your listing was restored', 'Your marketplace listing is live again.', []]
+  ]),
+  ntDef('candidate', [
+    ['Account access restored', 'I', 'Your deactivated account is restored', 'Your access was restored', 'Your account access has been restored.', []],
+    ['Interview confirmed', 'I', 'Your interview is confirmed', 'Your interview is confirmed', 'Your interview with {agent} is confirmed for {date} at {time}.', ['agent', 'date', 'time']],
+    ['Interview reminder, 24 hours before', 'I', '24 hours before your interview', 'Interview tomorrow', 'Your interview with {agent} is in 24 hours, on {date} at {time}.', ['agent', 'date', 'time']],
+    ['Interview reminder, one hour before', 'I', 'One hour before your interview', 'Interview in one hour', 'Your interview with {agent} starts in one hour.', ['agent']],
+    ['Interview rescheduled', 'I', 'Your interview moves', 'Your interview moved', 'Your interview with {agent} is now on {date} at {time}.', ['agent', 'date', 'time']],
+    ['Agent cancelled the interview', 'I', 'The agent cancels your interview', 'Your interview was cancelled', '{agent} cancelled your interview. You can book another.', ['agent']],
+    ['Interview report pending', 'C', 'Your report is still being prepared', 'Your report is on its way', '{agent} is preparing your interview report.', ['agent']],
+    ['Interview report ready and level set', 'I', 'Your report is ready and your level is set', 'Your level is set', 'Your interview report is ready and your level is now {level}.', ['level']],
+    ['Paid rebooking credit active', 'C', 'You hold a live rebooking credit', 'You have a rebooking credit', 'You have a rebooking credit worth {amount}, valid until {date}.', ['amount', 'date']],
+    ['Free rebooking active', 'C', 'You hold a live free rebooking', 'You have a free rebooking', 'You have a free rebooking to use by {date}.', ['date']],
+    ['Paid rebooking credit expired', 'I', 'Your rebooking credit expires', 'Your rebooking credit expired', 'Your rebooking credit has expired.', []],
+    ['Free rebooking expired', 'I', 'Your free rebooking expires', 'Your free rebooking expired', 'Your free rebooking has expired.', []],
+    ['SCENES ready to choose', 'C', 'Your SCENES are ready and unchosen', 'Choose your SCENES', 'Your interview SCENES are ready to choose.', []],
+    ['Level changed through a Super Admin override', 'I', 'An override changes your level', 'Your level was changed', 'Your level was changed to {level}.', ['level']],
+    ['Enrolled in a cohort', 'I', 'You are enrolled in a cohort', 'You joined a cohort', 'You are enrolled in {cohort}.', ['cohort']],
+    ['Chapter unlocked', 'I', 'A chapter unlocks', 'A chapter unlocked', '{chapter} of {course} is now unlocked.', ['chapter', 'course']],
+    ['Task due today', 'C', 'A task is due today', 'A task is due today', 'You have a task due today in {course}.', ['course']],
+    ['Cohort Leader assigned or replaced', 'I', 'Your cohort leader is assigned or replaced', 'Your cohort leader', '{leader} is leading {cohort}.', ['leader', 'cohort']],
+    ['Cohort call scheduled', 'I', 'A cohort call is scheduled', 'A cohort call is scheduled', 'A call for {cohort} is set for {date} at {time}.', ['cohort', 'date', 'time']],
+    ['Cohort call reminder, 24 hours before', 'I', '24 hours before a cohort call', 'Cohort call tomorrow', 'Your {cohort} call is in 24 hours, on {date} at {time}.', ['cohort', 'date', 'time']],
+    ['Cohort call reminder, one hour before', 'I', 'One hour before a cohort call', 'Cohort call in one hour', 'Your {cohort} call starts in one hour.', ['cohort']],
+    ['Cohort call changed', 'I', 'A cohort call changes', 'A cohort call changed', 'Your {cohort} call is now on {date} at {time}.', ['cohort', 'date', 'time']],
+    ['Cohort call cancelled', 'I', 'A cohort call is cancelled', 'A cohort call was cancelled', 'Your {cohort} call was cancelled.', ['cohort']],
+    ['Cohort Leader posted an announcement', 'I', 'Your leader posts an announcement', 'New announcement', '{leader} posted an announcement in {cohort}.', ['leader', 'cohort']],
+    ['Cohort Leader sent a direct message', 'I', 'Your leader sends you a message', 'New message', '{leader} sent you a message.', ['leader']],
+    ['Moved to another cohort', 'I', 'You are moved to another cohort', 'You moved cohort', 'You have been moved to {cohort}.', ['cohort']],
+    ['Removed from a cohort', 'I', 'You are removed from a cohort', 'You were removed from a cohort', 'You have been removed from {cohort}.', ['cohort']],
+    ['Added to a cohort', 'I', 'You are added to a cohort', 'You were added to a cohort', 'You have been added to {cohort}.', ['cohort']],
+    ['Cohort start date changed', 'I', 'Your cohort’s start date changes', 'Your cohort start date changed', '{cohort} now starts on {date}.', ['cohort', 'date']],
+    ['Cohort cancelled with a replacement cohort', 'I', 'Your cohort is cancelled with a replacement', 'Your cohort was cancelled', '{cohort} was cancelled and your place moved to a replacement cohort.', ['cohort']],
+    ['Cohort cancelled and paid enrolment moved to Awaiting cohort', 'I', 'Your cohort is cancelled and your paid place waits', 'Your cohort was cancelled', '{cohort} was cancelled. Your paid place is now Awaiting cohort.', ['cohort']],
+    ['Badge earned', 'I', 'You earn a badge', 'You earned a badge', 'You earned the {badge} badge.', ['badge']],
+    ['Points awarded', 'I', 'You are awarded points', 'You earned points', 'You were awarded {points} points.', ['points']],
+    ['Rank earned or changed', 'I', 'Your rank changes', 'Your rank changed', 'Your rank is now {rank}.', ['rank']],
+    ['Promotion earned', 'I', 'You earn a promotion', 'You earned a promotion', 'You earned a promotion.', []],
+    ['Certificate arrived', 'I', 'Your certificate arrives', 'Your certificate is ready', 'Your certificate for {course} has arrived.', ['course']],
+    ['Payment succeeded', 'I', 'A payment succeeds', 'Payment received', 'Your payment of {amount} was received.', ['amount']],
+    ['Payment failed', 'I', 'A payment fails', 'Payment failed', 'Your payment of {amount} did not go through.', ['amount']]
+  ])
+);
+const NT_BY_ID = {}; NOTIF_TEMPLATES.forEach(t => NT_BY_ID[t.id] = t);
+/* render a template string with its placeholders substituted for sample values */
+const tplRender = str => esc(str).replace(/\{(\w+)\}/g, (m, k) => `<b>${esc(NT_SAMPLE[k] || m)}</b>`);
+const tplPlain = str => String(str).replace(/\{(\w+)\}/g, (m, k) => NT_SAMPLE[k] || m);
+function nowStamp(){ const d = new Date(); const mo = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d.getMonth()]; return `${d.getDate()} ${mo} ${d.getFullYear()}, ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; }
+
+function settingsTemplates(){
+  const on = getFilter('tplon', 'all'), rcp = getFilter('tplrcp', 'all'), q = getFilter('q', '');
+  const rows = NOTIF_TEMPLATES.filter(t =>
+    (on === 'all' || (on === 'on' ? t.on : !t.on)) &&
+    (rcp === 'all' || t.recipient === rcp) &&
+    hit(q, t.title));
+  const tableRows = rows.map(t => ({sheet:'tpledit:' + t.id, cells:[
+    esc(t.title), NT_RCP[t.recipient], NT_TYPE[t.type], esc(t.sentWhen),
+    t.on ? tag('active', 'On') : tag('inactive', 'Off'),
+    t.at ? `${esc(t.by || 'You')} · ${esc(t.at)}` : '—',
+    rowActs([['edit', 'Edit', `data-sheet="tpledit:${t.id}"`]])]}));
+  return `<section class="sec">
+    ${aiHead('Notification templates', 'The wording and on/off of every in-app notification. Templates cannot be added or removed — a new event needs a release. English only; email and SMS wording is fixed in the build.')}
+    ${lstTools('Search by title',
+      filterDd('tplon', 'all', [['all', 'All'], ['on', 'On'], ['off', 'Off']], 'Status')
+      + filterDd('tplrcp', 'all', [['all', 'All'], ['staff', 'Internal staff'], ['agent', 'Talent Agent'], ['candidate', 'Candidate'], ['leader', 'Cohort Leader']], 'Recipient'))}
+    ${rows.length ? table([{label:'Notification'}, {label:'Recipient'}, {label:'Type'}, {label:'Sent when'}, {label:'On/Off'}, {label:'Last edited'}, ACT_COL], tableRows, {select:false})
+      : emptyState('notification', 'No templates match', 'Clear the filters or search to see the full set.')}
+  </section>`;
+}
+/* THE EDITOR — a right slider (like the onboarding question builder). A working
+   copy lives in `S.tplEdit`; `data-tplf` inputs update it WITHOUT a render (trap 9)
+   so the caret survives, and the On/Off, wording and inserted placeholders stay
+   pending until Save. */
+SHEETS.tpledit = arg => {
+  const id = arg; const t = NT_BY_ID[id];
+  if(!t) return {title:'Template', body:'', ok:''};
+  if(!S.tplEdit || S.tplEdit.id !== id) S.tplEdit = {id, title:t.title, body:t.body, on:t.on, ph:t.ph.slice(), recipient:t.recipient, type:t.type};
+  const e = S.tplEdit;
+  const chips = e.ph.length
+    ? `<div style="margin-top:var(--s04)"><span class="t-label" style="display:block;margin-bottom:var(--s02);color:var(--text-secondary)">Insert a placeholder</span>
+       <div style="display:flex;flex-wrap:wrap;gap:var(--s03)">${e.ph.map(p => `<button type="button" class="btn btn-g btn-sm noic" data-tplins="{${p}}">{${p}}</button>`).join('')}</div></div>`
+    : `<p class="t-desc" style="margin-top:var(--s04)">This event has no placeholders.</p>`;
+  const cnt = (k, max) => `<span class="tpl-count" data-tplcount="${k}" style="float:right;color:var(--text-helper);font-weight:var(--t-w-book)">${e[k].length}/${max}</span>`;
+  return {
+    title:'Edit template',
+    body:`
+      <p class="t-desc" style="margin-bottom:var(--s04)">${esc(NT_RCP[e.recipient])} · ${esc(NT_TYPE[e.type])}</p>
+      <label class="tg" style="margin-bottom:var(--s05)"><div class="tb"><b>Show this notification</b></div><input type="checkbox"${e.on ? ' checked' : ''} data-act="tpltoggle" aria-label="Show this notification"><span class="sw"></span></label>
+      <label class="f"><span class="lbl">Title <span class="req-star" aria-hidden="true">*</span>${cnt('title', 60)}</span>
+        <input class="inp" data-tplf="title" maxlength="60" value="${esc(e.title)}" placeholder="Notification title" autocomplete="off"></label>
+      <label class="f"><span class="lbl">Body <span class="req-star" aria-hidden="true">*</span>${cnt('body', 500)}</span>
+        <textarea class="inp" data-tplf="body" rows="3" maxlength="500" placeholder="Notification message">${esc(e.body)}</textarea></label>
+      ${chips}
+      <div style="margin-top:var(--s05)"><span class="t-label" style="display:block;margin-bottom:var(--s02);color:var(--text-secondary)">Preview</span>
+        <div style="border:1px solid var(--rule);padding:var(--s04)">
+          <b data-tplpreview-t>${tplRender(e.title)}</b>
+          <p data-tplpreview-b style="margin-top:var(--s02);color:var(--text-secondary)">${tplRender(e.body)}</p></div></div>
+      <div style="margin-top:var(--s04)"><button class="btn btn-g btn-sm noic" data-act="tpltest">Send a test</button></div>`,
+    ok:'Save', act:'tplsave'
+  };
+};
+function tplPreviewUpdate(){
+  if(!S.tplEdit) return;
+  const t = device.querySelector('[data-tplpreview-t]'), b = device.querySelector('[data-tplpreview-b]');
+  if(t) t.innerHTML = tplRender(S.tplEdit.title);
+  if(b) b.innerHTML = tplRender(S.tplEdit.body);
+}
+ACTIONS.tpltoggle = () => { if(S.tplEdit) S.tplEdit.on = !S.tplEdit.on; return 'keep'; };
+ACTIONS.tpltest = () => {
+  const e = S.tplEdit; if(!e) return 'stay';
+  ADMIN_NOTIF.unshift({h:tplPlain(e.title), t:tplPlain(e.body), w:'Just now', ic:'notification', go:'settings/templates'});
+  toast('A test notification was posted to your bell');
+  return 'stay';
+};
+ACTIONS.tplsave = () => {
+  const e = S.tplEdit; if(!e) return; const t = NT_BY_ID[e.id]; if(!t) return;
+  const title = (e.title || '').trim(), body = (e.body || '').trim();
+  if(title.length < 1 || title.length > 60){ toast('Enter a title (1–60 characters).', 'warn'); return 'stay'; }
+  if(body.length < 1 || body.length > 500){ toast('Enter a body (1–500 characters).', 'warn'); return 'stay'; }
+  const tokens = [...title.matchAll(/\{(\w+)\}/g), ...body.matchAll(/\{(\w+)\}/g)].map(m => m[1]);
+  const bad = tokens.find(w => !e.ph.includes(w));
+  if(bad){ toast(`{${bad}} is not an allowed placeholder for this event.`, 'warn'); return 'stay'; }
+  const from = `${t.title} · ${t.on ? 'On' : 'Off'}`;
+  t.title = title; t.body = body; t.on = e.on; t.by = 'You'; t.at = nowStamp();
+  S.tplEdit = null; S.sheet = null;
+  audit('Edited notification template', title, 'Settings', 'notice', {from, to:`${title} · ${e.on ? 'On' : 'Off'}`});
+  toast('Template saved');
+};
+
 /* SETTINGS RENDERS AS ONE PAGE WITH INNER TABS (Maryam, 21 Sep 2026), mirroring
    the candidate profile: the head band, then a `.sec.sec-cs` tab strip, then the
    active pane. The tabs are the (now rail-hidden) subs; each is a `data-go`
    button so switching a tab navigates (`settings/<key>`), keeping the URL
-   deep-linkable and the rulings-register / account-menu links working. The pane
-   renderers are unchanged — they just no longer arrive via `modView`. */
-const SETTINGS_PANES = {general:settingsGeneral, profile:settingsProfile,
-  notifications:settingsNotifications, security:settingsSecurity, payments:settingsPayments};
-const SETTINGS_TABS = [['general', 'General'], ['profile', 'My Profile'],
-  ['notifications', 'Notifications'], ['security', 'Login & Security'], ['payments', 'Payments & Cards']];
+   deep-linkable. My Profile and General Settings LEFT this module for their own
+   standalone pages (Maryam, 29 Sep 2026); Payments & Cards was dropped. What
+   remains: Platform (11.1), Notification Templates (11.2), Notifications (your
+   prefs), Login & Security. */
+const SETTINGS_PANES = {platform:settingsPlatform, templates:settingsTemplates,
+  notifications:settingsNotifications, security:settingsSecurity};
+const SETTINGS_TABS = [['platform', 'Platform'], ['templates', 'Notification Templates'],
+  ['notifications', 'Notifications'], ['security', 'Login & Security']];
 function settingsTabs(cur){
   return `<section class="sec sec-cs set-tabs"><div class="cs" role="tablist" aria-label="Settings">
     ${SETTINGS_TABS.map(([k, l]) => `<button role="tab" class="${k === cur ? 'on' : ''}" aria-selected="${k === cur}" data-go="settings/${k}">${esc(l)}</button>`).join('')}
@@ -12832,16 +13807,23 @@ function settingsTabs(cur){
 }
 /* The Super Admin hides Tal's summary portal-wide, so the candidate profile's
    summary-band-as-page-intro has no admin equivalent — the page would open with
-   no heading. A plain `aiHead('Settings', …)` sits above the tabs as the page
-   heading + description (Maryam 21 Sep 2026: "the page heading and desc is
-   missing on this page"); each pane keeps its own section heading below the
-   tabs. */
+   no heading. A plain `aiHead(…)` sits above the tabs as the page heading; each
+   pane keeps its own section heading below the tabs. */
 V.settings = () => {
-  const cur = SETTINGS_PANES[S.sub] ? S.sub : 'general';
+  const cur = SETTINGS_PANES[S.sub] ? S.sub : 'platform';
   return head(pageSummary())
-    + `<section class="sec set-head">${aiHead('Settings', 'Your own account and how the platform runs — its identity, notifications, sign-in and billing.')}</section>`
+    + `<section class="sec set-head">${aiHead('Settings', 'How the platform runs — its standing values, its notification wording, your alerts and your sign-in.')}</section>`
     + settingsTabs(cur) + SETTINGS_PANES[cur]();
 };
+/* MY PROFILE and GENERAL SETTINGS are standalone pages (own modules, off the
+   rail), opened from the account-menu chevron. They render the same panes, just
+   without the Settings tab strip. */
+V.profile = () => head(pageSummary())
+  + `<section class="sec set-head">${aiHead('My Profile', 'Your own account. Correct your name here; email, job title and role are managed in the Staff module.')}</section>`
+  + settingsProfile();
+V.general = () => head(pageSummary())
+  + `<section class="sec set-head">${aiHead('General Settings', 'The platform’s identity and how dates, currency and the timezone read across the admin.')}</section>`
+  + settingsGeneral();
 
 ACTIONS.toggleset = key => {
   const path = key.split(':')[1];
@@ -13206,9 +14188,9 @@ ACTIONS.actsetpw = () => {
    ====================================================================== */
 function acctMenu(){
   return `<div class="acct-menu ${S.acct ? 'on' : ''}" role="menu" aria-label="Account">
-    <button class="acct-i" role="menuitem" data-go="settings/profile">
+    <button class="acct-i" role="menuitem" data-go="profile/profile">
       <span class="acct-i-mk">${I.user}</span><span class="acct-i-t">My Profile</span></button>
-    <button class="acct-i" role="menuitem" data-go="settings/general">
+    <button class="acct-i" role="menuitem" data-go="general/general">
       <span class="acct-i-mk">${I.settings}</span><span class="acct-i-t">General Settings</span></button>
     <button class="acct-i" role="menuitem" data-confirm="logout">
       <span class="acct-i-mk">${I.logout}</span><span class="acct-i-t">Log out</span></button>
@@ -13432,7 +14414,7 @@ function askConfirm(o){ S._confirm = o; S.confirm = '_dyn'; S.stepupTries = 0; }
    to match "Add User" on the same module. The guarded two-step actions
    (change role, deactivate, reactivate, delete) stay centre modals — they are a
    decision, not "creating something". */
-const SIDE_SHEET_KEYS = ['addstaff', 'editstaff', 'inviteagent', 'adduser', 'connect', 'obedit'];
+const SIDE_SHEET_KEYS = ['addstaff', 'editstaff', 'inviteagent', 'adduser', 'connect', 'obedit', 'tpledit'];
 const sideSheet = key => !!key && (key.indexOf('rec:') === 0 || SIDE_SHEET_KEYS.some(k => key === k || key.indexOf(k + ':') === 0));
 
 /* resolve `S.sheet` to its `{title, body, ok, act, danger}` — shared by the
@@ -13892,6 +14874,10 @@ function go(dest, keepNav){
      over the page and shuts, as it always did. */
   if(!keepNav) S.nav = false;
   S.notif = false; S.acct = false; S.tal = false; S.editPerms = false; S.rowMenu = null; S.pgOpen = null; S.fdOpen = null; S.roleSw = false;
+  /* leaving a page discards any UNSAVED staged Settings CRUD (story 11.1:
+     Departments / Working days changes are staged in the group and do not commit
+     until the group Save). A fresh visit to the Platform tab re-snapshots live. */
+  S.setDraft = null; S.tplEdit = null;
   render();
   const main = device.querySelector('.main');
   if(main) main.scrollTop = 0;
@@ -13947,6 +14933,22 @@ device.addEventListener('click', e => {
     fdt.setAttribute('aria-expanded', String(!wasOpen));
     const sb = fdt.closest('.sheet-b'); if(sb) sb.classList.toggle('dd-open', !wasOpen);
     return;
+  }
+  /* NOTIFICATION TEMPLATE — insert an allowed placeholder at the caret of the
+     last-focused field (title / body), DOM-only, no render (trap 9), then repaint
+     the count and preview. */
+  const tpi = e.target.closest('[data-tplins]');
+  if(tpi && S.tplEdit){
+    const k = S.tplField === 'title' ? 'title' : 'body'; const token = tpi.dataset.tplins;
+    const el = device.querySelector(`[data-tplf="${k}"]`); if(!el) return;
+    const max = k === 'title' ? 60 : 500;
+    const start = el.selectionStart == null ? el.value.length : el.selectionStart;
+    const end = el.selectionEnd == null ? el.value.length : el.selectionEnd;
+    let nv = el.value.slice(0, start) + token + el.value.slice(end); if(nv.length > max) nv = nv.slice(0, max);
+    el.value = nv; S.tplEdit[k] = nv; el.focus();
+    const pos = Math.min(start + token.length, nv.length); try { el.setSelectionRange(pos, pos); } catch(_){}
+    const c = device.querySelector(`[data-tplcount="${k}"]`); if(c) c.textContent = `${nv.length}/${max}`;
+    tplPreviewUpdate(); return;
   }
   const fds = e.target.closest('[data-formddset]');
   if(fds){
@@ -14115,6 +15117,14 @@ device.addEventListener('input', e => {
      field; `data-obopt="<i>:<field>"` an option's label or score. */
   const obf = e.target.closest('[data-qbf]');
   if(obf && S.qEdit){ S.qEdit[obf.dataset.qbf] = obf.value; return; }
+  /* NOTIFICATION TEMPLATE EDITOR — a keystroke updates the working copy in
+     `S.tplEdit` WITHOUT a render (trap 9), keeps the char count in step and
+     repaints the live preview. `S.tplField` remembers which field the caret is in
+     so a placeholder chip inserts into the right one. */
+  const tplf = e.target.closest('[data-tplf]');
+  if(tplf && S.tplEdit){ const k = tplf.dataset.tplf; S.tplEdit[k] = tplf.value; S.tplField = k;
+    const c = device.querySelector(`[data-tplcount="${k}"]`); if(c) c.textContent = `${tplf.value.length}/${k === 'title' ? 60 : 500}`;
+    tplPreviewUpdate(); return; }
   const obopt = e.target.closest('[data-qbopt]');
   if(obopt && S.qEdit){ const ci = obopt.dataset.qbopt.indexOf(':'), i = +obopt.dataset.qbopt.slice(0, ci), f = obopt.dataset.qbopt.slice(ci + 1);
     (S.qEdit.options[i] = S.qEdit.options[i] || {})[f] = obopt.value; return; }
@@ -14176,7 +15186,7 @@ device.addEventListener('click', e => {
        S.sheet a beat later so the panel slides out and the content widens back,
        instead of the panel vanishing in one frame. Guarded so a double-click
        does not re-arm it. The centre modal / confirm keep their instant close. */
-    if(d.close === 'sheet'){ S.refundTxn = null; S.qEdit = null; }   /* a fresh refund / question next time */
+    if(d.close === 'sheet'){ S.refundTxn = null; S.qEdit = null; S.tplEdit = null; }   /* a fresh refund / question / template next time */
     if(d.close === 'sheet' && sideSheet(S.sheet) && !S.sheetClosing){
       S.sheetClosing = true; render();
       setTimeout(() => { S.sheet = null; S.sheetClosing = false; render(); }, 400);
