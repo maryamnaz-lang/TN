@@ -1616,6 +1616,10 @@ const tag = (status, label) => {
    since §106 — rather than a photograph that would claim an identity. */
 const initials = name => String(name || '?').trim().split(/\s+/).slice(0, 2)
   .map(w => w[0]).join('').toUpperCase();
+/* Split a stored full name into first + rest, and join a form's first/last back
+   (forms capture the two separately — Maryam, 28 Sep 2026). */
+const splitName = n => { const p = String(n || '').trim().split(/\s+/); const first = p.shift() || ''; return {first, last: p.join(' ')}; };
+const joinName = v => [String(v.first || '').trim(), String(v.last || '').trim()].filter(Boolean).join(' ');
 const av = (name, size) => `<span class="av${size ? ' ' + size : ''} mem-av">${esc(initials(name))}</span>`;
 
 /* ======================================================================
@@ -5469,7 +5473,8 @@ SHEETS.adduser = () => {
             ${roleOpts.map(r => `<label class="rdo"><input type="radio" name="adduser-role" data-f="role" value="${esc(r.k)}"${r.k === 'agent' ? ' checked' : ''}><span class="rdo-dot"></span><span class="rdo-txt">${esc(r.name)}</span></label>`).join('')}
           </div>
         </div>
-        ${fieldHtml({k:'name', l:'Full name', t:'text', req:1, ph:'First and last name'})}
+        ${fieldHtml({k:'first', l:'First name', t:'text', req:1, ph:'First name'})}
+        ${fieldHtml({k:'last', l:'Last name', t:'text', req:1, ph:'Last name'})}
         ${fieldHtml({k:'email', l:'Email address', t:'email', req:1, ph:'name@company.com'})}
         ${''/* Origin field and the info block are hidden (Maryam, 16 Sep 2026);
               new accounts default to 'individual' origin in submitadduser. */}
@@ -5479,7 +5484,7 @@ SHEETS.adduser = () => {
               checked (`.adduser-form:has(input[value="agent"]:checked)`), so the
               radio change fires no render() and the half-typed name/email survive. */}
         <div class="adduser-agentonly">
-          ${fieldHtml({k:'commission', l:'Commission (%)', t:'number', req:1, ph:'The platform’s share of this agent’s fee'})}
+          ${fieldHtml({k:'commission', l:'Commission (%)', t:'number', ph:'The platform’s share of this agent’s fee — defaults to 20%'})}
           <div class="f"><span class="lbl">Initial rating <span class="req-star" aria-hidden="true">*</span></span>
             ${starPick('rating')}
             <span class="f-hint">Their starting Agent Score out of 5, shown to candidates until the first quarterly review replaces it.</span>
@@ -5501,9 +5506,11 @@ SHEETS.adduser = () => {
     gateFn: v => {
       if(!v.role) return true;
       const has = k => String(v[k] == null ? '' : v[k]).trim() !== '';
-      if(v.role === 'agent') return !(has('name') && has('email') && has('commission') && has('rating'));
+      /* Commission is optional now (defaults to 20% — Maryam, 28 Sep 2026); an agent
+         needs first + last name, email and an initial rating. */
+      if(v.role === 'agent') return !(has('first') && has('last') && has('email') && has('rating'));
       if(v.leadercand) return false;   /* promoting an existing candidate */
-      return !(has('name') && has('email'));
+      return !(has('first') && has('last') && has('email'));
     }
   };
 };
@@ -5531,10 +5538,11 @@ ACTIONS.submitadduser = () => {
   }
   /* THE INVITE PATH — a new single-role account. */
   const email = (v.email || '').trim();
-  if(!v.name){ toast('Full name is required', 'warn'); return 'keep'; }
+  const name = joinName(v);
+  if(!name){ toast('First and last name are required', 'warn'); return 'keep'; }
   if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ toast('Enter a valid email address', 'warn'); return 'keep'; }
   if(USERS.some(u => u.email.toLowerCase() === email.toLowerCase())){ toast('This email address is already in use on the platform', 'warn'); return 'keep'; }
-  const rec = KINDS.user.create({name:v.name, email, roles:[v.role], origin:v.origin || 'individual'});
+  const rec = KINDS.user.create({name, email, roles:[v.role], origin:v.origin || 'individual'});
   /* A NEW TALENT AGENT carries its per-agent commission and starting Agent Score
      from the moment it is created (story 3.2, Maryam 24 Sep 2026) — the same shape
      KINDS.agent.create writes, so the new row reads correctly in the Talent Agents
@@ -5851,7 +5859,7 @@ SHEETS.markagent = id => {
   return {
     title:`Invite ${u.name} to be a talent agent`,
     body: `<p class="t-desc" style="margin-bottom:var(--s05)">${esc(u.name)} keeps their current account and role. Set the commission and starting Agent Score; an invitation to the agent workspace is sent.</p>`
-      + fieldHtml({k:'commission', l:'Commission (%)', t:'number', req:1, def:20, ph:'The platform’s share of this agent’s fee'})
+      + fieldHtml({k:'commission', l:'Commission (%)', t:'number', def:20, ph:'The platform’s share of this agent’s fee — defaults to 20%'})
       + fieldHtml({k:'rating', l:'Initial rating', t:'stars', req:1, hint:'Their starting Agent Score out of 5, shown to candidates until the first quarterly review replaces it.'}),
     ok:'Send Invite',
     act:'submitmarkagent:' + id,
@@ -5861,9 +5869,9 @@ SHEETS.markagent = id => {
 ACTIONS.submitmarkagent = key => {
   const u = USER_BY_ID[key.split(':')[1]]; if(!u) return;
   const v = readForm();
-  if(v.commission === '' || v.commission == null || !v.rating){ toast('Set the commission and initial rating', 'warn'); return 'keep'; }
+  if(!v.rating){ toast('Set the initial rating', 'warn'); return 'keep'; }
   if(!u.roles.includes('agent')) u.roles = [...u.roles, 'agent'];
-  u.commission = Number(v.commission); u.commissionAt = today(); u.rating = Number(v.rating); u.interviewed = u.interviewed || 0; u.onboarded = false;
+  u.commission = (v.commission !== '' && v.commission != null) ? Number(v.commission) : 20; u.commissionAt = today(); u.rating = Number(v.rating); u.interviewed = u.interviewed || 0; u.onboarded = false;
   audit('Invited as talent agent', `${u.name} · ${u.commission}% commission · ${u.rating}★ start`, 'Users & Roles', 'high');
   toast(`Invitation sent to ${u.name} to become a talent agent.`);
   S.sheet = null;
@@ -8015,7 +8023,9 @@ KINDS.agent = {
   label:'talent agent', an:'a', mod:'Talent Agents', after:'agents/agents',
   find: id => USER_BY_ID[id], name: a => a.name, detail: a => 'agents/detail/' + a.id,
   fields: a => [
-    {k:'name', l:'Full name', t:'text', req:1},
+    /* First and last name captured separately (Maryam, 28 Sep 2026). */
+    {k:'first', l:'First name', t:'text', req:1, get: x => splitName(x.name).first},
+    {k:'last', l:'Last name', t:'text', req:1, get: x => splitName(x.name).last},
     /* email shows on edit too, but read-only (Maryam, 18 Sep 2026); on add it is an
        editable required field. The Listing field is gone — a listing is paused or
        restored from the row action, not this form (Maryam, 18 Sep 2026). */
@@ -8028,7 +8038,7 @@ KINDS.agent = {
        the point the account is created, 0–100 with one decimal. It rides the
        agent record and is shown on the agent detail's Listing panel; changing it
        later is a fee decision. */
-    {k:'commission', l:'Commission (%)', t:'number', req:1, def:20, ph:'The platform’s share of this agent’s fee'},
+    {k:'commission', l:'Commission (%)', t:'number', def:20, ph:'The platform’s share of this agent’s fee — defaults to 20%'},
     /* INITIAL RATING (Maryam, 24 Sep 2026: "add the rating option ... just like the
        talent agent invitation form on the users submodule") — a starting 5-star
        Agent Score, captured on the invite only (not the edit sheet). */
@@ -8049,8 +8059,8 @@ KINDS.agent = {
   /* An invite closes the sheet and drops the row into the Invited tab — it does not
      open a detail page (Maryam, 24 Sep 2026). */
   stayOnCreate:true, createdAudit:'Invited talent agent', createdMsg: rec => `Invite sent to ${rec.email}`,
-  create: v => { const u = {id:newId('u', USERS), name:v.name, email:v.email, roles:['agent'], level:'—', job:v.job, rating:v.rating ? Number(v.rating) : 0, interviewed:0, status:'invited', joined:today(), origin:'individual', last:'Never', invitedOn:today(), invitedBy:ME.id, fee:v.fee, commission:v.commission != null && v.commission !== '' ? Number(v.commission) : 20, commissionAt:today()}; USERS.push(u); USER_BY_ID[u.id] = u; return u; },
-  update: (a, v) => { a.name = v.name; a.job = v.job; a.fee = v.fee; if(v.commission != null && v.commission !== '' && Number(v.commission) !== a.commission){ a.commission = Number(v.commission); a.commissionAt = today(); } if(v.from && v.to) a.range = [v.from, v.to]; if(v.status) a.status = v.status; },
+  create: v => { const u = {id:newId('u', USERS), name:joinName(v) || v.name, email:v.email, roles:['agent'], level:'—', job:v.job, rating:v.rating ? Number(v.rating) : 0, interviewed:0, status:'invited', joined:today(), origin:'individual', last:'Never', invitedOn:today(), invitedBy:ME.id, fee:v.fee, commission:v.commission != null && v.commission !== '' ? Number(v.commission) : 20, commissionAt:today()}; USERS.push(u); USER_BY_ID[u.id] = u; return u; },
+  update: (a, v) => { const nm = joinName(v); if(nm) a.name = nm; a.job = v.job; a.fee = v.fee; if(v.commission != null && v.commission !== '' && Number(v.commission) !== a.commission){ a.commission = Number(v.commission); a.commissionAt = today(); } if(v.from && v.to) a.range = [v.from, v.to]; if(v.status) a.status = v.status; },
   remove: a => { a.roles = a.roles.filter(r => r !== 'agent'); if(!a.roles.length){ USERS.splice(USERS.indexOf(a), 1); delete USER_BY_ID[a.id]; } },
   delWarn: a => `${a.name} comes off the marketplace and loses the agent role. Booked interviews are cancelled and refunded; held payouts settle on the next cycle.`,
   status: (a, val) => val === 'inactive'
@@ -8093,10 +8103,10 @@ function agentsAll(){
       filterDd('agrange', 'all', [['all', 'Any level'], ...LADDER.map(l => [l, l])], 'Assesses'))}
     ${rankBanner()}
     ${list.length ? table(
-      [{label:'Rank', num:true}, {label:'Agent'}, {label:'Agent Score'}, {label:'Components'}, {label:'Interviews conducted', num:true}, {label:'Training'}, {label:'Assessment range'}, {label:'Fee', num:true}, {label:'Listing state'}, ACT_COL],
+      [{label:'Agent'}, {label:'Rank', num:true}, {label:'Agent Score'}, {label:'Components'}, {label:'Interviews conducted', num:true}, {label:'Training'}, {label:'Assessment range'}, {label:'Fee', num:true}, {label:'Listing state'}, ACT_COL],
       list.map(a => ({id:a.id, go:'agents/detail/' + a.id, cells:[
-        a.rank ? String(a.rank) : '—',
         personCell(a.name, a.email),
+        a.rank ? String(a.rank) : '—',
         a.status === 'invited' ? '—' : agScoreCell(a),
         a.status === 'invited' ? '—' : agComponentsCell(a),
         String(a.interviewed),
@@ -8141,10 +8151,10 @@ function marketplaceView(){
     ${lstTools('Search by name or email', filterDd('agrange', 'all', [['all', 'Any level'], ...LADDER.map(l => [l, l])], 'Assesses'))}
     ${rankBanner()}
     ${list.length ? table(
-      [{label:'Rank', num:true}, {label:'Agent'}, {label:'Agent Score'}, {label:'Components'}, {label:'Interviews conducted', num:true}, {label:'Assessment range'}, {label:'Fee', num:true}, ACT_COL],
+      [{label:'Agent'}, {label:'Rank', num:true}, {label:'Agent Score'}, {label:'Components'}, {label:'Interviews conducted', num:true}, {label:'Assessment range'}, {label:'Fee', num:true}, ACT_COL],
       list.map(a => ({id:a.id, go:'agents/detail/' + a.id, cells:[
-        a.rank ? String(a.rank) : '—',
         personCell(a.name, a.email),
+        a.rank ? String(a.rank) : '—',
         agScoreCell(a),
         agComponentsCell(a),
         String(a.interviewed),
