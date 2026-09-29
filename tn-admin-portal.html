@@ -14,7 +14,7 @@
      The <style> block is PROTOTYPE CHROME AND NOTHING ELSE (the device frame,
      the viewport picker, the wordmark size, a toast host) — no product rule.
      ========================================================================== -->
-<link rel="stylesheet" href="design-system/talentnext-ds.css?b=3af8f401">
+<link rel="stylesheet" href="design-system/talentnext-ds.css?b=2fd184fe">
 <style id="admin-auth-slider">
 /* THE FRONT DOOR IS A SLIDER — ported verbatim from the candidate portal's
    §132 (hifi/build/132-authslide.css). That layer is hifi-only
@@ -816,7 +816,12 @@ input:-webkit-autofill:focus{
    the far right against the label on the left; the collapsed trigger shows the
    selected option's meta the same way (its `.fdd-val` grows so the meta pins
    right, just inside the chevron). Meta reads the description grey. Admin-local. */
-.app .fdd-opt.has-meta{display:flex; align-items:center; gap:var(--s04)}
+/* An option with an avatar (`fddAv`) needs a gap between the photo and the name —
+   without it the disc touches the text (Maryam, 29 Sep 2026). The option goes flex
+   with the trigger's own `--s02` gap; `.has-meta` widens to `--s04` for the trailing
+   meta and pins it right. */
+.app .fdd-opt{display:flex; align-items:center; gap:var(--s02)}
+.app .fdd-opt.has-meta{gap:var(--s04)}
 .app .fdd-t .fdd-val.has-meta{flex:1; min-width:0}
 .app .fdd-meta{margin-left:auto; color:var(--text-secondary); white-space:nowrap}
 
@@ -1033,6 +1038,32 @@ input:-webkit-autofill:focus{
    (`.sheet-f`) so a page-body ghost button is untouched. (0,3,1) beats the DS
    `.app .btn-s`. */
 .app .sheet-f .btn.btn-s{background:var(--rule)}
+/* A modal kv row that names an agent shows a SMALL round photo before the name,
+   sized down and vertically centred so it sits on the row's own text line
+   (Maryam, 29 Sep 2026: "a little smaller and aligned with the row content"). */
+.app .kv-face{display:inline-flex; align-items:center; gap:var(--s03)}
+.app .kv-face img{width:20px; height:20px; border-radius:50%; object-fit:cover; display:block; flex:none}
+/* The agent's evaluation block (`ivEvalBlock`) is the last block of one section —
+   it takes NO foot divider and sits a tight gap under its heading's description,
+   not the DS `.signed`'s 32px foot-of-page rule (Maryam, 29 Sep 2026: "remove the
+   line and reduce the gap after 'What the agent recorded after the interview.'").
+   (0,4,1) beats the DS `.app .page .sec > .signed`. */
+.app .page .sec > .signed.iv-eval{border-top:0; padding-top:0}
+/* A foot divider under the agent evaluation, so a line sits above the Candidate's
+   rating section (Maryam, 29 Sep 2026). The section ends in a card block, which
+   §138 keeps line-free, so restate the platform's inset foot hairline here. */
+.app .page .iv-eval-sec{position:relative}
+.app .page .iv-eval-sec::after{content:''; position:absolute; left:var(--pad-x); right:var(--pad-x); bottom:0; border-bottom:1px solid var(--rule)}
+/* The interview header carries the candidate's photo on the top-left, before the
+   "Interview with …" heading (Maryam, 29 Sep 2026). */
+.app .iv-head-row{display:flex; align-items:center; gap:var(--s05)}
+.app .iv-head-row .sec-h{flex:1; min-width:0; margin:0}
+.app .iv-head-ph{flex:none; width:56px; height:56px; border-radius:50%; overflow:hidden; background:var(--surface-2)}
+.app .iv-head-ph img{width:100%; height:100%; object-fit:cover; display:block}
+/* the interview recording card is 20px wider than the DS default 480 (Maryam, 29 Sep 2026) */
+@container app (min-width:900px){
+  .app .iv-rec-sec .iv-rec{max-width:500px; width:500px}
+}
 </style>
 <style id="admin-recovered">
 /* ==========================================================================
@@ -1052,6 +1083,14 @@ input:-webkit-autofill:focus{
 .app .pcell-av img{width:100%; height:100%; object-fit:cover; display:block}
 .app .pcell-b{min-width:0}
 .app .pcell-n{color:inherit; font-weight:inherit}
+/* The Platform (TALENTnext) party disc: the brand mark, not a photo — same disc as a
+   person cell, the logo centred at --icon-primary (Maryam 29 Sep 2026). */
+.app .pcell-tn{display:flex; align-items:center; justify-content:center}
+.app .pcell-tn svg{width:16px; height:16px; color:var(--icon-primary)}
+/* A cell clamped to two lines; the full text opens as a floating block on hover
+   (`clampTip*`, lifted into .main so the table scroller can't clip it). */
+.app .clamptxt{display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; line-clamp:2; overflow:hidden; cursor:default}
+.app .clamp-tip{position:absolute; z-index:60; max-width:320px; background:var(--layer-01); color:var(--text-primary); border:1px solid var(--rule); box-shadow:0 8px 24px rgba(17,17,17,.12); padding:var(--s03) var(--s04); font-size:var(--t-desc-size); line-height:1.45; white-space:normal; pointer-events:none}
 
 /* --- Row-select checkbox (tbl-cb) + select cell (tbl-sel). Quiet light-grey
    square, softly rounded (radius-0 exception), accent + white check when on;
@@ -1085,11 +1124,21 @@ input:-webkit-autofill:focus{
 /* --- No-background accent link button (Release / Release All / etc.) --- */
 .app .btn.acc-link{background:transparent; border:0; box-shadow:none; padding:0; color:var(--accent-text)}
 .app .btn.acc-link svg{color:var(--accent-text)}
+/* the Leader History button is the black variant of an acc-link — ink label + ink glyph
+   (Maryam, 29 Sep 2026), sitting left of the accent Change Leader button. */
+.app .btn.acc-link.leadhist-btn, .app .btn.acc-link.leadhist-btn svg{color:var(--text-primary)}
 
 /* --- Date-field trigger + our month-grid popup (formDate / dateGrid), opens
    downward on the right under a calendar icon --- */
 .app .fdate{position:relative}
 .app .fdate-t{cursor:pointer; text-align:left}
+/* A FORM date trigger's calendar icon sits at the same --s05 inset as the form
+   dropdown's chevron (Maryam, 29 Sep 2026: "the calendar icon should be right aligned
+   just like the chevron of the time field"). `.inp` gives it the wide --s08 right pad
+   meant for a native select's built-in arrow, which pushed the calendar icon further in
+   than the `.fdd-form` chevron (padding-right:--s05). The filter-variant date pill keeps
+   its own rule below. */
+.app .f .fdate-t{padding-right:var(--s05)}
 .app .fdate-val.fdate-ph{color:var(--text-placeholder)}
 .app .fdate-ic{flex:none; width:20px; height:20px; color:var(--icon-secondary)}
 .app .fdate-pop{display:none; position:absolute; top:calc(100% + var(--s02)); right:0; z-index:60; width:266px; background:var(--background); border:1px solid var(--rule); box-shadow:0 8px 24px rgba(17,17,17,.12); padding:var(--s04)}
@@ -1485,7 +1534,7 @@ input:-webkit-autofill:focus{
   </div>
 </div>
 
-<script src="design-system/talentnext-ds.js?b=3af8f401"></script>
+<script src="design-system/talentnext-ds.js?b=2fd184fe"></script>
 <script>
 /* ==========================================================================
    THE SUPER ADMIN PORTAL
@@ -3424,16 +3473,34 @@ function table(cols, rows, opts){
         return `<td${cls ? ` class="${cls}"` : ''}>${c}</td>`;
       }).join('')}</tr>`;
   }).join('');
-  /* COLUMNS DIVIDE THE FULL WIDTH (Maryam, 15 Sep 2026: "the column take the
-     width accordingly ... divide the space accordingly"). The colgroup is
-     PROPORTIONAL (percentages of the total), so `width:100%` always fills the
-     container — the columns keep their content-proportional ratios (stable page
-     to page) but stretch to the edge rather than leaving space on the right. The
-     `min-width` (the px sum) still lets `.tbl-wrap` scroll a genuinely-too-narrow
-     table sideways. */
-  const allW = (doSel ? [selW] : []).concat(colW);
-  const totalW = allW.reduce((s, w) => s + w, 0) || 1;
-  const cg = `<colgroup>${allW.map(w => `<col style="width:${(w / totalW * 100).toFixed(3)}%">`).join('')}</colgroup>`;
+  /* COLUMNS DIVIDE THE SPACE EQUALLY (Maryam, 29 Sep 2026: "why there is a gap
+     after the start date column ... divide the space between all columns
+     equally"). The earlier build sized every column to its own content (15 Sep)
+     and stretched those ratios to 100%, so a middling column like Start date —
+     short values sitting between narrow columns — took a mid share and left a
+     trailing whitespace gap. Now the FIXED columns keep their pixels (the 34px
+     select box, the 56px kebab) and every DATA column takes an equal share of
+     what's left, via `calc((100% - fixedPx) / n)`. The `min-width` is sized off
+     the content estimate (unchanged from the proportional build), so the table
+     fills a normal desktop container with no sideways scroll and equal columns,
+     and `.tbl-wrap` still scrolls only a genuinely too-narrow table. This
+     reverses the content-proportional colgroup; stable-across-pages still holds
+     (equal widths are inherently stable). */
+  /* A column may pin an explicit px width with `c.w`. AND the FIRST data column is the
+     name anchor: when it holds a person cell (name over email) an equal share wraps the
+     two onto three lines, so it is pinned to its own content estimate (which already
+     reserves the avatar + the longest line) and the OTHER columns give up a little,
+     splitting what's left equally — the name and email then sit on one line each
+     (Maryam 29 Sep 2026). Pinned columns come off the total first. */
+  const firstIsPerson = cols.length && !cols[0].act && ordered.some(r => /pcell/.test(String(((r.cells || [])[0]) ?? '')));
+  const pinW = cols.map((c, i) => c.act ? 0 : c.w ? c.w : (i === 0 && firstIsPerson ? colW[0] : 0));
+  const pinnedW = pinW.reduce((s, w) => s + w, 0);
+  const nData = cols.filter((c, i) => !c.act && !pinW[i]).length || 1;
+  const fixedPx = (doSel ? selW : 0) + (hasAct ? 56 : 0) + pinnedW;
+  const totalW = (doSel ? selW : 0) + colW.reduce((s, w) => s + w, 0);
+  const dataColStyle = `width:calc((100% - ${fixedPx}px) / ${nData})`;
+  const cg = `<colgroup>${(doSel ? [`<col style="width:${selW}px">`] : []).concat(
+    cols.map((c, i) => c.act ? `<col style="width:56px">` : pinW[i] ? `<col style="width:${pinW[i]}px">` : `<col style="${dataColStyle}">`)).join('')}</colgroup>`;
   return `<div class="tbl-wrap"><table class="tbl" style="table-layout:fixed;width:100%;min-width:${totalW}px">${cg}<tr>${selHead}${head}</tr>${body}</table></div>${pgBar}`;
 }
 
@@ -3510,7 +3577,10 @@ const rowActs = acts => {
   const id = 'rm' + (ROWMENU_SEQ++);
   const open = S.rowMenu === id;
   const items = acts.map(([icon, label, attr]) =>
-    `<button class="rowmenu-i" role="menuitem" ${attr}><span class="rowmenu-ic">${I[icon] || ic(icon)}</span>${esc(label)}</button>`).join('');
+    /* `ic()` first, not `I[icon]` — the bare proxy returns a truthy EMPTY svg for an
+       alias key like `bank`/`money`/`scale` (trap 7), which would win the `||` and
+       render a blank mark; `ic()` resolves the alias to the real glyph (Maryam 29 Sep 2026). */
+    `<button class="rowmenu-i" role="menuitem" ${attr}><span class="rowmenu-ic">${ic(icon) || I[icon]}</span>${esc(label)}</button>`).join('');
   /* `.on` rides the LIST, not the wrapper — `placeRowMenu` lifts the open list
      out of `.rowmenu` into `.main`, where a wrapper-scoped state would not reach
      it (§125). */
@@ -5006,6 +5076,10 @@ const roleChips = roles => roles.map(r => {
 
 /* A TWO-LINE TABLE IDENTITY CELL — a name over a caption (email, ref…). */
 const idCell = (name, sub) => `<div>${esc(name)}</div>${sub ? `<div class="t-caption">${esc(sub)}</div>` : ''}`;
+/* A cell clamped to N lines with an ellipsis; the full text shows in a floating block
+   on hover (`clampTip*` below). The table scroller clips overflow both ways, so the
+   tip is lifted into `.main` rather than drawn with `::after` (Maryam 29 Sep 2026). */
+const clampCell = (text, lines = 2, cls = '') => { const t = String(text == null ? '' : text); return `<div class="clamptxt${cls ? ' ' + cls : ''}" data-tip="${esc(t)}"${lines !== 2 ? ` style="-webkit-line-clamp:${lines}"` : ''}>${esc(t)}</div>`; };
 /* A PERSON CELL — a candidate's or agent's name with their photo as a small round
    disc (Maryam, 15 Sep 2026: "add agent and candidate images with their names in
    all tables"). `agentFace` is the same deterministic placeholder-face helper the
@@ -5017,6 +5091,11 @@ const personCell = (name, sub) => {
   if(!n || n === '—' || n === 'Unassigned') return idCell(name, sub);
   return `<div class="pcell"><span class="pcell-av"><img src="${agentFace(n)}" alt="" loading="lazy"></span><div class="pcell-b"><div class="pcell-n">${esc(n)}</div>${sub ? `<div class="t-caption">${esc(sub)}</div>` : ''}</div></div>`;
 };
+/* THE PLATFORM (TALENTnext) PARTY wears the brand mark, not a person's photo — the
+   same `TN_MARK` lockup the collapsed side-nav shows (Maryam 29 Sep 2026). Same
+   `.pcell` disc as a person cell so the column lines up; the logo sits centred in
+   the disc at `--icon-primary`. */
+const platformCell = (name, sub) => `<div class="pcell"><span class="pcell-av pcell-tn">${TN_MARK}</span><div class="pcell-b"><div class="pcell-n">${esc(name)}</div>${sub ? `<div class="t-caption">${esc(sub)}</div>` : ''}</div></div>`;
 
 /* A GRANTED / NOT-GRANTED MARK — the icon proxy returns a full <svg> with no
    size, so a matrix cell needs its own sized wrapper; the fill is a token. */
@@ -8336,9 +8415,9 @@ function agentsAll(){
             ])
           : rowActs([
               /* Marketplace actions (6.1/6.2) + the account-admin actions this
-                 directory owns (Deactivate / Delete). Edit lives on the agent
-                 detail page (Maryam, 29 Sep 2026). */
+                 directory owns (Edit / Deactivate / Delete). */
               ...agMarketActs(a),
+              ['edit', 'Edit', `data-sheet="rec:agent:${a.id}"`],
               (a.status === 'active' || a.status === 'ok') ? ['deactivate', 'Deactivate', `data-sheet="deactext:${a.id}"`] : ['play', 'Reactivate', `data-sheet="reactext:${a.id}"`],
               ['delete', 'Delete', `data-sheet="delext:${a.id}"`]
             ])
@@ -8533,8 +8612,9 @@ function agentsDetail(){
 
   ${''/* MARKETPLACE STANDING + LISTING ELIGIBILITY (Epic 6, Maryam 28 Sep 2026):
         the Agent Score, training gate and the 6.4 Listable/Not-listable verdict.
-        The old "Listing details" panel (story 3.8) stays hidden. */}
-  ${agentMarketPanel(a)}
+        HIDDEN (Maryam, 29 Sep 2026); `agentMarketPanel` stays defined, not drawn.
+        The old "Listing details" panel (story 3.8) stays hidden too. */}
+  ${'' && agentMarketPanel(a)}
 
   ${''/* the Payouts section is only drawn when there is something to release
         (Maryam, 18 Sep 2026: "when there is nothing to release do not even show
@@ -8703,6 +8783,51 @@ const ivEvalBlock = iv => `<div class="signed iv-eval">
       <div class="sig-b"><div class="sig-top"><span class="sig-t">${esc(String(iv.agent).split(' ')[0])}’s note</span></div><p class="sig-p">&ldquo;${esc(iv.note)}&rdquo;</p></div></div>
   </div>`;
 
+/* ── THREE SHARED EVALUATION SECTIONS (Maryam, 29 Sep 2026) ────────────────────
+   The Past-Interview detail (`agentsInterview`) is the reference layout, and the
+   Level approval (`marketApproval`) and Level-change log (`levellingChange`) detail
+   pages follow it: an Interview-recording section (heading + desc left, the compact
+   `.iv-rec` card on the right), then a SEPARATE Tal's-Evaluation section and a
+   SEPARATE agent's-evaluation section (the agent's suggested level + acronyms, then
+   the strengths / growth / note block). One set of builders, three call sites. */
+function ivRecordingSection(cand, agent){
+  return `<section class="sec iv-rec-sec">
+    ${aiHead('Interview recording', `The recorded 48 minutes interview of ${esc(cand)} with ${esc(agent)}.`,
+      `<div class="iv-rec" style="cursor:default">
+        <span class="iv-rec-thumb"><img src="assets/agent/iv-recording-still.webp" alt="" loading="lazy"></span>
+        <span class="iv-rec-b">
+          <span class="iv-rec-n t-body">Interview with ${esc(cand)}.mp4</span>
+          <span class="iv-rec-m t-desc">Video recording &middot; 48:00</span>
+        </span>
+        <span class="iv-rec-open">${I.play}</span>
+      </div>`)}
+  </section>`;
+}
+/* `talHTML` is rich HTML (the `<b>` accent highlights survive without `.ai-aura`),
+   its stored paragraphs collapsed into one; `opts.note` is a trailing helper line
+   (the interview detail's "Proposed only …" caveat). */
+function talEvalSection(cand, talHTML, talType, opts){
+  opts = opts || {};
+  const first = esc(String(cand).split(' ')[0]);
+  const read = talHTML ? talHTML.replace(/<\/p>\s*<p[^>]*>/g, ' ') : '';
+  if(!read) return '';
+  return `<section class="sec">
+    ${aiHead('Tal’s Evaluation', 'What Tal read from the interview.')}
+    <div class="tal-eval"><div class="ai-body">${read}${talType ? `<p class="mt5">Tal reads ${first} as a <b>${esc(talType)}</b>.</p>` : ''}${opts.note ? `<p class="help mt5">${opts.note}</p>` : ''}</div></div>
+    ${opts.talLevel ? kv([['Suggested level', esc(opts.talLevel)], ['Acronyms', esc(lettersLabel(opts.talLetters) || '—')]]) : ''}
+  </section>`;
+}
+/* The agent's evaluation — the suggested level + acronyms (Maryam, 29 Sep 2026:
+   "what level and acronyms are suggested by the agent, we need that on the screen"),
+   then the strengths / growth / note block. */
+function agentEvalSection(agent, agentLevel, agentLetters, evalData){
+  return `<section class="sec iv-eval-sec">
+    ${aiHead(esc(agent) + '’s evaluation', 'What the agent recorded after the interview.')}
+    ${agentLevel ? kv([['Suggested level', esc(agentLevel)], ['Acronyms', esc(lettersLabel(agentLetters) || '—')]]) : ''}
+    ${ivEvalBlock(evalData)}
+  </section>`;
+}
+
 /* The interview transcript as the styled `.tx-*` lines (authored placeholder,
    §74) — the same source the Recordings register reads. */
 const ivTranscript = iv => { const A = String(iv.agent).split(' ')[0], C = String(iv.cand).split(' ')[0];
@@ -8796,6 +8921,34 @@ function reInterviewExtras(iv){
   </section>
   ${cohortLeaderEval(iv, c)}`;
 }
+/* THE UPCOMING-INTERVIEW BODY (an interview not yet held) — the identity head + the
+   four-fact band, the candidate's levelling-quiz read, the note they wrote at booking,
+   and (for a re-interview) their whole profile, cohort journey and cohort-leader
+   evaluation. Shared so the Talent Agents interview detail (agentsInterview) and the
+   Interviews-module booking detail (marketBooking, a booked interview) render the same
+   surface (Maryam 29 Sep 2026). Caller wraps it in `.iv-detail-body` + detailHead.
+   `iv` needs {cand, agent, kind, fee}; `when` and the status HTML are passed in. */
+function upcomingInterviewBody(iv, when, statusHtml){
+  const isFirst = !agIvIsRe(iv.kind);
+  const first = esc(String(iv.cand).split(' ')[0]);
+  const quote = '<span style="color:var(--accent-text);font-size:1.35em;line-height:0;vertical-align:-.18em">';
+  return `
+    <section class="sec">
+      ${aiHead('Interview with ' + esc(iv.cand), `${esc(iv.agent)} &middot; ${esc(agIvKind(iv.kind))} &middot; ${esc(when)}`)}
+      <div class="facts pf-facts">
+        ${admFact(I.wallet, '--mk-4', 'Interview fee', agIvFee(iv.kind, iv.fee))}
+        ${admFact(I.video, '--mk-3', 'Type', agIvKind(iv.kind))}
+        ${admFact(I.calendar, '--mk-2', 'When', when)}
+        <div style="--mk:var(--mk-1)"><span class="l pf-l">${ic('shield')}Status</span><span class="v">${statusHtml}</span></div>
+      </div>
+    </section>
+    ${admQuiz({name: iv.cand})}
+    <section class="sec">
+      ${aiHead('What ' + first + ' wants to talk about')}
+      <p class="t-body" style="margin:0">${quote}&ldquo;</span>${esc(ivTopicOf(iv))}${quote}&rdquo;</span></p>
+    </section>
+    ${isFirst ? '' : reInterviewExtras(iv)}`;
+}
 function agentsInterview(){
   const piv = PAST_IVS.find(x => x.id === S.id), bk = BOOKINGS.find(x => x.id === S.id);
   const iv = piv || bk;
@@ -8819,30 +8972,17 @@ function agentsInterview(){
        a stable per-candidate note. A RE-interview (a cohort finisher) also shows the
        candidate's whole profile, the cohort journey and the cohort-leader
        evaluation — `reInterviewExtras`. */
-    const isFirst = !agIvIsRe(iv.kind);
     /* THE CONTENT SECTIONS ARE WRAPPED IN `.iv-detail-body` so a page-scoped rule can
        widen the gap between every section (Maryam, 22 Sep 2026: "give more gaps
        between each section") — including the sections that come from shared helpers
        (`admQuiz`, `candCV`, `reInterviewExtras`), which a per-section class could not
        reach. detailHead stays outside so the first section keeps its top-block
-       treatment (the wrapper restates the no-divider `::after` rule). */
+       treatment (the wrapper restates the no-divider `::after` rule). The body itself
+       is the shared `upcomingInterviewBody` (also used by the Interviews-module booking
+       detail). */
     return `${detailHead(backTo)}
     <div class="iv-detail-body">
-    <section class="sec">
-      ${aiHead('Interview with ' + esc(iv.cand), `${esc(iv.agent)} &middot; ${esc(agIvKind(iv.kind))} &middot; ${esc(when)}`)}
-      <div class="facts pf-facts">
-        ${admFact(I.wallet, '--mk-4', 'Interview fee', agIvFee(iv.kind, iv.fee))}
-        ${admFact(I.video, '--mk-3', 'Type', agIvKind(iv.kind))}
-        ${admFact(I.calendar, '--mk-2', 'When', when)}
-        <div style="--mk:var(--mk-1)"><span class="l pf-l">${ic('shield')}Status</span><span class="v">${tag(iv.status)}</span></div>
-      </div>
-    </section>
-    ${admQuiz({name: iv.cand})}
-    <section class="sec">
-      ${aiHead('What ' + esc(String(iv.cand).split(' ')[0]) + ' wants to talk about')}
-      <p class="t-body" style="margin:0"><span style="color:var(--accent-text);font-size:1.35em;line-height:0;vertical-align:-.18em">&ldquo;</span>${esc(ivTopicOf(iv))}<span style="color:var(--accent-text);font-size:1.35em;line-height:0;vertical-align:-.18em">&rdquo;</span></p>
-    </section>
-    ${isFirst ? '' : reInterviewExtras(iv)}
+    ${upcomingInterviewBody(iv, when, tag(iv.status))}
     </div>`;
   }
   /* PAST — the full record, behind TWO TABS (Maryam, 17 Sep 2026: "i need two tabs
@@ -8858,7 +8998,10 @@ function agentsInterview(){
   const ivTab = getFilter('ivtab', 'about');
   return `${detailHead(backTo)}
   <section class="sec iv-head">
-    ${aiHead('Interview with ' + esc(iv.cand), `${esc(iv.agent)} &middot; ${esc(agIvKind(iv.kind))} &middot; ${esc(when)}`)}
+    <div class="iv-head-row">
+      <span class="iv-head-ph"><img src="${agentFace(iv.cand)}" alt="" loading="lazy"></span>
+      ${aiHead('Interview with ' + esc(iv.cand), `${esc(iv.agent)} &middot; ${esc(agIvKind(iv.kind))} &middot; ${esc(when)}`)}
+    </div>
   </section>
   <section class="sec sec-cs iv-tabs">
     ${filterStrip('ivtab', 'about', [['about', 'About Interview'], ['transcript', 'Transcript']])}
@@ -8876,6 +9019,20 @@ function agentsInterview(){
       ${admFact(I.calendar, '--mk-1', 'When', when)}
     </div>
   </section>
+  ${''/* INTERVIEW RECORDING — the compact `.iv-rec` card rides the aiHead's action
+        slot, so it sits to the RIGHT of the heading + desc (Maryam, 29 Sep 2026),
+        aligned with them. Same card the approval detail draws. */}
+  <section class="sec iv-rec-sec">
+    ${aiHead('Interview recording', `The recorded 48 minutes interview of ${esc(iv.cand)} with ${esc(iv.agent)}.`,
+      `<div class="iv-rec" style="cursor:default">
+        <span class="iv-rec-thumb"><img src="assets/agent/iv-recording-still.webp" alt="" loading="lazy"></span>
+        <span class="iv-rec-b">
+          <span class="iv-rec-n t-body">Interview with ${esc(iv.cand)}.mp4</span>
+          <span class="iv-rec-m t-desc">Video recording &middot; 48:00</span>
+        </span>
+        <span class="iv-rec-open">${I.play}</span>
+      </div>`)}
+  </section>
   ${''/* TAL'S EVALUATION — a plain section heading, and the read as ONE paragraph
         (Maryam, 18 Sep 2026: "make tal read a paragraph" / "make tals read a section
         heading with name 'Tal's Evaluation'"). The `.tal-eval .ai-body p b` highlight
@@ -8888,12 +9045,10 @@ function agentsInterview(){
         <p class="help mt5">Proposed only. TalentNext sets the level after analysis, so this is not a decision you make here.</p></div>
     </div>
   </section>
-  ${''/* the agent's evaluation is the last content block before the review — no foot
-        line (Maryam, 18 Sep 2026: "remove the line after the agent evaluation"). */}
-  <section class="sec sec-noline">
-    ${aiHead(esc(iv.agent) + '’s evaluation', 'What the agent recorded after the interview.')}
-    ${ivEvalBlock(iv)}
-  </section>
+  ${''/* the agent's evaluation carries the agent's suggested level + acronyms
+        (Maryam, 29 Sep 2026) and a foot divider so a line sits above the
+        Candidate's rating section (reversing the 18 Sep no-line). */}
+  ${agentEvalSection(iv.agent, iv.agentLevel, iv.agentLetters, iv)}
   <section class="sec">
     ${aiHead('Candidate’s rating and review', `What ${esc(String(iv.cand).split(' ')[0])} said about this interview.`)}
     ${''/* rating is five gold stars, not a boxed number (Maryam, 18 Sep 2026:
@@ -8918,7 +9073,7 @@ SHEETS.agrange = id => {
   const a = USER_BY_ID[id]; if(!a) return {title:'Set assessment range', body:'', ok:''};
   const r = agRange(a);
   return {title:`Set assessment range — ${a.name}`, ok:'Save Range', act:'doagrange:' + id,
-    body:`${kv([['Agent', `<span style="display:inline-flex;align-items:center;gap:var(--s03)"><span class="pcell-av"><img src="${agentFace(a.name)}" alt="" loading="lazy"></span>${esc(a.name)}</span>`], ['Current range', rangeLabel(r)]])}
+    body:`${kv([['Agent', `<span class="kv-face"><img src="${agentFace(a.name)}" alt="" loading="lazy">${esc(a.name)}</span>`], ['Current range', rangeLabel(r)]])}
       <div style="margin-top:var(--s06)">${fieldHtml({k:'from', l:'From level', t:'select', opts: LADDER.map(l => [l, l])}, r[0])}</div>
       ${fieldHtml({k:'to', l:'To level', t:'select', opts: LADDER.map(l => [l, l])}, r[1])}
       ${fieldHtml({k:'reason', l:'Reason', t:'textarea', req:1, ph:'Required — written to the audit log; never shown to the agent'})}`};
@@ -8938,7 +9093,7 @@ SHEETS.agpause = id => {
   const a = USER_BY_ID[id]; if(!a) return {title:'Pause listing', body:'', ok:''};
   const n = agUpcoming(a);
   return {title:`Pause ${a.name}’s listing`, ok:'Pause Listing', danger:true, act:'askagpause:' + id,
-    body:`${kv([['Agent', `<span style="display:inline-flex;align-items:center;gap:var(--s03)"><span class="pcell-av"><img src="${agentFace(a.name)}" alt="" loading="lazy"></span>${esc(a.name)}</span>`], ['Email', esc(a.email)], ['Upcoming interviews', `${n} in the diary`]])}
+    body:`${kv([['Agent', `<span class="kv-face"><img src="${agentFace(a.name)}" alt="" loading="lazy">${esc(a.name)}</span>`], ['Email', esc(a.email)], ['Upcoming interviews', `${n} in the diary`]])}
       <div style="margin-top:var(--s06)">${fieldHtml({k:'reason', l:'Reason', t:'textarea', req:1, ph:'Required — written to the audit log; never shown to the agent'})}</div>`};
 };
 ACTIONS.askagpause = key => {
@@ -9120,17 +9275,18 @@ KINDS.cohort = {
     {k:'name', l:'Cohort name', t:'text', req:1, ph:'e.g. Cohort 9'},
     {k:'min', l:'Minimum members', t:'number', req:1, def:5, ph:'e.g. 5'},
     {k:'cap', l:'Maximum members', t:'number', req:1, def:12, ph:'e.g. 12'},
-    {k:'chapters', l:'Chapters', t:'number', req:1, def:12, ph:'1 to 90'},
     {k:'completeDelay', l:'Completed delay (days)', t:'number', req:1, def:7, ph:'0 to 30'},
     {k:'start', l:'Cohort starts on', t:'date', req:1}
   ],
-  help:'A new cohort is created Forming and opens for enrolment. Assign a leader (7.5) and build its session outline before its start date. It needs the minimum plus a leader to start, caps at the maximum, and Completes the set number of days after day 90.',
   okNew:'Create Cohort',
   create: v => { const c = {id:newId('ch', COHORTS), name:v.name, leader:'Unassigned', min:Number(v.min) || 5, cap:Number(v.cap) || 12, chapters:Number(v.chapters) || 12, completeDelay:(v.completeDelay === '' || v.completeDelay == null) ? 7 : Number(v.completeDelay), size:0, week:0, day:0, start:v.start, status:'forming', leadFrom:null, leadHist:[], sessions:[]};
     COHORTS.push(c); COHORT_BY_ID[c.id] = c; placeAwaiting(); return c; },
   update: (c, v) => { CANDS.forEach(x => { if(x.cohort === c.name) x.cohort = v.name; }); c.name = v.name; if(v.min) c.min = Number(v.min); if(v.cap) c.cap = Number(v.cap); if(v.chapters) c.chapters = Number(v.chapters); if(v.completeDelay !== '' && v.completeDelay != null) c.completeDelay = Number(v.completeDelay); c.start = v.start; },
   remove: c => { CANDS.forEach(x => { if(x.cohort === c.name) x.cohort = '—'; }); COHORTS.splice(COHORTS.indexOf(c), 1); delete COHORT_BY_ID[c.id]; },
-  guard: c => (c.status === 'running' && cohortSize(c)) ? `${c.name} is running with ${cohortSize(c)} member${cohortSize(c) === 1 ? '' : 's'} — cancel it through intervention instead` : null,
+  /* No delete guard (Maryam, 29 Sep 2026: "on click to delete nothing happens, it should
+     show a modal"). The old guard blocked a running cohort with a warn toast that pointed
+     at Intervene — now hidden — so Delete appeared to do nothing. Delete always opens the
+     confirmation modal; its delWarn states the members return to no cohort. */
   delWarn: c => `${c.name} is removed and its ${cohortSize(c)} member${cohortSize(c) === 1 ? '' : 's'} return to no cohort.`,
   status: (c, val) => val === 'completed'
     ? {title:`Mark ${c.name} completed?`, body:'The cohort closes now. Members keep their level and history.', ok:'Mark Completed', log:'Completed cohort', done:`${c.name} completed`, apply: x => { x.status = 'completed'; x.completedOn = todayISO(); x.day = 90; x.week = 13; }}
@@ -9168,8 +9324,8 @@ function cohortsList(){
         tag(c.status),
         `${dpFmt(c.start) || c.start}${note ? `<div style="margin-top:var(--s02)">${note}</div>` : ''}`,
         `${cohortSize(c)} / ${c.cap || 12}`,
-        cohortHasLeader(c) ? esc(leaderName(c)) : '<span class="tag sm warn">Unassigned</span>',
-        cohortProgress(c) || '—',
+        cohortHasLeader(c) ? personCell(leaderName(c), '') : '<span class="tag sm warn">Unassigned</span>',
+        c.status === 'running' ? `Day ${c.day} of 90` : '—',
         rowActs([
           ['launch', 'View', `data-go="cohorts/detail/${c.id}"`],
           COHORT_ACTIVE(c) ? [cohortHasLeader(c) ? 'renew' : 'user', cohortHasLeader(c) ? 'Change leader' : 'Assign leader', `data-sheet="assignlead:${c.id}"`] : null,
@@ -9213,8 +9369,14 @@ function cohortsAssign(){
      "Current cohort" column names the cohort each leads, "Allot a cohort" shows
      only for a leader not currently leading, and the removal action reads "Remove
      as cohort leader" (was "Decline"). */
-  const sf = getFilter('lstage', 'feedback');
-  const rows = LEADER_REQS.filter(r => r.stage === sf);
+  /* A "Cohort Leaders" tab (Maryam, 29 Sep 2026: "this is a cohort leaders module and
+     we are just showing the ones who are not even approved yet"). The applicant tabs
+     (All / Awaiting Interviews / Interview Pending) are the pipeline; this synthetic
+     `leaders` filter is the approved pool who are ACTUALLY leading a cohort now, so the
+     module opens on the real cohort leaders. */
+  const isLeader = r => r.stage === 'feedback' && leaderCohorts(r.name).length > 0;
+  const sf = getFilter('lstage', 'leaders');
+  const rows = sf === 'leaders' ? LEADER_REQS.filter(isLeader) : LEADER_REQS.filter(r => r.stage === sf);
   const acts = r => {
     const leading = leaderCohorts(r.name).length > 0;
     const remove = ['close', 'Remove as cohort leader', `data-act="askremovelead:${r.id}"`];
@@ -9226,7 +9388,8 @@ function cohortsAssign(){
   <section class="sec">
     ${aiHead('Cohort leaders', 'Candidates applying to lead a cohort. Allot an approved leader to any cohort that needs one.',
       `<button class="btn btn-p btn-sm noic" data-sheet="invitelead">${I.add} Invite A Leader</button>`)}
-    ${filterStrip('lstage', 'feedback', [
+    ${filterStrip('lstage', 'leaders', [
+      ['leaders', 'Cohort Leaders', LEADER_REQS.filter(isLeader).length],
       ['feedback', 'All', LEADER_REQS.filter(r => r.stage === 'feedback').length],
       ['applied', 'Awaiting Interviews', LEADER_REQS.filter(r => r.stage === 'applied').length],
       ['scheduled', 'Interview Pending', LEADER_REQS.filter(r => r.stage === 'scheduled').length]
@@ -9235,7 +9398,7 @@ function cohortsAssign(){
     ${rows.length ? table(
       [{label:'Cohort Leader'}, {label:'Level'}, {label:'Track'}, {label:'Cohorts led', num:true}, {label:'Current cohort'}, ACT_COL],
       rows.map(r => { const cur = leaderCohorts(r.name); return {id:r.id, cells:[
-        personCell(r.name, r.email || ''),
+        personCell(r.name, candEmail(r.name)),
         esc(r.level), esc(r.bucket), r.led ? String(r.led) : '—',
         cur.length ? esc(cur.map(c => c.name).join(', ')) : '—',
         acts(r)
@@ -9305,9 +9468,7 @@ function cohortsDetail(){
       `<span style="display:flex;align-items:center;gap:var(--s03)">${tag(c.status)}
        ${rowActs([
          COHORT_ACTIVE(c) ? [cohortHasLeader(c) ? 'renew' : 'user', cohortHasLeader(c) ? 'Change Leader' : 'Assign Leader', `data-sheet="assignlead:${c.id}"`] : null,
-         COHORT_ACTIVE(c) ? ['edit', 'Intervene', `data-sheet="intervene:${c.id}"`] : null,
          ready ? ['play', 'Start Cohort', `data-act="askstatus:cohort:${c.id}:running"`] : null,
-         running ? ['check', 'Mark Completed', `data-act="askstatus:cohort:${c.id}:completed"`] : null,
          ['edit', 'Edit Details', `data-sheet="rec:cohort:${c.id}"`],
          ['delete', 'Delete', `data-act="askdel:cohort:${c.id}"`]
        ])}</span>`)}
@@ -9321,15 +9482,13 @@ function cohortsDetail(){
   </section>
 
   <section class="sec">
-    ${aiHead('Leader', cohortHasLeader(c) ? `Assigned ${dpFmt(c.leadFrom) || 'at creation'}` : 'No leader assigned',
-      COHORT_ACTIVE(c) ? `<button class="btn acc-link btn-sm noic" data-sheet="assignlead:${c.id}">${cohortHasLeader(c) ? I.renew + ' Change Leader' : I.add + ' Assign Leader'}</button>` : '')}
+    ${aiHead('Cohort Leader', '',
+      `<div style="display:flex;gap:var(--s05);align-items:center">${
+        (c.leadHist && c.leadHist.length) ? `<button class="btn acc-link leadhist-btn btn-sm noic" data-sheet="leadhist:${c.id}">${I.time} Leader History</button>` : ''}${
+        COHORT_ACTIVE(c) ? `<button class="btn acc-link btn-sm noic" data-sheet="assignlead:${c.id}">${cohortHasLeader(c) ? I.user + ' Change Leader' : I.add + ' Assign Leader'}</button>` : ''}</div>`)}
     ${cohortHasLeader(c)
       ? `<div class="tile-stack">${memRow(leaderName(c), `Cohort leader${c.leadFrom ? ` · since ${dpFmt(c.leadFrom)}` : ''}`, '', null, agentFace(leaderName(c)))}</div>`
       : emptyState('users', 'No leader assigned', COHORT_ACTIVE(c) ? 'This cohort cannot start without a leader. Assign one before its start date.' : 'This cohort holds no leader.')}
-    ${(c.leadHist && c.leadHist.length) ? `<div style="margin-top:var(--s05)">
-      <p class="t-label" style="color:var(--text-secondary);margin-bottom:var(--s03)">Replacement history</p>
-      ${c.leadHist.map(h => `<p class="t-desc" style="margin-bottom:var(--s03)"><b style="color:var(--text-primary)">${esc(dpFmt(h.on) || h.on)}</b> · ${esc(h.from.replace(/\s*\(.*\)/, ''))} → ${esc(h.to.replace(/\s*\(.*\)/, ''))}${h.reason ? ` — ${esc(h.reason)}` : ''}</p>`).join('')}
-    </div>` : ''}
   </section>
 
   <section class="sec">
@@ -9374,6 +9533,37 @@ function cohortsDetail(){
    an agent — `leaderAssignOpts`). A first assignment commits directly; a change asks a
    reason and a confirmation. On assign the start conditions are re-evaluated (a cohort
    waiting only on a leader starts). Opened as `assignlead:<cohortId>`. */
+/* Read-only leader-history modal (Maryam 29 Sep 2026: the replacement history is no
+   longer shown openly on the cohort detail — a "Leader History" button opens it here).
+   It lists every leader this cohort has had with their joining and removal dates, newest
+   on top; the sitting leader shows a round accent "Current" tag where the removal date
+   would be. Tenures are reconstructed from `leadHist` (each entry is a handover on `on`)
+   plus `leadFrom`/`leader`; the original leader's join falls back to the cohort start.
+   No `ok` → the dialog draws Close only. Opened as `leadhist:<cohortId>`. */
+SHEETS.leadhist = arg => {
+  const c = COHORT_BY_ID[String(arg).split(':')[0]] || COHORT_BY_ID[S.id];
+  if(!c) return {title:'Leader history', body:'', ok:''};
+  const nm = s => String(s || '').replace(/\s*\(.*\)/, '');
+  const h = c.leadHist || [];
+  const rows = [];                                     /* oldest → newest */
+  if(h.length){
+    rows.push({name:nm(h[0].from), join:c.start, leave:h[0].on});
+    h.forEach((x, k) => rows.push({name:nm(x.to), join:x.on, leave: h[k + 1] ? h[k + 1].on : null, reason:x.reason, current: k === h.length - 1}));
+  } else if(cohortHasLeader(c)){
+    rows.push({name:leaderName(c), join:c.leadFrom, leave:null, current:true});
+  }
+  const curTag = '<span style="flex:none;background:var(--accent);color:var(--on-accent);border-radius:999px;padding:3px var(--s03);font-size:11.5px;line-height:1;font-weight:var(--t-w-strong)">Current</span>';
+  return {title:`Leader history — ${c.name}`, ok:'',
+    body: rows.length ? `<div class="tile-stack">${rows.slice().reverse().map(r => `<div style="display:flex;align-items:flex-start;gap:var(--s04);padding:var(--s04) 0">
+      ${fddAv(agentFace(r.name))}
+      <div style="flex:1;min-width:0">
+        <p class="t-body"><b>${esc(r.name)}</b></p>
+        <p class="t-caption" style="color:var(--text-helper);margin-top:2px">Joined ${esc(dpFmt(r.join) || r.join || '—')}${r.leave ? ` · Removed ${esc(dpFmt(r.leave) || r.leave)}` : ''}</p>
+        ${r.reason ? `<p class="t-desc" style="margin-top:var(--s02)">${esc(r.reason)}</p>` : ''}
+      </div>
+      ${r.current ? curTag : ''}</div>`).join('')}</div>`
+      : note('', 'No leader yet', 'This cohort has not had a leader assigned.')};
+};
 SHEETS.assignlead = arg => {
   const c = COHORT_BY_ID[String(arg).split(':')[0]] || COHORT_BY_ID[S.id];
   if(!c) return {title:'Assign leader', body:'', ok:''};
@@ -9385,8 +9575,7 @@ SHEETS.assignlead = arg => {
   return {title:`${changing ? 'Change' : 'Assign'} leader — ${c.name}`, ok: changing ? 'Change Leader' : 'Assign Leader', act:'askassignlead:' + c.id,
     body:`<p class="t-desc" style="margin-bottom:var(--s05)">${esc(c.name)} · starts ${dpFmt(c.start) || c.start} · ${cohortSize(c)} of ${c.cap || 12} members.</p>
       ${fieldHtml({k:'leader', l:'Leader', t:'select', req:1, ph:'Choose a leader', opts}, changing ? cur : undefined)}
-      ${changing ? fieldHtml({k:'reason', l:'Reason', t:'textarea', req:1, ph:'Why the cohort is changing leader'}) : ''}
-      <p class="t-desc">${changing ? 'Both leaders are notified and the cohort sees the change. The incoming leader takes it immediately; the outgoing leader keeps read-only access to the discussion and their own private threads, and their private notes stay with them.' : 'The leader is placed on the cohort and it appears in their leader portal. The cohort’s members are notified.'} A leader holds one active cohort at a time.</p>`};
+      ${changing ? fieldHtml({k:'reason', l:'Reason', t:'textarea', req:1, ph:'Why the cohort is changing leader'}) : ''}`};
 };
 function assignLeaderCommit(c, name, reason){
   if(!c || !name) return;
@@ -9448,8 +9637,7 @@ SHEETS.addmember = arg => {
   const free = CANDS.filter(x => (x.cohort === '—' || x.cohort === 'Awaiting') && x.level && x.status !== 'inactive');
   return {title:`Add a candidate to ${c.name}`, ok: free.length ? 'Add Candidate' : '', act:'doaddmember:' + c.id,
     body: free.length ? `${fieldHtml({k:'cand', l:'Candidate', t:'select', req:1, ph:'Choose a candidate', opts: free.map(x => [x.id, `${x.name} · ${x.level}${x.cohort === 'Awaiting' ? ' · awaiting a cohort' : ''}`])})}
-      ${fieldHtml({k:'reason', l:'Reason', t:'textarea', req:1, ph:'Why this candidate is being added'})}
-      <p class="t-desc">Only candidates who hold a level and no cohort place are listed. A cohort may be taken past its maximum this way. A candidate added to a started cohort joins at the current chapter with no progress of their own.</p>`
+      ${fieldHtml({k:'reason', l:'Reason', t:'textarea', req:1, ph:'Why this candidate is being added'})}`
       : note('warn', 'No candidate to add', 'Every candidate with a level already holds a cohort place.')};
 };
 ACTIONS.doaddmember = key => { const c = COHORT_BY_ID[key.split(':')[1]]; const v = readForm(); const m = CAND_BY_ID[v.cand]; if(!c || !m){ toast('Pick a candidate', 'warn'); return 'keep'; } if(!v.reason){ toast('A reason is required', 'warn'); return 'keep'; }
@@ -9482,8 +9670,7 @@ SHEETS.moveco = arg => {
         ? `<label class="f"><span class="lbl">Candidate</span><div class="inp" style="pointer-events:none;background:var(--surface-2)">${esc(m.name)} &middot; ${esc(m.level || '')}</div><input type="hidden" data-f="cand" value="${esc(m.id)}"></label>`
         : fieldHtml({k:'cand', l:'Candidate', t:'select', req:1, ph:'Choose a candidate', opts: roster.map(x => [x.id, `${x.name} · ${x.level}`])})}
       ${fieldHtml({k:'into', l:'Destination cohort', t:'select', req:1, ph:'Choose a cohort', opts: targets.map(x => [x.id, `${x.name} · ${cap(x.status)} · ${x.status === 'running' ? `day ${x.day} of 90` : `starts ${dpFmt(x.start)}`} · ${cohortSize(x)}/${x.cap || 12}`])})}
-      ${fieldHtml({k:'reason', l:'Reason', t:'textarea', req:1, ph:'Why this candidate is moving'})}
-      <p class="t-desc">The candidate keeps the place they paid for — no money moves — and carries their progress into the destination.</p>` : note('', 'Nothing to move', 'Either the roster is empty or no other cohort has room.')};
+      ${fieldHtml({k:'reason', l:'Reason', t:'textarea', req:1, ph:'Why this candidate is moving'})}` : note('', 'Nothing to move', 'Either the roster is empty or no other cohort has room.')};
 };
 ACTIONS.askmoveco = key => { const c = COHORT_BY_ID[key.split(':')[1]]; const v = readForm(); const m = CAND_BY_ID[v.cand]; const t = COHORT_BY_ID[v.into]; if(!c || !m || !t){ toast('Pick a candidate and a cohort', 'warn'); return 'keep'; } if(!v.reason){ toast('A reason is required', 'warn'); return 'keep'; }
   S._pending = v; askConfirm({mk:'check', title:`Move ${m.name} to ${t.name}?`, body:`${m.name} leaves ${c.name} and joins ${t.name}, keeping their paid place and their progress.`, ok:'Move', act:'domoveco:' + c.id}); };
@@ -9930,7 +10117,7 @@ ACTIONS.doimport = () => { const v = readForm(); const lc = COURSE_LIB.find(c =>
   const c = {id:newId('co', COURSES), name:lc.name, track:lc.track, price:lc.price, days:90, status:'draft'}; COURSES.push(c); COURSE_BY_ID[c.id] = c;
   audit('Imported course', c.name, 'Cohort Management', 'info'); toast(`${c.name} imported as a draft`); };
 SHEETS.invitelead = () => ({title:'Invite a cohort leader',
-  body:`${fieldHtml({k:'cand', l:'Candidate', t:'select', opts:CANDS.filter(c => c.bucket !== 'Explorer').map(c => [c.id, `${c.name} · ${c.level} ${c.bucket}`])})}
+  body:`${fieldHtml({k:'cand', l:'Candidate', t:'select', req:1, ph:'Choose a candidate', opts:CANDS.filter(c => c.bucket !== 'Explorer').map(c => [c.id, `${c.name} · ${c.level} ${c.bucket}`, agentFace(c.name)])})}
     <p class="t-desc">Only Builders and Trailblazers can lead. The invite opens an application in their portal; it lands here as “awaiting interview”.</p>`,
   ok:'Send Invite', act:'doinvitelead'});
 ACTIONS.doinvitelead = () => { const v = readForm(); const c = CAND_BY_ID[v.cand]; if(!c){ toast('Pick a candidate', 'warn'); return 'keep'; }
@@ -10187,7 +10374,7 @@ function marketBookings(){
     .slice().sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
   const stageTabs = [['all', 'All', base.length], ...BK_STAGE_ORDER.map(s => [s, BK_STAGE[s], base.filter(b => bkStage(b) === s).length])];
   const typeFilter = filterDd('bkkind', 'all', [['all', 'All'], ['first', 'First interview'], ['re', 'Re-interview']], 'Type');
-  const dateFilter = `${filterDate('bkfrom', 'From', 100)} ${filterDate('bkto', 'To', 100)}`;
+  const dateFilter = `${filterDate('bkfrom', 'From', 200)} ${filterDate('bkto', 'To', 200)}`;
   return `
   <section class="sec">
     ${searchHead('Interview register', 'Every interview and the stage it reached. A record, and a route into resolving one that could not take place.',
@@ -10300,35 +10487,21 @@ function marketApproval(){
       ? `<p class="t-desc">No transcript exists for this interview. The recording failed to transcribe, so settle the level on the agent report in the Recommendation tab.</p>`
       : ivTranscript(iv)}
   </section>`
-    : `<section class="sec">
-    ${secHead('Interview recording')}
-    ${/* THE COMPACT RECORDING CARD, exactly the talent agent evaluation screen's
-         `.iv-rec` (in the DS this portal links) — a 480px card with a 64×44 still,
-         the file name, "Video recording · 48:00" and a play mark. Non-clickable here. */''}
-    <div class="iv-rec" style="cursor:default">
-      <span class="iv-rec-thumb"><img src="assets/agent/iv-recording-still.webp" alt="" loading="lazy"></span>
-      <span class="iv-rec-b">
-        <span class="iv-rec-n t-body">Interview with ${esc(iv.cand)}.mp4</span>
-        <span class="iv-rec-m t-desc">Video recording &middot; 48:00</span>
-      </span>
-      <span class="iv-rec-open">${I.play}</span>
-    </div>
-  </section>
-  ${/* ONE MERGED SECTION — the levellingChange recommendation UI: a single
-       "{agent} and Tal's Recommendation" heading, the flowing read + type line, the
-       4-cell facts band (Final level once decided, else Report filed), the notes. */''}
-  <section class="sec sec-noline">
-    ${aiHead(esc(iv.agent) + ' and Tal’s Recommendation')}
-    <div class="tal-eval"><div class="ai-body">${iv.tal.replace(/<\/p>\s*<p[^>]*>/g, ' ')}
-      <p class="mt5">Tal reads ${first} as a <b>${esc(talType)}</b>.</p></div></div>
+    : `${/* THE RECOMMENDATION TAB FOLLOWS THE PAST-INTERVIEW DETAIL LAYOUT (Maryam,
+         29 Sep 2026): a 4-fact band, then the interview-recording section (heading +
+         desc left, card right), then SEPARATE Tal's-Evaluation and agent's-evaluation
+         sections (the agent's suggested level + acronyms + strengths/growth/note). */''}
+  <section class="sec">
     <div class="facts pf-facts">
-      ${admFact(I.video, '--mk-4', 'Agent’s recommendation', levelLetters(iv.agentLevel, iv.agentLetters))}
-      ${admFact(I.chat, '--mk-3', 'Tal’s suggestion', iv.talLevel ? levelLetters(iv.talLevel, iv.talLetters) : '—')}
-      ${decided ? admFact(I.check, '--mk-2', 'Final level', levelLetters(finalLvl, finalLetters)) : admFact(I.calendar, '--mk-2', 'Report filed', iv.filed || iv.submitted || iv.when)}
       ${admFact(I.starOutline, '--mk-1', 'Candidate rating', iv.rating ? iv.rating + '.0' : '—')}
+      ${decided ? admFact(I.check, '--mk-2', 'Final level', levelLetters(finalLvl, finalLetters)) : admFact(I.calendar, '--mk-2', 'Report filed', iv.filed || iv.submitted || iv.when)}
+      ${admFact(I.video, '--mk-3', 'Source', src)}
+      ${admFact(I.chat, '--mk-4', 'Interview', esc(agIvKind(iv.kind)))}
     </div>
-    ${ivEvalBlock(iv)}
   </section>
+  ${ivRecordingSection(iv.cand, iv.agent)}
+  ${talEvalSection(iv.cand, iv.tal, talType, {talLevel:iv.talLevel, talLetters:iv.talLetters})}
+  ${agentEvalSection(iv.agent, iv.agentLevel, iv.agentLetters, iv)}
   <section class="sec sec-noline">
     ${decided
       ? `<p class="t-desc">${iv.decision === 'approved' ? `You approved ${esc(levelLetters(finalLvl, finalLetters))}.` : `You set ${esc(levelLetters(finalLvl, finalLetters))}, overriding the recommendation.`}${iv.decisionNote ? ' ' + esc(iv.decisionNote) : ''}</p>`
@@ -10517,7 +10690,7 @@ function levellingLog(){
   const dirDd = filterDd('lcdir', 'all', [['all', 'All'], ['Up', 'Up'], ['Down', 'Down'], ['Held', 'Held']], 'Direction');
   /* THE DATE RANGE (Epic 5.1) — a from and a to date, both our own pickers, Optional and
      empty by default; they combine with Source, Direction and search. */
-  const dateRange = `<span class="lc-drange">${filterDate('lcfrom', 'From')}${filterDate('lcto', 'To')}</span>`;
+  const dateRange = `<span class="lc-drange">${filterDate('lcfrom', 'From', 200)}${filterDate('lcto', 'To', 200)}</span>`;
   return `
   <section class="sec">
     ${searchHead('Levelling Log', 'Every level change that has gone live, across every candidate — who moved, who proposed it, who approved it and when it took effect.',
@@ -10628,27 +10801,18 @@ function levellingChange(){
        rating) over the read-only ladder, then the agent's notes (`ivEvalBlock`).
        Data is the log row's own authored fields (§74), consistent with its `to` level. */''}
   ${(() => {
-    const first = esc(String(r.cand).split(' ')[0]);
-    const talRead = r.tal ? r.tal.replace(/<\/p>\s*<p[^>]*>/g, ' ') : (r.reasoning ? `<p>${esc(r.reasoning)}</p>` : '');
-    if(!talRead && !r.agentLevel) return '';
-    /* ONE SECTION for Tal's read + the agent's proposed evaluation (Maryam, 25 Sep 2026:
-       "the heading update was in place of Tal's read, no other heading will be there") —
-       the single heading "{talent agent name} and Tal's Recommendation" REPLACES the
-       "Tal's read" heading; below it sit Tal's read prose, the facts band and the agent's
-       notes, with NO other heading and no inner divider. Without an agent proposal (an
-       admin override) it falls back to just Tal's read under a "Tal's read" heading. */
-    const heading = r.agentLevel ? `${esc(r.proposedBy || 'The agent')} and Tal’s Recommendation` : 'Tal’s read';
-    return `<section class="sec sec-noline">
-      ${aiHead(heading)}
-      ${talRead ? `<div class="tal-eval"><div class="ai-body">${talRead}${r.talType ? `<p class="mt5">Tal reads ${first} as a <b>${esc(r.talType)}</b>.</p>` : ''}</div></div>` : ''}
-      ${r.agentLevel ? `<div class="facts pf-facts">
-        ${admFact(I.video, '--mk-4', 'Agent’s recommendation', levelLetters(r.agentLevel, r.agentLetters))}
-        ${admFact(I.chat, '--mk-3', 'Tal’s suggestion', r.talLevel ? levelLetters(r.talLevel, r.talLetters) : '—')}
-        ${admFact(I.check, '--mk-2', 'Final level', levelLetters(r.to, r.toLetters))}
-        ${admFact(I.starOutline, '--mk-1', 'Candidate rating', r.rating ? r.rating + '.0' : '—')}
-      </div>
-      ${ivEvalBlock({strengths:r.strengths || '', growth:r.growth || '', agent:r.proposedBy || 'The agent', note:r.note || ''})}` : ''}
-    </section>`;
+    /* FOLLOWS THE PAST-INTERVIEW DETAIL LAYOUT (Maryam, 29 Sep 2026): an
+       interview-recording section (only for an interview-based row), then a SEPARATE
+       Tal's-Evaluation section and a SEPARATE agent's-evaluation section (the agent's
+       suggested level + acronyms + strengths/growth/note). An admin override (no
+       agent proposal) shows just Tal's read; a quiz row is handled above. */
+    const talRead = r.tal ? r.tal : (r.reasoning ? `<p>${esc(r.reasoning)}</p>` : '');
+    const collapsed = talRead ? talRead.replace(/<\/p>\s*<p[^>]*>/g, ' ') : '';
+    if(!collapsed && !r.agentLevel) return '';
+    const agent = r.proposedBy || 'The agent';
+    return `${r.agentLevel ? ivRecordingSection(r.cand, agent) : ''}
+      ${talEvalSection(r.cand, talRead, r.talType, {talLevel:r.talLevel, talLetters:r.talLetters})}
+      ${r.agentLevel ? agentEvalSection(agent, r.agentLevel, r.agentLetters, {strengths:r.strengths || '', growth:r.growth || '', agent, note:r.note || ''}) : ''}`;
   })()}
   ${r.reason ? `<section class="sec">
     ${secHead(r.source === 'Admin override' ? 'Override reason' : 'Reviewer override reason')}
@@ -10670,6 +10834,14 @@ function marketBooking(){
     <section class="sec">${emptyState('video', 'Booking not found', 'This interview is no longer on the register.')}</section>`;
   DETAIL_LABEL = `${b.cand} with ${b.agent}`;
   const s = bkStage(b);
+  /* A BOOKED (not-yet-happened) interview reads as the Talent Agents upcoming-interview
+     detail — quiz, talk-about, and (re-interview) the candidate's profile + cohort
+     journey + leader evaluation — not the plain booking/recording/report panels, which
+     only have content once the interview has taken place (Maryam 29 Sep 2026). */
+  if(s === 'booked') return `${detailHead('market/bookings')}
+    <div class="iv-detail-body">
+    ${upcomingInterviewBody(b, bkWhen(b), bkStageTag(b))}
+    </div>`;
   const failedTx = b.transcript === 'Failed';
   const txn = TXNS.find(t => t.cat === 'interview' && t.who === b.cand) || null;
   const plat = b.fee ? Math.round(b.fee * 0.2) : 0, share = (b.fee || 0) - plat;
@@ -10813,7 +10985,7 @@ function marketRecordings(){
   const consentFilter = filterDd('recscenes', 'all', [['all', 'All'], ['Given', 'Given'], ['Withdrawn', 'Withdrawn'], ['Not asked', 'Not asked']], 'SCENES consent');
   const statusFilter = filterDd('recstatus', 'all', [['all', 'All'], ['Available', 'Available'], ['Deleted', 'Deleted']], 'Status');
   const trFilter = filterDd('rectr', 'all', [['all', 'All'], ['Generating', 'Generating'], ['Ready', 'Ready'], ['Failed', 'Failed']], 'Transcript');
-  const dateFilter = `${filterDate('recfrom', 'From')} ${filterDate('recto', 'To')}`;
+  const dateFilter = `${filterDate('recfrom', 'From', 200)} ${filterDate('recto', 'To', 200)}`;
   return `
   <section class="sec">
     ${searchHead('Recordings & Transcripts', 'Every interview recording with its consent state, transcript and status. The register shows that a recording exists, not its content.',
@@ -11606,7 +11778,7 @@ const TX_STATUS_META = {succeeded:['green', 'Succeeded'], pending:['warn', 'Pend
 const txStatusTag = t => { const m = TX_STATUS_META[t.status] || ['', cap(t.status)]; return `<span class="statw${m[0] ? ' ' + m[0] : ''}">${esc(m[1])}</span>`; };
 /* Party carries the account type beneath the name (9.1); the platform is not a
    person, so it reads as a plain two-line cell with no invented face. */
-const txPartyCell = t => t.party === 'Platform' ? idCell(t.who, 'Platform') : personCell(t.who, t.party);
+const txPartyCell = t => t.party === 'Platform' ? platformCell(t.who, 'Platform') : personCell(t.who, t.party);
 /* The split — agent share + platform commission — rides interview + payout rows
    only, and adds back to the gross exactly (9.1/9.2). */
 const txSplitCell = t => t.sp ? `${money(t.sp.share)} agent · ${money(t.sp.com)} platform` : '<span class="t-caption">—</span>';
@@ -11657,7 +11829,6 @@ function financeTransactions(){
     /* Search matches reference, Stripe reference, party name and email (9.1) —
        never the card number (the brand word only, on `methodBrand`). */
     .filter(t => hit(q, t.ref, t.stripeRef, t.who, t.email, t.desc, methodBrand(t.method)));
-  const T = txTotals(rows);
   return `
   <section class="sec">
     ${searchHead('Transactions', 'Every movement of money and rebooking credit — each traced to what caused it.',
@@ -11674,33 +11845,20 @@ function financeTransactions(){
     ${lstTools('Search by reference, Stripe ref, person or email',
       filterDd('txstatus', 'all', [['all', 'All'], ['succeeded', 'Succeeded'], ['pending', 'Pending'], ['failed', 'Failed'], ['active', 'Active'], ['used', 'Used'], ['expired', 'Expired']], 'Status')
       + filterDd('txparty', 'all', [['all', 'All'], ['candidate', 'Candidate'], ['agent', 'Talent Agent'], ['platform', 'Platform']], 'Party type')
-      + filterDate('txfrom', 'From', 100) + filterDate('txto', 'To', 100))}
+      + filterDate('txfrom', 'From', 200) + filterDate('txto', 'To', 200))}
     ${rows.length ? table(
-      [{label:'Reference'}, {label:'Date'}, {label:'Type'}, {label:'Party'}, {label:'Description'}, {label:'Amount', num:true}, {label:'Split'}, {label:'Method'}, {label:'Status'}],
+      [{label:'Reference'}, {label:'Date'}, {label:'Type'}, {label:'Party'}, {label:'Amount', num:true}, {label:'Split'}, {label:'Method'}, {label:'Status'}],
       rows.map(t => ({id:t.id, go:'finance/transaction/' + t.id, sv:[t.ref, t.who], cells:[
         idCell(t.ref, t.stripeRef && t.stripeRef !== '—' ? t.stripeRef : ''),
         idCell(dpFmt(t.date) || t.date, t.time || ''),
         esc(TX_TYPE_LABEL[t.type] || t.type),
         txPartyCell(t),
-        esc(t.desc || t.kind),
         (t.dir === 'out' ? '−' : '') + (t.amt ? money(t.amt) : '—'),
         txSplitCell(t),
         methodMark(t.method),
         txStatusTag(t)
       ]})))
       : emptyState('wallet', 'No transactions match', 'Nothing in this filter yet.')}
-  </section>
-  <section class="sec">
-    ${secHead('Totals for this view')}
-    ${kv([
-      ['Gross taken', money(T.grossTaken), 'n'],
-      ['Held in escrow', money(T.escrow), 'n'],
-      ['Released to agents', money(T.released), 'n'],
-      ['Platform commission', money(T.commission), 'n'],
-      ['Active rebooking credit', money(T.active), 'n'],
-      ['Rebooking credit applied', money(T.applied), 'n'],
-      ['Credit returned to source', money(T.returned), 'n']
-    ])}
   </section>`;
 }
 
@@ -11839,8 +11997,8 @@ function poReleasesCell(p){
   if(p.state === 'paid') return idCell(dpFmt(p.releasedOn) || '—', 'Paid');
   if(p.state === 'returned') return '<span class="t-caption">—</span>';
   if(!p.releases) return `<span class="statw warn">Report outstanding</span>`;
-  const mark = p.runFailed ? `<div class="t-caption" style="color:var(--support-error)">Last run failed: ${esc(p.runFailed)}</div>`
-    : p.noDest ? `<div class="t-caption" style="color:var(--support-attention)">No payout destination — the run skips it</div>` : '';
+  const mark = p.runFailed ? `<div class="t-caption clamptxt" data-tip="${esc('Last run failed: ' + p.runFailed)}" style="color:var(--support-error)">Last run failed: ${esc(p.runFailed)}</div>`
+    : p.noDest ? `<div class="t-caption clamptxt" data-tip="No payout destination — the run skips it" style="color:var(--support-attention)">No payout destination — the run skips it</div>` : '';
   return `${dpFmt(p.releases)}${mark}`;
 }
 /* Payable on the next run: in escrow, a release date set, a destination on file, not
@@ -11866,14 +12024,11 @@ function financePayouts(){
     .filter(p => ff === 'all' ? true : (ff === 'candidate' ? p.funder === 'Candidate' : p.funder === 'Platform'))
     .filter(p => dateInRange(p.ivDate, from, to))
     .filter(p => hit(q, p.agent, p.agentEmail, p.candidate, p.ref));
-  const T = poTotals(rows);
-  const failed = PAYOUTS.filter(p => p.state === 'escrow' && p.runFailed);
   const eligibleAll = PAYOUTS.filter(poEligible);
   return `
   <section class="sec">
     ${searchHead('Payouts', `An agent’s share per interview, out of escrow ${SETTINGS.payoutDelay} working days after the report on the weekly ${SETTINGS.payoutRunDay} run.`,
       `${finExportBtn('Payouts')} ${eligibleAll.length ? `<button class="btn btn-g btn-sm noic" data-act="askrunweekly">${I.renew} Run Weekly Run</button>` : ''}`, 'Search by agent or candidate')}
-    ${failed.length ? note('warn', `A payout run could not complete ${failed.length} payment${failed.length === 1 ? '' : 's'}`, `The weekly run on ${dpFmt(failed[0].releases)} failed for ${failed.map(p => esc(p.agent)).join(', ')}. Those payouts stay In escrow and the next run will pick them up. The reason the provider gave is shown on each row.`) : ''}
     ${filterStrip('pstate', 'all', [
       ['all', 'All', PAYOUTS.length],
       ['escrow', 'In escrow', PAYOUTS.filter(p => p.state === 'escrow').length],
@@ -11882,9 +12037,9 @@ function financePayouts(){
     ])}
     ${lstTools('Search by agent name, email or candidate',
       filterDd('pfund', 'all', [['all', 'All'], ['candidate', 'Candidate'], ['platform', 'Platform']], 'Funded by')
-      + filterDate('pfrom', 'From', 100) + filterDate('pto', 'To', 100))}
+      + filterDate('pfrom', 'From', 200) + filterDate('pto', 'To', 200))}
     ${rows.length ? table(
-      [{label:'Agent'}, {label:'Candidate'}, {label:'Interview'}, {label:'Amount', num:true}, {label:'Funded by'}, {label:'State'}, {label:'Releases'}, ACT_COL],
+      [{label:'Agent', w:220}, {label:'Candidate'}, {label:'Interview'}, {label:'Amount', num:true}, {label:'Funded by'}, {label:'State'}, {label:'Releases'}, ACT_COL],
       rows.map(p => ({id:p.id, sv:[p.agent, p.candidate], cells:[
         personCell(p.agent, p.agentEmail),
         personCell(p.candidate, ''),
@@ -11898,14 +12053,6 @@ function financePayouts(){
           : [])
       ]})), {select:false})
       : emptyState('bank', 'No payouts match', 'Nothing in this filter yet.')}
-  </section>
-  <section class="sec">
-    ${secHead('Totals for this view')}
-    ${kv([
-      ['Held in escrow', money(T.escrow), 'n'],
-      ['Blocked by an outstanding report', money(T.blocked), 'n'],
-      ['Value of the next weekly run', money(T.nextRun), 'n']
-    ])}
   </section>`;
 }
 
@@ -12007,12 +12154,10 @@ function financeReconciliation(){
     .filter(s => sf === 'all' ? true : s.status === sf)
     .filter(s => dateInRange(s.sent, from, to))
     .filter(s => hit(q, s.ref, s.providerRef));
-  const errs = SETTLEMENTS.filter(s => s.ingestErr);
   return `
   <section class="sec">
     ${searchHead('Reconciliation', 'Match what Stripe says it paid against what the platform released, so a difference is found before it becomes a missing payout.',
       finExportBtn('Reconciliation'), 'Search by batch or provider reference')}
-    ${errs.length ? note('warn', `An ingestion could not complete on ${errs.length} batch${errs.length === 1 ? '' : 'es'}`, `${errs.map(s => `${esc(s.ref)}: ${esc(s.ingestErr)}`).join(' · ')}. The batch keeps its status until the report is re-checked.`) : ''}
     ${filterStrip('bstatus', 'all', [
       ['all', 'All', SETTLEMENTS.length],
       ['sent', 'Sent', SETTLEMENTS.filter(s => s.status === 'sent').length],
@@ -12021,7 +12166,7 @@ function financeReconciliation(){
       ['discrepancy', 'Discrepancy', SETTLEMENTS.filter(s => s.status === 'discrepancy').length],
       ['failed', 'Failed', SETTLEMENTS.filter(s => s.status === 'failed').length]
     ])}
-    ${lstTools('Search by batch or provider reference', filterDate('bfrom', 'From', 100) + filterDate('bto', 'To', 100))}
+    ${lstTools('Search by batch or provider reference', filterDate('bfrom', 'From', 200) + filterDate('bto', 'To', 200))}
     ${rows.length ? table(
       [{label:'Batch'}, {label:'Sent'}, {label:'Items', num:true}, {label:'Platform total', num:true}, {label:'Provider total', num:true}, {label:'Difference', num:true}, {label:'Status'}],
       rows.map(s => { const d = batchDiff(s); return {id:s.id, go:'finance/batch/' + s.id, sv:[s.ref], cells:[
@@ -12164,6 +12309,8 @@ KINDS.fee = {
 const FEE_VALUE_LABEL = {commission:'Agent commission', delay:'Payout release delay', runday:'Payout run day'};
 const feeISO = e => { const d = (e.on || '').split(',')[0].trim(); return /^\d{4}-\d{2}-\d{2}$/.test(d) ? d : ''; };
 const feeOnFmt = e => { const iso = feeISO(e); const tail = e.on && e.on.includes(',') ? e.on.split(',').slice(1).join(',').trim() : ''; return `${iso ? dpFmt(iso) : (e.on || '')}${tail ? ' · ' + tail : ''}`; };
+/* Changed-on as two rows — the date over the time (Maryam 29 Sep 2026). */
+const feeOnCell = e => { const iso = feeISO(e); const tail = e.on && e.on.includes(',') ? e.on.split(',').slice(1).join(',').trim() : ''; return idCell(iso ? dpFmt(iso) : (e.on || ''), tail); };
 /* EPIC 9.4 — FEE SETTINGS. The read-only record of every fee value ever set or
    changed: per-agent commissions and the two Settings money values (release delay,
    run day). Value type is the primary TAB STRIP; date range + search in the toolbar.
@@ -12180,34 +12327,25 @@ function financeFeeSettings(){
   <section class="sec">
     ${searchHead('Fee Settings', 'The record of every fee value ever set or changed. It is read-only and cannot be edited or cleared by anyone.',
       finExportBtn('Fee Settings'), 'Search by agent or who changed it')}
-    ${note('info', 'Commission is per agent — there is no platform-wide rate', 'Set or change a commission on the agent’s own record in Talent Agents (Change fee, with the step-up prompt). The payout release delay and run day live in Settings; their history is here.')}
     ${filterStrip('fvtype', 'all', [
       ['all', 'All', FEE_LOG.length],
       ['commission', 'Agent commission', FEE_LOG.filter(e => e.valueType === 'commission').length],
       ['delay', 'Payout release delay', FEE_LOG.filter(e => e.valueType === 'delay').length],
       ['runday', 'Payout run day', FEE_LOG.filter(e => e.valueType === 'runday').length]
     ])}
-    ${lstTools('Search by agent, email or who changed it', filterDate('ffrom', 'From', 100) + filterDate('fto', 'To', 100))}
+    ${lstTools('Search by agent, email or who changed it', filterDate('ffrom', 'From', 200) + filterDate('fto', 'To', 200))}
     ${rows.length ? table(
-      [{label:'Value'}, {label:'Agent'}, {label:'From'}, {label:'To'}, {label:'Changed by'}, {label:'Changed on'}, {label:'Reason'}],
+      [{label:'Value'}, {label:'Agent', w:220}, {label:'From'}, {label:'To'}, {label:'Changed by'}, {label:'Changed on'}, {label:'Reason'}],
       rows.map(e => ({cells:[
         esc(FEE_VALUE_LABEL[e.valueType] || e.valueType),
         e.valueType === 'commission' ? personCell(e.agent, e.agentEmail) : '<span class="t-caption">—</span>',
         esc(e.from),
         `<b>${esc(e.to)}</b>`,
         idCell(e.changedBy, e.role),
-        esc(feeOnFmt(e)),
-        esc(e.reason)
+        feeOnCell(e),
+        clampCell(e.reason)
       ]})), {select:false})
       : emptyState('scale', 'No fee changes match', 'Nothing in this filter yet.')}
-  </section>
-  <section class="sec">
-    ${secHead('Current Settings values')}
-    ${kv([
-      ['Payout release delay', `${SETTINGS.payoutDelay} working days after a report is filed`],
-      ['Payout run day', esc(SETTINGS.payoutRunDay)]
-    ])}
-    <p class="t-caption">These two values are held in Settings; their change history is above.</p>
   </section>`;
 }
 /* SET / CHANGE COMMISSION (9.4) — on the agent record. Change fee permission +
@@ -14614,6 +14752,42 @@ function placeRowMenu(){
   list.style.top = top + 'px';
   list.style.bottom = 'auto';
 }
+
+/* CLAMPED-CELL HOVER TOOLTIP (Maryam 29 Sep 2026). A `.clamptxt` cell shows only
+   two lines; hovering it opens the whole text in a floating block. The table's
+   scroller clips overflow both ways (`.tbl-wrap`), so — like the row menu (§125) —
+   the tip is lifted into `.main` and positioned in main's own (unscaled) content
+   coordinates, dividing by the frame's fit-to-pane scale. Shown only when the text
+   is actually truncated. Delegated on `device`, which survives every re-render. */
+let CLAMP_TIP = null;
+function clampTipHide(){ if(CLAMP_TIP && CLAMP_TIP.parentNode) CLAMP_TIP.remove(); }
+function clampTipShow(el){
+  const truncated = el.scrollHeight > el.clientHeight + 1 || el.scrollWidth > el.clientWidth + 1;
+  if(!truncated) return;
+  const main = device.querySelector('.main'); if(!main) return;
+  const tip = CLAMP_TIP || (CLAMP_TIP = document.createElement('div'));
+  tip.className = 'clamp-tip';
+  tip.textContent = el.getAttribute('data-tip') || el.textContent;
+  tip.style.display = 'block';
+  main.style.position = 'relative';
+  main.appendChild(tip);
+  const mr = main.getBoundingClientRect();
+  const scale = mr.width / main.clientWidth || 1;
+  const er = el.getBoundingClientRect();
+  const elLeft   = (er.left   - mr.left) / scale + main.scrollLeft;
+  const elTop    = (er.top    - mr.top ) / scale + main.scrollTop;
+  const elBottom = (er.bottom - mr.top ) / scale + main.scrollTop;
+  const contentW = main.clientWidth, frameH = main.clientHeight, edge = 8, gap = 6;
+  const tipW = tip.offsetWidth, tipH = tip.offsetHeight;
+  let left = Math.max(edge, Math.min(elLeft, contentW - tipW - edge));
+  let top = elBottom + gap;
+  if(top + tipH > main.scrollTop + frameH && elTop - gap - tipH >= main.scrollTop) top = elTop - gap - tipH;
+  tip.style.left = left + 'px';
+  tip.style.top = top + 'px';
+}
+device.addEventListener('mouseover', e => { const el = e.target.closest && e.target.closest('.clamptxt[data-tip]'); if(el) clampTipShow(el); });
+device.addEventListener('mouseout', e => { const el = e.target.closest && e.target.closest('.clamptxt[data-tip]'); if(el && !el.contains(e.relatedTarget)) clampTipHide(); });
+device.addEventListener('scroll', clampTipHide, true);
 
 function render(){
   /* OPENING A SIDE DRAWER SHUTS THE RAIL (Maryam's QA, 23 Sep 2026: "when the

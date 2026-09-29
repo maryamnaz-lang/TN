@@ -267,22 +267,21 @@
 .app .form-page .auth-id{
   box-sizing:border-box;
   padding:20px;
-  /* A TINTED ACCENT CHIP, NOT A SOLID RED BLOCK. It read solid `--accent`
-     (#f9423a) with white text (Maryam, 17 Sep 2026, earlier the same day);
-     she then asked for "the inner text to be in accent color and the bg color
-     to be in lightest accent color tone" — the rank-chip pattern. So the
-     ground is the lightest accent tint (`--accent` at 12% over white) and the
-     ink is `--accent-text` (#c2332d, the accent as INK, 5.5:1 on white and
-     tuned for AA on a near-white ground — plain `--accent` fails AA on this
-     tint). The address, the label and the "Not you?" link all read it. */
-  background-color:color-mix(in srgb, var(--accent) 12%, #fff);
+  /* A NEUTRAL GREY CHIP, BLACK TEXT. It was a solid `--accent` block with white
+     text, then (17 Sep 2026) a lightest-accent tint with `--accent-text` ink;
+     Maryam then asked (29 Sep 2026) for "black text inside and the bg #000000 at
+     3% opacity". So the ground is black at 3% (a stated value, like the
+     platform's other overlay washes) and every string in it (the label, the
+     address value and the "Not you?" link) reads `--text-primary` #111, the
+     platform black. The address value inherits this `color`. */
+  background-color:rgba(0,0,0,.03);
   border-radius:var(--auth-r);
-  color:var(--accent-text)}
+  color:var(--text-primary)}
 
 .app .form-page .auth-id-l{
   display:block;
   font-size:13.5px;line-height:20px;letter-spacing:.16px;
-  color:var(--accent-text)}
+  color:var(--text-primary)}
 
 /* THE VALUE AND THE WAY OUT ON ONE BASELINE. `align-items:baseline` and not
    `center`: the two are different sizes, and centring them on the box puts the
@@ -293,13 +292,13 @@
   margin-top:4px;
   font-size:16px;line-height:24px;font-weight:600;letter-spacing:0}
 
-/* THE LINK RIDES THE SAME ACCENT INK, UNDERLINED. On the old solid-red panel
-   it was white (the only readable non-blue there); on the tinted chip it takes
-   `--accent-text` like the rest of the panel and stays underlined so it still
-   reads as a link with no second colour in play. */
+/* THE LINK RIDES THE SAME BLACK INK, UNDERLINED. It was white on the solid-red
+   panel, then `--accent-text` on the tinted chip; on the neutral grey chip it
+   takes `--text-primary` like the rest of the panel and stays underlined so it
+   still reads as a link with no second colour in play. */
 .app .form-page .auth-id-v a{
   font-size:13.5px;line-height:20px;font-weight:400;
-  color:var(--accent-text);text-decoration:underline;text-underline-offset:2px}
+  color:var(--text-primary);text-decoration:underline;text-underline-offset:2px}
 
 /* the section holding it pays the vertical only — the sides belong to the
    card's padding at desktop and to `--pad-x` on the phone, which is §17's
