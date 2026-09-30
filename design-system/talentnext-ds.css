@@ -14,7 +14,7 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 6383.  Rules dropped as product-specific: 222.
+   Rules kept: 6399.  Rules dropped as product-specific: 222.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
@@ -3672,6 +3672,10 @@ button{font-family:var(--font-sans)}
 .app .notif .nrow-ic svg{width:20px; height:20px}
 .app .notif .nrow-b{grid-column:2; grid-row:1; margin:0}
 .app .notif .nrow-w{grid-column:2; grid-row:2; position:static; margin:0}
+.app .notif .nrow-info{padding-right:calc(var(--pad-x) + var(--s07))}
+.app .notif .nrow-x{position:absolute; top:var(--s05); right:var(--pad-x); z-index:1; display:flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:999px; cursor:pointer; color:var(--text-helper)}
+.app .notif .nrow-x svg{width:16px; height:16px}
+.app .notif .nrow-x:hover{color:var(--text-primary); background:var(--surface-2)}
 .app .notif-scrim{position:absolute; inset:0; z-index:49; background:var(--overlay); opacity:0; visibility:hidden; pointer-events:none; transition:opacity var(--dur-standard) var(--ease-standard),visibility var(--dur-standard)}
 @container app (min-width:900px){
   .app .notif-scrim.on{opacity:1; visibility:visible; pointer-events:auto}
@@ -5565,7 +5569,7 @@ button.btn-p:active,
 .app .tag.rec-tag{height:20px; padding:0 var(--s03); border-radius:999px}
 .app .tag.rec-tag[style]{color:var(--mk); border-color:transparent; background-color:color-mix(in srgb, var(--mk) 12%, var(--layer-01))}
 .app[data-portal="leader"] .tbl-flag td{border-bottom:0}
-.app[data-portal="leader"] .tbl-flag th{border-bottom-color:var(--rule)}
+.app[data-portal="leader"] .tbl th{border-bottom-color:var(--rule)}
 .app[data-portal="leader"] .tbl-flag tr:first-child + tr td{padding-top:var(--s06)}
 .app[data-portal="leader"] .tbl-flag td{vertical-align:middle}
 .app[data-portal="leader"] .tbl-flag .tbl-act .btn{min-height:24px; padding-left:0; padding-right:0}
@@ -5625,7 +5629,7 @@ button.btn-p:active,
 }
 .app .lead-cohd{display:grid; gap:var(--s05)}
 .app .lead-cohd-id{display:flex; flex-direction:column; gap:2px}
-.app .lead-cohd-n{font-size:var(--t-h1-size); line-height:var(--t-h1-lh); font-weight:var(--t-w-strong); color:var(--text-primary)}
+.app .lead-cohd-n{font-size:var(--t-h1-size); line-height:var(--t-h1-lh); font-weight:var(--t-w-strong); color:var(--accent-text)}
 .app .lead-cohd-course{font-size:var(--t-desc-size); line-height:normal; color:var(--text-secondary)}
 .app .lead-cohd-day{display:flex; flex-wrap:wrap; align-items:baseline; gap:var(--s03) var(--s05)}
 .app .lead-cohd-dw{display:inline-flex; align-items:baseline; gap:var(--s03)}
@@ -5914,8 +5918,15 @@ button.btn-p:active,
 .app .ldr-dm{display:flex; flex-direction:column; gap:var(--s06)}
 .app .ldr-dm-thread{display:flex; flex-direction:column; min-width:0}
 .app .ldr-dm-list{display:flex; flex-direction:column; min-width:0}
-.app .ldr-dm-lh{display:flex; align-items:baseline; justify-content:space-between; gap:var(--s04); padding:var(--s04) var(--s05); border-bottom:1px solid var(--rule); font-size:13px; line-height:18px; font-weight:600; letter-spacing:.1px}
-.app .ldr-dm-t{display:flex; align-items:center; gap:var(--s04); width:100%; padding:var(--s04) var(--s05); border:0; border-bottom:1px solid var(--border-subtle-01); background-color:transparent; text-align:left; cursor:pointer; transition:background-color var(--dur-short) var(--ease-standard)}
+.app .ldr-dm{--dm-h:calc(19px + 17px + 1px + var(--s04) * 2 + 1px); --dm-row-h:calc(var(--dm-h) + 10px)}
+.app .ldr-dm-lh{display:flex; align-items:center; justify-content:space-between; gap:var(--s04); padding:var(--s04) var(--s05); min-height:var(--dm-h); border-bottom:1px solid var(--rule); font-size:13px; line-height:18px; font-weight:600; letter-spacing:.1px}
+.app .ldr-dm-srch{display:flex; align-items:center; gap:var(--s03); padding:var(--s04) var(--s05); border-bottom:1px solid var(--rule)}
+.app .ldr-dm-srch > svg{width:18px; height:18px; flex:none; color:var(--text-helper)}
+.app .ldr-dm-srch > input{flex:1; min-width:0; border:0; background:transparent; padding:0; font:inherit; font-size:13px; line-height:20px; color:var(--text-primary)}
+.app .ldr-dm-srch > input::placeholder{color:var(--text-secondary)}
+.app .ldr-dm-srch > input:focus{outline:none}
+.app .ldr-dm-rows{display:flex; flex-direction:column; min-height:0}
+.app .ldr-dm-t{display:flex; align-items:center; gap:var(--s04); width:100%; padding:var(--s04) var(--s05); min-height:var(--dm-row-h); border:0; border-bottom:1px solid var(--border-subtle-01); background-color:transparent; text-align:left; cursor:pointer; transition:background-color var(--dur-short) var(--ease-standard)}
 .app .ldr-dm-t:last-child{border-bottom:0}
 .app .ldr-dm-t.on{background-color:var(--surface-2); box-shadow:inset 2px 0 0 var(--text-primary)}
 .app .ldr-dm-t > .mem-av{width:36px; height:36px; flex:none; position:relative; overflow:hidden; background-color:var(--gray-80)}
@@ -5924,13 +5935,13 @@ button.btn-p:active,
 .app .ldr-dm-tx{font-size:12px; line-height:17px; color:var(--text-secondary); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 .app .ldr-dm-tw{flex:none; align-self:flex-start; font-size:11px; line-height:15px; letter-spacing:.2px; color:var(--text-helper); font-variant-numeric:tabular-nums}
 .app .ldr-dm-dot{width:7px; height:7px; flex:none; border-radius:50%; background-color:var(--accent)}
-.app .ldr-dm-h{display:flex; align-items:center; gap:var(--s04); flex:none; padding:var(--s04) var(--s05); border-bottom:1px solid var(--rule)}
+.app .ldr-dm-h{display:flex; align-items:center; gap:var(--s04); flex:none; padding:var(--s04) var(--s05); min-height:var(--dm-h); border-bottom:1px solid var(--rule)}
 .app .ldr-dm-h > .mem-av{width:36px; height:36px; flex:none; position:relative; overflow:hidden; background-color:var(--gray-80)}
 .app .ldr-dm-hb{display:flex; flex-direction:column; gap:1px; min-width:0}
 .app .ldr-dm-hb b{font-size:14px; line-height:19px; font-weight:600; letter-spacing:-.05px}
 .app .ldr-dm-hb > span{font-size:12px; line-height:17px; color:var(--text-secondary)}
 .app .ldr-dm-thread > .msgs{padding:var(--s05)}
-.app .ldr-dm-thread > .composer{flex:none; margin:0 var(--s05) var(--s05)}
+.app .ldr-dm-thread > .composer{flex:none; margin:0 var(--s05)}
 .app .crs-card{display:flex; flex-direction:column; align-items:flex-start; gap:var(--s03); text-align:left}
 .app .crs-card > .crs-name,
 .app .crs-card > .crs-desc{text-align:left; width:100%; margin:0}
@@ -5950,7 +5961,7 @@ button.btn-p:active,
 }
 .app .ldr-dm-back{flex:none; margin-right:var(--s02)}
 .app .main:has(> .msg-mod){display:flex; flex-direction:column; flex:1; min-height:0; padding-left:0; padding-right:0}
-.app .page.msg-mod{display:flex; flex-direction:column; flex:1 1 auto; min-height:0; width:100%; max-width:100%; box-sizing:border-box; padding-bottom:var(--s06)}
+.app .page.msg-mod{display:flex; flex-direction:column; flex:1 1 auto; min-height:0; width:100%; max-width:100%; box-sizing:border-box; padding-bottom:0}
 .app .page.msg-mod > .sec.ldr-dm-sec{display:flex; flex-direction:column; flex:1 1 auto; min-height:0}
 .app .page.msg-mod > .sec.ldr-dm-sec > .ldr-dm{flex:1 1 auto; min-height:0}
 .app .main:has(> .msg-mod),
@@ -6050,6 +6061,10 @@ button.btn-p:active,
 .app .ldr-eval-a{display:flex; gap:var(--s04)}
 .app .ldr-draft-note{margin-top:var(--s04); font-size:var(--t-caption-size); color:var(--text-helper)}
 .app .f-req-err{font-size:var(--t-caption-size); color:var(--support-error); font-weight:var(--t-w-book); margin-left:var(--s02)}
+.app[data-portal="leader"] .page > .sec:has(> .lead-cohd){padding-bottom:var(--s05)!important}
+.app[data-portal="leader"] .page > .lead-callsec{padding-top:var(--s05)!important; padding-bottom:var(--s05)!important}
+.app[data-portal="leader"] .page > .lead-callsec::after{content:none!important}
+.app[data-portal="leader"] .page > .sec:has(> .lead-counts){padding-top:var(--s05)!important}
 
 /* ---- 37-refit.css ---- */
 .app .page > .rail-wrap:has(+ .sec){position:relative}
@@ -9498,7 +9513,8 @@ button.btn-p:active,
 .app .lcal-slot{flex:none; align-self:stretch; aspect-ratio:1; margin:-1px 0 -1px -1px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; padding:var(--s04); text-align:center; background-color:color-mix(in srgb, var(--on-dark) 5%, transparent)}
 .app .lcal-slot-ic{line-height:0; margin-bottom:2px}
 .app .lcal-slot-ic svg{width:18px; height:18px; display:block}
-.app .lcal-next > .lcal-body{flex:1 1 auto; min-width:0; display:flex; flex-direction:column; align-items:stretch; gap:var(--s04); padding:var(--s05)}
+.app .lcal-next > .lcal-body{flex:1 1 auto; min-width:0; display:flex; flex-direction:column; align-items:stretch; gap:var(--s04); padding:var(--s07) var(--s07) var(--s07) var(--s05)}
+.app .lcal-next .lcal-f > .btn{min-height:40px}
 .app .lcal-timerbox{margin-left:auto; flex:none; display:inline-flex; align-items:center; gap:var(--s02); white-space:nowrap}
 .app .lcal-timerbox svg{width:15px; height:15px; flex:none}
 .app .lcal-seatsrow{display:flex; align-items:center; gap:var(--s03); min-width:0}

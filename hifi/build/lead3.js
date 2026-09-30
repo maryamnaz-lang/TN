@@ -74,74 +74,86 @@ S.ldrSes = null;
    derived (§74), and one seeded session reads "Attendance unavailable".
    ========================================================================== */
 
-/* the "what this session is" line the highlighted card and the rows share */
-const sesMeta = (c, s) => `${c.members.length} candidates &middot; ${levelsLabel(c)} &middot; ${lcourse(c)} &middot; ${s.dur} min &middot; week ${s.week} of 13`;
+/* THE LEADER SCHEDULES NOTHING (Maryam, 30 Sep 2026: "a cohort leader can not
+   schedule a session or edit or cancel it"). The Sessions page is view + join:
+   the "Schedule a session" button and every Edit/Cancel control are gone (the
+   sheets `leadSessionSheet`/`leadCancelSheet` and their handlers stay defined,
+   unreachable). This reverses the 12.5 story's "the leader schedules them" — the
+   series is set for them; they read it and join. */
 
-/* the next-session card (12.5): highlighted, with Join (5-minute gate) */
-function sesNextCard(c, s){
-  const joinable = sesJoinable(s);
-  return `<div class="ses-next">
-    <div class="ses-next-h">
-      <div class="ses-next-id">
-        <span class="ses-next-eyebrow">Next session &middot; ${sesCountdown(s)}</span>
-        <h3 class="ses-next-t">${s.title}</h3>
-        <span class="ses-next-when">${s.date} &middot; ${s.time} (${LEAD_TZ})</span>
-      </div>
-      ${leadEditable(c) ? `<div class="ses-next-a">
-        <button class="btn btn-t btn-sm ic-l" data-sesedit="${s.id}">${I.edit} Edit</button>
-        <button class="btn btn-t btn-sm ic-l ses-cancel-b" data-sescancel="${s.id}">${I.close} Cancel</button>
-      </div>` : ''}
-    </div>
-    <div class="ses-next-cov"><span class="ses-next-ch">${s.chapter}</span><span class="ses-next-sub">${sesMeta(c, s)}</span></div>
-    ${s.cover ? `<p class="ses-next-note">${s.cover}</p>` : ''}
-    <div class="ses-next-foot">
-      <button class="btn btn-p noic" data-call="cohort" ${joinable?'':'disabled'}>${I.video} Join Call</button>
-      <span class="ses-next-hint">${joinable ? 'The room is open.' : 'Join opens 5 minutes before the start.'}</span>
-    </div>
-  </div>`;
-}
-
-/* an upcoming (not-next) or past session row */
-function sesRow(c, s){
-  const past = sesPast(s);
-  const cancelled = s.status === 'cancelled';
+/* AN UPCOMING OR PAST SESSION ROW, ON THE TALENT-AGENT `.bk-row` DIARY SHAPE
+   (Maryam, 30 Sep 2026: "for upcoming sessions ui, please use the ui i am
+   attaching from talent agent portal but show the data according to cohort
+   leader session"). A left day/time column against a hairline, the call mark,
+   the call + its chapter, and the session's state at the right end. A cohort
+   call is not a person, so the face slot the agent row wears holds the `I.video`
+   call mark (§31's own `.bk-row` default; the phone drops it). Time reads 12-hour
+   to match the black card above. A past HELD session opens its attendance
+   record; an upcoming one is read-only. */
+const WDAY = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const sesDayLbl = s => { const d = new Date(s.dISO + 'T00:00:00'); return WDAY[d.getDay()] + ' ' + d.getDate(); };
+const t12 = hhmm => { let [h,m] = String(hhmm||'').split(':').map(Number); const ap = h>=12?'PM':'AM'; h = h%12||12; return h + ':' + String(m||0).padStart(2,'0') + ' ' + ap; };
+function sesBkRow(c, s){
+  const past = sesPast(s), cancelled = s.status === 'cancelled';
+  const day = `<span class="bk-day"><span class="d">${sesDayLbl(s)}</span><span class="n">${t12(s.time)}</span></span>`;
+  /* THE ROW TITLE IS "Week {n} Cohort Session" (Maryam 30 Sep 2026, was "Cohort N
+     call · weekly"). The week is the session's own (`s.week`), or derived from its
+     date against the cohort start. The "weekly" repeat tag is dropped — every
+     session in the series is weekly, so it said nothing. */
+  const wk = s.week || leadWeek(sesDayOf(c, s.dISO));
+  const body = `<span class="cardrow-b">
+      <span class="cardrow-t">Week ${wk} Cohort Session</span>
+      <span class="cardrow-s">${s.chapter}${cancelled&&s.reason?` &middot; ${s.reason}`:''}</span></span>`;
   let mark;
   if(cancelled) mark = `<span class="ses-mark ses-cancelled">Cancelled</span>`;
   else if(!past) mark = `<span class="ses-mark ses-upcoming">${sesCountdown(s)}</span>`;
   else if(s.unavail) mark = `<span class="ses-mark ses-na">Attendance unavailable</span>`;
-  else { const held = leadHeld(c); const reg = leadRegister(c, s); const att = reg.filter(x=>x.r&&x.r.att).length;
+  else { const reg = leadRegister(c, s); const att = reg.filter(x=>x.r&&x.r.att).length;
     mark = `<span class="ses-mark ses-att">${att} of ${reg.length} attended</span>`; }
-  const open = past && !cancelled;   /* a held session opens its attendance record */
-  const tag = `<span class="ses-row-b">
-      <span class="ses-row-t">${s.title}${s.repeat!=='none'?' <span class="ses-repeat">weekly</span>':''}</span>
-      <span class="ses-row-s">${s.date} &middot; ${s.time} &middot; ${s.chapter}${cancelled&&s.reason?` &middot; ${s.reason}`:''}</span>
-    </span>`;
-  if(open) return `<button class="ses-row clk" data-go="leadSession" data-ldrses="${s.id}">${tag}${mark}<span class="ses-row-go">${I.chevRight}</span></button>`;
-  return `<div class="ses-row">${tag}${mark}${!past && !cancelled && leadEditable(c) ? `<span class="ses-row-a">
-    <button class="btn btn-t btn-sm ic-l" data-sesedit="${s.id}" aria-label="Edit">${I.edit}</button>
-    <button class="btn btn-t btn-sm ic-l ses-cancel-b" data-sescancel="${s.id}" aria-label="Cancel">${I.close}</button></span>` : ''}</div>`;
+  /* NO VIDEO-CALL MARK (Maryam 30 Sep 2026, "remove the video call icon") — the
+     day/time column already says what the row is; the glyph added nothing. */
+  if(past && !cancelled)
+    return `<button class="cardrow bk-row clk" data-go="leadSession" data-ldrses="${s.id}">${day}${body}${mark}<svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg></button>`;
+  return `<div class="cardrow bk-row">${day}${body}${mark}</div>`;
 }
 
 V.leadSessions = () => {
   const c = leadLive();
   if(!c) return `<main class="main"><div class="page">${ph('Sessions')}
     <div class="sec"><div class="empty" style="border:0">${I.calendar}<h3>You are not leading a cohort at the moment.</h3>
-      <p>Scheduling a session needs a current cohort.</p></div></div></div></main>`;
+      <p>Your sessions appear here while you are leading a cohort.</p></div></div></div></main>`;
   const all = leadSessionsOf(c);
   const next = leadNextSession(c);
   const upcoming = all.filter(s => sesEnd(s) >= LEAD_NOW && s.id !== (next&&next.id));
   const past = all.filter(s => sesEnd(s) < LEAD_NOW).reverse();
   return `<main class="main"><div class="page">
   ${ph('Sessions')}
-  <div class="sec">
-    <div class="sec-h"><h2>Schedule</h2>
-      ${leadEditable(c) ? `<button class="btn btn-p btn-sm ic-l" data-sesnew="1">${I.add} Schedule a session</button>` : ''}</div>
-    ${next ? sesNextCard(c, next) : `<div class="empty" style="border:0">${I.calendar}<h3>No session is scheduled yet.</h3>${leadEditable(c)?'<p>Schedule the cohort&rsquo;s next call above.</p>':''}</div>`}
-  </div>
-  ${upcoming.length ? `<div class="sec"><div class="sec-h"><h2>Upcoming</h2></div>
-    <div class="tile-stack ses-list">${upcoming.map(s=>sesRow(c,s)).join('')}</div></div>` : ''}
-  ${past.length ? `<div class="sec tint"><div class="sec-h"><h2>Past sessions</h2></div>
-    <div class="tile-stack ses-list">${past.map(s=>sesRow(c,s)).join('')}</div></div>` : ''}
+  ${''/* THE NEXT SESSION IS THE BLACK CALL CARD (Maryam, 30 Sep 2026: "bring
+        back the black card for call") — `leadCallCard`, the same appointment
+        drawing the dashboard and the cohort page, with its gated Join. It is its
+        own `.sec.dark-card`, so it takes the `--pad-x` gutter and the page reads
+        with the padding every other page has (the pink `.ses-next` card, and the
+        full-bleed `.ses-row` list it sat over, were the missing-gutter cause). */}
+  ${next ? leadCallCard(lcall(c)) : `<div class="sec"><div class="empty" style="border:0">${I.calendar}<h3>No session is scheduled yet.</h3></div></div>`}
+  ${''/* TWO TABS — Upcoming / Past sessions (Maryam 30 Sep 2026: "instead of this
+        long page, i need 2 tabs of Upcoming and Past Sessions"). The two lists
+        were stacked down one scroll; they are one `.sec.sec-cs` strip now, the
+        same `.cs` mechanism the cohort page uses (`data-ldrsestab` → `S.ldrSesTab`).
+        The count rides each tab. */}
+  ${(() => {
+    const tab = S.ldrSesTab || 'upcoming';
+    const rows = tab === 'past' ? past : upcoming;
+    const empty = tab === 'past'
+      ? `<div class="empty" style="border:0">${I.calendar}<h3>No past sessions yet</h3><p>Sessions move here once they have run.</p></div>`
+      : `<div class="empty" style="border:0">${I.calendar}<h3>Nothing else upcoming</h3><p>The next session is the one above.</p></div>`;
+    return `<div class="sec sec-cs">
+      <div class="cs">
+        <button class="${tab === 'upcoming' ? 'on' : ''}" data-ldrsestab="upcoming">Upcoming${upcoming.length?` <span class="lf-n">${upcoming.length}</span>`:''}</button>
+        <button class="${tab === 'past' ? 'on' : ''}" data-ldrsestab="past">Past sessions${past.length?` <span class="lf-n">${past.length}</span>`:''}</button>
+      </div>
+      ${rows.length ? `<div class="tile-stack ses-list">${rows.map(s=>sesBkRow(c,s)).join('')}</div>` : empty}
+    </div>`;
+  })()}
 </div></main>`;
 };
 

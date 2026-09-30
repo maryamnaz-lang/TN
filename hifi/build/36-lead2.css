@@ -565,12 +565,50 @@
 .app .ldr-dm-list{display:flex;flex-direction:column;min-width:0}
 
 /* the list's own caption. It is not a `.sec-h` — it is inside a panel — so it
-   takes the sheet heading's step down, the same one §36.1 gives `.ldr-sh`. */
+   takes the sheet heading's step down, the same one §36.1 gives `.ldr-sh`.
+   TWO HEIGHTS, STATED ONCE EACH (Maryam 30 Sep 2026, in this order):
+   `--dm-h`   — the caption `.ldr-dm-lh` AND the thread banner `.ldr-dm-h` are
+                THIS height, and equal ("the direct messages block height should
+                be equal to the right side chat person banner"). It is what sets
+                the banner: its two-line `.ldr-dm-hb` stack (19px name + 17px sub
+                + 1px gap, which just tops the 36px `.mem-av`) + the shared `--s04`
+                top/bottom padding + the 1px foot border. Derived, not pinned
+                (trap 20).
+   `--dm-row-h`— each CONVERSATION ROW `.ldr-dm-t` is `--dm-h` + 10px ("the height
+                of the chat block should be increased to +10px"). Only the rows
+                grow; the caption and banner stay equal to each other, so the
+                header does not outgrow the banner. */
+.app .ldr-dm{
+  --dm-h:calc(19px + 17px + 1px + var(--s04) * 2 + 1px);
+  --dm-row-h:calc(var(--dm-h) + 10px)}
 .app .ldr-dm-lh{
-  display:flex;align-items:baseline;justify-content:space-between;gap:var(--s04);
+  display:flex;align-items:center;justify-content:space-between;gap:var(--s04);
   padding:var(--s04) var(--s05);
+  min-height:var(--dm-h);
   border-bottom:1px solid var(--rule);
   font-size:13px;line-height:18px;font-weight:600;letter-spacing:.1px}
+
+/* SEARCH THE CONVERSATIONS (Maryam 30 Sep 2026: "show a search field before the
+   chats list"). Sits under the caption, above the rows — the inbox pattern. A
+   quiet field: the search glyph, then a borderless input on the panel ground, a
+   `--rule` foot hairline so it reads as its own band. `ldrDmSearch` filters the
+   rows in place. */
+.app .ldr-dm-srch{
+  display:flex;align-items:center;gap:var(--s03);
+  /* --s04 top/bottom (was --s03) for a taller, more comfortable field — Maryam
+     30 Sep 2026: "search should have more height" */
+  padding:var(--s04) var(--s05);
+  border-bottom:1px solid var(--rule)}
+.app .ldr-dm-srch > svg{
+  width:18px;height:18px;flex:none;color:var(--text-helper)}
+.app .ldr-dm-srch > input{
+  flex:1;min-width:0;border:0;background:transparent;padding:0;
+  font:inherit;font-size:13px;line-height:20px;color:var(--text-primary)}
+.app .ldr-dm-srch > input::placeholder{color:var(--text-secondary)}
+.app .ldr-dm-srch > input:focus{outline:none}
+/* the scrolling rows live in their own wrapper so the caption + search stay
+   pinned and only the conversations scroll */
+.app .ldr-dm-rows{display:flex;flex-direction:column;min-height:0}
 
 /* A THREAD ROW. `.mem`'s shape without `.mem`'s classes, because this one is a
    tab: it is `aria-selected`, it lives in a `role=tablist`, and the selected
@@ -579,12 +617,13 @@
    portal is disarmed anyway (`build.py`, `HOVER_KEEP`). */
 .app .ldr-dm-t{
   display:flex;align-items:center;gap:var(--s04);width:100%;
-  /* --s04 top/bottom, to MATCH the thread header `.ldr-dm-h` (Maryam 9 Sep 2026:
-     "the direct message row height should be equal to the right side name row of
-     the candidate"). It briefly ran at --s05 for more air between rows; the ask
-     is that a list row and the header of the thread it opens be the same height,
-     so both are `--s04 --s05` now and both come out ~61px. */
+  /* --s04 top/bottom, plus `--dm-row-h` (= the caption/banner height + 10px) so
+     each conversation row carries 10px more air than the header above it (Maryam
+     30 Sep 2026: "give 10px more height to each chat block"). This deliberately
+     parts from the 9 Sep "a list row equals the thread header" rule — the rows
+     are the roomier element now; the caption and banner stay equal to each other. */
   padding:var(--s04) var(--s05);
+  min-height:var(--dm-row-h);
   border:0;border-bottom:1px solid var(--border-subtle-01);
   background-color:transparent;text-align:left;cursor:pointer;
   transition:background-color var(--dur-short) var(--ease-standard)}
@@ -617,10 +656,13 @@
   width:7px;height:7px;flex:none;border-radius:50%;
   background-color:var(--accent)}
 
-/* the head of the conversation column: who, and what this thread is */
+/* the head of the conversation column: who, and what this thread is. `--dm-h`
+   pins it to exactly the caption's height so the two read as one line across the
+   split (Maryam 30 Sep 2026). */
 .app .ldr-dm-h{
   display:flex;align-items:center;gap:var(--s04);flex:none;
-  padding:var(--s04) var(--s05);border-bottom:1px solid var(--rule)}
+  padding:var(--s04) var(--s05);min-height:var(--dm-h);
+  border-bottom:1px solid var(--rule)}
 .app .ldr-dm-h > .mem-av{
   width:36px;height:36px;flex:none;position:relative;overflow:hidden;
   background-color:var(--gray-80)}
@@ -634,8 +676,15 @@
 /* THE FIELD FLOATS INSIDE THE PANEL, and it is the candidate's field — §16.12
    draws the box and names this surface on the same rule. What belongs here is
    only where it sits: a margin rather than a padded row, because the panel's
-   own foot is the boundary and the field is an object inside it. */
-.app .ldr-dm-thread > .composer{flex:none;margin:0 var(--s05) var(--s05)}
+   own foot is the boundary and the field is an object inside it.
+   NO BOTTOM MARGIN (Maryam 30 Sep 2026, "the messages module has an odd bottom
+   padding"): the composer carried its own `--s05` bottom margin WHILE the page
+   carried a `--s06` bottom padding, so the composer floated ~16px above the list
+   column's foot — the two columns did not end on the same line, which read as odd
+   space on the thread side. The inbox is now a full-bleed app surface flush to
+   the frame (the page's bottom padding is dropped too, §36.18b), so both columns
+   end together at the frame edge. Side margins stay. */
+.app .ldr-dm-thread > .composer{flex:none;margin:0 var(--s05)}
 
 /* THE MEMBER PAGE'S COURSE CARD (Maryam, 9 Sep 2026) — the candidate's course
    name over its description, in a tile. A column with a small gap so the name
@@ -795,7 +844,13 @@
 .app .page.msg-mod{
   display:flex;flex-direction:column;flex:1 1 auto;min-height:0;
   width:100%;max-width:100%;box-sizing:border-box;
-  padding-bottom:var(--s06)}
+  /* NO BOTTOM PADDING (Maryam 30 Sep 2026, "odd bottom padding"). The 2 Sep note
+     below argued for `--s06` here to leave the composer air above the (absent) ask
+     dock — but combined with the composer's own bottom margin it double-padded the
+     thread side and left the two columns ending on different lines. The inbox is a
+     full-bleed app surface, so it now runs flush to the frame foot and both columns
+     end together; the composer's own margin is gone too (§36 composer rule). */
+  padding-bottom:0}
 .app .page.msg-mod > .sec.ldr-dm-sec{
   display:flex;flex-direction:column;flex:1 1 auto;min-height:0}
 .app .page.msg-mod > .sec.ldr-dm-sec > .ldr-dm{flex:1 1 auto;min-height:0}
@@ -1008,3 +1063,23 @@
 .app .ldr-eval-a{display:flex;gap:var(--s04)}
 .app .ldr-draft-note{margin-top:var(--s04);font-size:var(--t-caption-size);color:var(--text-helper)}
 .app .f-req-err{font-size:var(--t-caption-size);color:var(--support-error);font-weight:var(--t-w-book);margin-left:var(--s02)}
+
+/* ==========================================================================
+   MY COHORT — the three top sections sit a flat 32px apart, and the black call
+   card draws no foot divider (Maryam, 30 Sep 2026: "remove the divider after the
+   black card ... maintain the gap of 32px between all three sections").
+
+   The three are the cohort header (`.sec:has(> .lead-cohd)`), the black call
+   card (`.lead-callsec`) and the "Cohort at a glance" counters
+   (`.sec:has(> .lead-counts)`). The platform rhythm chain lands these at 24/16,
+   so each gap read 40-48 and a `::after` hairline drew under the card. This is
+   the sanctioned `!important` section-rhythm override (DESIGN.md §3, the
+   authtight precedent — the ~30-class `:not()`/`:has()` padding chain cannot be
+   outweighed by a plain selector). Each contributes 16, so every gap is 16+16=32;
+   the header keeps its own top (the Tal-summary gap above is untouched) and the
+   counters keep their own bottom. Leader-only.
+   ========================================================================== */
+.app[data-portal="leader"] .page > .sec:has(> .lead-cohd){padding-bottom:var(--s05)!important}
+.app[data-portal="leader"] .page > .lead-callsec{padding-top:var(--s05)!important;padding-bottom:var(--s05)!important}
+.app[data-portal="leader"] .page > .lead-callsec::after{content:none!important}
+.app[data-portal="leader"] .page > .sec:has(> .lead-counts){padding-top:var(--s05)!important}

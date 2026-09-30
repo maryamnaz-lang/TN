@@ -291,7 +291,13 @@
    §31's ink on `.flag-t`, twenty lines up — which is a different question from
    which rows are visible. */
 .app[data-portal="leader"] .tbl-flag td{border-bottom:0}
-.app[data-portal="leader"] .tbl-flag th{border-bottom-color:var(--rule)}
+/* EVERY leader table's header divider is the one light hairline, not §10.242's
+   `--rule-ink` #111 (Maryam 30 Sep 2026: "lighten this column header divider ...
+   match it with the other dividers"). The roster (`.lead-roster`) header still
+   read the black base rule while its row lines are `--rule`; this is the same
+   call the admin makes for its tables (§128). Broadened from the `.tbl-flag`-only
+   override this replaces; (0,3,1) beats §10.242's (0,1,1). */
+.app[data-portal="leader"] .tbl th{border-bottom-color:var(--rule)}
 
 /* --------------------------------------------------------------------------
    THE FIRST ROW STANDS OFF THE RULE
@@ -852,7 +858,10 @@
 /* 12.2 — the cohort header */
 .app .lead-cohd{display:grid;gap:var(--s05)}
 .app .lead-cohd-id{display:flex;flex-direction:column;gap:2px}
-.app .lead-cohd-n{font-size:var(--t-h1-size);line-height:var(--t-h1-lh);font-weight:var(--t-w-strong);color:var(--text-primary)}
+/* the cohort title reads in the accent as ink (Maryam 30 Sep 2026: "make the
+   cohort name in accent color"). §63 does not target this class, so its colour is
+   owned here as its size/weight already are. */
+.app .lead-cohd-n{font-size:var(--t-h1-size);line-height:var(--t-h1-lh);font-weight:var(--t-w-strong);color:var(--accent-text)}
 .app .lead-cohd-course{font-size:var(--t-desc-size);line-height:normal;color:var(--text-secondary)}
 .app .lead-cohd-day{display:flex;flex-wrap:wrap;align-items:baseline;gap:var(--s03) var(--s05)}
 .app .lead-cohd-dw{display:inline-flex;align-items:baseline;gap:var(--s03)}

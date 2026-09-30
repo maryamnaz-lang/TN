@@ -241,7 +241,17 @@
   flex:1 1 auto;min-width:0;
   display:flex;flex-direction:column;align-items:stretch;
   gap:var(--s04);
-  padding:var(--s05)}
+  /* THE BODY MATCHES THE SESSIONS BLACK CARD's inset — `--s07` (32) top, right and
+     bottom, like `leadCallCard`'s §75 dark-card padding (Maryam 30 Sep 2026:
+     "follow the card paddings from top, bottom, and right side ... just like
+     sessions module"). The LEFT stays `--s05` — it is the gap to the red slot,
+     which the Sessions card has no equivalent of, so it is not part of "top,
+     bottom, right". */
+  padding:var(--s07) var(--s07) var(--s07) var(--s05)}
+/* THE JOIN MATCHES THE SESSIONS CARD's Join — the full 40px `.btn` height, not
+   `btn-sm`'s 32 (Maryam 30 Sep 2026: "button as well just like sessions module").
+   `leadCallCard`'s crow Join renders at 40; this pins the same. */
+.app .lcal-next .lcal-f > .btn{min-height:40px}
 /* THE LIVE COUNTDOWN takes the header's right end on an auto margin, where the
    date's word-over-figure block sat on the light card. The clock mark leads the
    digits (28 Sep 2026); tabular figures (set inline) so it does not jitter. */

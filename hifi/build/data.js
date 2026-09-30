@@ -393,7 +393,7 @@ const NOTIF = {
      candidate to do at this stage, which is the stage's whole character, so
      the bell reports facts rather than tasks. */
   consult:[
-    {ic:'calendar',   t:'Your consultant call is booked', b:'Jordan Blake, Thursday, August 13 at 2:00 PM ET. A calendar invite is on its way.', w:'1h ago',    go:'dashboard', unread:1},
+    {ic:'calendar',   t:'Your consultant call is booked', b:'Jordan Blake, Thursday, August 13 at 2:00 PM ET. A calendar invite is on its way.', w:'1h ago',    go:'dashboard', unread:1, kind:'cond'},
     {ic:'trophy',     t:'Your quiz result carried over',  b:'You are on the Explorer track. Your level comes later, from an agent interview.',   w:'3h ago',    go:'level',     unread:1},
     {ic:'checkOutline' ,t:'Account created',                b:'Welcome to TalentNext, Maryam.',                                                    w:'Yesterday', go:'account',   unread:0}
   ],
@@ -403,13 +403,13 @@ const NOTIF = {
     {ic:'checkOutline' ,t:'Account created',            b:'Welcome to TalentNext, Maryam.',                               w:'Yesterday', go:'account', unread:1}
   ],
   booked:[
-    {ic:'calendar', t:'Interview confirmed',          b:'Priya Nair, Thursday, August 20 at 6:30 PM ET.',                 w:'1h ago', go:'interviews', unread:1},
+    {ic:'calendar', t:'Interview confirmed',          b:'Priya Nair, Thursday, August 20 at 6:30 PM ET.',                 w:'1h ago', go:'interviews', unread:1, kind:'cond'},
     {ic:'email',    t:'Calendar invite sent',         b:'Check maryam.naz@tkxel.io for the joining link.',               w:'1h ago', go:'interviews', unread:1},
     {ic:'creditCard',t:'Payment received',            b:'$95 for your interview. Receipt in Payments.',                 w:'Yesterday', go:'billing',  unread:0}
   ],
   /* THE RESCHEDULE FORK — `booked`'s three, copied. See the row in STAGES. */
   resched:[
-    {ic:'calendar', t:'Interview confirmed',          b:'Priya Nair, Thursday, August 20 at 6:30 PM ET.',                 w:'1h ago', go:'interviews', unread:1},
+    {ic:'calendar', t:'Interview confirmed',          b:'Priya Nair, Thursday, August 20 at 6:30 PM ET.',                 w:'1h ago', go:'interviews', unread:1, kind:'cond'},
     {ic:'email',    t:'Calendar invite sent',         b:'Check maryam.naz@tkxel.io for the joining link.',               w:'1h ago', go:'interviews', unread:1},
     {ic:'creditCard',t:'Payment received',            b:'$95 for your interview. Receipt in Payments.',                 w:'Yesterday', go:'billing',  unread:0}
   ],
@@ -417,7 +417,7 @@ const NOTIF = {
      candidate to do anything; the bell reports the state. */
   held:[
     {ic:'checkOutline' ,t:'Interview complete',         b:'Priya is writing up your report. It will be ready within 24 hours.', w:'Just now', go:'interviews', unread:1},
-    {ic:'document', t:'Your report is on its way',     b:'You will be told the moment Priya signs it. There is nothing to do.', w:'Just now', go:'level',     unread:1},
+    {ic:'document', t:'Your report is on its way',     b:'You will be told the moment Priya signs it. There is nothing to do.', w:'Just now', go:'level',     unread:1, kind:'cond'},
     {ic:'video',    t:'Interview recorded',            b:'The recording and transcript are what your report is built from.',    w:'Just now', go:'interviews', unread:0}
   ],
   assessed:[
@@ -425,14 +425,21 @@ const NOTIF = {
     {ic:'ticket',   t:'Enrollment is open',            b:'Cohort 41 starts in 6 days and has 7 places left.',            w:'3h ago', go:'enrol',      unread:1},
     {ic:'video',    t:'Interview recording available',b:'Yours to watch or delete at any time.',                        w:'Yesterday', go:'report',  unread:0}
   ],
+  /* ENROLLED, COHORT NOT STARTED — enrolment confirmed, the leader assigned, the
+     cohort still to begin. */
+  enrolPre:[
+    {ic:'ticket',   t:'You are enrolled',              b:'Cohort 41 on Communicating with Impact. It starts in 6 days.',  w:'1h ago', go:'cohort',    unread:1},
+    {ic:'group',    t:'Your leader is Priya Nair',     b:'She will lead your cohort through the 90 days.',                 w:'2h ago', go:'cohort',    unread:1},
+    {ic:'creditCard',t:'Payment received',             b:'$120 for Cohort 41. Receipt in Payments.',                      w:'Yesterday', go:'billing', unread:0}
+  ],
   week1:[
     {ic:'book',     t:'Chapter 1 is unlocked',        b:'Why We Exist. 45 minutes, opens in LightSpeed VT.',            w:'Today', go:'coursework',  unread:1},
-    {ic:'group',    t:'First cohort call on Thursday',b:'6:00 PM ET with Priya Nair and 9 others.',                      w:'Today', go:'cohort',      unread:1},
+    {ic:'group',    t:'First cohort call on Thursday',b:'6:00 PM ET with Priya Nair and 9 others.',                      w:'Today', go:'cohort',      unread:1, kind:'cond'},
     {ic:'trophy',   t:'250 points awarded',           b:'1-Star rank. You are a member of Cohort 41.',                  w:'Yesterday', go:'rewards', unread:1}
   ],
   day34:[
     {ic:'warning',  t:'Week 4 reflection is overdue', b:'It was due Monday. Priya can see it on her roster.',           w:'2h ago', go:'coursework',  unread:1},
-    {ic:'group',    t:'Weekly call in 2 days',        b:'Thursday 6:00 PM ET. Week 5 covers hard conversations.',        w:'Today', go:'cohort',      unread:1},
+    {ic:'group',    t:'Weekly call in 2 days',        b:'Thursday 6:00 PM ET. Week 5 covers hard conversations.',        w:'Today', go:'cohort',      unread:1, kind:'cond'},
     {ic:'trophy',   t:'25 points awarded',            b:'Chapter completion. You are 1,405 points from Bronze.',        w:'Today', go:'rewards',     unread:1},
     {ic:'chat',     t:'Priya replied',                b:'“Bring the vendor review example on Thursday.”',               w:'Yesterday', go:'messages', unread:0},
     {ic:'book',     t:'Chapter 5 opens Monday',       b:'Hard Conversations. 55 minutes.',                              w:'3 days ago', go:'coursework', unread:0}
@@ -447,10 +454,22 @@ const NOTIF = {
     {ic:'certificate',t:'Certificate available',      b:'Explorer Track – E3, Cohort 41. Yours to download and share.', w:'Today', go:'transcript',  unread:1},
     {ic:'ticket',   t:'Explorer Track – E4 opens December 1',b:'Cohort 58 has 7 places left.',                          w:'Yesterday', go:'enrol',    unread:0}
   ],
+  /* COHORT CANCELLED, MOVED TO A REPLACEMENT (story 7.6 / 15.6). */
+  cancelled:[
+    {ic:'warning',  t:'Your cohort was cancelled',     b:'You have been moved to Cohort 47, which starts on 12 Mar 2026.', w:'1h ago', go:'cohort',    unread:1},
+    {ic:'group',    t:'Your leader is Priya Nair',     b:'She will lead your new cohort through the 90 days.',              w:'2h ago', go:'cohort',    unread:1},
+    {ic:'checkOutline',t:'Your paid enrolment carried over',b:'No new payment is needed for the replacement cohort.',       w:'Yesterday', go:'billing', unread:0}
+  ],
+  /* INTERVIEW COULD NOT TAKE PLACE, REBOOKING CREDIT ACTIVE (story 8.3 / 15.6). */
+  rebook:[
+    {ic:'warning',  t:'Your interview could not take place', b:'Priya could not run the call. A rebooking credit is on your account.', w:'1h ago', go:'agents', unread:1, kind:'cond'},
+    {ic:'ticket',   t:'Your rebooking credit is active',b:'Free rebooking, 14 days left to use it.',                       w:'1h ago', go:'agents',     unread:1, kind:'cond'},
+    {ic:'creditCard',t:'No payment was taken',          b:'Your first interview was complimentary, so nothing was charged.', w:'Yesterday', go:'billing', unread:0}
+  ],
   /* THE RED ACCENT DEMO — day 34's five, copied. See `RED_DEMO` in this file. */
   reddemo:[
     {ic:'warning',  t:'Week 4 reflection is overdue', b:'It was due Monday. Priya can see it on her roster.',           w:'2h ago', go:'coursework',  unread:1},
-    {ic:'group',    t:'Weekly call in 2 days',        b:'Thursday 6:00 PM ET. Week 5 covers hard conversations.',        w:'Today', go:'cohort',      unread:1},
+    {ic:'group',    t:'Weekly call in 2 days',        b:'Thursday 6:00 PM ET. Week 5 covers hard conversations.',        w:'Today', go:'cohort',      unread:1, kind:'cond'},
     {ic:'trophy',   t:'25 points awarded',            b:'Chapter completion. You are 1,405 points from Bronze.',        w:'Today', go:'rewards',     unread:1},
     {ic:'chat',     t:'Priya replied',                b:'“Bring the vendor review example on Thursday.”',               w:'Yesterday', go:'messages', unread:0},
     {ic:'book',     t:'Chapter 5 opens Monday',       b:'Hard Conversations. 55 minutes.',                              w:'3 days ago', go:'coursework', unread:0}
@@ -517,16 +536,21 @@ const NAVSETS = {
      thing it holds.
 
      EPIC 12 (12.1) — the workspace rail is the five items the story names, in
-     that order: My Cohort, Sessions, Discussion, Messages, Evaluations. Maryam
-     kept Course Reports and Certifications after them (28 Sep decision), so the
-     rail is seven. The standalone Cohorts LIST and the Ranking tab are gone —
-     redundant with one live cohort (Past cohorts is a band on My Cohort now, and
-     Ranking folds away). `leadDash` is now "My Cohort" (the 12.2 landing);
+     that order: My Cohort, Sessions, Discussion, Messages, Evaluations. The
+     standalone Cohorts LIST and the Ranking tab are gone — redundant with one
+     live cohort (Past cohorts is a band on My Cohort now, and Ranking folds
+     away). `leadDash` is now "My Cohort" (the 12.2 landing);
      `leadSessions`/`leadDiscussion` are the two new views. The dropped keys
      (`leadCalls`, `leadCohorts`) stay DEFINED and deep-link reachable, off the
      rail. `leadCohort`/`leadMember`/`leadSession`/`leadSum` are sub-pages, kept
-     lit through `PARENT`. */
-  leader:  [['leadDash','My Cohort','group'],['leadSessions','Sessions','calendar'],['leadDiscussion','Discussion','chat'],['leadMessages','Messages','email',2],['leadEvals','Evaluations','edit'],['leadReports','Course Reports','chart'],['leadCerts','Certifications','certificate']]
+     lit through `PARENT`.
+     COURSE REPORTS AND CERTIFICATIONS ARE HIDDEN (Maryam, 30 Sep 2026: "hide the
+     course reports and certifications modules"), reversing the 28 Sep decision
+     that kept them after the five. `V.leadReports`/`V.leadCerts` stay DEFINED and
+     deep-link reachable, off the rail — the same treatment as `leadCalls`/
+     `leadCohorts`; the notification rows and Tal answers that route to them still
+     work. So the rail is the five story items. */
+  leader:  [['leadDash','My Cohort','group'],['leadSessions','Sessions','calendar'],['leadDiscussion','Discussion','chat'],['leadMessages','Messages','email',2],['leadEvals','Evaluations','edit']]
 };
 
 const PARENT = {report:'level', result:'level', agents:'interviews', agent:'interviews',

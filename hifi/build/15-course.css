@@ -783,6 +783,22 @@
 .app .notif .nrow-b{grid-column:2;grid-row:1;margin:0}
 .app .notif .nrow-w{grid-column:2;grid-row:2;position:static;margin:0}
 
+/* THE DISMISS CROSS on an INFORMATIONAL notification (story 15.6, Maryam
+   30 Sep 2026). A bare muted glyph pinned top-right of the row; a condition-based
+   row (`kind:'cond'`) carries none. It is a `<span role="button">` inside the row
+   button — the delegated listener answers its `data-dismiss` before the row's
+   `data-go`, so the cross dismisses and the rest of the row navigates. An info
+   row (`.nrow-info`) reserves right space so a long title never runs under it.
+   `.nrow-x` is armed in `HOVER_KEEP` (the one narrow class), so the hover lift
+   from muted to primary actually fires. Crosses to the DS; only the candidate and
+   leader panels emit `.nrow-x`, so it is inert on the hand-written portals. */
+.app .notif .nrow-info{padding-right:calc(var(--pad-x) + var(--s07))}
+.app .notif .nrow-x{position:absolute;top:var(--s05);right:var(--pad-x);z-index:1;
+  display:flex;align-items:center;justify-content:center;
+  width:22px;height:22px;border-radius:999px;cursor:pointer;color:var(--text-helper)}
+.app .notif .nrow-x svg{width:16px;height:16px}
+.app .notif .nrow-x:hover{color:var(--text-primary);background:var(--surface-2)}
+
 /* THE PANEL DIMS THE FRAME BEHIND IT — Maryam, 15 Sep 2026: "when you open the
    notification side slider then give overlay to the screen". Only on a wide
    frame, where the panel is a 380px side panel with the app visible beside it;

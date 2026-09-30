@@ -1455,10 +1455,17 @@ render = function(){
   try {
     const app = device.querySelector('.app');
     if(app) app.dataset.portal = S.portal || 'candidate';
-    /* EPIC 12.2 — re-apply the My Cohort roster search after every paint, so a
-       sort or a level pick does not lose the typed query (the DOM-filter
-       technique the deleted queue's note records). No-op off that page. */
-    if(typeof leadApplyRosterSearch === 'function') leadApplyRosterSearch();
+    /* EPIC 12.2 — the roster search now filters the DATA (so pagination works),
+       so after the render a keystroke triggers, put the caret back where it was
+       (`leadRestoreRosterFocus`, the admin's SRCH_FOCUS). And position the open
+       roster kebab (§125 `placeLeadRowMenu`, lifted out of the sideways-clipping
+       `.tbl-wrap`). Both no-op off the My Cohort page. */
+    /* keep the page where it was on a roster re-render (kebab / pagination /
+       sort / filter / search) before positioning the kebab — else `.main`
+       resets to the top. The stash is set by `ldrRerender`. */
+    if(S.ldrKeepScroll != null){ const m = device.querySelector('.main'); if(m){ void m.scrollHeight; /* force layout so scrollTop is not clamped to 0 before the new content measures */ m.scrollTop = S.ldrKeepScroll; } S.ldrKeepScroll = null; }
+    if(typeof leadRestoreRosterFocus === 'function') leadRestoreRosterFocus();
+    if(typeof placeLeadRowMenu === 'function') placeLeadRowMenu();
     /* `leadStick()` was called here to drive the sticky position-indicator; the
        bar and its scroll-spy were removed 9 Sep 2026 (see the note above), so the
        wrapper now only stamps `data-portal`, which both stylesheets scope on. */

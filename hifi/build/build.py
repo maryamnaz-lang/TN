@@ -1516,6 +1516,10 @@ HOVER_KEEP = ('sn-item', 'btn-p', 'tal-fab', 'tal-star',
               # §128 — the list-page search field's clear (X) button darkens on
               # hover; `srch-x` is minted for this and written nowhere else.
               'srch-x',
+              # §15 — the notification row's dismiss cross (story 15.6). The glyph
+              # lifts from the floor grey to primary on hover; `nrow-x` is minted
+              # for this and written nowhere else, which the `endswith` match needs.
+              'nrow-x',
               # §120.1c — the collapsed admin rail's sub-module flyout. The hover
               # is on the parent wrapper so the panel stays open as the pointer
               # crosses from the icon to it; `sn-node` is minted for this and

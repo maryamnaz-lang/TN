@@ -86,6 +86,16 @@ const ldrBoard = id => +id === LEAD_COHORTS[0].id ? ROOM : (LDR_BOARDS[id] || []
    attachment (name/type/size); `readAt` on the thread is the time the candidate
    last read up to, shown as "Read <time>" under the leader's last message. A
    thread whose cohort has closed is read-only (the composer is replaced). */
+/* ONE THREAD PER CANDIDATE IN THE LIVE COHORT (Maryam 30 Sep 2026: "show all 10
+   candidates chats list here so it looks filled"). The ten are Cohort 41's own
+   roster (`LEAD_COHORTS[0].members`), name/initials/photo matched so the inbox
+   reads as the cohort. The three worked threads (Yuki, James, Tobias) keep their
+   real exchanges; the other seven are authored placeholder last-messages (§74 —
+   the seed has no per-candidate thread history), a mix of `me:0` (a reply is
+   waiting, the accent dot) and `me:1` (you spoke last) so the list looks lived-in.
+   PAST-COHORT THREADS ARE NO LONGER SHOWN (Maryam 30 Sep 2026: "do not show past
+   cohort chats") — Owen's Cohort-33 thread stays in the data (readable by deep
+   route, `threadActive` false) but the list renders active threads only. */
 const LDR_THREADS = [
   {who:'Yuki Tanaka', i:'YT', img:'hana', co:41, readAt:'Tue 9:10 AM', msgs:[
     {me:1, t:'Yuki — you have not been in since week 1 and I would rather ask than assume. Is the course the problem, or is it everything else?', w:'Mon 9:12 AM'},
@@ -102,7 +112,34 @@ const LDR_THREADS = [
     {me:0, kind:'voice', dur:'0:22', w:'2 days ago'},
     {me:0, t:'Sorry — work ate the fortnight. I am back in and through to 35%.', w:'2 days ago'}
   ]},
-  /* a past-cohort thread (Cohort 33, completed): stays readable, no new message */
+  {who:'Aisha Bello', i:'AB', img:'priya', co:41, readAt:'Wed 7:40 PM', msgs:[
+    {me:0, t:'Ran the delegation piece from chapter 6 with my team this morning and it actually landed. Thank you.', w:'Wed 6:55 PM'},
+    {me:1, t:'That is the whole point of it. Bring what happened to Thursday and we will pull it apart with the group.', w:'Wed 7:38 PM'}
+  ]},
+  {who:'Daniel Kerr', i:'DK', img:'owen', co:41, readAt:'Yesterday 4:10 PM', msgs:[
+    {me:1, t:'Daniel, you are a week ahead of pace. Slow down on 7 and sit with the hard-conversation drill before you move on.', w:'Yesterday 3:20 PM'},
+    {me:0, t:'Noted. I will hold on 7 and bring a real one to work on.', w:'Yesterday 4:05 PM'}
+  ]},
+  {who:'Sofia Marchetti', i:'SM', img:'lena', co:41, readAt:null, msgs:[
+    {me:0, t:'Could we move my one-to-one to after the Thursday call this week? Something has come up at work.', w:'Today 9:15 AM'}
+  ]},
+  {who:'Ravi Chandran', i:'RC', img:'samuel', co:41, readAt:'Mon 8:05 PM', msgs:[
+    {me:1, t:'Ravi — your attempts are creeping up on every chapter. It is not the material, it is that you are grading yourself as you go. Answer first, check after.', w:'Mon 7:50 PM'},
+    {me:0, t:'That is exactly it. I will try leaving the checking until the end.', w:'Mon 8:02 PM'}
+  ]},
+  {who:'Nora Lindqvist', i:'NL', img:'lena', co:41, readAt:'3 days ago', msgs:[
+    {me:0, t:'Missed Thursday — was it recorded anywhere I can catch up on?', w:'3 days ago'},
+    {me:1, t:'It was. I will send the LightspeedVT link. The part you want is the middle twenty minutes on the week-5 assessment.', w:'3 days ago'}
+  ]},
+  {who:'Chloe Ferreira', i:'CF', img:'priya', co:41, readAt:null, msgs:[
+    {me:1, t:'Chloe — quiet week. Everything alright, or is the course slipping down the list?', w:'5 days ago'}
+  ]},
+  {who:'Maryam Naz', i:'MN', img:'hana', co:41, readAt:'Today 10:30 AM', msgs:[
+    {me:0, t:'Booked my re-interview for next Tuesday. Anything I should go in ready to talk about?', w:'Today 10:05 AM'},
+    {me:1, t:'The two calls you ran in weeks 3 and 4, not the chapter scores. They are what moved you.', w:'Today 10:28 AM'}
+  ]},
+  /* a past-cohort thread (Cohort 33, completed): kept for the record, NOT listed
+     (Maryam 30 Sep 2026) — reachable only by an explicit route, never rendered */
   {who:'Owen Clarke', i:'OC', img:'owen', co:33, readAt:'12 Sep', msgs:[
     {me:0, t:'Thank you for the recommendation. The re-interview is next week and I feel ready for it.', w:'11 Sep'},
     {me:1, t:'You earned it. Go in and talk about the calls you ran, not the chapters you finished.', w:'11 Sep'}
@@ -115,6 +152,7 @@ const LDR_THREADS = [
    with one possible value is not state. The second named which cohort's board
    the pane held. `S.ldrTh` is now the whole of what the pane reads. */
 S.ldrTh = 0;
+S.ldrDmQ = '';   /* the DM list search query (filters in place, `ldrDmSearch`) */
 /* NARROW WIDTHS SHOW ONE OF THE TWO COLUMNS AT A TIME, and this is which.
    Both columns are always rendered — the class on `.ldr-dm` is what §36.17
    reads to decide, so at 900px and up the pair is a two-pane inbox whatever
@@ -186,6 +224,18 @@ const dmName = name => SHOW_REAL.has(name)
   : `<b>${handleOf(name)}</b>`;
 const threadActive = th => !!leadLive() && th.co === leadLive().id;
 
+/* DM SEARCH — filters the conversation list IN PLACE, no render, so the caret
+   stays put while you type (trap 9; same shape as `leadApplyRosterSearch`). The
+   count in the list header is the total, not the filtered set — it says how many
+   conversations you have, and re-typing it live would make it flicker. */
+function ldrDmSearch(inp){
+  S.ldrDmQ = inp.value;
+  const q = (S.ldrDmQ||'').trim().toLowerCase();
+  device.querySelectorAll('.ldr-dm-rows > .ldr-dm-t[data-dmname]').forEach(b=>{
+    b.hidden = !!q && !b.getAttribute('data-dmname').includes(q);
+  });
+}
+
 function msgBubble(msg, th){
   let body;
   if(msg.kind === 'voice') body = `<span class="m-voice">${I.microphone}<span class="m-voice-bar"></span><span class="m-voice-d">${msg.dur}</span></span>`;
@@ -195,7 +245,7 @@ function msgBubble(msg, th){
     <span class="m-av">${avatar(msg.me ? {i:LEADER.i, img:LEADER.img} : {i:th.i, img:AV[th.img]}, 32)}</span>
     <div class="m-c">
       <div class="m-b${msg.kind?' m-b-'+msg.kind:''}">${body}</div>
-      <div class="m-w">${msg.w}${msg.me ? `<i class="m-tick">${I.doneAll}</i>` : ''}</div>
+      <div class="m-w">${msg.w}${msg.me ? `<i class="m-tick">${I.check}</i>` : ''}</div>
     </div>
   </div>`;
 }
@@ -204,7 +254,6 @@ V.leadMessages = () => {
   const th = LDR_THREADS[S.ldrTh] || LDR_THREADS[0];
   const waiting = t => t.msgs.length && t.msgs[t.msgs.length - 1].me === 0;
   const current = LDR_THREADS.map((t,i)=>({t,i})).filter(x=>threadActive(x.t));
-  const pastTh  = LDR_THREADS.map((t,i)=>({t,i})).filter(x=>!threadActive(x.t));
   const lastMine = (() => { for(let i=th.msgs.length-1;i>=0;i--) if(th.msgs[i].me) return i; return -1; })();
   const active = threadActive(th);
   const rec = S.ldrRec;
@@ -213,7 +262,10 @@ V.leadMessages = () => {
     const last = t.msgs[t.msgs.length - 1];
     const on = i === S.ldrTh;
     const lastTxt = last ? (last.me ? 'You: ' : '') + (last.kind==='voice'?'Voice note':last.kind==='file'?last.name:last.t) : 'No messages yet';
-    return `<button class="ldr-dm-t${on ? ' on' : ''}" data-ldrpick="${i}" role="tab" aria-selected="${on}">
+    /* what the DM search matches: the real name AND the handle, both lowercased,
+       so a leader can find a thread by either (`ldrDmSearch` filters in place) */
+    const key = (t.who + ' ' + handleOf(t.who)).toLowerCase();
+    return `<button class="ldr-dm-t${on ? ' on' : ''}" data-ldrpick="${i}" data-dmname="${key.replace(/"/g,'&quot;')}" role="tab" aria-selected="${on}">
       <span class="mem-av mem-ph">${avatar({i:t.i, img:AV[t.img]}, 36)}</span>
       <span class="ldr-dm-tb">
         <span class="ldr-dm-tn">${dmName(t.who)}${waiting(t) ? '<i class="ldr-dm-dot" aria-label="waiting on your reply"></i>' : ''}</span>
@@ -230,8 +282,9 @@ V.leadMessages = () => {
     <div class="ldr-dm${S.ldrThOpen ? ' show-thread' : ''}">
       <div class="ldr-dm-list" role="tablist" aria-label="Your conversations">
         <div class="ldr-dm-lh">Direct messages<span class="t-helper-01">${current.length}</span></div>
-        ${current.map(dmRow).join('')}
-        ${pastTh.length ? `<div class="ldr-dm-lh ldr-dm-lh-2">Past cohorts</div>${pastTh.map(dmRow).join('')}` : ''}
+        <label class="ldr-dm-srch">${I.search}
+          <input type="search" placeholder="Search conversations" value="${(S.ldrDmQ||'').replace(/"/g,'&quot;')}" oninput="ldrDmSearch(this)" aria-label="Search conversations"></label>
+        <div class="ldr-dm-rows">${current.map(dmRow).join('')}</div>
       </div>
       <div class="ldr-dm-thread">
         <div class="ldr-dm-h">

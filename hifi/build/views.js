@@ -23,6 +23,16 @@ const cfg = k => Object.assign({}, CFG_BASE, CFG[k]);
    stage returns you to the candidate (see setStage), and switching portal
    leaves the stage untouched so you come back to where you were. */
 const S = {stage:'new', view:'dashboard', portal:'candidate', tal:false, talQ:null, nav:false, notif:false, acct:false, peek:null, read:[], rtab:'points', crtMenu:null, ctab:'discussion', hist:[], thread:[], typing:false,
+  /* NOTIFICATIONS (story 15.6). `dismissed` holds the titles of informational
+     items the candidate has dismissed — they leave the panel and stop counting.
+     Condition-based items carry no cross and are never in here. Session-only. */
+  dismissed:[],
+  /* ASK TAL DAILY LIMIT (story 15.5). `talAsked` counts questions asked today; a
+     chip counts like any other question. The cap is `TAL_LIMIT` (25); on reaching
+     it the composer disables and the thread carries the limit line. Prototype-
+     simulated — one session's count, no real midnight/timezone reset. `talBanner`
+     dismisses the celebration banners; see `CELEBRATE`. */
+  talAsked:0, celebDismiss:[],
   addCard:false, editPhoto:false, stg:0, notes:false, iv:'level',
   /* STORY-GAP STATE (15 Sep 2026). `ivTopic` is what the candidate types at
      booking ("what to talk about"); `ivCancel`/`ivCancelNote` drive the cancel
@@ -148,17 +158,36 @@ const rungOf  = c => RUNG[c] || 2;
 const notifList = () => isLead()
   ? (typeof LEAD_NOTIF !== 'undefined' ? LEAD_NOTIF : [])
   : (NOTIF[S.stage] || []);
-const unreadCount = () => notifList().filter(n=>n.unread && !S.read.includes(n.t)).length;
+/* A DISMISSED ITEM IS GONE — it does not render and it does not count. Only
+   informational items can be dismissed (they carry the cross); a condition-based
+   item (`kind:'cond'`) is never in `S.dismissed`. */
+const notifShown = () => notifList().filter(n=>!S.dismissed.includes(n.t));
+const unreadCount = () => notifShown().filter(n=>n.unread && !S.read.includes(n.t)).length;
+/* the read informational items still on the panel — what "Dismiss all read"
+   clears, and the reason that control shows at all */
+const notifReadInfo = () => notifShown().filter(n=>n.kind!=='cond' && !(n.unread && !S.read.includes(n.t)));
 
+/* TWO KINDS OF NOTIFICATION (story 15.6). A CONDITION-BASED item describes
+   something still true — an interview confirmed, a report pending, a cohort call
+   coming up, a rebooking credit active — so it clears itself when the condition
+   ends and the candidate cannot dismiss it: no cross. An INFORMATIONAL item
+   describes something that happened; it stays until dismissed, so it carries a
+   cross. `kind:'cond'` in the data marks the first; everything else is
+   informational. The dismiss cross is a `<span role="button">` INSIDE the row
+   button (a button cannot nest a button); the delegated listener answers
+   `data-dismiss` before the row's `data-go`, so the cross dismisses and the rest
+   of the row navigates. */
 function notifPanel(){
-  const list = notifList();
+  const list = notifShown();
   const rows = (group) => list.filter(n=>group==='today' ? /ago|Today/.test(n.w) : !/ago|Today/.test(n.w))
     .map(n=>{
       const un = n.unread && !S.read.includes(n.t);
-      return `<button class="nrow ${un?'un':''}" data-go="${n.go}" data-read="${n.t}">
+      const info = n.kind!=='cond';
+      return `<button class="nrow ${un?'un':''} ${info?'nrow-info':''}" data-go="${n.go}" data-read="${n.t}">
         <span class="nrow-ic">${I[n.ic]}</span>
         <span class="nrow-b"><span class="nrow-t">${n.t}</span><span class="nrow-d">${n.b}</span></span>
         <span class="nrow-w">${n.w}</span>
+        ${info?`<span class="nrow-x" role="button" tabindex="0" data-dismiss="${n.t}" aria-label="Dismiss notification">${I.close}</span>`:''}
       </button>`;
     }).join('');
   const today = rows('today'), earlier = rows('earlier');
@@ -167,6 +196,7 @@ function notifPanel(){
     <div class="notif-h">
       <h2>Notifications</h2>
       ${unreadCount()?`<button class="notif-all" data-readall="1">Mark all read</button>`:''}
+      ${notifReadInfo().length?`<button class="notif-all" data-dismissread="1">Dismiss all read</button>`:''}
       <button class="x" data-toggle="notif" aria-label="Close">${I.close}</button>
     </div>
     <div class="notif-b">
@@ -366,10 +396,22 @@ const crumbBar = () =>
 
    SENTENCE CASE, per §63 §4: the words go in the markup the way they are read.
    ============================================================ */
+/* THE ACCOUNT MENU IS My profile / Profile settings / role switches / Sign out
+   (story 15.1). "My profile" and "Profile settings" both open the Profile page
+   (`account`) on their own tab — My profile on the general tab (`me`), Profile
+   settings on Privacy Settings (`priv`) — carried by `data-pftab`, which the
+   `[data-go]` branch reads. Sign out ends the session on this device (14.4); it
+   mirrors the rail's own "Log out" (`stage:signup/login`) so the two agree. The
+   role-switch rows are unchanged. */
 function acctMenu(){
   const [ok, ol, oi] = otherPortal();
+  const prof = isLead() ? 'leadProfile' : 'account';
   return `<div class="acct-menu ${S.acct?'on':''}" role="menu" aria-label="Account">
-    <button class="acct-i" role="menuitem" data-go="${isLead()?'leadProfile':'account'}">
+    <button class="acct-i" role="menuitem" data-go="${prof}" data-pftab="me">
+      <span class="acct-i-mk">${I.user}</span>
+      <span class="acct-i-t">My profile</span>
+    </button>
+    <button class="acct-i" role="menuitem" data-go="${prof}" data-pftab="priv">
       <span class="acct-i-mk">${I.settings}</span>
       <span class="acct-i-t">Profile settings</span>
     </button>
@@ -380,6 +422,10 @@ function acctMenu(){
     <button class="acct-i" role="menuitem" data-doc="${AGENT_PORTAL}">
       <span class="acct-i-mk acct-i-av"><img src="${AV.owen}" alt=""></span>
       <span class="acct-i-t">Switch to Talent Agent</span>
+    </button>
+    <button class="acct-i" role="menuitem" data-go="stage:signup/login">
+      <span class="acct-i-mk">${I.logout}</span>
+      <span class="acct-i-t">Sign out</span>
     </button>
   </div>`;
 }
@@ -15911,6 +15957,17 @@ device.addEventListener('click', e => {
   const ra = t.closest('[data-readall]');
   if(ra){ notifList().forEach(n=>{ if(!S.read.includes(n.t)) S.read.push(n.t); }); render(); return; }
 
+  /* DISMISS ONE INFORMATIONAL ITEM (story 15.6). Answered BEFORE the row's
+     `data-go` — the cross is a span inside the row button, so `closest` finds it
+     first and the press dismisses rather than navigating. Immediate, no confirm,
+     no undo. */
+  const nd = t.closest('[data-dismiss]');
+  if(nd){ const ti = nd.dataset.dismiss; if(!S.dismissed.includes(ti)) S.dismissed.push(ti); render(); return; }
+  /* DISMISS ALL READ — every read informational item at once. Condition-based
+     and unread items are untouched. */
+  const dra = t.closest('[data-dismissread]');
+  if(dra){ notifReadInfo().forEach(n=>{ if(!S.dismissed.includes(n.t)) S.dismissed.push(n.t); }); render(); return; }
+
   /* CROSSING PORTALS IS NOT NAVIGATION. It changes who is signed in, so the
      back stack, the open overlays and anything Tal was mid-conversation about
      all belong to the account you are leaving. Everything resets except the
@@ -16103,6 +16160,11 @@ device.addEventListener('click', e => {
        which is the only writer that also navigates, lands at the top of a page
        with a form open 900px down. */
     if(pe !== undefined){ S.pfEdit = pe || null; if(pe){ S.pfTab = 'me'; pfScroll(pe); } }
+    /* A `data-go` that ALSO names a profile tab lands on that tab — the account
+       menu's "My profile" (me) and "Profile settings" (priv) both open the
+       Profile page, on their own tab (15.1). Set before `go()` so the first
+       paint of `V.account` reads the right `S.pfTab`. */
+    if(g.dataset.pftab) S.pfTab = g.dataset.pftab;
     if(S.notif) S.notif=false;
     if(S.acct) S.acct=false;
     /* a module opened from the side nav is a top-level destination, so it starts

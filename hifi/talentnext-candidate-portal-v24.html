@@ -3623,6 +3623,12 @@ body,.app,.pt-bar,.pt-sel,input,select,textarea,button{font-family:var(--font-sa
 .app .notif .nrow-ic svg{width:20px;height:20px}
 .app .notif .nrow-b{grid-column:2;grid-row:1;margin:0}
 .app .notif .nrow-w{grid-column:2;grid-row:2;position:static;margin:0}
+.app .notif .nrow-info{padding-right:calc(var(--pad-x) + var(--s07))}
+.app .notif .nrow-x{position:absolute;top:var(--s05);right:var(--pad-x);z-index:1;
+  display:flex;align-items:center;justify-content:center;
+  width:22px;height:22px;border-radius:999px;cursor:pointer;color:var(--text-helper)}
+.app .notif .nrow-x svg{width:16px;height:16px}
+.app .notif .nrow-x:hover{color:var(--text-primary);background:var(--surface-2)}
 .app .notif-scrim{
   position:absolute;inset:0;z-index:49;background:var(--overlay);
   opacity:0;visibility:hidden;pointer-events:none;
@@ -6765,7 +6771,7 @@ button.btn-p:active,
   color:var(--mk);border-color:transparent;
   background-color:color-mix(in srgb, var(--mk) 12%, var(--layer-01))}
 .app[data-portal="leader"] .tbl-flag td{border-bottom:0}
-.app[data-portal="leader"] .tbl-flag th{border-bottom-color:var(--rule)}
+.app[data-portal="leader"] .tbl th{border-bottom-color:var(--rule)}
 .app[data-portal="leader"] .tbl-flag tr:first-child + tr td{padding-top:var(--s06)}
 .app[data-portal="leader"] .tbl-flag td{vertical-align:middle}
 .app[data-portal="leader"] .tbl-flag .tbl-act .btn{
@@ -6859,7 +6865,7 @@ button.btn-p:active,
 @container app (max-width:479.98px){ .app .lead-hdr{display:none} }
 .app .lead-cohd{display:grid;gap:var(--s05)}
 .app .lead-cohd-id{display:flex;flex-direction:column;gap:2px}
-.app .lead-cohd-n{font-size:var(--t-h1-size);line-height:var(--t-h1-lh);font-weight:var(--t-w-strong);color:var(--text-primary)}
+.app .lead-cohd-n{font-size:var(--t-h1-size);line-height:var(--t-h1-lh);font-weight:var(--t-w-strong);color:var(--accent-text)}
 .app .lead-cohd-course{font-size:var(--t-desc-size);line-height:normal;color:var(--text-secondary)}
 .app .lead-cohd-day{display:flex;flex-wrap:wrap;align-items:baseline;gap:var(--s03) var(--s05)}
 .app .lead-cohd-dw{display:inline-flex;align-items:baseline;gap:var(--s03)}
@@ -7323,14 +7329,31 @@ button.btn-p:active,
 .app .ldr-dm{display:flex;flex-direction:column;gap:var(--s06)}
 .app .ldr-dm-thread{display:flex;flex-direction:column;min-width:0}
 .app .ldr-dm-list{display:flex;flex-direction:column;min-width:0}
+.app .ldr-dm{
+  --dm-h:calc(19px + 17px + 1px + var(--s04) * 2 + 1px);
+  --dm-row-h:calc(var(--dm-h) + 10px)}
 .app .ldr-dm-lh{
-  display:flex;align-items:baseline;justify-content:space-between;gap:var(--s04);
+  display:flex;align-items:center;justify-content:space-between;gap:var(--s04);
   padding:var(--s04) var(--s05);
+  min-height:var(--dm-h);
   border-bottom:1px solid var(--rule);
   font-size:13px;line-height:18px;font-weight:600;letter-spacing:.1px}
+.app .ldr-dm-srch{
+  display:flex;align-items:center;gap:var(--s03);
+  padding:var(--s04) var(--s05);
+  border-bottom:1px solid var(--rule)}
+.app .ldr-dm-srch > svg{
+  width:18px;height:18px;flex:none;color:var(--text-helper)}
+.app .ldr-dm-srch > input{
+  flex:1;min-width:0;border:0;background:transparent;padding:0;
+  font:inherit;font-size:13px;line-height:20px;color:var(--text-primary)}
+.app .ldr-dm-srch > input::placeholder{color:var(--text-secondary)}
+.app .ldr-dm-srch > input:focus{outline:none}
+.app .ldr-dm-rows{display:flex;flex-direction:column;min-height:0}
 .app .ldr-dm-t{
   display:flex;align-items:center;gap:var(--s04);width:100%;
   padding:var(--s04) var(--s05);
+  min-height:var(--dm-row-h);
   border:0;border-bottom:1px solid var(--border-subtle-01);
   background-color:transparent;text-align:left;cursor:pointer;
   transition:background-color var(--dur-short) var(--ease-standard)}
@@ -7358,7 +7381,8 @@ button.btn-p:active,
   background-color:var(--accent)}
 .app .ldr-dm-h{
   display:flex;align-items:center;gap:var(--s04);flex:none;
-  padding:var(--s04) var(--s05);border-bottom:1px solid var(--rule)}
+  padding:var(--s04) var(--s05);min-height:var(--dm-h);
+  border-bottom:1px solid var(--rule)}
 .app .ldr-dm-h > .mem-av{
   width:36px;height:36px;flex:none;position:relative;overflow:hidden;
   background-color:var(--gray-80)}
@@ -7368,7 +7392,7 @@ button.btn-p:active,
 .app .ldr-dm-hb > span{
   font-size:12px;line-height:17px;color:var(--text-secondary)}
 .app .ldr-dm-thread > .msgs{padding:var(--s05)}
-.app .ldr-dm-thread > .composer{flex:none;margin:0 var(--s05) var(--s05)}
+.app .ldr-dm-thread > .composer{flex:none;margin:0 var(--s05)}
 .app .crs-card{display:flex;flex-direction:column;align-items:flex-start;gap:var(--s03);text-align:left}
 .app .crs-card > .crs-name,.app .crs-card > .crs-desc{text-align:left;width:100%;margin:0}
 .app .sec.ldr-dm-sec{padding:0}
@@ -7392,7 +7416,7 @@ button.btn-p:active,
 .app .page.msg-mod{
   display:flex;flex-direction:column;flex:1 1 auto;min-height:0;
   width:100%;max-width:100%;box-sizing:border-box;
-  padding-bottom:var(--s06)}
+  padding-bottom:0}
 .app .page.msg-mod > .sec.ldr-dm-sec{
   display:flex;flex-direction:column;flex:1 1 auto;min-height:0}
 .app .page.msg-mod > .sec.ldr-dm-sec > .ldr-dm{flex:1 1 auto;min-height:0}
@@ -7505,6 +7529,10 @@ button.btn-p:active,
 .app .ldr-eval-a{display:flex;gap:var(--s04)}
 .app .ldr-draft-note{margin-top:var(--s04);font-size:var(--t-caption-size);color:var(--text-helper)}
 .app .f-req-err{font-size:var(--t-caption-size);color:var(--support-error);font-weight:var(--t-w-book);margin-left:var(--s02)}
+.app[data-portal="leader"] .page > .sec:has(> .lead-cohd){padding-bottom:var(--s05)!important}
+.app[data-portal="leader"] .page > .lead-callsec{padding-top:var(--s05)!important;padding-bottom:var(--s05)!important}
+.app[data-portal="leader"] .page > .lead-callsec::after{content:none!important}
+.app[data-portal="leader"] .page > .sec:has(> .lead-counts){padding-top:var(--s05)!important}
 .app .page > .rail-wrap:has(+ .sec){position:relative}
 .app .page > .rail-wrap:has(+ .sec)::after{
   content:'';position:absolute;bottom:0;
@@ -13636,7 +13664,8 @@ button.btn-p:active,
   flex:1 1 auto;min-width:0;
   display:flex;flex-direction:column;align-items:stretch;
   gap:var(--s04);
-  padding:var(--s05)}
+  padding:var(--s07) var(--s07) var(--s07) var(--s05)}
+.app .lcal-next .lcal-f > .btn{min-height:40px}
 .app .lcal-timerbox{
   margin-left:auto;flex:none;
   display:inline-flex;align-items:center;gap:var(--s02);
@@ -15589,7 +15618,7 @@ const GROWTH = [3,4,11];
 
 const NOTIF = {
   consult:[
-    {ic:'calendar',   t:'Your consultant call is booked', b:'Jordan Blake, Thursday, August 13 at 2:00 PM ET. A calendar invite is on its way.', w:'1h ago',    go:'dashboard', unread:1},
+    {ic:'calendar',   t:'Your consultant call is booked', b:'Jordan Blake, Thursday, August 13 at 2:00 PM ET. A calendar invite is on its way.', w:'1h ago',    go:'dashboard', unread:1, kind:'cond'},
     {ic:'trophy',     t:'Your quiz result carried over',  b:'You are on the Explorer track. Your level comes later, from an agent interview.',   w:'3h ago',    go:'level',     unread:1},
     {ic:'checkOutline' ,t:'Account created',                b:'Welcome to TalentNext, Maryam.',                                                    w:'Yesterday', go:'account',   unread:0}
   ],
@@ -15599,18 +15628,18 @@ const NOTIF = {
     {ic:'checkOutline' ,t:'Account created',            b:'Welcome to TalentNext, Maryam.',                               w:'Yesterday', go:'account', unread:1}
   ],
   booked:[
-    {ic:'calendar', t:'Interview confirmed',          b:'Priya Nair, Thursday, August 20 at 6:30 PM ET.',                 w:'1h ago', go:'interviews', unread:1},
+    {ic:'calendar', t:'Interview confirmed',          b:'Priya Nair, Thursday, August 20 at 6:30 PM ET.',                 w:'1h ago', go:'interviews', unread:1, kind:'cond'},
     {ic:'email',    t:'Calendar invite sent',         b:'Check maryam.naz@tkxel.io for the joining link.',               w:'1h ago', go:'interviews', unread:1},
     {ic:'creditCard',t:'Payment received',            b:'$95 for your interview. Receipt in Payments.',                 w:'Yesterday', go:'billing',  unread:0}
   ],
   resched:[
-    {ic:'calendar', t:'Interview confirmed',          b:'Priya Nair, Thursday, August 20 at 6:30 PM ET.',                 w:'1h ago', go:'interviews', unread:1},
+    {ic:'calendar', t:'Interview confirmed',          b:'Priya Nair, Thursday, August 20 at 6:30 PM ET.',                 w:'1h ago', go:'interviews', unread:1, kind:'cond'},
     {ic:'email',    t:'Calendar invite sent',         b:'Check maryam.naz@tkxel.io for the joining link.',               w:'1h ago', go:'interviews', unread:1},
     {ic:'creditCard',t:'Payment received',            b:'$95 for your interview. Receipt in Payments.',                 w:'Yesterday', go:'billing',  unread:0}
   ],
   held:[
     {ic:'checkOutline' ,t:'Interview complete',         b:'Priya is writing up your report. It will be ready within 24 hours.', w:'Just now', go:'interviews', unread:1},
-    {ic:'document', t:'Your report is on its way',     b:'You will be told the moment Priya signs it. There is nothing to do.', w:'Just now', go:'level',     unread:1},
+    {ic:'document', t:'Your report is on its way',     b:'You will be told the moment Priya signs it. There is nothing to do.', w:'Just now', go:'level',     unread:1, kind:'cond'},
     {ic:'video',    t:'Interview recorded',            b:'The recording and transcript are what your report is built from.',    w:'Just now', go:'interviews', unread:0}
   ],
   assessed:[
@@ -15618,14 +15647,19 @@ const NOTIF = {
     {ic:'ticket',   t:'Enrollment is open',            b:'Cohort 41 starts in 6 days and has 7 places left.',            w:'3h ago', go:'enrol',      unread:1},
     {ic:'video',    t:'Interview recording available',b:'Yours to watch or delete at any time.',                        w:'Yesterday', go:'report',  unread:0}
   ],
+  enrolPre:[
+    {ic:'ticket',   t:'You are enrolled',              b:'Cohort 41 on Communicating with Impact. It starts in 6 days.',  w:'1h ago', go:'cohort',    unread:1},
+    {ic:'group',    t:'Your leader is Priya Nair',     b:'She will lead your cohort through the 90 days.',                 w:'2h ago', go:'cohort',    unread:1},
+    {ic:'creditCard',t:'Payment received',             b:'$120 for Cohort 41. Receipt in Payments.',                      w:'Yesterday', go:'billing', unread:0}
+  ],
   week1:[
     {ic:'book',     t:'Chapter 1 is unlocked',        b:'Why We Exist. 45 minutes, opens in LightSpeed VT.',            w:'Today', go:'coursework',  unread:1},
-    {ic:'group',    t:'First cohort call on Thursday',b:'6:00 PM ET with Priya Nair and 9 others.',                      w:'Today', go:'cohort',      unread:1},
+    {ic:'group',    t:'First cohort call on Thursday',b:'6:00 PM ET with Priya Nair and 9 others.',                      w:'Today', go:'cohort',      unread:1, kind:'cond'},
     {ic:'trophy',   t:'250 points awarded',           b:'1-Star rank. You are a member of Cohort 41.',                  w:'Yesterday', go:'rewards', unread:1}
   ],
   day34:[
     {ic:'warning',  t:'Week 4 reflection is overdue', b:'It was due Monday. Priya can see it on her roster.',           w:'2h ago', go:'coursework',  unread:1},
-    {ic:'group',    t:'Weekly call in 2 days',        b:'Thursday 6:00 PM ET. Week 5 covers hard conversations.',        w:'Today', go:'cohort',      unread:1},
+    {ic:'group',    t:'Weekly call in 2 days',        b:'Thursday 6:00 PM ET. Week 5 covers hard conversations.',        w:'Today', go:'cohort',      unread:1, kind:'cond'},
     {ic:'trophy',   t:'25 points awarded',            b:'Chapter completion. You are 1,405 points from Bronze.',        w:'Today', go:'rewards',     unread:1},
     {ic:'chat',     t:'Priya replied',                b:'“Bring the vendor review example on Thursday.”',               w:'Yesterday', go:'messages', unread:0},
     {ic:'book',     t:'Chapter 5 opens Monday',       b:'Hard Conversations. 55 minutes.',                              w:'3 days ago', go:'coursework', unread:0}
@@ -15640,9 +15674,19 @@ const NOTIF = {
     {ic:'certificate',t:'Certificate available',      b:'Explorer Track – E3, Cohort 41. Yours to download and share.', w:'Today', go:'transcript',  unread:1},
     {ic:'ticket',   t:'Explorer Track – E4 opens December 1',b:'Cohort 58 has 7 places left.',                          w:'Yesterday', go:'enrol',    unread:0}
   ],
+  cancelled:[
+    {ic:'warning',  t:'Your cohort was cancelled',     b:'You have been moved to Cohort 47, which starts on 12 Mar 2026.', w:'1h ago', go:'cohort',    unread:1},
+    {ic:'group',    t:'Your leader is Priya Nair',     b:'She will lead your new cohort through the 90 days.',              w:'2h ago', go:'cohort',    unread:1},
+    {ic:'checkOutline',t:'Your paid enrolment carried over',b:'No new payment is needed for the replacement cohort.',       w:'Yesterday', go:'billing', unread:0}
+  ],
+  rebook:[
+    {ic:'warning',  t:'Your interview could not take place', b:'Priya could not run the call. A rebooking credit is on your account.', w:'1h ago', go:'agents', unread:1, kind:'cond'},
+    {ic:'ticket',   t:'Your rebooking credit is active',b:'Free rebooking, 14 days left to use it.',                       w:'1h ago', go:'agents',     unread:1, kind:'cond'},
+    {ic:'creditCard',t:'No payment was taken',          b:'Your first interview was complimentary, so nothing was charged.', w:'Yesterday', go:'billing', unread:0}
+  ],
   reddemo:[
     {ic:'warning',  t:'Week 4 reflection is overdue', b:'It was due Monday. Priya can see it on her roster.',           w:'2h ago', go:'coursework',  unread:1},
-    {ic:'group',    t:'Weekly call in 2 days',        b:'Thursday 6:00 PM ET. Week 5 covers hard conversations.',        w:'Today', go:'cohort',      unread:1},
+    {ic:'group',    t:'Weekly call in 2 days',        b:'Thursday 6:00 PM ET. Week 5 covers hard conversations.',        w:'Today', go:'cohort',      unread:1, kind:'cond'},
     {ic:'trophy',   t:'25 points awarded',            b:'Chapter completion. You are 1,405 points from Bronze.',        w:'Today', go:'rewards',     unread:1},
     {ic:'chat',     t:'Priya replied',                b:'“Bring the vendor review example on Thursday.”',               w:'Yesterday', go:'messages', unread:0},
     {ic:'book',     t:'Chapter 5 opens Monday',       b:'Hard Conversations. 55 minutes.',                              w:'3 days ago', go:'coursework', unread:0}
@@ -15656,7 +15700,7 @@ const NAVSETS = {
   full:    [['dashboard','Dashboard','dashboard'],['level','My Level','growth'],['coursework','Coursework','book'],['transcript','Course Progress','chart'],['rewards','Achievements','trophy'],['cohort','Cohort','group'],['messages','Messages','chat',1],['interviews','Interviews','calendar'],['billing','Payments','wallet']],
   full90:  [['dashboard','Dashboard','dashboard'],['level','My Level','growth'],['transcript','Course Progress','chart'],['rewards','Achievements','trophy'],['cohort','Cohort','group'],['messages','Messages','chat',1],['interviews','Interviews','calendar'],['billing','Payments','wallet']],
   next:    [['dashboard','Dashboard','dashboard'],['level','My Level','growth'],['transcript','Course Progress','chart'],['rewards','Achievements','trophy'],['messages','Messages','chat',1],['enrol','Course Enrollment','ticket'],['interviews','Interviews','calendar'],['billing','Payments','wallet']],
-  leader:  [['leadDash','My Cohort','group'],['leadSessions','Sessions','calendar'],['leadDiscussion','Discussion','chat'],['leadMessages','Messages','email',2],['leadEvals','Evaluations','edit'],['leadReports','Course Reports','chart'],['leadCerts','Certifications','certificate']]
+  leader:  [['leadDash','My Cohort','group'],['leadSessions','Sessions','calendar'],['leadDiscussion','Discussion','chat'],['leadMessages','Messages','email',2],['leadEvals','Evaluations','edit']]
 };
 
 const PARENT = {report:'level', result:'level', agents:'interviews', agent:'interviews',
@@ -15842,6 +15886,8 @@ const BMK = {
 const cfg = k => Object.assign({}, CFG_BASE, CFG[k]);
 
 const S = {stage:'new', view:'dashboard', portal:'candidate', tal:false, talQ:null, nav:false, notif:false, acct:false, peek:null, read:[], rtab:'points', crtMenu:null, ctab:'discussion', hist:[], thread:[], typing:false,
+  dismissed:[],
+  talAsked:0, celebDismiss:[],
   addCard:false, editPhoto:false, stg:0, notes:false, iv:'level',
   ivTopic:'', ivCancel:false, ivCancelNote:'', receipt:null, legalTab:'data',
   photoTab:'photo', photoPreview:null, avatarPick:'av1',
@@ -15869,17 +15915,21 @@ const rungOf  = c => RUNG[c] || 2;
 const notifList = () => isLead()
   ? (typeof LEAD_NOTIF !== 'undefined' ? LEAD_NOTIF : [])
   : (NOTIF[S.stage] || []);
-const unreadCount = () => notifList().filter(n=>n.unread && !S.read.includes(n.t)).length;
+const notifShown = () => notifList().filter(n=>!S.dismissed.includes(n.t));
+const unreadCount = () => notifShown().filter(n=>n.unread && !S.read.includes(n.t)).length;
+const notifReadInfo = () => notifShown().filter(n=>n.kind!=='cond' && !(n.unread && !S.read.includes(n.t)));
 
 function notifPanel(){
-  const list = notifList();
+  const list = notifShown();
   const rows = (group) => list.filter(n=>group==='today' ? /ago|Today/.test(n.w) : !/ago|Today/.test(n.w))
     .map(n=>{
       const un = n.unread && !S.read.includes(n.t);
-      return `<button class="nrow ${un?'un':''}" data-go="${n.go}" data-read="${n.t}">
+      const info = n.kind!=='cond';
+      return `<button class="nrow ${un?'un':''} ${info?'nrow-info':''}" data-go="${n.go}" data-read="${n.t}">
         <span class="nrow-ic">${I[n.ic]}</span>
         <span class="nrow-b"><span class="nrow-t">${n.t}</span><span class="nrow-d">${n.b}</span></span>
         <span class="nrow-w">${n.w}</span>
+        ${info?`<span class="nrow-x" role="button" tabindex="0" data-dismiss="${n.t}" aria-label="Dismiss notification">${I.close}</span>`:''}
       </button>`;
     }).join('');
   const today = rows('today'), earlier = rows('earlier');
@@ -15888,6 +15938,7 @@ function notifPanel(){
     <div class="notif-h">
       <h2>Notifications</h2>
       ${unreadCount()?`<button class="notif-all" data-readall="1">Mark all read</button>`:''}
+      ${notifReadInfo().length?`<button class="notif-all" data-dismissread="1">Dismiss all read</button>`:''}
       <button class="x" data-toggle="notif" aria-label="Close">${I.close}</button>
     </div>
     <div class="notif-b">
@@ -15938,8 +15989,13 @@ const crumbBar = () =>
 
 function acctMenu(){
   const [ok, ol, oi] = otherPortal();
+  const prof = isLead() ? 'leadProfile' : 'account';
   return `<div class="acct-menu ${S.acct?'on':''}" role="menu" aria-label="Account">
-    <button class="acct-i" role="menuitem" data-go="${isLead()?'leadProfile':'account'}">
+    <button class="acct-i" role="menuitem" data-go="${prof}" data-pftab="me">
+      <span class="acct-i-mk">${I.user}</span>
+      <span class="acct-i-t">My profile</span>
+    </button>
+    <button class="acct-i" role="menuitem" data-go="${prof}" data-pftab="priv">
       <span class="acct-i-mk">${I.settings}</span>
       <span class="acct-i-t">Profile settings</span>
     </button>
@@ -15950,6 +16006,10 @@ function acctMenu(){
     <button class="acct-i" role="menuitem" data-doc="${AGENT_PORTAL}">
       <span class="acct-i-mk acct-i-av"><img src="${AV.owen}" alt=""></span>
       <span class="acct-i-t">Switch to Talent Agent</span>
+    </button>
+    <button class="acct-i" role="menuitem" data-go="stage:signup/login">
+      <span class="acct-i-mk">${I.logout}</span>
+      <span class="acct-i-t">Sign out</span>
     </button>
   </div>`;
 }
@@ -24503,6 +24563,11 @@ device.addEventListener('click', e => {
   const ra = t.closest('[data-readall]');
   if(ra){ notifList().forEach(n=>{ if(!S.read.includes(n.t)) S.read.push(n.t); }); render(); return; }
 
+  const nd = t.closest('[data-dismiss]');
+  if(nd){ const ti = nd.dataset.dismiss; if(!S.dismissed.includes(ti)) S.dismissed.push(ti); render(); return; }
+  const dra = t.closest('[data-dismissread]');
+  if(dra){ notifReadInfo().forEach(n=>{ if(!S.dismissed.includes(n.t)) S.dismissed.push(n.t); }); render(); return; }
+
   const doc = t.closest('[data-doc]');
   if(doc){ location.href = doc.dataset.doc; return; }
 
@@ -24556,6 +24621,7 @@ device.addEventListener('click', e => {
     const tb = g.dataset.gotab; if(tb) S.rtab = tb;
     const pe = g.dataset.pfedit;
     if(pe !== undefined){ S.pfEdit = pe || null; if(pe){ S.pfTab = 'me'; pfScroll(pe); } }
+    if(g.dataset.pftab) S.pfTab = g.dataset.pftab;
     if(S.notif) S.notif=false;
     if(S.acct) S.acct=false;
     const fresh = !!(g.closest('.sn-item') || g.classList.contains('shell-logo'));
@@ -26942,7 +27008,9 @@ render = function(){
   try {
     const app = device.querySelector('.app');
     if(app) app.dataset.portal = S.portal || 'candidate';
-    if(typeof leadApplyRosterSearch === 'function') leadApplyRosterSearch();
+    if(S.ldrKeepScroll != null){ const m = device.querySelector('.main'); if(m){ void m.scrollHeight; /* force layout so scrollTop is not clamped to 0 before the new content measures */ m.scrollTop = S.ldrKeepScroll; } S.ldrKeepScroll = null; }
+    if(typeof leadRestoreRosterFocus === 'function') leadRestoreRosterFocus();
+    if(typeof placeLeadRowMenu === 'function') placeLeadRowMenu();
   } catch(e){ console.warn('portal stamp', e); }
 };
 
@@ -26971,6 +27039,7 @@ const noteEditable = (n, c) => leadEditable(c) && !!n.at && (Date.now() - n.at) 
 const leadEditable = c => !!c && c.status === 'active';
 
 S.ldrCTab = 'progress';  /* Candidate Progress is the first of four tabs (9 Sep 2026) */
+S.ldrSesTab = 'upcoming'; /* the Sessions page's two tabs — Upcoming / Past (30 Sep 2026) */
 S.ldrNoteAt = null;
 S.ldrNoteK = '';   /* 12.4: neither type pre-selected */
 
@@ -27235,17 +27304,109 @@ function leadRoster(c){
   let rows = c.members.slice();
   const lvl = (S.ddVal && S.ddVal.ldrlvl) || 'All levels';
   if(lvl !== 'All levels') rows = rows.filter(m => mlevel(m) === lvl);
+  const q = (S.ldrRosterQ || '').trim().toLowerCase();
+  if(q) rows = rows.filter(m => leadPlain(m).toLowerCase().includes(q));
   const so = S.ldrSort || {k:'name', dir:1};
   const key = ldrSortKey(c, so.k);
   rows.sort((a,b)=>{ const x=key(a), y=key(b); return (x<y?-1:x>y?1:0) * so.dir; });
   return rows;
 }
-function ldrRosterSearch(inp){ S.ldrRosterQ = inp.value; leadApplyRosterSearch(); }
-function leadApplyRosterSearch(){
-  const q = (S.ldrRosterQ||'').trim().toLowerCase();
-  device.querySelectorAll('.lead-roster tr[data-rname]').forEach(tr=>{
-    tr.hidden = !!q && !tr.getAttribute('data-rname').includes(q);
-  });
+function ldrRerender(){ const m = device.querySelector('.main'); S.ldrKeepScroll = m ? m.scrollTop : null; render(); }
+function ldrRosterSearch(inp){ S.ldrRosterQ = inp.value; S.ldrPage = 0; S.ldrRosterFocus = inp.selectionStart; ldrRerender(); }
+function ldrLevelFdd(c){
+  const cur = (S.ddVal && S.ddVal.ldrlvl) || 'All levels';
+  const opts = ['All levels'].concat(levelsPresent(c));
+  const open = S.ldrLvlOpen;
+  return `<div class="fdd${open ? ' on' : ''}">
+    <button class="fdd-t" data-ldrlvltoggle="1" aria-haspopup="listbox" aria-expanded="${open ? 'true' : 'false'}">Level: ${cur === 'All levels' ? 'All' : cur}<svg class="fdd-cx" viewBox="0 0 24 24" aria-hidden="true">${inner('chevDown')}</svg></button>
+    <div class="fdd-menu" role="listbox">${opts.map(o =>
+      `<button class="fdd-opt${o === cur ? ' on' : ''}" role="option" aria-selected="${o === cur ? 'true' : 'false'}" data-ldrlvlset="${o}">${o}</button>`).join('')}</div>
+  </div>`;
+}
+function ldrRosterTools(c){
+  const q = S.ldrRosterQ || '';
+  return `<div class="lst-tools">
+    <div class="srch${q ? ' srch-has' : ''}">
+      <svg class="mag" viewBox="0 0 24 24">${inner('search')}</svg>
+      <input class="inp" id="ldrRosterInp" value="${q.replace(/"/g,'&quot;')}" placeholder="Search by handle or name" aria-label="Search by handle or name" autocomplete="off" oninput="ldrRosterSearch(this)">
+      ${q ? `<button type="button" class="srch-x" data-ldrsrchclear="1" aria-label="Clear search">${I.close}</button>` : ''}
+    </div>
+    <div class="lst-filters">${ldrLevelFdd(c)}</div>
+  </div>`;
+}
+function leadRestoreRosterFocus(){
+  if(S.ldrRosterFocus == null) return;
+  const inp = device.querySelector('#ldrRosterInp'); const pos = S.ldrRosterFocus; S.ldrRosterFocus = null;
+  if(inp){ try{ inp.focus({preventScroll:true}); }catch(e){ inp.focus(); } try{ inp.setSelectionRange(pos, pos); }catch(e){} }
+}
+function leadApplyRosterSearch(){}
+
+const LDR_PAGE_SIZES = [5, 10, 25, 50], LDR_PAGE_DEFAULT = 5;
+function ldrPageWindow(page, pages){
+  if(pages <= 7) return Array.from({length: pages}, (_, i) => i);
+  const out = [0], start = Math.max(1, page - 1), end = Math.min(pages - 2, page + 1);
+  if(start > 1) out.push('…');
+  for(let i = start; i <= end; i++) out.push(i);
+  if(end < pages - 2) out.push('…');
+  out.push(pages - 1);
+  return out;
+}
+function ldrPagination(total, page, size, pages){
+  const from = page * size + 1, to = Math.min(total, (page + 1) * size);
+  const open = S.ldrPgOpen;
+  const sizeDd = `<div class="pgn-dd${open ? ' on' : ''}">
+    <button class="pgn-dd-t" data-ldrpgdd="1" aria-haspopup="listbox" aria-expanded="${open ? 'true' : 'false'}">${size}<svg class="pgn-dd-cx" viewBox="0 0 24 24" aria-hidden="true">${inner('chevDown')}</svg></button>
+    <div class="pgn-dd-menu" role="listbox">${LDR_PAGE_SIZES.map(s =>
+      `<button class="pgn-dd-opt${s === size ? ' on' : ''}" role="option" aria-selected="${s === size ? 'true' : 'false'}" data-ldrpgsize="${s}">${s}</button>`).join('')}</div>
+  </div>`;
+  const nums = ldrPageWindow(page, pages).map(n => n === '…'
+    ? `<span class="pgn-gap">…</span>`
+    : `<button class="btn btn-sm noic ${n === page ? 'btn-p' : 'btn-g'}" data-ldrpg="${n}"${n === page ? ' aria-current="page"' : ''}>${n + 1}</button>`).join('');
+  return `<div class="pgn">
+    <div class="pgn-size"><span class="pgn-lbl">Rows per page</span>${sizeDd}</div>
+    <div class="pgn-info">${from}&ndash;${to} of ${total}</div>
+    <div class="pgn-nav">
+      <button class="btn btn-g btn-sm pgn-arrow" data-ldrpg="prev"${page === 0 ? ' disabled' : ''} aria-label="Previous page">${I.chevLeft}</button>
+      <div class="pgn-nums">${nums}</div>
+      <button class="btn btn-g btn-sm pgn-arrow" data-ldrpg="next"${page >= pages - 1 ? ' disabled' : ''} aria-label="Next page">${I.chevRight}</button>
+    </div>
+  </div>`;
+}
+let LDR_RM_SEQ = 0;
+function ldrRowMenu(acts){
+  const id = 'lrm' + (LDR_RM_SEQ++);
+  const open = S.ldrRowMenu === id;
+  const items = acts.map(([icon, label, attr]) =>
+    `<button class="rowmenu-i" role="menuitem" ${attr}><span class="rowmenu-ic">${I[icon]}</span>${label}</button>`).join('');
+  return `<div class="rowmenu">
+    <button class="btn btn-g btn-sm rowmenu-t" data-ldrrm="${id}" aria-haspopup="menu" aria-expanded="${open ? 'true' : 'false'}" title="Actions" aria-label="Actions">${I.overflow}</button>
+    <div class="rowmenu-list${open ? ' on' : ''}" role="menu" data-lrmlist="${id}">${items}</div>
+  </div>`;
+}
+function placeLeadRowMenu(){
+  if(!S.ldrRowMenu) return;
+  const main = device.querySelector('.main');
+  const trig = device.querySelector(`.rowmenu-t[data-ldrrm="${S.ldrRowMenu}"]`);
+  const list = device.querySelector(`.rowmenu-list[data-lrmlist="${S.ldrRowMenu}"]`);
+  if(!main || !trig || !list) return;
+  const mr = main.getBoundingClientRect();
+  const scale = mr.width / main.clientWidth || 1;
+  const tr = trig.getBoundingClientRect();
+  const triRight = (tr.right - mr.left) / scale + main.scrollLeft;
+  const triTop = (tr.top - mr.top) / scale + main.scrollTop;
+  const triBottom = (tr.bottom - mr.top) / scale + main.scrollTop;
+  main.style.position = 'relative';
+  main.appendChild(list);
+  const menuW = list.offsetWidth || 190, menuH = list.offsetHeight || 0;
+  const gap = 6, edge = 8, contentW = main.clientWidth, frameH = main.clientHeight;
+  let left = triRight - menuW;
+  left = Math.max(edge, Math.min(left, contentW - menuW - edge));
+  const dock = device.querySelector('.askdock');
+  let viewBottom = main.scrollTop + frameH;
+  if(dock){ const dr2 = dock.getBoundingClientRect(); viewBottom = Math.min(viewBottom, (dr2.top - mr.top) / scale + main.scrollTop - gap); }
+  const openUp = (triBottom + gap + menuH > viewBottom) && (triTop - gap - menuH >= main.scrollTop);
+  list.style.left = left + 'px'; list.style.right = 'auto';
+  list.style.top = (openUp ? triTop - gap - menuH : triBottom + gap) + 'px'; list.style.bottom = 'auto';
 }
 function ldrSortTh(k, label, extra){
   const so = S.ldrSort || {k:'name', dir:1};
@@ -27254,8 +27415,13 @@ function ldrSortTh(k, label, extra){
   return `<th class="srt${on?' on':''}${extra||''}" data-ldrsort="${k}"><span class="srt-b">${label}${ar}</span></th>`;
 }
 function leadRosterTable(c){
-  const rows = leadRoster(c);
-  return `<div class="tbl-wrap"><table class="tbl lead-roster">
+  LDR_RM_SEQ = 0;                          /* stable kebab ids across renders */
+  const all = leadRoster(c);
+  const size = S.ldrPageSize || LDR_PAGE_DEFAULT;
+  const pages = Math.max(1, Math.ceil(all.length / size));
+  const page = Math.min(Math.max(0, S.ldrPage || 0), pages - 1);   /* clamp when a filter shrinks the list */
+  const rows = all.slice(page * size, page * size + size);
+  const table = `<div class="tbl-wrap"><table class="tbl lead-roster">
     <tr>
       ${ldrSortTh('name','Candidate')}
       ${ldrSortTh('level','Level')}
@@ -27267,7 +27433,7 @@ function leadRosterTable(c){
       ${ldrSortTh('last','Last active')}
       <th class="lead-roster-act">Actions</th>
     </tr>
-    ${rows.map(m=>{
+    ${rows.length ? rows.map(m=>{
       const a = leadAttn(m,c), done = lchDone(m), mins = lmins(m), rt = lretaken(m);
       const low = m.avg>0 && m.avg<75;
       return `<tr data-rname="${leadPlain(m).toLowerCase()}">
@@ -27279,34 +27445,34 @@ function leadRosterTable(c){
         <td class="num">${mins?lTimeFull(mins):'None'}${mins?`<span class="cell-sub">${Math.round(mins/Math.max(1,done))} min a chapter</span>`:''}</td>
         <td class="num">${a.held?a.att+' of '+a.held:'<span class="t-helper-01">&mdash;</span>'}</td>
         <td>${m.last==='Never'?'Never':m.last}</td>
-        <td class="tbl-act"><span class="row-acts">
-          <button class="btn btn-t btn-sm ic-l" data-go="leadMember" data-ldrmem="${m.name}" data-ldrco="${c.id}">${I.chart} View Progress</button>
-          <button class="btn btn-t btn-sm ic-l" data-ldrdm="${m.name}">${I.chat} Contact</button></span></td>
+        <td class="tbl-act lead-roster-act">${ldrRowMenu([
+          ['chart','View Progress', `data-go="leadMember" data-ldrmem="${m.name}" data-ldrco="${c.id}"`],
+          ['chat','Contact', `data-ldrdm="${m.name}"`]
+        ])}</td>
       </tr>`;
-    }).join('')}
-  </table></div>
-  <p class="lead-sync">Course figures last read from LightspeedVT ${LEAD_SYNC} (${LEAD_TZ}).</p>`;
+    }).join('') : `<tr><td colspan="9" class="lead-roster-empty">No candidate matches your search.</td></tr>`}
+  </table></div>`;
+  return table + (all.length > LDR_PAGE_SIZES[0] ? ldrPagination(all.length, page, size, pages) : '');
 }
 
 function leadCohortHead(c){
-  const next = leadNextSession(c);
-  const nextLine = next
-    ? `Week ${next.week} &middot; ${next.chapter} &middot; <b>${sesCountdown(next)}</b>`
-    : 'No session is scheduled yet.';
   return `<div class="sec sec-noline"><div class="lead-cohd">
     <div class="lead-cohd-id">
+      ${''/* the course name below the cohort title is removed (Maryam 30 Sep 2026:
+             "remove the course name below the cohort name"); the day/week/date line
+             below carries what the reader needs, and the course is on every card. */}
       <h2 class="lead-cohd-n">${lname(c)}</h2>
-      <p class="lead-cohd-course">${lcourse(c)}</p>
     </div>
     <div class="lead-cohd-day">
       <span class="lead-cohd-dw"><b>Day ${c.day} of 90</b><span>Week ${leadWeek(c.day)} of 13</span></span>
       <span class="lead-cohd-dates">${c.start} &ndash; ${c.end}</span>
     </div>
-    <div class="lead-cohd-kv">
-      <div class="lead-cohd-cell"><span class="lead-cohd-l">Candidates</span><span class="lead-cohd-v">${c.members.length} &middot; ${levelsLabel(c)}</span></div>
-      <div class="lead-cohd-cell"><span class="lead-cohd-l">Average progress</span><span class="lead-cohd-v">${lavg(c,'pc')}%</span></div>
-      <div class="lead-cohd-cell lead-cohd-next"><span class="lead-cohd-l">Next session</span><span class="lead-cohd-v">${nextLine}</span></div>
-    </div>
+    ${''/* THE FACT CELLS MOVED DOWN, below the call card (Maryam, 30 Sep 2026:
+          "take the Candidates / Average progress / Next session cards below the
+          call card"). Candidates and Average progress became two of the four
+          "Cohort at a glance" cells (`leadCounters`); Next session is dropped —
+          the black call card and the Day/Week line above already carry it. The
+          header now holds the identity and the day line only. */}
   </div></div>`;
 }
 
@@ -27314,8 +27480,9 @@ function leadCounters(c){
   const below = c.members.filter(m => m.avg>0 && m.avg<75).length;
   const never = c.members.filter(m => m.last==='Never').length;
   return `<div class="sec">
-    <div class="sec-h"><h2>This week at a glance</h2></div>
+    <div class="sec-h"><h2>Cohort at a glance</h2></div>
     <div class="facts pf-facts lead-counts">
+      ${pfFact(I.group,  '--mk-3', 'Candidates', String(c.members.length))}
       ${pfFact(I.growth, '--mk-4', 'Average progress', lavg(c,'pc') + '%')}
       ${pfFact(I.chart,  '--mk-1', 'Below pass mark', String(below))}
       ${pfFact(I.misuse, '--mk-2', 'Never signed in', String(never))}
@@ -27336,7 +27503,11 @@ function leadPastSection(){
             <span class="cardrow-t">${lname(c)}${cancelled?' <span class="tag sm">Cancelled</span>':''}</span>
             <span class="cardrow-s">${lcourse(c)} &middot; ${c.start} &ndash; ${c.end} &middot; ${c.members.length} candidates &middot; ${leadRecsWritten(c)} recommendations written</span>
           </span>
-          <span class="cardrow-go">${I.chevRight}</span>
+          ${''/* a real, SIZED trailing arrow so the row reads as clickable (Maryam
+                30 Sep 2026). It was `.cardrow-go` — a class with no CSS, so the
+                chevron rendered unsized/invisible; `.tile-arrow` is the sized 18px
+                arrow every other leader row uses. */}
+          <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg>
         </button>`;
       }).join('')}
     </div>
@@ -27385,14 +27556,27 @@ V.leadDash = () => {
     </div>
   </div>
   ${leadCohortHead(c)}
+  ${''/* THE BLACK CALL CARD IS BACK, under the cohort header (Maryam, 30 Sep
+        2026), and it is the CARD ALONE — no "Your upcoming calls" heading and no
+        "View all sessions" link (Maryam, 30 Sep 2026: "remove the heading row
+        with Your upcoming calls View all sessions"). It is the §113 `.lcal-next`
+        black card (square slot, live countdown, roster faces, gated accent
+        Join). With one live cohort `lcalls()` is one call, so `.lcal-row` holds
+        the one card. The section is a BARE BLOCK ROW (`.lcal-row` first child, no
+        heading) so §10/§138 close it with 32px of air and NO divider (Maryam,
+        30 Sep 2026: "remove the divider after the black card") — that is why the
+        headed `leadCallsSec` is not used here. Header, this card and the counters
+        then sit 32px apart, all three sections (Maryam, 30 Sep 2026). */}
+  <div class="sec lead-callsec"><div class="lcal-row">${lcalls().map((k, i) => lcalCard(k, i === 0)).join('')}</div></div>
   ${leadCounters(c)}
   <div class="sec" id="lead-roster">
     <div class="sec-h"><h2>Candidates</h2></div>
-    <div class="lead-roster-tools">
-      <label class="lead-search"><span class="lead-search-mk">${I.search}</span>
-        <input type="search" placeholder="Search by handle or name" value="${(S.ldrRosterQ||'').replace(/"/g,'&quot;')}" oninput="ldrRosterSearch(this)"></label>
-      <span class="lead-roster-filter">${dd('ldrlvl', ['All levels'].concat(levelsPresent(c)), (S.ddVal&&S.ddVal.ldrlvl)||'All levels')}</span>
-    </div>
+    ${''/* THE ADMIN LIST-TABLE CHROME (Maryam, 30 Sep 2026: "follow the search
+          field, filter ui, and the table header divider ui ... from super admin
+          table"). `.lst-tools` + `.srch` + `.fdd` are the design system's own
+          list-table classes (§128/§120) — the same component the Super Admin
+          uses — wired to the leader's roster state; no checkboxes. */}
+    ${ldrRosterTools(c)}
     ${leadRosterTable(c)}
   </div>
   ${leadPastSection()}
@@ -27489,7 +27673,6 @@ V.leadCohorts = () => {
 
 V.leadCohort = () => {
   const c = lco();
-  const gap = lpaceGap(c);
   const flagged = c.members.filter(m => m.flag);
   const severe = flagged.filter(m => m.flag.k === 'bad');
   const weakest = c.members.filter(m => m.avg > 0).slice().sort((a,b) => a.avg - b.avg)[0];
@@ -27525,13 +27708,25 @@ V.leadCohort = () => {
          ONE DRAWING, THREE PAGES. The dashboard, the Calls page and now this one
          all call `leadCallCard(lcall(c))`, so the same appointment cannot be
          described three ways — the `bkStamp` rule, one portal over. What this
-         caller states is only its own secondary. */}
-  ${leadCallCard(lcall(c), {second:{at:`data-ldrbrief="${c.id}"`, ic:I.edit, t:'Generate the brief'}})}
+         caller states is only its own secondary.
+
+         ONLY FOR AN ACTIVE COHORT (Maryam, 30 Sep 2026: "why we are showing a
+         call card in the past cohort detail page?"). A completed/cancelled
+         cohort has no upcoming session, so the "Upcoming Cohort Session" Join
+         card is drawn only while `c.status === 'active'`. A past cohort opens
+         straight on its figure band. */}
+  ${c.status === 'active' ? leadCallCard(lcall(c), {second:{at:`data-ldrbrief="${c.id}"`, ic:I.edit, t:'Generate the brief'}}) : ''}
   <div class="sec">
     <div class="stats">
-      ${statCell(I.growth, 'Average progress', lavg(c,'pc') + '<small>%</small>', `${gap >= 0 ? '+' + gap : gap} against pace`)}
+      ${''/* THE SUB IS ALWAYS "Of all candidates", never "+N/-N against pace"
+             (Maryam, 30 Sep 2026). The pace gap read as a judgement on the
+             cohort's standing on a plain average figure; it stays the sort key
+             for the attention queue (`lpaceGap`), just off this cell. */}
+      ${statCell(I.growth, 'Average progress', lavg(c,'pc') + '<small>%</small>', 'Of all candidates')}
       ${statCell(I.time,   'Expected pace',    lpace(c) + '<small>%</small>', `day ${c.day} of 90`)}
-      ${statCell(I.chart,  'Assessment average', lassess(c) ? lassess(c) + '<small>%</small>' : '<small>Not yet</small>', weakest ? `lowest ${weakest.avg}% &middot; ${c.members.filter(m => m.avg > 0).length} of ${c.members.length} assessed` : 'nothing assessed yet')}
+      ${''/* SUB IS "lowest N%" ONLY — the "· N of N assessed" count is dropped
+             (Maryam, 30 Sep 2026: "remove 8 of 8 assessed"). */}
+      ${statCell(I.chart,  'Assessment average', lassess(c) ? lassess(c) + '<small>%</small>' : '<small>Not yet</small>', weakest ? `Lowest ${weakest.avg}%` : 'Nothing assessed yet')}
       ${statCell(I.warningAlt, 'Flagged', flagged.length + `<small> of ${c.members.length}</small>`, `${severe.length} severe`)}
     </div>
   </div>
@@ -28090,15 +28285,45 @@ device.addEventListener('keydown', e => {
 
 device.addEventListener('change', e => { if(e.target.id === 'ldrNoteK') S.ldrNoteK = e.target.value; });
 device.addEventListener('click', e => {
+  const inRm = e.target.closest('.rowmenu, .rowmenu-list');
+  const inPg = e.target.closest('.pgn-dd');
+  const inFd = e.target.closest('.fdd');
+  if(S.ldrRowMenu && !inRm){ S.ldrRowMenu = null; ldrRerender(); }
+  if(S.ldrPgOpen && !inPg){ S.ldrPgOpen = null; ldrRerender(); }
+  if(S.ldrLvlOpen && !inFd){ S.ldrLvlOpen = null; ldrRerender(); }
+
+  const rmT = e.target.closest('[data-ldrrm]');
+  if(rmT){ S.ldrRowMenu = S.ldrRowMenu === rmT.dataset.ldrrm ? null : rmT.dataset.ldrrm; ldrRerender(); return; }
+  if(e.target.closest('.rowmenu-list')) S.ldrRowMenu = null;   /* a menu item press */
+
+  const pgdd = e.target.closest('[data-ldrpgdd]');
+  if(pgdd){ S.ldrPgOpen = !S.ldrPgOpen; ldrRerender(); return; }
+  const pgsz = e.target.closest('[data-ldrpgsize]');
+  if(pgsz){ S.ldrPageSize = +pgsz.dataset.ldrpgsize; S.ldrPage = 0; S.ldrPgOpen = null; ldrRerender(); return; }
+  const pg = e.target.closest('[data-ldrpg]');
+  if(pg){ const act = pg.dataset.ldrpg; let p = S.ldrPage || 0;
+    p = act === 'prev' ? p - 1 : act === 'next' ? p + 1 : +act;
+    S.ldrPage = Math.max(0, p); ldrRerender(); return; }
+
+  const lvT = e.target.closest('[data-ldrlvltoggle]');
+  if(lvT){ S.ldrLvlOpen = !S.ldrLvlOpen; ldrRerender(); return; }
+  const lvS = e.target.closest('[data-ldrlvlset]');
+  if(lvS){ S.ddVal = S.ddVal || {}; S.ddVal.ldrlvl = lvS.dataset.ldrlvlset; S.ldrLvlOpen = null; S.ldrPage = 0; ldrRerender(); return; }
+  const scx = e.target.closest('[data-ldrsrchclear]');
+  if(scx){ S.ldrRosterQ = ''; S.ldrPage = 0; S.ldrRosterFocus = 0; ldrRerender(); return; }
+
   const rep = e.target.closest('[data-ldrrep]');
   if(rep){ S.ldrRep = rep.dataset.ldrrep; render(); return; }
 
   const ctb = e.target.closest('[data-ldrctab]');
   if(ctb){ S.ldrCTab = ctb.dataset.ldrctab; render(); return; }
 
+  const stb = e.target.closest('[data-ldrsestab]');
+  if(stb){ S.ldrSesTab = stb.dataset.ldrsestab; render(); return; }
+
   const srt = e.target.closest('[data-ldrsort]');
   if(srt){ const k = srt.dataset.ldrsort, cur = S.ldrSort || {k:'name', dir:1};
-    S.ldrSort = {k, dir: cur.k === k ? -cur.dir : 1}; render(); return; }
+    S.ldrSort = {k, dir: cur.k === k ? -cur.dir : 1}; ldrRerender(); return; }
 
   if(e.target.closest('[data-ldrchall]')){ S.ldrChAll = !S.ldrChAll; render(); return; }
 
@@ -28186,71 +28411,65 @@ S.sesCancel = null;
 S.ldrSes = null;
 
 
-const sesMeta = (c, s) => `${c.members.length} candidates &middot; ${levelsLabel(c)} &middot; ${lcourse(c)} &middot; ${s.dur} min &middot; week ${s.week} of 13`;
 
-function sesNextCard(c, s){
-  const joinable = sesJoinable(s);
-  return `<div class="ses-next">
-    <div class="ses-next-h">
-      <div class="ses-next-id">
-        <span class="ses-next-eyebrow">Next session &middot; ${sesCountdown(s)}</span>
-        <h3 class="ses-next-t">${s.title}</h3>
-        <span class="ses-next-when">${s.date} &middot; ${s.time} (${LEAD_TZ})</span>
-      </div>
-      ${leadEditable(c) ? `<div class="ses-next-a">
-        <button class="btn btn-t btn-sm ic-l" data-sesedit="${s.id}">${I.edit} Edit</button>
-        <button class="btn btn-t btn-sm ic-l ses-cancel-b" data-sescancel="${s.id}">${I.close} Cancel</button>
-      </div>` : ''}
-    </div>
-    <div class="ses-next-cov"><span class="ses-next-ch">${s.chapter}</span><span class="ses-next-sub">${sesMeta(c, s)}</span></div>
-    ${s.cover ? `<p class="ses-next-note">${s.cover}</p>` : ''}
-    <div class="ses-next-foot">
-      <button class="btn btn-p noic" data-call="cohort" ${joinable?'':'disabled'}>${I.video} Join Call</button>
-      <span class="ses-next-hint">${joinable ? 'The room is open.' : 'Join opens 5 minutes before the start.'}</span>
-    </div>
-  </div>`;
-}
-
-function sesRow(c, s){
-  const past = sesPast(s);
-  const cancelled = s.status === 'cancelled';
+const WDAY = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const sesDayLbl = s => { const d = new Date(s.dISO + 'T00:00:00'); return WDAY[d.getDay()] + ' ' + d.getDate(); };
+const t12 = hhmm => { let [h,m] = String(hhmm||'').split(':').map(Number); const ap = h>=12?'PM':'AM'; h = h%12||12; return h + ':' + String(m||0).padStart(2,'0') + ' ' + ap; };
+function sesBkRow(c, s){
+  const past = sesPast(s), cancelled = s.status === 'cancelled';
+  const day = `<span class="bk-day"><span class="d">${sesDayLbl(s)}</span><span class="n">${t12(s.time)}</span></span>`;
+  const wk = s.week || leadWeek(sesDayOf(c, s.dISO));
+  const body = `<span class="cardrow-b">
+      <span class="cardrow-t">Week ${wk} Cohort Session</span>
+      <span class="cardrow-s">${s.chapter}${cancelled&&s.reason?` &middot; ${s.reason}`:''}</span></span>`;
   let mark;
   if(cancelled) mark = `<span class="ses-mark ses-cancelled">Cancelled</span>`;
   else if(!past) mark = `<span class="ses-mark ses-upcoming">${sesCountdown(s)}</span>`;
   else if(s.unavail) mark = `<span class="ses-mark ses-na">Attendance unavailable</span>`;
-  else { const held = leadHeld(c); const reg = leadRegister(c, s); const att = reg.filter(x=>x.r&&x.r.att).length;
+  else { const reg = leadRegister(c, s); const att = reg.filter(x=>x.r&&x.r.att).length;
     mark = `<span class="ses-mark ses-att">${att} of ${reg.length} attended</span>`; }
-  const open = past && !cancelled;   /* a held session opens its attendance record */
-  const tag = `<span class="ses-row-b">
-      <span class="ses-row-t">${s.title}${s.repeat!=='none'?' <span class="ses-repeat">weekly</span>':''}</span>
-      <span class="ses-row-s">${s.date} &middot; ${s.time} &middot; ${s.chapter}${cancelled&&s.reason?` &middot; ${s.reason}`:''}</span>
-    </span>`;
-  if(open) return `<button class="ses-row clk" data-go="leadSession" data-ldrses="${s.id}">${tag}${mark}<span class="ses-row-go">${I.chevRight}</span></button>`;
-  return `<div class="ses-row">${tag}${mark}${!past && !cancelled && leadEditable(c) ? `<span class="ses-row-a">
-    <button class="btn btn-t btn-sm ic-l" data-sesedit="${s.id}" aria-label="Edit">${I.edit}</button>
-    <button class="btn btn-t btn-sm ic-l ses-cancel-b" data-sescancel="${s.id}" aria-label="Cancel">${I.close}</button></span>` : ''}</div>`;
+  if(past && !cancelled)
+    return `<button class="cardrow bk-row clk" data-go="leadSession" data-ldrses="${s.id}">${day}${body}${mark}<svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg></button>`;
+  return `<div class="cardrow bk-row">${day}${body}${mark}</div>`;
 }
 
 V.leadSessions = () => {
   const c = leadLive();
   if(!c) return `<main class="main"><div class="page">${ph('Sessions')}
     <div class="sec"><div class="empty" style="border:0">${I.calendar}<h3>You are not leading a cohort at the moment.</h3>
-      <p>Scheduling a session needs a current cohort.</p></div></div></div></main>`;
+      <p>Your sessions appear here while you are leading a cohort.</p></div></div></div></main>`;
   const all = leadSessionsOf(c);
   const next = leadNextSession(c);
   const upcoming = all.filter(s => sesEnd(s) >= LEAD_NOW && s.id !== (next&&next.id));
   const past = all.filter(s => sesEnd(s) < LEAD_NOW).reverse();
   return `<main class="main"><div class="page">
   ${ph('Sessions')}
-  <div class="sec">
-    <div class="sec-h"><h2>Schedule</h2>
-      ${leadEditable(c) ? `<button class="btn btn-p btn-sm ic-l" data-sesnew="1">${I.add} Schedule a session</button>` : ''}</div>
-    ${next ? sesNextCard(c, next) : `<div class="empty" style="border:0">${I.calendar}<h3>No session is scheduled yet.</h3>${leadEditable(c)?'<p>Schedule the cohort&rsquo;s next call above.</p>':''}</div>`}
-  </div>
-  ${upcoming.length ? `<div class="sec"><div class="sec-h"><h2>Upcoming</h2></div>
-    <div class="tile-stack ses-list">${upcoming.map(s=>sesRow(c,s)).join('')}</div></div>` : ''}
-  ${past.length ? `<div class="sec tint"><div class="sec-h"><h2>Past sessions</h2></div>
-    <div class="tile-stack ses-list">${past.map(s=>sesRow(c,s)).join('')}</div></div>` : ''}
+  ${''/* THE NEXT SESSION IS THE BLACK CALL CARD (Maryam, 30 Sep 2026: "bring
+        back the black card for call") — `leadCallCard`, the same appointment
+        drawing the dashboard and the cohort page, with its gated Join. It is its
+        own `.sec.dark-card`, so it takes the `--pad-x` gutter and the page reads
+        with the padding every other page has (the pink `.ses-next` card, and the
+        full-bleed `.ses-row` list it sat over, were the missing-gutter cause). */}
+  ${next ? leadCallCard(lcall(c)) : `<div class="sec"><div class="empty" style="border:0">${I.calendar}<h3>No session is scheduled yet.</h3></div></div>`}
+  ${''/* TWO TABS — Upcoming / Past sessions (Maryam 30 Sep 2026: "instead of this
+        long page, i need 2 tabs of Upcoming and Past Sessions"). The two lists
+        were stacked down one scroll; they are one `.sec.sec-cs` strip now, the
+        same `.cs` mechanism the cohort page uses (`data-ldrsestab` → `S.ldrSesTab`).
+        The count rides each tab. */}
+  ${(() => {
+    const tab = S.ldrSesTab || 'upcoming';
+    const rows = tab === 'past' ? past : upcoming;
+    const empty = tab === 'past'
+      ? `<div class="empty" style="border:0">${I.calendar}<h3>No past sessions yet</h3><p>Sessions move here once they have run.</p></div>`
+      : `<div class="empty" style="border:0">${I.calendar}<h3>Nothing else upcoming</h3><p>The next session is the one above.</p></div>`;
+    return `<div class="sec sec-cs">
+      <div class="cs">
+        <button class="${tab === 'upcoming' ? 'on' : ''}" data-ldrsestab="upcoming">Upcoming${upcoming.length?` <span class="lf-n">${upcoming.length}</span>`:''}</button>
+        <button class="${tab === 'past' ? 'on' : ''}" data-ldrsestab="past">Past sessions${past.length?` <span class="lf-n">${past.length}</span>`:''}</button>
+      </div>
+      ${rows.length ? `<div class="tile-stack ses-list">${rows.map(s=>sesBkRow(c,s)).join('')}</div>` : empty}
+    </div>`;
+  })()}
 </div></main>`;
 };
 
@@ -29160,6 +29379,32 @@ const LDR_THREADS = [
     {me:0, kind:'voice', dur:'0:22', w:'2 days ago'},
     {me:0, t:'Sorry — work ate the fortnight. I am back in and through to 35%.', w:'2 days ago'}
   ]},
+  {who:'Aisha Bello', i:'AB', img:'priya', co:41, readAt:'Wed 7:40 PM', msgs:[
+    {me:0, t:'Ran the delegation piece from chapter 6 with my team this morning and it actually landed. Thank you.', w:'Wed 6:55 PM'},
+    {me:1, t:'That is the whole point of it. Bring what happened to Thursday and we will pull it apart with the group.', w:'Wed 7:38 PM'}
+  ]},
+  {who:'Daniel Kerr', i:'DK', img:'owen', co:41, readAt:'Yesterday 4:10 PM', msgs:[
+    {me:1, t:'Daniel, you are a week ahead of pace. Slow down on 7 and sit with the hard-conversation drill before you move on.', w:'Yesterday 3:20 PM'},
+    {me:0, t:'Noted. I will hold on 7 and bring a real one to work on.', w:'Yesterday 4:05 PM'}
+  ]},
+  {who:'Sofia Marchetti', i:'SM', img:'lena', co:41, readAt:null, msgs:[
+    {me:0, t:'Could we move my one-to-one to after the Thursday call this week? Something has come up at work.', w:'Today 9:15 AM'}
+  ]},
+  {who:'Ravi Chandran', i:'RC', img:'samuel', co:41, readAt:'Mon 8:05 PM', msgs:[
+    {me:1, t:'Ravi — your attempts are creeping up on every chapter. It is not the material, it is that you are grading yourself as you go. Answer first, check after.', w:'Mon 7:50 PM'},
+    {me:0, t:'That is exactly it. I will try leaving the checking until the end.', w:'Mon 8:02 PM'}
+  ]},
+  {who:'Nora Lindqvist', i:'NL', img:'lena', co:41, readAt:'3 days ago', msgs:[
+    {me:0, t:'Missed Thursday — was it recorded anywhere I can catch up on?', w:'3 days ago'},
+    {me:1, t:'It was. I will send the LightspeedVT link. The part you want is the middle twenty minutes on the week-5 assessment.', w:'3 days ago'}
+  ]},
+  {who:'Chloe Ferreira', i:'CF', img:'priya', co:41, readAt:null, msgs:[
+    {me:1, t:'Chloe — quiet week. Everything alright, or is the course slipping down the list?', w:'5 days ago'}
+  ]},
+  {who:'Maryam Naz', i:'MN', img:'hana', co:41, readAt:'Today 10:30 AM', msgs:[
+    {me:0, t:'Booked my re-interview for next Tuesday. Anything I should go in ready to talk about?', w:'Today 10:05 AM'},
+    {me:1, t:'The two calls you ran in weeks 3 and 4, not the chapter scores. They are what moved you.', w:'Today 10:28 AM'}
+  ]},
   {who:'Owen Clarke', i:'OC', img:'owen', co:33, readAt:'12 Sep', msgs:[
     {me:0, t:'Thank you for the recommendation. The re-interview is next week and I feel ready for it.', w:'11 Sep'},
     {me:1, t:'You earned it. Go in and talk about the calls you ran, not the chapters you finished.', w:'11 Sep'}
@@ -29167,6 +29412,7 @@ const LDR_THREADS = [
 ];
 
 S.ldrTh = 0;
+S.ldrDmQ = '';   /* the DM list search query (filters in place, `ldrDmSearch`) */
 S.ldrThOpen = false;
 S.ldrRec = null;   /* EPIC 12.8 — voice-note recording in progress */
 S.ldrEditProfile = false;
@@ -29199,6 +29445,14 @@ const dmName = name => SHOW_REAL.has(name)
   : `<b>${handleOf(name)}</b>`;
 const threadActive = th => !!leadLive() && th.co === leadLive().id;
 
+function ldrDmSearch(inp){
+  S.ldrDmQ = inp.value;
+  const q = (S.ldrDmQ||'').trim().toLowerCase();
+  device.querySelectorAll('.ldr-dm-rows > .ldr-dm-t[data-dmname]').forEach(b=>{
+    b.hidden = !!q && !b.getAttribute('data-dmname').includes(q);
+  });
+}
+
 function msgBubble(msg, th){
   let body;
   if(msg.kind === 'voice') body = `<span class="m-voice">${I.microphone}<span class="m-voice-bar"></span><span class="m-voice-d">${msg.dur}</span></span>`;
@@ -29208,7 +29462,7 @@ function msgBubble(msg, th){
     <span class="m-av">${avatar(msg.me ? {i:LEADER.i, img:LEADER.img} : {i:th.i, img:AV[th.img]}, 32)}</span>
     <div class="m-c">
       <div class="m-b${msg.kind?' m-b-'+msg.kind:''}">${body}</div>
-      <div class="m-w">${msg.w}${msg.me ? `<i class="m-tick">${I.doneAll}</i>` : ''}</div>
+      <div class="m-w">${msg.w}${msg.me ? `<i class="m-tick">${I.check}</i>` : ''}</div>
     </div>
   </div>`;
 }
@@ -29217,7 +29471,6 @@ V.leadMessages = () => {
   const th = LDR_THREADS[S.ldrTh] || LDR_THREADS[0];
   const waiting = t => t.msgs.length && t.msgs[t.msgs.length - 1].me === 0;
   const current = LDR_THREADS.map((t,i)=>({t,i})).filter(x=>threadActive(x.t));
-  const pastTh  = LDR_THREADS.map((t,i)=>({t,i})).filter(x=>!threadActive(x.t));
   const lastMine = (() => { for(let i=th.msgs.length-1;i>=0;i--) if(th.msgs[i].me) return i; return -1; })();
   const active = threadActive(th);
   const rec = S.ldrRec;
@@ -29226,7 +29479,8 @@ V.leadMessages = () => {
     const last = t.msgs[t.msgs.length - 1];
     const on = i === S.ldrTh;
     const lastTxt = last ? (last.me ? 'You: ' : '') + (last.kind==='voice'?'Voice note':last.kind==='file'?last.name:last.t) : 'No messages yet';
-    return `<button class="ldr-dm-t${on ? ' on' : ''}" data-ldrpick="${i}" role="tab" aria-selected="${on}">
+    const key = (t.who + ' ' + handleOf(t.who)).toLowerCase();
+    return `<button class="ldr-dm-t${on ? ' on' : ''}" data-ldrpick="${i}" data-dmname="${key.replace(/"/g,'&quot;')}" role="tab" aria-selected="${on}">
       <span class="mem-av mem-ph">${avatar({i:t.i, img:AV[t.img]}, 36)}</span>
       <span class="ldr-dm-tb">
         <span class="ldr-dm-tn">${dmName(t.who)}${waiting(t) ? '<i class="ldr-dm-dot" aria-label="waiting on your reply"></i>' : ''}</span>
@@ -29243,8 +29497,9 @@ V.leadMessages = () => {
     <div class="ldr-dm${S.ldrThOpen ? ' show-thread' : ''}">
       <div class="ldr-dm-list" role="tablist" aria-label="Your conversations">
         <div class="ldr-dm-lh">Direct messages<span class="t-helper-01">${current.length}</span></div>
-        ${current.map(dmRow).join('')}
-        ${pastTh.length ? `<div class="ldr-dm-lh ldr-dm-lh-2">Past cohorts</div>${pastTh.map(dmRow).join('')}` : ''}
+        <label class="ldr-dm-srch">${I.search}
+          <input type="search" placeholder="Search conversations" value="${(S.ldrDmQ||'').replace(/"/g,'&quot;')}" oninput="ldrDmSearch(this)" aria-label="Search conversations"></label>
+        <div class="ldr-dm-rows">${current.map(dmRow).join('')}</div>
       </div>
       <div class="ldr-dm-thread">
         <div class="ldr-dm-h">

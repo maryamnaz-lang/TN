@@ -123,6 +123,7 @@ const leadEditable = c => !!c && c.status === 'active';
    candidate's `S.ctab` — the two pages can both be open behind the portal
    switch, which resets neither. */
 S.ldrCTab = 'progress';  /* Candidate Progress is the first of four tabs (9 Sep 2026) */
+S.ldrSesTab = 'upcoming'; /* the Sessions page's two tabs — Upcoming / Past (30 Sep 2026) */
 S.ldrNoteAt = null;
 S.ldrNoteK = '';   /* 12.4: neither type pre-selected */
 
@@ -668,6 +669,12 @@ function leadRoster(c){
   let rows = c.members.slice();
   const lvl = (S.ddVal && S.ddVal.ldrlvl) || 'All levels';
   if(lvl !== 'All levels') rows = rows.filter(m => mlevel(m) === lvl);
+  /* THE SEARCH FILTERS THE DATA NOW, not the DOM (Maryam, 30 Sep 2026 — the
+     table paginates like the admin's, so a DOM-hide would only see the current
+     page). The caret survives via the render wrapper's focus-restore
+     (`S.ldrRosterFocus`), the admin's `SRCH_FOCUS` idiom. */
+  const q = (S.ldrRosterQ || '').trim().toLowerCase();
+  if(q) rows = rows.filter(m => leadPlain(m).toLowerCase().includes(q));
   const so = S.ldrSort || {k:'name', dir:1};
   const key = ldrSortKey(c, so.k);
   rows.sort((a,b)=>{ const x=key(a), y=key(b); return (x<y?-1:x>y?1:0) * so.dir; });
@@ -676,12 +683,130 @@ function leadRoster(c){
 /* SEARCH FILTERS THE DOM, NOT THE STATE — the caret survives (the technique the
    deleted queue's note records). Re-applied after every paint by the render
    wrapper, so a level pick or a sort does not lose it. */
-function ldrRosterSearch(inp){ S.ldrRosterQ = inp.value; leadApplyRosterSearch(); }
-function leadApplyRosterSearch(){
-  const q = (S.ldrRosterQ||'').trim().toLowerCase();
-  device.querySelectorAll('.lead-roster tr[data-rname]').forEach(tr=>{
-    tr.hidden = !!q && !tr.getAttribute('data-rname').includes(q);
-  });
+/* A ROSTER RE-RENDER THAT KEEPS THE PAGE WHERE IT IS. `render()` replaces
+   `device.innerHTML`, so the `.main` scroller resets to 0 — which, on a control
+   that lives below the fold (the kebab, the pagination, a sort), throws the page
+   to the top. Stash `.main` scrollTop, and the leader render wrapper restores it
+   before it positions the kebab (the admin's preserve-scroll idiom). */
+function ldrRerender(){ const m = device.querySelector('.main'); S.ldrKeepScroll = m ? m.scrollTop : null; render(); }
+function ldrRosterSearch(inp){ S.ldrRosterQ = inp.value; S.ldrPage = 0; S.ldrRosterFocus = inp.selectionStart; ldrRerender(); }
+/* the level filter as the admin's `.fdd` dropdown (§128 CSS ships here); wired to
+   the leader's own `S.ddVal.ldrlvl` state and `S.ldrLvlOpen` open flag. */
+function ldrLevelFdd(c){
+  const cur = (S.ddVal && S.ddVal.ldrlvl) || 'All levels';
+  const opts = ['All levels'].concat(levelsPresent(c));
+  const open = S.ldrLvlOpen;
+  return `<div class="fdd${open ? ' on' : ''}">
+    <button class="fdd-t" data-ldrlvltoggle="1" aria-haspopup="listbox" aria-expanded="${open ? 'true' : 'false'}">Level: ${cur === 'All levels' ? 'All' : cur}<svg class="fdd-cx" viewBox="0 0 24 24" aria-hidden="true">${inner('chevDown')}</svg></button>
+    <div class="fdd-menu" role="listbox">${opts.map(o =>
+      `<button class="fdd-opt${o === cur ? ' on' : ''}" role="option" aria-selected="${o === cur ? 'true' : 'false'}" data-ldrlvlset="${o}">${o}</button>`).join('')}</div>
+  </div>`;
+}
+/* the admin's `.lst-tools` toolbar: the `.srch` underline field (magnifier +
+   clear-X) on the left, the level `.fdd` on the right — the same list-table chrome
+   the Super Admin uses (Maryam, 30 Sep 2026), from the design system it ships in. */
+function ldrRosterTools(c){
+  const q = S.ldrRosterQ || '';
+  return `<div class="lst-tools">
+    <div class="srch${q ? ' srch-has' : ''}">
+      <svg class="mag" viewBox="0 0 24 24">${inner('search')}</svg>
+      <input class="inp" id="ldrRosterInp" value="${q.replace(/"/g,'&quot;')}" placeholder="Search by handle or name" aria-label="Search by handle or name" autocomplete="off" oninput="ldrRosterSearch(this)">
+      ${q ? `<button type="button" class="srch-x" data-ldrsrchclear="1" aria-label="Clear search">${I.close}</button>` : ''}
+    </div>
+    <div class="lst-filters">${ldrLevelFdd(c)}</div>
+  </div>`;
+}
+/* Re-focus the roster search after the render a keystroke triggers, caret where
+   it was — the admin's SRCH_FOCUS. Called from the leader render wrapper. */
+function leadRestoreRosterFocus(){
+  if(S.ldrRosterFocus == null) return;
+  const inp = device.querySelector('#ldrRosterInp'); const pos = S.ldrRosterFocus; S.ldrRosterFocus = null;
+  if(inp){ try{ inp.focus({preventScroll:true}); }catch(e){ inp.focus(); } try{ inp.setSelectionRange(pos, pos); }catch(e){} }
+}
+/* kept a no-op so any stray caller (the render wrapper's guard) is harmless now
+   that the search filters the data */
+function leadApplyRosterSearch(){}
+
+/* ==========================================================================
+   THE MY-COHORT ROSTER: KEBAB ACTIONS + PAGINATION (Maryam, 30 Sep 2026: "follow
+   the super admin table ui ... just not show the checkboxes"). The §125 rowmenu
+   and §127 pagination CSS ship in this build already; these are the leader-side
+   drivers, ported narrow from the admin's `rowActs` / `pagination` / `placeRowMenu`
+   for the one table that uses them. No checkboxes (the admin's row-select is left
+   out, by instruction).
+   ========================================================================== */
+const LDR_PAGE_SIZES = [5, 10, 25, 50], LDR_PAGE_DEFAULT = 5;
+function ldrPageWindow(page, pages){
+  if(pages <= 7) return Array.from({length: pages}, (_, i) => i);
+  const out = [0], start = Math.max(1, page - 1), end = Math.min(pages - 2, page + 1);
+  if(start > 1) out.push('…');
+  for(let i = start; i <= end; i++) out.push(i);
+  if(end < pages - 2) out.push('…');
+  out.push(pages - 1);
+  return out;
+}
+function ldrPagination(total, page, size, pages){
+  const from = page * size + 1, to = Math.min(total, (page + 1) * size);
+  const open = S.ldrPgOpen;
+  const sizeDd = `<div class="pgn-dd${open ? ' on' : ''}">
+    <button class="pgn-dd-t" data-ldrpgdd="1" aria-haspopup="listbox" aria-expanded="${open ? 'true' : 'false'}">${size}<svg class="pgn-dd-cx" viewBox="0 0 24 24" aria-hidden="true">${inner('chevDown')}</svg></button>
+    <div class="pgn-dd-menu" role="listbox">${LDR_PAGE_SIZES.map(s =>
+      `<button class="pgn-dd-opt${s === size ? ' on' : ''}" role="option" aria-selected="${s === size ? 'true' : 'false'}" data-ldrpgsize="${s}">${s}</button>`).join('')}</div>
+  </div>`;
+  const nums = ldrPageWindow(page, pages).map(n => n === '…'
+    ? `<span class="pgn-gap">…</span>`
+    : `<button class="btn btn-sm noic ${n === page ? 'btn-p' : 'btn-g'}" data-ldrpg="${n}"${n === page ? ' aria-current="page"' : ''}>${n + 1}</button>`).join('');
+  return `<div class="pgn">
+    <div class="pgn-size"><span class="pgn-lbl">Rows per page</span>${sizeDd}</div>
+    <div class="pgn-info">${from}&ndash;${to} of ${total}</div>
+    <div class="pgn-nav">
+      <button class="btn btn-g btn-sm pgn-arrow" data-ldrpg="prev"${page === 0 ? ' disabled' : ''} aria-label="Previous page">${I.chevLeft}</button>
+      <div class="pgn-nums">${nums}</div>
+      <button class="btn btn-g btn-sm pgn-arrow" data-ldrpg="next"${page >= pages - 1 ? ' disabled' : ''} aria-label="Next page">${I.chevRight}</button>
+    </div>
+  </div>`;
+}
+/* one kebab, a dropdown of actions (§125). `LDR_RM_SEQ` resets at the top of
+   `leadRosterTable`, so an id is stable across renders (the render order is). */
+let LDR_RM_SEQ = 0;
+function ldrRowMenu(acts){
+  const id = 'lrm' + (LDR_RM_SEQ++);
+  const open = S.ldrRowMenu === id;
+  const items = acts.map(([icon, label, attr]) =>
+    `<button class="rowmenu-i" role="menuitem" ${attr}><span class="rowmenu-ic">${I[icon]}</span>${label}</button>`).join('');
+  return `<div class="rowmenu">
+    <button class="btn btn-g btn-sm rowmenu-t" data-ldrrm="${id}" aria-haspopup="menu" aria-expanded="${open ? 'true' : 'false'}" title="Actions" aria-label="Actions">${I.overflow}</button>
+    <div class="rowmenu-list${open ? ' on' : ''}" role="menu" data-lrmlist="${id}">${items}</div>
+  </div>`;
+}
+/* lift the open menu out of the sideways-clipping `.tbl-wrap` into `.main` and
+   position it in main's own (unscaled) content coordinates — the admin's
+   `placeRowMenu`, verbatim but for `data-ldrrm`/`data-lrmlist`. Called from the
+   leader render wrapper. */
+function placeLeadRowMenu(){
+  if(!S.ldrRowMenu) return;
+  const main = device.querySelector('.main');
+  const trig = device.querySelector(`.rowmenu-t[data-ldrrm="${S.ldrRowMenu}"]`);
+  const list = device.querySelector(`.rowmenu-list[data-lrmlist="${S.ldrRowMenu}"]`);
+  if(!main || !trig || !list) return;
+  const mr = main.getBoundingClientRect();
+  const scale = mr.width / main.clientWidth || 1;
+  const tr = trig.getBoundingClientRect();
+  const triRight = (tr.right - mr.left) / scale + main.scrollLeft;
+  const triTop = (tr.top - mr.top) / scale + main.scrollTop;
+  const triBottom = (tr.bottom - mr.top) / scale + main.scrollTop;
+  main.style.position = 'relative';
+  main.appendChild(list);
+  const menuW = list.offsetWidth || 190, menuH = list.offsetHeight || 0;
+  const gap = 6, edge = 8, contentW = main.clientWidth, frameH = main.clientHeight;
+  let left = triRight - menuW;
+  left = Math.max(edge, Math.min(left, contentW - menuW - edge));
+  const dock = device.querySelector('.askdock');
+  let viewBottom = main.scrollTop + frameH;
+  if(dock){ const dr2 = dock.getBoundingClientRect(); viewBottom = Math.min(viewBottom, (dr2.top - mr.top) / scale + main.scrollTop - gap); }
+  const openUp = (triBottom + gap + menuH > viewBottom) && (triTop - gap - menuH >= main.scrollTop);
+  list.style.left = left + 'px'; list.style.right = 'auto';
+  list.style.top = (openUp ? triTop - gap - menuH : triBottom + gap) + 'px'; list.style.bottom = 'auto';
 }
 function ldrSortTh(k, label, extra){
   const so = S.ldrSort || {k:'name', dir:1};
@@ -690,8 +815,13 @@ function ldrSortTh(k, label, extra){
   return `<th class="srt${on?' on':''}${extra||''}" data-ldrsort="${k}"><span class="srt-b">${label}${ar}</span></th>`;
 }
 function leadRosterTable(c){
-  const rows = leadRoster(c);
-  return `<div class="tbl-wrap"><table class="tbl lead-roster">
+  LDR_RM_SEQ = 0;                          /* stable kebab ids across renders */
+  const all = leadRoster(c);
+  const size = S.ldrPageSize || LDR_PAGE_DEFAULT;
+  const pages = Math.max(1, Math.ceil(all.length / size));
+  const page = Math.min(Math.max(0, S.ldrPage || 0), pages - 1);   /* clamp when a filter shrinks the list */
+  const rows = all.slice(page * size, page * size + size);
+  const table = `<div class="tbl-wrap"><table class="tbl lead-roster">
     <tr>
       ${ldrSortTh('name','Candidate')}
       ${ldrSortTh('level','Level')}
@@ -703,7 +833,7 @@ function leadRosterTable(c){
       ${ldrSortTh('last','Last active')}
       <th class="lead-roster-act">Actions</th>
     </tr>
-    ${rows.map(m=>{
+    ${rows.length ? rows.map(m=>{
       const a = leadAttn(m,c), done = lchDone(m), mins = lmins(m), rt = lretaken(m);
       const low = m.avg>0 && m.avg<75;
       return `<tr data-rname="${leadPlain(m).toLowerCase()}">
@@ -715,45 +845,56 @@ function leadRosterTable(c){
         <td class="num">${mins?lTimeFull(mins):'None'}${mins?`<span class="cell-sub">${Math.round(mins/Math.max(1,done))} min a chapter</span>`:''}</td>
         <td class="num">${a.held?a.att+' of '+a.held:'<span class="t-helper-01">&mdash;</span>'}</td>
         <td>${m.last==='Never'?'Never':m.last}</td>
-        <td class="tbl-act"><span class="row-acts">
-          <button class="btn btn-t btn-sm ic-l" data-go="leadMember" data-ldrmem="${m.name}" data-ldrco="${c.id}">${I.chart} View Progress</button>
-          <button class="btn btn-t btn-sm ic-l" data-ldrdm="${m.name}">${I.chat} Contact</button></span></td>
+        <td class="tbl-act lead-roster-act">${ldrRowMenu([
+          ['chart','View Progress', `data-go="leadMember" data-ldrmem="${m.name}" data-ldrco="${c.id}"`],
+          ['chat','Contact', `data-ldrdm="${m.name}"`]
+        ])}</td>
       </tr>`;
-    }).join('')}
-  </table></div>
-  <p class="lead-sync">Course figures last read from LightspeedVT ${LEAD_SYNC} (${LEAD_TZ}).</p>`;
+    }).join('') : `<tr><td colspan="9" class="lead-roster-empty">No candidate matches your search.</td></tr>`}
+  </table></div>`;
+  /* THE PAGINATION BAR sits OUTSIDE `.tbl-wrap` (§127), drawn only when the list
+     is longer than the smallest page. The "Course figures last read from
+     LightspeedVT …" line was removed 30 Sep 2026. */
+  return table + (all.length > LDR_PAGE_SIZES[0] ? ldrPagination(all.length, page, size, pages) : '');
 }
 
 /* --- the cohort header (12.2) ------------------------------------------- */
 function leadCohortHead(c){
-  const next = leadNextSession(c);
-  const nextLine = next
-    ? `Week ${next.week} &middot; ${next.chapter} &middot; <b>${sesCountdown(next)}</b>`
-    : 'No session is scheduled yet.';
   return `<div class="sec sec-noline"><div class="lead-cohd">
     <div class="lead-cohd-id">
+      ${''/* the course name below the cohort title is removed (Maryam 30 Sep 2026:
+             "remove the course name below the cohort name"); the day/week/date line
+             below carries what the reader needs, and the course is on every card. */}
       <h2 class="lead-cohd-n">${lname(c)}</h2>
-      <p class="lead-cohd-course">${lcourse(c)}</p>
     </div>
     <div class="lead-cohd-day">
       <span class="lead-cohd-dw"><b>Day ${c.day} of 90</b><span>Week ${leadWeek(c.day)} of 13</span></span>
       <span class="lead-cohd-dates">${c.start} &ndash; ${c.end}</span>
     </div>
-    <div class="lead-cohd-kv">
-      <div class="lead-cohd-cell"><span class="lead-cohd-l">Candidates</span><span class="lead-cohd-v">${c.members.length} &middot; ${levelsLabel(c)}</span></div>
-      <div class="lead-cohd-cell"><span class="lead-cohd-l">Average progress</span><span class="lead-cohd-v">${lavg(c,'pc')}%</span></div>
-      <div class="lead-cohd-cell lead-cohd-next"><span class="lead-cohd-l">Next session</span><span class="lead-cohd-v">${nextLine}</span></div>
-    </div>
+    ${''/* THE FACT CELLS MOVED DOWN, below the call card (Maryam, 30 Sep 2026:
+          "take the Candidates / Average progress / Next session cards below the
+          call card"). Candidates and Average progress became two of the four
+          "Cohort at a glance" cells (`leadCounters`); Next session is dropped —
+          the black call card and the Day/Week line above already carry it. The
+          header now holds the identity and the day line only. */}
   </div></div>`;
 }
 
-/* --- three aggregate counters (12.2) ------------------------------------ */
+/* --- the four "Cohort at a glance" cells (12.2) -------------------------- */
+/* FOUR CARDS IN A ROW, and the header's fact cells fold in here (Maryam, 30 Sep
+   2026: "change the This week at a glance heading to 'Cohort at a glance' and
+   show 4 cards in a row that are, Candidates, Average Progress, Below pass mark,
+   and Never signed in"). Candidates and Average progress moved down out of
+   `leadCohortHead`; Below pass mark and Never signed in were already here.
+   `.facts.pf-facts` is a fixed four-column grid at ≥900 (§105.1a), so four cells
+   read as one clean row rather than the 3 + empty the three-cell band drew. */
 function leadCounters(c){
   const below = c.members.filter(m => m.avg>0 && m.avg<75).length;
   const never = c.members.filter(m => m.last==='Never').length;
   return `<div class="sec">
-    <div class="sec-h"><h2>This week at a glance</h2></div>
+    <div class="sec-h"><h2>Cohort at a glance</h2></div>
     <div class="facts pf-facts lead-counts">
+      ${pfFact(I.group,  '--mk-3', 'Candidates', String(c.members.length))}
       ${pfFact(I.growth, '--mk-4', 'Average progress', lavg(c,'pc') + '%')}
       ${pfFact(I.chart,  '--mk-1', 'Below pass mark', String(below))}
       ${pfFact(I.misuse, '--mk-2', 'Never signed in', String(never))}
@@ -778,7 +919,11 @@ function leadPastSection(){
             <span class="cardrow-t">${lname(c)}${cancelled?' <span class="tag sm">Cancelled</span>':''}</span>
             <span class="cardrow-s">${lcourse(c)} &middot; ${c.start} &ndash; ${c.end} &middot; ${c.members.length} candidates &middot; ${leadRecsWritten(c)} recommendations written</span>
           </span>
-          <span class="cardrow-go">${I.chevRight}</span>
+          ${''/* a real, SIZED trailing arrow so the row reads as clickable (Maryam
+                30 Sep 2026). It was `.cardrow-go` — a class with no CSS, so the
+                chevron rendered unsized/invisible; `.tile-arrow` is the sized 18px
+                arrow every other leader row uses. */}
+          <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg>
         </button>`;
       }).join('')}
     </div>
@@ -832,14 +977,27 @@ V.leadDash = () => {
     </div>
   </div>
   ${leadCohortHead(c)}
+  ${''/* THE BLACK CALL CARD IS BACK, under the cohort header (Maryam, 30 Sep
+        2026), and it is the CARD ALONE — no "Your upcoming calls" heading and no
+        "View all sessions" link (Maryam, 30 Sep 2026: "remove the heading row
+        with Your upcoming calls View all sessions"). It is the §113 `.lcal-next`
+        black card (square slot, live countdown, roster faces, gated accent
+        Join). With one live cohort `lcalls()` is one call, so `.lcal-row` holds
+        the one card. The section is a BARE BLOCK ROW (`.lcal-row` first child, no
+        heading) so §10/§138 close it with 32px of air and NO divider (Maryam,
+        30 Sep 2026: "remove the divider after the black card") — that is why the
+        headed `leadCallsSec` is not used here. Header, this card and the counters
+        then sit 32px apart, all three sections (Maryam, 30 Sep 2026). */}
+  <div class="sec lead-callsec"><div class="lcal-row">${lcalls().map((k, i) => lcalCard(k, i === 0)).join('')}</div></div>
   ${leadCounters(c)}
   <div class="sec" id="lead-roster">
     <div class="sec-h"><h2>Candidates</h2></div>
-    <div class="lead-roster-tools">
-      <label class="lead-search"><span class="lead-search-mk">${I.search}</span>
-        <input type="search" placeholder="Search by handle or name" value="${(S.ldrRosterQ||'').replace(/"/g,'&quot;')}" oninput="ldrRosterSearch(this)"></label>
-      <span class="lead-roster-filter">${dd('ldrlvl', ['All levels'].concat(levelsPresent(c)), (S.ddVal&&S.ddVal.ldrlvl)||'All levels')}</span>
-    </div>
+    ${''/* THE ADMIN LIST-TABLE CHROME (Maryam, 30 Sep 2026: "follow the search
+          field, filter ui, and the table header divider ui ... from super admin
+          table"). `.lst-tools` + `.srch` + `.fdd` are the design system's own
+          list-table classes (§128/§120) — the same component the Super Admin
+          uses — wired to the leader's roster state; no checkboxes. */}
+    ${ldrRosterTools(c)}
     ${leadRosterTable(c)}
   </div>
   ${leadPastSection()}
@@ -962,7 +1120,6 @@ V.leadCohorts = () => {
    ========================================================================== */
 V.leadCohort = () => {
   const c = lco();
-  const gap = lpaceGap(c);
   const flagged = c.members.filter(m => m.flag);
   const severe = flagged.filter(m => m.flag.k === 'bad');
   const weakest = c.members.filter(m => m.avg > 0).slice().sort((a,b) => a.avg - b.avg)[0];
@@ -998,13 +1155,25 @@ V.leadCohort = () => {
          ONE DRAWING, THREE PAGES. The dashboard, the Calls page and now this one
          all call `leadCallCard(lcall(c))`, so the same appointment cannot be
          described three ways — the `bkStamp` rule, one portal over. What this
-         caller states is only its own secondary. */}
-  ${leadCallCard(lcall(c), {second:{at:`data-ldrbrief="${c.id}"`, ic:I.edit, t:'Generate the brief'}})}
+         caller states is only its own secondary.
+
+         ONLY FOR AN ACTIVE COHORT (Maryam, 30 Sep 2026: "why we are showing a
+         call card in the past cohort detail page?"). A completed/cancelled
+         cohort has no upcoming session, so the "Upcoming Cohort Session" Join
+         card is drawn only while `c.status === 'active'`. A past cohort opens
+         straight on its figure band. */}
+  ${c.status === 'active' ? leadCallCard(lcall(c), {second:{at:`data-ldrbrief="${c.id}"`, ic:I.edit, t:'Generate the brief'}}) : ''}
   <div class="sec">
     <div class="stats">
-      ${statCell(I.growth, 'Average progress', lavg(c,'pc') + '<small>%</small>', `${gap >= 0 ? '+' + gap : gap} against pace`)}
+      ${''/* THE SUB IS ALWAYS "Of all candidates", never "+N/-N against pace"
+             (Maryam, 30 Sep 2026). The pace gap read as a judgement on the
+             cohort's standing on a plain average figure; it stays the sort key
+             for the attention queue (`lpaceGap`), just off this cell. */}
+      ${statCell(I.growth, 'Average progress', lavg(c,'pc') + '<small>%</small>', 'Of all candidates')}
       ${statCell(I.time,   'Expected pace',    lpace(c) + '<small>%</small>', `day ${c.day} of 90`)}
-      ${statCell(I.chart,  'Assessment average', lassess(c) ? lassess(c) + '<small>%</small>' : '<small>Not yet</small>', weakest ? `lowest ${weakest.avg}% &middot; ${c.members.filter(m => m.avg > 0).length} of ${c.members.length} assessed` : 'nothing assessed yet')}
+      ${''/* SUB IS "lowest N%" ONLY — the "· N of N assessed" count is dropped
+             (Maryam, 30 Sep 2026: "remove 8 of 8 assessed"). */}
+      ${statCell(I.chart,  'Assessment average', lassess(c) ? lassess(c) + '<small>%</small>' : '<small>Not yet</small>', weakest ? `Lowest ${weakest.avg}%` : 'Nothing assessed yet')}
       ${statCell(I.warningAlt, 'Flagged', flagged.length + `<small> of ${c.members.length}</small>`, `${severe.length} severe`)}
     </div>
   </div>
@@ -1783,6 +1952,42 @@ device.addEventListener('keydown', e => {
    filter: open the composer twice and it offers the kind you chose last. */
 device.addEventListener('change', e => { if(e.target.id === 'ldrNoteK') S.ldrNoteK = e.target.value; });
 device.addEventListener('click', e => {
+  /* §125/§127 — the My Cohort roster's kebab menu and pagination size dropdown.
+     An outside press closes whichever is open (it does NOT return, so the click
+     carries on to the branch it was meant for — the views.js `S.acct` idiom); a
+     press on a menu item clears the kebab so the next paint does not reopen it
+     (the item's own handler in views/lead4 runs first and navigates). */
+  const inRm = e.target.closest('.rowmenu, .rowmenu-list');
+  const inPg = e.target.closest('.pgn-dd');
+  const inFd = e.target.closest('.fdd');
+  /* clear whichever overlay the press fell outside. `ldrRerender` keeps the page
+     where it is; if an action branch below also renders, the scroll stash is
+     read once per synchronous render so both land on the same place. */
+  if(S.ldrRowMenu && !inRm){ S.ldrRowMenu = null; ldrRerender(); }
+  if(S.ldrPgOpen && !inPg){ S.ldrPgOpen = null; ldrRerender(); }
+  if(S.ldrLvlOpen && !inFd){ S.ldrLvlOpen = null; ldrRerender(); }
+
+  const rmT = e.target.closest('[data-ldrrm]');
+  if(rmT){ S.ldrRowMenu = S.ldrRowMenu === rmT.dataset.ldrrm ? null : rmT.dataset.ldrrm; ldrRerender(); return; }
+  if(e.target.closest('.rowmenu-list')) S.ldrRowMenu = null;   /* a menu item press */
+
+  const pgdd = e.target.closest('[data-ldrpgdd]');
+  if(pgdd){ S.ldrPgOpen = !S.ldrPgOpen; ldrRerender(); return; }
+  const pgsz = e.target.closest('[data-ldrpgsize]');
+  if(pgsz){ S.ldrPageSize = +pgsz.dataset.ldrpgsize; S.ldrPage = 0; S.ldrPgOpen = null; ldrRerender(); return; }
+  const pg = e.target.closest('[data-ldrpg]');
+  if(pg){ const act = pg.dataset.ldrpg; let p = S.ldrPage || 0;
+    p = act === 'prev' ? p - 1 : act === 'next' ? p + 1 : +act;
+    S.ldrPage = Math.max(0, p); ldrRerender(); return; }
+
+  /* the level filter (admin `.fdd`) — toggle, pick, and clear the search */
+  const lvT = e.target.closest('[data-ldrlvltoggle]');
+  if(lvT){ S.ldrLvlOpen = !S.ldrLvlOpen; ldrRerender(); return; }
+  const lvS = e.target.closest('[data-ldrlvlset]');
+  if(lvS){ S.ddVal = S.ddVal || {}; S.ddVal.ldrlvl = lvS.dataset.ldrlvlset; S.ldrLvlOpen = null; S.ldrPage = 0; ldrRerender(); return; }
+  const scx = e.target.closest('[data-ldrsrchclear]');
+  if(scx){ S.ldrRosterQ = ''; S.ldrPage = 0; S.ldrRosterFocus = 0; ldrRerender(); return; }
+
   /* the cohort filter on Course Reports */
   const rep = e.target.closest('[data-ldrrep]');
   if(rep){ S.ldrRep = rep.dataset.ldrrep; render(); return; }
@@ -1791,11 +1996,15 @@ device.addEventListener('click', e => {
   const ctb = e.target.closest('[data-ldrctab]');
   if(ctb){ S.ldrCTab = ctb.dataset.ldrctab; render(); return; }
 
+  /* the Sessions page's two tabs (Upcoming / Past sessions) */
+  const stb = e.target.closest('[data-ldrsestab]');
+  if(stb){ S.ldrSesTab = stb.dataset.ldrsestab; render(); return; }
+
   /* EPIC 12.2 — the My Cohort roster's sortable columns. Same column toggles
      the direction; a new column starts ascending. */
   const srt = e.target.closest('[data-ldrsort]');
   if(srt){ const k = srt.dataset.ldrsort, cur = S.ldrSort || {k:'name', dir:1};
-    S.ldrSort = {k, dir: cur.k === k ? -cur.dir : 1}; render(); return; }
+    S.ldrSort = {k, dir: cur.k === k ? -cur.dir : 1}; ldrRerender(); return; }
 
   /* the member page's chapter list, five rows or thirteen */
   if(e.target.closest('[data-ldrchall]')){ S.ldrChAll = !S.ldrChAll; render(); return; }
