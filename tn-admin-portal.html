@@ -14,7 +14,7 @@
      The <style> block is PROTOTYPE CHROME AND NOTHING ELSE (the device frame,
      the viewport picker, the wordmark size, a toast host) — no product rule.
      ========================================================================== -->
-<link rel="stylesheet" href="design-system/talentnext-ds.css?b=7499312e">
+<link rel="stylesheet" href="design-system/talentnext-ds.css?b=f89c861a">
 <style id="admin-auth-slider">
 /* THE FRONT DOOR IS A SLIDER — ported verbatim from the candidate portal's
    §132 (hifi/build/132-authslide.css). That layer is hifi-only
@@ -536,6 +536,12 @@ input:-webkit-autofill:focus{
      ellipsize (crumb-bar is flex:1 min-width:0), so nothing overflows. */
   .app .roleswitch-t{max-width:150px}
 }
+</style>
+<style id="admin-auth-loader">
+/* THE SIGN-IN LOADER is the DS `.tn-loader` centred full-frame on the app ground
+   (Maryam, 30 Sep 2026). The blade animation + ink ship in the linked DS; this is
+   only the centring wrapper. */
+.app .auth-loading{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--background)}
 </style>
 <style id="admin-rail-tip">
 /* THE COLLAPSED RAIL NAMES EVERY ICON ON HOVER AND ON KEYBOARD FOCUS (design
@@ -1548,8 +1554,12 @@ input:-webkit-autofill:focus{
    the JUST-SWITCHED chart (`.lc-anim`) grows its bars up from the baseline and
    fades its lines/areas in. One-render only — the marker is cleared after render,
    so unrelated re-renders don't re-animate. */
-.app .lc-anim .lchart-svg{animation:gperFade .45s ease both}
-.app .lc-anim .lchart-svg rect{transform-box:fill-box; transform-origin:center bottom; animation:gperBar .5s cubic-bezier(.2,.8,.2,1) both}
+/* A SLOWER grow-in (Maryam 30 Sep 2026: "the graph interaction should be slow") —
+   the bars rise from the baseline over ~1.2s and the fade eases in over ~0.8s, so
+   the reveal reads as a deliberate build rather than a flash. Shared by the login
+   grow-in and the period-filter switch. */
+.app .lc-anim .lchart-svg{animation:gperFade .8s ease both}
+.app .lc-anim .lchart-svg rect{transform-box:fill-box; transform-origin:center bottom; animation:gperBar 1.2s cubic-bezier(.2,.8,.2,1) both}
 @keyframes gperBar{from{transform:scaleY(0)} to{transform:scaleY(1)}}
 @keyframes gperFade{from{opacity:0} to{opacity:1}}
 
@@ -1613,7 +1623,7 @@ input:-webkit-autofill:focus{
   </div>
 </div>
 
-<script src="design-system/talentnext-ds.js?b=7499312e"></script>
+<script src="design-system/talentnext-ds.js?b=f89c861a"></script>
 <script>
 /* ==========================================================================
    THE SUPER ADMIN PORTAL
@@ -12798,7 +12808,6 @@ function financeDiscounts(){
     if(oa !== ob) return oa - ob;
     return String(a.end || '').localeCompare(String(b.end || ''));
   });
-  const totalGiven = sorted.reduce((s, d) => s + discValue(d), 0);
   return `
   <section class="sec">
     ${searchHead('Discount Codes', 'Every discount code and how much it has funded — what is live, what has run its course, and what has cost more than it was meant to.',
@@ -12828,10 +12837,6 @@ function financeDiscounts(){
         discActs(d)
       ]})), {select:false})
       : emptyState('ticket', 'No discount codes match', 'Nothing in this filter yet.')}
-  </section>
-  <section class="sec">
-    ${secHead('Totals for this view')}
-    ${kv([['Value given away', money(totalGiven), 'n']])}
   </section>`;
 }
 /* EPIC 9.6 — VIEW DISCOUNT CODE DETAIL. Read-only; every change is made from the
@@ -14685,7 +14690,7 @@ const AUTH_ART_ADMIN = `
   <span class="auth-logo" role="img" aria-label="TalentNext">${LOGO_SVG}</span>
   <div class="auth-intro">
     <h2 class="t-heading-01">Welcome to TALENTnext</h2>
-    <p class="t-body-02 auth-lede">An AI-native platform that grows your leadership,<br>one level at a time.</p>
+    <p class="t-body-02 auth-lede">Manage talent, assessments, cohorts, and growth—all in one place.</p>
   </div>
   <div class="auth-foot-row">
     <p class="t-helper-01 auth-foot">&copy; 2026 TALENTnext Limited</p>
@@ -14778,6 +14783,19 @@ function pwFields(){
       <input class="inp fill" id="cp" type="password" placeholder="Re-enter the password" autocomplete="new-password"></div>
     ${pwChecklist('')}
   </div>`;
+}
+/* THE SIGN-IN LOADER SCENE — the candidate portal's `.tn-loader` (three relay
+   blades, `--icon-primary` ink), centred full-frame on the app ground. The
+   `.tn-loader` CSS ships in the design system this portal links; `.auth-loading`
+   is the admin-local centring wrapper. Wrapped in `.app` so the DS scope matches. */
+function adminLoaderScreen(){
+  return `<div class="app authShell" data-portal="admin"><div class="auth-loading">
+    <div class="tn-loader" role="status" aria-label="Signing you in">
+      <span class="tn-loader__blade tn-loader__blade--a"></span>
+      <span class="tn-loader__blade tn-loader__blade--b"></span>
+      <span class="tn-loader__blade tn-loader__blade--c"></span>
+    </div>
+  </div></div>`;
 }
 function authView(){
   const step = S.auth === 'code' ? authCode()
@@ -14896,11 +14914,29 @@ ACTIONS.signin = () => {
      flow (goreset/resetcont → authFlow 'reset'), where the code protects a password
      change. Everything the OTP-success branch did lands here instead. */
   S.authFlow = 'signin';
-  S.signedIn = true; S.auth = 'login';
-  try { sessionStorage.setItem('tn-admin-signedin', '1'); } catch(e){}
-  AUDIT.unshift({when:'Just now', who:ME.name, role:'Super Admin', obj:'Email + password', act:'Signed in', mod:'System & Audit', cat:'Sign-in', sev:'notice', ip:'10.2.14.2'});
-  S.mod = 'home'; S.sub = 'home'; S.hist = [];
-  try { history.replaceState(null, '', location.pathname + location.search); } catch(e){}
+  /* SHOW THE TN LOADER FOR 2s, THEN LAND ON THE DASHBOARD (Maryam, 30 Sep 2026:
+     "show the loading we are using on the candidate portal after the onboarding
+     process ... then lands the user on the dashboard"). The standing load
+     convention: hold a flag, render() paints the loader, a 2000ms setTimeout
+     (never rAF — trap 17) completes the sign-in and renders the console. The
+     dispatcher's own render() after this action paints the loader because
+     `S.authLoading` is set and the render gate checks it before `S.signedIn`. */
+  S.authLoading = true;
+  setTimeout(() => {
+    S.authLoading = false;
+    S.signedIn = true; S.auth = 'login';
+    try { sessionStorage.setItem('tn-admin-signedin', '1'); } catch(e){}
+    AUDIT.unshift({when:'Just now', who:ME.name, role:'Super Admin', obj:'Email + password', act:'Signed in', mod:'System & Audit', cat:'Sign-in', sev:'notice', ip:'10.2.14.2'});
+    S.mod = 'home'; S.sub = 'home'; S.hist = [];
+    try { history.replaceState(null, '', location.pathname + location.search); } catch(e){}
+    render();
+    /* PLAY THE PLATFORM USERS GROW-IN ON THE FIRST DASHBOARD PAINT (Maryam, 30 Sep
+       2026: "the graph should show the interaction ... instead of showing static").
+       `armPUGrow` normally fires on `load`, but that fired while the login screen was
+       up (no chart), so it no-op'd; running it here, after the post-loader render,
+       plays the same grow-in the reload shows. A short settle lets layout land. */
+    if(typeof armPUGrow === 'function') setTimeout(armPUGrow, 80);
+  }, 2000);
 };
 ACTIONS.authback = () => { S.auth = 'login'; S.authFlow = 'signin'; S.authErr = null; };
 ACTIONS.goreset = () => { S.auth = 'reset'; S.authFlow = 'reset'; S.authErr = null; };
@@ -15487,6 +15523,13 @@ function render(){
   if(S.activate){ device.innerHTML = activateView();
     const f = device.querySelector('.otp input, #np'); if(f && document.activeElement !== f){ try { f.focus(); } catch(e){} }
     return; }
+  /* THE SIGN-IN LOADER. Between a correct Log In and the console, the frame holds
+     the TN loader for 2s (Maryam, 30 Sep 2026). Checked before the signed-out gate
+     because `S.signedIn` is still false during the transition. */
+  if(S.authLoading){
+    device.innerHTML = adminLoaderScreen();
+    return;
+  }
   /* SA-02 — THE GATE. Signed out, the frame holds the sign-in scene and nothing
      else: no shell, no rail, no dock, no hash written. */
   if(!S.signedIn){

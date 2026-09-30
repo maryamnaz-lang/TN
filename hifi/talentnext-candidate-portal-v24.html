@@ -6865,7 +6865,10 @@ button.btn-p:active,
 .app .lead-hdr-w{font-size:var(--t-caption-size);color:var(--text-secondary)}
 @container app (max-width:719.98px){ .app .lead-hdr-w{display:none} }
 @container app (max-width:479.98px){ .app .lead-hdr{display:none} }
-.app .lead-cohd{display:grid;gap:var(--s03)}
+.app .lead-cohd{display:grid;gap:var(--s02)}
+.app .sec.sec-cs.lead-evtabs{padding-bottom:0}
+.app .sec.sec-cs.lead-evtabs > .cs{margin-bottom:0}
+.app .sec.lead-evbody{padding-top:var(--s05)}
 .app .lead-cohd-id{display:flex;flex-direction:column;gap:2px}
 .app .lead-cohd-n{font-size:var(--t-h1-size);line-height:var(--t-h1-lh);font-weight:var(--t-w-strong);color:var(--accent-text)}
 .app .lead-cohd-course{font-size:var(--t-desc-size);line-height:normal;color:var(--text-secondary)}
@@ -6922,7 +6925,7 @@ button.btn-p:active,
 .app .stat .stat-low{color:var(--support-error)}
 .app .crs-card .crs-lsvt{margin-top:var(--s05)}
 .app .atd-row{display:flex;align-items:center;justify-content:space-between;gap:var(--s04);
-  padding:var(--s04) 0;border-bottom:1px solid var(--rule)}
+  padding:var(--s04) var(--pad-x);border-bottom:1px solid var(--rule)}
 .app .atd-row:last-child{border-bottom:0}
 .app .atd-b{display:flex;flex-direction:column;gap:2px;min-width:0}
 .app .atd-t{font-size:var(--t-compact-size);color:var(--text-primary)}
@@ -7422,7 +7425,7 @@ button.btn-p:active,
 .app .page.msg-mod{
   display:flex;flex-direction:column;flex:1 1 auto;min-height:0;
   width:100%;max-width:100%;box-sizing:border-box;
-  padding-bottom:0}
+  padding-bottom:var(--s05)}
 .app .page.msg-mod > .sec.ldr-dm-sec{
   display:flex;flex-direction:column;flex:1 1 auto;min-height:0}
 .app .page.msg-mod > .sec.ldr-dm-sec > .ldr-dm{flex:1 1 auto;min-height:0}
@@ -10204,7 +10207,7 @@ button.btn-p:active,
 .app .lcal-faces .lcal-face-more{
   font-size:var(--t-caption-size);
   font-weight:var(--t-w-strong);
-  color:var(--accent-text)}
+  color:var(--on-dark)}
 .app .page .pulse .stand .stand-l{
   font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-compact-ls);
@@ -13671,16 +13674,17 @@ button.btn-p:active,
   gap:2px;
   padding:var(--s04);
   text-align:center;
-  background-color:color-mix(in srgb, var(--on-dark) 5%, transparent)}
+  background-color:color-mix(in srgb, var(--on-dark) 5%, transparent);
+  display:none}
 .app .lcal-slot-ic{line-height:0;margin-bottom:2px}
 .app .lcal-slot-ic svg{width:18px;height:18px;display:block}
 .app .lcal-next > .lcal-body{
   flex:1 1 auto;min-width:0;
   display:flex;flex-direction:column;align-items:stretch;
-  gap:var(--s04);
-  padding:var(--s07) var(--s07) var(--s07) var(--s05)}
+  gap:var(--s03);
+  padding:var(--s07)}
 .app .lcal-next .lcal-f > .btn{min-height:40px}
-.app .lcal-next .lcal-f{align-items:flex-end}
+.app .lcal-next .lcal-f{align-items:flex-end;padding-top:0}
 .app .lcal-timerbox{
   margin-left:auto;flex:none;
   display:inline-flex;align-items:center;gap:var(--s02);
@@ -13695,7 +13699,7 @@ button.btn-p:active,
   width:22px;height:22px;flex:none;
   display:inline-flex;align-items:center;justify-content:center;
   margin-left:-8px;border-radius:50%;
-  background:var(--background);
+  background:color-mix(in srgb, var(--on-dark) 14%, var(--gray-100));
   box-shadow:0 0 0 2px var(--gray-100);
   position:relative;z-index:2}
 .app .agt{padding:0 var(--pad-x)}
@@ -15195,6 +15199,29 @@ button.btn-p:active,
 .app .page > .sec:last-child::after{display:none}
 .app .page > .sec.dark-card + .sec:has(> .sec-h){padding-top:var(--s05)}
 .app .page > .sec:not(.dark-card):is(:has(> .stats),:has(> .facts),:has(> .certban),:has(> .tile-stack),:has(> .tile),:has(> .cardrow),:has(> .gcard),:has(> .kv),:has(> .stat),:has(> .note),:has(> .plate),:has(> .lcal-row)):has(+ .sec > .sec-h){padding-bottom:var(--s05)}
+.app .scv{position:relative}
+.app .scene-cell{position:relative;display:flex;flex-direction:column;min-width:0}
+.app .scv:has(.scv-share.on),
+.app .scene-cell:has(.scv-share.on){z-index:30}
+.app .scv-share{position:absolute;top:var(--s03);right:var(--s03);z-index:4}
+.app .scv-share-t{
+  display:grid;place-items:center;
+  width:32px;height:32px;border-radius:50%;border:0;cursor:pointer;
+  background:rgba(0,0,0,.44)}
+.app .scv-share-t svg{width:18px;height:18px;color:#fff;display:block}
+.app .scv-share-menu{
+  position:absolute;top:calc(100% + var(--s02));right:0;left:auto;z-index:30;
+  min-width:220px;display:flex;flex-direction:column;text-align:left;
+  background:var(--layer-01);border:1px solid var(--rule);
+  box-shadow:0 8px 24px rgba(17,17,17,.12)}
+.app .scv-share-i{
+  display:flex;align-items:center;gap:var(--s04);
+  padding:var(--s04) var(--s05);
+  background:transparent;border:0;cursor:pointer;text-align:left}
+.app .scv-share-i + .scv-share-i{border-top:1px solid var(--rule)}
+.app .scv-share-ic{flex:none;display:grid;place-items:center;width:22px;height:22px;color:var(--brand)}
+.app .scv-share-ic svg{width:22px;height:22px;display:block;fill:currentColor}
+.app .scene-row .scene-cell:first-child .scv-share-menu{left:0;right:auto}
 
 </style>
 </head>
@@ -16265,7 +16292,7 @@ function sceneCard(kind, i, n){
 
 function sceneRow(kind){
   const keep = sceneKeep(kind) || [0,1,2];
-  return `<div class="scene-row">${keep.map((i,n)=>sceneCard(kind,i,n+1)).join('')}</div>`;
+  return `<div class="scene-row">${keep.map((i,n)=>`<div class="scene-cell">${sceneCard(kind,i,n+1)}${shareControl('rep:'+kind+':'+i)}</div>`).join('')}</div>`;
 }
 
 function scenePick(kind){
@@ -23162,12 +23189,18 @@ function scenesCarousel(title, scenes, opts){
       </div>
     </div>
     <div class="scv-row">
-      ${scenes.map(s => `<div class="scv">
+      ${scenes.map((s, idx) => `<div class="scv">
         <span class="scv-art">
           <img src="${s.img}" alt="">
           <span class="scv-play">${I.play}</span>
           <span class="scv-at t-caption">${s.at}</span>
         </span>
+        ${''/* THE SHARE CONTROL IS A SIBLING OF `.scv-art`, NOT A CHILD — the
+              art is `overflow:hidden`, so its menu would be clipped inside it.
+              `opts.shareFor(idx)` is the caller's own control (candidate only,
+              it needs `S.shareOpen`); a portal that hands no `shareFor` gets
+              nothing, which is why this builder stays pure enough for the DS. */}
+        ${opts.shareFor ? opts.shareFor(idx) : ''}
         <span class="scv-b">
           <span class="scv-h t-h4">${s.title}</span>
         </span>
@@ -23191,7 +23224,7 @@ const pfScenes = () => {
   const a = AGENTS[(S.booking && S.booking.agent) || S.agent || recKey()] || AGENTS.priya;
   const scenes = SCENES.level.map(([t, , at]) => ({img:a.img, i:a.i, name:a.n, at, title:t}));
   const foot = `<button class="scene-ask" data-tal-ask="Why were these scenes chosen from my interview?"><i class="aih-mk"></i>Ask Tal why these scenes were chosen from your interview?</button>`;
-  return scenesCarousel('Interview scenes', scenes, {foot});
+  return scenesCarousel('Interview scenes', scenes, {foot, shareFor: i => shareControl('scv:' + i)});
 };
 
 const pfSecView = {
@@ -23490,6 +23523,21 @@ const SOCIAL = [
    svg:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>'}
 ];
 S.linked = S.linked || {linkedin:true, instagram:true, twitter:true};
+
+const SHARE_NETS = ['linkedin', 'instagram', 'twitter'];
+S.shareOpen = S.shareOpen || null;
+function shareControl(id){
+  const open = S.shareOpen === id;
+  return `<span class="scv-share${open ? ' on' : ''}">
+    <button class="scv-share-t" data-shareopen="${id}" aria-haspopup="true" aria-expanded="${open}" aria-label="Share this scene">${I.share}</button>
+    ${open ? `<div class="scv-share-menu" role="menu">
+      ${SHARE_NETS.map(k => {
+        const s = SOCIAL.find(x => x.k === k);
+        return `<button class="scv-share-i" data-shareto="${s.k}" role="menuitem" style="--brand:${s.color}"><span class="scv-share-ic">${s.svg}</span><span class="t-body">Share on ${s.n}</span></button>`;
+      }).join('')}
+    </div>` : ''}
+  </span>`;
+}
 
 function pfLinkedView(){
   return `<div class="sec sec-linked" data-pfsec="linked">
@@ -24502,6 +24550,7 @@ device.addEventListener('click', e => {
   if(S.acct && !t.closest('.acct-t, .acct-menu')){ S.acct = false; render(); }
   if(S.crtMenu !== null && !t.closest('.crt-menu, .crt-pop')){ S.crtMenu = null; render(); }
   if(S.certShare && !t.closest('.crt-share-wrap')){ S.certShare = false; render(); }
+  if(S.shareOpen && !t.closest('.scv-share')){ S.shareOpen = null; render(); }
   if(S.dd && !t.closest('.dd')){ S.dd = null; render(); }
 
   const ddt = t.closest('[data-ddtoggle]');
@@ -24772,7 +24821,9 @@ device.addEventListener('click', e => {
     render(); return;
   }
   if(t.closest('[data-certshare]')){ S.certShare = !S.certShare; render(); return; }
-  if(t.closest('[data-shareto]')){ S.certShare = false; render(); return; }
+  const so = t.closest('[data-shareopen]');
+  if(so){ const id = so.dataset.shareopen; S.shareOpen = S.shareOpen === id ? null : id; render(); return; }
+  if(t.closest('[data-shareto]')){ S.certShare = false; S.shareOpen = null; render(); return; }
   if(t.closest('[data-chall]')){ S.chAll = !S.chAll; render(); return; }
 
   const sc = t.closest('[data-scene]');
@@ -26974,7 +27025,8 @@ const leadCallCard = (k, o) => `<div class="sec dark-card crow-dark">
     ${crow(leadCall(k, false), {when:false, second:false})}
   </div>`;
 
-const lcalCard = (k, lead) => {
+const lcalCard = (k, lead, opts) => {
+  const o = opts || {};
   const act = lead
     ? `<button class="btn btn-p btn-sm noic" data-call="cohort" data-joinwhen="${k.when}" data-joinmins="${k.mins}"${
         joinLive(k.when, k.mins) ? '' : ` disabled title="${joinShut(k.when)}"`}>Join call ${I.arrowRight}</button>`
@@ -27000,14 +27052,17 @@ const lcalCard = (k, lead) => {
                show In 2hrs 40mins"). No `data-calltill`, so `callTimerArm` leaves
                it alone — the demo card reads the call as still ahead, which also
                keeps the Join in its accent-disabled state. */}
-        <span class="lcal-timerbox">${I.time}<span class="lcal-timer t-h4">In 2hrs 40mins</span></span>
+        ${''/* the countdown label; callers may override it (the Sessions page passes
+               "In 02:40", the HH:MM form — Maryam 30 Sep 2026). */}
+        <span class="lcal-timerbox">${I.time}<span class="lcal-timer t-h4">${o.countdown || 'In 2hrs 40mins'}</span></span>
       </span>
       <span class="lcal-seatsrow">
         ${faces ? `<span class="lcal-faces">${faces}${moreFaces ? `<span class="lcal-face-more">+${moreFaces}</span>` : ''}</span>` : ''}
         <span class="lcal-seats t-desc">${k.seats} candidates</span>
       </span>
       <span class="lcal-f">
-        <span class="lcal-m t-desc">${k.mins} minutes</span>
+        ${''/* "N minutes session" (Maryam 30 Sep 2026), the black dashboard card only. */}
+        <span class="lcal-m t-desc">${k.mins} minutes session</span>
         ${act}
       </span>
     </span>
@@ -27112,6 +27167,7 @@ const leadEditable = c => !!c && c.status === 'active';
 
 S.ldrCTab = 'progress';  /* Candidate Progress is the first of four tabs (9 Sep 2026) */
 S.ldrSesTab = 'upcoming'; /* the Sessions page's two tabs — Upcoming / Past (30 Sep 2026) */
+S.ldrEvTab = 'awaiting';  /* the Evaluations page's two tabs — Awaiting / Evaluated (30 Sep 2026) */
 S.ldrNoteAt = null;
 S.ldrNoteK = '';   /* 12.4: neither type pre-selected */
 
@@ -28398,6 +28454,9 @@ device.addEventListener('click', e => {
   const stb = e.target.closest('[data-ldrsestab]');
   if(stb){ S.ldrSesTab = stb.dataset.ldrsestab; render(); return; }
 
+  const evb = e.target.closest('[data-ldrevtab]');
+  if(evb){ S.ldrEvTab = evb.dataset.ldrevtab; render(); return; }
+
   const srt = e.target.closest('[data-ldrsort]');
   if(srt){ const k = srt.dataset.ldrsort, cur = S.ldrSort || {k:'name', dir:1};
     S.ldrSort = {k, dir: cur.k === k ? -cur.dir : 1}; ldrRerender(); return; }
@@ -28520,13 +28579,14 @@ V.leadSessions = () => {
   const past = all.filter(s => sesEnd(s) < LEAD_NOW).reverse();
   return `<main class="main"><div class="page lead-ses-page">
   ${ph('Sessions')}
-  ${''/* THE NEXT SESSION IS THE BLACK CALL CARD (Maryam, 30 Sep 2026: "bring
-        back the black card for call") — `leadCallCard`, the same appointment
-        drawing the dashboard and the cohort page, with its gated Join. It is its
-        own `.sec.dark-card`, so it takes the `--pad-x` gutter and the page reads
-        with the padding every other page has (the pink `.ses-next` card, and the
-        full-bleed `.ses-row` list it sat over, were the missing-gutter cause). */}
-  ${next ? leadCallCard(lcall(c)) : `<div class="sec"><div class="empty" style="border:0">${I.calendar}<h3>No session is scheduled yet.</h3></div></div>`}
+  ${''/* THE NEXT SESSION IS THE MY-COHORT BLACK CALL CARD (Maryam, 30 Sep 2026:
+        "use the same black call card on my cohorts screen in place of the black card
+        on the session screen"). The same `.lcal-next` `lcalCard` the dashboard draws
+        (`lcall(c)` is its record) in its `.lcal-row` wrapper, so the two screens read
+        identically — only the countdown differs, "In 02:40" here (Maryam: "just
+        update the In 2hrs 40mins text to 'In 02:40'"). This replaces `leadCallCard`,
+        the older crow-based card. */}
+  ${next ? `<div class="sec lead-callsec"><div class="lcal-row">${lcalCard(lcall(c), true, {countdown:'In 02:40'})}</div></div>` : `<div class="sec"><div class="empty" style="border:0">${I.calendar}<h3>No session is scheduled yet.</h3></div></div>`}
   ${''/* TWO TABS — Upcoming / Past sessions (Maryam 30 Sep 2026: "instead of this
         long page, i need 2 tabs of Upcoming and Past Sessions"). The two lists
         were stacked down one scroll; they are one `.sec.sec-cs` strip now, the
@@ -28556,20 +28616,30 @@ V.leadSession = () => {
     ${ph('Attendance')}<div class="sec"><div class="empty" style="border:0">${I.calendar}<h3>No session</h3></div></div></div></main>`;
   const reg = leadRegister(c, s);
   const attended = reg.filter(x=>x.r&&x.r.att).length;
-  const note = SESSION_NOTES[s.id] || '';
-  const canNote = leadEditable(c);
   return `<main class="main"><div class="page">
   ${crumb(['Sessions','leadSessions'], s.title)}
   ${ph(s.title)}
+  ${''/* THE FOUR FACTS ARE A BLOCK BAND, NOT A kv (Maryam 30 Sep 2026: "make the
+         top 4 rows into 4 blocks in a row"). A "Session" fact leads — "Week N
+         Cohort Call" (Maryam: "add session - Week (n) Cohort Call") — then Chapter
+         reads "Chapter N" (the week's chapter number, not its title — Maryam:
+         'change "Delegation Without Drop-Off" to "Chapter 5"'), the date drops its
+         "(London (UTC+01:00))" zone (Maryam: "remove (London (UTC+01:00))"), and
+         Attendance. `.facts pf-facts` is the fixed-4 band `leadCounters` uses. */}
   <div class="sec">
-    <div class="kv"><span class="k">Chapter</span><span class="v">${s.chapter}</span></div>
-    <div class="kv"><span class="k">Date and time</span><span class="v">${s.date} &middot; ${s.time} (${LEAD_TZ})</span></div>
-    <div class="kv"><span class="k">Attendance</span><span class="v">${s.unavail?'Unavailable':attended+' of '+reg.length+' attended'}</span></div>
+    <div class="facts pf-facts">
+      ${pfFact(I.video,    '--mk-3', 'Session', `Week ${s.week} Cohort Call`)}
+      ${pfFact(I.book,     '--mk-1', 'Chapter', `Chapter ${s.week}`)}
+      ${pfFact(I.calendar, '--mk-4', 'Date and time', `${s.date} &middot; ${s.time}`)}
+      ${pfFact(I.group,    '--mk-2', 'Attendance', s.unavail?'Unavailable':attended+' of '+reg.length+' attended')}
+    </div>
   </div>
   ${s.unavail ? `<div class="sec"><div class="ses-warn"><span class="ses-warn-mk">${I.warningAlt}</span>
       <div class="ses-warn-b"><h3>Attendance unavailable</h3><p>The platform received no participation data for this session, so no candidate is marked. It is left out of every attendance total.</p></div></div></div>`
-  : `<div class="sec">
-    <div class="sec-h"><h2>Register</h2><span class="t-helper-01">Worked out from the room &middot; ${ATTEND_MIN_MIN} min minimum</span></div>
+  : `<div class="sec ses-reg-sec">
+    ${''/* THE "Worked out from the room · 5 min minimum" CAPTION IS GONE (Maryam
+           30 Sep 2026: "remove ... text"); the heading stands alone. */}
+    <div class="sec-h"><h2>Register</h2></div>
     <div class="tile-stack ses-reg">
       ${reg.map(({m,r})=>`<div class="atd-row">
         <span class="atd-b"><span class="rname">${mAv(m,28)}${leadName(m)}</span></span>
@@ -28577,13 +28647,9 @@ V.leadSession = () => {
       </div>`).join('')}
     </div>
   </div>`}
-  <div class="sec">
-    <div class="sec-h"><h2>Note on the session</h2></div>
-    ${canNote ? `<div class="ses-note-box">
-      <textarea class="inp ses-note-ta" id="sesNote" rows="3" maxlength="1000" placeholder="How did the session go? (optional, up to 1000 characters)">${note}</textarea>
-      <div class="ses-note-a"><button class="btn btn-p btn-sm noic" data-sesnotesave="${s.id}">Save note</button></div>
-    </div>` : note ? `<p class="t-body">${note}</p>` : `<p class="t-helper-01">No note, and the cohort has closed.</p>`}
-  </div>
+  ${''/* THE "Note on the session" SECTION IS REMOVED (Maryam 30 Sep 2026: "remove
+         notes section from the end of this page"). `SESSION_NOTES` and the
+         `data-sesnotesave` handler stay defined, just not drawn here. */}
 </div></main>`;
 };
 
@@ -28782,8 +28848,6 @@ V.leadCalls = () => {
 V.leadEvals = () => {
   const ps = LEAD_SUMMARIES.filter(s => s.status === 'pending');
   const published = LEAD_SUMMARIES.filter(s => s.status === 'done');
-  const evalCo = lcoOf(LEAD_SUMMARIES[0].cohort);
-  const closeDate = dPretty(dISOadd(cohortEndISO(evalCo), evalCo.completeDelay || 7));
 
   const sumRow = s => {
     const c = lcoOf(s.cohort);
@@ -28792,131 +28856,40 @@ V.leadEvals = () => {
     return `<button class="tile clk gcard face-row" data-ldrsum="${s.id}" data-go="leadSum">
       <span class="mem-av mem-ph">${avatar({i:s.i, img:AV[s.img]}, 36)}</span>
       <span class="gcard-b"><h3>${s.name}${done ? ' ' + ldrRecTag(s.rec) : ''}</h3>
-        <span class="sub">${done
-          ? `Scored ${m.avg}%`
-          : `${lname(c)} &middot; ${m.pc}% complete &middot; assessments ${m.avg}% &middot; sign to close their 90 days`}</span></span>
+        <span class="sub">Scored ${m.avg}%</span></span>
       ${''/* THE ARROW'S LABEL — `.row-cta`, §112 (Maryam, 2 Sep 2026: "with
              right side arrows, give text 'View Evaluation' on the left of the
              arrow"). Written here rather than through `faceRow`'s fifth
              argument because this row is `sumRow`'s own markup: the two
              functions draw the same shape and only this one puts a chip in the
              heading.
-             ON THE PUBLISHED ROWS ONLY, which is what "View" means. A waiting
-             row opens the same page to WRITE the recommendation, and the black
-             card at the top of this page already labels that action "Evaluate
-             Candidate" — one verb per state, and the two must not both be on
-             screen saying different things about the same button. */}
-      ${done ? '<span class="row-cta">View Evaluation</span>' : ''}
+             ONE VERB PER STATE: a published row VIEWs the evaluation, a waiting
+             row opens the same page to WRITE it — "Evaluate Candidate" (Maryam
+             30 Sep 2026). The black card that used to carry that verb is gone —
+             the two states are now the SAME ROW under two tabs, so the label is
+             what tells you which action the row opens. */}
+      <span class="row-cta">${done ? 'View Evaluation' : 'Evaluate Candidate'}</span>
       <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg>
     </button>`;
   };
 
-  const evCol = s => {
-    const c = lcoOf(s.cohort);
-    const m = lmemOf(c, s.name);
-    const b = lbadge(m.pts);
-    return `<div class="ev-c">
-      <div class="ev-top">
-        <span class="mem-av mem-ph">${avatar({i:s.i, img:AV[s.img]}, 44)}</span>
-        <span class="ev-id">
-          <span class="ev-nm">
-            <h3 class="ttl">${s.name}</h3>
-            ${b ? `<span class="ev-bdg"><img src="${AWARD[b.n.toLowerCase()]}" alt="">
-              <span class="sub">${b.n}</span></span>` : ''}
-          </span>
-          <span class="sub ev-pts">${I.trophy}${m.pts.toLocaleString()} points</span>
-        </span>
-        <span class="ev-ring">
-          ${ring(m.avg, `${m.avg}% scored on assessments`)}
-          <span class="sub">Scored</span>
-        </span>
-      </div>
-      <button class="btn btn-s btn-sm noic" data-ldrsum="${s.id}" data-go="leadSum">Evaluate Candidate</button>
-    </div>`;
-  };
+  const tab = S.ldrEvTab || 'awaiting';
+  const listSec = (rows, empty) => rows.length
+    ? `<div class="sec lead-evbody"><div class="tile-stack">${rows.map(sumRow).join('')}</div></div>`
+    : `<div class="sec lead-evbody"><div class="empty" style="border:0">${I.checkFilled}${empty}</div></div>`;
 
   return `<main class="main"><div class="page">
   ${crumb(['Dashboard','leadDash'],'Evaluations')}
-  ${''/* NO `sub`, AND THAT IS THE DOCUMENTED MOVE. It said "2 waiting on your
-         signature" directly above Tal saying "Two 90-day summaries are waiting
-         on you" — the exact duplication CLAUDE.md's two-copy-slots rule exists
-         to stop, and it survived the old version only because Tal's sentence
-         there led on level decisions instead. This page has no factual SPINE of
-         its own: the queue is one to four candidates from whichever cohort has
-         reached day 90, which is a count rather than a coordinate, and the four
-         figure cells below state it four ways. So Tal's sentence is the opening
-         line, which is what the rule prescribes for a page with no spine. */}
   ${ph('Evaluations')}
-  ${''/* EPIC 12.9 — the outstanding count and the window-close date. */}
-  <div class="sec sec-noline"><p class="eval-window">${ps.length ? `<b>${ps.length}</b> recommendation${ps.length===1?'':'s'} outstanding.` : 'Every recommendation is written.'} Recommendations can be written until ${closeDate}.</p></div>
-  ${''/* THE TWO WAITING ARE THE PAGE'S BLACK CARD (Maryam, 1 Sep 2026: "take
-         the 2 candidates awaiting in the black card with the card heading
-         Awaiting Evaluations", and "remove the 90-day summaries heading").
-
-         THE WHOLE §75 RECIPE COMES WITH THE CLASS and none of it is written
-         here — the standing instruction is that "make this a black card" means
-         the inset, the top-right haze, the `--s07` frame, the 20px gap, the
-         section's own hairlines off, the head row's `--on-dark-rule`, the ink
-         flip (§63 §6a) and the internal seams (§75.5). This card is the FOURTH
-         caller and, like the leader's own call card, it states not one rule of
-         its own: the two rows are `.tile`s, so §75.5 turns their ground
-         transparent and their seam to 16% white, and §63 §6a inks the name
-         `--on-dark` and the subtitle `--on-dark-2`.
-
-         NEVER `.plate` OR `.sec.on-dark` — both are in ai5's `DARK_CARD`, so
-         `placeDark` would hoist this section into the head band, where it would
-         land beside Tal's summary at ~330px with each row's face, name and
-         subtitle on three lines of their own. §75.3 records that exact bug.
-
-         THE HEADING MOVED INTO THE CARD RATHER THAN BEING DELETED TWICE. "90-day
-         summaries" was the section's `.sec-h` and "Awaiting Evaluations" is the
-         card's `.dc-t`, which is the same slot one component in — so the page
-         still names this block, and it now names it with the word the dashboard
-         card and the rail-side queue already use. The count went with the
-         heading: `.dc-hd-r` takes a `.dc-t` and then EITHER a control or a time
-         (§75, they share one auto margin), and a bare "2 waiting" is neither —
-         Tal's sentence above the card states it in words anyway.
-
-         WHY IT EARNS THE LOUDEST OBJECT ON THE PAGE: §75's test is "this is the
-         one thing the page is about", and on a page whose other list is a record
-         of work already done, two signatures somebody is waiting on is exactly
-         that. §59's clock test is the `.plate` test, not this one. */}
-  <div class="sec dark-card">
-    <div class="dc-hd">
-      <div class="dc-hd-r"><h2 class="dc-t">Awaiting Evaluations</h2></div>
+  <div class="sec sec-cs lead-evtabs">
+    <div class="cs">
+      <button class="${tab === 'awaiting' ? 'on' : ''}" data-ldrevtab="awaiting">Awaiting Evaluations${ps.length ? ` <span class="lf-n">${ps.length}</span>` : ''}</button>
+      <button class="${tab === 'evaluated' ? 'on' : ''}" data-ldrevtab="evaluated">Evaluated Candidates${published.length ? ` <span class="lf-n">${published.length}</span>` : ''}</button>
     </div>
-    ${ps.length ? `<div class="ev-row">
-      ${ps.map(evCol).join('')}
-    </div>` : `<div class="empty" style="border:0">${I.checkFilled}
-      <h3>Nothing waiting</h3><p>Every 90-day summary in this cohort is published.</p></div>`}
-    ${/* THE FOOTNOTE IS GONE. It explained what a summary is FOR — "the
-          document a candidate's next level is argued from" — to the one person
-          who already knows, at the foot of a list of two rows that each say
-          "sign to close their 90 days". A closing line earns its place
-          when it tells you something the rows do not; this one restated the
-          page's own subject. */''}
   </div>
-  ${''/* THE SECOND SECTION IS TINTED, WHICH IS THE PAGE'S RHYTHM AND NOT A
-         JUDGEMENT ABOUT THE CONTENT. White, tint, white down a page is what
-         every other leader page does (§55/§84 draw it, `leadDash` alternates
-         its four blocks by POSITION), and it happens to say the useful thing
-         here too: the work is on the white ground at the top and the record is
-         on the quiet one below it.
-         THE COUNT CAME OFF THE HEADING ROW (Maryam, 1 Sep 2026), AND THE ROW
-         IS WHY IT COULD. "6 published" was a `.t-helper-01` at the far right of
-         the heading — the shape the Calls page and the Messages inbox use for a
-         count — and it was saying the word the heading beside it already says
-         ("Evaluated") about rows that each say it again ("you recommended").
-         Tal's sentence at the top of the page is what states the arithmetic:
-         two of eight are still waiting, so six are not. Both counts on this page
-         went the same way and for the same reason; the card's heading lost "2
-         waiting" 30 lines up. */}
-  ${published.length ? `<div class="sec tint">
-    <div class="sec-h"><h2>Evaluated Candidates</h2></div>
-    <div class="tile-stack">
-      ${published.map(sumRow).join('')}
-    </div>
-  </div>` : ''}
+  ${tab === 'awaiting'
+    ? listSec(ps, '<h3>Nothing waiting</h3><p>Every 90-day summary in this cohort is published.</p>')
+    : listSec(published, '<h3>No evaluations yet</h3><p>Nothing has been signed off in this cohort.</p>')}
 </div></main>`;
 };
 

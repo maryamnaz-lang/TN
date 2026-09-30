@@ -124,6 +124,7 @@ const leadEditable = c => !!c && c.status === 'active';
    switch, which resets neither. */
 S.ldrCTab = 'progress';  /* Candidate Progress is the first of four tabs (9 Sep 2026) */
 S.ldrSesTab = 'upcoming'; /* the Sessions page's two tabs — Upcoming / Past (30 Sep 2026) */
+S.ldrEvTab = 'awaiting';  /* the Evaluations page's two tabs — Awaiting / Evaluated (30 Sep 2026) */
 S.ldrNoteAt = null;
 S.ldrNoteK = '';   /* 12.4: neither type pre-selected */
 
@@ -2004,6 +2005,10 @@ device.addEventListener('click', e => {
   /* the Sessions page's two tabs (Upcoming / Past sessions) */
   const stb = e.target.closest('[data-ldrsestab]');
   if(stb){ S.ldrSesTab = stb.dataset.ldrsestab; render(); return; }
+
+  /* the Evaluations page's two tabs (Awaiting / Evaluated candidates) */
+  const evb = e.target.closest('[data-ldrevtab]');
+  if(evb){ S.ldrEvTab = evb.dataset.ldrevtab; render(); return; }
 
   /* EPIC 12.2 — the My Cohort roster's sortable columns. Same column toggles
      the direction; a new column starts ascending. */

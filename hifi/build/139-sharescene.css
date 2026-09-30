@@ -1,0 +1,71 @@
+/* ==========================================================================
+   §139 — THE INTERVIEW-SCENE SHARE CONTROL (Maryam, 30 Sep 2026)
+
+   A share disc at the top-left of every scene thumbnail — the candidate
+   Profile's "Interview scenes" carousel (`.scv`) and the interview Report's
+   "Scenes" row (`.scene-cell`) — opening a dropdown of social platforms.
+
+   hifi-only, and it is `NOT_IN_DS`: the behaviour needs `S.shareOpen` and a
+   click handler no other portal ships (`scenesCarousel`/`dsScenes` takes the
+   control through an optional `opts.shareFor`, inert without it). Styling the
+   two surfaces with ONE set of `.scv-share*` classes, so the disc and the menu
+   read the same on the carousel card and the report card.
+
+   AFTER §38 AND §111 (the two scene components it sits on) and after §63 (it
+   states no type — the menu label is `.t-body`, §63's; the share glyph's white
+   is an icon treatment, the §134/§135 precedent). The disc matches the play
+   mark's translucent-black wash (§38/§111); the menu is the certificate hero's
+   share menu (§96) reused as a thumbnail overlay.
+   ========================================================================== */
+
+/* THE CARD IS THE POSITIONED PARENT. The share wrapper anchors to the card's
+   top-right, which is the thumbnail's top-right (the picture is the first
+   child). An open card is raised so its menu sits above the card below/beside
+   it. `.scene-cell` STRETCHES ITS `.scene`: on the report row the card was the
+   grid item and the track stretched it; wrapped, `.scene` (a flex column with
+   no width of its own) shrank to its title, so the cell is a flex column too
+   and its single `.scene` fills the track's width again. */
+.app .scv{position:relative}
+.app .scene-cell{position:relative;display:flex;flex-direction:column;min-width:0}
+.app .scv:has(.scv-share.on),
+.app .scene-cell:has(.scv-share.on){z-index:30}
+
+/* THE WRAPPER OVERLAYS THE THUMBNAIL'S TOP-RIGHT. It is a SIBLING of the
+   `overflow:hidden` art, so its menu is not clipped by it. */
+.app .scv-share{position:absolute;top:var(--s03);right:var(--s03);z-index:4}
+
+/* THE TRIGGER IS THE PLAY MARK'S DISC — a round translucent-black wash with a
+   white glyph — so the two overlays on one thumbnail read as one family. Icon
+   only, no "Share" word. */
+.app .scv-share-t{
+  display:grid;place-items:center;
+  width:32px;height:32px;border-radius:50%;border:0;cursor:pointer;
+  background:rgba(0,0,0,.44)}
+.app .scv-share-t svg{width:18px;height:18px;color:#fff;display:block}
+
+/* THE MENU OPENS DOWNWARD FROM THE TRIGGER — the certificate share menu (§96):
+   a white panel, one hairline per row, a brand-tinted mark. It carries a soft
+   lift because it floats over a photograph, not a page ground. The disc sits
+   top-right, so the menu's right edge anchors to it and it extends LEFT — which
+   also keeps a 220px menu inside a card narrower than it. */
+.app .scv-share-menu{
+  position:absolute;top:calc(100% + var(--s02));right:0;left:auto;z-index:30;
+  min-width:220px;display:flex;flex-direction:column;text-align:left;
+  background:var(--layer-01);border:1px solid var(--rule);
+  box-shadow:0 8px 24px rgba(17,17,17,.12)}
+.app .scv-share-i{
+  display:flex;align-items:center;gap:var(--s04);
+  padding:var(--s04) var(--s05);
+  background:transparent;border:0;cursor:pointer;text-align:left}
+.app .scv-share-i + .scv-share-i{border-top:1px solid var(--rule)}
+.app .scv-share-ic{flex:none;display:grid;place-items:center;width:22px;height:22px;color:var(--brand)}
+.app .scv-share-ic svg{width:22px;height:22px;display:block;fill:currentColor}
+
+/* THE LEFTMOST REPORT CARD OPENS ITS MENU RIGHTWARD. The menu is right-anchored
+   by default (it extends left from the top-right disc), which keeps it on-screen
+   for every card except the first: on a phone the report row is `repeat(3,1fr)`
+   (§137), so the leftmost card is narrow and a 220px menu extending left from it
+   runs off the frame. The first cell alone flips to left-anchored. The carousel
+   needs no flip: its 240px card is wider than the 220px menu, so a right-anchored
+   menu always fits within the card it belongs to. */
+.app .scene-row .scene-cell:first-child .scv-share-menu{left:0;right:auto}

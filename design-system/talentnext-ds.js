@@ -1321,12 +1321,18 @@ function dsScenes(title, scenes, opts){
       </div>
     </div>
     <div class="scv-row">
-      ${scenes.map(s => `<div class="scv">
+      ${scenes.map((s, idx) => `<div class="scv">
         <span class="scv-art">
           <img src="${s.img}" alt="">
           <span class="scv-play">${I.play}</span>
           <span class="scv-at t-caption">${s.at}</span>
         </span>
+        ${''/* THE SHARE CONTROL IS A SIBLING OF `.scv-art`, NOT A CHILD — the
+              art is `overflow:hidden`, so its menu would be clipped inside it.
+              `opts.shareFor(idx)` is the caller's own control (candidate only,
+              it needs `S.shareOpen`); a portal that hands no `shareFor` gets
+              nothing, which is why this builder stays pure enough for the DS. */}
+        ${opts.shareFor ? opts.shareFor(idx) : ''}
         <span class="scv-b">
           <span class="scv-h t-h4">${s.title}</span>
         </span>

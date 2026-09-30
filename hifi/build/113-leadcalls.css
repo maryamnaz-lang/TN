@@ -218,6 +218,12 @@
    around the block, reading as a stroke. `margin:-1px 0 -1px -1px` pulls the
    block over the border on top/left/bottom so it sits truly flush; the right
    side keeps the gap to the text. */
+/* THE DATE/TIME BLOCK IS HIDDEN (Maryam, 30 Sep 2026: "hide the interview date and
+   time block"). The `display:none` at the foot of this rule is the whole change —
+   the block's full styling is kept above it so restoring is deleting one line, and
+   the markup stays. With it gone the card is the body alone, whose left inset is
+   lifted to `--s07` below so the text sits an even 32 from every card wall (the
+   `--s05` left was the gap to this block). */
 .app .lcal-slot{
   flex:none;
   align-self:stretch;
@@ -228,7 +234,8 @@
   gap:2px;
   padding:var(--s04);
   text-align:center;
-  background-color:color-mix(in srgb, var(--on-dark) 5%, transparent)}
+  background-color:color-mix(in srgb, var(--on-dark) 5%, transparent);
+  display:none}
 /* THE CALENDAR MARK ABOVE "Today" (28 Sep 2026). A stroke glyph on
    `currentColor`, so it takes the slot's white ink (§6a) with no colour set. */
 .app .lcal-slot-ic{line-height:0;margin-bottom:2px}
@@ -240,14 +247,19 @@
 .app .lcal-next > .lcal-body{
   flex:1 1 auto;min-width:0;
   display:flex;flex-direction:column;align-items:stretch;
-  gap:var(--s04);
+  /* THE ROW GAP IS TIGHT — `--s03` (8), not `--s04` (Maryam 30 Sep 2026: "reduce
+     the gap of the left side content and the 60 minutes text"). The foot's own
+     `padding-top` is also dropped below, so the "N minutes session" line sits close
+     under the count instead of a doubled 12+8 apart. */
+  gap:var(--s03);
   /* THE BODY MATCHES THE SESSIONS BLACK CARD's inset — `--s07` (32) top, right and
      bottom, like `leadCallCard`'s §75 dark-card padding (Maryam 30 Sep 2026:
      "follow the card paddings from top, bottom, and right side ... just like
      sessions module"). The LEFT stays `--s05` — it is the gap to the red slot,
      which the Sessions card has no equivalent of, so it is not part of "top,
-     bottom, right". */
-  padding:var(--s07) var(--s07) var(--s07) var(--s05)}
+     bottom, right". WITH THE SLOT HIDDEN (30 Sep 2026) the left is lifted to `--s07`
+     too, so the body sits an even 32 from all four card walls. */
+  padding:var(--s07)}
 /* THE JOIN MATCHES THE SESSIONS CARD's Join — the full 40px `.btn` height, not
    `btn-sm`'s 32 (Maryam 30 Sep 2026: "button as well just like sessions module").
    `leadCallCard`'s crow Join renders at 40; this pins the same. */
@@ -257,7 +269,7 @@
    content not middle aligned"). `.lcal-f` is `align-items:center`, which floats the
    40px button above the shorter minutes line; on the black card the foot bottom-
    aligns so the button sits on the same baseline band as the minutes. */
-.app .lcal-next .lcal-f{align-items:flex-end}
+.app .lcal-next .lcal-f{align-items:flex-end;padding-top:0}
 /* THE LIVE COUNTDOWN takes the header's right end on an auto margin, where the
    date's word-over-figure block sat on the light card. The clock mark leads the
    digits (28 Sep 2026); tabular figures (set inline) so it does not jitter. */
@@ -275,15 +287,19 @@
 .app .lcal-faces{display:inline-flex;flex:none;align-items:center}
 .app .lcal-faces .av-ph{box-shadow:0 0 0 2px var(--gray-100)}
 .app .lcal-faces .av-ph + .av-ph{margin-left:-8px}
-/* THE "+N" OVERFLOW DISC (Maryam 30 Sep 2026) — a card-ground white circle the
-   size of a roster face, tucked under the second one with the same 2px ring, so
-   the stack reads "two faces and eight more". Its geometry only; the accent,
-   semibold, small type is §63's (this layer sits after §63, so type stays there). */
+/* THE "+N" OVERFLOW DISC (Maryam 30 Sep 2026) — a circle the size of a roster
+   face, tucked under the second one with the same 2px ring, so the stack reads
+   "two faces and eight more". Its GROUND is a SOLID DARK GREY, not the card-ground
+   white it was and not a low-opacity wash (Maryam 30 Sep 2026: "the white +8 circle
+   should be grey", then "solid dark grey not low opacity grey") — 14% white mixed
+   INTO the card's `--gray-100` #111 (opaque, no transparency), a clear step up from
+   the black ground; §63 §20d inks the "+N" white to read on it. Geometry only; the
+   type is §63's (this layer sits after §63, so type stays there). */
 .app .lcal-faces .lcal-face-more{
   width:22px;height:22px;flex:none;
   display:inline-flex;align-items:center;justify-content:center;
   margin-left:-8px;border-radius:50%;
-  background:var(--background);
+  background:color-mix(in srgb, var(--on-dark) 14%, var(--gray-100));
   box-shadow:0 0 0 2px var(--gray-100);
   /* THE +N DISC SITS ON TOP OF THE PHOTO STACK (Maryam 30 Sep 2026: "take +8 white
      circle above the image"). The avatars' `.av-ph` establish their own stacking,

@@ -3058,13 +3058,16 @@
 .app .lcal.lcal-next .lcal-slot-day{color:var(--on-dark)}
 
 /* 20d. THE "+N" FACE-STACK OVERFLOW DISC (Maryam 30 Sep 2026: "+8 text ... in
-   accent color and semibold but in small size to look good in the small circle").
-   Its disc geometry is §113; this owns the type — accent ink, the strong weight
-   (500, the platform's "semibold"), at the caption size so it fits the 22px disc. */
+   accent color and semibold but in small size to look good in the small circle";
+   ink REVERSED 30 Sep 2026 to WHITE — "the +8 text in white color" — now that the
+   disc ground is the block's grey wash, not white, so the accent no longer reads).
+   Its disc geometry is §113; this owns the type — WHITE ink on the grey disc, the
+   strong weight (500, the platform's "semibold"), at the caption size so it fits
+   the 22px disc. */
 .app .lcal-faces .lcal-face-more{
   font-size:var(--t-caption-size);
   font-weight:var(--t-w-strong);
-  color:var(--accent-text)}
+  color:var(--on-dark)}
 
 /* ==========================================================================
    22. THE STANDING COLUMN LOSES A TIER — §72's `.stand` inside `.pulse`

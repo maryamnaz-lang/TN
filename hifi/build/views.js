@@ -927,7 +927,12 @@ function sceneCard(kind, i, n){
    is what handles "nothing chosen yet", and it is a different page. */
 function sceneRow(kind){
   const keep = sceneKeep(kind) || [0,1,2];
-  return `<div class="scene-row">${keep.map((i,n)=>sceneCard(kind,i,n+1)).join('')}</div>`;
+  /* EACH CARD IS WRAPPED IN A `.scene-cell` so the share control can sit beside
+     it. `.scene` is a `<button>` and the share trigger is one too — a button
+     inside a button is invalid (the same rule §38.3 records for the checkbox) —
+     and `.scene-still` is `overflow:hidden`, so the share menu would be clipped
+     if it lived on the card. The cell is the positioned parent for both. */
+  return `<div class="scene-row">${keep.map((i,n)=>`<div class="scene-cell">${sceneCard(kind,i,n+1)}${shareControl('rep:'+kind+':'+i)}</div>`).join('')}</div>`;
 }
 
 /* THE CHOOSER. Six of the same card, each one selectable, with the count and
@@ -13378,12 +13383,18 @@ function scenesCarousel(title, scenes, opts){
       </div>
     </div>
     <div class="scv-row">
-      ${scenes.map(s => `<div class="scv">
+      ${scenes.map((s, idx) => `<div class="scv">
         <span class="scv-art">
           <img src="${s.img}" alt="">
           <span class="scv-play">${I.play}</span>
           <span class="scv-at t-caption">${s.at}</span>
         </span>
+        ${''/* THE SHARE CONTROL IS A SIBLING OF `.scv-art`, NOT A CHILD — the
+              art is `overflow:hidden`, so its menu would be clipped inside it.
+              `opts.shareFor(idx)` is the caller's own control (candidate only,
+              it needs `S.shareOpen`); a portal that hands no `shareFor` gets
+              nothing, which is why this builder stays pure enough for the DS. */}
+        ${opts.shareFor ? opts.shareFor(idx) : ''}
         <span class="scv-b">
           <span class="scv-h t-h4">${s.title}</span>
         </span>
@@ -13427,7 +13438,7 @@ const pfScenes = () => {
   const a = AGENTS[(S.booking && S.booking.agent) || S.agent || recKey()] || AGENTS.priya;
   const scenes = SCENES.level.map(([t, , at]) => ({img:a.img, i:a.i, name:a.n, at, title:t}));
   const foot = `<button class="scene-ask" data-tal-ask="Why were these scenes chosen from my interview?"><i class="aih-mk"></i>Ask Tal why these scenes were chosen from your interview?</button>`;
-  return scenesCarousel('Interview scenes', scenes, {foot});
+  return scenesCarousel('Interview scenes', scenes, {foot, shareFor: i => shareControl('scv:' + i)});
 };
 
 /* ONE READ VIEW PER SECTION, KEYED THE SAME WAY THE FORMS ARE. Each returns
@@ -13843,6 +13854,43 @@ const SOCIAL = [
    svg:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>'}
 ];
 S.linked = S.linked || {linkedin:true, instagram:true, twitter:true};
+
+/* THE INTERVIEW-SCENE SHARE CONTROL (Maryam, 30 Sep 2026). A share disc at the
+   top-left of every scene thumbnail — the candidate Profile carousel and the
+   interview Report row — that opens a dropdown of social platforms, the
+   certificate hero's share menu reused as a thumbnail overlay.
+
+   THE THREE PLATFORMS ARE A FIXED SET, not `S.linked` filtered. The reference
+   shows LinkedIn / Instagram / X whatever is connected — sharing a scene is not
+   the same as posting a certificate to an account you have linked, so it does
+   not read `S.linked`. `SOCIAL`'s `twitter` record is named "X".
+
+   THE MENU MUST ESCAPE THE THUMBNAIL. `.scv-art` / `.scene-still` are
+   `overflow:hidden`, so the control is a SIBLING of the art (a child of `.scv`
+   / `.scene-cell`), positioned over the top-left corner; the trigger overlays
+   the picture, the menu hangs below it inside the card's own bounds — which is
+   why the carousel's horizontal scroll clip never reaches it (the card is
+   3:4, far taller than a three-row menu).
+
+   `S.shareOpen` HOLDS THE OPEN CARD'S ID (one at a time, trap 9): the markup is
+   a pure function of it, so nothing a click leaves on the DOM has to survive a
+   render. `id` is unique per card — `scv:<i>` on the profile, `rep:<kind>:<i>`
+   on the report. A prototype, so picking a network closes the menu and stops
+   (§121); the real build hands off to the network's own share endpoint. */
+const SHARE_NETS = ['linkedin', 'instagram', 'twitter'];
+S.shareOpen = S.shareOpen || null;
+function shareControl(id){
+  const open = S.shareOpen === id;
+  return `<span class="scv-share${open ? ' on' : ''}">
+    <button class="scv-share-t" data-shareopen="${id}" aria-haspopup="true" aria-expanded="${open}" aria-label="Share this scene">${I.share}</button>
+    ${open ? `<div class="scv-share-menu" role="menu">
+      ${SHARE_NETS.map(k => {
+        const s = SOCIAL.find(x => x.k === k);
+        return `<button class="scv-share-i" data-shareto="${s.k}" role="menuitem" style="--brand:${s.color}"><span class="scv-share-ic">${s.svg}</span><span class="t-body">Share on ${s.n}</span></button>`;
+      }).join('')}
+    </div>` : ''}
+  </span>`;
+}
 
 function pfLinkedView(){
   return `<div class="sec sec-linked" data-pfsec="linked">
@@ -15819,6 +15867,8 @@ device.addEventListener('click', e => {
   if(S.crtMenu !== null && !t.closest('.crt-menu, .crt-pop')){ S.crtMenu = null; render(); }
   /* the certificate SHARE menu closes the same way */
   if(S.certShare && !t.closest('.crt-share-wrap')){ S.certShare = false; render(); }
+  /* and the interview-scene share menu — a press outside the open control */
+  if(S.shareOpen && !t.closest('.scv-share')){ S.shareOpen = null; render(); }
   /* and OUR dropdown (`dd()`, the Intent field) — a press outside `.dd` closes
      the open one, the agent portal's own click-away for `S.dd` */
   if(S.dd && !t.closest('.dd')){ S.dd = null; render(); }
@@ -16470,7 +16520,12 @@ device.addEventListener('click', e => {
   /* the certificate hero's Share menu — toggle open, and picking a linked
      account closes it (the prototype's whole share flow). */
   if(t.closest('[data-certshare]')){ S.certShare = !S.certShare; render(); return; }
-  if(t.closest('[data-shareto]')){ S.certShare = false; render(); return; }
+  /* the interview-scene share disc — toggle its menu (one open at a time) */
+  const so = t.closest('[data-shareopen]');
+  if(so){ const id = so.dataset.shareopen; S.shareOpen = S.shareOpen === id ? null : id; render(); return; }
+  /* picking a network closes both share menus — the cert hero's and a scene's
+     (the prototype's whole share flow, §121) */
+  if(t.closest('[data-shareto]')){ S.certShare = false; S.shareOpen = null; render(); return; }
   /* the chapter record's own "show all" — a re-render, not a navigation, and it
      goes through `S` for trap 9's reason: the list is rebuilt from scratch on
      every render, so a class toggled on the button here would not survive the

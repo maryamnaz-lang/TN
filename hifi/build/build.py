@@ -1430,7 +1430,17 @@ css = '\n'.join((here / f).read_text() for f in
                  # §14's container tier plus an all-widths block-suppress and
                  # last-child-off. Last, so it wins over §14's base-off and §10's
                  # ruled-paper base. States no type (that is §63). Crosses to the DS.
-                 '138-secrhythm.css',])
+                 '138-secrhythm.css',
+                 # §139 — THE INTERVIEW-SCENE SHARE CONTROL (Maryam, 30 Sep 2026).
+                 # A share disc at the top-left of every scene thumbnail (the
+                 # profile carousel `.scv` and the report row `.scene-cell`) that
+                 # opens a dropdown of social platforms. hifi-only — the behaviour
+                 # needs `S.shareOpen`, so it is in build-ds.py's NOT_IN_DS;
+                 # `scenesCarousel` takes the control through an optional
+                 # `opts.shareFor`, inert without it. Last, after §38/§111 (the two
+                 # scene components) and §63 (states no type; the glyph white is an
+                 # icon treatment, the §134/§135 precedent).
+                 '139-sharescene.css',])
 # ==========================================================================
 # NO HOVER
 # The state layer was fighting the layout everywhere it appeared: a wash on a

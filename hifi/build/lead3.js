@@ -131,13 +131,14 @@ V.leadSessions = () => {
   const past = all.filter(s => sesEnd(s) < LEAD_NOW).reverse();
   return `<main class="main"><div class="page lead-ses-page">
   ${ph('Sessions')}
-  ${''/* THE NEXT SESSION IS THE BLACK CALL CARD (Maryam, 30 Sep 2026: "bring
-        back the black card for call") — `leadCallCard`, the same appointment
-        drawing the dashboard and the cohort page, with its gated Join. It is its
-        own `.sec.dark-card`, so it takes the `--pad-x` gutter and the page reads
-        with the padding every other page has (the pink `.ses-next` card, and the
-        full-bleed `.ses-row` list it sat over, were the missing-gutter cause). */}
-  ${next ? leadCallCard(lcall(c)) : `<div class="sec"><div class="empty" style="border:0">${I.calendar}<h3>No session is scheduled yet.</h3></div></div>`}
+  ${''/* THE NEXT SESSION IS THE MY-COHORT BLACK CALL CARD (Maryam, 30 Sep 2026:
+        "use the same black call card on my cohorts screen in place of the black card
+        on the session screen"). The same `.lcal-next` `lcalCard` the dashboard draws
+        (`lcall(c)` is its record) in its `.lcal-row` wrapper, so the two screens read
+        identically — only the countdown differs, "In 02:40" here (Maryam: "just
+        update the In 2hrs 40mins text to 'In 02:40'"). This replaces `leadCallCard`,
+        the older crow-based card. */}
+  ${next ? `<div class="sec lead-callsec"><div class="lcal-row">${lcalCard(lcall(c), true, {countdown:'In 02:40'})}</div></div>` : `<div class="sec"><div class="empty" style="border:0">${I.calendar}<h3>No session is scheduled yet.</h3></div></div>`}
   ${''/* TWO TABS — Upcoming / Past sessions (Maryam 30 Sep 2026: "instead of this
         long page, i need 2 tabs of Upcoming and Past Sessions"). The two lists
         were stacked down one scroll; they are one `.sec.sec-cs` strip now, the
@@ -168,20 +169,30 @@ V.leadSession = () => {
     ${ph('Attendance')}<div class="sec"><div class="empty" style="border:0">${I.calendar}<h3>No session</h3></div></div></div></main>`;
   const reg = leadRegister(c, s);
   const attended = reg.filter(x=>x.r&&x.r.att).length;
-  const note = SESSION_NOTES[s.id] || '';
-  const canNote = leadEditable(c);
   return `<main class="main"><div class="page">
   ${crumb(['Sessions','leadSessions'], s.title)}
   ${ph(s.title)}
+  ${''/* THE FOUR FACTS ARE A BLOCK BAND, NOT A kv (Maryam 30 Sep 2026: "make the
+         top 4 rows into 4 blocks in a row"). A "Session" fact leads — "Week N
+         Cohort Call" (Maryam: "add session - Week (n) Cohort Call") — then Chapter
+         reads "Chapter N" (the week's chapter number, not its title — Maryam:
+         'change "Delegation Without Drop-Off" to "Chapter 5"'), the date drops its
+         "(London (UTC+01:00))" zone (Maryam: "remove (London (UTC+01:00))"), and
+         Attendance. `.facts pf-facts` is the fixed-4 band `leadCounters` uses. */}
   <div class="sec">
-    <div class="kv"><span class="k">Chapter</span><span class="v">${s.chapter}</span></div>
-    <div class="kv"><span class="k">Date and time</span><span class="v">${s.date} &middot; ${s.time} (${LEAD_TZ})</span></div>
-    <div class="kv"><span class="k">Attendance</span><span class="v">${s.unavail?'Unavailable':attended+' of '+reg.length+' attended'}</span></div>
+    <div class="facts pf-facts">
+      ${pfFact(I.video,    '--mk-3', 'Session', `Week ${s.week} Cohort Call`)}
+      ${pfFact(I.book,     '--mk-1', 'Chapter', `Chapter ${s.week}`)}
+      ${pfFact(I.calendar, '--mk-4', 'Date and time', `${s.date} &middot; ${s.time}`)}
+      ${pfFact(I.group,    '--mk-2', 'Attendance', s.unavail?'Unavailable':attended+' of '+reg.length+' attended')}
+    </div>
   </div>
   ${s.unavail ? `<div class="sec"><div class="ses-warn"><span class="ses-warn-mk">${I.warningAlt}</span>
       <div class="ses-warn-b"><h3>Attendance unavailable</h3><p>The platform received no participation data for this session, so no candidate is marked. It is left out of every attendance total.</p></div></div></div>`
-  : `<div class="sec">
-    <div class="sec-h"><h2>Register</h2><span class="t-helper-01">Worked out from the room &middot; ${ATTEND_MIN_MIN} min minimum</span></div>
+  : `<div class="sec ses-reg-sec">
+    ${''/* THE "Worked out from the room · 5 min minimum" CAPTION IS GONE (Maryam
+           30 Sep 2026: "remove ... text"); the heading stands alone. */}
+    <div class="sec-h"><h2>Register</h2></div>
     <div class="tile-stack ses-reg">
       ${reg.map(({m,r})=>`<div class="atd-row">
         <span class="atd-b"><span class="rname">${mAv(m,28)}${leadName(m)}</span></span>
@@ -189,13 +200,9 @@ V.leadSession = () => {
       </div>`).join('')}
     </div>
   </div>`}
-  <div class="sec">
-    <div class="sec-h"><h2>Note on the session</h2></div>
-    ${canNote ? `<div class="ses-note-box">
-      <textarea class="inp ses-note-ta" id="sesNote" rows="3" maxlength="1000" placeholder="How did the session go? (optional, up to 1000 characters)">${note}</textarea>
-      <div class="ses-note-a"><button class="btn btn-p btn-sm noic" data-sesnotesave="${s.id}">Save note</button></div>
-    </div>` : note ? `<p class="t-body">${note}</p>` : `<p class="t-helper-01">No note, and the cohort has closed.</p>`}
-  </div>
+  ${''/* THE "Note on the session" SECTION IS REMOVED (Maryam 30 Sep 2026: "remove
+         notes section from the end of this page"). `SESSION_NOTES` and the
+         `data-sesnotesave` handler stay defined, just not drawn here. */}
 </div></main>`;
 };
 
@@ -485,11 +492,9 @@ V.leadCalls = () => {
 V.leadEvals = () => {
   const ps = LEAD_SUMMARIES.filter(s => s.status === 'pending');
   const published = LEAD_SUMMARIES.filter(s => s.status === 'done');
-  /* EPIC 12.9 — the recommendation window closes when the cohort is marked
-     Completed, a set number of days (the course's completeDelay) after its last
-     day. The queue's cohort is the one being closed. */
-  const evalCo = lcoOf(LEAD_SUMMARIES[0].cohort);
-  const closeDate = dPretty(dISOadd(cohortEndISO(evalCo), evalCo.completeDelay || 7));
+  /* EPIC 12.9 — the recommendation window (its close date used to head this page)
+     now lives only in Tal's summary; the on-page window line was removed 30 Sep
+     2026, so `evalCo`/`closeDate` are no longer derived here. */
 
   /* BOTH ROWS ARE THE SAME COMPONENT AND THE DIFFERENCE IS THE SUBTITLE, which
      is what made the split cheap. A published row says what you decided; a
@@ -548,186 +553,61 @@ V.leadEvals = () => {
     return `<button class="tile clk gcard face-row" data-ldrsum="${s.id}" data-go="leadSum">
       <span class="mem-av mem-ph">${avatar({i:s.i, img:AV[s.img]}, 36)}</span>
       <span class="gcard-b"><h3>${s.name}${done ? ' ' + ldrRecTag(s.rec) : ''}</h3>
-        <span class="sub">${done
-          ? `Scored ${m.avg}%`
-          : `${lname(c)} &middot; ${m.pc}% complete &middot; assessments ${m.avg}% &middot; sign to close their 90 days`}</span></span>
+        <span class="sub">Scored ${m.avg}%</span></span>
       ${''/* THE ARROW'S LABEL — `.row-cta`, §112 (Maryam, 2 Sep 2026: "with
              right side arrows, give text 'View Evaluation' on the left of the
              arrow"). Written here rather than through `faceRow`'s fifth
              argument because this row is `sumRow`'s own markup: the two
              functions draw the same shape and only this one puts a chip in the
              heading.
-             ON THE PUBLISHED ROWS ONLY, which is what "View" means. A waiting
-             row opens the same page to WRITE the recommendation, and the black
-             card at the top of this page already labels that action "Evaluate
-             Candidate" — one verb per state, and the two must not both be on
-             screen saying different things about the same button. */}
-      ${done ? '<span class="row-cta">View Evaluation</span>' : ''}
+             ONE VERB PER STATE: a published row VIEWs the evaluation, a waiting
+             row opens the same page to WRITE it — "Evaluate Candidate" (Maryam
+             30 Sep 2026). The black card that used to carry that verb is gone —
+             the two states are now the SAME ROW under two tabs, so the label is
+             what tells you which action the row opens. */}
+      <span class="row-cta">${done ? 'View Evaluation' : 'Evaluate Candidate'}</span>
       <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg>
     </button>`;
   };
 
-  /* ------------------------------------------------------------------------
-     A WAITING CANDIDATE IS A COLUMN, NOT A ROW (Maryam, 1 Sep 2026, with a
-     reference screen). §90 is the drawing and its head carries the three things
-     the reference was refused; what this function decides is the CONTENT.
+  /* TWO TABS — "Awaiting Evaluations" / "Evaluated Candidates" (Maryam, 30 Sep
+     2026: "this page should have 2 tabs Awaiting Evaluations and Evaluated
+     Candidates"). The black card is GONE (Maryam: "in awaiting evaluations do not
+     show the black card just show the candidate row like ... evaluated
+     candidates") — a waiting candidate is now the SAME `.tile` `sumRow` as a
+     published one, under its own tab, differing only by its cta verb ("Evaluate
+     Candidate" vs "View Evaluation") and the absence of a recommendation chip.
+     `evCol` and its `.ev-*` column drawing (§90) are RETIRED with the card — §90
+     is now dead CSS (nothing writes `.ev-c`/`.ev-row`/`.ev-top`/`.ev-ring`/
+     `.ev-bdg`/`.ev-pts`/`.ev-id`/`.ev-nm`); flag to drop the layer.
+     The strip is the leader's own tab mechanism (`data-ldrevtab` → `S.ldrEvTab`),
+     the same `.sec.sec-cs > .cs` the Sessions and Cohort pages use. The window
+     line stays above the tabs — it is the page's status, true on both tabs. */
+  const tab = S.ldrEvTab || 'awaiting';
+  const listSec = (rows, empty) => rows.length
+    ? `<div class="sec lead-evbody"><div class="tile-stack">${rows.map(sumRow).join('')}</div></div>`
+    : `<div class="sec lead-evbody"><div class="empty" style="border:0">${I.checkFilled}${empty}</div></div>`;
 
-     THE COLUMN IS NOT A BUTTON, and that is what having an action costs. The
-     stacked version was a `<button>` ending in a chevron, so the whole row was
-     the target; a column with "Evaluate Candidate" in it cannot also be one —
-     nested interactive elements. The button carries the `data-ldrsum` the row
-     used to, so the route is unchanged and lead3's capture listener still sets
-     the subject before `go()` runs.
-
-     THE RING SHOWS `m.avg` AND THE WORD UNDER IT IS "Scored". The reference puts
-     course progress in the circle over the word "Complete"; the label Maryam
-     asked for names a score, and the assessments average is the only score this
-     product holds. So the ring is 87 / 90 and the progress percentage stays in
-     the line under the name, where the stacked row already had it — one figure
-     each, neither printed twice.
-
-     `aria-label` SAYS WHAT THE RING IS, because "Scored" beside a bare number is
-     the one thing a screen reader gets less of than the eye does: the visual
-     pairing of a figure with the word under it is not in the markup order.
-
-     THE SUPPORTING LINE IS POINTS, AND THE BADGE SITS BESIDE THE NAME (Maryam,
-     1 Sep 2026: "instead of Cohort 33 · 92% complete, show the points earned by
-     the candidate with the small points icon on its left … next to the name,
-     show the highest badge earned"). Three subtractions and two additions:
-
-       gone   the cohort — it is in the card's own context (every row on this
-              page is Cohort 33's, and Tal's sentence above names it once) and it
-              was the same three words on both columns.
-       gone   "92% complete" — course progress, which is not what this card is
-              for: the ring beside it is the score and the button opens the page
-              that holds the four figures.
-       gone   from an earlier pass, "assessments 87%" (now the ring) and "sign to
-              close their 90 days" (now the button, in the words of what it does).
-       new    the points total, `m.pts` off the member record, with `I.trophy` on
-              its left — the product's own subject mark for points (`statCell(
-              I.trophy, 'Points', …)` on the candidate's dashboard, and §72's
-              pulse takes the same one for "Your standing").
-       new    the highest badge, `lbadge(m.pts)` — DERIVED from those points via
-              `BDG`'s ladder, so the two cannot disagree. Owen has cleared Silver
-              and Lena has not, which is what makes the pair legible as a fact
-              about each candidate rather than a decoration on both.
-
-     THE BADGE IS THE AWARD ARTWORK, THE POINTS MARK IS A GLYPH, and §72 already
-     drew that line: its three column marks are bare glyphs because they name a
-     subject, and its standing rows keep the award WebPs at 24px because "a
-     generic glyph of a shield is a picture of the category instead". A badge is
-     an object somebody earned; points are a topic.
-
-     NO BADGE IS NO ELEMENT. Below 2,500 `lbadge` returns null and the span is not
-     drawn — an empty slot beside a name would read as artwork that failed to
-     load, which is `crow`'s own rule for a missing `img`.
-     ------------------------------------------------------------------------ */
-  const evCol = s => {
-    const c = lcoOf(s.cohort);
-    const m = lmemOf(c, s.name);
-    const b = lbadge(m.pts);
-    return `<div class="ev-c">
-      <div class="ev-top">
-        <span class="mem-av mem-ph">${avatar({i:s.i, img:AV[s.img]}, 44)}</span>
-        <span class="ev-id">
-          <span class="ev-nm">
-            <h3 class="ttl">${s.name}</h3>
-            ${b ? `<span class="ev-bdg"><img src="${AWARD[b.n.toLowerCase()]}" alt="">
-              <span class="sub">${b.n}</span></span>` : ''}
-          </span>
-          <span class="sub ev-pts">${I.trophy}${m.pts.toLocaleString()} points</span>
-        </span>
-        <span class="ev-ring">
-          ${ring(m.avg, `${m.avg}% scored on assessments`)}
-          <span class="sub">Scored</span>
-        </span>
-      </div>
-      <button class="btn btn-s btn-sm noic" data-ldrsum="${s.id}" data-go="leadSum">Evaluate Candidate</button>
-    </div>`;
-  };
-
+  /* THE WINDOW LINE IS GONE and the STRIP ATTACHES TO THE TAL SUMMARY (Maryam
+     30 Sep 2026: "remove '2 recommendations outstanding …', attach tabs with the
+     top tal summary since the line will be removed, reduce the gap of tabs and
+     the bottom content"). With the `.sec.sec-noline` window line removed the strip
+     is the first section after the summary band, so §15's `.modhead + .sec > .cs`
+     drops its top border and it reads as one block with the summary;
+     `.lead-evtabs`/`.lead-evbody` (§31) then tighten the strip→content gap to
+     `--s05`. The `closeDate`/outstanding count now live only in Tal's summary. */
   return `<main class="main"><div class="page">
   ${crumb(['Dashboard','leadDash'],'Evaluations')}
-  ${''/* NO `sub`, AND THAT IS THE DOCUMENTED MOVE. It said "2 waiting on your
-         signature" directly above Tal saying "Two 90-day summaries are waiting
-         on you" — the exact duplication CLAUDE.md's two-copy-slots rule exists
-         to stop, and it survived the old version only because Tal's sentence
-         there led on level decisions instead. This page has no factual SPINE of
-         its own: the queue is one to four candidates from whichever cohort has
-         reached day 90, which is a count rather than a coordinate, and the four
-         figure cells below state it four ways. So Tal's sentence is the opening
-         line, which is what the rule prescribes for a page with no spine. */}
   ${ph('Evaluations')}
-  ${''/* EPIC 12.9 — the outstanding count and the window-close date. */}
-  <div class="sec sec-noline"><p class="eval-window">${ps.length ? `<b>${ps.length}</b> recommendation${ps.length===1?'':'s'} outstanding.` : 'Every recommendation is written.'} Recommendations can be written until ${closeDate}.</p></div>
-  ${''/* THE TWO WAITING ARE THE PAGE'S BLACK CARD (Maryam, 1 Sep 2026: "take
-         the 2 candidates awaiting in the black card with the card heading
-         Awaiting Evaluations", and "remove the 90-day summaries heading").
-
-         THE WHOLE §75 RECIPE COMES WITH THE CLASS and none of it is written
-         here — the standing instruction is that "make this a black card" means
-         the inset, the top-right haze, the `--s07` frame, the 20px gap, the
-         section's own hairlines off, the head row's `--on-dark-rule`, the ink
-         flip (§63 §6a) and the internal seams (§75.5). This card is the FOURTH
-         caller and, like the leader's own call card, it states not one rule of
-         its own: the two rows are `.tile`s, so §75.5 turns their ground
-         transparent and their seam to 16% white, and §63 §6a inks the name
-         `--on-dark` and the subtitle `--on-dark-2`.
-
-         NEVER `.plate` OR `.sec.on-dark` — both are in ai5's `DARK_CARD`, so
-         `placeDark` would hoist this section into the head band, where it would
-         land beside Tal's summary at ~330px with each row's face, name and
-         subtitle on three lines of their own. §75.3 records that exact bug.
-
-         THE HEADING MOVED INTO THE CARD RATHER THAN BEING DELETED TWICE. "90-day
-         summaries" was the section's `.sec-h` and "Awaiting Evaluations" is the
-         card's `.dc-t`, which is the same slot one component in — so the page
-         still names this block, and it now names it with the word the dashboard
-         card and the rail-side queue already use. The count went with the
-         heading: `.dc-hd-r` takes a `.dc-t` and then EITHER a control or a time
-         (§75, they share one auto margin), and a bare "2 waiting" is neither —
-         Tal's sentence above the card states it in words anyway.
-
-         WHY IT EARNS THE LOUDEST OBJECT ON THE PAGE: §75's test is "this is the
-         one thing the page is about", and on a page whose other list is a record
-         of work already done, two signatures somebody is waiting on is exactly
-         that. §59's clock test is the `.plate` test, not this one. */}
-  <div class="sec dark-card">
-    <div class="dc-hd">
-      <div class="dc-hd-r"><h2 class="dc-t">Awaiting Evaluations</h2></div>
+  <div class="sec sec-cs lead-evtabs">
+    <div class="cs">
+      <button class="${tab === 'awaiting' ? 'on' : ''}" data-ldrevtab="awaiting">Awaiting Evaluations${ps.length ? ` <span class="lf-n">${ps.length}</span>` : ''}</button>
+      <button class="${tab === 'evaluated' ? 'on' : ''}" data-ldrevtab="evaluated">Evaluated Candidates${published.length ? ` <span class="lf-n">${published.length}</span>` : ''}</button>
     </div>
-    ${ps.length ? `<div class="ev-row">
-      ${ps.map(evCol).join('')}
-    </div>` : `<div class="empty" style="border:0">${I.checkFilled}
-      <h3>Nothing waiting</h3><p>Every 90-day summary in this cohort is published.</p></div>`}
-    ${/* THE FOOTNOTE IS GONE. It explained what a summary is FOR — "the
-          document a candidate's next level is argued from" — to the one person
-          who already knows, at the foot of a list of two rows that each say
-          "sign to close their 90 days". A closing line earns its place
-          when it tells you something the rows do not; this one restated the
-          page's own subject. */''}
   </div>
-  ${''/* THE SECOND SECTION IS TINTED, WHICH IS THE PAGE'S RHYTHM AND NOT A
-         JUDGEMENT ABOUT THE CONTENT. White, tint, white down a page is what
-         every other leader page does (§55/§84 draw it, `leadDash` alternates
-         its four blocks by POSITION), and it happens to say the useful thing
-         here too: the work is on the white ground at the top and the record is
-         on the quiet one below it.
-         THE COUNT CAME OFF THE HEADING ROW (Maryam, 1 Sep 2026), AND THE ROW
-         IS WHY IT COULD. "6 published" was a `.t-helper-01` at the far right of
-         the heading — the shape the Calls page and the Messages inbox use for a
-         count — and it was saying the word the heading beside it already says
-         ("Evaluated") about rows that each say it again ("you recommended").
-         Tal's sentence at the top of the page is what states the arithmetic:
-         two of eight are still waiting, so six are not. Both counts on this page
-         went the same way and for the same reason; the card's heading lost "2
-         waiting" 30 lines up. */}
-  ${published.length ? `<div class="sec tint">
-    <div class="sec-h"><h2>Evaluated Candidates</h2></div>
-    <div class="tile-stack">
-      ${published.map(sumRow).join('')}
-    </div>
-  </div>` : ''}
+  ${tab === 'awaiting'
+    ? listSec(ps, '<h3>Nothing waiting</h3><p>Every 90-day summary in this cohort is published.</p>')
+    : listSec(published, '<h3>No evaluations yet</h3><p>Nothing has been signed off in this cohort.</p>')}
 </div></main>`;
 };
 

@@ -1138,7 +1138,8 @@ const leadCallCard = (k, o) => `<div class="sec dark-card crow-dark">
    is not this ask; the alternative was a Join wired to nothing, which is the
    dead control §60 refuses outright.
    ========================================================================== */
-const lcalCard = (k, lead) => {
+const lcalCard = (k, lead, opts) => {
+  const o = opts || {};
   /* THE LIGHT CARDS OPEN THE COHORT, NOT THE CALLS PAGE. `data-go` alone can
      only name a view, so the cohort's own id rides beside it as `data-ldrco`
      and lead2's capture-phase listener sets `S.ldrCo` before `go()` runs —
@@ -1192,14 +1193,17 @@ const lcalCard = (k, lead) => {
                show In 2hrs 40mins"). No `data-calltill`, so `callTimerArm` leaves
                it alone — the demo card reads the call as still ahead, which also
                keeps the Join in its accent-disabled state. */}
-        <span class="lcal-timerbox">${I.time}<span class="lcal-timer t-h4">In 2hrs 40mins</span></span>
+        ${''/* the countdown label; callers may override it (the Sessions page passes
+               "In 02:40", the HH:MM form — Maryam 30 Sep 2026). */}
+        <span class="lcal-timerbox">${I.time}<span class="lcal-timer t-h4">${o.countdown || 'In 2hrs 40mins'}</span></span>
       </span>
       <span class="lcal-seatsrow">
         ${faces ? `<span class="lcal-faces">${faces}${moreFaces ? `<span class="lcal-face-more">+${moreFaces}</span>` : ''}</span>` : ''}
         <span class="lcal-seats t-desc">${k.seats} candidates</span>
       </span>
       <span class="lcal-f">
-        <span class="lcal-m t-desc">${k.mins} minutes</span>
+        ${''/* "N minutes session" (Maryam 30 Sep 2026), the black dashboard card only. */}
+        <span class="lcal-m t-desc">${k.mins} minutes session</span>
         ${act}
       </span>
     </span>

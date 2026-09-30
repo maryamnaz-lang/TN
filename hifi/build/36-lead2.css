@@ -844,13 +844,15 @@
 .app .page.msg-mod{
   display:flex;flex-direction:column;flex:1 1 auto;min-height:0;
   width:100%;max-width:100%;box-sizing:border-box;
-  /* NO BOTTOM PADDING (Maryam 30 Sep 2026, "odd bottom padding"). The 2 Sep note
-     below argued for `--s06` here to leave the composer air above the (absent) ask
-     dock — but combined with the composer's own bottom margin it double-padded the
-     thread side and left the two columns ending on different lines. The inbox is a
-     full-bleed app surface, so it now runs flush to the frame foot and both columns
-     end together; the composer's own margin is gone too (§36 composer rule). */
-  padding-bottom:0}
+  /* A BOTTOM PADDING UNDER BOTH PANES (Maryam 30 Sep 2026, "give bottom padding to
+     message field"). The earlier same-day pass ran the inbox flush to the frame foot
+     (`padding-bottom:0`) to end both columns on one line — but the composer jammed
+     against the frame edge read as cramped. Restoring the page's own `--s05` bottom
+     padding lifts the WHOLE two-pane surface off the foot, so the field gets its air
+     AND both columns still end together (the padding is the page's, not the
+     composer's, so the list rail lifts with it). The composer keeps no bottom margin
+     of its own — the page pays it once. */
+  padding-bottom:var(--s05)}
 .app .page.msg-mod > .sec.ldr-dm-sec{
   display:flex;flex-direction:column;flex:1 1 auto;min-height:0}
 .app .page.msg-mod > .sec.ldr-dm-sec > .ldr-dm{flex:1 1 auto;min-height:0}

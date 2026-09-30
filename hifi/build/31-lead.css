@@ -855,8 +855,18 @@
 @container app (max-width:719.98px){ .app .lead-hdr-w{display:none} }
 @container app (max-width:479.98px){ .app .lead-hdr{display:none} }
 
-/* 12.2 — the cohort header */
-.app .lead-cohd{display:grid;gap:var(--s03)}
+/* 12.2 — the cohort header. The title-to-day-line gap is `--s02` (4), not `--s03`
+   (8) — Maryam 30 Sep 2026: "reduce their gap from 8px to 4px". */
+.app .lead-cohd{display:grid;gap:var(--s02)}
+
+/* THE EVALUATIONS TAB STRIP SITS TIGHT TO ITS CONTENT (Maryam 30 Sep 2026: "reduce
+   the gap of tabs and the bottom content"). The strip-only `.sec-cs` zeroes its own
+   foot padding and the `.cs`'s bottom margin, so the single `--s05` on the content
+   section is the whole gap — the same tight tab→pane relationship the interview
+   page's `.iv-tabs` uses. */
+.app .sec.sec-cs.lead-evtabs{padding-bottom:0}
+.app .sec.sec-cs.lead-evtabs > .cs{margin-bottom:0}
+.app .sec.lead-evbody{padding-top:var(--s05)}
 .app .lead-cohd-id{display:flex;flex-direction:column;gap:2px}
 /* the cohort title reads in the accent as ink (Maryam 30 Sep 2026: "make the
    cohort name in accent color"). §63 does not target this class, so its colour is
@@ -949,8 +959,14 @@
    ========================================================================== */
 .app .stat .stat-low{color:var(--support-error)}
 .app .crs-card .crs-lsvt{margin-top:var(--s05)}
+/* THE REGISTER CONTENT IS INSET `--pad-x` EACH SIDE (Maryam 30 Sep 2026: "give left
+   and right side padding to the Register section content"). The `.ses-reg` tile-stack
+   is full-bleed by default (§10's negative inline margin makes its box sit at the
+   section-box edge so its dividers run wall-to-wall). Leaving that bleed in place and
+   paying `--pad-x` on each row lands the row content — and its hairline — on the same
+   gutter as the section heading and the facts band above. */
 .app .atd-row{display:flex;align-items:center;justify-content:space-between;gap:var(--s04);
-  padding:var(--s04) 0;border-bottom:1px solid var(--rule)}
+  padding:var(--s04) var(--pad-x);border-bottom:1px solid var(--rule)}
 .app .atd-row:last-child{border-bottom:0}
 .app .atd-b{display:flex;flex-direction:column;gap:2px;min-width:0}
 .app .atd-t{font-size:var(--t-compact-size);color:var(--text-primary)}

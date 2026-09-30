@@ -36,7 +36,7 @@
      rule sweep clean on 21 screens, 84 screen-width combos with no overflow,
      zero thrown errors.
      ========================================================================== -->
-<link rel="stylesheet" href="design-system/talentnext-ds.css?b=7499312e">
+<link rel="stylesheet" href="design-system/talentnext-ds.css?b=f89c861a">
 
 <style>
 /* ==========================================================================
@@ -276,7 +276,7 @@
        somebody choosing a stage would want it. -->
 </div>
 
-<script src="design-system/talentnext-ds.js?b=7499312e"></script>
+<script src="design-system/talentnext-ds.js?b=f89c861a"></script>
 <script>
 /* ==========================================================================
    THE TALENT AGENT PORTAL
@@ -498,6 +498,21 @@ const A = {
   rank:12, pool:38,
   follow:4.4, depth:4.7,
   manager:'Nadia Rahman',
+
+  /* AGENT SCORE (story 13.15 / Epic 6 model) — stars out of 5. The number SHOWN is
+     the reviewer-approved score once a quarter has been reviewed (`approvedScore`),
+     else the `startingScore` set at invite (components hidden until the first
+     review). Its two components are the interview `rubric` and the candidate
+     `rating`, each /5; `ratingCount` is how many candidate ratings sit behind the
+     rating. `follow`/`depth` (above) are the reviewer's PER-INTERVIEW marks, not
+     score inputs. Cancellations are evidence the reviewer sees, they do not move
+     the score (13.12). All authored placeholder (§74) — the seed carries no rubric,
+     view or cancellation telemetry. */
+  scoreApproved:true, startingScore:4.0, approvedScore:4.5,
+  rubric:4.5, ratingCount:148,
+  scoreAt:'1 July', reviewNext:'1 October', quarterEnd:'30 September',
+  ivsQ:47, signedPct:96, cancels:2, lateCancels:1,
+
   escrow:204, earned:612,
   payout:'Stripe · account ending 4417',
 
@@ -592,7 +607,11 @@ const CFG = {
   reviewed: {nav:'full',  approved:true, listing:true, paid:true, certified:true, listed:true,
              busy:true, reviewed:true,
              range:'Explorer E1 – Builder B2', rangeShort:'E1 – B2',
-             rank:9, follow:4.6, ivs:171, month:7}
+             rank:9, follow:4.6, ivs:171, month:7,
+             /* the quarter that just closed: the review approved a higher score and
+                the reviewer's per-interview marks are now set (13.15). */
+             rubric:4.7, approvedScore:4.6, scoreAt:'1 October', reviewNext:'1 January',
+             ivsQ:52, signedPct:98, cancels:3, lateCancels:1}
 };
 
 /* `tal` IS THE ASK PAGE BEING OPEN, and `talQ` is gone with the sheet it served
@@ -1650,8 +1669,8 @@ const PAGESUM = {
   },
 
   standing: {
-    reviewed:'The review widened your range on 1 October, so you may assess E1 to B2 now. Follow-up came up to 4.6 over the quarter.',
-    _:       'Follow-up came up to 4.4 in August and depth has held at 4.7 since May. Nadia Rahman reads the quarter on 1 October.'
+    reviewed:'Your Agent Score is <b>4.6 stars</b> after this quarter, up from 4.5. Nadia approved it on 1 October and widened your range to E1 to B2.',
+    _:       'Your Agent Score is <b>4.5 stars</b>, your interview score at 4.5 and your candidate rating at 4.6 across 148 ratings. Nadia reviews the quarter on 1 October.'
   },
 
   /* PROFILE IS A TABLE NOW, because the page became two things: who you are,
@@ -1685,9 +1704,9 @@ const TALQ = {
     ['What’s on me today?',
      'Sofia Marek’s recording is the one to confirm, which releases her pay. Five more recordings are waiting behind it, and two interviews are still ahead: Rafael on Thursday, Amara on Monday, both paid for already.',
      null, ['Confirm recordings', 'interviews']],
-    ['How are my scores moving?',
-     'Follow-up is 4.4, up from 4.2 in July. Depth has sat at 4.7 since May. Both are read off your transcripts, not off candidate ratings.',
-     [['Follow-up', '4.4 &middot; was 4.2'], ['Depth', '4.7 &middot; unchanged'], ['Rank', '12 of 38']],
+    ['How is my score moving?',
+     'Your Agent Score is 4.5 stars, your interview score at 4.5 and your candidate rating at 4.6. Follow-up and depth are the reviewer’s per-interview marks, set each quarter. Nadia reads the next quarter on 1 October.',
+     [['Agent Score', '4.5&#9733;'], ['Interview score', '4.5 / 5'], ['Candidate rating', '4.6 / 5']],
      ['Open Standing', 'standing']],
     ['When does the escrow release?',
      'Three working days after you confirm the recording. Tom’s $68 releases Thursday; Sofia’s starts counting the moment you confirm hers.',
@@ -1758,13 +1777,13 @@ const TALQ = {
   ],
   standing: [
     ['What’s actually being scored?',
-     'Your half of the conversation: how well you followed up, and how deep you got. Tal reads the transcript. The candidate’s rating is counted separately.'],
+     'Two things make your Agent Score, out of 5: your interview score, how well your interviews meet the standard, and the candidate’s rating of you. Follow-up and depth are the reviewer’s separate per-interview marks.'],
     /* NO TIER IN THIS ONE EITHER — it asked "What moves me to A3?", which is
        the removed concept in the question rather than in the answer. What a
        reader actually wants to know is what the review looks at and where they
        stand against it, which is what the answer already said. */
     ['What widens my range?',
-     'The last quarter’s volume and both scores, read by Nadia on 1 October. Follow-up at 4.5 is the usual bar; you’re at 4.4.'],
+     'The quarterly review reads your interview score, your candidate rating and the quarter’s volume. Nadia reads yours on 1 October, and a stronger score is what widens the range.'],
     ['Does my rank change my fee?',
      'No. You set your fee. Rank changes where you sit in browse, which is a different thing, and it is recalculated weekly.']
   ],
@@ -4175,7 +4194,7 @@ V.dashboard = v => {
           bare title was thin on and exactly what a Quick Action wants. Kept short
           enough to stay on one line at the two-card row's ~386px per card. */''}
     ${quickActions([
-      {ic: I.checkFilled, hue: 'ic-stand', go: 'interviews', tab: 'eval', t: 'Recordings To Confirm', d: 'Confirm to release your pay'},
+      {ic: I.checkOutline, hue: 'ic-stand', go: 'interviews', tab: 'eval', t: 'Recordings To Confirm', d: 'Confirm to release your pay'},
       {ic: I.video,       hue: 'ic-prep',  go: 'interviews', tab: 'next', t: 'Upcoming Interviews', d: 'Calls booked ahead'}
     ])}`;
 };
@@ -5414,166 +5433,85 @@ V.earnings = v => {
    the note that was here. Its first draft had the spine, the hero and Tal all
    saying "A2, ranked 12 of 38, reviewed by Nadia"; the figures are the band's
    and what MOVED is Tal's, and neither says the other's thing. */
-/* THE STANDING MODULE IS THE AGENT'S "MY STATS" (Maryam, 7 Sep 2026: "get inspo
-   from the stats page of upwork ... useful data, ui and even wording ... according
-   to our product context"). Upwork's My stats reads Job Success Score, a proposals
-   funnel and a profile-metrics trend; the three map onto an interviewer's world as
-   an AGENT SCORE gauge (how the interviews land, in one number), a THIS-QUARTER
-   funnel (profile views to signed reports) and a PROFILE-VIEWS trend. Score and its
-   three inputs are REAL — `v.follow` / `v.depth` / `v.rating`, the same figures
-   "Where you are" and "Last five" print. The funnel counts and the eight weekly
-   bars are AUTHORED PLACEHOLDERS, flagged here and in DESIGN.md §8: the product has
-   no view/request telemetry in the seed, so the shape is real and the numbers stand
-   in. `STAND_TREND` is the one array to swap for live weekly views. */
-const STAND_TREND = [18, 24, 20, 27, 25, 31, 29, 37]; /* PLACEHOLDER — weekly profile views, last 8 weeks */
-
+/* THE STANDING MODULE — story 13.15, "View My Standing". Rebuilt 30 Sep 2026 onto
+   the Agent Score model (stars out of 5, Epic 6), replacing the earlier Upwork "My
+   stats" placeholder (a percentage gauge computed off follow-up/depth/rating, an
+   eight-week profile-views trend, and a five-step views to signed funnel). The score
+   is now the REVIEWER-APPROVED number `v.approvedScore` (or `v.startingScore` before
+   the first quarter is reviewed); its two components are the interview `rubric` and
+   the candidate `rating`, each /5; and follow-up/depth are the reviewer's per-
+   interview marks that read "Awaiting review" between quarters. `STAND_TREND` and the
+   verbal band are deleted with the trend card. The this-quarter figures and the
+   cancellation counts are authored placeholders (§74). Read-only throughout. Kept as
+   the two-column card masonry Maryam chose — the cards changed, not the layout. */
 V.standing = v => {
-  /* THE STANDING MODULE IS THE AGENT'S "MY STATS", NOW AS A CARD MASONRY (Maryam,
-     7 Sep 2026: "follow that ui and adjust our content accordingly" — the Upwork
-     My-stats reference). Upwork lays its stats out as a TWO-COLUMN grid of bordered
-     panels; this rebuild does the same in our tokens — white `--layer-01` cards with
-     a 1px `--rule` edge at radius 0, `card()` below. Two explicit column stacks in an
-     `auto-fit minmax(340px,1fr)` grid, so they sit side by side above ~744px and
-     stack below with NO container query. The stat BANDS are gone: `.stats` reads the
-     whole-`app` width, not its card, so it can't live in a column — each is reworked
-     into the card-native VERTICAL form the reference itself uses (a funnel list, a
-     rank figure, a rating breakdown). Score and its three inputs stay REAL
-     (`v.follow`/`v.depth`/`v.rating`); the funnel counts and `STAND_TREND` are
-     authored placeholders (DESIGN.md §8). */
-  const inputs = [v.follow, v.depth, v.rating].filter(n => typeof n === 'number');
-  const score = Math.round(inputs.reduce((a, b) => a + b, 0) / inputs.length / 5 * 100);
-  const arc = (163.36 * score / 100).toFixed(1);
-  const band = score >= 90 ? 'Excellent' : score >= 80 ? 'Strong'
-             : score >= 70 ? 'Building' : 'Needs attention';
-  const fn = {views: 284, req: 51, held: 22, signed: 21}; /* AUTHORED PLACEHOLDER counts */
-  const asOf = v.reviewed ? '1 October' : '1 July';
-  const trendMax = Math.max(...STAND_TREND);
+  /* THE SCORE SHOWN is the approved score once a quarter has been reviewed, else the
+     starting score set at invite (components hidden until the first review). One
+     decimal, a gold star, no verbal label (13.15). `revBool` is whether the current
+     quarter's review has landed — it gates the per-interview marks below. */
+  const approved = v.scoreApproved !== false;
+  const score    = (approved ? v.approvedScore : v.startingScore).toFixed(1);
+  const asOf     = v.reviewed ? '1 October' : '1 July';
+  const revBool  = !!v.reviewed;
 
-  /* A CARD is a bordered white panel — the reference's box, in our tokens. `.sec-h`
-     gives the title its 16px section-heading size and the flex title row; a `sub`
-     is the reference's grey line under the title (Upwork's "Improve your reputation
-     ..."). Radius stays 0. */
-  const card = (title, body, sub) => `
-    <div style="border:1px solid var(--rule); background:var(--layer-01); padding:var(--s06)">
-      <div class="sec-h" style="margin-bottom:${sub ? '4px' : 'var(--s05)'}"><h2>${title}</h2></div>
-      ${sub ? `<p class="t-desc" style="margin:0 0 var(--s05)">${sub}</p>` : ''}
-      ${body}
+  /* A RIGHT-ALIGNED kv for the cards (Maryam, 30 Sep 2026) — the value hugs the
+     card's right edge, not the 184px label column. Shadows the module `kv` for the
+     length of this view only; keeps the DS `.kv` grid so the row hairlines stay. */
+  const kv = rows => `<div>${rows.map(([k, val]) =>
+    `<div class="kv"><span class="k">${k}</span><span class="v" style="text-align:right">${val}</span></div>`).join('')}</div>`;
+
+  /* THE EIGHT-CELL FIGURE GRID (Maryam, 30 Sep 2026) — the card masonry is replaced
+     by one attached `.facts pf-facts` band, which §105.1a pins to a FIXED FOUR
+     COLUMNS at ≥900, so eight cells read as two attached rows of four (and 2-up on a
+     phone). `pfFact(ic, mk, label, val)` is the candidate-profile cell (mark + label
+     over value); the DS inks the mark #111 (§29), so the `--mk` hue is harmless. Your
+     Score wears the gold star; before the first approved quarter the two component
+     cells read "—" (components absent until the first review, 13.15). */
+  const star = `<span style="color:var(--star)"> &#9733;</span>`;
+  const dash = '&mdash;';
+  const facts = `
+    <div class="facts pf-facts">
+      ${pfFact(I.chart,    '--mk-1', 'Your score',           `${score}${star}`)}
+      ${pfFact(I.trophy,   '--mk-2', 'Your rank',            `#${v.rank}`)}
+      ${pfFact(I.video,    '--mk-3', 'Interview score',      approved ? `${v.rubric.toFixed(1)} / 5` : dash)}
+      ${pfFact(I.star,     '--mk-4', 'Candidate rating',     approved ? `${v.rating.toFixed(1)} / 5` : dash)}
+      ${pfFact(I.group,    '--mk-1', 'Interviews held',      `${v.ivsQ}`)}
+      ${pfFact(I.shield,   '--mk-2', 'Position in browse',   `${v.rank} of ${v.pool}`)}
+      ${pfFact(I.calendar, '--mk-3', 'Cancelled interviews', `${v.cancels}`)}
+      ${pfFact(I.time,     '--mk-4', 'Late cancellations',   `${v.lateCancels}`)}
     </div>`;
 
-  /* A FUNNEL ROW — the reference's proposals list: a label, the count with its
-     step-conversion beside it, and a bar whose width is the count as a share of the
-     top of the funnel, so the shape narrows down the card. */
-  const fRow = (label, count, note) => `
-    <div>
-      <div style="display:flex; justify-content:space-between; align-items:baseline; gap:var(--s04)">
-        <span class="t-body">${label}</span>
-        <span style="white-space:nowrap"><span class="t-h4" style="font-variant-numeric:tabular-nums">${count}</span>${note ? ` <span class="t-caption" style="color:var(--text-helper)">${note}</span>` : ''}</span>
-      </div>
-      <div style="height:6px; background:var(--layer-02); margin-top:6px">
-        <div style="height:100%; width:${Math.round(count / fn.views * 100)}%; background:var(--accent)"></div>
-      </div>
-    </div>`;
-
-  const scoreCard = card('Agent Score', `
-    <div style="display:flex; gap:var(--s05); align-items:center; flex-wrap:wrap; margin-bottom:var(--s06)">
-      <div class="ring" style="width:84px; height:84px" role="img" aria-label="Agent score ${score} percent">
-        <svg viewBox="0 0 64 64" aria-hidden="true">
-          <circle class="ring-t" cx="32" cy="32" r="26"></circle>
-          <circle class="ring-f" cx="32" cy="32" r="26" style="--arc:${arc}"></circle>
-        </svg>
-        <span class="ring-n t-h2">${score}<small>%</small></span>
-      </div>
-      <div style="flex:1 1 180px; min-width:180px">
-        <div class="t-h3">${band}</div>
-        <p class="t-desc">The interviews you run, in one number. As of ${asOf} &middot; updates after each review.</p>
-      </div>
-    </div>
-    ${kv([
-      ['Follow-up', `${v.follow} / 5`],
-      ['Depth', `${v.depth} / 5`],
-      ['Candidate rating', `${v.rating} / 5`]])}`);
-
-  const trendCard = card('Profile views', `
-    <div class="chart" style="margin-top:0">
-      <div class="chart-plot">
-        ${STAND_TREND.map(nv => `<div class="chart-bar" style="cursor:default"><i style="height:${Math.max(3, Math.round(nv / trendMax * 100))}%"></i></div>`).join('')}
-      </div>
-      <div class="chart-x">${STAND_TREND.map((_, i) => `<span>W${i + 1}</span>`).join('')}</div>
-    </div>`, `Last 8 weeks &middot; ${STAND_TREND.reduce((a, b) => a + b, 0)} total`);
-
-  const reviewCard = card('Your review', kv([
-      ['Reviewed by', `${v.manager} &middot; manager of agents`],
-      ['How often', 'Every quarter'],
-      ['Last one', v.reviewed ? `1 October &middot; range widened to ${v.rangeShort}`
-                              : `1 July &middot; range held at ${v.rangeShort}`],
-      ['Next', v.reviewed ? '1 January' : '1 October'],
-      ['What it can move', 'The range you may assess, and where you sit in browse']]));
-
-  const quarterCard = card('This quarter', `
-    <div style="display:flex; flex-direction:column; gap:var(--s05)">
-      ${fRow('Profile views', fn.views, 'opened your card')}
-      ${fRow('Booking requests', fn.req, `${Math.round(fn.req / fn.views * 100)}% of views`)}
-      ${fRow('Interviews held', fn.held, `${Math.round(fn.held / fn.req * 100)}% of requests`)}
-      ${fRow('Signed on time', fn.signed, `${Math.round(fn.signed / fn.held * 100)}% within 24h`)}
-    </div>`);
-
-  const browseCard = card('In browse', `
-    <div class="t-display" style="font-variant-numeric:tabular-nums; line-height:1">${v.rank}<span class="t-h3" style="color:var(--text-helper); font-weight:var(--t-w-book)"> of ${v.pool}</span></div>
-    <p class="t-desc" style="margin-top:var(--s03)">Ranked by follow-up and depth. You assess <b style="color:var(--text-primary); font-weight:var(--t-w-strong)">${v.rangeShort}</b> &mdash; Explorer to Builder.</p>`);
-
-  const heldCard = card('Also held', `
-    <div style="display:flex; gap:var(--s05); align-items:flex-start">
-      <span class="pf-sr-ic" style="--mk:var(--mk-2)">${I.certificate}</span>
-      <div>
-        <div class="t-h4">Certified 20 June 2024</div>
-        <p class="t-desc" style="margin-top:2px">Training and calibration &mdash; all four lessons, and the method re-checked each June.</p>
-      </div>
-    </div>`);
+  /* THE REVIEWER'S FACE beside the name (Maryam, 30 Sep 2026) — a round 28px disc,
+     right-aligned in the value cell (inline-flex reads to the right under the value's
+     `text-align:right`). Nadia's portrait is `AV.hana` from the shared photo pool. */
+  const reviewerCell = approved
+    ? `<span style="display:inline-flex; align-items:center; gap:var(--s03)">${avatar('NR', AV.hana, 28)}<span>${v.manager}</span></span>`
+    : 'Not yet reviewed';
 
   return head({
     title: 'Your standing',
-    sub: `Ranked ${v.rank} of ${v.pool} in browse &middot; assesses ${v.rangeShort} &middot; reviewed quarterly`
+    sub: `${score}&#9733; Agent Score &middot; ranked ${v.rank} of ${v.pool} in browse &middot; reviewed quarterly`
   }) + `
 
-  ${/* THE TWO-COLUMN CARD MASONRY. Two explicit column stacks (left rated/trend,
-        right activity/position) inside an auto-fit grid that collapses them to one
-        stack below ~744px. `align-items:start` so a short column does not stretch. */''}
+  ${/* THE FIGURE GRID. `.facts` is a §10.15 label-column opt-out, so the band bleeds
+        full width with no spine. The explanatory statement line was removed (Maryam,
+        30 Sep 2026). */''}
   <section class="sec">
-    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(340px,1fr)); gap:var(--s06); align-items:start">
-      <div style="display:flex; flex-direction:column; gap:var(--s06)">
-        ${scoreCard}
-        ${trendCard}
-        ${reviewCard}
-      </div>
-      <div style="display:flex; flex-direction:column; gap:var(--s06)">
-        ${quarterCard}
-        ${browseCard}
-        ${heldCard}
-      </div>
-    </div>
+    ${facts}
   </section>
 
-  ${/* LAST FIVE runs full width under the masonry — a table wants the whole measure,
-        not a column. Wrapped in the same card so it reads as one more panel. */''}
+  ${/* YOUR REVIEW — a plain section, NOT a card, full-width content. `.kv` is a §10.15
+        opt-out that is itself a label column, so a headed kv section stacks: heading on
+        top, keys and right-aligned values full width below. Reviewer NAME + face, no role
+        title (13.15); "Not yet reviewed" before the first approval. "What it can move"
+        removed (Maryam, 30 Sep 2026). */''}
   <section class="sec">
-    ${card('Last five', `
-    <div class="tbl-wrap">
-      <table class="tbl">
-        <tr><th>Candidate</th><th>Date</th><th class="num">Follow-up</th><th class="num">Depth</th><th class="num">Their rating</th></tr>
-        <tr><td>Tom Whelan</td><td>17 Aug</td><td class="num">4.6</td><td class="num">4.8</td><td class="num">5.0</td></tr>
-        <tr><td>Nina Haddad</td><td>14 Aug</td><td class="num">4.3</td><td class="num">4.7</td><td class="num">4.5</td></tr>
-        <tr><td>Marcus Bell</td><td>12 Aug</td><td class="num">4.5</td><td class="num">4.6</td><td class="num">4.5</td></tr>
-        <tr><td>Iris Novak</td><td>8 Aug</td><td class="num">4.2</td><td class="num">4.7</td><td class="num">4.0</td></tr>
-        <tr><td>Jonah Petit</td><td>5 Aug</td><td class="num">4.4</td><td class="num">4.8</td><td class="num">5.0</td></tr>
-      </table>
-    </div>`)}
-  </section>
-
-  <section class="sec">
-    <div class="note"><span>${I.info}</span><div class="nb"><b>Your range decides who can book you</b>
-      ${v.reviewed
-        ? 'The review widened it to Explorer E1 – Builder B2, which is why Explorer’s first two levels appeared in your queue this month.'
-        : 'It is Explorer E2 – Builder B1 today. Widening it would add Explorer’s first two levels and Builder’s second.'}</div></div>
+    <div class="sec-h"><h2>Your review</h2></div>
+    ${kv([
+      ['Reviewed by', reviewerCell],
+      ['How often', 'Every quarter'],
+      ['Last review', approved ? `${asOf} &middot; ${score}&#9733;` : 'None yet'],
+      ['Next review', v.reviewNext]])}
   </section>`;
 };
 

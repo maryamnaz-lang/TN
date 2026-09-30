@@ -1897,6 +1897,12 @@ NOT_IN_DS = {
     # and passes the other portals never run — shipping the file would put a
     # `.mob-ph`/`.lvl-hero` phone flow on portals that build neither. hifi-only.
     '137-mobileflow.css': "the candidate report's phone flow (.mob-ph/.lvl-hero/ladder); hifi-only markup and passes — see the layer's note",
+    # §139 is the interview-scene share disc + platform dropdown, on the profile
+    # carousel and the report row. The behaviour needs `S.shareOpen` and a click
+    # handler no other portal ships; `scenesCarousel` takes the control through an
+    # optional `opts.shareFor`, so the DS builder stays inert without it. Shipping
+    # the CSS would put a `.scv-share` skin on portals that emit no such control.
+    '139-sharescene.css': "the scene share disc/menu is hifi behaviour (S.shareOpen); opts.shareFor keeps dsScenes inert — see the layer's note",
 }
 
 

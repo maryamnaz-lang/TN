@@ -14,7 +14,7 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 6409.  Rules dropped as product-specific: 222.
+   Rules kept: 6412.  Rules dropped as product-specific: 222.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
@@ -5629,7 +5629,10 @@ button.btn-p:active,
 @container app (max-width:479.98px){
   .app .lead-hdr{display:none}
 }
-.app .lead-cohd{display:grid; gap:var(--s03)}
+.app .lead-cohd{display:grid; gap:var(--s02)}
+.app .sec.sec-cs.lead-evtabs{padding-bottom:0}
+.app .sec.sec-cs.lead-evtabs > .cs{margin-bottom:0}
+.app .sec.lead-evbody{padding-top:var(--s05)}
 .app .lead-cohd-id{display:flex; flex-direction:column; gap:2px}
 .app .lead-cohd-n{font-size:var(--t-h1-size); line-height:var(--t-h1-lh); font-weight:var(--t-w-strong); color:var(--accent-text)}
 .app .lead-cohd-course{font-size:var(--t-desc-size); line-height:normal; color:var(--text-secondary)}
@@ -5680,7 +5683,7 @@ button.btn-p:active,
 .app .lead-past-row{width:100%}
 .app .stat .stat-low{color:var(--support-error)}
 .app .crs-card .crs-lsvt{margin-top:var(--s05)}
-.app .atd-row{display:flex; align-items:center; justify-content:space-between; gap:var(--s04); padding:var(--s04) 0; border-bottom:1px solid var(--rule)}
+.app .atd-row{display:flex; align-items:center; justify-content:space-between; gap:var(--s04); padding:var(--s04) var(--pad-x); border-bottom:1px solid var(--rule)}
 .app .atd-row:last-child{border-bottom:0}
 .app .atd-b{display:flex; flex-direction:column; gap:2px; min-width:0}
 .app .atd-t{font-size:var(--t-compact-size); color:var(--text-primary)}
@@ -5967,7 +5970,7 @@ button.btn-p:active,
 }
 .app .ldr-dm-back{flex:none; margin-right:var(--s02)}
 .app .main:has(> .msg-mod){display:flex; flex-direction:column; flex:1; min-height:0; padding-left:0; padding-right:0}
-.app .page.msg-mod{display:flex; flex-direction:column; flex:1 1 auto; min-height:0; width:100%; max-width:100%; box-sizing:border-box; padding-bottom:0}
+.app .page.msg-mod{display:flex; flex-direction:column; flex:1 1 auto; min-height:0; width:100%; max-width:100%; box-sizing:border-box; padding-bottom:var(--s05)}
 .app .page.msg-mod > .sec.ldr-dm-sec{display:flex; flex-direction:column; flex:1 1 auto; min-height:0}
 .app .page.msg-mod > .sec.ldr-dm-sec > .ldr-dm{flex:1 1 auto; min-height:0}
 .app .main:has(> .msg-mod),
@@ -7602,7 +7605,7 @@ button.btn-p:active,
 .app .dark-card .btn.btn-p[disabled]{color:var(--on-accent)}
 .app .plate .btn.btn-p[disabled]{color:var(--on-accent)}
 .app .lcal.lcal-next .lcal-slot-day{color:var(--on-dark)}
-.app .lcal-faces .lcal-face-more{font-size:var(--t-caption-size); font-weight:var(--t-w-strong); color:var(--accent-text)}
+.app .lcal-faces .lcal-face-more{font-size:var(--t-caption-size); font-weight:var(--t-w-strong); color:var(--on-dark)}
 .app .page .pulse .stand .stand-l{font-size:var(--t-compact-size); line-height:var(--t-compact-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-compact-ls); text-transform:none; color:var(--text-primary)}
 .app .page .pulse .stand .stand-v{font-size:var(--t-h3-size); line-height:var(--t-h3-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h3-ls); text-transform:none; color:var(--text-primary)}
 .app .page .pulse .stand .stand-v small{font-size:var(--t-caption-size); line-height:var(--t-caption-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-caption-ls); color:var(--text-secondary)}
@@ -9519,19 +9522,19 @@ button.btn-p:active,
 .app .lcal-f > .tile-arrow{width:16px; height:16px}
 .app .lcal.lcal-next{border-color:transparent; background-color:var(--gray-100); background-image:var(--dark-haze); background-repeat:no-repeat}
 .app .lcal.lcal-next{flex-direction:row; align-items:stretch; gap:0; padding:0}
-.app .lcal-slot{flex:none; align-self:stretch; aspect-ratio:1; margin:-1px 0 -1px -1px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; padding:var(--s04); text-align:center; background-color:color-mix(in srgb, var(--on-dark) 5%, transparent)}
+.app .lcal-slot{flex:none; align-self:stretch; aspect-ratio:1; margin:-1px 0 -1px -1px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; padding:var(--s04); text-align:center; background-color:color-mix(in srgb, var(--on-dark) 5%, transparent); display:none}
 .app .lcal-slot-ic{line-height:0; margin-bottom:2px}
 .app .lcal-slot-ic svg{width:18px; height:18px; display:block}
-.app .lcal-next > .lcal-body{flex:1 1 auto; min-width:0; display:flex; flex-direction:column; align-items:stretch; gap:var(--s04); padding:var(--s07) var(--s07) var(--s07) var(--s05)}
+.app .lcal-next > .lcal-body{flex:1 1 auto; min-width:0; display:flex; flex-direction:column; align-items:stretch; gap:var(--s03); padding:var(--s07)}
 .app .lcal-next .lcal-f > .btn{min-height:40px}
-.app .lcal-next .lcal-f{align-items:flex-end}
+.app .lcal-next .lcal-f{align-items:flex-end; padding-top:0}
 .app .lcal-timerbox{margin-left:auto; flex:none; display:inline-flex; align-items:center; gap:var(--s02); white-space:nowrap}
 .app .lcal-timerbox svg{width:15px; height:15px; flex:none}
 .app .lcal-seatsrow{display:flex; align-items:center; gap:var(--s03); min-width:0}
 .app .lcal-faces{display:inline-flex; flex:none; align-items:center}
 .app .lcal-faces .av-ph{box-shadow:0 0 0 2px var(--gray-100)}
 .app .lcal-faces .av-ph + .av-ph{margin-left:-8px}
-.app .lcal-faces .lcal-face-more{width:22px; height:22px; flex:none; display:inline-flex; align-items:center; justify-content:center; margin-left:-8px; border-radius:50%; background:var(--background); box-shadow:0 0 0 2px var(--gray-100); position:relative; z-index:2}
+.app .lcal-faces .lcal-face-more{width:22px; height:22px; flex:none; display:inline-flex; align-items:center; justify-content:center; margin-left:-8px; border-radius:50%; background:color-mix(in srgb, var(--on-dark) 14%, var(--gray-100)); box-shadow:0 0 0 2px var(--gray-100); position:relative; z-index:2}
 
 /* ---- 114-agenttable.css ---- */
 .app .agt{padding:0 var(--pad-x)}
