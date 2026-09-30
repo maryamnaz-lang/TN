@@ -1409,7 +1409,7 @@ input:-webkit-autofill:focus{
 /* Payouts row — two cards side by side (Maryam 22 Sep 2026, inspo): Platform
    earnings breakdown (left) + Payouts statistics graph (right). Stacks on a phone. */
 .app .pay-row{display:grid; grid-template-columns:1fr; gap:var(--s05)}
-@container app (min-width:900px){ .app .pay-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:var(--s06)} }
+@container app (min-width:900px){ .app .pay-row{grid-template-columns:minmax(0,1fr) max-content; gap:var(--s06)} }   /* Payouts (2nd) takes only its required width — ring + legend — and Platform earnings (1st) takes the rest (Maryam 30 Sep 2026) */
 .app .pay-card{border:1px solid var(--rule); background:var(--background); padding:var(--s06)}
 .app .pay-card > .sec-h{margin-bottom:var(--s04)}
 /* Semicircle gauge (payouts settlement status) — Figma node 1-601, Maryam 22 Sep 2026. */
@@ -1451,10 +1451,52 @@ input:-webkit-autofill:focus{
 .app .pbrk-bar{display:flex; gap:4px; height:26px; margin:var(--s05) 0}
 .app .pbrk-bar > span{display:block; border-radius:4px; min-width:6px}
 .app .pbrk-leg{display:flex; flex-direction:column; gap:var(--s03)}
+/* Platform earnings division as two STACKED fields separated by a single divider (Maryam 30 Sep 2026): mark · title+desc · a little accent sparkline · the value; no block frame, the icon/title align with the $274 headline's left edge */
+.app .pearn-rows{margin-top:var(--s05)}
+.app .pearn-row{display:flex; align-items:center; gap:var(--s04); padding:var(--s05) 0}
+.app .pearn-row + .pearn-row{border-top:1px solid var(--rule)}
+.app .pearn-ic{flex:none; display:inline-flex; color:var(--icon-primary)}
+.app .pearn-ic svg{width:18px; height:18px; display:block}
+.app .pearn-txt{display:flex; flex-direction:column; gap:2px; min-width:0; flex:1}
+.app .pearn-t{font-size:var(--t-h4-size); line-height:1.25; color:var(--text-primary); font-weight:var(--t-w-strong)}
+.app .pearn-d{font-size:var(--t-label-size); line-height:1.3; color:var(--text-secondary)}
+.app .pearn-spark{height:26px; width:auto; flex:none; display:block}   /* Maryam's supplied line-graph SVGs, sized by height, aspect kept from the viewBox (Maryam 30 Sep 2026) */
+.app .pearn-v{font-size:20px; line-height:1; color:var(--text-primary); font-weight:var(--t-w-strong); font-variant-numeric:tabular-nums; flex:none}
+/* Interviews section — the three counts as THREE blocks in a row (Maryam 30 Sep 2026); pin to 3 columns so the ≥700 4-col .stats rule doesn't leave an empty track painting a grey hairline */
+.app .page .iv-stats{grid-template-columns:repeat(3, minmax(0, 1fr))}
+.app .iv-chart-head{margin-top:var(--s06)}   /* gap between the three blocks and the monthly line chart */
 .app .pbrk-row{display:flex; align-items:center; gap:var(--s03); font-size:var(--t-body-size); color:var(--text-secondary)}
 .app .pbrk-dot{width:10px; height:10px; border-radius:3px; flex:none}
 .app .pbrk-name{flex:1; min-width:0}
 .app .pbrk-pct{color:var(--text-primary); font-weight:var(--t-w-strong)}
+/* Users-by-status legend — one horizontal row, dot + name + count per item, a thin
+   divider between them (Maryam 30 Sep 2026). Own classes so the vertical .pbrk-leg
+   the Platform-earnings card uses is untouched. */
+.app .pbrk-bar.ubs-bar{height:13px}   /* half the shared 26px (Maryam 30 Sep 2026) */
+.app .dash-dates{display:inline-flex; align-items:center; gap:var(--s03); flex-wrap:wrap; justify-content:flex-end}   /* the heading-row period dropdown + date range (Maryam 30 Sep 2026) */
+.app .dash-dates .dash-period{display:inline-flex; margin-left:var(--s04)}   /* period sits to the RIGHT of the date range, a little gap between them (Maryam 30 Sep 2026) */
+/* a section divider closes the welcome/head row, centred in the gap: --s06 below the head content, and the next section pays --s06 on top, so the line has equal air both sides (Maryam 30 Sep 2026). The section-rhythm :not() chain owns the padding, so !important per the sanctioned override precedent. The aiHead's .sec-h carries a dead 24px margin-bottom (nothing follows it) that would stack with the padding into 48px above the line — zero it so the gap above == the gap below */
+.app .main .sec.dash-head{position:relative; padding-bottom:var(--s06) !important}
+.app .main .sec.dash-head > .sec-h{margin-bottom:0 !important}
+/* the top-block-no-divider rule (.app .modhead + .sec:not(#_)::after) suppresses the head's foot line; :not(#_) re-boosts this above it without !important */
+.app .main .sec.dash-head:not(#_)::after{content:''; position:absolute; left:var(--pad-x); right:var(--pad-x); bottom:0; height:1px; background:var(--rule)}
+/* Payouts concentric-ring radial (Maryam 30 Sep 2026, supplied SVG) — graph LEFT,
+   legend vertical on the RIGHT (reference layout). */
+.app .pring-wrap{display:flex; flex-direction:row; align-items:center; gap:calc(var(--s07) + 20px); margin-top:var(--s05); flex-wrap:wrap}   /* +20px on the ring↔legend gap widens the max-content Payouts card by 20px (Maryam 30 Sep 2026) */
+.app .pring-wrap svg{width:160px; height:160px; flex:none}
+.app .pring-leg{display:flex; flex-direction:column; align-items:flex-start; gap:var(--s05)}
+.app .pring-row{display:flex; align-items:center; gap:var(--s03); font-size:var(--t-body-size)}
+.app .pring-nm{color:var(--text-secondary)}
+.app .pring-v{color:var(--text-primary); font-weight:var(--t-w-strong); margin-left:var(--s02)}
+.app .ubs-leg{display:flex; flex-wrap:wrap; align-items:center; gap:var(--s04); font-size:var(--t-body-size); color:var(--text-secondary); margin-top:var(--s04)}
+.app .ubs-item{display:inline-flex; align-items:center; gap:var(--s02)}
+/* a trailing nav arrow at the end of each clickable cohort-health row → cohort detail (Maryam 30 Sep 2026) */
+.app .row-arrow{display:inline-flex; justify-content:flex-end; align-items:center; width:100%; color:var(--text-secondary)}
+.app .row-arrow svg{width:18px; height:18px; display:block}
+.app .main tr.clk:hover .row-arrow{color:var(--accent-text)}
+.app .ubs-nm{color:var(--text-secondary)}
+.app .ubs-v{color:var(--text-primary); font-weight:var(--t-w-strong); margin-left:var(--s02)}
+.app .ubs-sep{color:var(--border-subtle-02); user-select:none}
 /* Bucket cards — a 3-up `.stats` grid (Candidates by bucket, Maryam 21 Sep 2026).
    Base `.stats` is 2-up (mobile) / 4-up (>=900); three cells there would leave a
    grey grid-gap cell, so pin it to one column on a phone and exactly three across
@@ -1962,6 +2004,12 @@ const USERS=[
  {id:'u44', name:'Tomas Vega', email:'tomas@talentnext.io', roles:['manager'], level:'—', status:'active', joined:'02-24-2026', origin:'internal', last:'3d ago', internal:true, job:'Manager of Agents', dept:'Talent Success', phone:'+1 (628) 555-0144', invitedBy:'u8'},
  {id:'u46', name:'Yara Suleiman', email:'yara@talentnext.io', roles:['reviewer'], level:'—', status:'invited', joined:'09-13-2026', origin:'internal', last:'Never', internal:true, job:'Level Reviewer', dept:'Talent Success', phone:'+971 4 555 0146', invitedBy:'u9', invitedOn:'09-13-2026'},
  {id:'u47', name:'Paul Adeyemi', email:'paul@talentnext.io', roles:['manager'], level:'—', status:'inactive', joined:'01-30-2026', origin:'internal', last:'34d ago', internal:true, job:'Manager of Agents', dept:'Talent Success', phone:'+234 1 555 0147', invitedBy:'u9', deactivatedOn:'2026-08-30'},
+ /* Outstanding invites (Maryam 30 Sep 2026 — so "Users by status" reads a real Inactive/invited chunk). `onboarded:false` keeps the invited agents OUT of the listed count. */
+ {id:'u48', name:'Tomas Vega', email:'tomas.vega@gmail.com', roles:['agent'], level:'—', job:'Sales Director, Vega Co', rating:0, interviewed:0, onboarded:false, status:'invited', joined:'09-24-2026', origin:'individual', last:'Never', fee:150, commission:20, commissionAt:'09-24-2026', invitedOn:'09-24-2026', invitedBy:'u9'},
+ {id:'u49', name:'Aisha Rahman', email:'aisha.rahman@gmail.com', roles:['agent'], level:'—', job:'Head of People, Rahman Group', rating:0, interviewed:0, onboarded:false, status:'invited', joined:'09-26-2026', origin:'individual', last:'Never', fee:175, commission:20, commissionAt:'09-26-2026', invitedOn:'09-26-2026', invitedBy:'u9'},
+ {id:'u50', name:'Marco Bianchi', email:'marco.bianchi@gmail.com', roles:['agent'], level:'—', job:'Regional Manager, Bianchi Retail', rating:0, interviewed:0, onboarded:false, status:'invited', joined:'09-28-2026', origin:'individual', last:'Never', fee:160, commission:20, commissionAt:'09-28-2026', invitedOn:'09-28-2026', invitedBy:'u9'},
+ {id:'u51', name:'Omar Haddad', email:'omar@talentnext.io', roles:['manager'], level:'—', status:'invited', joined:'09-20-2026', origin:'internal', last:'Never', internal:true, job:'Operations Manager', dept:'Operations', phone:'+971 4 555 0151', invitedBy:'u9', invitedOn:'09-20-2026'},
+ {id:'u52', name:'Lena Fischer', email:'lena@talentnext.io', roles:['reviewer'], level:'—', status:'invited', joined:'09-22-2026', origin:'internal', last:'Never', internal:true, job:'Level Reviewer', dept:'Talent Success', phone:'+971 4 555 0152', invitedBy:'u9', invitedOn:'09-22-2026'},
  {id:'u13', name:'Owen Blake', email:'owen@blake.io', roles:['agent'], level:'—', job:'Startup Founder & Ex-VC', rating:4.5, interviewed:19, status:'active', joined:'02-08-2026', origin:'individual', last:'4h ago', fee:150},
  {id:'u14', name:'Naomi Frost', email:'naomi@frost.co', roles:['agent'], level:'—', job:'Design Lead, Figma', rating:4.7, interviewed:37, status:'active', joined:'01-19-2026', origin:'individual', last:'1h ago', fee:200},
  /* A NOT-LISTED agent (marketplace 6.1): finished sign-up but never completed onboarding
@@ -2963,7 +3011,7 @@ function filterDd(key, def, opts, label){
   const curOpt = opts.find(o => o[0] === cur) || opts[0];
   const open = S.fdOpen === pageKey() + ':' + key;
   return `<div class="fdd${open ? ' on' : ''}">
-    <button class="fdd-t" data-fdtoggle="${key}" aria-haspopup="listbox" aria-expanded="${open ? 'true' : 'false'}">${esc(label)}: ${esc(curOpt[1])}<svg class="fdd-cx" viewBox="0 0 24 24" aria-hidden="true">${inner('chevDown')}</svg></button>
+    <button class="fdd-t" data-fdtoggle="${key}" aria-haspopup="listbox" aria-expanded="${open ? 'true' : 'false'}">${label ? esc(label) + ': ' : ''}${esc(curOpt[1])}<svg class="fdd-cx" viewBox="0 0 24 24" aria-hidden="true">${inner('chevDown')}</svg></button>
     <div class="fdd-menu" role="listbox">${opts.map(([v, l]) =>
       `<button class="fdd-opt${v === cur ? ' on' : ''}" role="option" aria-selected="${v === cur ? 'true' : 'false'}" data-filter="${key}:${v}">${esc(l)}</button>`).join('')}</div>
   </div>`;
@@ -4771,6 +4819,45 @@ function homeOverview(){
   const highDec = DECISIONS.filter(d => d.sev === 'high').length;
   const medDec = DECISIONS.filter(d => d.sev === 'med').length;
 
+  /* ── STORY 2.2 GAP-FILL (Maryam, 30 Sep 2026) — the panels the console-landing
+     story names that the operational-first dashboard did not carry. Every figure
+     is derived from the same seed the modules read; the period-based ones are
+     authored placeholder (SA-03 E1 — the seed has no time series). ────────────── */
+  /* Population — the two the "Platform at a glance" five were missing. */
+  const totalUsers = people.length;                              // every account bar the (hidden) employer orgs
+  const staffCount = USERS.filter(u => u.internal).length;       // internal staff — Staff: View
+  /* Money — the three "Money at a glance" figures beyond gross/escrow. `poSettled`
+     is released to agents, `platTake` is TalentNext's commission take. */
+  const releasedToAgents = poSettled;
+  const movedToTN = platTake;
+  const activeCredit = TXNS.filter(t => t.cat === 'rbcredit' && t.status === 'active')
+    .reduce((n, t) => n + ((t.cr && t.cr.remaining != null) ? t.cr.remaining : t.amt), 0);
+  /* Payouts due — "releasing this week": the held payouts payable on the next run
+     (a release date set, report filed, not blocked by a failed run or no destination). */
+  const poReleasingWeek = PAYOUTS.filter(p => p.status === 'held' && p.releases && p.reportFiled && !p.runFailed && !p.noDest)
+    .reduce((n, p) => n + p.net, 0);
+  /* Marketplace this week — booked / held / reports filed inside the 24h deadline.
+     `reported` bookings stand in for on-time reports (authored placeholder). */
+  const ivBooked = BOOKINGS.filter(b => bkStage(b) === 'booked').length;
+  const ivHeld = BOOKINGS.filter(b => bkStage(b) === 'held').length;
+  const ivReported = BOOKINGS.filter(b => bkStage(b) === 'reported').length;
+  /* Level changes this period — up / down / overridden (a reviewer or admin
+     override, read off `decidedOn`). Off LEVEL_LOG. */
+  const lcUp = LEVEL_LOG.filter(r => r.direction === 'Up').length;
+  const lcDown = LEVEL_LOG.filter(r => r.direction === 'Down').length;
+  const lcOver = LEVEL_LOG.filter(r => /override/i.test(r.decidedOn || '')).length;
+  /* Agent standing — top by Agent Score and by interviews conducted; a listed/paused
+     agent (not an outstanding invite) carries a score. Ties fall the way the ranking does. */
+  const agPool = AGENTS().filter(a => a.status !== 'invited');
+  const topByScore = agPool.slice().sort((a, b) => agScore(b) - agScore(a) || b.interviewed - a.interviewed).slice(0, 3);
+  const topByIv = agPool.slice().sort((a, b) => b.interviewed - a.interviewed || agScore(b) - agScore(a)).slice(0, 3);
+  /* Attention (built now, surfaced later — Maryam 30 Sep 2026: "add the functionality
+     so we can show later but not now"). `ATTN_EXTRA_ON` gates the two story items off;
+     flip it true to surface them. Counts + routes are live so nothing else changes then. */
+  const ATTN_EXTRA_ON = false;
+  const invitedAcct = USERS.filter(u => u.status === 'invited').length;     // staff + external outstanding invites
+  const agUnlisted = AGENTS().filter(a => agState(a) === 'notlisted').length; // active accounts not on the marketplace
+
   /* NEEDS-YOUR-ATTENTION — the operational lead. Each queue is a clickable
      `.tile clk gcard` row (the count-bearing tile pattern, NOT a `.qa-c`
      quick-action card, whose copy may not carry live queue data — §98.3), and a
@@ -4787,7 +4874,12 @@ function homeOverview(){
     cohortsNoLeader && ['cohorts', 'Cohorts without a leader', `${cohortsNoLeader} active cohort${cohortsNoLeader === 1 ? '' : 's'} to assign`, 'cohorts/assign'],
     leadReady && ['group', 'Cohort leaders ready to allot', `${leadReady} recommended and interviewed`, 'cohorts/assign'],
     ivOverdue && ['market', 'Interview reports overdue', `${ivOverdue} held interview${ivOverdue === 1 ? '' : 's'} past 24h`, 'market/bookings'],
-    heldPo && ['bank', 'Payouts to release', `${heldPo} pending settlement`, 'finance/payouts']
+    heldPo && ['bank', 'Payouts to release', `${heldPo} pending settlement`, 'finance/payouts'],
+    /* STORY 2.2 — built now, surfaced later (gated by ATTN_EXTRA_ON). Each links to
+       the directory; the pre-filter (invited status / not-listed state) is wired when
+       the tile is turned on. */
+    ATTN_EXTRA_ON && invitedAcct && ['mail', 'Outstanding invitations', `${invitedAcct} invite${invitedAcct === 1 ? '' : 's'} awaiting acceptance`, 'users/users'],
+    ATTN_EXTRA_ON && agUnlisted && ['agents', 'Agents active but not listed', `${agUnlisted} not on the marketplace`, 'agents/agents']
   ].filter(Boolean);
   const attnRows = attn.map(([ic_, t, s, go]) => `<button class="tile clk gcard" data-go="${go}">
       <span class="cardrow-ic">${ic(ic_)}</span>
@@ -4815,11 +4907,18 @@ function homeOverview(){
      It should say Welcome Back, Derek!"). The admin hides Tal's summary portal-wide,
      so the dashboard had no visible heading — this is a plain aiHead page title,
      the signed-in Super Admin's own first name (ME = Derek Sole). */''}
-  <section class="sec dash-head">${aiHead('Welcome Back, ' + esc(ME.name.split(' ')[0]) + '!', 'Monitor platform activity, users, transactions, and overall operations from one place.')}</section>
+  ${/* HEADING-ROW CONTROLS on the RIGHT of the "Welcome Back, Derek!" row: a PERIOD
+       DROPDOWN (This week / This month / This quarter, This month default — Maryam
+       30 Sep 2026, replacing the tab-strip selector) NEXT TO the From/To date-range
+       filter (the shared `filterDate` month-grid picker Finance/Levelling use). Both
+       presentational (the seed has no time series, SA-03 E1). */''}
+  <section class="sec dash-head">${aiHead('Welcome Back, ' + esc(ME.name.split(' ')[0]) + '!', 'Monitor platform activity, users, transactions, and overall operations from one place.',
+    `<span class="dash-dates">${filterDate('dashfrom', 'From', 180)}${filterDate('dashto', 'To', 180)}<span class="dash-period">${filterDd('period', 'month', [['week', 'This week'], ['month', 'This month'], ['quarter', 'This quarter']], '')}</span></span>`)}</section>
 
-  ${/* Dashboard period bar removed (Maryam, 22 Sep 2026: "remove this") — each chart
-       now carries its own Weekly/Monthly/Yearly filter. `periodBar`/`asAt` are left
-       defined but unused so the bar can be restored by re-adding the section. */''}
+  ${/* The period selector is now the PERIOD DROPDOWN in the heading row above
+       (Maryam 30 Sep 2026, replacing the tab strip); `periodBar` is left defined but
+       unused. */''}
+
 
   ${/* ══ NEEDS YOUR ATTENTION ══ the operational lead — the live queues, count-bearing tiles */''}
   ${attnRows ? `<section class="sec">
@@ -4836,15 +4935,18 @@ function homeOverview(){
          give a true 2 x 4 block whose row divider matches its column dividers;
          two containers each paid their own top margin and border, which is what
          opened the gap between the rows. Same eight cells, same order. */''}
+    ${/* The eight cells Maryam fixed 30 Sep 2026: the five story populations (total
+         users, candidates, cohort leaders, talent agents, staff) plus courses,
+         running cohorts and platform earnings. Order as she named them. */''}
     ${stats([
+      ['group', 'Total Users', String(totalUsers), `${uActive} active`],
       ['candidates', 'Candidates', String(activeCands), `in ${activeCohorts} cohort${activeCohorts === 1 ? '' : 's'}`],
-      ['group', 'Cohort leaders', String(cohortLeaderCount), `${moderatorCount} moderator${moderatorCount === 1 ? '' : 's'}`],
-      ['agents', 'Talent agents', String(agentListed), 'listed & bookable'],
-      ['cohorts', 'Running cohorts', String(activeCohorts), `${draftCohorts} forming`],
+      ['user', 'Cohort Leaders', String(cohortLeaderCount), `${moderatorCount} moderator${moderatorCount === 1 ? '' : 's'}`],
+      ['agents', 'Talent Agents', String(agentListed), 'listed & bookable'],
+      ['shield', 'Staff Members', String(staffCount), 'internal'],
       ['book', 'Courses', String(COURSES.length), `${liveCourses} live · ${draftCourses} draft`],
-      ['money', 'Gross payment', money(gross), 'this window'],
-      ['bank', 'In escrow', money(inprog), 'not yet settled'],
-      ['clock', 'Payouts pending', money(poPending), 'to release']
+      ['cohorts', 'Running Cohorts', String(activeCohorts), `${draftCohorts} forming`],
+      ['money', 'Earnings', money(platTake), 'platform take']
     ], 'dash-stats')}
   </section>
 
@@ -4873,6 +4975,28 @@ function homeOverview(){
     })()}
   </section>
 
+  ${/* ══ USERS BY STATUS ══ Active / Invited / Deactivated (story 2.2 population
+       panel, Users: View). ONE stacked bar + legend, the SAME treatment and palette
+       as the Platform-earnings breakdown (Maryam, 30 Sep 2026: "3 bars in a single
+       row just like the platform earning bars and colors"): Active #111 / Invited
+       accent / Deactivated #6B6B6B, the count bold in the legend. Segments carry a
+       6px min-width so a small count still shows. Sits below Platform Users. */''}
+  <section class="sec">
+    ${chartHead('Users by status', {go: 'users/users', label: 'View users'})}
+    ${(() => {
+      /* Middle segment labelled "Inactive" (Maryam 30 Sep 2026); the value is the
+         invited-status count (`uInvited`). Legend is one horizontal row. */
+      const src = [
+        ['Active', uActive, 'var(--accent)'],
+        ['Inactive', uInvited, 'var(--text-primary)'],
+        ['Deactivated', uInactive, '#6B6B6B']
+      ];
+      const bar = src.map(r => `<span style="flex:${r[1]}; background:${r[2]}"></span>`).join('');
+      const leg = src.map((r, i) => `${i ? '<span class="ubs-sep">|</span>' : ''}<span class="ubs-item"><span class="pbrk-dot" style="background:${r[2]}"></span><span class="ubs-nm">${r[0]}</span><b class="ubs-v">${r[1]}</b></span>`).join('');
+      return `<div class="pbrk-bar ubs-bar">${bar}</div><div class="ubs-leg">${leg}</div>`;
+    })()}
+  </section>
+
   ${/* ══ PAYOUTS ══ an inspo "statistics-card" money graph (Maryam, 22 Sep 2026:
        "i want the inspo like graph for payouts statistics and the platform
        earnings"). A headline total + % change chip, then a SPIKY (angular) area
@@ -4885,43 +5009,96 @@ function homeOverview(){
        Payouts STATISTICS graph (headline + % chip + a single spiky area line for
        agent payouts with a dotted average baseline). Monthly figures + the % change
        are AUTHORED PLACEHOLDER (§74; no dated ledger, SA-03 E1). */''}
+  ${/* ══ MONEY AT A GLANCE ══ four finance figures (story 2.2, Finance: View) as a
+       4-card row (Maryam, 30 Sep 2026: "4 cards in a row, remove the active rebooking
+       credit") — gross taken, held in escrow, released to agents, moved to TalentNext.
+       `.stats` is the fixed 2/4-column grid, so exactly four fill one row (§stats).
+       Revenue-by-line (course + interview fees) is the Earnings breakdown below. */''}
+  <section class="sec">
+    ${chartHead('Money at a glance', {go: 'finance/transactions', label: 'View finance'})}
+    ${stats([
+      ['money', 'Gross taken', money(gross), 'this window'],
+      ['bank', 'Held in escrow', money(inprog), 'not yet settled'],
+      ['agents', 'Released to agents', money(releasedToAgents), 'paid out'],
+      ['wallet', 'Moved to TalentNext', money(movedToTN), 'platform take']
+    ], 'dash-stats')}
+  </section>
+
   <section class="sec">
     ${group('Earnings & Payouts')}
     <div class="pay-row">
       ${(() => {
-        /* Bar palette matches the Platform Users chart (Maryam 22 Sep 2026):
-           Course fees #111 (--text-primary), Interview fees #f9423a (--accent),
-           Scene purchases #6B6B6B (literal, no token). Overrides the --dv green ramp. */
-        const src = [
-          ['Course fees', courseRev, 'var(--text-primary)'],
-          ['Interview fees', interviewRev, 'var(--accent)'],
-          ['Scene purchases', sceneRev, '#6B6B6B']
-        ];
-        const tot = src.reduce((s, r) => s + r[1], 0) || 1;
-        const bar = src.map(r => `<span style="flex:${r[1]}; background:${r[2]}"></span>`).join('');
-        const leg = src.map(r => `<div class="pbrk-row"><span class="pbrk-dot" style="background:${r[2]}"></span><span class="pbrk-name">${r[0]}</span><b class="pbrk-pct">${pctOf(r[1], tot)}%</b></div>`).join('');
+        /* Platform earnings — the headline take, then the division as TWO figure
+           blocks (Maryam 30 Sep 2026: "remove the bar", "remove scenes earning",
+           "show the earnings division in 2 blocks ... show the desc in each block").
+           Course Payments + Interview Payments only (Scene purchases dropped); each
+           block's value is that stream's revenue, its sub-line the count of items
+           behind it — a course purchase, and a paid interview = a re-interview (a
+           first interview is complimentary, §74 demo counts off the TXNS seed). */
+        const courseN = TXNS.filter(t => t.cat === 'course' && t.dir === 'in').length;
+        const reintN = TXNS.filter(t => t.cat === 'interview' && t.dir === 'in').length;
+        /* each row: mark · title+desc · a little green line-graph · the value. The two
+           sparkline SVGs are Maryam's supplied artwork (30 Sep 2026), pasted verbatim
+           (not redrawn); #04CE00 green, one per stream (authored §74 shape). */
+        const SPARK_COURSE = `<svg class="pearn-spark" width="95" height="25" viewBox="0 0 95 25" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 23.5L12.5943 19.8334L17.3294 15.7083L24.3647 21.5292L29.1 18.7792L34.1059 1.5L46.9588 18.4126L56.2941 12.775L74.1529 23.5L79.7 20.7959L83.0824 16.3042L93.5 12.775" stroke="#04CE00" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+        const SPARK_IV = `<svg class="pearn-spark" width="92" height="26" viewBox="0 0 92 26" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 18.5021L12.5943 14.8354L17.3294 10.7104L22.5 20.5L29.1 13.7813L33 3.5L46.9588 13.4146L57 24.5L65 11.3063L79.7 15.798L83.0824 11.3063L90 1.5" stroke="#04CE00" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+        const earnRow = (icon, title, desc, spark, val) => `<div class="pearn-row">
+          <span class="pearn-ic">${ic(icon)}</span>
+          <div class="pearn-txt"><div class="pearn-t">${title}</div><div class="pearn-d">${desc}</div></div>
+          ${spark}
+          <div class="pearn-v">${val}</div>
+        </div>`;
         return `<div class="pay-card">
           ${chartHead('Platform earnings', {go: 'finance/transactions', label: 'View transactions'})}
           <div class="pbrk-fig"><span class="pstat-total">${money(platTake)}</span><span class="pstat-chip">↗ 12%</span></div>
-          <div class="pbrk-bar">${bar}</div>
-          <div class="pbrk-leg">${leg}</div>
+          <div class="pearn-rows">
+            ${earnRow('book', 'Course Payments', `${courseN} Purchased Courses`, SPARK_COURSE, money(courseRev))}
+            ${earnRow('video', 'Interview Payments', `${reintN} Re-Interviews`, SPARK_IV, money(interviewRev))}
+          </div>
         </div>`;
       })()}
       ${(() => {
-        /* Payouts by settlement status (Maryam 22 Sep 2026, Figma gauge node 1-601):
-           how many are settled and how much is still pending to release. Counts are
-           read off the PAYOUTS seed (SA-03 E1 — a demo ledger, not signed-off KPIs). */
-        const settled = PAYOUTS.filter(p => p.status === 'settled').length;
-        const held = PAYOUTS.filter(p => p.status === 'held').length;   // pending to release
-        const totalPo = settled + held;
-        const pending = PAYOUTS.filter(p => p.status === 'held').reduce((n, p) => n + p.net, 0);
+        /* Payouts by settlement STATE as a CONCENTRIC 3-RING radial (Maryam 30 Sep
+           2026 — replaces the semicircle gauge, kept defined; ring style off her
+           supplied SVG, refined 30 Sep: red/black/grey like the other graphs, all
+           three arcs the SAME width as the outer ring, MONEY values, graph left with
+           a vertical legend on the right). Each ring's coloured arc = that state's
+           share of the total AMOUNT, from 12 o'clock clockwise over a light track.
+           Amounts off the PAYOUTS seed (SA-03 E1 — a demo ledger). */
+        const paidN = PAYOUTS.filter(p => p.status === 'settled').reduce((n, p) => n + p.net, 0);
+        const escrowN = PAYOUTS.filter(p => p.status === 'held').reduce((n, p) => n + p.net, 0);
+        const returnedN = PAYOUTS.filter(p => p.status === 'returned').reduce((n, p) => n + p.net, 0);
+        const totalN = paidN + escrowN + returnedN || 1;
+        /* ARC is the coloured line, uniform across rings (the outer ring's width);
+           TRK is the light track, THINNER than the arc (Maryam 30 Sep 2026, per the
+           reference). The viewBox is PADDED past 272 so the outer arc (r+ARC/2 ≈ 138
+           from the 135.64/136.316 centre) is not clipped on any side. */
+        const cx = 135.64, cy = 136.316, ARC = 14, TRK = 8.519;   /* coloured arc a little thinner (was 17.038) but still clearly thicker than the grey track 8.519 (Maryam 30 Sep 2026) */
+        /* outer → inner; red/black/grey, the platform's categorical set. */
+        const rings = [
+          {l: 'In escrow', v: escrowN, r: 129.583, c: 'var(--accent)'},
+          {l: 'Paid', v: paidN, r: 97.048, c: 'var(--text-primary)'},
+          {l: 'Returned', v: returnedN, r: 63.765, c: '#6B6B6B'}
+        ];
+        const arcs = rings.map(g => {
+          const C = 2 * Math.PI * g.r;
+          const len = (g.v / totalN) * C;
+          return `<circle cx="${cx}" cy="${cy}" r="${g.r}" fill="none" stroke="#E5E5EF" stroke-width="${TRK}"/>
+            ${g.v > 0 ? `<circle cx="${cx}" cy="${cy}" r="${g.r}" fill="none" stroke="${g.c}" stroke-width="${ARC}" stroke-linecap="round" stroke-dasharray="${len.toFixed(2)} ${(C - len).toFixed(2)}" transform="rotate(-90 ${cx} ${cy})"/>` : ''}`;
+        }).join('');
+        /* legend outer → inner (In escrow · Paid · Returned), each dot its ring colour,
+           the state's total money beside it. */
+        const leg = rings.map(g => `<div class="pring-row"><span class="pbrk-dot" style="background:${g.c}"></span><span class="pring-nm">${g.l}</span><b class="pring-v">${money(g.v)}</b></div>`).join('');
         return `<div class="pay-card">
           ${chartHead('Payouts', {go: 'finance/payouts', label: 'View payouts'})}
-          <div class="pbrk-sub">${money(pending)} pending to release</div>
-          ${gauge([
-            {l: 'Settled', v: settled, c: 'var(--accent)', arc: true},
-            {l: 'In progress', v: held, c: 'var(--gray-30)'}
-          ], {centerLabel: 'Total payouts', centerValue: totalPo, aria: 'Payouts by settlement status'})}
+          <div class="pring-wrap">
+            <svg viewBox="-10 -10 292 292" role="img" aria-label="Payouts by settlement state">
+              ${arcs}
+              <text x="${cx}" y="128" text-anchor="middle" font-size="14" fill="var(--text-secondary)">Total payouts</text>
+              <text x="${cx}" y="160" text-anchor="middle" font-size="26" font-weight="500" fill="var(--text-primary)">${money(totalN)}</text>
+            </svg>
+            <div class="pring-leg">${leg}</div>
+          </div>
         </div>`;
       })()}
     </div>
@@ -4948,31 +5125,38 @@ function homeOverview(){
       }).join('')}</div>`;
     })()}
   </section>
-  ${/* Cohort health — HIDDEN (Maryam, 21 Sep 2026: "hide this section"). Kept so it
-       can be restored: flip the false to render the running-cohort table again. */''}
-  ${false ? `<section class="sec">
-    ${aiHead('Cohort health', 'Every running cohort, how far through the 90-day loop it is, and whether it has a leader.',
-      '<button class="btn btn-g btn-sm noic" data-go="cohorts/cohorts">Cohorts</button>')}
+  ${/* ══ COHORT HEALTH ══ RESTORED (Maryam, 30 Sep 2026 — story 2.2 oversight panel,
+       Cohorts: View): every running cohort, how far through the 90-day loop it is and
+       whether it has a leader. Reversing the 21 Sep hide, by instruction. */''}
+  ${true ? `<section class="sec">
+    ${aiHead('Cohort health', 'Every running cohort, how far through the 90-day loop it is, and whether it has a leader.')}
     ${liveCohorts.length ? table(
-      [{label:'Cohort'}, {label:'Progress'}, {label:'Members'}, {label:'Leader'}],
-      liveCohorts.map(c => ({cells:[
+      [{label:'Cohort'}, {label:'Progress'}, {label:'Members'}, {label:'Leader'}, {label:'', num:true}],
+      liveCohorts.map(c => ({id:c.id, go:'cohorts/detail/' + c.id, cells:[
         idCell(c.name, c.level),
         `Wk ${c.week} / 12`,
         `${c.size} / ${c.cap || 10}`,
-        c.leader === 'Unassigned' ? tag('flagged', 'Needs a leader') : esc(c.leader)
+        c.leader === 'Unassigned' ? tag('flagged', 'Needs a leader') : esc(c.leader),
+        `<span class="row-arrow">${I.arrowRight}</span>`
       ]})),
-      {paginate:false}
+      {paginate:false, select:false}
     ) : emptyState('cohorts', 'No active cohorts', 'Nothing is running this window.')}
   </section>` : ''}
 
-  ${/* ══ INTERVIEWS ══ first- vs re-interview volume by month (Maryam, 21 Sep 2026:
-       heading "Interviews"; there is no plain "interview" — every one is a FIRST
-       interview or a RE-interview; drop the Booking-mix donut and the
-       Interviews-by-state list). Grouped bars, green `--dv-*` ramp. The monthly
-       split is AUTHORED PLACEHOLDER (§74) — the seed has no dated booking history
-       (SA-03 E1); first interviews run ahead of re-interviews, as in the seed. */''}
+  ${/* ══ INTERVIEWS ══ ONE section (Maryam, 30 Sep 2026: "these three sections should be
+       one single section named Interviews") merging the old Marketplace-this-week kv,
+       the Booking-mix donut (DROPPED — "no need to show booking mix content") and the
+       monthly Interviews line. The three counts show as THREE BLOCKS in a row with a
+       fitting description each; the line's note reads "Interviews this month". Counts
+       + monthly split are AUTHORED PLACEHOLDER (§74 — the seed has no dated booking
+       history, SA-03 E1). */''}
   <section class="sec">
     ${chartHead('Interviews', {go: 'market/bookings', label: 'View interviews'})}
+    ${stats([
+      ['calendar', 'Interviews booked', String(ivBooked), 'Scheduled this month'],
+      ['video', 'Interviews held', String(ivHeld), 'Conducted so far'],
+      ['document', 'Reports filed within 24h', String(ivReported), 'Submitted on time']
+    ], 'iv-stats')}
     ${(() => {
       const {labels, series} = perData([
         {name: 'First interview', color: 'var(--accent)', pts: [4, 5, 6, 5, 7, 8, 7, 9, 8, 10, 9, 11]},
@@ -4980,11 +5164,41 @@ function homeOverview(){
       ], 'iv');
       const total = series.reduce((s, ser) => s + ser.pts.reduce((a, b) => a + b, 0), 0);
       const mi = Math.round((series[0].pts.length - 1) * 0.7);   // a highlighted point, like the reference
-      return `<div class="pstat-head"><div class="pstat-fig">
+      return `<div class="pstat-head iv-chart-head"><div class="pstat-fig">
         <span class="pstat-total">${total}</span>
-        <span class="pstat-note">interviews this period</span>
+        <span class="pstat-note">Interviews this month</span>
       </div></div>` + lineChart(series, {aria: 'First interviews and re-interviews by period', labels, smooth: true, dashed: false, area: true, marker: {i: mi, s: 0}, filterId: 'iv', vmax: 12, step: 2, xInset: 0});
     })()}
+  </section>
+
+  ${/* ══ LEVEL CHANGES THIS PERIOD ══ HIDDEN (Maryam, 30 Sep 2026: "hide level changes
+       this period section"). Kept so it can be restored — flip the false. Off LEVEL_LOG. */''}
+  ${false ? `<section class="sec">
+    ${chartHead('Level changes this period', {go: 'levelling/log', label: 'View level log'})}
+    ${hbars([
+      ['Moved up', String(lcUp), lcUp],
+      ['Moved down', String(lcDown), lcDown],
+      ['Overridden', String(lcOver), lcOver]
+    ])}
+  </section>` : ''}
+
+  ${/* ══ AGENT STANDING ══ ONE table (Maryam, 30 Sep 2026: "shift the Agent standing
+       into a table and show talent agent picture as well with their name ... remove
+       Top by Agent Score and Most interviews conducted headings, both sides are the
+       same agent so adjust in a table"). Ranked by Agent Score (stars out of 5, one
+       decimal; a starting score is marked), with each agent's interviews-conducted
+       beside it. Photo via personCell (agentFace). */''}
+  <section class="sec">
+    ${chartHead('Agent standing', {go: 'agents/agents', label: 'View agents'})}
+    ${table(
+      [{label:'Agent'}, {label:'Agent Score', num:true}, {label:'Interviews conducted', num:true}],
+      topByScore.map(a => ({cells:[
+        personCell(a.name, ''),
+        `${starMark} ${agScore(a).toFixed(1)}${a.scoreApproved === false ? ' <span class="t-caption">· Starting</span>' : ''}`,
+        `${a.interviewed} <span class="t-caption">interviews</span>`
+      ]})),
+      {paginate:false, select:false}
+    )}
   </section>
 
   ${/* System & activity — HIDDEN (Maryam, 22 Sep 2026: "hide system and activity
