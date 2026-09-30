@@ -82,19 +82,30 @@ const ldrBoard = id => +id === LEAD_COHORTS[0].id ? ROOM : (LDR_BOARDS[id] || []
    currently-flagged people would delete its own history every time somebody
    recovered, which is the opposite of what `lnotes` and this page are for.
    -------------------------------------------------------------------------- */
+/* EPIC 12.8 — a message carries text, a voice note (its duration) or an
+   attachment (name/type/size); `readAt` on the thread is the time the candidate
+   last read up to, shown as "Read <time>" under the leader's last message. A
+   thread whose cohort has closed is read-only (the composer is replaced). */
 const LDR_THREADS = [
-  {who:'Yuki Tanaka', i:'YT', img:'hana', co:41, msgs:[
+  {who:'Yuki Tanaka', i:'YT', img:'hana', co:41, readAt:'Tue 9:10 AM', msgs:[
     {me:1, t:'Yuki — you have not been in since week 1 and I would rather ask than assume. Is the course the problem, or is it everything else?', w:'Mon 9:12 AM'},
     {me:0, t:'Sorry. Work went sideways and I kept telling myself I would catch up at the weekend, and then I did not.', w:'Mon 10:40 PM'},
     {me:1, t:'That is the normal version of this, not the shameful one. Do not try to catch up — start at chapter 2 and come to Thursday even if you have done nothing. Turning up is the part that restarts it.', w:'Tue 8:05 AM'}
   ]},
-  {who:'James Whitby', i:'JW', img:'owen', co:41, msgs:[
+  {who:'James Whitby', i:'JW', img:'owen', co:41, readAt:'Yesterday 8:30 PM', msgs:[
     {me:0, t:'I have re-taken the chapter 4 assessment three times and I am still at 65. Should I keep going at it?', w:'Yesterday 7:15 PM'},
-    {me:1, t:'No. Leave it at 65 and move to 5. Four is the one that only makes sense after you have tried the thing at work and it has gone badly once. Come back to it in week 8 and it will score itself.', w:'Yesterday 8:02 PM'}
+    {me:1, t:'No. Leave it at 65 and move to 5. Four is the one that only makes sense after you have tried the thing at work and it has gone badly once. Come back to it in week 8 and it will score itself.', w:'Yesterday 8:02 PM'},
+    {me:1, kind:'file', name:'handover-framework.pdf', size:184320, type:'PDF', w:'Yesterday 8:03 PM'}
   ]},
-  {who:'Tobias Mensah', i:'TM', img:'samuel', co:41, msgs:[
+  {who:'Tobias Mensah', i:'TM', img:'samuel', co:41, readAt:null, msgs:[
     {me:1, t:'Tobias — eight days quiet and 18% at week 5. Not chasing you, just checking the course is still something you want.', w:'4 days ago'},
+    {me:0, kind:'voice', dur:'0:22', w:'2 days ago'},
     {me:0, t:'Sorry — work ate the fortnight. I am back in and through to 35%.', w:'2 days ago'}
+  ]},
+  /* a past-cohort thread (Cohort 33, completed): stays readable, no new message */
+  {who:'Owen Clarke', i:'OC', img:'owen', co:33, readAt:'12 Sep', msgs:[
+    {me:0, t:'Thank you for the recommendation. The re-interview is next week and I feel ready for it.', w:'11 Sep'},
+    {me:1, t:'You earned it. Go in and talk about the calls you ran, not the chapters you finished.', w:'11 Sep'}
   ]}
 ];
 
@@ -111,7 +122,33 @@ S.ldrTh = 0;
    back out of. State rather than a DOM class because `render()` rebuilds the
    panel from scratch (trap 9). */
 S.ldrThOpen = false;
+S.ldrRec = null;   /* EPIC 12.8 — voice-note recording in progress */
 S.ldrEditProfile = false;
+
+/* EPIC 12.8 — an attachment (prototype): the file's name/type/size ride the
+   message; nothing is uploaded. */
+device.addEventListener('change', e => {
+  if(e.target.id !== 'ldrFile') return;
+  const f = e.target.files && e.target.files[0]; if(!f) return;
+  if(f.size > 25*1048576){ e.target.value=''; return; }   /* 25 MB cap */
+  const ext = (f.name.split('.').pop()||'').toUpperCase();
+  (LDR_THREADS[S.ldrTh] || LDR_THREADS[0]).msgs.push({me:1, kind:'file', name:f.name, size:f.size, type:ext, w:'Just now'});
+  render();
+});
+/* the recording timer: one interval while S.ldrRec is set, driving #ldrRecTime
+   by id (render rebuilds the element, so the interval keeps finding it). Uses
+   ELAPSED time, not a counter (trap 17), and auto-stops at 5 minutes. */
+function ldrRecTick(){
+  if(S.ldrRec){
+    if(!window.__ldrRecInt) window.__ldrRecInt = setInterval(() => {
+      if(!S.ldrRec){ clearInterval(window.__ldrRecInt); window.__ldrRecInt = 0; return; }
+      const ms = Date.now() - S.ldrRec.start;
+      const el = device.querySelector('#ldrRecTime');
+      if(el) el.textContent = Math.floor(ms/60000) + ':' + String(Math.floor(ms/1000)%60).padStart(2,'0');
+      if(ms >= 300000){ const stop = device.querySelector('[data-ldrrecstop]'); if(stop) stop.click(); }
+    }, 250);
+  } else if(window.__ldrRecInt){ clearInterval(window.__ldrRecInt); window.__ldrRecInt = 0; }
+}
 /* `S.ldrAvail` was the third and is deleted with the weekly-calls sheet
    (2 Sep 2026) — a leader does not reschedule a cohort call. */
 
@@ -138,105 +175,89 @@ S.ldrPfTab = 'general';
    one-to-one uses, with the same four controls in the same order, so the two
    halves of one conversation are drawn by one component.
    ========================================================================== */
+/* EPIC 12.8 — the private one-to-one thread: text, voice notes and attachments,
+   read receipts, a past-cohorts section (a thread outlives its cohort), and a
+   read-only state once the cohort closes. Voice recording and file uploads are
+   PROTOTYPE — the note carries a duration and the file its name/type/size; no
+   media leaves the browser. */
+const KB = n => n < 1024 ? n + ' B' : n < 1048576 ? Math.round(n/1024) + ' KB' : (n/1048576).toFixed(1) + ' MB';
+const dmName = name => SHOW_REAL.has(name)
+  ? `<b>${name}</b> <span class="dm-h">${handleOf(name)}</span>`
+  : `<b>${handleOf(name)}</b>`;
+const threadActive = th => !!leadLive() && th.co === leadLive().id;
+
+function msgBubble(msg, th){
+  let body;
+  if(msg.kind === 'voice') body = `<span class="m-voice">${I.microphone}<span class="m-voice-bar"></span><span class="m-voice-d">${msg.dur}</span></span>`;
+  else if(msg.kind === 'file') body = `<span class="m-file">${I.attachment}<span class="m-file-b"><span class="m-file-n">${msg.name}</span><span class="m-file-s">${msg.type} &middot; ${KB(msg.size)}</span></span></span>`;
+  else body = msg.t;
+  return `<div class="m ${msg.me ? 'me' : 'them'}">
+    <span class="m-av">${avatar(msg.me ? {i:LEADER.i, img:LEADER.img} : {i:th.i, img:AV[th.img]}, 32)}</span>
+    <div class="m-c">
+      <div class="m-b${msg.kind?' m-b-'+msg.kind:''}">${body}</div>
+      <div class="m-w">${msg.w}${msg.me ? `<i class="m-tick">${I.doneAll}</i>` : ''}</div>
+    </div>
+  </div>`;
+}
+
 V.leadMessages = () => {
   const th = LDR_THREADS[S.ldrTh] || LDR_THREADS[0];
   const waiting = t => t.msgs.length && t.msgs[t.msgs.length - 1].me === 0;
-  /* `fresh` WENT WITH THE PICKER — it derived "everybody you have not written
-     to yet" for the New message list, and with that list gone it was a query
-     with no reader. `lmembers()` keeps three other callers. */
+  const current = LDR_THREADS.map((t,i)=>({t,i})).filter(x=>threadActive(x.t));
+  const pastTh  = LDR_THREADS.map((t,i)=>({t,i})).filter(x=>!threadActive(x.t));
+  const lastMine = (() => { for(let i=th.msgs.length-1;i>=0;i--) if(th.msgs[i].me) return i; return -1; })();
+  const active = threadActive(th);
+  const rec = S.ldrRec;
 
-  /* THE RAIL IS ONE LIST OF PEOPLE (Maryam, 2 Sep 2026: "remove the cohort
-     boards section from messages module"). It held two groups — three cohort
-     boards over the direct threads — and `boardRow` drew the first with a
-     `data-ldrpick="board:<id>"`.
-
-     NOTHING IS LOST, BECAUSE THE BOARD IS NOT THIS MODULE'S. A cohort's
-     discussion is on the cohort's own page: `V.leadCohort`'s Discussion tab
-     (lead2) already draws Cohort 41's through `discussionRoom()`, the same
-     component and the same `ROOM` array the candidate reads. Messages is now
-     the one-to-one surface it is named after, and a board is where the cohort
-     is. */
-  const dmRow = (t, i) => {
+  const dmRow = ({t,i}) => {
     const last = t.msgs[t.msgs.length - 1];
     const on = i === S.ldrTh;
+    const lastTxt = last ? (last.me ? 'You: ' : '') + (last.kind==='voice'?'Voice note':last.kind==='file'?last.name:last.t) : 'No messages yet';
     return `<button class="ldr-dm-t${on ? ' on' : ''}" data-ldrpick="${i}" role="tab" aria-selected="${on}">
       <span class="mem-av mem-ph">${avatar({i:t.i, img:AV[t.img]}, 36)}</span>
       <span class="ldr-dm-tb">
-        <span class="ldr-dm-tn">${t.who}${waiting(t) ? '<i class="ldr-dm-dot" aria-label="waiting on your reply"></i>' : ''}</span>
-        <span class="ldr-dm-tx">${last ? (last.me ? 'You: ' : '') + last.t : 'No messages yet'}</span>
+        <span class="ldr-dm-tn">${dmName(t.who)}${waiting(t) ? '<i class="ldr-dm-dot" aria-label="waiting on your reply"></i>' : ''}</span>
+        <span class="ldr-dm-tx">${lastTxt}</span>
       </span>
       <span class="ldr-dm-tw">${last ? last.w.replace(/ \d?\d:\d\d [AP]M/,'') : ''}</span>
     </button>`;
   };
 
   return `<main class="main"><div class="page msg-mod">
-  ${crumb(['Dashboard','leadDash'],'Messages')}
+  ${crumb(['My Cohort','leadDash'],'Messages')}
   ${ph('Messages')}
   <div class="sec ldr-dm-sec">
-    ${''/* THERE IS NO BAR ABOVE THE TWO PANES (Maryam, 2 Sep 2026: "remove the
-           top bar of tabs and search"). It held an All / Unread pair, a search
-           field and New message, and all three were answers to a list that is
-           nine rows long: three cohort boards and six threads, every one of
-           them on screen at once at desktop. A filter over a list you can see
-           in full is a control that can only ever hide something.
-           THE CANDIDATE'S MESSAGES IS THE REFERENCE for this whole view and it
-           has no such bar either — the rail IS the index, and the waiting dot
-           on a row is what "unread" means here.
-           WHAT WENT WITH IT: `S.ldrInbox` and its two branches in the list,
-           `ldrInboxFilter` and the `input` listener that drove it, and the
-           `S.ldrMsg === 'new'` picker, which `data-ldrnew` was the only way
-           into. Starting a thread is unchanged and still lives where the
-           REASON to start one is — `data-ldrdm` on the attention queue's
-           Contact button (lead.js) and on the member page's Contact Candidate
-           (lead2.js) — which is the better entry point anyway: you write to a
-           candidate because of something you just read about them. */}
     <div class="ldr-dm${S.ldrThOpen ? ' show-thread' : ''}">
       <div class="ldr-dm-list" role="tablist" aria-label="Your conversations">
-        <div class="ldr-dm-lh">Direct messages<span class="t-helper-01">${LDR_THREADS.length}</span></div>
-        ${LDR_THREADS.map(dmRow).join('')}
+        <div class="ldr-dm-lh">Direct messages<span class="t-helper-01">${current.length}</span></div>
+        ${current.map(dmRow).join('')}
+        ${pastTh.length ? `<div class="ldr-dm-lh ldr-dm-lh-2">Past cohorts</div>${pastTh.map(dmRow).join('')}` : ''}
       </div>
       <div class="ldr-dm-thread">
-        ${''/* THE BOARDS BRANCH IS DELETED (Maryam, 2 Sep 2026: "remove the
-               cohort boards section from messages module"). The pane used to be
-               a ternary — a cohort board on one side, this thread on the other —
-               and with one kind of conversation left there is nothing to choose
-               between, so the thread is drawn straight rather than as the
-               surviving arm of a condition nothing evaluates. */}
         <div class="ldr-dm-h">
           <button class="ph-back ldr-dm-back" data-ldrthback="1" aria-label="Back to your conversations">${I.arrowLeft}</button>
           <span class="mem-av mem-ph">${avatar({i:th.i, img:AV[th.img]}, 36)}</span>
-          <span class="ldr-dm-hb"><b>${th.who}</b><span>Private &middot; Cohort ${th.co} &middot; you can see their chapters, scores and attendance</span></span>
+          <span class="ldr-dm-hb"><b>${SHOW_REAL.has(th.who)?th.who:handleOf(th.who)}</b><span>Private &middot; Cohort ${th.co}${active?'':' &middot; closed'}</span></span>
         </div>
         <div class="msgs">
           ${th.msgs.length ? '' : `<div class="m-day"><span>No messages yet &mdash; this one starts with you</span></div>`}
-          ${''/* THE STAMP IS THE TIME AND A READ TICK, WHICH IS `V.messages`'s
-                 OWN CORRECTION APPLIED HERE. That thread used to print
-                 "Priya Nair &middot; 9:12 AM" on every line and its note says why
-                 it stopped: the name is said once per message in a thread with
-                 exactly two people in it, and the face beside the bubble is
-                 already saying it. What the outgoing side gets instead is the
-                 read state — `I.doneAll` in the accent, the one place in a
-                 thread where a colour means a state rather than a person.
-                 This side was still printing the name on both halves. */}
-          ${th.msgs.map(msg => `<div class="m ${msg.me ? 'me' : 'them'}">
-            <span class="m-av">${avatar(msg.me ? {i:LEADER.i, img:LEADER.img} : {i:th.i, img:AV[th.img]}, 32)}</span>
-            <div class="m-c">
-              <div class="m-b">${msg.t}</div>
-              <div class="m-w">${msg.w}${msg.me ? `<i class="m-tick">${I.doneAll}</i>` : ''}</div>
-            </div>
-          </div>`).join('')}
+          ${th.msgs.map((msg,i) => msgBubble(msg, th) + (i===lastMine && th.readAt ? `<div class="m-read">Read ${th.readAt}</div>` : '')).join('')}
         </div>
-        ${''/* THE FIELD IS `V.messages`'s — attachment, then the input, then the
-               microphone, then send. §16.12's note argues the order: the leading
-               slot is "add a thing to this message" and the right end is send
-               plus the one control that RECORDS a message. A one-to-one thread
-               is the surface that carries all four, and this one had two. */}
-        <div class="composer">
-          <button class="composer-act composer-lead" aria-label="Attach a file">${I.attachment}</button>
-          <input class="inp" id="ldrReply" placeholder="${th.msgs.length ? 'Reply to' : 'Message'} ${th.who.split(' ')[0]}" aria-label="${th.msgs.length ? 'Reply' : 'Message'}">
-          <button class="composer-act" aria-label="Record a voice message">${I.microphone}</button>
-          <button class="composer-send" data-ldrreply="1" aria-label="Send">${I.send}</button>
-        </div>
+        ${!active
+          ? `<div class="dm-closed">This cohort has closed. You can still read your messages.</div>`
+          : rec
+          ? `<div class="composer composer-rec">
+              <button class="composer-act dm-rec-x" data-ldrrecdiscard="1" aria-label="Discard">${I.close}</button>
+              <span class="dm-rec-live"><span class="dm-rec-dot"></span>Recording <span id="ldrRecTime">0:00</span></span>
+              <button class="composer-send" data-ldrrecstop="1" aria-label="Send voice note">${I.send}</button>
+            </div>`
+          : `<div class="composer">
+              <label class="composer-act composer-lead" aria-label="Attach a file">${I.attachment}
+                <input type="file" id="ldrFile" hidden accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.png,.jpg,.jpeg,.gif,.heic"></label>
+              <input class="inp" id="ldrReply" placeholder="${th.msgs.length ? 'Reply to' : 'Message'} ${th.who.split(' ')[0]}" aria-label="${th.msgs.length ? 'Reply' : 'Message'}">
+              <button class="composer-act" data-ldrrecstart="1" aria-label="Record a voice message">${I.microphone}</button>
+              <button class="composer-send" data-ldrreply="1" aria-label="Send">${I.send}</button>
+            </div>`}
       </div>
     </div>
   </div>
@@ -729,6 +750,136 @@ function ldrProfileSheet(){
    tell one level up. `.tg` / `.sw` are untouched: the notification switches
    three sections above are the component's real caller. */
 
+/* EPIC 12.7 — discussion state */
+S.discReplyTo = null;
+S.discEdit = null;
+S.discPinAsk = null;
+
+/* ==========================================================================
+   EPIC 12.7 — THE COHORT DISCUSSION
+
+   Threaded posts, most recent thread first: pin (one at a time, leader only),
+   reply (one level deep), react (a single thumbs up, toggled), edit for one hour
+   after posting, a "Cohort Leader" badge on the leader's posts and "You" on your
+   own. There is NO delete and NO moderation in V1 — a post, once made, stands.
+   Leader-side only; the same board is the candidates' Discussion tab (built with
+   the candidate portal, out of this pass).
+   ========================================================================== */
+const LEAD_ME = {n:'Priya Nair', handle:'@priya', img:AV.priya, ini:'PN', leader:true};
+const discWho = m => ({n:m.name, handle:handleOf(m.name), img:AV[m.img], ini:m.ini});
+/* seed authors off the active roster so faces/handles agree with the rest */
+const discM = name => { const c = leadLive(); const m = c && c.members.find(x=>x.name===name);
+  return m ? discWho(m) : {n:name, handle:handleOf(name), img:AV.hana, ini:name.slice(0,2).toUpperCase()}; };
+
+/* AUTHORED (§74): the seed has no discussion store. Threads are newest-first;
+   `at` is old on every seed so nothing is inside the 1-hour edit window. */
+let LEAD_DISC = [
+  {id:'t1', who:LEAD_ME, text:'Thursday we run chapter 5, Hard Conversations. Bring one real example from your own week, not a hypothetical. It does not have to have gone well.', when:'2 days ago', at:0, pinned:true, reacts:['Aisha Bello','Daniel Kerr','Ravi Chandran','Sofia Marchetti'], replies:[
+    {id:'r1', who:discM('Daniel Kerr'), text:'Mine went badly, so this is good timing.', when:'2 days ago', at:0, reacts:['Aisha Bello']}]},
+  {id:'t2', who:discM('Daniel Kerr'), text:'Did anyone else find chapter 4 harder than the three before it? I have read the handover section twice.', when:'Yesterday', at:0, pinned:false, reacts:['Aisha Bello','Ravi Chandran','Nora Lindqvist'], replies:[
+    {id:'r2', who:discM('Aisha Bello'), text:'Yes. It is the first one that asks you to change something at work rather than understand something.', when:'Yesterday', at:0, reacts:['Daniel Kerr','Sofia Marchetti']},
+    {id:'r3', who:LEAD_ME, text:'That is the point of it. The reading is the easy half. Try one small handover this week and we will look at it on the call.', when:'Yesterday', at:0, reacts:['Daniel Kerr']}]},
+  {id:'t3', who:discM('Sofia Marchetti'), text:'Bringing my example on Thursday. Mine is a vendor review that went badly and I still think I was right to take it back.', when:'5 hours ago', at:0, pinned:false, reacts:['Ravi Chandran'], replies:[]}
+];
+
+const DISC_EDIT_MS = 60*60*1000;
+const discEditable = p => !!p.at && (Date.now() - p.at) < DISC_EDIT_MS && p.who.handle === LEAD_ME.handle;
+const discPinned = () => LEAD_DISC.find(t => t.pinned);
+const discFind = id => { for(const t of LEAD_DISC){ if(t.id===id) return t; const r=t.replies.find(x=>x.id===id); if(r) return r; } return null; };
+
+/* one post's byline + body + actions; `reply` marks a nested reply (no Reply/Pin) */
+function discPost(p, tid, reply){
+  const mine = p.who.handle === LEAD_ME.handle;
+  const reacted = p.reacts.includes(LEAD_ME.n);
+  const editing = S.discEdit === p.id;
+  return `<div class="disc-post${reply?' disc-reply':''}${p.pinned?' disc-pinned':''}">
+    <span class="disc-av"><span class="av-ph" style="width:${reply?28:36}px;height:${reply?28:36}px"><i>${p.who.ini}</i><img src="${p.who.img}" alt=""></span></span>
+    <div class="disc-b">
+      <div class="disc-head">
+        <span class="disc-nm">${p.who.n}</span>
+        ${p.who.leader?'<span class="disc-badge">Cohort Leader</span>':''}
+        ${mine?'<span class="disc-you">You</span>':`<span class="disc-h">${p.who.handle}</span>`}
+        <span class="disc-w">&middot; ${p.when}${p.edited?' &middot; edited':''}</span>
+        ${p.pinned?`<span class="disc-pin-tag">${I.location} Pinned</span>`:''}
+      </div>
+      ${editing
+        ? `<div class="disc-edit"><textarea class="inp" id="discEditTa" rows="3" maxlength="2000">${p.text}</textarea>
+            <div class="disc-edit-a"><button class="btn btn-s btn-sm noic" data-disccancel="1">Cancel</button>
+              <button class="btn btn-p btn-sm noic" data-disceditsave="${p.id}">Save</button></div></div>`
+        : `<p class="disc-text">${p.text}</p>`}
+      <div class="disc-acts">
+        <button class="disc-act${reacted?' on':''}" data-discreact="${p.id}">${reacted?I.thumbsUpFilled:I.thumbsUp} ${p.reacts.length||''}</button>
+        ${!reply?`<button class="disc-act" data-discreply="${tid}">${I.chat} Reply</button>`:''}
+        ${LEAD_ME.leader && !reply ? (p.pinned
+          ? `<button class="disc-act" data-discunpin="${p.id}">${I.location} Unpin</button>`
+          : `<button class="disc-act" data-discpin="${p.id}">${I.location} Pin</button>`) : ''}
+        ${discEditable(p) && !editing ? `<button class="disc-act" data-discedit="${p.id}">${I.edit} Edit</button>` : ''}
+      </div>
+    </div>
+  </div>`;
+}
+
+function discThread(t){
+  const replying = S.discReplyTo === t.id;
+  return `<div class="disc-thread">
+    ${discPost(t, t.id, false)}
+    ${t.replies.length ? `<div class="disc-replies">${t.replies.map(r=>discPost(r, t.id, true)).join('')}</div>` : ''}
+    ${replying ? `<div class="disc-reply-box">
+      <textarea class="inp" id="discReplyTa" rows="2" maxlength="2000" placeholder="Write a reply"></textarea>
+      <div class="disc-reply-a"><button class="btn btn-s btn-sm noic" data-disccancel="1">Cancel</button>
+        <button class="btn btn-p btn-sm noic" data-discsendreply="${t.id}">Reply</button></div>
+    </div>` : ''}
+  </div>`;
+}
+
+V.leadDiscussion = () => {
+  const c = leadLive();
+  if(!c) return `<main class="main"><div class="page">${ph('Discussion')}
+    <div class="sec"><div class="empty" style="border:0">${I.chat}<h3>You are not leading a cohort at the moment.</h3>
+      <p>Your past cohorts&rsquo; discussions stay readable.</p></div></div></div></main>`;
+  const pin = discPinned();
+  const threads = LEAD_DISC.filter(t => !t.pinned);
+  return `<main class="main"><div class="page">
+  ${ph('Discussion')}
+  <div class="sec">
+    <div class="disc-compose">
+      <span class="disc-av"><span class="av-ph" style="width:36px;height:36px"><i>PN</i><img src="${LEAD_ME.img}" alt=""></span></span>
+      <div class="disc-compose-b">
+        <textarea class="inp" id="discMsg" rows="2" maxlength="2000" placeholder="Post to your cohort"></textarea>
+        <div class="disc-compose-a">
+          <label class="disc-pin-cb"><input type="checkbox" id="discPinNew"> Pin to the top</label>
+          <button class="btn btn-p btn-sm noic" data-discpost="1">Post</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  ${pin ? `<div class="sec"><div class="sec-h"><h2>Pinned</h2></div><div class="disc-thread">${discThread(pin)}</div></div>` : ''}
+  <div class="sec">
+    <div class="sec-h"><h2>Discussion</h2></div>
+    ${threads.length ? threads.map(discThread).join('') : `<div class="empty" style="border:0">${I.chat}<h3>No posts yet</h3><p>Start the cohort&rsquo;s conversation above.</p></div>`}
+  </div>
+</div></main>`;
+};
+
+/* the pin-replace confirmation (12.7) — a `.conf` modal via LDR_SHEETS */
+function discPinSheet(){
+  const id = S.discPinAsk; if(!id) return `<div class="modal" data-dpclose="1"></div>`;
+  return `<div class="modal on" data-dpclose="1">
+    <div class="sheet conf" role="dialog" aria-modal="true" aria-label="Pin post">
+      <div class="sheet-b conf-b">
+        <span class="conf-mk">${I.location}</span>
+        <h2 class="conf-t">Pin this post?</h2>
+        <p class="conf-x">It replaces the post currently pinned.</p>
+      </div>
+      <div class="sheet-f conf-a">
+        <button class="btn btn-s noic" data-dpclose="1">Go back</button>
+        <button class="btn btn-p noic" data-discdopin="${id}">Pin</button>
+      </div>
+    </div>
+  </div>`;
+}
+LDR_SHEETS.push(discPinSheet);
+
 LDR_SHEETS.push(ldrProfileSheet);
 
 /* ==========================================================================
@@ -825,6 +976,16 @@ device.addEventListener('click', e => {
     render();
     return;
   }
+  /* EPIC 12.8 — voice note (prototype: a real timer, no captured audio). Record
+     stops at 5 minutes. */
+  if(t.closest('[data-ldrrecstart]')){ S.ldrRec = {start:Date.now()}; render(); return; }
+  if(t.closest('[data-ldrrecdiscard]')){ S.ldrRec = null; render(); return; }
+  if(t.closest('[data-ldrrecstop]')){
+    const ms = S.ldrRec ? Math.min(300000, Date.now() - S.ldrRec.start) : 0;
+    const dur = Math.floor(ms/60000) + ':' + String(Math.floor(ms/1000)%60).padStart(2,'0');
+    (LDR_THREADS[S.ldrTh] || LDR_THREADS[0]).msgs.push({me:1, kind:'voice', dur: dur==='0:00'?'0:01':dur, w:'Just now'});
+    S.ldrRec = null; render(); return;
+  }
 
   /* THE PROFILE TABS. `render()` rather than an `.on` class move, because the
      tab decides which sections the page EMITS — trap 9's other half: a class
@@ -917,10 +1078,57 @@ function ldrPinThread(){
   const box = device.querySelector('.ldr-dm-thread > .msgs');
   if(box) box.scrollTop = box.scrollHeight;
 }
+/* ==========================================================================
+   EPIC 12.7 — the discussion handlers. Post / reply / edit read the DOM on
+   submit so the caret survives typing; react, pin and unpin are pure state.
+   ========================================================================== */
+device.addEventListener('click', e => {
+  const g = sel => device.querySelector(sel);
+  const now = () => 'Just now';
+
+  if(e.target.closest('[data-discpost]')){
+    const ta = g('#discMsg'); const text = ta ? ta.value.trim() : '';
+    if(!text){ if(ta) ta.focus(); return; }
+    const pin = g('#discPinNew') && g('#discPinNew').checked;
+    if(pin) LEAD_DISC.forEach(t => t.pinned = false);
+    LEAD_DISC.unshift({id:'t'+Date.now(), who:LEAD_ME, text, when:now(), at:Date.now(), pinned:!!pin, reacts:[], replies:[]});
+    render(); return;
+  }
+  const rp = e.target.closest('[data-discreply]');
+  if(rp){ S.discReplyTo = rp.dataset.discreply; S.discEdit = null; render(); return; }
+  const sr = e.target.closest('[data-discsendreply]');
+  if(sr){ const t = LEAD_DISC.find(x=>x.id===sr.dataset.discsendreply); const ta=g('#discReplyTa');
+    const text = ta ? ta.value.trim() : ''; if(!text){ if(ta) ta.focus(); return; }
+    if(t) t.replies.push({id:'r'+Date.now(), who:LEAD_ME, text, when:now(), at:Date.now(), reacts:[]});
+    S.discReplyTo = null; render(); return; }
+  const rc = e.target.closest('[data-discreact]');
+  if(rc){ const p = discFind(rc.dataset.discreact); if(p){ const i=p.reacts.indexOf(LEAD_ME.n);
+    if(i>=0) p.reacts.splice(i,1); else p.reacts.push(LEAD_ME.n); } render(); return; }
+  const pn = e.target.closest('[data-discpin]');
+  if(pn){ const id=pn.dataset.discpin;
+    if(discPinned()){ S.discPinAsk = id; } else { const p=discFind(id); if(p) p.pinned=true; }
+    render(); return; }
+  const dp = e.target.closest('[data-discdopin]');
+  if(dp){ const id=dp.dataset.discdopin; LEAD_DISC.forEach(t=>t.pinned=false);
+    const p=LEAD_DISC.find(t=>t.id===id); if(p) p.pinned=true; S.discPinAsk=null; render(); return; }
+  const up = e.target.closest('[data-discunpin]');
+  if(up){ const p=discFind(up.dataset.discunpin); if(p) p.pinned=false; render(); return; }
+  const ed = e.target.closest('[data-discedit]');
+  if(ed){ S.discEdit = ed.dataset.discedit; S.discReplyTo = null; render(); return; }
+  const es = e.target.closest('[data-disceditsave]');
+  if(es){ const p=discFind(es.dataset.disceditsave); const ta=g('#discEditTa');
+    const text = ta ? ta.value.trim() : ''; if(!text){ if(ta) ta.focus(); return; }
+    if(p){ p.text=text; p.edited=true; } S.discEdit=null; render(); return; }
+  if(e.target.closest('[data-disccancel]')){ S.discReplyTo=null; S.discEdit=null; render(); return; }
+  const dpc = e.target.closest('[data-dpclose]');
+  if(dpc){ if(dpc.classList.contains('modal') && e.target !== dpc) return; S.discPinAsk=null; render(); return; }
+});
+
 const _baseLead4 = render;
 render = function(){
   _baseLead4();
   try { ldrPinThread(); } catch(e){ console.warn('thread pin', e); }
+  try { ldrRecTick(); } catch(e){ console.warn('rec tick', e); }
 };
 
 render();

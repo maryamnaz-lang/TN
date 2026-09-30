@@ -49,6 +49,227 @@ const ldrSumOf = id => LEAD_SUMMARIES.filter(s => s.id === id)[0] || LEAD_SUMMAR
 S.ldrSum = null;
 S.ldrRec = null;
 S.ldrErr = false;
+/* EPIC 12.9 — the two written sections are mandatory, the send confirms, and a
+   draft can be kept. */
+S.ldrGrowErr = false;
+S.ldrDevErr = false;
+S.ldrPubAsk = null;
+S.ldrDraftSaved = null;
+
+/* EPIC 12.5/12.6 — sessions state: the open schedule/edit form (S.sesForm), the
+   open cancel sheet (S.sesCancel) and which session's attendance record is read
+   (S.ldrSes). */
+S.sesForm = null;
+S.sesCancel = null;
+S.ldrSes = null;
+
+/* ==========================================================================
+   EPIC 12.5 / 12.6 — SESSIONS AND ATTENDANCE
+
+   The cohort's calls are held on the platform. The leader schedules them (with
+   the chapter each covers), edits or cancels them, and the platform works out
+   who attended from the room. Rooms (Twilio), the real join/leave capture and
+   every notification send are STUBBED — a scheduled session gets a room the
+   moment it is created (a comment, not a call), a past session's register is
+   derived (§74), and one seeded session reads "Attendance unavailable".
+   ========================================================================== */
+
+/* the "what this session is" line the highlighted card and the rows share */
+const sesMeta = (c, s) => `${c.members.length} candidates &middot; ${levelsLabel(c)} &middot; ${lcourse(c)} &middot; ${s.dur} min &middot; week ${s.week} of 13`;
+
+/* the next-session card (12.5): highlighted, with Join (5-minute gate) */
+function sesNextCard(c, s){
+  const joinable = sesJoinable(s);
+  return `<div class="ses-next">
+    <div class="ses-next-h">
+      <div class="ses-next-id">
+        <span class="ses-next-eyebrow">Next session &middot; ${sesCountdown(s)}</span>
+        <h3 class="ses-next-t">${s.title}</h3>
+        <span class="ses-next-when">${s.date} &middot; ${s.time} (${LEAD_TZ})</span>
+      </div>
+      ${leadEditable(c) ? `<div class="ses-next-a">
+        <button class="btn btn-t btn-sm ic-l" data-sesedit="${s.id}">${I.edit} Edit</button>
+        <button class="btn btn-t btn-sm ic-l ses-cancel-b" data-sescancel="${s.id}">${I.close} Cancel</button>
+      </div>` : ''}
+    </div>
+    <div class="ses-next-cov"><span class="ses-next-ch">${s.chapter}</span><span class="ses-next-sub">${sesMeta(c, s)}</span></div>
+    ${s.cover ? `<p class="ses-next-note">${s.cover}</p>` : ''}
+    <div class="ses-next-foot">
+      <button class="btn btn-p noic" data-call="cohort" ${joinable?'':'disabled'}>${I.video} Join Call</button>
+      <span class="ses-next-hint">${joinable ? 'The room is open.' : 'Join opens 5 minutes before the start.'}</span>
+    </div>
+  </div>`;
+}
+
+/* an upcoming (not-next) or past session row */
+function sesRow(c, s){
+  const past = sesPast(s);
+  const cancelled = s.status === 'cancelled';
+  let mark;
+  if(cancelled) mark = `<span class="ses-mark ses-cancelled">Cancelled</span>`;
+  else if(!past) mark = `<span class="ses-mark ses-upcoming">${sesCountdown(s)}</span>`;
+  else if(s.unavail) mark = `<span class="ses-mark ses-na">Attendance unavailable</span>`;
+  else { const held = leadHeld(c); const reg = leadRegister(c, s); const att = reg.filter(x=>x.r&&x.r.att).length;
+    mark = `<span class="ses-mark ses-att">${att} of ${reg.length} attended</span>`; }
+  const open = past && !cancelled;   /* a held session opens its attendance record */
+  const tag = `<span class="ses-row-b">
+      <span class="ses-row-t">${s.title}${s.repeat!=='none'?' <span class="ses-repeat">weekly</span>':''}</span>
+      <span class="ses-row-s">${s.date} &middot; ${s.time} &middot; ${s.chapter}${cancelled&&s.reason?` &middot; ${s.reason}`:''}</span>
+    </span>`;
+  if(open) return `<button class="ses-row clk" data-go="leadSession" data-ldrses="${s.id}">${tag}${mark}<span class="ses-row-go">${I.chevRight}</span></button>`;
+  return `<div class="ses-row">${tag}${mark}${!past && !cancelled && leadEditable(c) ? `<span class="ses-row-a">
+    <button class="btn btn-t btn-sm ic-l" data-sesedit="${s.id}" aria-label="Edit">${I.edit}</button>
+    <button class="btn btn-t btn-sm ic-l ses-cancel-b" data-sescancel="${s.id}" aria-label="Cancel">${I.close}</button></span>` : ''}</div>`;
+}
+
+V.leadSessions = () => {
+  const c = leadLive();
+  if(!c) return `<main class="main"><div class="page">${ph('Sessions')}
+    <div class="sec"><div class="empty" style="border:0">${I.calendar}<h3>You are not leading a cohort at the moment.</h3>
+      <p>Scheduling a session needs a current cohort.</p></div></div></div></main>`;
+  const all = leadSessionsOf(c);
+  const next = leadNextSession(c);
+  const upcoming = all.filter(s => sesEnd(s) >= LEAD_NOW && s.id !== (next&&next.id));
+  const past = all.filter(s => sesEnd(s) < LEAD_NOW).reverse();
+  return `<main class="main"><div class="page">
+  ${ph('Sessions')}
+  <div class="sec">
+    <div class="sec-h"><h2>Schedule</h2>
+      ${leadEditable(c) ? `<button class="btn btn-p btn-sm ic-l" data-sesnew="1">${I.add} Schedule a session</button>` : ''}</div>
+    ${next ? sesNextCard(c, next) : `<div class="empty" style="border:0">${I.calendar}<h3>No session is scheduled yet.</h3>${leadEditable(c)?'<p>Schedule the cohort&rsquo;s next call above.</p>':''}</div>`}
+  </div>
+  ${upcoming.length ? `<div class="sec"><div class="sec-h"><h2>Upcoming</h2></div>
+    <div class="tile-stack ses-list">${upcoming.map(s=>sesRow(c,s)).join('')}</div></div>` : ''}
+  ${past.length ? `<div class="sec tint"><div class="sec-h"><h2>Past sessions</h2></div>
+    <div class="tile-stack ses-list">${past.map(s=>sesRow(c,s)).join('')}</div></div>` : ''}
+</div></main>`;
+};
+
+/* 12.6 — the attendance record for one held session (read-only register + note) */
+V.leadSession = () => {
+  const c = leadLive() || LEAD_COHORTS[0];
+  const s = leadSessionsOf(c).find(x => x.id === S.ldrSes) || leadHeld(c)[0];
+  if(!s) return `<main class="main"><div class="page">${crumb(['Sessions','leadSessions'],'Attendance')}
+    ${ph('Attendance')}<div class="sec"><div class="empty" style="border:0">${I.calendar}<h3>No session</h3></div></div></div></main>`;
+  const reg = leadRegister(c, s);
+  const attended = reg.filter(x=>x.r&&x.r.att).length;
+  const note = SESSION_NOTES[s.id] || '';
+  const canNote = leadEditable(c);
+  return `<main class="main"><div class="page">
+  ${crumb(['Sessions','leadSessions'], s.title)}
+  ${ph(s.title)}
+  <div class="sec">
+    <div class="kv"><span class="k">Chapter</span><span class="v">${s.chapter}</span></div>
+    <div class="kv"><span class="k">Date and time</span><span class="v">${s.date} &middot; ${s.time} (${LEAD_TZ})</span></div>
+    <div class="kv"><span class="k">Attendance</span><span class="v">${s.unavail?'Unavailable':attended+' of '+reg.length+' attended'}</span></div>
+  </div>
+  ${s.unavail ? `<div class="sec"><div class="ses-warn"><span class="ses-warn-mk">${I.warningAlt}</span>
+      <div class="ses-warn-b"><h3>Attendance unavailable</h3><p>The platform received no participation data for this session, so no candidate is marked. It is left out of every attendance total.</p></div></div></div>`
+  : `<div class="sec">
+    <div class="sec-h"><h2>Register</h2><span class="t-helper-01">Worked out from the room &middot; ${ATTEND_MIN_MIN} min minimum</span></div>
+    <div class="tile-stack ses-reg">
+      ${reg.map(({m,r})=>`<div class="atd-row">
+        <span class="atd-b"><span class="rname">${mAv(m,28)}${leadName(m)}</span></span>
+        <span class="atd-mark ${r&&r.att?'atd-yes':'atd-no'}">${r&&r.att?`Attended &middot; ${r.mins} min`:`Did not attend${r?` &middot; ${r.mins} min`:''}`}</span>
+      </div>`).join('')}
+    </div>
+  </div>`}
+  <div class="sec">
+    <div class="sec-h"><h2>Note on the session</h2></div>
+    ${canNote ? `<div class="ses-note-box">
+      <textarea class="inp ses-note-ta" id="sesNote" rows="3" maxlength="1000" placeholder="How did the session go? (optional, up to 1000 characters)">${note}</textarea>
+      <div class="ses-note-a"><button class="btn btn-p btn-sm noic" data-sesnotesave="${s.id}">Save note</button></div>
+    </div>` : note ? `<p class="t-body">${note}</p>` : `<p class="t-helper-01">No note, and the cohort has closed.</p>`}
+  </div>
+</div></main>`;
+};
+
+/* --------------------------------------------------------------------------
+   THE SCHEDULE / EDIT SHEET (12.5)
+   Native controls, read on Save so typing never triggers a render (the caret
+   trap). S.sesForm holds the last-entered values, so an overlap error can
+   re-render with everything the leader typed still in place.
+   -------------------------------------------------------------------------- */
+function leadSessionSheet(){
+  const f = S.sesForm; if(!f) return `<div class="modal" data-sesclose="1"></div>`;
+  const c = leadLive() || LEAD_COHORTS[0];
+  const editing = !!f.edit;
+  const series = editing && (leadSessionsOf(c).find(s=>s.id===f.edit)||{}).series;
+  const today = LEAD_NOW.toISOString().slice(0,10);
+  return `<div class="modal on" data-sesclose="1">
+    <div class="sheet">
+      <div class="sheet-h"><h2>${editing?'Edit session':'Schedule a session'}</h2>
+        <button class="x" data-sesclose="1" aria-label="Close">${I.close}</button></div>
+      <div class="sheet-b">
+        ${f.err ? `<div class="ses-err">${I.warningAlt} ${f.err}</div>` : ''}
+        <div class="f"><label for="sesTitle">Title</label>
+          <input class="inp" id="sesTitle" maxlength="100" value="${(f.title||'').replace(/"/g,'&quot;')}" placeholder="Cohort ${c.id} call"></div>
+        <div class="f"><label for="sesChapter">Chapter covered</label>
+          <select class="inp" id="sesChapter">
+            <option value=""${f.chapter?'':' selected'} disabled>Choose a chapter</option>
+            ${CH.map((ch,i)=>`<option value="${ch[0]}"${f.chapter===ch[0]?' selected':''}>${i+1}. ${ch[0]}</option>`).join('')}
+          </select></div>
+        <div class="f-row">
+          <div class="f"><label for="sesDate">Date</label>
+            <input class="inp" type="date" id="sesDate" min="${today}" max="${cohortEndISO(c)}" value="${f.date||''}"></div>
+          <div class="f"><label for="sesTime">Start time <span class="f-tz">${LEAD_TZ}</span></label>
+            <input class="inp" type="time" id="sesTime" value="${f.time||'18:00'}"></div>
+        </div>
+        <div class="f-row">
+          <div class="f"><label for="sesDur">Duration (minutes)</label>
+            <input class="inp" type="number" id="sesDur" min="15" max="240" value="${f.dur||60}"></div>
+          <div class="f"><label for="sesRepeat">Repeat</label>
+            <select class="inp" id="sesRepeat"${editing?' disabled':''}>
+              <option value="none"${f.repeat==='none'?' selected':''}>Does not repeat</option>
+              <option value="weekly"${f.repeat==='weekly'?' selected':''}>Weekly</option>
+              <option value="fortnightly"${f.repeat==='fortnightly'?' selected':''}>Fortnightly</option>
+            </select></div>
+        </div>
+        <div class="f"><label for="sesCover">What it covers <span class="f-opt">(optional)</span></label>
+          <textarea class="inp" id="sesCover" rows="2" maxlength="1000" placeholder="Anything the cohort should read or bring">${f.cover||''}</textarea></div>
+        ${editing && series ? `<div class="f"><span class="f-lbl">Apply to</span>
+          <div class="ses-scope">
+            <label class="ses-scope-o"><input type="radio" name="sesScope" value="this" ${f.scope!=='all'?'checked':''}> This session only</label>
+            <label class="ses-scope-o"><input type="radio" name="sesScope" value="all" ${f.scope==='all'?'checked':''}> This and every later session</label>
+          </div></div>` : ''}
+      </div>
+      <div class="sheet-f">
+        <button class="btn btn-s noic" data-sesclose="1">Cancel</button>
+        <button class="btn btn-p noic" data-sessave="1">${editing?'Save changes':'Schedule session'}</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* THE CANCEL SHEET (12.5) — reason (mandatory) + this-or-series, confirmation copy */
+function leadCancelSheet(){
+  const x = S.sesCancel; if(!x) return `<div class="modal" data-cxclose="1"></div>`;
+  const c = leadLive() || LEAD_COHORTS[0];
+  const s = leadSessionsOf(c).find(y=>y.id===x.id); if(!s) return `<div class="modal" data-cxclose="1"></div>`;
+  return `<div class="modal on" data-cxclose="1">
+    <div class="sheet sheet-narrow">
+      <div class="sheet-h"><h2>Cancel session</h2>
+        <button class="x" data-cxclose="1" aria-label="Close">${I.close}</button></div>
+      <div class="sheet-b">
+        <p class="t-body mb5">Cancel <b>${s.title}</b> on ${s.date}? Everyone in the cohort will be told.</p>
+        ${x.err ? `<div class="ses-err">${I.warningAlt} ${x.err}</div>` : ''}
+        <div class="f"><label for="cxReason">Reason <span class="f-req">Shown to candidates</span></label>
+          <textarea class="inp" id="cxReason" rows="3" maxlength="500" placeholder="Why are you cancelling?">${x.reason||''}</textarea></div>
+        ${s.series ? `<div class="f"><span class="f-lbl">Which sessions</span>
+          <div class="ses-scope">
+            <label class="ses-scope-o"><input type="radio" name="cxScope" value="this" ${x.scope!=='all'?'checked':''}> This session only</label>
+            <label class="ses-scope-o"><input type="radio" name="cxScope" value="all" ${x.scope==='all'?'checked':''}> This and every later session</label>
+          </div></div>` : ''}
+      </div>
+      <div class="sheet-f">
+        <button class="btn btn-s noic" data-cxclose="1">Go back</button>
+        <button class="btn btn-p danger noic" data-sesdocancel="${s.id}">Cancel session</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+LDR_SHEETS.push(leadSessionSheet, leadCancelSheet);
 
 /* ==========================================================================
    CALLS — THE LEADER'S DIARY
@@ -249,6 +470,11 @@ V.leadCalls = () => {
 V.leadEvals = () => {
   const ps = LEAD_SUMMARIES.filter(s => s.status === 'pending');
   const published = LEAD_SUMMARIES.filter(s => s.status === 'done');
+  /* EPIC 12.9 — the recommendation window closes when the cohort is marked
+     Completed, a set number of days (the course's completeDelay) after its last
+     day. The queue's cohort is the one being closed. */
+  const evalCo = lcoOf(LEAD_SUMMARIES[0].cohort);
+  const closeDate = dPretty(dISOadd(cohortEndISO(evalCo), evalCo.completeDelay || 7));
 
   /* BOTH ROWS ARE THE SAME COMPONENT AND THE DIFFERENCE IS THE SUBTITLE, which
      is what made the split cheap. A published row says what you decided; a
@@ -417,6 +643,8 @@ V.leadEvals = () => {
          figure cells below state it four ways. So Tal's sentence is the opening
          line, which is what the rule prescribes for a page with no spine. */}
   ${ph('Evaluations')}
+  ${''/* EPIC 12.9 — the outstanding count and the window-close date. */}
+  <div class="sec sec-noline"><p class="eval-window">${ps.length ? `<b>${ps.length}</b> recommendation${ps.length===1?'':'s'} outstanding.` : 'Every recommendation is written.'} Recommendations can be written until ${closeDate}.</p></div>
   ${''/* THE TWO WAITING ARE THE PAGE'S BLACK CARD (Maryam, 1 Sep 2026: "take
          the 2 candidates awaiting in the black card with the card heading
          Awaiting Evaluations", and "remove the 90-day summaries heading").
@@ -705,6 +933,12 @@ V.leadSum = () => {
       ${statCell(I.renew, 'Chapters retaken', retakes, m.att.toFixed(1) + ' attempts on average')}
     </div>
   </div>
+  ${''/* EPIC 12.9 — attendance, read-only, from the register the platform keeps.
+         Sessions with no participation data are left out of both figures. */}
+  ${(() => { const a = leadAttn(m, c); return `<div class="sec sec-noline">
+    <div class="sec-h"><h2>Attendance</h2></div>
+    <div class="kv"><span class="k">Sessions attended</span><span class="v">${a.held ? a.att + ' of ' + a.held + ' since they joined' : 'no sessions held'}</span></div>
+  </div>`; })()}
   ${''/* THE LEADER'S OWN NOTES ON THIS CANDIDATE (Maryam, 9 Sep 2026: "there
          needs to be a section of the notes taken by the cohort leader about this
          candidate on this evaluation screen"). The same `S.ldrNotes` store and
@@ -717,16 +951,7 @@ V.leadSum = () => {
   ${lnotes(s.name).length ? `
   <div class="sec">
     <div class="sec-h"><h2>Your notes on ${first}</h2></div>
-    <div class="note-list">
-      ${lnotes(s.name).map(n => { const k = NOTE_K[n.k] || NOTE_K.general;
-        return `<div class="note-row note-ro" data-note-k="${n.k || 'general'}" style="--note-ink:var(${k.ink});--note-bg:color-mix(in srgb, var(${k.ink}) ${k.mix}, var(--layer-01))">
-          <span class="note-b">
-            <span class="note-t">${n.t}</span>
-            ${n.b ? `<span class="note-x">${n.b}</span>` : ''}
-            <span class="note-f"><span class="note-tag">${k.t}</span><span class="note-w">Added by you &middot; ${n.w}</span></span>
-          </span>
-        </div>`; }).join('')}
-    </div>
+    ${ldrNotesRead(s.name)}
   </div>` : ''}
   ${/* ONE BAND OF FIGURES, NOT TWO. A `.facts` row of four sat directly under
         the `.stats` row of four — the same object twice, one with an icon and
@@ -789,10 +1014,10 @@ V.leadSum = () => {
           ? 'A double promotion is you saying 90 days did more than they are built to. Say why, and it goes on the summary the next agent reads.'
           : 'Anything other than a promotion is you saying the 90 days did not do what they were meant to. Say why, and it goes on the summary.'}</div></div>` : ''}
       ` : ''}
-      <div class="f mt5"><label for="ldrGrowth">Where they grew</label>
-        <textarea class="inp" id="ldrGrowth" rows="3" placeholder="What changed over the 90 days that the numbers above do not show."></textarea></div>
-      <div class="f mt5"><label for="ldrDev">Still to develop</label>
-        <textarea class="inp" id="ldrDev" rows="3" placeholder="What the next 90 days, or the re-interview, should look at."></textarea></div>
+      <div class="f mt5"><label for="ldrGrowth">Where they grew${S.ldrGrowErr?' <span class="f-req-err">Required</span>':''}</label>
+        <textarea class="inp" id="ldrGrowth" rows="3" maxlength="2000" placeholder="What changed over the 90 days that the numbers above do not show."></textarea></div>
+      <div class="f mt5"><label for="ldrDev">Still to develop${S.ldrDevErr?' <span class="f-req-err">Required</span>':''}</label>
+        <textarea class="inp" id="ldrDev" rows="3" maxlength="2000" placeholder="What the next 90 days, or the re-interview, should look at."></textarea></div>
       <p class="t-helper-01">Published to ${first} and to whichever agent runs their re-interview. Your private notes stay private.</p>
     </div>
     ${/* ONE BUTTON, AND ITS WORDS ARE THE ACT (Maryam, 2 Sep 2026). "Send
@@ -808,9 +1033,11 @@ V.leadSum = () => {
           rule is that a control which cannot do what it says should not be
           drawn. `.btn-set` stays on the wrapper for the spacing even with one
           child, which is what `.mt5` is measured against. */''}
-    <div class="btn-set mt5">
+    <div class="btn-set mt5 ldr-eval-a">
+      <button class="btn btn-s" data-ldrdraft="${s.id}">Save draft</button>
       <button class="btn btn-p" data-ldrpub="${s.id}">Send Recommendation</button>
     </div>
+    ${S.ldrDraftSaved === s.id ? `<p class="ldr-draft-note">Draft saved. ${first} stays in Awaiting until you send it.</p>` : ''}
   </div>
 </div></main>`;
 
@@ -993,7 +1220,10 @@ V.leadSum = () => {
    ========================================================================== */
 device.addEventListener('click', e => {
   const su = e.target.closest('[data-ldrsum]');
-  if(su){ S.ldrSum = su.dataset.ldrsum; S.ldrRec = 'promote'; S.ldrErr = false; }
+  if(su){ S.ldrSum = su.dataset.ldrsum; S.ldrErr = false; S.ldrGrowErr = false; S.ldrDevErr = false; S.ldrDraftSaved = null;
+    /* EPIC 12.9 — a saved draft returns the leader to where they left off. */
+    const s = ldrSumOf(su.dataset.ldrsum), d = s.draft;
+    S.ldrRec = d ? d.rec : 'promote'; S.ldrSumWhy = d ? d.why : ''; S.ldrGrowth = d ? d.growth : ''; S.ldrDev = d ? d.develop : ''; }
 }, true);
 
 /* WHAT IS TYPED SURVIVES A PICK. Choosing a different recommendation
@@ -1019,26 +1249,69 @@ device.addEventListener('click', e => {
      dashboard, its "Waiting on you" list and the figure band on Evaluations all
      read `status`, so publishing here empties them everywhere at once rather
      than in one place. */
+  /* EPIC 12.9 — Send opens a confirmation first (the recommendation cannot be
+     changed once sent). Both written sections are mandatory; a non-promotion also
+     needs its reason. */
   const pb = e.target.closest('[data-ldrpub]');
   if(pb){
     ldrDraftRead();
-    const s = ldrSumOf(pb.dataset.ldrpub);
+    S.ldrDraftSaved = null;
     const rec = S.ldrRec || 'promote';
     if(rec !== 'promote' && !(S.ldrSumWhy || '').trim()){
       S.ldrErr = true; render();
-      const box = device.querySelector('#ldrSumWhy'); if(box) box.focus();
-      return;
+      const box = device.querySelector('#ldrSumWhy'); if(box) box.focus(); return;
     }
+    if(!(S.ldrGrowth || '').trim()){ S.ldrGrowErr = true; render();
+      const box = device.querySelector('#ldrGrowth'); if(box) box.focus(); return; }
+    if(!(S.ldrDev || '').trim()){ S.ldrDevErr = true; render();
+      const box = device.querySelector('#ldrDev'); if(box) box.focus(); return; }
+    S.ldrGrowErr = false; S.ldrDevErr = false;
+    S.ldrPubAsk = pb.dataset.ldrpub; render(); return;
+  }
+  const dp = e.target.closest('[data-ldrdopub]');
+  if(dp){
+    const s = ldrSumOf(dp.dataset.ldrdopub);
+    const rec = S.ldrRec || 'promote';
     s.status = 'done';
     s.rec = (LDR_RECS.filter(r => r[0] === rec)[0] || LDR_RECS[0])[1];
     s.why = (S.ldrSumWhy || '').trim();
     s.growth = (S.ldrGrowth || '').trim();
     s.develop = (S.ldrDev || '').trim();
+    delete s.draft;
     S.ldrSumWhy = ''; S.ldrGrowth = ''; S.ldrDev = ''; S.ldrErr = false;
-    render();
-    return;
+    S.ldrPubAsk = null; render(); return;
   }
+  /* Save draft (12.9): keeps the candidate in Awaiting, visible to nobody else. */
+  const dd = e.target.closest('[data-ldrdraft]');
+  if(dd){
+    ldrDraftRead();
+    const s = ldrSumOf(dd.dataset.ldrdraft);
+    s.draft = {rec:S.ldrRec || 'promote', why:(S.ldrSumWhy||'').trim(), growth:(S.ldrGrowth||'').trim(), develop:(S.ldrDev||'').trim()};
+    S.ldrDraftSaved = s.id; render(); return;
+  }
+  const epc = e.target.closest('[data-epclose]');
+  if(epc){ if(epc.classList.contains('modal') && e.target !== epc) return; S.ldrPubAsk = null; render(); return; }
 });
+
+/* the send confirmation (12.9) — a `.conf` via LDR_SHEETS */
+function leadEvalConfirmSheet(){
+  const id = S.ldrPubAsk; if(!id) return `<div class="modal" data-epclose="1"></div>`;
+  const s = ldrSumOf(id);
+  return `<div class="modal on" data-epclose="1">
+    <div class="sheet conf" role="dialog" aria-modal="true" aria-label="Send recommendation">
+      <div class="sheet-b conf-b">
+        <span class="conf-mk">${I.send}</span>
+        <h2 class="conf-t">Send your recommendation for ${handleOf(s.name)}?</h2>
+        <p class="conf-x">It goes to the agent running their re-interview and cannot be changed afterwards.</p>
+      </div>
+      <div class="sheet-f conf-a">
+        <button class="btn btn-s noic" data-epclose="1">Cancel</button>
+        <button class="btn btn-p noic" data-ldrdopub="${id}">Send Recommendation</button>
+      </div>
+    </div>
+  </div>`;
+}
+LDR_SHEETS.push(leadEvalConfirmSheet);
 
 /* THE DRAFT IS PRINTED BACK INTO THE BOXES after every render, rather than
    inlined into the markup: a `value` attribute on a textarea is its INITIAL
@@ -1060,6 +1333,94 @@ function ldrDraftWrite(){
    is worth keeping because `LDR_RECS` is a `.btn-set` in the same shape and
    would want the same pass if it ever grew past a phone's width. It has five
    entries and wraps, so it does not. */
+/* ==========================================================================
+   EPIC 12.5/12.6 — the session handlers. Native form controls read on Save, so
+   typing never triggers a render (the caret trap); an overlap or missing-field
+   error re-renders with the last-entered values kept on S.sesForm. Rooms,
+   notifications and the vendor's own overlap check are stubbed.
+   ========================================================================== */
+device.addEventListener('click', e => {
+  const cRec = leadLive() || LEAD_COHORTS[0];
+  const g = sel => device.querySelector(sel);
+  const today = LEAD_NOW.toISOString().slice(0,10);
+
+  if(e.target.closest('[data-sesnew]')){
+    S.sesForm = {edit:null, title:'', chapter:'', date:'', time:cRec.callTimeH||'18:00', dur:60, cover:'', repeat:'none', scope:'this', err:''};
+    render(); return;
+  }
+  const se = e.target.closest('[data-sesedit]');
+  if(se){ const s = leadSessionsOf(cRec).find(x=>x.id===se.dataset.sesedit);
+    if(s) S.sesForm = {edit:s.id, title:s.title, chapter:s.chapter, date:s.dISO, time:s.time, dur:s.dur, cover:s.cover||'', repeat:s.repeat, scope:'this', err:''};
+    render(); return;
+  }
+
+  if(e.target.closest('[data-sessave]')){
+    const f = S.sesForm; if(!f) return;
+    const title=(g('#sesTitle').value||'').trim(), chapter=g('#sesChapter').value,
+      date=g('#sesDate').value, time=g('#sesTime').value, dur=+g('#sesDur').value,
+      cover=(g('#sesCover').value||'').trim(), repeat=g('#sesRepeat')?g('#sesRepeat').value:'none',
+      scopeEl=device.querySelector('input[name=sesScope]:checked'), scope=scopeEl?scopeEl.value:'this';
+    S.sesForm = {...f, title, chapter, date, time, dur, cover, repeat, scope};
+    let err='';
+    if(!title) err='Add a title.';
+    else if(!chapter) err='Choose the chapter this session covers.';
+    else if(!date) err='Choose a date.';
+    else if(date < today) err='The date must be today or later.';
+    else if(date > cohortEndISO(cRec)) err='The date must fall within the cohort’s 90 days.';
+    else if(!time) err='Choose a start time.';
+    else if(!(dur>=15 && dur<=240)) err='Duration must be between 15 and 240 minutes.';
+    else { const clash = leadOverlap(cRec, date, time, dur, f.edit);
+      if(clash) err='This overlaps '+clash.title+' on '+clash.date+'. Change the time or the date.'; }
+    if(err){ S.sesForm.err=err; render(); return; }
+    const arr = LEAD_SESSIONS[cRec.id];
+    if(f.edit){
+      const s = arr.find(x=>x.id===f.edit);
+      const apply = t => { t.title=title; t.chapter=chapter; t.time=time; t.dur=dur; t.cover=cover; t.week=leadWeek(sesDayOf(cRec,t.dISO)); };
+      if(scope==='all' && s.series){ arr.filter(x=>x.series===s.series && sesDT(x)>=sesDT(s) && x.status==='scheduled').forEach(apply); }
+      else { apply(s); s.dISO=date; s.date=dPretty(date); s.week=leadWeek(sesDayOf(cRec,date)); }
+    } else {
+      const sid = repeat!=='none' ? 'u'+Date.now() : null;
+      let n=0; const mk = dISO => ({id:'s'+cRec.id+'u'+Date.now()+'_'+(n++), co:cRec.id, series:sid,
+        title, chapter, dISO, date:dPretty(dISO), time, dur, cover, repeat,
+        week:leadWeek(sesDayOf(cRec,dISO)), status:'scheduled', unavail:false, adhoc:true});
+      const step = repeat==='weekly'?7:repeat==='fortnightly'?14:0;
+      const endISO = cohortEndISO(cRec);
+      let d = date;
+      arr.push(mk(d));
+      if(step){ d = dISOadd(d, step); while(d <= endISO){ arr.push(mk(d)); d = dISOadd(d, step); } }
+    }
+    S.sesForm=null; render(); return;
+  }
+
+  const cx = e.target.closest('[data-sescancel]');
+  if(cx){ S.sesCancel = {id:cx.dataset.sescancel, reason:'', scope:'this', err:''}; render(); return; }
+  const dcx = e.target.closest('[data-sesdocancel]');
+  if(dcx){
+    const arr = LEAD_SESSIONS[cRec.id], s = arr.find(x=>x.id===dcx.dataset.sesdocancel); if(!s) return;
+    const reason=(g('#cxReason').value||'').trim();
+    const scopeEl=device.querySelector('input[name=cxScope]:checked'), scope=scopeEl?scopeEl.value:'this';
+    if(!reason){ S.sesCancel={...S.sesCancel, reason, scope, err:'Add a reason. It is shown to candidates.'}; render(); return; }
+    const cancel = t => { t.status='cancelled'; t.reason=reason; };
+    if(scope==='all' && s.series){ arr.filter(x=>x.series===s.series && sesDT(x)>=sesDT(s) && x.status==='scheduled').forEach(cancel); }
+    else cancel(s);
+    S.sesCancel=null; render(); return;
+  }
+
+  const sn = e.target.closest('[data-sesnotesave]');
+  if(sn){ const ta=g('#sesNote'); if(ta) SESSION_NOTES[sn.dataset.sesnotesave]=ta.value.trim(); render(); return; }
+
+  /* the close branches come LAST: the sheet's own controls carry data-sesclose /
+     data-cxclose ON THE BUTTON, but the backdrop `.modal` carries it too, so a
+     click on Save (inside the modal) reaches the modal via closest(). Checking
+     these after every action means a Save is handled before the backdrop can
+     swallow it; here they only close on the modal backdrop itself or a close
+     button. */
+  const sc = e.target.closest('[data-sesclose]');
+  if(sc){ if(sc.classList.contains('modal') && e.target !== sc) return; S.sesForm = null; render(); return; }
+  const cxc = e.target.closest('[data-cxclose]');
+  if(cxc){ if(cxc.classList.contains('modal') && e.target !== cxc) return; S.sesCancel = null; render(); return; }
+});
+
 const _baseLdr3 = render;
 render = function(){
   _baseLdr3();

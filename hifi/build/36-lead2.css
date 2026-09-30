@@ -906,3 +906,98 @@
    and a 36px square is the face's box, which is what keeps both kinds of row
    starting their text at the same x.
    -------------------------------------------------------------------------- */
+
+/* ==========================================================================
+   EPIC 12.5/12.6 — SESSIONS AND ATTENDANCE
+   ========================================================================== */
+/* the highlighted next-session card */
+.app .ses-next{border:1px solid var(--border-subtle-02);padding:var(--s05);
+  background:color-mix(in srgb, var(--accent) 4%, var(--background))}
+.app .ses-next-h{display:flex;justify-content:space-between;gap:var(--s04);flex-wrap:wrap}
+.app .ses-next-eyebrow{display:block;font-size:var(--t-eyebrow-size);color:var(--accent-text);
+  text-transform:none;margin-bottom:2px}
+.app .ses-next-t{font-size:var(--t-h3-size);font-weight:var(--t-w-strong);color:var(--text-primary)}
+.app .ses-next-when{display:block;font-size:var(--t-desc-size);color:var(--text-secondary);margin-top:2px}
+.app .ses-next-a{display:flex;gap:var(--s03);flex:0 0 auto}
+.app .ses-next-cov{display:flex;flex-direction:column;gap:2px;margin-top:var(--s04);
+  padding-top:var(--s04);border-top:1px solid var(--rule)}
+.app .ses-next-ch{font-size:var(--t-body-size);font-weight:var(--t-w-strong);color:var(--text-primary)}
+.app .ses-next-sub{font-size:var(--t-caption-size);color:var(--text-secondary)}
+.app .ses-next-note{margin-top:var(--s03);font-size:var(--t-desc-size);color:var(--text-secondary)}
+.app .ses-next-foot{display:flex;align-items:center;gap:var(--s04);margin-top:var(--s05);flex-wrap:wrap}
+.app .ses-next-hint{font-size:var(--t-caption-size);color:var(--text-helper)}
+
+/* a session row */
+.app .ses-list .ses-row{display:flex;align-items:center;gap:var(--s04);width:100%;
+  padding:var(--s04) 0;border-bottom:1px solid var(--rule);text-align:left;
+  background:none;border-left:0;border-right:0;border-top:0;font:inherit;color:inherit}
+.app .ses-list .ses-row:last-child{border-bottom:0}
+.app .ses-row.clk{cursor:pointer}
+.app .ses-row-b{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1 1 auto}
+.app .ses-row-t{font-size:var(--t-compact-size);font-weight:var(--t-w-strong);color:var(--text-primary)}
+.app .ses-row-s{font-size:var(--t-caption-size);color:var(--text-secondary)}
+.app .ses-repeat{font-size:var(--t-caption-size);font-weight:var(--t-w-book);color:var(--text-helper)}
+.app .ses-row-a{display:inline-flex;gap:var(--s02);flex:0 0 auto}
+.app .ses-row-go{flex:0 0 auto;color:var(--text-secondary);display:inline-flex}
+.app .ses-mark{flex:0 0 auto;font-size:var(--t-label-size);white-space:nowrap;text-align:right}
+.app .ses-att{color:var(--text-secondary)}
+.app .ses-upcoming{color:var(--accent-text)}
+.app .ses-na{color:var(--text-helper)}
+.app .ses-cancelled{color:var(--support-error)}
+
+/* attendance record */
+.app .ses-reg .atd-row .rname{display:inline-flex;align-items:center;gap:var(--s03)}
+.app .ses-warn{display:flex;gap:var(--s04);padding:var(--s05);
+  border:1px solid var(--support-attention);
+  background:color-mix(in srgb, var(--support-attention) 8%, var(--background))}
+.app .ses-warn-mk{flex:0 0 auto;color:var(--support-attention)}
+.app .ses-warn-b h3{font-size:var(--t-h4-size);color:var(--text-primary)}
+.app .ses-warn-b p{font-size:var(--t-desc-size);color:var(--text-secondary);margin-top:2px}
+.app .ses-note-box{display:flex;flex-direction:column;gap:var(--s04)}
+.app .ses-note-a{display:flex;justify-content:flex-end}
+
+/* the schedule / cancel sheet extras */
+.app .ses-err{display:flex;align-items:flex-start;gap:var(--s02);margin-bottom:var(--s05);
+  padding:var(--s03) var(--s04);font-size:var(--t-label-size);color:var(--support-error);
+  background:color-mix(in srgb, var(--support-error) 8%, var(--background))}
+.app .ses-err svg{width:18px;height:18px;flex:0 0 auto}
+.app .f-tz,.app .f-opt,.app .f-req{font-size:var(--t-caption-size);color:var(--text-helper);font-weight:var(--t-w-book)}
+.app .f-lbl{display:block;font-size:var(--t-label-size);color:var(--text-secondary);margin-bottom:var(--s03)}
+.app .ses-scope{display:flex;flex-direction:column;gap:var(--s03)}
+.app .ses-scope-o{display:flex;align-items:center;gap:var(--s03);font-size:var(--t-body-size);color:var(--text-primary);cursor:pointer}
+.app .sheet.sheet-narrow{max-width:460px}
+
+/* ==========================================================================
+   EPIC 12.7 — THE COHORT DISCUSSION
+   ========================================================================== */
+.app .disc-compose,.app .disc-post{display:flex;gap:var(--s04)}
+.app .disc-av{flex:0 0 auto}
+.app .disc-av .av-ph{border-radius:50%}
+.app .disc-compose-b{flex:1 1 auto;display:flex;flex-direction:column;gap:var(--s03)}
+.app .disc-compose-a{display:flex;align-items:center;justify-content:space-between;gap:var(--s04)}
+.app .disc-pin-cb{display:inline-flex;align-items:center;gap:var(--s02);font-size:var(--t-label-size);color:var(--text-secondary);cursor:pointer}
+.app .disc-thread{padding:var(--s05) 0;border-bottom:1px solid var(--rule)}
+.app .disc-thread:last-child{border-bottom:0}
+.app .disc-b{flex:1 1 auto;min-width:0}
+.app .disc-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:var(--s02) var(--s03)}
+.app .disc-nm{font-size:var(--t-compact-size);font-weight:var(--t-w-strong);color:var(--text-primary)}
+.app .disc-h{font-size:var(--t-caption-size);color:var(--text-secondary)}
+.app .disc-w{font-size:var(--t-caption-size);color:var(--text-helper)}
+.app .disc-badge{font-size:var(--t-caption-size);color:var(--accent-text);
+  padding:1px var(--s02);border:1px solid var(--accent-text);border-radius:999px}
+.app .disc-you{font-size:var(--t-caption-size);color:var(--text-helper)}
+.app .disc-pin-tag{display:inline-flex;align-items:center;gap:2px;font-size:var(--t-caption-size);color:var(--text-secondary)}
+.app .disc-pin-tag svg{width:13px;height:13px}
+.app .disc-text{font-size:var(--t-body-size);line-height:var(--t-body-lh);color:var(--text-primary);
+  margin-top:var(--s02);white-space:pre-wrap}
+.app .disc-acts{display:flex;gap:var(--s04);margin-top:var(--s03)}
+.app .disc-act{display:inline-flex;align-items:center;gap:var(--s02);font:inherit;
+  font-size:var(--t-label-size);color:var(--text-secondary);background:none;border:0;cursor:pointer;padding:0}
+.app .disc-act svg{width:16px;height:16px}
+.app .disc-act.on{color:var(--accent-text)}
+.app .disc-replies{margin-top:var(--s04);padding-left:var(--s07);
+  border-left:2px solid var(--rule);display:flex;flex-direction:column;gap:var(--s04)}
+.app .disc-reply .disc-text{font-size:var(--t-compact-size)}
+.app .disc-reply-box,.app .disc-edit{margin-top:var(--s04);display:flex;flex-direction:column;gap:var(--s03);padding-left:var(--s07)}
+.app .disc-edit{padding-left:0}
+.app .disc-reply-a,.app .disc-edit-a{display:flex;justify-content:flex-end;gap:var(--s03)}

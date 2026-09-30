@@ -834,3 +834,95 @@
      longest label never fit, so the phone was where the ragged column was
      worst — and with the mark dropped there is room for the full box. */
 }
+
+/* ==========================================================================
+   EPIC 12 — THE LEADER WORKSPACE (My Cohort, header chip, roster)
+   New surfaces from stories 12.1/12.2. Leader-only; every colour is a token,
+   radius 0 except the avatar disc and the pills the platform already curves.
+   ========================================================================== */
+
+/* 12.1 — the persistent header context: cohort name + week */
+.app[data-portal="leader"] .lead-hdr{display:inline-flex;align-items:center;gap:var(--s03);
+  padding:0 var(--s04) 0 0;margin-right:var(--s02);white-space:nowrap}
+.app .lead-hdr-n{font-size:var(--t-compact-size);font-weight:var(--t-w-strong);color:var(--text-primary)}
+.app .lead-hdr-w{font-size:var(--t-caption-size);color:var(--text-secondary)}
+@container app (max-width:719.98px){ .app .lead-hdr-w{display:none} }
+@container app (max-width:479.98px){ .app .lead-hdr{display:none} }
+
+/* 12.2 — the cohort header */
+.app .lead-cohd{display:grid;gap:var(--s05)}
+.app .lead-cohd-id{display:flex;flex-direction:column;gap:2px}
+.app .lead-cohd-n{font-size:var(--t-h1-size);line-height:var(--t-h1-lh);font-weight:var(--t-w-strong);color:var(--text-primary)}
+.app .lead-cohd-course{font-size:var(--t-desc-size);line-height:normal;color:var(--text-secondary)}
+.app .lead-cohd-day{display:flex;flex-wrap:wrap;align-items:baseline;gap:var(--s03) var(--s05)}
+.app .lead-cohd-dw{display:inline-flex;align-items:baseline;gap:var(--s03)}
+.app .lead-cohd-dw b{font-size:var(--t-h3-size);font-weight:var(--t-w-strong);color:var(--text-primary)}
+.app .lead-cohd-dw span{font-size:var(--t-body-size);color:var(--text-secondary)}
+.app .lead-cohd-dates{font-size:var(--t-caption-size);color:var(--text-helper)}
+.app .lead-cohd-kv{display:grid;grid-template-columns:1fr;gap:0;border-top:1px solid var(--rule)}
+.app .lead-cohd-cell{display:flex;justify-content:space-between;align-items:baseline;gap:var(--s04);
+  padding:var(--s04) 0;border-bottom:1px solid var(--rule)}
+.app .lead-cohd-l{font-size:var(--t-label-size);color:var(--text-secondary)}
+.app .lead-cohd-v{font-size:var(--t-body-size);color:var(--text-primary);text-align:right}
+.app .lead-cohd-v b{font-weight:var(--t-w-strong)}
+@container app (min-width:900px){
+  .app .lead-cohd-kv{grid-template-columns:repeat(3,1fr);border-top:0}
+  .app .lead-cohd-cell{flex-direction:column;justify-content:flex-start;align-items:flex-start;
+    padding:var(--s04) var(--s05) var(--s04) 0;border-bottom:0;border-left:1px solid var(--rule)}
+  .app .lead-cohd-cell:first-child{border-left:0;padding-left:0}
+  .app .lead-cohd-v{text-align:left}
+}
+
+/* 12.2 — the candidate table tools (search + level filter) */
+.app .lead-roster-tools{display:flex;flex-wrap:wrap;gap:var(--s04);align-items:center;
+  justify-content:space-between;margin-bottom:var(--s05)}
+.app .lead-search{position:relative;display:inline-flex;align-items:center;flex:1 1 240px;max-width:360px}
+.app .lead-search-mk{position:absolute;left:var(--s03);display:inline-flex;pointer-events:none;color:var(--text-secondary)}
+.app .lead-search-mk svg{width:18px;height:18px}
+.app .lead-search input{width:100%;font:inherit;font-size:var(--t-body-size);color:var(--text-primary);
+  padding:var(--s03) var(--s03) var(--s03) calc(var(--s06) + 4px);
+  border:1px solid var(--border-subtle-02);background:var(--background)}
+.app .lead-search input:focus{outline:none;border-color:var(--text-primary)}
+.app .lead-roster-filter{flex:0 0 auto;min-width:150px}
+
+/* 12.2 — the roster table itself */
+.app .lead-roster .rname{display:inline-flex;align-items:center;gap:var(--s03)}
+.app .lead-roster .rname .av-ph{flex:0 0 auto;border-radius:50%}
+.app .lnm{display:inline-flex;flex-direction:column;line-height:1.25}
+.app .lnm-r{font-weight:var(--t-w-strong);color:var(--text-primary)}
+.app .lnm-h{font-size:var(--t-caption-size);color:var(--text-secondary)}
+.app .lnm-only{font-size:var(--t-compact-size);font-weight:var(--t-w-strong);color:var(--text-primary)}
+.app .lead-roster .cell-sub{display:block;font-size:var(--t-caption-size);color:var(--text-helper)}
+.app .lead-roster td.cell-low{color:var(--support-error)}
+.app .lead-roster .row-acts{display:inline-flex;gap:var(--s03);justify-content:flex-end;white-space:nowrap}
+.app th.lead-roster-act{text-align:right}
+/* sortable headers */
+.app th.srt{cursor:pointer;user-select:none}
+.app th.srt .srt-b{display:inline-flex;align-items:center;gap:2px}
+.app th.srt.num .srt-b{justify-content:flex-end}
+.app th.srt.on{color:var(--text-primary)}
+.app .srt-a{width:14px;height:14px;color:var(--accent-text)}
+.app .srt-a.srt-dn{transform:rotate(180deg)}
+
+/* 12.2 — the LightspeedVT last-read stamp */
+.app .lead-sync{margin-top:var(--s04);font-size:var(--t-caption-size);color:var(--text-helper)}
+
+/* 12.2 — a past-cohort row */
+.app .lead-past-row{width:100%}
+
+/* ==========================================================================
+   EPIC 12.3 — the candidate progress detail (attendance list, low-score mark)
+   ========================================================================== */
+.app .stat .stat-low{color:var(--support-error)}
+.app .crs-card .crs-lsvt{margin-top:var(--s05)}
+.app .atd-row{display:flex;align-items:center;justify-content:space-between;gap:var(--s04);
+  padding:var(--s04) 0;border-bottom:1px solid var(--rule)}
+.app .atd-row:last-child{border-bottom:0}
+.app .atd-b{display:flex;flex-direction:column;gap:2px;min-width:0}
+.app .atd-t{font-size:var(--t-compact-size);color:var(--text-primary)}
+.app .atd-w{font-size:var(--t-caption-size);color:var(--text-helper)}
+.app .atd-note{color:var(--text-secondary)}
+.app .atd-mark{flex:0 0 auto;font-size:var(--t-label-size);white-space:nowrap}
+.app .atd-yes{color:var(--support-success-ink)}
+.app .atd-no{color:var(--text-secondary)}
+.app .atd-na{color:var(--text-helper);font-style:normal}

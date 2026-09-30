@@ -91,14 +91,30 @@ S.ldrNote = null;
    summary screen needs the leader's own notes on the candidate to show (Maryam,
    9 Sep 2026: "there needs to be a section of the notes taken by the cohort
    leader about this candidate on this evaluation screen"). Flagged, not real. */
+/* EPIC 12.4 — a note is a TYPE (Strength / Area to develop) + free text, tagged
+   with the cycle week and date it was written. The `t` title is gone (the story's
+   form is Type + Note); `b` is the note, `wk` the cycle-week number, `d` the date.
+   Seeded notes carry no `at`, so they read as older than the 24h edit window and
+   are read-only; a note written this session gets `at:Date.now()` and is editable
+   for 24 hours. */
 S.ldrNotes = {
-  'Yuki Tanaka':[{k:'develop', t:'Twelve days without a sign-in', b:'Emailed the address on file and got no bounce, so it is being read. Trying the cohort board next before I escalate.', w:'2 days ago'}],
-  'James Whitby':[{k:'develop', t:'Re-taking assessments rather than moving on', b:'Told him on the call to leave three and four at 65 and come back after chapter 6 — the material builds, the score does not.', w:'Last week'},
-                  {k:'general', t:'Asked for the handover framework twice', b:'Sent it. Worth checking he used it.', w:'Earlier'}],
-  'Owen Clarke':[{k:'strength', t:'Ran the Thursday call twice when I was out', b:'Stepped in without being asked and kept the group on the agenda both times. The cohort listens to him.', w:'Week 6'},
-                 {k:'develop', t:'Writes the answer before the working', b:'Strong instincts, but the report skips how he got there. Asked him to show the steps so the next reader can follow the decision.', w:'Last week'}],
-  'Lena Fischer':[{k:'general', t:'Quiet on calls, thorough on the board', b:'Rarely speaks up live, but her written feedback to peers is the most detailed in the cohort. Worth drawing out in the room.', w:'2 weeks ago'}]
+  'Yuki Tanaka':[{k:'develop', b:'Twelve days without a sign-in. Emailed the address on file and got no bounce, so it is being read. Trying the cohort board next before I escalate.', wk:5, d:'24 Sep 2026'}],
+  'James Whitby':[{k:'develop', b:'Re-taking assessments rather than moving on. Told him on the call to leave three and four at 65 and come back after chapter 6 — the material builds, the score does not.', wk:4, d:'18 Sep 2026'},
+                  {k:'strength', b:'Asked for the handover framework twice and put it straight to use on the delegation task. Slow to start, but he does the reading once he has the tool.', wk:3, d:'11 Sep 2026'}],
+  'Owen Clarke':[{k:'strength', b:'Ran the Thursday call twice when I was out. Stepped in without being asked and kept the group on the agenda both times. The cohort listens to him.', wk:8, d:'6 Aug 2026'},
+                 {k:'develop', b:'Writes the answer before the working. Strong instincts, but the report skips how he got there. Asked him to show the steps so the next reader can follow the decision.', wk:9, d:'13 Aug 2026'}],
+  'Lena Fischer':[{k:'develop', b:'Quiet on calls, thorough on the board. Rarely speaks up live, but her written feedback to peers is the most detailed in the cohort. Worth drawing out in the room.', wk:7, d:'30 Jul 2026'}]
 };
+/* today, for a newly-written note's date stamp (§74, static prototype) */
+const LEAD_TODAY = '29 Sep 2026';
+/* a note is editable for 24 hours after it is written AND while the cohort is
+   still editable (active). Seeded notes have no `at`, so only session-written
+   ones can be edited or deleted. */
+const NOTE_EDIT_MS = 24*60*60*1000;
+const noteEditable = (n, c) => leadEditable(c) && !!n.at && (Date.now() - n.at) < NOTE_EDIT_MS;
+/* a cohort's record is editable while it is active; Completed / Cancelled make
+   notes, sessions and evaluations read-only (12.4/12.5/12.9). */
+const leadEditable = c => !!c && c.status === 'active';
 
 /* The composer's state. `S.ldrNoteAt` is null when it is shut, `-1` while a new
    note is being written and the note's index while one is being edited — one
@@ -108,7 +124,7 @@ S.ldrNotes = {
    switch, which resets neither. */
 S.ldrCTab = 'progress';  /* Candidate Progress is the first of four tabs (9 Sep 2026) */
 S.ldrNoteAt = null;
-S.ldrNoteK = 'general';
+S.ldrNoteK = '';   /* 12.4: neither type pre-selected */
 
 /* --------------------------------------------------------------------------
    READINGS OF THE ROSTER
@@ -214,41 +230,25 @@ const ldrRankBoard = c => `<div class="board">
    destroys the `<input>` and takes the caret with it. The rows are hidden by
    class instead and the count line is written in place.
    ========================================================================== */
+/* EPIC 12.4 — two types only: Strength and Area to develop. */
 const NOTE_K = {
   strength:{t:'Strength',        ink:'--support-success-ink', mix:'12%'},
-  develop: {t:'Area to develop', ink:'--support-attention',   mix:'14%'},
-  general: {t:'General',         ink:'--link',                mix:'10%'}
+  develop: {t:'Area to develop', ink:'--support-attention',   mix:'14%'}
 };
 
-const ldrNoteRow = (n, name, i) => {
-  const k = NOTE_K[n.k] || NOTE_K.general;
-  return `<div class="note-row" data-note-i="${i}" data-note-k="${n.k || 'general'}"
+const ldrNoteRow = (n, name, i, c) => {
+  const k = NOTE_K[n.k] || NOTE_K.develop;
+  const editable = noteEditable(n, c);
+  return `<div class="note-row" data-note-i="${i}" data-note-k="${n.k || 'develop'}"
        style="--note-ink:var(${k.ink});--note-bg:color-mix(in srgb, var(${k.ink}) ${k.mix}, var(--layer-01))">
     <span class="note-b">
-      <span class="note-t">${n.t}</span>
-      ${n.b ? `<span class="note-x">${n.b}</span>` : ''}
-      <span class="note-f"><span class="note-tag">${k.t}</span><span class="note-w">Added by you &middot; ${n.w}</span></span>
+      <span class="note-x">${n.b}${n.edited ? ' <span class="note-edited">(edited)</span>' : ''}</span>
+      <span class="note-f"><span class="note-tag">${k.t}</span><span class="note-w">Week ${n.wk} &middot; ${n.d}</span></span>
     </span>
-    ${''/* THE TWO ACTIONS ARE CHIPS (Maryam, 2 Sep 2026: "instead of this, give
-           chips of edit and delete, edit chip will have the blue color … delete
-           chip will have red text red icon on left and light red bg"). They
-           were two bare `.ic` glyphs — a pencil and a cross — which is the
-           product's shape for an action on a ROW in a dense list, and these two
-           sit on a note that is three lines tall with nothing else beside it.
-           A chip names what it does, which is what an irreversible one should.
-           SAME COMPONENT AS THE HEADER'S PAIR: `.ldr-chip`, the mark leading
-           the words, the ground mixed from the ink the words are set in. Blue
-           is §12's "goes somewhere" and red is `--danger-ink`, this build's red
-           as INK — §31 measures both pairs.
-           THE DELETE MARK IS `I.close`, NOT A BIN. The icon set has no `delete`
-           glyph, and trap 7's rule is that a mark is PASTED from the official
-           Rounded set rather than drawn — inventing a path here would be the
-           one thing that file forbids. The × is what this row already used and
-           what every sheet in the build dismisses with. */}
-    <span class="note-a">
+    ${editable ? `<span class="note-a">
       <button class="ldr-chip chip-edit" data-ldrnoteedit="${name}:${i}" aria-label="Edit note" title="Edit">${I.edit}</button>
       <button class="ldr-chip chip-del" data-ldrnotedel="${name}:${i}" aria-label="Delete note" title="Delete">${I.delete}</button>
-    </span>
+    </span>` : ''}
   </div>`;
 };
 
@@ -257,47 +257,23 @@ const ldrNoteRow = (n, name, i) => {
    sake: state 2's row is a heading with a paragraph under it, so a composer
    with one box could only fill that heading by cutting the first sentence off
    the body, which is a guess about the writing dressed up as a feature. */
-const ldrNoteBox = (name, n) => `<div class="note-box">
+/* EPIC 12.4 — the composer: a Type (two radios, neither pre-selected) and one
+   Note field, 1-2000 characters. No title. The chosen type lives in `S.ldrNoteK`
+   so it survives the render a type press triggers; Save reads the textarea and
+   the chosen type, both required. */
+const ldrNoteBox = (name, n) => { const cur = n ? n.k : S.ldrNoteK;
+  return `<div class="note-box">
     <span class="note-mk note-mk-w">${I.edit}</span>
-    ${''/* THE TYPE AND THE TWO BUTTONS ARE INSIDE THE BOX (Maryam, 2 Sep 2026:
-           "the type selection should not have a bottom line and it should be
-           inside the note block at the bottom left, and it should have a
-           chevron with it so user knows that there is some kind of selection
-           option here"). The textarea kept the frame and the row sat under it,
-           so the composer read as a field and then two unrelated controls; one
-           box holding all three is the reference's own arrangement and says
-           they belong to the note being written.
-           SO THE FRAME MOVES OFF THE TEXTAREA AND ONTO `.note-fbox`, and the
-           textarea goes borderless inside it — otherwise the box has a second
-           box in it, which is the thing this whole pass has been removing.
-           THE CHEVRON IS A REAL `I.chevDown` OVER A REAL `<select>`, not a
-           background image and not a menu of our own: the select keeps the
-           keyboard and the platform's own picker, and the mark sits over it
-           with `pointer-events:none` so a press still opens it. */}
     <div class="note-form">
-      <input class="inp note-ttl" id="ldrNoteT" placeholder="A short title"
-        value="${n ? n.t.replace(/"/g,'&quot;') : ''}" aria-label="Note title">
+      <div class="note-types" role="radiogroup" aria-label="Note type">
+        ${Object.keys(NOTE_K).map(k => `<button type="button" class="note-type${cur===k?' on':''}"
+          role="radio" aria-checked="${cur===k}" data-ldrnotek="${k}"
+          style="--note-ink:var(${NOTE_K[k].ink})"><span class="note-type-dot"></span>${NOTE_K[k].t}</button>`).join('')}
+      </div>
       <div class="note-fbox">
-        <textarea class="inp note-body" id="ldrNoteB" rows="3"
-          placeholder="Write your note here…" aria-label="Note">${n ? n.b || '' : ''}</textarea>
+        <textarea class="inp note-body" id="ldrNoteB" rows="3" maxlength="2000"
+          placeholder="What did you observe? (1 to 2000 characters)" aria-label="Note">${n ? n.b || '' : ''}</textarea>
         <div class="note-form-a">
-          ${''/* THE LABEL IS DRAWN AND THE SELECT IS LAID OVER IT INVISIBLY
-                 (Maryam, 2 Sep 2026: "take the chevron close to the type, it
-                 should have only 8px gap"). A native `<select>` at `width:auto`
-                 sizes to its WIDEST option, so with "Area to develop" in the
-                 list the box stayed that wide whatever was chosen and the
-                 chevron sat ~100px past the word — nothing in CSS shrinks a
-                 select to its selected option. Drawing the chosen label as text
-                 and stretching the real select over the pair gives the exact
-                 width, keeps the keyboard and the platform's own picker, and
-                 costs one span. */}
-          <span class="note-sel-w">
-            <span class="note-sel-t">${NOTE_K[(n ? n.k : S.ldrNoteK)] ? NOTE_K[(n ? n.k : S.ldrNoteK)].t : NOTE_K.general.t}</span>
-            <span class="note-sel-ch">${I.chevDown}</span>
-            <select class="note-sel" id="ldrNoteK" aria-label="Note type">
-              ${Object.keys(NOTE_K).map(k => `<option value="${k}"${(n ? n.k : S.ldrNoteK) === k ? ' selected' : ''}>${NOTE_K[k].t}</option>`).join('')}
-            </select>
-          </span>
           <span class="note-form-b">
             <button class="btn btn-s btn-sm noic note-cancel" data-ldrnotecancel="1">Cancel</button>
             <button class="btn btn-p btn-sm noic" data-ldrnotesave="${name}">Save note</button>
@@ -305,11 +281,36 @@ const ldrNoteBox = (name, n) => `<div class="note-box">
         </div>
       </div>
     </div>
-  </div>`;
+  </div>`; };
 
-const ldrNotesSec = m => {
+/* EPIC 12.4/12.9 — the leader's notes, READ-ONLY and GROUPED under Strengths and
+   Areas to develop, each showing the week it was added. Used on the evaluation
+   screen (and anywhere the notes are shown but not edited). */
+function ldrNoteReadRow(n){
+  const k = NOTE_K[n.k] || NOTE_K.develop;
+  return `<div class="note-row note-ro" data-note-k="${n.k||'develop'}"
+       style="--note-ink:var(${k.ink});--note-bg:color-mix(in srgb, var(${k.ink}) ${k.mix}, var(--layer-01))">
+    <span class="note-b">
+      <span class="note-x">${n.b}${n.edited?' <span class="note-edited">(edited)</span>':''}</span>
+      <span class="note-f"><span class="note-w">Week ${n.wk} &middot; ${n.d}</span></span>
+    </span></div>`;
+}
+function ldrNotesRead(name){
+  const notes = lnotes(name);
+  if(!notes.length) return '';
+  const groups = [['strength','Strengths'],['develop','Areas to develop']];
+  return groups.map(([k,label])=>{
+    const rows = notes.filter(n => (n.k||'develop') === k);
+    if(!rows.length) return '';
+    return `<div class="note-group"><h3 class="note-group-h">${label}</h3>
+      <div class="note-list">${rows.map(ldrNoteReadRow).join('')}</div></div>`;
+  }).join('');
+}
+
+const ldrNotesSec = (m, c) => {
   const notes = lnotes(m.name);
-  const open = S.ldrNoteAt !== null;
+  const canAdd = leadEditable(c);          /* 12.4: no new note once the cohort closes */
+  const open = canAdd && S.ldrNoteAt !== null;
   const editing = S.ldrNoteAt >= 0 ? notes[S.ldrNoteAt] : null;
   /* THE SECTION LOST ITS FURNITURE (Maryam, 2 Sep 2026: "there are a lot of
      unnecessary lines in this section"). Four things went and each was drawing
@@ -337,19 +338,21 @@ const ldrNotesSec = m => {
      lost: it is the one sentence the empty state still makes, which is where a
      reader who has never written a note actually needs it. */
   return `<div class="sec">
-    <div class="sec-h"><h2>Your private notes</h2>
-      ${open ? '' : `<button class="btn btn-g btn-sm ic-l" data-ldrnote="${m.name}">${I.edit} Add note</button>`}
+    <div class="sec-h"><h2>Your notes on ${m.name.split(' ')[0]}</h2>
+      ${(open || !canAdd) ? '' : `<button class="btn btn-g btn-sm ic-l" data-ldrnote="${m.name}">${I.edit} Add note</button>`}
     </div>
     ${!notes.length && !open
       ? `<div class="note-panel note-empty">
           <span class="note-mk note-mk-lg">${I.edit}</span>
-          <h3>No notes added yet</h3>
-          <p>Write anything that helps capture ${m.name.split(' ')[0]}&rsquo;s progress, strengths and areas to develop. These private notes feed the 90-day summary.</p>
-          <button class="btn btn-s noic note-first" data-ldrnote="${m.name}">${I.add} Add your first note</button>
+          <h3>No notes yet</h3>
+          <p>${canAdd
+            ? `Write anything that helps capture ${m.name.split(' ')[0]}&rsquo;s strengths and areas to develop. These private notes are yours, and you draw on them when you write the 90-day recommendation.`
+            : 'This cohort has closed, so no note can be added. Your notes stay with your past cohort record.'}</p>
+          ${canAdd ? `<button class="btn btn-s noic note-first" data-ldrnote="${m.name}">${I.add} Add your first note</button>` : ''}
         </div>`
       : `<div class="note-list">
           ${open ? ldrNoteBox(m.name, editing) : ''}
-          ${notes.map((n,i) => ldrNoteRow(n, m.name, i)).join('')}
+          ${notes.map((n,i) => ldrNoteRow(n, m.name, i, c)).join('')}
         </div>`}
   </div>`;
 };
@@ -615,6 +618,233 @@ const pastCohortCard = c => `<button class="cco clk" data-go="leadCohort" data-l
       </span>
     </span>
   </button>`;
+
+/* EPIC 12.2 — My Cohort lives in lead2.js, not lead.js: it reads lead2's own
+   helpers (lchDone, lidle, lmemOf), which are in their temporal dead zone during
+   lead.js's foot render(). Placed here, lead.js's foot render falls back to the
+   candidate dashboard (V.leadDash undefined then) and lead2's foot render draws
+   it once every const it needs exists. */
+/* ==========================================================================
+   EPIC 12.2 — MY COHORT  (the leader's landing screen)
+
+   The old dashboard was a queue-of-everything with a four-cell scroll-spy
+   (`LEAD_JUMPS`). The story replaces that with one cohort's view: a cohort
+   header (name, course, day/week, dates, count + levels, average progress, the
+   next session with a countdown), a Summary by Tal, three aggregate counters
+   (average progress / below pass mark / never signed in — NO attendance counter,
+   attendance is worked out per candidate), the candidate table (filter by level,
+   search by handle or shown name, every column sortable), the LightspeedVT
+   last-read stamp, and a Past cohorts band. `LEAD_JUMPS`, `leadCallsSec`,
+   `lcalCard` and the figure band are retired here (kept defined, unread).
+   ========================================================================== */
+
+const mAv = (m, size) => avatar({i:m.ini, img:AV[m.img]}, size);
+
+/* levels present in a cohort, in ladder order (12.2) */
+const LVL_ORDER = ['E1','E2','E3','E4','E5','B1','B2','B3','B4','B5','T1','T2','T3','T4','T5'];
+const levelsPresent = c => [...new Set(c.members.map(mlevel))].sort((a,b)=>LVL_ORDER.indexOf(a)-LVL_ORDER.indexOf(b));
+const levelsLabel = c => { const l = levelsPresent(c); return l.length===1 ? l[0] : l[0]+'–'+l[l.length-1]; };
+
+/* time on the course, the story's words: "14 h 20 min" / "None" (12.2/12.3) */
+const lTimeFull = mins => !mins ? 'None' : mins<60 ? mins+' min' : Math.floor(mins/60)+' h '+(mins%60)+' min';
+/* chapters retaken, derived from the avg-attempts figure (§74 — the seed has the
+   average only). */
+const lretaken  = m => Math.max(0, Math.round((Math.min(2, m.att||0) - 1) * lchDone(m)));
+
+/* --- the candidate table (12.2): level filter, sort, search ------------- */
+function ldrSortKey(c, k){
+  return ({
+    name:  m => handleOf(m).toLowerCase(),
+    level: m => LVL_ORDER.indexOf(mlevel(m)),
+    ch:    m => m.pc,
+    assess:m => m.avg,
+    att:   m => (m.att||0),
+    time:  m => lmins(m),
+    atd:   m => { const a = leadAttn(m,c); return a.held ? a.att/a.held : -1; },
+    last:  m => m.last==='Never' ? 99999 : (m.last==='Today') ? 0 : (m.last==='Yesterday') ? 1 : lidle(m)
+  }[k]) || (m => handleOf(m).toLowerCase());
+}
+function leadRoster(c){
+  let rows = c.members.slice();
+  const lvl = (S.ddVal && S.ddVal.ldrlvl) || 'All levels';
+  if(lvl !== 'All levels') rows = rows.filter(m => mlevel(m) === lvl);
+  const so = S.ldrSort || {k:'name', dir:1};
+  const key = ldrSortKey(c, so.k);
+  rows.sort((a,b)=>{ const x=key(a), y=key(b); return (x<y?-1:x>y?1:0) * so.dir; });
+  return rows;
+}
+/* SEARCH FILTERS THE DOM, NOT THE STATE — the caret survives (the technique the
+   deleted queue's note records). Re-applied after every paint by the render
+   wrapper, so a level pick or a sort does not lose it. */
+function ldrRosterSearch(inp){ S.ldrRosterQ = inp.value; leadApplyRosterSearch(); }
+function leadApplyRosterSearch(){
+  const q = (S.ldrRosterQ||'').trim().toLowerCase();
+  device.querySelectorAll('.lead-roster tr[data-rname]').forEach(tr=>{
+    tr.hidden = !!q && !tr.getAttribute('data-rname').includes(q);
+  });
+}
+function ldrSortTh(k, label, extra){
+  const so = S.ldrSort || {k:'name', dir:1};
+  const on = so.k === k;
+  const ar = on ? `<svg viewBox="0 0 24 24" class="srt-a${so.dir<0?' srt-dn':''}">${inner('arrowUp')}</svg>` : '';
+  return `<th class="srt${on?' on':''}${extra||''}" data-ldrsort="${k}"><span class="srt-b">${label}${ar}</span></th>`;
+}
+function leadRosterTable(c){
+  const rows = leadRoster(c);
+  return `<div class="tbl-wrap"><table class="tbl lead-roster">
+    <tr>
+      ${ldrSortTh('name','Candidate')}
+      ${ldrSortTh('level','Level')}
+      ${ldrSortTh('ch','Chapters',' num')}
+      ${ldrSortTh('assess','Assessment',' num')}
+      ${ldrSortTh('att','Attempts',' num')}
+      ${ldrSortTh('time','Time on course',' num')}
+      ${ldrSortTh('atd','Attendance',' num')}
+      ${ldrSortTh('last','Last active')}
+      <th class="lead-roster-act">Actions</th>
+    </tr>
+    ${rows.map(m=>{
+      const a = leadAttn(m,c), done = lchDone(m), mins = lmins(m), rt = lretaken(m);
+      const low = m.avg>0 && m.avg<75;
+      return `<tr data-rname="${leadPlain(m).toLowerCase()}">
+        <td><span class="rname">${mAv(m,32)}${leadName(m)}</span></td>
+        <td>${mlevel(m)}</td>
+        <td class="num">${done} <span class="t-helper-01">of 13</span><span class="cell-sub">${m.pc}%</span></td>
+        <td class="num${low?' cell-low':''}">${m.avg?m.avg+'%':'<span class="t-helper-01">&mdash;</span>'}</td>
+        <td class="num">${rt?rt+' retaken':'<span class="t-helper-01">0</span>'}<span class="cell-sub">avg ${(m.att||0).toFixed(1)}</span></td>
+        <td class="num">${mins?lTimeFull(mins):'None'}${mins?`<span class="cell-sub">${Math.round(mins/Math.max(1,done))} min a chapter</span>`:''}</td>
+        <td class="num">${a.held?a.att+' of '+a.held:'<span class="t-helper-01">&mdash;</span>'}</td>
+        <td>${m.last==='Never'?'Never':m.last}</td>
+        <td class="tbl-act"><span class="row-acts">
+          <button class="btn btn-t btn-sm ic-l" data-go="leadMember" data-ldrmem="${m.name}" data-ldrco="${c.id}">${I.chart} View Progress</button>
+          <button class="btn btn-t btn-sm ic-l" data-ldrdm="${m.name}">${I.chat} Contact</button></span></td>
+      </tr>`;
+    }).join('')}
+  </table></div>
+  <p class="lead-sync">Course figures last read from LightspeedVT ${LEAD_SYNC} (${LEAD_TZ}).</p>`;
+}
+
+/* --- the cohort header (12.2) ------------------------------------------- */
+function leadCohortHead(c){
+  const next = leadNextSession(c);
+  const nextLine = next
+    ? `Week ${next.week} &middot; ${next.chapter} &middot; <b>${sesCountdown(next)}</b>`
+    : 'No session is scheduled yet.';
+  return `<div class="sec sec-noline"><div class="lead-cohd">
+    <div class="lead-cohd-id">
+      <h2 class="lead-cohd-n">${lname(c)}</h2>
+      <p class="lead-cohd-course">${lcourse(c)}</p>
+    </div>
+    <div class="lead-cohd-day">
+      <span class="lead-cohd-dw"><b>Day ${c.day} of 90</b><span>Week ${leadWeek(c.day)} of 13</span></span>
+      <span class="lead-cohd-dates">${c.start} &ndash; ${c.end}</span>
+    </div>
+    <div class="lead-cohd-kv">
+      <div class="lead-cohd-cell"><span class="lead-cohd-l">Candidates</span><span class="lead-cohd-v">${c.members.length} &middot; ${levelsLabel(c)}</span></div>
+      <div class="lead-cohd-cell"><span class="lead-cohd-l">Average progress</span><span class="lead-cohd-v">${lavg(c,'pc')}%</span></div>
+      <div class="lead-cohd-cell lead-cohd-next"><span class="lead-cohd-l">Next session</span><span class="lead-cohd-v">${nextLine}</span></div>
+    </div>
+  </div></div>`;
+}
+
+/* --- three aggregate counters (12.2) ------------------------------------ */
+function leadCounters(c){
+  const below = c.members.filter(m => m.avg>0 && m.avg<75).length;
+  const never = c.members.filter(m => m.last==='Never').length;
+  return `<div class="sec">
+    <div class="sec-h"><h2>This week at a glance</h2></div>
+    <div class="facts pf-facts lead-counts">
+      ${pfFact(I.growth, '--mk-4', 'Average progress', lavg(c,'pc') + '%')}
+      ${pfFact(I.chart,  '--mk-1', 'Below pass mark', String(below))}
+      ${pfFact(I.misuse, '--mk-2', 'Never signed in', String(never))}
+    </div>
+  </div>`;
+}
+
+/* --- past cohorts (12.2) ------------------------------------------------ */
+/* Every cohort this leader has led, read-only, with its course, dates, final
+   count and how many recommendations were written. A cancelled cohort is marked
+   Cancelled. Opens the cohort read-only. */
+const leadRecsWritten = c => LEAD_SUMMARIES.filter(s => s.cohort === c.id && s.status === 'done').length;
+function leadPastSection(){
+  if(!LEAD_PAST.length) return '';
+  return `<div class="sec" id="lead-past">
+    <div class="sec-h"><h2>Past cohorts</h2></div>
+    <div class="tile-stack">
+      ${LEAD_PAST.map(c=>{
+        const cancelled = c.status === 'cancelled';
+        return `<button class="cardrow lead-past-row clk" data-go="leadCohort" data-ldrco="${c.id}">
+          <span class="cardrow-b">
+            <span class="cardrow-t">${lname(c)}${cancelled?' <span class="tag sm">Cancelled</span>':''}</span>
+            <span class="cardrow-s">${lcourse(c)} &middot; ${c.start} &ndash; ${c.end} &middot; ${c.members.length} candidates &middot; ${leadRecsWritten(c)} recommendations written</span>
+          </span>
+          <span class="cardrow-go">${I.chevRight}</span>
+        </button>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
+V.leadDash = () => {
+  const c = leadLive();
+
+  /* NO LIVE COHORT (12.1/12.2): the workspace still opens; past cohorts stay
+     readable, and the actions that need a current cohort are simply absent. */
+  if(!c) return `<main class="main"><div class="page">
+    ${ph('My Cohort')}
+    <div class="sec"><div class="empty" style="border:0">${I.group}
+      <h3>You are not leading a cohort at the moment.</h3>
+      <p>Your past cohorts stay readable below, including your recommendations and notes.</p></div></div>
+    ${leadPastSection()}
+  </div></main>`;
+
+  const pend = lpending();
+  const s0 = LEAD_SUMMARIES.filter(s => s.status === 'pending');
+  const next = leadNextSession(c);
+  /* SUMMARY BY TAL (12.2), written to the leader about the week. Leads on a
+     waiting recommendation, else on the next session, else on the cohort's pace.
+     No em dashes (Tal's voice). */
+  const talRead = pend
+    ? {h:`${pend === 1 ? 'One recommendation is' : 'Two recommendations are'} waiting on you`,
+       p:`${s0.map(s => `<b>${s.name}</b>`).join(' and ')} finished the 90 days in Cohort ${s0[0].cohort}. Nothing reaches their next agent until you send what you saw.`,
+       a:'leadEvals', ab:'Open evaluations'}
+    : next
+    ? {h:`Cohort ${c.id} is ${sesCountdown(next).toLowerCase()==='live now'?'live now':'meeting '+sesCountdown(next)}`,
+       p:`Week ${leadWeek(c.day)} of 13, ${c.members.length} candidates, averaging ${lavg(c,'pc')}%. ${c.members.filter(m=>m.flag&&m.flag.k==='bad').length} need a look before ${next.chapter}.`,
+       a:'leadSessions', ab:'Open sessions'}
+    : {h:`Cohort ${c.id} at week ${leadWeek(c.day)}`,
+       p:`${c.members.length} candidates, averaging ${lavg(c,'pc')}%. No session is on the schedule, so the next thing is to put one there.`,
+       a:'leadSessions', ab:'Open sessions'};
+
+  return `<main class="main"><div class="page">
+  ${ph('My Cohort')}
+  <div class="sec">
+    <div class="ai-aura tile">
+      <div class="ai-head">${talLabel()}<h3>${talRead.h}</h3></div>
+      <div class="ai-body"><p>${talRead.p}</p></div>
+      <div class="ai-foot noline">
+        <button class="btn btn-p btn-sm ic-l ai-do" data-go="${talRead.a}">${I.arrowRight}${talRead.ab}</button>
+        <span class="sp"><button class="ic" aria-label="Helpful">${I.thumbsUp}</button><button class="ic" aria-label="More">${I.overflow}</button></span></div>
+      <div class="ai-asks">
+        ${askChip('Who should I worry about this week?','Who should I worry about?')}
+        ${askChip('Brief me for the next session','Brief me for the next session')}
+      </div>
+    </div>
+  </div>
+  ${leadCohortHead(c)}
+  ${leadCounters(c)}
+  <div class="sec" id="lead-roster">
+    <div class="sec-h"><h2>Candidates</h2></div>
+    <div class="lead-roster-tools">
+      <label class="lead-search"><span class="lead-search-mk">${I.search}</span>
+        <input type="search" placeholder="Search by handle or name" value="${(S.ldrRosterQ||'').replace(/"/g,'&quot;')}" oninput="ldrRosterSearch(this)"></label>
+      <span class="lead-roster-filter">${dd('ldrlvl', ['All levels'].concat(levelsPresent(c)), (S.ddVal&&S.ddVal.ldrlvl)||'All levels')}</span>
+    </div>
+    ${leadRosterTable(c)}
+  </div>
+  ${leadPastSection()}
+</div></main>`;
+};
 
 V.leadCohorts = () => {
   const flagged = lmembers().filter(x => x.m.flag);
@@ -1034,178 +1264,83 @@ const LDR_SCENES = [
   ['Re-planning the week after a setback','Composure','minute 51','1:18']
 ];
 
+/* EPIC 12.3 — a candidate's progress detail, read from LightspeedVT (attendance
+   is the one figure this platform keeps). What the leader must NOT see is written
+   into the page by its ABSENCE: no interview recordings, transcripts or Level
+   Reports, no AI raw score, no other leader's notes, and the real name only where
+   the candidate chose to show it. The old interview-scenes row is removed for
+   exactly that reason. */
 V.leadMember = () => {
   const c = lco();
   const m = lmemOf(c, S.ldrMem);
-  const d = m.pc - lpace(c);
   const done = lchDone(m);
-  const notes = lnotes(m.name);
   const first = m.name.split(' ')[0];
-  const [tk,tl] = ltask(m,c);
-
-  /* Three scenes, chosen by the name so they are stable, in the wireframe's
-     own arithmetic. */
-  let seed = 0; for(let i = 0; i < m.name.length; i++) seed += m.name.charCodeAt(i);
-  const pick = [seed % 6, (seed + 2) % 6, (seed + 4) % 6];
+  const low = m.avg>0 && m.avg<75;
+  const att = leadAttn(m, c);
+  const joinWk = memJoinWeek(m);
+  const past = leadSessionsOf(c).filter(s => s.status==='scheduled' && sesPast(s) && joinWk <= s.week);
 
   return `<main class="main"><div class="page">
-  ${crumb(['Cohorts','leadCohorts'],[lname(c),'leadCohort'], m.name)}
-  ${/* THE HEADER TAKES NO ACTION, and the two actions sit together instead.
-        "Add a note" was in `ph()`'s action slot, hard right of the h1, while
-        "Message" sat in the identity row 80px below it — two things you can do
-        about one person, drawn as far apart as the page allows, and the one in
-        the header was the loudest object above the fold on a page whose subject
-        is a record. They are one group: the person, then what you can do about
-        them, in the row that names them. Same argument the interviews page
-        makes for emptying its own header slot (views.js `V.interviews`). */''}
-  ${ph(m.name, `${lname(c)} &middot; ${llevel(c)} &middot; week ${c.week} &middot; last active ${m.last.toLowerCase()}`)}
+  ${crumb(['My Cohort','leadDash'], m.name)}
+  ${ph(m.name)}
   <div class="sec">
     <div class="idhead">
       <span class="av-ph" style="width:72px;height:72px"><i>${m.ini}</i><img src="${AV[m.img]}" alt=""></span>
       <div class="idhead-b">
-        <span class="idname">${m.name}</span>
-        ${''/* THE COURSE IS THE THIRD FACT ABOUT WHERE THIS PERSON IS (2 Sep
-               2026), and this row is the only place on the page that says it —
-               §78 hides the `.ph` on every leader page, so `ph()`'s fact row
-               above is not drawn and this `.idmeta` IS the candidate's context
-               line. What they are taking matters here for the same reason the
-               level does: the figures underneath are read against a course. */}
-        <span class="idmeta">${llevel(c)} &middot; ${lname(c)} &middot; ${lintent(c)}</span>
+        <span class="idname">${leadName(m)}</span>
+        <span class="idmeta">${mlevel(m)} &middot; Day ${c.day} of 90 &middot; Week ${leadWeek(c.day)} of 13${joinWk>1?` &middot; joined week ${joinWk}`:''}</span>
         ${m.flag ? lflagTag(m.flag) : '<span class="tag green sm">On track</span>'}
       </div>
-      ${/* MESSAGE FIRST, NOTE SECOND. A message goes TO them and a note is
-            for the leader's own record, so the outward-facing one leads; and
-            the note keeps the pencil it carried in the header. Both are
-            `.btn-g` — neither is the page's primary action, the record is. */''}
-      ${''/* THEY ARE CHIPS NOW, AND THE MARK LEADS (Maryam, 2 Sep 2026: "i
-             need message and notes icons to be on the left side of the texts",
-             "the message and notes should be chips, notes should yellow text
-             and light bg, message should be blue text and light blue bg").
-             `.btn-g` put the glyph after the label — §02's own order for a
-             button, where the trailing mark is the direction of travel. A chip
-             is a label, so its mark leads the words the way `.flag-t`'s does.
-             THE TWO HUES SAY WHICH DIRECTION EACH ONE FACES. Blue is this
-             build's "information / goes somewhere" ink (§12) and the message
-             leaves the page; yellow is the note, which stays. Neither is the
-             accent, because neither is the page's primary action — the record
-             is, which is what `.btn-g` was saying in a different way. */}
       <div class="idhead-a">
-        <button class="ldr-chip chip-msg" data-go="leadMessages">${I.chat} Message</button>
-        <button class="ldr-chip chip-note" data-ldrnote="${m.name}">${I.edit} Add a note</button>
+        <button class="ldr-chip chip-msg" data-ldrdm="${m.name}">${I.chat} Contact Candidate</button>
       </div>
     </div>
   </div>
   <div class="sec">
     <div class="stats">
-      ${''/* SHORT, PLAIN SUB-LINES, NOT INSIGHTS (Maryam, 9 Sep 2026: "i do not
-             want insights like -29 or +1 against pace, please make these line
-             simple and short"). Each sub is now a plain descriptor of what its
-             figure IS — the gap-to-pace judgement, the pass-mark comparison and
-             the "going round twice" reading all come off; the flag column and
-             the figure band above already carry the reading. Attempts rounds to
-             a whole number here too (§O). */}
-      ${statCell(I.growth, 'Progress',   m.pc + '<small>%</small>', 'of the course')}
-      ${statCell(I.chart,  'Assessment', m.avg ? m.avg + '<small>%</small>' : '<small>Not yet</small>', m.avg ? 'course average' : 'not assessed yet')}
-      ${statCell(I.renew,  'Attempts',   m.att ? Math.round(m.att) : '<small>&mdash;</small>', m.att ? 'per chapter' : 'not started')}
-      ${statCell(I.time,   'Time on the course', lhrs(lmins(m)), done ? Math.round(lmins(m)/done) + ' min a chapter' : 'not started')}
+      ${statCell(I.growth, 'Chapters',   done + '<small> of 13</small>', m.pc + '% complete')}
+      ${statCell(I.chart,  'Assessment', m.avg ? `<span class="${low?'stat-low':''}">${m.avg}<small>%</small></span>` : '<small>Not yet</small>', m.avg ? (low?'below the 75% pass mark':'course average') : 'not assessed yet')}
+      ${statCell(I.renew,  'Attempts',   lretaken(m) ? lretaken(m) : '<small>0</small>', (m.att||0).toFixed(1) + ' on average')}
+      ${statCell(I.time,   'Time on course', lmins(m) ? lTimeFull(lmins(m)) : '<small>None</small>', done ? Math.round(lmins(m)/done) + ' min a chapter' : 'not started')}
     </div>
+    <p class="lead-sync">Course figures last read from LightspeedVT ${LEAD_SYNC} (${LEAD_TZ}).</p>
   </div>
-  ${''/* THE COURSE THIS CANDIDATE IS TAKING — name and description, as on the
-         enrolment card (Maryam, 9 Sep 2026: "show the course image, name and its
-         desc that we are showing on the black card while enrolling"). `mcourse` /
-         `courseDesc` read the candidate's own course (the same one the reports
-         table names), so the card matches the row. The enrolment card carries no
-         photographic cover in this build — it is a name over a description — so
-         this is that, in a tile. (`.tile` under a `.sec-h` stacks, as "Your
-         recommendation" on the evaluation screen does.) */}
   <div class="sec">
     <div class="sec-h"><h2>Course</h2></div>
     <div class="tile crs-card">
       <h3 class="t-h3 crs-name">${mcourse(m)}</h3>
       <p class="t-desc crs-desc">${courseDesc(mlevel(m))}</p>
+      ${''/* Open in LightspeedVT (12.3): the deep link into this candidate's course.
+             A prototype link — the real hand-off uses the provider's SSO. */}
+      <a class="btn btn-g btn-sm ic-l crs-lsvt" href="https://www.lightspeedvt.com/" target="_blank" rel="noopener">${I.launch} Open in LightspeedVT</a>
     </div>
   </div>
-  ${''/* PROGRESS BY CHAPTER IS THE CANDIDATE'S OWN LIST (Maryam, 2 Sep 2026,
-         with a screenshot of it: "use that ui but the heading should be
-         Progress by Chapter and show chapters like the candidate with the show
-         all button at bottom"). It replaces a five-column `.tbl` — #, chapter,
-         status, score, attempts — which said the same four things in a shape
-         built for scanning twenty-eight rows rather than reading thirteen.
-         `ldrChRow` IS `chRow`'S MARKUP WITH THE LEADER'S DATA, not a call to it.
-         Every class is §15's (`.ch`, `.ch-num`, `.ch-b`, `.ch-n`, `.ch-tick`,
-         `.ch-m`, `.ch-ic`) so the two portals draw one component, and three
-         things could not cross: `chRow` reads `SCORE`, `GROWTH` and
-         `OPEN_DATES`, which are the SIGNED-IN candidate's own; and it stamps
-         `data-go="chapter:i"`, which from here would open the leader inside
-         somebody else's chapter player.
-         THE TRAIL IS EMPTY ON A FINISHED CHAPTER, WHICH IS THE ONE VISIBLE
-         DIFFERENCE. The candidate's row ends in "Restart" — an action on their
-         own course. A leader cannot restart anybody's chapter, and §60's rule
-         is that a dead control on a live surface is worse than a missing one,
-         so the slot carries the state mark and nothing else.
-         `S.ldrChAll` IS ITS OWN KEY, not the candidate's `S.chAll`. §65 records
-         why: one boolean for two surfaces holds the first one's value the
-         moment they can both be open, and these two can — the portal switch
-         does not reset either. */}
   <div class="sec tint">
-    <div class="sec-h"><h2>Progress by Chapter</h2><span class="t-helper-01">From the course platform</span></div>
+    <div class="sec-h"><h2>Progress by Chapter</h2><span class="t-helper-01">From LightspeedVT</span></div>
     ${done ? `<div class="tile-stack">
       ${(S.ldrChAll ? CH : CH.slice(0,5)).map((_,i) => ldrChRow(i, m, done)).join('')}
     </div>
     <div class="mt4"><button class="btn btn-g" data-ldrchall="1">${S.ldrChAll ? `Show the first five ${I.chevUp}` : `Show all 13 ${I.chevDown}`}</button></div>`
     : `<div class="empty" style="border:0">${I.book}
       <h3>Nothing on the record</h3>
-      <p>${first} has not opened a chapter, so the course platform has sent nothing back. The record fills in the moment they start.</p>
+      <p>${first} has not opened a chapter, so LightspeedVT has sent nothing back. The record fills in the moment they start.</p>
     </div>`}
   </div>
-  ${''/* "THEIR LEVEL" AND "ATTENDANCE AND THIS WEEK" ARE BOTH DELETED (Maryam,
-         2 Sep 2026). What each was and what is left of it:
-         THEIR LEVEL was a four-row `.kv` — quiz band, proposed at interview,
-         signed by their agent, next level — under a sentence explaining that
-         the level is the talent agent's decision and not the leader's. That
-         sentence is the part worth not losing, and it is not lost: `V.leadSum`
-         makes the same point where it matters, on the page where the leader
-         signs something. The four rows were a record of a decision taken in
-         another portal, on a page about how this person is doing this week.
-         ATTENDANCE AND THIS WEEK was four `.facts` cells, and three of the four
-         were DERIVED FROM THE FLAG rather than reported: "calls attended"
-         subtracted 3 from the week if the candidate was flagged and 1 if they
-         were not, and "passed first time" subtracted 1 if their attempts
-         average was over 1. Nothing in this build holds per-candidate
-         attendance (`LEAD_RUN` counts seats per CALL), so those two figures
-         were arithmetic dressed as data — the invented figures §74 rules out —
-         and deleting the section is the honest way to stop printing them. The
-         fourth, "last active", is in the `ph()` line and on the flag chip. */}
-  ${ldrNotesSec(m)}
-  <div class="sec tint">
-    ${''/* THE HEADING STANDS ALONE (Maryam, 2 Sep 2026: "remove the top right
-           The three Maryam chose to show text ... remove the bottom These are
-           the clips ... text as well").
-           BOTH LINES SAID THE SAME THING, ONE ABOVE THE ROW AND ONE BELOW IT:
-           the helper said the candidate chose these three, the paragraph said it
-           again at length and added the privacy rule. Three stills under a
-           heading that names them do not need a caption saying there are three.
-           THE PRIVACY FACT IS NOT LOST — it is on `V.leadProfile`'s data-use row
-           and in the Data use notice, which is where a rule about what a leader
-           may see belongs; a caption under one row of clips is a bad place for a
-           policy, and lead.js's own note cites the sentence rather than this
-           element. */}
-    <div class="sec-h"><h2>Interview scenes</h2></div>
-    ${''/* THE SCENES ARE THE CANDIDATE PORTAL'S CARDS (Maryam, 2 Sep 2026:
-           "Interview scenes section should be from the candidate portal, the
-           three scene row should be added here"). They were `.clip` rows — a
-           40px thumbnail, a title and a caption, stacked — and the candidate
-           sees the same three moments as three stills across a row. One
-           component, both portals, which is the rule `lcTitle` and `bkStamp`
-           already hold this side to.
-           THE STILL IS THE CANDIDATE'S OWN PHOTOGRAPH, which is the one place
-           this improves on the original: `sceneCard` hardcodes `AV.hana`
-           because the candidate portal has exactly one signed-in face, and
-           here the row is about whichever of the 28 you opened. */}
-    <div class="scene-row">
-      ${pick.map((i,n) => ldrSceneCard(LDR_SCENES[i], m, i)).join('')}
-    </div>
+  ${''/* ATTENDANCE (12.3): every session held since the candidate joined, each with
+         the mark and, where the leader wrote one, the session note. This is the one
+         figure not from LightspeedVT — the platform works it out from the room. */}
+  <div class="sec">
+    <div class="sec-h"><h2>Attendance</h2><span class="t-helper-01">${att.held ? att.att + ' of ' + att.held + ' since they joined' : 'no sessions yet'}</span></div>
+    ${past.length ? `<div class="tile-stack">
+      ${past.map(s=>{ const r = s.unavail ? null : memAttended(m, s); const note = SESSION_NOTES[s.id];
+        return `<div class="atd-row">
+          <span class="atd-b"><span class="atd-t">${s.title} &middot; ${s.chapter}</span>
+            <span class="atd-w">${s.date}${note?` &middot; <span class="atd-note">${note}</span>`:''}</span></span>
+          <span class="atd-mark ${s.unavail?'atd-na':r&&r.att?'atd-yes':'atd-no'}">${s.unavail?'Attendance unavailable':r&&r.att?`Attended &middot; ${r.mins} min`:'Did not attend'}</span>
+        </div>`; }).join('')}
+    </div>` : `<div class="empty" style="border:0">${I.calendar}<h3>No sessions held yet</h3><p>Attendance fills in as this cohort's sessions run.</p></div>`}
   </div>
+  ${ldrNotesSec(m, c)}
 </div></main>`;
 };
 
@@ -1622,6 +1757,8 @@ device.addEventListener('click', e => {
   if(co) S.ldrCo = +co.dataset.ldrco;
   const mem = e.target.closest('[data-ldrmem]');
   if(mem) S.ldrMem = mem.dataset.ldrmem;
+  const ses = e.target.closest('[data-ldrses]');   /* EPIC 12.6 — the attendance record */
+  if(ses) S.ldrSes = ses.dataset.ldrses;
 }, true);
 
 /* A TABLE ROW IS A BUTTON, so it answers the keyboard like one. `role=button`
@@ -1654,6 +1791,12 @@ device.addEventListener('click', e => {
   const ctb = e.target.closest('[data-ldrctab]');
   if(ctb){ S.ldrCTab = ctb.dataset.ldrctab; render(); return; }
 
+  /* EPIC 12.2 — the My Cohort roster's sortable columns. Same column toggles
+     the direction; a new column starts ascending. */
+  const srt = e.target.closest('[data-ldrsort]');
+  if(srt){ const k = srt.dataset.ldrsort, cur = S.ldrSort || {k:'name', dir:1};
+    S.ldrSort = {k, dir: cur.k === k ? -cur.dir : 1}; render(); return; }
+
   /* the member page's chapter list, five rows or thirteen */
   if(e.target.closest('[data-ldrchall]')){ S.ldrChAll = !S.ldrChAll; render(); return; }
 
@@ -1665,33 +1808,41 @@ device.addEventListener('click', e => {
      the render that closes the composer, because that render replaces them —
      the same order the sheet needed and the reason `render()` is always last. */
   const nt = e.target.closest('[data-ldrnote]');
-  if(nt){ S.ldrNoteAt = -1; S.ldrNoteK = 'general'; render(); return; }
+  if(nt){ S.ldrNoteAt = -1; S.ldrNoteK = ''; render(); return; }
 
   const ed = e.target.closest('[data-ldrnoteedit]');
   if(ed){
     const raw = ed.dataset.ldrnoteedit, cut = raw.lastIndexOf(':');
     S.ldrNoteAt = +raw.slice(cut + 1);
+    S.ldrNoteK = (S.ldrNotes[raw.slice(0,cut)] || [])[+raw.slice(cut+1)]?.k || '';
     render();
     return;
   }
 
-  if(e.target.closest('[data-ldrnotecancel]')){ S.ldrNoteAt = null; render(); return; }
+  /* 12.4 — the Type radios. A press only records the choice and re-renders (the
+     composer's textarea is read fresh from the DOM on Save, so a re-render here
+     does not lose it — but a keystroke does, hence Type is a render and the note
+     text is not). */
+  const nk = e.target.closest('[data-ldrnotek]');
+  if(nk){ S.ldrNoteK = nk.dataset.ldrnotek; render(); return; }
+
+  if(e.target.closest('[data-ldrnotecancel]')){ S.ldrNoteAt = null; S.ldrNoteK = ''; render(); return; }
 
   const sv = e.target.closest('[data-ldrnotesave]');
   if(sv){
     const name = sv.dataset.ldrnotesave;
-    const tt = device.querySelector('#ldrNoteT'), bb = device.querySelector('#ldrNoteB');
-    const kk = device.querySelector('#ldrNoteK');
-    const t = tt ? tt.value.trim() : '', b = bb ? bb.value.trim() : '';
-    /* A TITLE IS THE ONE REQUIRED FIELD, because it is the row. An empty body
-       draws a two-line row rather than a broken one, which is why `.note-x` is
-       conditional in the markup. */
-    if(!t){ if(tt) tt.focus(); return; }
-    const k = kk ? kk.value : 'general';
+    const bb = device.querySelector('#ldrNoteB');
+    const b = bb ? bb.value.trim() : '';
+    const k = S.ldrNoteK;
+    /* 12.4 — Type and Note are both required. Focus the missing one. */
+    if(!k){ const t0 = device.querySelector('.note-type'); if(t0) t0.focus(); return; }
+    if(!b){ if(bb) bb.focus(); return; }
+    const c = lco();
     S.ldrNotes[name] = S.ldrNotes[name] || [];
-    if(S.ldrNoteAt >= 0) S.ldrNotes[name][S.ldrNoteAt] = {k, t, b, w:S.ldrNotes[name][S.ldrNoteAt].w};
-    else S.ldrNotes[name].unshift({k, t, b, w:'Just now'});
-    S.ldrNoteAt = null;
+    if(S.ldrNoteAt >= 0){ const old = S.ldrNotes[name][S.ldrNoteAt];
+      S.ldrNotes[name][S.ldrNoteAt] = {k, b, wk:old.wk, d:old.d, at:old.at, edited:true}; }
+    else S.ldrNotes[name].unshift({k, b, wk:leadWeek(c.day), d:LEAD_TODAY, at:Date.now()});
+    S.ldrNoteAt = null; S.ldrNoteK = '';
     render();
     return;
   }

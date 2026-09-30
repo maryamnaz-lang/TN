@@ -204,7 +204,13 @@ const lbadge = pts => BDG.filter(b => b.need && pts >= b.need).pop() || null;
    this leader finishes Cohort 41 they take the next one; the shape already
    supports it, and a moderator build simply carries more than one entry here. */
 const LEAD_COHORTS = [
-  {id:41, level:'E3', intent:INTENTS[2], week:5, day:34, call:'Thursday 6:00 PM', callDay:'Today', callTime:'6:00 PM', callOrd:2, starts:'', status:'active', members:[
+  {id:41, level:'E3', intent:INTENTS[2], week:5, day:34, call:'Thursday 6:00 PM', callDay:'Today', callTime:'6:00 PM', callOrd:2, starts:'',
+   /* EPIC 12 (12.2/12.5): the cohort's own dates, its weekly-call base Thursday
+      (ISO + 24h time in the leader's tz) and the completed-delay captured off the
+      course at creation (12.9). Authored placeholder (§74) — day 34 lands "today"
+      (29 Sep 2026) with the week-5 call two days out. */
+   start:'28 Aug 2026', end:'26 Nov 2026', startISO:'2026-08-28', callBaseISO:'2026-09-03', callTimeH:'18:00', completeDelay:7,
+   status:'active', members:[
     lmem('Maryam Naz','MN','hana',46,84,1.3,'Today',1760),
     lmem('Aisha Bello','AB','priya',71,94,1.0,'Today',2610),
     lmem('Daniel Kerr','DK','owen',58,88,1.2,'Today',2140),
@@ -227,7 +233,9 @@ const LEAD_COHORTS = [
    call fields stay for the past-calls history (`LEAD_RUN`) but it never enters the
    upcoming diary — `lcalls` reads `LEAD_COHORTS`, not this. */
 const LEAD_PAST = [
-  {id:33, level:'E1', intent:INTENTS[0], week:11, day:76, call:'Friday 5:00 PM', callDay:'Tomorrow', callTime:'5:00 PM', callOrd:4, starts:'', status:'completed', members:[
+  {id:33, level:'E1', intent:INTENTS[0], week:11, day:76, call:'Friday 5:00 PM', callDay:'Tomorrow', callTime:'5:00 PM', callOrd:4, starts:'',
+   start:'12 Jun 2026', end:'10 Sep 2026', startISO:'2026-06-12', callBaseISO:'2026-06-19', callTimeH:'17:00', completeDelay:7,
+   status:'completed', members:[
     lmem('Owen Clarke','OC','owen',92,87,1.3,'Today',5240),
     lmem('Lena Fischer','LF','lena',88,90,1.0,'Yesterday',4880),
     lmem('Samuel Adeyemi','SA','samuel',84,79,1.6,'Today',4510),
@@ -424,6 +432,197 @@ const LEAD_RUN = [
   {co:41, week:3,  when:'Thursday 21 August', attended:8},
   {co:33, week:9,  when:'Friday 15 August',   attended:8}
 ];
+
+/* ==========================================================================
+   EPIC 12 — THE LEADER WORKSPACE FOUNDATION (stories 12.1-12.9)
+
+   The nine stories reshape this portal into a formal workspace. Three model
+   pieces are new and everything downstream reads them:
+
+   1. THE HANDLE / SHOW-REAL-NAME MODEL (22.3). The leader sees a candidate by
+      avatar and HANDLE. The real name is shown beside the handle ONLY where the
+      candidate switched on "Show my real name to my cohort and cohort leader".
+      A member carries no name-visibility field, so it is authored here:
+      `SHOW_REAL` is the set who opted in, `HANDLE` overrides the derived handle
+      where the candidate portal already fixed one (@maryamsss). `leadName(m)`
+      is the one display helper every roster, table, note, thread and register
+      calls; `leadPlain(m)` is the text the search matches against.
+
+   2. THE SESSION + ATTENDANCE MODEL (12.5/12.6). Cohort calls are weekly across
+      the 90 days. `LEAD_SESSIONS[coId]` is generated once from the cohort's own
+      `callBaseISO` (a Thursday) so a convincing schedule is one series, not
+      thirteen hand-typed rows; one-offs and cancellations are pushed onto it at
+      runtime. Rooms (Twilio), the real join/leave capture, the vendor overlap
+      check and every notification/email send are STUBBED — a held session's
+      register is DERIVED at read time from each member's own engagement
+      (authored §74), and one past session is marked "attendance unavailable" to
+      draw that state. `leadAttn(m,c)` is attended-of-held since the member
+      joined, the one figure on this portal that does not come from LightspeedVT.
+
+   3. THE FIGURES ARE READ FROM A SYNC (19.1). Nothing here is live; the panels
+      state when the figures were last read (`LEAD_SYNC`) in the leader's tz.
+   ========================================================================== */
+
+/* 12.2 — the week is DERIVED from the day, ceil(day/7), capped at 13. A stored
+   `week` already agrees (day 34 -> 5, day 76 -> 11); this is the reader. */
+const leadWeek = day => Math.min(13, Math.max(1, Math.ceil(day / 7)));
+
+/* 12.2/12.3 — the LightspeedVT last-read stamp and the leader's account tz.
+   Authored (§74): a static prototype reads no sync. */
+const LEAD_SYNC = '29 Sep 2026, 14:30';
+const LEAD_TZ   = 'London (UTC+01:00)';
+
+/* --- the handle / show-real-name model (22.3) --------------------------- */
+const HANDLE = {'Maryam Naz':'@maryamsss'};
+/* accepts a member object or a name string, so every call site can hand it `m` */
+const handleOf = x => { const name = typeof x === 'string' ? x : x.name;
+  return HANDLE[name] || '@' + name.split(' ')[0].toLowerCase().replace(/[^a-z0-9]/g,''); };
+/* AUTHORED (§74): who has switched the real-name visibility on. A mix so the
+   leader's roster shows both states — most are handle-only. */
+const SHOW_REAL = new Set(['Maryam Naz','Aisha Bello','Daniel Kerr','Owen Clarke','Grace Mwangi','Hana Kim']);
+const showReal  = m => SHOW_REAL.has(m.name);
+/* The display cell: handle always; the real name beside it only where shown.
+   `leadName` is HTML (two spans §31 styles); `leadPlain` is what search reads —
+   the handle, plus the real name only where the candidate chose to show it. */
+const leadName  = m => showReal(m)
+  ? `<span class="lnm"><span class="lnm-r">${m.name}</span> <span class="lnm-h">${handleOf(m)}</span></span>`
+  : `<span class="lnm"><span class="lnm-h lnm-only">${handleOf(m)}</span></span>`;
+const leadPlain = m => (showReal(m) ? m.name + ' ' : '') + handleOf(m);
+
+/* --- when a member joined (12.2/12.3/12.6) ------------------------------- */
+/* AUTHORED (§74): two members joined after the cohort started, to draw the
+   "joined week N" line and to trim their attendance denominator. */
+const LEAD_JOINED = {'Chloe Ferreira':2, 'Tobias Mensah':3};
+const memJoinWeek = m => LEAD_JOINED[m.name] || 1;
+
+/* --- sessions (12.5) ---------------------------------------------------- */
+/* A session: {id, co, title, chapter, dISO, date, time, dur, repeat, series,
+   week, status, reason, unavail, adhoc}. `date` is the display string, `dISO`
+   the sortable/comparable one. `past`/`live`/`joinable` are derived at read
+   time against LEAD_NOW so they never go stale in the seed. */
+const LEAD_NOW = new Date('2026-09-29T15:00:00');
+const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const dPretty = iso => { const d = new Date(iso + 'T00:00:00'); return d.getDate() + ' ' + MON[d.getMonth()] + ' ' + d.getFullYear(); };
+const dISOadd = (iso, days) => { const d = new Date(iso + 'T00:00:00'); d.setDate(d.getDate() + days); return d.toISOString().slice(0,10); };
+const sesDT   = s => new Date(s.dISO + 'T' + (s.time || '00:00') + ':00');
+const sesEnd  = s => new Date(sesDT(s).getTime() + s.dur * 60000);
+const sesPast = s => sesEnd(s) < LEAD_NOW;               /* the whole session is behind us */
+const sesLive = s => sesDT(s) <= LEAD_NOW && sesEnd(s) >= LEAD_NOW;
+/* Join Call becomes active 5 minutes before the start and stays live to the end. */
+const sesJoinable = s => s.status === 'scheduled' && (sesDT(s) - LEAD_NOW) <= 5*60000 && sesEnd(s) >= LEAD_NOW;
+
+/* THE COUNTDOWN (12.2): whole days until 24h out, then hours, then minutes;
+   inside the 5-minute window it reads "Starting now". */
+function sesCountdown(s){
+  const ms = sesDT(s) - LEAD_NOW;
+  if(ms <= 0) return sesEnd(s) >= LEAD_NOW ? 'Live now' : 'Ended';
+  const mins = Math.round(ms/60000);
+  if(mins <= 5)  return 'Starting now';
+  if(mins < 60)  return 'in ' + mins + ' minutes';
+  const hrs = Math.floor(mins/60);
+  if(hrs < 24)   return 'in ' + hrs + ' hour' + (hrs===1?'':'s');
+  return 'in ' + Math.round(hrs/24) + ' day' + (Math.round(hrs/24)===1?'':'s');
+}
+
+/* Build the weekly series for a cohort off its own base Thursday, one occurrence
+   a week to day 90 and no further (12.5). Chapter = that week's chapter off `CH`
+   (the shared curriculum), so a call in week 4 covers chapter 4 and the fact is
+   never typed twice. `sid` is stable per (cohort, week) so runtime edits target a
+   real occurrence. */
+function leadBuildSeries(c){
+  const out = [];
+  for(let w=1; w<=13; w++){
+    const iso = dISOadd(c.callBaseISO, (w-1)*7);
+    out.push({
+      id:'s'+c.id+'w'+w, co:c.id, series:'wk'+c.id,
+      title:'Cohort '+c.id+' call', chapter:CH[w-1][0],
+      dISO:iso, date:dPretty(iso), time:c.callTimeH, dur:60,
+      repeat:'weekly', week:w, status:'scheduled', unavail:false, adhoc:false
+    });
+  }
+  return out;
+}
+/* The live session store, generated once. Runtime schedule/edit/cancel mutate
+   THIS (never the seed cohort). Registers stay lazy (derived at read). */
+const LEAD_SESSIONS = {};
+LEAD_ALL().forEach(c => { LEAD_SESSIONS[c.id] = leadBuildSeries(c); });
+/* AUTHORED demo states on the active cohort (§74): week 2 produced no
+   participation data (leader never joined) so it reads "Attendance unavailable";
+   one extra ad-hoc Q&A was scheduled then cancelled with a reason. */
+(function(){
+  const ss = LEAD_SESSIONS[41]; if(!ss) return;
+  const w2 = ss.find(s => s.week === 2); if(w2) w2.unavail = true;
+  ss.push({id:'s41x1', co:41, series:null, title:'Extra Q&A before assessment', chapter:'Hard Conversations',
+    dISO:'2026-09-15', date:dPretty('2026-09-15'), time:'19:00', dur:45, repeat:'none', week:leadWeek(19),
+    status:'cancelled', reason:'Clashed with the LightspeedVT maintenance window. I will fold the questions into Thursday.', unavail:false, adhoc:true});
+})();
+
+/* Every session for a cohort, soonest first. */
+const leadSessionsOf = c => (LEAD_SESSIONS[c.id] || []).slice().sort((a,b) => sesDT(a) - sesDT(b));
+/* The next upcoming, scheduled (not cancelled) session — the dashboard header
+   and the Sessions page both read this, so "next" is one answer. */
+const leadNextSession = c => leadSessionsOf(c).find(s => s.status === 'scheduled' && sesEnd(s) >= LEAD_NOW) || null;
+/* Held = a past, non-cancelled session that produced participation data. */
+const leadHeld = c => leadSessionsOf(c).filter(s => s.status === 'scheduled' && sesPast(s) && !s.unavail);
+
+/* Overlap (12.5): two sessions on the same cohort may not overlap. Returns the
+   clashing session or null. A cancelled session is never an overlap. */
+function leadOverlap(c, dISO, time, dur, exceptId){
+  const a0 = new Date(dISO + 'T' + time + ':00'), a1 = new Date(a0.getTime() + dur*60000);
+  return leadSessionsOf(c).find(s => s.id !== exceptId && s.status === 'scheduled'
+    && a0 < sesEnd(s) && a1 > sesDT(s)) || null;
+}
+
+/* --- attendance (12.6) -------------------------------------------------- */
+/* The register is DERIVED (authored §74) — the seed has no room telemetry. A
+   member's chance of attending tracks their engagement; someone idle >= 7 days
+   or who never signed in mostly misses. Stable per (member, session) so it does
+   not flicker across renders. Returns {att, mins} or null (not yet in cohort). */
+function leadHash(str){ let h=2166136261; for(let i=0;i<str.length;i++){ h ^= str.charCodeAt(i); h = (h*16777619)>>>0; } return h; }
+function memAttended(m, s){
+  if(memJoinWeek(m) > s.week) return null;
+  const idle = /(\d+)d ago/.test(m.last) ? +m.last.match(/(\d+)d/)[1] : 0;
+  const chance = m.last === 'Never' ? 0 : idle >= 7 ? 20 : Math.min(96, 55 + Math.round(m.pc/2));
+  const att = (leadHash(m.name + s.id) % 100) < chance;
+  const mins = att ? Math.max(5, Math.round(s.dur * (0.55 + (leadHash(s.id + m.name) % 45)/100)))
+                   : Math.round(s.dur * (leadHash('x'+m.name+s.id) % 4)/100);
+  return {att:att && mins >= 5, mins};
+}
+/* Attended of held since the member joined, leaving out cancelled sessions and
+   sessions with no data (12.6): totals read 4 of 5, not 4 of 6. */
+function leadAttn(m, c){
+  const held = leadHeld(c).filter(s => memJoinWeek(m) <= s.week);
+  let att = 0; held.forEach(s => { const r = memAttended(m, s); if(r && r.att) att++; });
+  return {att, held: held.length};
+}
+/* The register for one held session: every member who belonged when it ran. */
+const SESSION_NOTES = {};   /* runtime session notes, keyed by session id (12.6) */
+function leadRegister(c, s){
+  return c.members.filter(m => memJoinWeek(m) <= s.week)
+    .map(m => ({m, r: memAttended(m, s)}));
+}
+
+/* THE ATTENDANCE MINIMUM AND THE ABSENT-LEADER GAP are Settings defaults
+   (12.5/12.6), shipped as stated constants here. */
+const ATTEND_MIN_MIN = 5;      /* minutes in the room to count as Attended */
+const LEADER_GAP_MIN = 10;     /* a leader offline this long is treated as left */
+
+/* the cohort's last day, ISO (12.5 — a session must fall within the 90 days) */
+const cohortEndISO = c => dISOadd(c.startISO, 89);
+/* the day-of-90 an ISO date falls on for this cohort (1-based) */
+const sesDayOf = (c, dISO) => Math.round((new Date(dISO+'T00:00:00') - new Date(c.startISO+'T00:00:00'))/86400000) + 1;
+
+/* ONE LIVE COHORT AT A TIME (12.1). The leader holds a single active assignment;
+   `leadLive()` is it, or null when they lead none. The workspace opens that
+   assignment automatically and carries no cohort selector. */
+const leadLive = () => LEAD_COHORTS[0] || null;
+
+/* The persistent header context (12.1): cohort name + week, shown throughout the
+   workspace; omitted when there is no live cohort. */
+function leadHeaderChip(){
+  const c = leadLive(); if(!c) return '';
+  return `<span class="lead-hdr"><span class="lead-hdr-n">Cohort ${c.id}</span><span class="lead-hdr-w">Week ${leadWeek(c.day)} of 13</span></span>`;
+}
 /* --------------------------------------------------------------------------
    THE WHOLE COHORT IS HERE, NOT ONLY THE TWO STILL WAITING
    Maryam, 1 Sep 2026: "this evaluation screen will come when a cohort is
@@ -1162,315 +1361,6 @@ const leadCertBanner = () => `<div class="sec">
   </div>
 </div>`;
 
-V.leadDash = () => {
-  const att = lattention(), next = lnext(), pend = lpending();
-  const severe = att.filter(x => x.m.flag.k === 'bad');
-  const moderate = att.filter(x => x.m.flag.k === 'wa');
-  const bad = severe.length;
-  /* THE QUEUE SHOWS THE WORST OF EACH KIND, NOT THE WORST OVERALL. Sorted
-     purely by severity, the seven rows that fit were seven severe ones —
-     week 1 of a new cohort alone contributes four candidates who have never
-     signed in — so the moderate group was invisible and the column that
-     distinguishes them had nothing to distinguish. Four severe and three
-     moderate: the leader sees both populations and the count below says what
-     is not on screen. */
-  const shown = severe.slice(0,4).concat(moderate.slice(0,3));
-  const rest = att.length - shown.length;
-  const c41 = LEAD_COHORTS[0];
-  /* `lcalls()` DIRECTLY, NOT `lbooked()` — that wrapper existed to glue a
-     title, a description and a `go` onto each call for `bookedRow`, and both
-     went with the list on 4 Sep 2026. The figure cell only ever wanted the
-     count and the first call's day and time. */
-  const booked = lcalls();
-
-  /* The figure each card carries, keyed by the section it goes to, so the
-     numbers cannot drift out of step with `LEAD_JUMPS`. */
-  const FIG = {
-    'lead-attention': [att.length,          `${bad} severe`],
-    'lead-waiting':   [pend,                '90-day summaries'],
-    'lead-calls':     [booked.length,       booked[0] ? 'next ' + booked[0].day.toLowerCase() + ' ' + booked[0].time.toLowerCase() : 'nothing this week'],
-    'lead-cohorts':   [LEAD_COHORTS.length, `${lmembers().length} candidates`]
-  };
-
-  /* Tal leads with whatever is most urgent, and the required action follows the
-     same test the wireframe's banner used: a signature blocks a candidate, so
-     it outranks a call that is still two days away.
-     THE FIRST BRANCH IS SUMMARIES NOW, NOT LEVEL DECISIONS (1 Sep 2026), and it
-     is still first for the same reason it always was — nothing about the person
-     it names moves until the leader signs. The second branch is the call the
-     card 40px below already draws, so it says the one thing the card does not:
-     what the brief is FOR. */
-  const s0 = LEAD_SUMMARIES.filter(s => s.status === 'pending');
-  const talRead = pend
-    ? {h:`${pend === 1 ? 'One summary is' : 'Two summaries are'} waiting on you`,
-       p:`${s0.map(s => `<b>${s.name}</b>`).join(' and ')} finished the 90 days in Cohort ${s0[0].cohort}. Nothing reaches their next agent, and no level moves, until you publish what you saw.`,
-       a:'leadEvals', ab:'Open evaluations'}
-    : next
-    ? {h:'Cohort ' + next.co + ' meets ' + next.day.toLowerCase(),
-       p:`Week ${next.week} of 13, ${next.seats} candidates. I can pull a brief from where the cohort actually is rather than from where the syllabus says it should be.`,
-       a:'leadCalls', ab:'Open sessions'}
-    : {h:'Cohort 41 meets on Thursday',
-       p:`Week ${c41.week} of 13. I can pull a brief from where the cohort actually is rather than from where the syllabus says it should be.`,
-       a:'leadCohorts', ab:'Open Cohort 41'};
-
-  return `<main class="main"><div class="page">
-  ${/* THE SAME GREETING THE CANDIDATE GETS. The candidate's dashboard opens
-        "Welcome Back, Maryam!" and this one opened "Hi Priya" — two different
-        greetings for the same moment, in a product where the two portals are
-        the same person's two roles and the switch between them is one click in
-        the app bar. Whichever wording wins, it has to be one wording. */''}
-  ${ph('Welcome back, Priya',`Cohort leader &middot; ${LEAD_COHORTS.length===1?'one active cohort':LEAD_COHORTS.length+' active cohorts'} &middot; ${lmembers().length} candidates, all Explorer`)}
-  <div class="sec">
-    <div class="ai-aura tile">
-      <div class="ai-head">${talLabel()}<h3>${talRead.h}</h3></div>
-      <div class="ai-body"><p>${talRead.p}</p></div>
-      <div class="ai-foot noline">
-        <button class="btn btn-p btn-sm ic-l ai-do" data-go="${talRead.a}">${I.arrowRight}${talRead.ab}</button>
-        <span class="sp"><button class="ic" aria-label="Helpful">${I.thumbsUp}</button><button class="ic" aria-label="More">${I.overflow}</button></span></div>
-      <div class="ai-asks">
-        ${askChip('Brief me for Thursday&rsquo;s call','Brief me for Thursday')}
-        ${askChip('Who should I worry about this week?','Who should I worry about?')}
-      </div>
-    </div>
-  </div>
-  ${''/* THE UPCOMING CALLS, ALL OF THEM (Maryam, 4 Sep 2026). This was
-         `leadCallCard(next)` — one black card holding the next appointment —
-         and the Cohort Calls section 1000px below listed the same three. It is
-         one section now, in this slot, carrying `id="lead-calls"`; the long
-         version is over `lcalCard`.
-         IT IS STILL AFTER TAL'S `.sec` AND THAT IS STILL LOAD-BEARING.
-         `placeBand`'s run walks forward from the `.ph` and stops at the first
-         section that is not head furniture, so whatever stands here is what
-         ends the band — written between the `.ph` and Tal's card it would
-         leave the summary in the page body (trap 11's neighbourhood). */}
-  ${leadCallsSec()}
-  ${''/* THE CERTIFIED COHORT LEADER BADGE sits right after the calls (Maryam,
-         9 Sep 2026) — `leadCertBanner` above. */}
-  ${leadCertBanner()}
-  ${''/* THE FIGURE BAND IS PLAIN STAT CELLS, NOT A STICKY SCROLL-SPY (Maryam,
-         9 Sep 2026: "hide the fix tabs interaction, go with the generic scroll
-         just like other pages"). The cells used to be `data-jump` buttons that
-         scrolled to their section, and a second `.lead-bar` strip stuck to the
-         top of the scroller as a tab navigator lighting the section you were in.
-         Both are gone: the cells are static figures like every other dashboard's
-         and the page scrolls normally. `leadStick`, its scroll/resize listeners
-         and the click-to-jump handler went with them. The four sections keep
-         their ids — the figure counts still read `FIG[id]`. */}
-  <div class="sec">
-    <div class="stats stats-lead">
-      ${LEAD_JUMPS.map(j => statCell(I[j.ic], j.l, FIG[j.id][0], FIG[j.id][1])).join('')}
-    </div>
-  </div>
-  ${''/* THE PLATE STOOD HERE AND IS NOW `leadCallCard(next)`, 60 lines up the
-         page, directly under Tal's summary (Maryam, 31 Aug 2026). Two notes it
-         carried are worth keeping where a reader of this view will look for
-         them:
-
-         NO "NEXT UP" LABEL, AND THE CARD STILL HAS NONE. The eyebrow was a
-         category name over a card of one; what says "next" is the time at the
-         right end of the heading row, which is `.dc-when`'s whole job on §75's
-         card and was `data-when` + `placePlates` on the plate.
-
-         "A PLATE'S BUTTON IS ONE OR TWO SHORT WORDS" NO LONGER APPLIES AND THE
-         REASON IS THE GEOMETRY, NOT A CHANGE OF MIND. §56 gives the band's dark
-         card `minmax(300px,330px)`, so a two-button row had about 250px to
-         divide and "Join the interview" beside "All sessions" set BOTH labels on
-         two lines (measured: 147 + 95 in a 250 row) — which is why this plate's
-         button said `Join` and nothing else. §71 gives `.crow-a` two 185px
-         buttons on a card that spans the page, so "Join call" and "All sessions"
-         each sit on one line with room to spare. §56's rule is still the rule
-         for anything that lands in that column. */}
-  ${''/* THE FOUR SECTIONS ARE IN THE CARDS' ORDER, WHICH IS `LEAD_JUMPS`'
-         ORDER, AND THAT COUPLING IS THE WHOLE DESIGN OF THIS PAGE — the note
-         over that array says it: "the cards are generated from this array and
-         the sections carry these ids, so the only way to reorder either is to
-         reorder this". Maryam reordered it on 1 Sep 2026, so these four blocks
-         moved with it: Attention Required, Awaiting Evaluations (named
-         Awaiting Decisions until 1 Sep 2026), Cohort Calls,
-         Cohorts. Scrolling now lights the cards in the order they are read,
-         which is what makes the sticky band legible as a position indicator.
-
-         THE GROUNDS ALTERNATE BY POSITION, NOT BY SUBJECT. White, tint, white,
-         tint was already the page's rhythm and it is a property of where a
-         section SITS, so the two that swapped ends swapped grounds with them —
-         Attention was tinted when it was second and is white now that it is
-         first. Nothing about §84 or §55 changes; the classes moved. */}
-  <div class="sec" id="lead-attention">
-    ${''/* FIVE THINGS CAME OFF THIS SECTION ON 1 SEP 2026, and they came off
-           together because they were all answers to the same premise: that this
-           was a QUEUE of twelve you had to work through. It is three rows.
-
-           the helper line   "From course activity, not from you" — a caveat
-                             about provenance on a block whose every column is a
-                             number the platform reported. It was earning its
-                             place against twelve rows and a filter, where a
-                             leader might have wondered who decided.
-           the search field  three rows do not need finding.
-           the three chips   All / Severe / Moderate over a list of three, where
-                             two of the three filters leave one row. `.cs` is a
-                             tab strip, and a strip whose every state is legible
-                             in the thing it filters is chrome.
-           the count line    "All 3 flagged candidates." under a table of three
-                             visible rows, which is the table counting itself.
-                             It existed to say what the FILTER was doing.
-           the empty state   nothing can be filtered to nothing any more.
-
-           AND THE JS WENT WITH THEM, not just the markup: `S.leadQ`,
-           `S.leadFilter`, `leadFilterApply`, the `input` and `[data-lfilter]`
-           listeners and the render wrapper's call to it. So did `data-nm` and
-           `data-co` on each row — attributes that existed only for the search to
-           read — and §31's `tr.is-off`. The row still carries `sev` / `mod`,
-           because §31 keys the flag's INK on it and that is a different job. */}
-    <div class="sec-h"><h2>Attention Required</h2></div>
-    ${''/* THE LAST COLUMN IS THE ONE THING TO DO ABOUT A FLAG (Maryam, 1 Sep
-           2026: "add message icon with text Contact at the end of all three
-           rows and take the user on the direct chat with that candidate on
-           click, name this contact column Action").
-
-           IT IS A COLUMN, NOT A CLICKABLE ROW, and that is the difference
-           between this table and the roster's. `lead2`'s `.ldr-tr` rows carry
-           `data-go="leadMember"` and end in a chevron, because there the row IS
-           a person and opening them is the only thing to do. Here the row is a
-           FLAG on a person, and what a leader does about a flag is ask them —
-           `lnotes` and `LDR_THREADS` are both built on that. A named column
-           says which of the two this table is.
-
-           `.btn-t btn-sm ic-l` IS THE BLACK-TEXT CONTROL, the same shape and
-           the same argument as the Calls page's Reschedule: §64 took the border
-           off `.btn-t` and left the ink at `--text-primary`, so a text button
-           on a page IS black words, and §64's trailing arrow does not arrive
-           because its test is `:not(:has(svg))` and this one carries a mark.
-
-           THE MARK IS `I.chat`, WHICH IS THE RAIL'S OWN MESSAGES ICON. One word,
-           one glyph — the control, the module it opens and the rail slot that
-           holds it all wear the same mark, which is what `I.calendar` does for
-           Reschedule across both portals. `I.email` was the alternative and is
-           wrong twice: nothing here sends mail, and the product's own name for
-           this surface is a message.
-
-           IT CANNOT BE A `data-go`, because a view name is all that attribute
-           can carry and this has to name a PERSON as well — `data-ldrdm` is
-           read by lead4's listener, which finds or opens their thread and
-           navigates itself. `gcard`'s `data-ldrco` and `faceRow`'s `data-ldrsum`
-           are the same idiom one step simpler: those two only set state and let
-           `data-go` run, because the view they open is fixed. */}
-    <div class="tbl-wrap">
-      <table class="tbl tbl-flag">
-        <tr><th>Candidate</th><th>Cohort</th><th>Flag</th><th class="num">Progress</th><th class="num">Last active</th><th>Action</th></tr>
-        ${att.map(x=>`<tr class="${x.m.flag.k==='bad'?'sev':'mod'}">
-          <td>${x.m.name}</td>
-          <td>${x.c.id} &middot; ${x.c.level}</td>
-          <td><span class="flag-t">${I[x.m.flag.ic]}${x.m.flag.t}</span></td>
-          <td class="num">${x.m.pc}% <span class="t-helper-01">of ${lpace(x.c)}%</span></td>
-          <td class="num">${x.m.last.toLowerCase()}</td>
-          <td class="tbl-act"><button class="btn btn-t btn-sm ic-l" data-ldrdm="${x.m.name}">${I.chat} Contact</button></td>
-        </tr>`).join('')}
-      </table>
-    </div>
-  </div>
-  <div class="sec tint" id="lead-waiting">
-    <div class="sec-h"><h2>Awaiting Evaluations</h2></div>
-    ${pend?`<div class="tile-stack">
-      ${LEAD_SUMMARIES.filter(s=>s.status==='pending').map(s=>
-        faceRow(s, `90-day summary &middot; Cohort ${s.cohort} &middot; sign to close their 90 days`,
-          'leadSum', `data-ldrsum="${s.id}"`, 'Evaluate Candidate')).join('')}
-    </div>`:`<div class="empty" style="border:0">${I.checkFilled}<h3>Nothing outstanding</h3><p>Every 90-day summary is published.</p></div>`}
-  </div>
-  ${''/* THE COHORT CALLS SECTION STOOD HERE AND IS NOW THE ROW AT THE TOP OF
-         THE PAGE (Maryam, 4 Sep 2026), which is a MERGE and not a move: this
-         section listed `lcalls()` as `bookedRow`s while `leadCallCard(lnext())`
-         drew the first of the same three 1000px above it, and with one call per
-         cohort those are the same list. `leadCallsSec` carries `id="lead-calls"`
-         so the figure cell and the sticky tab still have their target.
-
-         TWO NOTES FROM IT ARE WORTH KEEPING WHERE A READER OF THIS VIEW WILL
-         LOOK FOR THEM, because both are still live decisions:
-
-         THE WAY OUT BELONGS IN THE HEADING ROW (31 Aug 2026). The section's
-         sentence — "Interviews and cohort calls, in the order they happen" —
-         came off because it described the list underneath it, and its slot is
-         where the section's control goes. `aiHead` puts `View all sessions`
-         there, and `Your cohorts` below still states the plain `.sec-h` version
-         of the same shape.
-
-         "Your availability" IS GONE FROM THE PAGE, NOT MOVED — it is a profile
-         setting, reachable from the account menu and from `leadProfile`, and it
-         was the second of two buttons under a list whose own action is on every
-         row.
-
-         AND THE HEADING WORD: "Cohort Calls" replaced "Booked" on 1 Sep 2026,
-         because nobody books a cohort leader and the word that named a diary of
-         two kinds named nothing once one kind was left. The figure CARD still
-         says Cohort Calls — that label is `LEAD_JUMPS`' and is untouched; the
-         section's own heading is now the reference's "Your upcoming calls",
-         which is what a row of what-is-coming is. */}
-  ${''/* THE GROUND FLIPS TO WHITE AND THAT IS POSITION, NOT SUBJECT. This page
-         alternates white / tint / white / tint down its sections, and with the
-         calls section out of position 3 the two that follow Attention would
-         both have been tinted. `lead-cohorts` takes the white slot the calls
-         section vacated. */}
-  <div class="sec" id="lead-cohorts">
-    ${''/* "VIEW ALL COHORTS", NOT "VIEW ALL 3" (Maryam, 1 Sep 2026). The count
-           was doing the naming, which works only while the reader can see that
-           the three rows under it ARE all of them — and the section's own
-           heading is "Your cohorts", so the button repeated a number the list
-           already showed instead of saying where it goes. The label is now the
-           destination, which is what `View all agents` and `View all calls` do
-           on the two cards that already had the choice.
-           IT NO LONGER READS `LEAD_COHORTS.length`, and that is a small loss
-           worth naming: a fourth cohort used to change this label by itself.
-           What it must not do is disagree with the list, and it cannot now —
-           the word is true at any count.
-           NO `${I.arrowRight}` IN THE LABEL, because §64 puts one there: a
-           `.btn-g` with no `<svg>` of its own gets the trailing arrow as a
-           `mask-image` (`:not(:has(svg))` is that layer's test). Writing the
-           glyph would swap an 18px mask for a 20px icon and change the button's
-           metrics on a copy edit. */}
-    <div class="sec-h"><h2>Your cohorts</h2><button class="btn btn-g btn-sm noic" data-go="leadCohorts">View All Cohorts</button></div>
-    <div class="tile-stack">
-      ${LEAD_COHORTS.map(c=>{
-        const b = c.members.filter(m=>m.flag&&m.flag.k==='bad').length;
-        const ahead = lavg(c,'pc') >= lpace(c);
-        /* THE ROW OPENS THE COHORT, NOT THE COHORTS PAGE (Maryam, 1 Sep 2026).
-           It was `data-go="leadCohorts"`, which landed on a list of the same
-           three rows — the same shape the Awaiting Evaluations rows had, and
-           answered the same way: `gcard`'s seventh argument carries
-           `data-ldrco`, lead2's capture-phase listener sets `S.ldrCo`, and
-           `V.leadCohort` is a pure function of it. The heading row's "View all
-           3" is still how you reach the list, which is the whole reason a row
-           does not have to be it. */
-        /* THE EYEBROW NAMES THE COURSE BETWEEN THE COHORT AND THE LEVEL (2 Sep
-           2026), which is the reading order a leader scans: WHICH cohort, WHAT
-           they are taking, HOW FAR UP the ladder it is. It goes in the eyebrow
-           rather than the title because the title is "Week 5 of 13" — a
-           position, not a name — and the course is the caption for the cover
-           16px to its left. */
-        /* AND THE ROW ENDS IN A BARE ARROW. It carried `.row-cta` reading "View
-           Cohort" for one build and Maryam took it off the same afternoon
-           ("remove the view cohort"), which is `bookedRow`'s own rule arriving
-           at the row it was written about: three rows in a column, each ending
-           in the same two words, says only "these are the same kind of thing" —
-           and the section's heading row already ends in "View All Cohorts", so
-           the label was that control's words repeated three times underneath it.
-           The Awaiting Evaluations queue keeps its label: one verb, on a queue
-           whose heading row has no control of its own. */
-        return gcard('cohort', lname(c)+' &middot; '+lintent(c)+' &middot; '+llevel(c),
-          'Week '+c.week+' of 13',
-          `${c.call} &middot; ${lavg(c,'pc')}% average progress against ${lpace(c)}% expected`
-          + (b?` &middot; ${b} at risk`:ahead?' &middot; on pace':''), 'leadCohort',
-          null /* course cover removed 9 Sep 2026 — cohorts are not courses; the cohort's own 'group' mark shows */, `data-ldrco="${c.id}"`);
-      }).join('')}
-    </div>
-  </div>
-  ${''/* "YOUR STANDING" IS OFF THE DASHBOARD (Maryam, 31 Aug 2026), AND IT
-         IS NOT LOST — `V.leadProfile` (lead4.js) draws the same four figures
-         under the same heading, which is where a record of your own belongs:
-         the dashboard is a queue of what needs you today, and a lifetime
-         rating sitting under it was the one section that asked for nothing.
-         `leadStick`'s exit trigger moved with it — see the note there. */}
-</div></main>`;
-};
-
 /* ==========================================================================
    ALL SEVEN MODULES ARE DRAWN, AND NOT IN THIS FILE
 
@@ -1565,6 +1455,10 @@ render = function(){
   try {
     const app = device.querySelector('.app');
     if(app) app.dataset.portal = S.portal || 'candidate';
+    /* EPIC 12.2 — re-apply the My Cohort roster search after every paint, so a
+       sort or a level pick does not lose the typed query (the DOM-filter
+       technique the deleted queue's note records). No-op off that page. */
+    if(typeof leadApplyRosterSearch === 'function') leadApplyRosterSearch();
     /* `leadStick()` was called here to drive the sticky position-indicator; the
        bar and its scroll-spy were removed 9 Sep 2026 (see the note above), so the
        wrapper now only stamps `data-portal`, which both stylesheets scope on. */

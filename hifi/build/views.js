@@ -423,6 +423,18 @@ function shell(){
     <button class="shell-logo" data-go="${isLead()?'leadDash':'dashboard'}" aria-label="TalentNext home"><img src="${LOGO_K}" alt="TalentNext"></button>
     ${crumbBar()}
     <div class="shell-right">
+      ${isLead() && V.leadDash ? leadHeaderChip() : ''/* EPIC 12 (12.1): the leader header carries
+             the current cohort name and week. The `V.leadDash` guard is the
+             cross-file TDZ fence lead.js records: on a `#leader/...` deep link
+             views.js's boot render runs BEFORE lead.js initialises its consts,
+             and `leadHeaderChip` reads `leadLive()` (a lead.js const in its
+             temporal dead zone then). `V.leadDash` is undefined until lead.js
+             assigns it, so it is a safe proxy for "lead.js has run" — the boot
+             render skips the chip and lead.js's own foot render() draws it.
+             the current cohort name and week throughout the workspace. This is
+             functional context (which cohort am I in), not the decorative
+             "Explorer track" label removed below, so it is reintroduced only for
+             the leader and only where a live cohort exists. */}
       ${''/* THE TRACK/ROLE TEXT IS REMOVED from the top bar (Maryam, 16 Sep 2026:
              "remove the Explorer track text from the top nav, all the portals have
              something in place of Explorer track so remove them all"). The candidate

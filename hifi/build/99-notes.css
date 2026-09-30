@@ -279,3 +279,20 @@
    -------------------------------------------------------------------------- */
 .app .page:not(.form-page) .sec:has(> .note-panel) > .sec-h,
 .app .page:not(.form-page) .sec:has(> .note-list) > .sec-h{padding-right:0}
+
+/* ==========================================================================
+   EPIC 12.4 — the note composer's Type radios and the grouped read-only view
+   ========================================================================== */
+.app .note-types{display:flex;flex-wrap:wrap;gap:var(--s03);margin-bottom:var(--s04)}
+.app .note-type{display:inline-flex;align-items:center;gap:var(--s02);
+  font:inherit;font-size:var(--t-label-size);color:var(--text-secondary);
+  padding:var(--s02) var(--s04);border:1px solid var(--rule);border-radius:999px;
+  background:var(--background);cursor:pointer}
+.app .note-type-dot{width:12px;height:12px;border-radius:50%;border:1.5px solid var(--border-subtle-02);flex:0 0 auto}
+.app .note-type.on{color:var(--note-ink);border-color:var(--note-ink);
+  background:color-mix(in srgb, var(--note-ink) 10%, var(--background))}
+.app .note-type.on .note-type-dot{border-color:var(--note-ink);background:var(--note-ink)}
+.app .note-edited{color:var(--text-helper);font-size:var(--t-caption-size)}
+/* grouped read-only notes (evaluation screen) */
+.app .note-group + .note-group{margin-top:var(--s05)}
+.app .note-group-h{font-size:var(--t-label-size);color:var(--text-secondary);margin-bottom:var(--s03)}

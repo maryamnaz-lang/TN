@@ -810,6 +810,18 @@ input:-webkit-autofill:focus{
    so the toolbar filter dropdowns keep their box. */
 .app .fdd-form .fdd-t{border:0; border-bottom:1px solid var(--rule); border-radius:0; background:transparent; padding-left:0; padding-right:var(--s05)}
 
+/* A FORMDD / DATE POPUP IN THE RIGHT-SLIDER MUST NOT COLLAPSE THE BODY SCROLL (fix,
+   30 Sep 2026). The shared `.dd-open` behaviour flips `.sheet-b` to overflow:visible so a
+   floating popup is not clipped — but in the tall, scrollable slider that expands the body
+   to its full content (clientHeight jumps) and forces scrollTop to 0, jerking the form to
+   the top and freezing its scroll; picking or leaving the field jumps it back. Here the
+   body STAYS scrollable and the open popup lays IN FLOW instead, pushing the fields below
+   it down, so the body simply reveals it — no jump, no clipping, no dead scroll. Scoped to
+   `.peek-form`, so centered modals keep the floating popup. */
+.app .peek-form .sheet-b.dd-open{overflow-y:auto}
+.app .peek-form .sheet-b .fdd.fdd-form.on .fdd-menu{position:relative; top:auto; left:0; right:0; margin-top:var(--s02); box-shadow:none}
+.app .peek-form .sheet-b .fdate.on .fdate-pop{position:relative; top:auto; right:auto; left:0; margin-top:var(--s02); box-shadow:none}
+
 /* A formDd OPTION MAY CARRY RIGHT-ALIGNED TRAILING META (Maryam, 22 Sep 2026:
    "the count should be right aligned on the row") — a 4th tuple element, e.g. the
    cohort picker's member count. The option row goes flex so `.fdd-meta` sits at
@@ -1826,7 +1838,11 @@ const SETTINGS = {
   talLimit:25,           /* Tal — questions per candidate per day through Ask Tal (5–200). */
   payoutDelay:3,         /* Money — working days after a report is filed before escrow becomes releasable (0–30). */
   payoutRunDay:'Monday', /* Money — the weekday the payout run executes at 00:00 (SA time zone). */
-  closureGrace:30        /* Account closure — days an external account stays Deactivated before auto-Delete (7–90). */
+  closureGrace:30,       /* Account closure — days an external account stays Deactivated before auto-Delete (7–90). */
+  cohortCreation:'manual'/* Cohorts (11.1) — how cohorts are created. Manual is in force: a cohort belongs
+                            to no course and is created by hand (7.7). Automatic (a course spawns a cohort per
+                            future start date) is documented but NOT yet selectable, so every cohort is a manual
+                            cohort with no course, no minimum and no maximum. `cohortMode()` reads this. */
 };
 /* the reviewer's fixed 24-hour review window is NOT configurable (11.1). The
    candidate's report-ready promise is DERIVED: report deadline + this window. */
@@ -4294,7 +4310,7 @@ const talq = () => {
     cohorts: [
       ['Which cohorts need a leader?', `${COHORTS.filter(c => c.leader === 'Unassigned').map(c => c.name).join(', ') || 'None'}. ${LEADER_REQS.filter(r => r.stage === 'feedback').length} leaders are recommended and ready to allot.`,
         null, ['Allot a leader', 'cohorts/assign']],
-      ['How full are the cohorts?', COHORTS.filter(c => c.status === 'running').map(c => `${c.name} ${cohortSize(c)}/${c.cap || 12}`).join(', ') + '. Each cohort runs the 90-day loop.',
+      ['How full are the cohorts?', COHORTS.filter(c => c.status === 'running').map(c => `${c.name} ${cohortSize(c)} member${cohortSize(c) === 1 ? '' : 's'}`).join(', ') + '. Each cohort runs the 90-day loop.',
         null, ['Open cohorts', 'cohorts/cohorts']]
     ],
     market: [
@@ -7156,7 +7172,7 @@ const COURSE_TRACKS = ['Explorer', 'Builder'];
 const courseRungs = track => [1, 2, 3, 4, 5].map(n => (track === 'Builder' ? 'B' : 'E') + n);
 /* The LMS (LightspeedVT) courses the course form maps to (7.1 "Learning platform
    course") — authored placeholder (§74): the real list comes from the LMS. */
-const LS_COURSES = ['Leadership Foundations (LSVT)', 'Communication & Influence (LSVT)', 'Team Dynamics (LSVT)', 'Coaching for Performance (LSVT)', 'Strategic Thinking (LSVT)', 'Change Leadership (LSVT)', 'Decision-Making Under Uncertainty (LSVT)', 'Executive Presence (LSVT)'];
+const LS_COURSES = ['Leadership Foundations', 'Communication & Influence', 'Team Dynamics', 'Coaching for Performance', 'Strategic Thinking', 'Change Leadership', 'Decision-Making Under Uncertainty', 'Executive Presence'];
 /* TRAILBLAZER IS OUT OF MVP AND STAYS IN THE DATA MODEL (SA-04 E4): the three
    T levels are kept on the records (Yuki Tanaka is T1 in the seed) and are not
    OFFERED by a picker. `levelOpts(cur)` is the MVP list plus the record's own
@@ -7253,7 +7269,7 @@ KINDS.cand = {
        The count rides the option's 4th tuple element (`ometa`) so formDd renders it
        RIGHT-ALIGNED on the row (Maryam 22 Sep 2026: "right aligned on the row"), not
        baked into the label. */
-    {k:'cohort', l:'Cohort', t:'select', opts:[['—', 'No cohort yet'], ...COHORTS.map(x => [x.name, x.name, undefined, `${x.size} / ${x.cap || 10}`])], def:'—'},
+    {k:'cohort', l:'Cohort', t:'select', opts:[['—', 'No cohort yet'], ...COHORTS.map(x => [x.name, x.name, undefined, `${x.size} member${x.size === 1 ? '' : 's'}`])], def:'—'},
     /* COURSE is READ-ONLY when editing (Maryam 20 Sep 2026: "the course row should
        show the course name and it should not be editable") — a candidate's course
        follows their own enrolment, the admin does not set it here. It shows the
@@ -9228,6 +9244,12 @@ const leaderOpts = () => [['Unassigned', 'Unassigned'], ...USERS.filter(u => u.r
 /* ==================== EPIC 7 — COHORT LIFECYCLE HELPERS (7.4) ==================== */
 const todayISO = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
 const COHORT_ACTIVE = c => c.status === 'forming' || c.status === 'running';
+/* 11.1 — Manual is the cohort-creation mode in force; Automatic is not yet selectable.
+   Every cohort is therefore a MANUAL cohort: it belongs to no course and has no minimum
+   and no maximum. A manual cohort starts on a leader + at least one member (7.4), shows
+   its headcount alone, and carries a "Manual cohort" sub-line (7.2). `cohortMode()` reads
+   the setting so the Automatic path can be switched on later without hunting for gates. */
+const cohortMode = () => SETTINGS.cohortCreation || 'manual';
 /* whole days from today to an ISO date; negative means the date has passed */
 function daysUntil(iso){ if(!/^\d{4}-\d{2}-\d{2}$/.test(iso || '')) return null; const [y, m, d] = iso.split('-').map(Number); const t = new Date(); t.setHours(0, 0, 0, 0); return Math.round((new Date(y, m - 1, d) - t) / 864e5); }
 const cohortSize = c => CANDS.filter(x => x.cohort === c.name).length;
@@ -9235,8 +9257,10 @@ const cohortHasLeader = c => !!c.leader && c.leader !== 'Unassigned';
 const leaderName = c => cohortHasLeader(c) ? c.leader.replace(/\s*\(.*\)/, '') : '';
 /* the chapter a Running cohort is on, from its day and chapter count */
 const cohortChapter = c => Math.min(c.chapters || 12, Math.max(1, Math.ceil((c.day || 1) / (90 / (c.chapters || 12)))));
-/* progress line ("Day 34 of 90, chapter 4 of 12"), blank until the cohort Runs */
-const cohortProgress = c => c.status === 'running' ? `Day ${c.day} of 90, chapter ${cohortChapter(c)} of ${c.chapters || 12}` : '';
+/* progress line — a MANUAL cohort belongs to no course, so it has no single chapter
+   count (each member sits on their own course); the line is the day only (7.2/7.3).
+   Blank until the cohort Runs. */
+const cohortProgress = c => c.status === 'running' ? `Day ${c.day} of 90` : '';
 /* `isoPlus(iso, days)` — the ONE declaration (a hoisted function so its earlier
    callers in the account-lifecycle block resolve it); guards a malformed date and
    adds days on local components. Declared once here; do NOT re-add a `const isoPlus`
@@ -9246,42 +9270,43 @@ function isoPlus(iso, days){ if(!/^\d{4}-\d{2}-\d{2}$/.test(iso || '')) return '
 /* day 90 (the last day) and the Completed date (day 90 + the cohort's own delay). */
 const cohortLastDay = c => isoPlus(c.start, 89);
 const cohortCompletedDate = c => c.completedOn || isoPlus(cohortLastDay(c), c.completeDelay == null ? 7 : c.completeDelay);
-/* a Forming cohort whose start date has passed without starting — the reason it did
-   not fire (below the minimum / without a leader / both), or null (7.4). */
-function cohortMissed(c){ if(c.status !== 'forming') return null; const du = daysUntil(c.start); if(du == null || du >= 0) return null; const low = cohortSize(c) < (c.min || 0), noLead = !cohortHasLeader(c); if(!low && !noLead) return null; return low && noLead ? 'below the minimum and without a leader' : low ? 'below the minimum' : 'without a leader'; }
-/* needs-attention (7.2): no leader, OR below the minimum with a start inside 7 days
-   (a missed start counts — it is inside 7 days on the wrong side). Forming only. */
-function cohortNeedsAttn(c){ if(c.status !== 'forming') return false; if(!cohortHasLeader(c)) return true; const du = daysUntil(c.start); return cohortSize(c) < (c.min || 0) && du != null && du <= 7; }
-/* the start-date cell marker for a Forming cohort (7.2): a missed start, else the
-   shortfall "N short, starts in X days". */
-function cohortStartNote(c){ if(c.status !== 'forming') return ''; const du = daysUntil(c.start), short = (c.min || 0) - cohortSize(c); if(du != null && du < 0) return `<span class="tag sm red">Missed start</span>`; if(short > 0) return `<span class="tag sm warn">${short} short${du != null ? `, starts in ${du} day${du === 1 ? '' : 's'}` : ''}</span>`; return ''; }
-/* 7.4 — re-evaluate a Forming cohort's start conditions; flip it to Running the moment
-   it is at/above minimum, has a leader and its start date has arrived. Called after
-   assign-leader, add-member and move-start (never at load, so the seeded states stand).
-   Returns true if it started. */
-function evalStart(c){ if(!c || c.status !== 'forming') return false; if(cohortSize(c) < (c.min || 0) || !cohortHasLeader(c)) return false; const du = daysUntil(c.start); if(du == null || du > 0) return false; c.status = 'running'; c.day = Math.max(1, -du + 1); c.week = Math.max(1, Math.ceil(c.day / 7)); audit('Cohort started', `${c.name} reached its minimum with a leader in place`, 'Cohort Management', 'notice', {from:'forming', to:'running'}); toast(`${c.name} started`); return true; }
-/* Awaiting-cohort auto-placement (7.6): a candidate waiting with no cohort place is put
-   into the next suitable cohort (Forming/Running, below max) when one opens — keeps the
-   paid place, carries progress, no new payment. */
-function placeAwaiting(){ const waiting = CANDS.filter(x => x.cohort === 'Awaiting'); if(!waiting.length) return; waiting.forEach(m => { const dest = COHORTS.find(c => COHORT_ACTIVE(c) && cohortSize(c) < (c.cap || 10)); if(dest){ m.cohort = dest.name; audit('Awaiting candidate placed', `${m.name} → ${dest.name}`, 'Cohort Management', 'notice'); } }); syncCohortSizes(); }
+/* a Forming MANUAL cohort whose start date has passed without starting — the reason it
+   did not fire (no leader / no members / both), or null (7.3/7.4). A manual cohort has
+   no minimum, so a below-minimum reason does not apply. */
+function cohortMissed(c){ if(c.status !== 'forming') return null; const du = daysUntil(c.start); if(du == null || du >= 0) return null; const noMem = cohortSize(c) < 1, noLead = !cohortHasLeader(c); if(!noMem && !noLead) return null; return noMem && noLead ? 'without a leader and with no members' : noLead ? 'without a leader' : 'with no members'; }
+/* needs-attention (7.2): for a MANUAL cohort only the no-leader condition applies (there
+   is no minimum to fall below). Forming only. Read by the dashboard + page summary; the
+   list's Needs-attention toggle itself stays removed (Maryam, 29 Sep 2026). */
+function cohortNeedsAttn(c){ return c.status === 'forming' && !cohortHasLeader(c); }
+/* the start-date cell marker for a Forming cohort (7.2): a MANUAL cohort is never marked
+   below-minimum, so the only marker is a missed start (past its date, not yet started). */
+function cohortStartNote(c){ if(c.status !== 'forming') return ''; const du = daysUntil(c.start); return (du != null && du < 0) ? `<span class="tag sm red">Missed start</span>` : ''; }
+/* 7.4 — re-evaluate a Forming MANUAL cohort's start conditions; flip it to Running the
+   moment it has a leader AND at least one member AND its start date has arrived (a manual
+   cohort has no minimum headcount). Called after assign-leader, add-member and move-start
+   (never at load, so the seeded states stand). Returns true if it started. */
+function evalStart(c){ if(!c || c.status !== 'forming') return false; if(!cohortHasLeader(c) || cohortSize(c) < 1) return false; const du = daysUntil(c.start); if(du == null || du > 0) return false; c.status = 'running'; c.day = Math.max(1, -du + 1); c.week = Math.max(1, Math.ceil(c.day / 7)); audit('Cohort started', `${c.name} started with a leader and members in place`, 'Cohort Management', 'notice', {from:'forming', to:'running'}); toast(`${c.name} started`); return true; }
+/* Awaiting-cohort auto-placement (7.6) is AUTOMATIC-MODE ONLY: "In Manual mode, an
+   Awaiting cohort enrolment is never assigned automatically. It waits until staff add the
+   candidate to a cohort." So in the in-force Manual mode this is a no-op. */
+function placeAwaiting(){ if(cohortMode() !== 'automatic') return; const waiting = CANDS.filter(x => x.cohort === 'Awaiting'); if(!waiting.length) return; waiting.forEach(m => { const dest = COHORTS.find(c => COHORT_ACTIVE(c)); if(dest){ m.cohort = dest.name; audit('Awaiting candidate placed', `${m.name} → ${dest.name}`, 'Cohort Management', 'notice'); } }); syncCohortSizes(); }
 KINDS.cohort = {
   label:'cohort', mod:'Cohort Management', after:'cohorts/cohorts',
   find: id => COHORT_BY_ID[id], name: c => c.name, detail: c => 'cohorts/detail/' + c.id,
-  /* A cohort is NEVER linked to a course (Maryam, 29 Sep 2026) — no course, no track.
-     `min` / `cap` / `chapters` / `completeDelay` live on the cohort itself. A leader is
-     placed through Assign Leader (7.5), not this form, so a cohort forms leaderless and
-     waits until one is assigned. */
+  /* A MANUAL cohort (11.1 Manual mode, in force): it belongs to no course and has NO
+     minimum and NO maximum (7.7 / 7.3 / 7.4). The form is name, Completed delay (the
+     days after day 90 before it moves to Completed, kept on the cohort itself), and the
+     start date. A leader is placed through Assign Leader (7.5), not this form, so a cohort
+     forms leaderless and starts once it has a leader and at least one member. */
   fields: c => [
     {k:'name', l:'Cohort name', t:'text', req:1, ph:'e.g. Cohort 9'},
-    {k:'min', l:'Minimum members', t:'number', req:1, def:5, ph:'e.g. 5'},
-    {k:'cap', l:'Maximum members', t:'number', req:1, def:12, ph:'e.g. 12'},
     {k:'completeDelay', l:'Completed delay (days)', t:'number', req:1, def:7, ph:'0 to 30'},
     {k:'start', l:'Cohort starts on', t:'date', req:1}
   ],
   okNew:'Create Cohort',
-  create: v => { const c = {id:newId('ch', COHORTS), name:v.name, leader:'Unassigned', min:Number(v.min) || 5, cap:Number(v.cap) || 12, chapters:Number(v.chapters) || 12, completeDelay:(v.completeDelay === '' || v.completeDelay == null) ? 7 : Number(v.completeDelay), size:0, week:0, day:0, start:v.start, status:'forming', leadFrom:null, leadHist:[], sessions:[]};
-    COHORTS.push(c); COHORT_BY_ID[c.id] = c; placeAwaiting(); return c; },
-  update: (c, v) => { CANDS.forEach(x => { if(x.cohort === c.name) x.cohort = v.name; }); c.name = v.name; if(v.min) c.min = Number(v.min); if(v.cap) c.cap = Number(v.cap); if(v.chapters) c.chapters = Number(v.chapters); if(v.completeDelay !== '' && v.completeDelay != null) c.completeDelay = Number(v.completeDelay); c.start = v.start; },
+  create: v => { const c = {id:newId('ch', COHORTS), name:v.name, leader:'Unassigned', completeDelay:(v.completeDelay === '' || v.completeDelay == null) ? 7 : Number(v.completeDelay), size:0, week:0, day:0, start:v.start, status:'forming', leadFrom:null, leadHist:[], sessions:[]};
+    COHORTS.push(c); COHORT_BY_ID[c.id] = c; return c; },
+  update: (c, v) => { CANDS.forEach(x => { if(x.cohort === c.name) x.cohort = v.name; }); c.name = v.name; if(v.completeDelay !== '' && v.completeDelay != null) c.completeDelay = Number(v.completeDelay); c.start = v.start; },
   remove: c => { CANDS.forEach(x => { if(x.cohort === c.name) x.cohort = '—'; }); COHORTS.splice(COHORTS.indexOf(c), 1); delete COHORT_BY_ID[c.id]; },
   /* No delete guard (Maryam, 29 Sep 2026: "on click to delete nothing happens, it should
      show a modal"). The old guard blocked a running cohort with a warn toast that pointed
@@ -9290,7 +9315,7 @@ KINDS.cohort = {
   delWarn: c => `${c.name} is removed and its ${cohortSize(c)} member${cohortSize(c) === 1 ? '' : 's'} return to no cohort.`,
   status: (c, val) => val === 'completed'
     ? {title:`Mark ${c.name} completed?`, body:'The cohort closes now. Members keep their level and history.', ok:'Mark Completed', log:'Completed cohort', done:`${c.name} completed`, apply: x => { x.status = 'completed'; x.completedOn = todayISO(); x.day = 90; x.week = 13; }}
-    : {title:`Start ${c.name} now?`, body:`This begins the 90-day cycle. Leader: ${leaderName(c) || 'unassigned'} · ${cohortSize(c)} of ${c.cap} members · start ${dpFmt(c.start) || c.start}.`, ok:'Start Cohort', log:'Started cohort', done:`${c.name} started`, apply: x => { x.status = 'running'; x.day = Math.max(1, x.day); x.week = Math.max(1, x.week); }}
+    : {title:`Start ${c.name} now?`, body:`This begins the 90-day cycle. Leader: ${leaderName(c) || 'unassigned'} · ${cohortSize(c)} member${cohortSize(c) === 1 ? '' : 's'} · start ${dpFmt(c.start) || c.start}.`, ok:'Start Cohort', log:'Started cohort', done:`${c.name} started`, apply: x => { x.status = 'running'; x.day = Math.max(1, x.day); x.week = Math.max(1, x.week); }}
 };
 
 /* EPIC 7 — COHORT LIST (7.2, Maryam 29 Sep 2026). Columns Cohort / Status / Start
@@ -9320,10 +9345,10 @@ function cohortsList(){
     ${rows.length ? table(
       [{label:'Cohort'}, {label:'Status'}, {label:'Start date'}, {label:'Members', num:true}, {label:'Leader'}, {label:'Progress'}, ACT_COL],
       rows.map(c => { const note = cohortStartNote(c); return {id:c.id, go:'cohorts/detail/' + c.id, cells:[
-        esc(c.name),
+        `<span class="pcell-n">${esc(c.name)}</span><div class="t-caption" style="color:var(--text-helper);margin-top:2px">Manual cohort</div>`,
         tag(c.status),
         `${dpFmt(c.start) || c.start}${note ? `<div style="margin-top:var(--s02)">${note}</div>` : ''}`,
-        `${cohortSize(c)} / ${c.cap || 12}`,
+        String(cohortSize(c)),
         cohortHasLeader(c) ? personCell(leaderName(c), '') : '<span class="tag sm warn">Unassigned</span>',
         c.status === 'running' ? `Day ${c.day} of 90` : '—',
         rowActs([
@@ -9350,9 +9375,12 @@ const leaderCohorts = name => COHORTS.filter(c => COHORT_ACTIVE(c) && c.leader.r
    `exceptName` keeps the cohort's current leader in the list on a change. Each entry:
    {name, kind:'Candidate'|'Staff', level, img}. */
 function leaderPool(exceptName){
-  const free = name => name === exceptName || leaderCohorts(name).length === 0;
+  /* 7.5 — the pool EXCLUDES an EXTERNAL (candidate) account already leading an active
+     (Forming/Running) cohort; a STAFF account is listed whatever cohorts it already leads
+     (staff may lead more than one at once). The current leader stays in on a change. */
+  const eligible = (name, kind) => name === exceptName || kind === 'Staff' || leaderCohorts(name).length === 0;
   const out = [], seen = new Set();
-  const add = (name, kind, level) => { if(seen.has(name) || !free(name)) return; seen.add(name); out.push({name, kind, level, img:agentFace(name)}); };
+  const add = (name, kind, level) => { if(seen.has(name) || !eligible(name, kind)) return; seen.add(name); out.push({name, kind, level, img:agentFace(name)}); };
   USERS.filter(u => u.roles.includes('leader') && u.status !== 'inactive').forEach(u => {
     const isCand = u.roles.includes('candidate'), cand = CAND_BY_ID[u.id];
     add(u.name, isCand ? 'Candidate' : 'Staff', isCand && cand ? cand.level : '');
@@ -9457,14 +9485,13 @@ function cohortsDetail(){
      progress note. Every action is governed by its own module's permission. */
   const roster = CANDS.filter(x => x.cohort === c.name);
   const forming = c.status === 'forming', running = c.status === 'running';
-  const cap = c.cap || 12, min = c.min || 0, size = roster.length;
-  const full = size >= cap;
+  const size = roster.length;
   const missed = cohortMissed(c);
-  const ready = forming && size >= min && cohortHasLeader(c);
+  const ready = forming && size >= 1 && cohortHasLeader(c);
   return `
   ${detailHead('cohorts/cohorts')}
   <section class="sec">
-    ${aiHead(esc(c.name), `${size} of ${cap} members${missed ? '' : forming ? ` · starts ${dpFmt(c.start) || c.start}` : running ? ` · ${cohortProgress(c)}` : c.status === 'completed' ? ` · completed ${dpFmt(cohortCompletedDate(c))}` : ''}`,
+    ${aiHead(esc(c.name), `Manual cohort · ${size} member${size === 1 ? '' : 's'}${missed ? '' : forming ? ` · starts ${dpFmt(c.start) || c.start}` : running ? ` · ${cohortProgress(c)}` : c.status === 'completed' ? ` · completed ${dpFmt(cohortCompletedDate(c))}` : ''}`,
       `<span style="display:flex;align-items:center;gap:var(--s03)">${tag(c.status)}
        ${rowActs([
          COHORT_ACTIVE(c) ? [cohortHasLeader(c) ? 'renew' : 'user', cohortHasLeader(c) ? 'Change Leader' : 'Assign Leader', `data-sheet="assignlead:${c.id}"`] : null,
@@ -9472,11 +9499,11 @@ function cohortsDetail(){
          ['edit', 'Edit Details', `data-sheet="rec:cohort:${c.id}"`],
          ['delete', 'Delete', `data-act="askdel:cohort:${c.id}"`]
        ])}</span>`)}
-    ${missed ? note('warn', 'Missed its start date', `The start date of ${dpFmt(c.start) || c.start} passed while the cohort was ${missed}. It starts automatically once it reaches the minimum of ${min} and has a leader in place.`) : ''}
+    ${missed ? note('warn', 'Missed its start date', `The start date of ${dpFmt(c.start) || c.start} passed while the cohort was ${missed}. It starts automatically once it has a leader and at least one member.`) : ''}
     <div class="facts pf-facts">
       ${admFact(I.calendar, '--mk-3', running || c.status === 'completed' ? 'Started' : 'Cohort starts on', dpFmt(c.start) || c.start)}
       ${admFact(I.growth, '--mk-2', 'Progress', cohortProgress(c) || (forming ? 'Not started' : c.status === 'completed' ? `Completed day 90` : 'Cancelled'))}
-      ${admFact(I.group, '--mk-1', 'Members', `${size} / ${cap}${size < min ? ` · min ${min}` : ''}`)}
+      ${admFact(I.group, '--mk-1', 'Members', `${size} member${size === 1 ? '' : 's'}`)}
       ${admFact(I.check, '--mk-4', 'Completed date', c.status === 'cancelled' ? '—' : dpFmt(cohortCompletedDate(c)))}
     </div>
   </section>
@@ -9492,12 +9519,14 @@ function cohortsDetail(){
   </section>
 
   <section class="sec">
-    ${aiHead('Cohort Members', size ? `${size} of ${cap} member${size === 1 ? '' : 's'}. Course progress is read from LightspeedVT, last read just now.` : `${size} of ${cap} members.`,
+    ${aiHead('Cohort Members', size ? `${size} member${size === 1 ? '' : 's'}. Course progress is read from LightspeedVT, last read just now.` : 'No members yet.',
       (COHORT_ACTIVE(c)) ? `<button class="btn acc-link btn-sm noic" data-sheet="addmember:${c.id}">${I.add} Add Member</button>` : '')}
+    ${''/* A MANUAL cohort's members each sit on their own course (7.3), so the table
+          carries a Course column showing each member's enrolled course. */}
     ${size ? table(
-      [{label:'Candidate'}, {label:'Handle'}, {label:'Level'}, {label:'Enrolled'}, {label:'Progress'}, {label:'State'}, ACT_COL],
+      [{label:'Candidate'}, {label:'Handle'}, {label:'Level'}, {label:'Course'}, {label:'Enrolled'}, {label:'Progress'}, {label:'State'}, ACT_COL],
       roster.map(m => ({id:m.id, cells:[
-        personCell(m.name, ''), esc(memHandle(m)), esc(m.level || '—'), dpFmt(m.enrolled || c.start) || '—', memProgress(m, c),
+        personCell(m.name, ''), esc(memHandle(m)), esc(m.level || '—'), esc(memCourse(m) || '—'), dpFmt(m.enrolled || c.start) || '—', memProgress(m, c),
         '<span class="tag sm green">Active</span>',
         rowActs([
           ['launch', 'Open record', `data-go="candidates/detail/${m.id}"`],
@@ -9505,7 +9534,7 @@ function cohortsDetail(){
           COHORT_ACTIVE(c) ? ['delete', 'Remove from cohort', `data-sheet="removemem:${c.id}:${m.id}"`] : null
         ])
       ]})), {select:false})
-      : emptyState('users', 'No members yet', `Add candidates to the roster; the cohort caps at ${cap}.`)}
+      : emptyState('users', 'No members yet', 'Add candidates to the roster. A manual cohort has no maximum.')}
   </section>
 
   <section class="sec">
@@ -9573,7 +9602,7 @@ SHEETS.assignlead = arg => {
   if(!opts.length) return {title:`${changing ? 'Change' : 'Assign'} leader — ${c.name}`, ok:'',
     body: note('warn', 'No leader is free', 'Every cohort leader is already leading an active cohort. A leader becomes free when their cohort completes or is cancelled.')};
   return {title:`${changing ? 'Change' : 'Assign'} leader — ${c.name}`, ok: changing ? 'Change Leader' : 'Assign Leader', act:'askassignlead:' + c.id,
-    body:`<p class="t-desc" style="margin-bottom:var(--s05)">${esc(c.name)} · starts ${dpFmt(c.start) || c.start} · ${cohortSize(c)} of ${c.cap || 12} members.</p>
+    body:`<p class="t-desc" style="margin-bottom:var(--s05)">${esc(c.name)} · Manual cohort · starts ${dpFmt(c.start) || c.start} · ${cohortSize(c)} member${cohortSize(c) === 1 ? '' : 's'}.</p>
       ${fieldHtml({k:'leader', l:'Leader', t:'select', req:1, ph:'Choose a leader', opts}, changing ? cur : undefined)}
       ${changing ? fieldHtml({k:'reason', l:'Reason', t:'textarea', req:1, ph:'Why the cohort is changing leader'}) : ''}`};
 };
@@ -9647,14 +9676,18 @@ ACTIONS.doaddmember = key => { const c = COHORT_BY_ID[key.split(':')[1]]; const 
 /* Remove a candidate (Forming/Running) — reason, then a confirmation; the fee is not
    returned. Opened member-locked as `removemem:<cohortId>:<memberId>`. */
 SHEETS.removemem = arg => { const [cid, mid] = String(arg).split(':'); const c = COHORT_BY_ID[cid]; const m = CAND_BY_ID[mid]; if(!c || !m) return {title:'Remove', body:'', ok:''};
+  const forming = c.status === 'forming';                          /* 7.6: Forming manual → enrolment returns to Awaiting, fee kept; Running → fee forfeited */
   return {title:`Remove ${m.name} from ${c.name}`, ok:'Continue', act:'askremovemem:' + cid + ':' + mid,
     body:`${fieldHtml({k:'reason', l:'Reason', t:'textarea', req:1, ph:'Why this candidate is being removed'})}
-      <p class="t-desc">They lose their place and their course fee is not returned. They can be added to another cohort later.</p>`};
+      <p class="t-desc">${forming ? 'Their paid enrolment returns to Awaiting cohort, and they can be added to a cohort later.' : 'They lose their place and their course fee is not returned. They can be added to another cohort later.'}</p>`};
 };
 ACTIONS.askremovemem = key => { const [, cid, mid] = key.split(':'); const c = COHORT_BY_ID[cid]; const m = CAND_BY_ID[mid]; const v = readForm(); if(!c || !m) return; if(!v.reason){ toast('A reason is required', 'warn'); return 'keep'; }
-  S._pending = {reason:v.reason, cid, mid}; askConfirm({mk:'warning', title:`Remove ${m.name} from ${c.name}?`, body:'They lose their place and their course fee is not returned.', ok:'Remove', danger:true, act:'doremovemem'}); };
-ACTIONS.doremovemem = () => { const p = S._pending || {}; S._pending = null; S.confirm = null; const c = COHORT_BY_ID[p.cid], m = CAND_BY_ID[p.mid]; if(!c || !m) return; m.cohort = '—'; syncCohortSizes();
-  audit('Removed candidate from cohort (fee forfeited)', `${m.name} ✕ ${c.name} · ${p.reason}`, 'Cohort Management', 'high', {from:c.name, to:'—'}); toast(`${m.name} removed from ${c.name}`); };
+  const forming = c.status === 'forming';
+  S._pending = {reason:v.reason, cid, mid};
+  askConfirm({mk:'warning', title:`Remove ${m.name} from ${c.name}?`, body: forming ? 'Their paid enrolment returns to Awaiting cohort.' : 'They lose their place and their course fee is not returned.', ok:'Remove', danger:true, act:'doremovemem'}); };
+ACTIONS.doremovemem = () => { const p = S._pending || {}; S._pending = null; S.confirm = null; const c = COHORT_BY_ID[p.cid], m = CAND_BY_ID[p.mid]; if(!c || !m) return;
+  const forming = c.status === 'forming'; m.cohort = forming ? 'Awaiting' : '—'; syncCohortSizes();
+  audit(forming ? 'Removed candidate from cohort (enrolment returned to Awaiting)' : 'Removed candidate from cohort (fee forfeited)', `${m.name} ✕ ${c.name} · ${p.reason}`, 'Cohort Management', 'high', {from:c.name, to: forming ? 'Awaiting' : '—'}); toast(`${m.name} removed from ${c.name}`); };
 /* Move a candidate to another cohort (Forming/Running) — destination is any active
    cohort below its maximum (no course to match on). Keeps the paid place and progress.
    Opened as `moveco:<cohortId>` (pick a member) or `moveco:<cohortId>:<memberId>`. */
@@ -9662,14 +9695,14 @@ SHEETS.moveco = arg => {
   const [cid, mid] = String(arg).split(':');
   const c = COHORT_BY_ID[cid]; if(!c) return {title:'Move', body:'', ok:''};
   const roster = CANDS.filter(x => x.cohort === c.name);
-  const targets = COHORTS.filter(x => x.id !== c.id && COHORT_ACTIVE(x) && cohortSize(x) < (x.cap || 12));
+  const targets = COHORTS.filter(x => x.id !== c.id && COHORT_ACTIVE(x));   /* a manual cohort has no maximum */
   const m = mid ? CAND_BY_ID[mid] : null;
   const canDo = (m || roster.length) && targets.length;
   return {title: m ? `Move ${m.name} to another cohort` : `Move a candidate out of ${c.name}`, ok: canDo ? 'Continue' : '', act:'askmoveco:' + c.id,
     body: canDo ? `${m
         ? `<label class="f"><span class="lbl">Candidate</span><div class="inp" style="pointer-events:none;background:var(--surface-2)">${esc(m.name)} &middot; ${esc(m.level || '')}</div><input type="hidden" data-f="cand" value="${esc(m.id)}"></label>`
         : fieldHtml({k:'cand', l:'Candidate', t:'select', req:1, ph:'Choose a candidate', opts: roster.map(x => [x.id, `${x.name} · ${x.level}`])})}
-      ${fieldHtml({k:'into', l:'Destination cohort', t:'select', req:1, ph:'Choose a cohort', opts: targets.map(x => [x.id, `${x.name} · ${cap(x.status)} · ${x.status === 'running' ? `day ${x.day} of 90` : `starts ${dpFmt(x.start)}`} · ${cohortSize(x)}/${x.cap || 12}`])})}
+      ${fieldHtml({k:'into', l:'Destination cohort', t:'select', req:1, ph:'Choose a cohort', opts: targets.map(x => [x.id, `${x.name} · ${cap(x.status)} · ${x.status === 'running' ? `day ${x.day} of 90` : `starts ${dpFmt(x.start)}`} · ${cohortSize(x)} member${cohortSize(x) === 1 ? '' : 's'}`])})}
       ${fieldHtml({k:'reason', l:'Reason', t:'textarea', req:1, ph:'Why this candidate is moving'})}` : note('', 'Nothing to move', 'Either the roster is empty or no other cohort has room.')};
 };
 ACTIONS.askmoveco = key => { const c = COHORT_BY_ID[key.split(':')[1]]; const v = readForm(); const m = CAND_BY_ID[v.cand]; const t = COHORT_BY_ID[v.into]; if(!c || !m || !t){ toast('Pick a candidate and a cohort', 'warn'); return 'keep'; } if(!v.reason){ toast('A reason is required', 'warn'); return 'keep'; }
@@ -9681,14 +9714,14 @@ ACTIONS.domoveco = key => { const c = COHORT_BY_ID[key.split(':')[1]]; const v =
    is Cancelled, members are moved or set Awaiting, and any leader is released. */
 SHEETS.cancelco = arg => { const c = COHORT_BY_ID[String(arg).split(':')[0]]; if(!c) return {title:'Cancel', body:'', ok:''};
   const roster = CANDS.filter(x => x.cohort === c.name);
-  const targets = COHORTS.filter(x => x.id !== c.id && COHORT_ACTIVE(x) && cohortSize(x) < (x.cap || 12));
-  const destOpts = [...targets.map(x => [x.id, `${x.name} · ${cap(x.status)} · ${cohortSize(x)}/${x.cap || 12}`]), ['await', 'Awaiting cohort — placed automatically later']];
+  const targets = COHORTS.filter(x => x.id !== c.id && COHORT_ACTIVE(x));   /* a manual cohort has no maximum */
+  const destOpts = [...targets.map(x => [x.id, `${x.name} · ${cap(x.status)} · ${cohortSize(x)} member${cohortSize(x) === 1 ? '' : 's'}`]), ['await', 'Awaiting cohort — added to a cohort by staff later']];
   const suggested = targets.length ? targets[0].id : 'await';
   return {title:`Cancel ${c.name}`, ok:'Continue', act:'askcancelco:' + c.id,
     body:`${roster.length ? `<p class="t-label" style="color:var(--text-secondary);margin-bottom:var(--s03)">Every member must be dealt with first. Choose where each one goes.</p>
       ${roster.map(m => fieldHtml({k:'dest_' + m.id, l:`${m.name} · ${m.level || ''}`, t:'select', opts:destOpts}, suggested)).join('')}` : `<p class="t-desc" style="margin-bottom:var(--s04)">This cohort has no members.</p>`}
       ${fieldHtml({k:'reason', l:'Reason', t:'textarea', req:1, ph:'Why the cohort is being cancelled'})}
-      <p class="t-desc">A member with a chosen cohort keeps their paid place and carries their progress. A member with no suitable cohort moves to Awaiting cohort and is placed automatically when one opens. This cannot be undone.</p>`};
+      <p class="t-desc">A member with a chosen cohort keeps their paid place and carries their progress. A member with no suitable cohort moves to Awaiting cohort and is added to a cohort by staff later. This cannot be undone.</p>`};
 };
 ACTIONS.askcancelco = key => { const c = COHORT_BY_ID[key.split(':')[1]]; const v = readForm(); if(!c) return; if(!v.reason){ toast('A reason is required', 'warn'); return 'keep'; }
   const roster = CANDS.filter(x => x.cohort === c.name);
@@ -9732,11 +9765,10 @@ KINDS.course = {
     {k:'chapters', t:'html', req:1, def:12, html:`<label class="f"><span class="lbl">Chapter count <span class="req-star" aria-hidden="true">*</span></span>
       <input class="inp" data-f="chapters" type="number" min="1" max="90" value="${(c && c.chapters) || 12}" placeholder="1 to 90" oninput="{var n=Math.max(1,Math.min(90,Number(this.value)||1));var el=document.getElementById('chDeriv');if(el)el.textContent='90 days over '+n+' chapters, about '+(90/n).toFixed(1)+' days per chapter';try{syncSheetSubmit()}catch(e){}}">
       <span class="f-hint" id="chDeriv">90 days over ${(c && c.chapters) || 12} chapters, about ${(90 / ((c && c.chapters) || 12)).toFixed(1)} days per chapter</span></label>`},
-    {k:'lsvt', l:'Learning platform course', t:'select', req:1, ph:'Choose the learning platform course', opts: LS_COURSES.map(x => [x, x])},
+    {k:'lsvt', l:'LightSpeedVT Courses', t:'select', req:1, ph:'Choose a LightSpeedVT course', opts: LS_COURSES.map(x => [x, x])},
     {k:'price', l:'Price ($)', t:'number', req:1, def:100, ro: !!c},
     {k:'status', l:'Status', t:'select', req:1, opts:[['draft', 'Draft — not visible to candidates'], ['live', 'Live — open for enrolment']], def:'draft'}
   ],
-  help:'Track, Levels, Intent and Description are what Tal ranks a course on when it recommends one — they never restrict who may enrol. A course runs 90 days. Its chapters live in the learning platform; the count set here drives the pacing shown to candidates.',
   okNew:'Add Course',
   create: v => { const c = {id:newId('co', COURSES), name:v.name, desc:v.desc || '', track:v.track || 'Explorer', levels:Array.isArray(v.levels) ? v.levels : [], intent:v.intent || '', chapters:Number(v.chapters) || 12, lsvt:v.lsvt || '', price:Number(v.price) || 0, days:90, status:v.status || 'draft'}; COURSES.push(c); COURSE_BY_ID[c.id] = c; return c; },
   update: (c, v) => { c.name = v.name; c.desc = v.desc; c.track = v.track; c.levels = Array.isArray(v.levels) ? v.levels : c.levels; c.intent = v.intent != null && v.intent !== '' ? v.intent : c.intent; c.chapters = Number(v.chapters) || c.chapters; c.lsvt = v.lsvt; c.days = 90; c.status = v.status; /* price is changed through the step-up flow, never here */ },
@@ -13733,10 +13765,29 @@ ACTIONS.moneyCommit = () => {
   toast('Money settings saved');
 };
 
+/* COHORT CREATION MODE (story 11.1). Manual is in force — a cohort belongs to no course
+   and is created by hand (7.7). Automatic (a course spawns a cohort for every future start
+   date) is documented but NOT yet selectable, so it renders disabled with a note. There is
+   nothing to save here yet; the switch lands when the Automatic path is built. `cohortMode()`
+   reads `SETTINGS.cohortCreation`. */
+function cohortModeGroup(){
+  const mode = cohortMode();
+  const disc = on => `<span style="flex:none;width:18px;height:18px;border-radius:999px;border:2px solid ${on ? 'var(--accent)' : 'var(--border-subtle-02)'};background:${on ? 'var(--accent)' : 'transparent'};display:inline-flex;align-items:center;justify-content:center;margin-top:2px">${on ? '<span style="width:6px;height:6px;border-radius:999px;background:var(--on-accent)"></span>' : ''}</span>`;
+  const row = (val, title, desc, disabled) => { const on = mode === val; return `<div style="display:flex;gap:var(--s04);align-items:flex-start;padding:var(--s04) 0${disabled ? ';opacity:.6' : ''}">
+      ${disc(on)}
+      <span style="flex:1;min-width:0"><span class="t-body"><b>${title}</b>${on ? ' <span class="tag sm green">In force</span>' : disabled ? ' <span class="tag sm warn">Not yet available</span>' : ''}</span><span class="cardrow-d" style="display:block;margin-top:2px">${desc}</span></span></div>`; };
+  return `<section class="sec">
+    ${aiHead('Cohort creation', 'How cohorts are created on the platform. Manual is in force; Automatic is planned and cannot be selected yet.')}
+    <div class="tile-stack mt4">
+      ${row('manual', 'Manual', 'Staff create each cohort by hand. A cohort belongs to no course, has no minimum and no maximum, and starts once it has a leader and at least one member. Candidates enrol on a course and wait at Awaiting cohort until staff add them to a cohort.', false)}
+      ${row('automatic', 'Automatic', 'A course creates a cohort for every future start date, and candidates fill it first come, first served up to its maximum. Not yet available.', true)}
+    </div>
+  </section>`;
+}
 function settingsPlatform(){
   return departmentsGroup()
     + numGroup('sessions') + numGroup('exports') + numGroup('interviews')
-    + numGroup('cohorts') + numGroup('tal') + moneyGroup()
+    + cohortModeGroup() + numGroup('cohorts') + numGroup('tal') + moneyGroup()
     + workingDaysGroup() + numGroup('closure');
 }
 
