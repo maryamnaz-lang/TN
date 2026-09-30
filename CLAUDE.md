@@ -572,7 +572,7 @@ like a broken layout and is not one. `window.innerWidth === 0` is the check.
 #### `hifi/respcheck.mjs` IS THAT CHECK, AND A HOOK RUNS IT ON EVERY REBUILD
 
 ```bash
-cd hifi && node respcheck.mjs          # 197 screens x 390/744/1024/1280, ~90s
+cd hifi && node respcheck.mjs          # 346 screens x 390/744/1024/1280, ~90s
 cd hifi && node respcheck.mjs --edge   # adds 899/900/940 — the breakpoint seam
 cd hifi && node respcheck.mjs --quick  # ~30 screens, ~15s — the triage
 ```

@@ -331,9 +331,27 @@ const PAGESUM = {
        point a popover at, and every clause here is settled. No em dash (Tal
        voice). The card in the body is `.ai-aura` too, so this replaces it via
        `placePageSummary` — trap 11 needs this entry to exist for the stage. */
-    held: 'Your interview with Priya Nair is done. It is being analysed now, and TalentNext sets your level from it within <b>24 hours</b>. There is nothing to do but wait.',
+    /* 48h PROMISE, WITH THE OVERDUE LINE (story 15.2). A function so the overdue
+       state can differ; `heldOverdue` is a views.js const, parsed before this
+       file. Neither branch has a `data-sum` phrase: there is no next action. */
+    held: () => (typeof heldOverdue === 'function' && heldOverdue())
+      ? 'Your interview result is taking a little longer than usual. We will have it to you shortly.'
+      : 'Your interview with Priya Nair is done. It is being analysed now, and TalentNext sets your level from it within <b>48 hours</b>. There is nothing to do but wait.',
 
     assessed: 'Welcome Back, Maryam! You are <b data-sum="level">Explorer &ndash; E3</b>, rung 3 of 15, set by TalentNext on 21 August after your interview, with <b data-sum="growth">delegation and hard conversations</b> as your growth areas. <b data-sum="enrol">Enrolling</b> is the only thing left.',
+
+    /* ENROLLED, COHORT NOT STARTED (story 15.2). No `data-sum` phrases: the one
+       thing to do is a section on the page (meet your cohort), not a popover, and
+       the rest is settled. No em dash (Tal voice). trap 11 needs this entry so
+       the placeholder card has a summary to become. */
+    enrolPre: 'You are enrolled on <b>Cohort 41</b>, led by <b>Priya Nair</b>. It starts in 6 days. Coursework, Course Progress and Achievements open on the start day; until then, you can meet your cohort.',
+
+    /* COHORT CANCELLED, MOVED TO A REPLACEMENT (story 7.6 / 15.2). The admin&rsquo;s
+       reason is internal and is never shown here. */
+    cancelled: 'Your cohort was cancelled, and you have been moved to <b>Cohort 47</b>, which starts on 12 Mar 2026. Your place and your payment carried over, so there is nothing to pay again.',
+
+    /* INTERVIEW COULD NOT TAKE PLACE, REBOOKING CREDIT ACTIVE (story 8.3 / 15.2). */
+    rebook: 'Your interview with <b>Priya Nair</b> could not take place. You have a <b>free rebooking</b> with 14 days left to use it, so book another interview whenever you are ready.',
 
     /* ------------------------------------------------------------------
        THE THREE ENROLLED STAGES — Figma 599:7418, and the same three
@@ -535,13 +553,11 @@ const PAGESUM = {
      names the pair with their chapters, and naming them here as well put
      "coaching" in the same sentence twice and took the line to 37 words. 28
      is the ceiling — see the head of this block. */
-  result: () => {
-    const lo = qzLow(1)[0];
-    const hi = SCORES.slice().sort((a,b) => b[1] - a[1])[0];
-    return `${hi[0]} at ${hi[1]} is your strongest band, ${lo[0].toLowerCase()} at ${lo[1]} `
-      + `your weakest. An agent pushes hardest on the two lowest, and both have a chapter `
-      + `on the course.`;
-  },
+  /* LEAN, AND SCORELESS (story 15.3, Maryam 30 Sep 2026). The page now shows the
+     TRACK and one line that the level is set at the interview — the score, the
+     bands and the chart are gone — so the summary names no figure either. It
+     reads only what the viewer can see on the surface (15.1). */
+  result: 'This is the track from your latest quiz. Your <b>level is set at your interview</b>, not here and not by the quiz.',
 
   /* THIS ONE HAD NO FACTS IN IT AT ALL. "Every interview you've had and
      every one booked. This is the only thing that sets or changes your

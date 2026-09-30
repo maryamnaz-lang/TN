@@ -14,7 +14,7 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 6399.  Rules dropped as product-specific: 222.
+   Rules kept: 6403.  Rules dropped as product-specific: 222.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
@@ -5318,6 +5318,8 @@ button.btn-p:active,
     repeating-linear-gradient(30.2deg,  var(--rule) 0 1px, transparent 1px 34px),
     repeating-linear-gradient(-42.1deg, var(--rule) 0 1px, transparent 1px 34px); -webkit-mask:radial-gradient(closest-side, currentColor 6%, transparent 62%); mask:radial-gradient(closest-side, currentColor 6%, transparent 62%); opacity:.35}
 .app .tal-panel .tal-sugg{display:flex; flex-wrap:wrap; gap:8px; padding:0 20px 15px; border-top:0}
+.app .tal-panel .tal-limit{padding:0 20px 15px; color:var(--text-secondary); text-align:center}
+.app .tal-panel .composer-off{opacity:.5; pointer-events:none}
 .app .tal-panel .tal-sugg .chip-tal{min-height:38px}
 .app .tal-panel .composer{display:flex; align-items:stretch; gap:0; margin:0 20px 20px; padding:0; height:53px; border:1px solid var(--rule); background:var(--layer-01)}
 .app .tal-panel .composer .composer-mk{margin:auto 0 auto 16px}
@@ -6564,6 +6566,8 @@ button.btn-p:active,
 .app .ask-page .ask-thread .tal-msg.me > .bb{grid-column:1; padding:var(--s03) 20px; max-width:min(80%, 520px); font-size:14px; line-height:18px; letter-spacing:.16px; background:var(--brand-primary); color:var(--on-brand)}
 .app .ask-page .ask-foot{display:flex; flex-direction:column; gap:var(--s05); padding:var(--s06) var(--pad-x); border-top:1px solid var(--askv-rule); background-color:#fff; background-image:var(--askv-mesh); background-size:100% 100%; background-position:center; background-repeat:no-repeat}
 .app .ask-page .ask-foot::before{content:none}
+.app .ask-page .ask-limit{text-align:center; color:var(--text-secondary); padding:var(--s03) 0}
+.app .ask-page .askfield-off{opacity:.5; pointer-events:none}
 .app .ask-page .askfield{gap:var(--s04); min-height:64px; height:64px; padding:0 var(--s06); background:#fff; border:1px solid var(--askv-rule)}
 .app .ask-page .askfield:focus-within{border-color:var(--text-primary)}
 .app .ask-page .askfield .askline-mark{width:20px; height:20px}

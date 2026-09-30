@@ -387,6 +387,15 @@ const OPEN_DATES = ['','','','','','Mon, Aug 18','Mon, Aug 25','Mon, Sep 1','Mon
 
 const GROWTH = [3,4,11];
 
+/* THE ASK-TAL DAILY QUESTION LIMIT (story 15.5). Set by the Tal question limit in
+   Settings (11.1), which ships at 25; a suggestion chip counts like any other
+   question. In the real product the count runs per candidate per calendar day in
+   their own time zone and resets at midnight there; the prototype simulates it as
+   one session's count (`S.talAsked`), so there is no real clock or reset. Tal's
+   onboarding conversation (14.3) is outside this limit — it runs through ob.js,
+   not `ask()`, so it never touches the count. */
+const TAL_LIMIT = 25;
+
 const NOTIF = {
   /* Two unread, and neither of them is an instruction: the call is booked and
      the quiz result travelled with the account. There is nothing for the
@@ -416,7 +425,7 @@ const NOTIF = {
   /* the wait — the call is done, the report is not. Nothing here asks the
      candidate to do anything; the bell reports the state. */
   held:[
-    {ic:'checkOutline' ,t:'Interview complete',         b:'Priya is writing up your report. It will be ready within 24 hours.', w:'Just now', go:'interviews', unread:1},
+    {ic:'checkOutline' ,t:'Interview complete',         b:'Priya is writing up your report. Your result is ready within 48 hours.', w:'Just now', go:'interviews', unread:1},
     {ic:'document', t:'Your report is on its way',     b:'You will be told the moment Priya signs it. There is nothing to do.', w:'Just now', go:'level',     unread:1, kind:'cond'},
     {ic:'video',    t:'Interview recorded',            b:'The recording and transcript are what your report is built from.',    w:'Just now', go:'interviews', unread:0}
   ],

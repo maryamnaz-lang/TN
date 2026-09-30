@@ -1333,13 +1333,18 @@ function talPanel(f){
       <button class="shell-act tal-x" data-toggle="tal" aria-label="Close Tal" style="color:var(--icon-primary)">${I.close}</button>
     </div>
     <div class="tal-body" id="talBody">${thread}</div>
-    ${S.thread.length?'':`<div class="tal-sugg">${ctx.map(s=>`<button class="chip-tal" data-ask="1"><span class="sk-mark xs"></span>${s}</button>`).join('')}</div>`}
-    
-    <div class="composer">
+    ${''/* THE DAILY-LIMIT STATE (story 15.5), same as the ask-page: at the limit
+           the chips give way to the limit line and the composer is disabled. The
+           `ask()` guard is the real enforcement; this is the visible half. */}
+    ${talAtLimit()
+      ? `<div class="tal-limit">You have asked Tal everything it can take today. Come back tomorrow.</div>`
+      : (S.thread.length?'':`<div class="tal-sugg">${ctx.map(s=>`<button class="chip-tal" data-ask="1"><span class="sk-mark xs"></span>${s}</button>`).join('')}</div>`)}
+
+    <div class="composer${talAtLimit()?' composer-off':''}">
       ${AI_RUN}
       ${borbMark('tal-mk sm composer-mk')}
-      <input class="inp ai-field" placeholder="Ask Tal anything" aria-label="Ask Tal">
-      <button aria-label="Send">${I.send}</button>
+      <input class="inp ai-field" placeholder="Ask Tal anything" aria-label="Ask Tal"${talAtLimit()?' disabled':''}>
+      <button aria-label="Send"${talAtLimit()?' disabled':''}>${I.send}</button>
     </div>
   </div>`;
 }
@@ -4641,6 +4646,19 @@ function journey(){
     case 'held': return row(['done','on','',''],
       ['Explorer track', 'Priya Nair &middot; report on its way', ...AHEAD]);
     case 'assessed': return LEVELLED;
+    /* ENROLLED, COHORT NOT STARTED (story 15.2) — step 3 complete, step 4 current.
+       `cancelled` is the same shape (moved to a replacement that has not started).
+       The way in is done; the 90 days are the step you are ON. */
+    case 'enrolPre': return row(['done','done','done','on'],
+      ['Explorer track &middot; Aug 12', 'E3 &middot; set by TalentNext, Aug 21',
+       'Cohort 41', 'Starts in 6 days']);
+    case 'cancelled': return row(['done','done','done','on'],
+      ['Explorer track &middot; Aug 12', 'E3 &middot; set by TalentNext, Aug 21',
+       'Moved to Cohort 47', 'Starts 12 Mar']);
+    /* INTERVIEW COULD NOT TAKE PLACE (story 8.3 / 15.2) — the stepper stays at the
+       interview step, current, because the levelling still has to happen. */
+    case 'rebook': return row(['done','on','',''],
+      ['Explorer track &middot; Aug 12', 'Could not take place &middot; free rebooking', ...AHEAD]);
     /* THIS STAGE IS THREE STEPS, NOT FOUR, AND IT IS THE ONE PLACE THE LIST IS
        NOT THE SAME LIST (Maryam, 1 Sep 2026: "this is not a component change,
        others steps on previous prototypes will remain same, for this one change
@@ -5097,10 +5115,17 @@ setInterval(joinArm, 20000);
    arrives with the right answer, and the next `render()` recomputes the same
    string. Not DOM state (trap 9): the text is a pure function of `Date.now()`
    and the element's own `data-heldtill`. */
+/* THE PROMISE IS 48 HOURS, NOT 24 (story 15.2, Maryam 30 Sep 2026). The candidate
+   result promise is the report deadline captured when the interview was held (24h)
+   plus the reviewer's fixed 24-hour window, so it ships at 48. `heldOverdue()` is
+   true once that has passed; the held card then reads the "taking a little longer"
+   line instead of the countdown. In a session the 48h never elapses, so this is
+   the correct code path rather than a live-triggered state. */
 function heldTill(){
-  if(!S.heldTill) S.heldTill = Date.now() + 24 * 3600 * 1000;
+  if(!S.heldTill) S.heldTill = Date.now() + 48 * 3600 * 1000;
   return S.heldTill;
 }
+const heldOverdue = () => heldTill() - Date.now() <= 0;
 function heldFmt(ms){
   const s = Math.max(0, Math.floor(ms / 1000));
   const p = n => String(n).padStart(2, '0');
@@ -6594,6 +6619,19 @@ created: () => `${authShell()}
    ============================================================ */
 const V = {};
 
+/* THE PRE-START WAITING BLOCK (story 15.2), shared by `enrolPre` and the moved
+   `cancelled` state. "Your cohort starts in n days" (or "Starts today"), the
+   course, the start date and the cohort leader, and one Meet your cohort action
+   opening the roster (19.4). A plain white section: `.kv` opts out of the label
+   column and stacks under the heading (trap 13), so heading over the facts. */
+const preStartBlock = (f) => `<div class="sec">
+  <div class="sec-h"><h2>${f.startIn>0?`Your cohort starts in ${f.startIn} days`:'Starts today'}</h2></div>
+  <div class="kv"><span class="k">Course</span><span class="v">Communicating with Impact</span></div>
+  <div class="kv"><span class="k">Starts</span><span class="v">${f.cancelled?'12 Mar 2026':'Monday, 18 August 2026'}</span></div>
+  <div class="kv"><span class="k">Cohort leader</span><span class="v">Priya Nair</span></div>
+  <div style="margin-top:var(--s05)"><button class="btn btn-p noic" data-go="cohort">Meet your cohort ${I.arrowRight}</button></div>
+</div>`;
+
 V.dashboard = (f) => {
   let body = '';
   /* ============================================================
@@ -6900,7 +6938,7 @@ V.dashboard = (f) => {
     <div class="sec">
       <div class="ai-aura tile">
         <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
-        <div class="ai-body"><p>Your interview with <b>Priya</b> is done. It is being analysed now, and <b>TalentNext sets your level</b> from it within 24 hours. There is nothing to do but wait.</p></div>
+        <div class="ai-body"><p>Your interview with <b>Priya</b> is done. It is being analysed now, and <b>TalentNext sets your level</b> from it within 48 hours. There is nothing to do but wait.</p></div>
       </div>
     </div>
     ${''/* THE INTERVIEW THAT HAPPENED, IN THE SAME BLACK CARD SLOT `booked` USES
@@ -6922,7 +6960,9 @@ V.dashboard = (f) => {
     <div class="sec sec-call dark-card crow-dark">
       <div class="dc-hd">
         <div class="dc-hd-r"><h2 class="dc-t">Your interview is complete</h2>
-          <span class="dc-when">${I.time}Results in <span class="held-timer" data-heldtill="${heldTill()}" style="font-variant-numeric:tabular-nums">${heldFmt(heldTill() - Date.now())}</span></span></div>
+          ${heldOverdue()
+            ? `<span class="dc-when">${I.time}Taking a little longer than usual</span>`
+            : `<span class="dc-when">${I.time}Results in <span class="held-timer" data-heldtill="${heldTill()}" style="font-variant-numeric:tabular-nums">${heldFmt(heldTill() - Date.now())}</span></span>`}</div>
       </div>
       ${crow('iv', {when:false, second:false, join:false})}
     </div>
@@ -7270,6 +7310,55 @@ V.dashboard = (f) => {
           slot is empty and the page's last section is the Quick Actions.
           §14.200 turns that one's closing hairline off unaided, which is the
           same reason §82.5 could be deleted. */}`;
+
+  /* ENROLLED, COHORT NOT STARTED (story 15.2). The pre-start waiting state, and
+     the stage enrolment lands on (the reader picks `week1` from the menu). No
+     coursework yet — the nav has none either. The `.ai-aura` card is the
+     placeholder `placePageSummary` replaces with `PAGESUM.dashboard.enrolPre`. */
+  else if(f.preStart && !f.cancelled) body = `
+    ${dashPh('Welcome back, Maryam!',`Explorer Track &ndash; E3 &middot; Cohort 41 &middot; ${f.startIn>0?`starts in ${f.startIn} days`:'starts today'}`)}
+    ${jrnList()}
+    <div class="sec">
+      <div class="ai-aura tile">
+        <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
+        <div class="ai-body"><p>You are enrolled on <b>Cohort 41</b>, led by <b>Priya Nair</b>. It starts in ${f.startIn} days. Coursework opens on the start day; until then, you can meet your cohort.</p></div>
+      </div>
+    </div>
+    ${preStartBlock(f)}`;
+
+  /* COHORT CANCELLED, MOVED TO A REPLACEMENT (story 7.6 / 15.2). The summary
+     states the cancellation and the move; the pre-start waiting state follows.
+     The admin's reason is internal and is never shown here (8.3). Menu-only. */
+  else if(f.cancelled) body = `
+    ${dashPh('Welcome back, Maryam!','Explorer Track &ndash; E3 &middot; cohort cancelled &middot; moved to Cohort 47')}
+    ${jrnList()}
+    <div class="sec">
+      <div class="ai-aura tile">
+        <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
+        <div class="ai-body"><p>Your cohort was cancelled. You have been moved to <b>Cohort 47</b>, which starts on 12 Mar 2026. Your place and payment carried over, so there is nothing to pay again.</p></div>
+      </div>
+    </div>
+    ${preStartBlock(f)}`;
+
+  /* INTERVIEW COULD NOT TAKE PLACE, REBOOKING AVAILABLE (story 8.3 / 15.2). The
+     next step is to book another interview; the credit and the time left are on
+     the block, and the stepper stays at the interview step, current. Menu-only. */
+  else if(f.rebook) body = `
+    ${dashPh('Welcome back, Maryam!','Explorer track &middot; interview could not take place &middot; free rebooking')}
+    ${jrnList()}
+    <div class="sec">
+      <div class="ai-aura tile">
+        <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
+        <div class="ai-body"><p>Your interview with <b>Priya</b> could not take place. You have a <b>free rebooking</b> with 14 days left to use it. Book another interview when you are ready.</p></div>
+      </div>
+    </div>
+    <div class="sec">
+      <div class="sec-h"><h2>Book another interview</h2></div>
+      <div class="kv"><span class="k">Agent</span><span class="v">Priya Nair</span></div>
+      <div class="kv"><span class="k">Rebooking</span><span class="v">Free rebooking</span></div>
+      <div class="kv"><span class="k">Time left</span><span class="v">14 days</span></div>
+      <div style="margin-top:var(--s05)"><button class="btn btn-p noic" data-go="agents">Book another interview ${I.arrowRight}</button></div>
+    </div>`;
 
   else { /* enrolled: week1, day34, day90 */
     const g = GAME[S.stage];
@@ -7966,61 +8055,30 @@ function quizRose(dims, score, bare){
   </div>`;
 }
 
-V.result = (f) => {
-  const low = qzLow(2).map(([k,v]) => ({k, v, ch:qzChapter(k)}));
-  const mark = (ic, kind, txt) =>
-    `<div class="qz-row"><span class="qz-mk ${kind}">${ic}</span><span class="qz-t">${txt}</span></div>`;
-  return `<main class="main"><div class="page">
+/* QUIZ RESULTS IS THE LEAN 15.3 SCREEN (Maryam, 30 Sep 2026: "strip to the lean
+   version"). Story 15.3: show ONLY the track from the latest quiz and a line that
+   the level is set at the interview, not by the quiz. The date is stored but NOT
+   shown; the raw answers are not stored and not shown; earlier retakes are not
+   shown. So the score (64 of 100), the taken-date subtitle, the rose chart, the
+   "What the quiz saw" strengths/growth tile and the "Where the course picks this
+   up" band are all gone. Read-only — the one control is navigation (book the
+   interview) on the pre-interview state, which changes nothing about the result.
+
+   ORPHANED BY THIS, FLAGGED NOT DELETED: `quizRose`, `qzLow`, `qzChapter`,
+   `qzTaken`, `QZ_STR`, `QZ_DEV` and the `.qz-*` chart layer had `V.result` as
+   their only candidate-portal caller. They are kept rather than pruned — this is
+   a one-page content decision and the revert is putting the old body back — so
+   they are the "gate nothing writes" tell here on purpose, not by oversight. */
+V.result = (f) => `<main class="main"><div class="page">
   ${crumb(['My Level','level'],'Quiz result')}
-  ${ph('Quiz result', `Explorer track &middot; 64 of 100 &middot; taken ${qzTaken(true)}`)}
+  ${ph('Quiz result', 'Explorer track')}
   <div class="sec">
-    <div class="sec-h"><h2>How you scored</h2></div>
-    ${quizRose(SCORES, 64)}
-  </div>
-  ${''/* TWO LISTS UNDER ONE HEADING, and the heading is what stops them being
-        read as Priya's. `.sig-l` is the label the report already uses for
-        exactly this pair — §58 gives it full ink and 28px of air — and it is
-        scoped to `.ai-body`, which is why the tile has one. */}
-  <div class="sec">
-    <div class="sec-h"><h2>What the quiz saw</h2></div>
-    ${''/* THE SOURCE LINE IS THE TILE'S FOOT, NOT THE SECTION'S HELPER. At
-          desktop §10.15 gives this section a 184px label column — it holds a
-          `.tile`, which is not on the opt-out list — and "What the quiz saw"
-          is already three lines in it. A second line of helper text under
-          that put five lines of grey in a gutter beside a two-item list.
-          `.ai-foot` is where `V.report` puts "Written by Priya Nair from your
-          interview", which is the same sentence doing the same job: it says
-          whose reading this is, at the end of the reading. */}
-    <div class="tile">
-      <div class="ai-body">
-        <p class="t-label-01 sig-l">What you do well</p>
-        ${QZ_STR.map(s => mark(I.checkFilled, 'ok', s)).join('')}
-        <p class="t-label-01 sig-l">Where you lose ground</p>
-        ${QZ_DEV.map(s => mark(I.growth, 'wa', s)).join('')}
-      </div>
-      <div class="ai-foot"><span class="t-legal-01" style="color:var(--text-helper)">From a hundred
-        multiple-choice answers &mdash; not from an interview</span></div>
-    </div>
-  </div>
-  ${''/* THE BRIDGE TO THE COURSE, and it is the reason this page exists rather
-        than being two paragraphs on My Level. The two weakest bands are
-        derived, their chapters are looked up in `CH`, and the action depends
-        on whether anybody has interviewed you yet: unlevelled, the next step
-        is the interview these two bands will be pushed on; levelled, the
-        report is where they were pushed. */}
-  <div class="sec tint">
-    <div class="sec-h"><h2>Where the course picks this up</h2></div>
-    ${low.map(b => `<div class="kv"><span class="k">${b.k} &middot; ${b.v}</span>
-      <span class="v">${b.ch ? `Chapter ${b.ch.n} &middot; ${b.ch.t}` : 'Not on this course'}</span></div>`).join('')}
-    <p class="t-helper-01 mt4">Your course opens at your level, and these two chapters are where the 90
-      days spend the most time. The quiz cannot tell them apart from a bad afternoon &mdash;
-      ${f.pred ? 'the interview is what does.' : 'the interview is what did.'}</p>
-    <div class="mt5">${f.pred
-      ? `<button class="btn btn-p" data-go="agents">Book your interview ${I.calendar}</button>`
-      : `<button class="btn btn-g" data-go="report">Read your report ${I.arrowRight}</button>`}</div>
+    <div class="sec-h"><h2>Your track</h2></div>
+    <p>Your latest quiz put you on the <b>Explorer track</b>.</p>
+    <p class="t-helper-01 mt4">Your track is the band you start in. Your <b>level is set at your interview</b>, not by the quiz.${f.pred ? '' : ' A later level can move you onto another track, but this stays the track your quiz produced.'}</p>
+    ${f.pred ? `<div class="mt5"><button class="btn btn-p" data-go="agents">Book your interview ${I.calendar}</button></div>` : ''}
   </div>
 </div></main>`;
-};
 
 V.report = (f) => `<main class="main"><div class="page">
   ${crumb(['My Level','level'],'Report')}
@@ -14352,8 +14410,17 @@ function go(target, fresh){
 const TAL_BEAT = 1400;
 let talTimer = null;
 let talQueue = [];
+/* THE DAILY LIMIT IS ENFORCED HERE, AT THE ONE PLACE A QUESTION IS SUBMITTED
+   (story 15.5). Every path — the composer send, a suggestion chip, a widget
+   follow-up chip, a voice message — reaches `ask()`, so one guard covers them
+   all: at the limit the question is refused and the composer/chips (disabled in
+   `askView`) never let it be sent anyway. A chip counts like any other question,
+   which is automatic because a chip calls `ask()` too. */
+const talAtLimit = () => S.talAsked >= TAL_LIMIT;
 function ask(q){
   if(!q) return;
+  if(talAtLimit()) return;
+  S.talAsked++;
   S.thread.push({who:'me', html:q});
   talQueue.push(q);
   S.typing = true;
@@ -15570,7 +15637,7 @@ function render(){
             `S.enrolOk` alone would follow the reader to day 34 with a sentence
             saying chapter 1 opened today; the stage test is what stops it, and
             it costs nothing because the dialog covers the app while it is up. */
-         + (S.enrolOk && S.stage==='week1' ? enrolSheet() : '')
+         + (S.enrolOk && S.stage==='enrolPre' ? enrolSheet() : '')
          /* STORY-GAP MODALS: the receipt (Payments) and the cancel-interview
             reason dialog (Interviews). Each is gated on its page and its own
             state, the pattern the four sheets above use. */
@@ -15850,7 +15917,11 @@ device.addEventListener('click', e => {
      `setStage` DOES NOT CLEAR THE FLAG, which is why the render gate tests the
      stage as well. Nothing else sets it, so it cannot be true on a stage the
      reader walked to with the picker. */
-  if(t.closest('[data-paid]')){ S.enrolOk = true; setStage('week1'); return; }
+  /* PAYING LANDS ON `enrolPre`, NOT `week1` (Maryam, 30 Sep 2026): enrolment is
+     complete but the cohort has not started, so the reader lands on the pre-start
+     dashboard and picks `week1` (the running cohort) from the stage menu when
+     they want it. The success dialog gates on `enrolPre` to match. */
+  if(t.closest('[data-paid]')){ S.enrolOk = true; setStage('enrolPre'); return; }
 
   /* THE INTERVIEW BOOKING (Maryam, 18 Sep 2026) — same shape as `data-paid`:
      `data-book` skips the checkout screen, lands on the booked dashboard

@@ -200,6 +200,9 @@
    -------------------------------------------------------------------------- */
 .app .tal-panel .tal-sugg{
   display:flex;flex-wrap:wrap;gap:8px;padding:0 20px 15px;border-top:0}
+/* THE DAILY-LIMIT LINE AND THE OFF COMPOSER (story 15.5). §63 owns the type. */
+.app .tal-panel .tal-limit{padding:0 20px 15px;color:var(--text-secondary);text-align:center}
+.app .tal-panel .composer-off{opacity:.5;pointer-events:none}
 .app .tal-panel .tal-sugg .chip-tal{min-height:38px}
 .app .tal-panel .composer{
   display:flex;align-items:stretch;gap:0;

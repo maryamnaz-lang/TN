@@ -390,9 +390,15 @@ function askView(f){
     </div>
     <div class="ask-thread" id="askThread">${thread}</div>
     <div class="ask-foot">
-      ${opened ? '' : `<div class="ask-sugg">${ctx.map(s =>
-        `<button class="chip-tal" data-ask="1"><span class="sk-mark xs"></span>${s}</button>`).join('')}</div>`}
-      <div class="askfield">
+      ${''/* THE DAILY-LIMIT STATE (story 15.5). At the limit the thread carries the
+             limit line, the suggestion chips are gone (inactive) and the composer
+             below is disabled. `talAtLimit` is a views.js const, available at render
+             time. Below the limit it is the usual chip row. */}
+      ${talAtLimit()
+        ? `<div class="ask-limit">You have asked Tal everything it can take today. Come back tomorrow.</div>`
+        : (opened ? '' : `<div class="ask-sugg">${ctx.map(s =>
+          `<button class="chip-tal" data-ask="1"><span class="sk-mark xs"></span>${s}</button>`).join('')}</div>`)}
+      <div class="askfield${talAtLimit()?' askfield-off':''}">
         ${''/* THE COMET COMES BACK (Maryam, 17 Sep 2026: "in the internal chat
                screens make sure the ui of chat bar is almost same in terms of
                shadows and this running strobe effect"). §118's note records the
@@ -404,7 +410,10 @@ function askView(f){
                took the first one off to avoid. */}
         ${AI_RUN}
         <span class="askv-clip">${I.attachFile}</span>
-        <input class="inp" id="askIn" placeholder="What can I help you with?" autocomplete="off">
+        ${''/* PLACEHOLDER "Ask Tal anything" — the fixed placeholder story 15.5
+               names. Disabled at the daily limit (the send is already disabled at
+               render and stays that way while the input is off). */}
+        <input class="inp" id="askIn" placeholder="Ask Tal anything" autocomplete="off"${talAtLimit()?' disabled':''}>
         ${''/* THE MIC IS DRAWN ONLY WHERE IT CAN WORK — §60's rule, applied to a
                browser capability rather than to missing data: "a dead control on
                a live surface is worse than a missing one", which is why the
@@ -419,7 +428,7 @@ function askView(f){
                beside the send because it is the field's own control, and it is
                still drawn only where the recogniser exists (`SPEECH_OK`), so a
                browser with no Web Speech keeps the field it always had. */}
-        ${SPEECH_OK ? `<button class="askfield-mic" data-askmic="1"
+        ${SPEECH_OK && !talAtLimit() ? `<button class="askfield-mic" data-askmic="1"
           aria-label="Record a voice message"
           title="Record a voice message">${I.microphone}</button>` : ''}
         ${''/* THE SEND IS OFF UNTIL THERE IS SOMETHING TO SEND (Maryam, 2 Sep

@@ -14,7 +14,7 @@
      The <style> block is PROTOTYPE CHROME AND NOTHING ELSE (the device frame,
      the viewport picker, the wordmark size, a toast host) — no product rule.
      ========================================================================== -->
-<link rel="stylesheet" href="design-system/talentnext-ds.css?b=5c8f6308">
+<link rel="stylesheet" href="design-system/talentnext-ds.css?b=35f7e50b">
 <style id="admin-auth-slider">
 /* THE FRONT DOOR IS A SLIDER — ported verbatim from the candidate portal's
    §132 (hifi/build/132-authslide.css). That layer is hifi-only
@@ -1551,7 +1551,7 @@ input:-webkit-autofill:focus{
   </div>
 </div>
 
-<script src="design-system/talentnext-ds.js?b=5c8f6308"></script>
+<script src="design-system/talentnext-ds.js?b=35f7e50b"></script>
 <script>
 /* ==========================================================================
    THE SUPER ADMIN PORTAL
@@ -2324,6 +2324,49 @@ const FEE_LOG=[
 /* The two Money values (payout release delay, payout run day) live in the Platform
    Settings `SETTINGS` object (Epic 11.1, `SETTINGS.payoutDelay` / `.payoutRunDay`);
    Fee Settings reads them live and their change history is FEE_LOG above. */
+/* EPIC 9.5 / 9.6 — DISCOUNT CODES (Maryam, 30 Sep 2026). A code is a string a
+   candidate enters at checkout (or the system-owned AUTOMATIC first-interview
+   discount, applied without a code). `applies`: course / interview / both.
+   `application`: checkout (user codes) / automatic (system). `limit` is the usage
+   limit (null = Unlimited); `perCand` the per-candidate limit. `deactivated` is the
+   manual off switch. `system:true` marks the one platform-owned automatic code
+   (cannot be created/edited by hand; only Enabled/Disabled). Status is DERIVED
+   (`discStatus`): deactivated → expired (past end) → exhausted (used ≥ limit) →
+   scheduled (start in the future) → live. `red` is the redemption ledger — used
+   count and value-given are read off it, so the listing and the detail always
+   agree (the seed-drift trap). Authored placeholder (§74) — no real redemption
+   telemetry in the seed; the automatic code's redemptions are the platform-funded
+   first interviews (paid $0, funded by Platform). */
+const DISCOUNTS=[
+ {id:'dc1', code:'FIRST-INTERVIEW', name:'Automatic first-interview discount', pct:100, applies:'interview', application:'automatic', start:'2026-01-01', end:'2027-12-31', limit:null, perCand:1, deactivated:false, system:true, red:[
+   {cand:'Grace Kim',      ref:'TXN-9034', txId:'t14', date:'2026-09-26', original:95,  discounted:95,  paid:0, source:'Platform'},
+   {cand:'Noah Kim',       ref:'TXN-8980', txId:'',    date:'2026-09-20', original:95,  discounted:95,  paid:0, source:'Platform'},
+   {cand:'Lucas Ferreira', ref:'TXN-8944', txId:'',    date:'2026-09-14', original:110, discounted:110, paid:0, source:'Platform'},
+   {cand:'Chris Boone',    ref:'TXN-8901', txId:'',    date:'2026-09-08', original:95,  discounted:95,  paid:0, source:'Platform'}
+ ]},
+ {id:'dc2', code:'WELCOME20', name:'Welcome — 20% off', pct:20, applies:'both', application:'checkout', start:'2026-09-01', end:'2026-12-31', limit:100, perCand:1, deactivated:false, system:false, red:[
+   {cand:'Maryam Naz',   ref:'TXN-9042', txId:'t1',  date:'2026-09-28', original:100, discounted:20, paid:80,  source:'Candidate'},
+   {cand:'Ava Thompson', ref:'TXN-9036', txId:'t4',  date:'2026-09-27', original:100, discounted:20, paid:80,  source:'Candidate'},
+   {cand:'Oliver Grant', ref:'TXN-9028', txId:'t7',  date:'2026-09-25', original:195, discounted:39, paid:156, source:'Candidate'},
+   {cand:'Liam Chen',    ref:'TXN-9016', txId:'t13', date:'2026-09-22', original:100, discounted:20, paid:80,  source:'Candidate'}
+ ]},
+ {id:'dc3', code:'AUTUMN15', name:'Autumn course promotion', pct:15, applies:'course', application:'checkout', start:'2026-10-15', end:'2026-12-15', limit:50, perCand:1, deactivated:false, system:false, red:[]},
+ {id:'dc4', code:'LAUNCH25', name:'Launch — 25% off interviews', pct:25, applies:'interview', application:'checkout', start:'2026-06-01', end:'2026-08-31', limit:80, perCand:1, deactivated:false, system:false, red:[
+   {cand:'Emma Novak',  ref:'TXN-8790', txId:'', date:'2026-08-20', original:180, discounted:45, paid:135, source:'Candidate'},
+   {cand:'Sophia Ali',  ref:'TXN-8654', txId:'', date:'2026-07-30', original:200, discounted:50, paid:150, source:'Candidate'},
+   {cand:'Jordan Vale', ref:'TXN-8501', txId:'', date:'2026-07-12', original:220, discounted:55, paid:165, source:'Candidate'}
+ ]},
+ {id:'dc5', code:'FIRST50', name:'Early bird — 50% off first course', pct:50, applies:'course', application:'checkout', start:'2026-08-01', end:'2026-11-30', limit:4, perCand:1, deactivated:false, system:false, red:[
+   {cand:'Nathan Brooks',  ref:'TXN-8388', txId:'', date:'2026-09-05', original:100, discounted:50, paid:50, source:'Candidate'},
+   {cand:'Kai Andersen',   ref:'TXN-8299', txId:'', date:'2026-08-28', original:100, discounted:50, paid:50, source:'Candidate'},
+   {cand:'Noor Adib',      ref:'TXN-8102', txId:'', date:'2026-08-18', original:100, discounted:50, paid:50, source:'Candidate'},
+   {cand:'Diego Alvarez',  ref:'TXN-8044', txId:'', date:'2026-08-06', original:100, discounted:50, paid:50, source:'Candidate'}
+ ]},
+ {id:'dc6', code:'PROMO10', name:'General 10% promotion', pct:10, applies:'both', application:'checkout', start:'2026-07-01', end:'2026-12-31', limit:null, perCand:2, deactivated:true, system:false, red:[
+   {cand:'Yusuf Demir', ref:'TXN-8500', txId:'', date:'2026-08-15', original:100, discounted:10, paid:90,  source:'Candidate'},
+   {cand:'Sophia Ali',  ref:'TXN-8410', txId:'', date:'2026-08-02', original:150, discounted:15, paid:135, source:'Candidate'}
+ ]}
+];
 const INVOICES=[
  {id:'iv1', num:'INV-2026-0142', party:'Meridian Labs', partyType:'Employer',  type:'Interview unlocks', qty:3, amount:120, issued:'2026-08-11', due:'2026-08-25', status:'sent',    method:'Invoice / ACH'},
  {id:'iv2', num:'INV-2026-0141', party:'BrightPath',    partyType:'Employer',  type:'Interview unlocks', qty:1, amount:40,  issued:'2026-08-05', due:'2026-08-19', status:'paid',    method:'Visa •9002'},
@@ -2679,8 +2722,8 @@ const MODULES=[
       employers (all of Invoices) are out of the system; they stay defined + deep-link
       reachable, drop `hidden` to bring one back. Fee Configuration is superseded by
       Fee Settings (9.4) and kept hidden. First visible sub is Transactions. */
-   {k:'transactions', t:'Transactions'}, {k:'payouts', t:'Payouts'}, {k:'feesettings', t:'Fee Settings'}, {k:'reconciliation', t:'Reconciliation'},
-   {k:'transaction', t:'Transaction', hidden:true}, {k:'batch', t:'Settlement batch', hidden:true},
+   {k:'transactions', t:'Transactions'}, {k:'payouts', t:'Payouts'}, {k:'feesettings', t:'Fee Settings'}, {k:'discounts', t:'Discount Codes'}, {k:'reconciliation', t:'Reconciliation'},
+   {k:'transaction', t:'Transaction', hidden:true}, {k:'batch', t:'Settlement batch', hidden:true}, {k:'discount', t:'Discount code', hidden:true},
    {k:'overview', t:'Overview', hidden:true}, {k:'invoices', t:'Invoices & Billing', hidden:true}, {k:'refunds', t:'Refunds & Disputes', hidden:true}, {k:'feeconfig', t:'Fee Configuration', hidden:true}]},
  /* CRM & Attribution hidden wholesale for now (Maryam, 16 Sep 2026: "hide
     complete crm and attribution module"), like Vetting — the module and its
@@ -12434,8 +12477,304 @@ ACTIONS.docommission = key => {
   toast(`Commission for ${a.name} set to ${p.pct}%`);
 };
 
+/* ─── EPIC 9.5 / 9.6 — DISCOUNT CODES ──────────────────────────────────────────
+   The listing (9.5) and the read-only detail (9.6). Screens-only, like the rest of
+   the portal: every action is shown, none is permission-gated (the single Super
+   Admin holds Finance: View, Change fee and Data: Export); the step-up password on
+   the fee-changing actions is still simulated per story 1.4. Two divergences from
+   the story text, both toward the Finance module's own conventions (a standing
+   Maryam ruling wins over a story per DESIGN.md): Status is the primary TAB STRIP
+   (not a dropdown) like every other finance register, and dates read MM-DD-YYYY
+   (the platform date format) rather than "12 Mar 2026". Column-click sorting is off
+   portal-wide (Maryam 13 Sep), so the default Status→end-date order is applied by
+   pre-sorting the rows. */
+const DISC_APPLIES = {course:'Course fees', interview:'Interviews', both:'Both'};
+const DISC_APPLY   = {checkout:'Entered at checkout', automatic:'Automatic'};
+const discUsed  = d => (d.red || []).length;
+const discValue = d => (d.red || []).reduce((s, r) => s + (Number(r.discounted) || 0), 0);
+function discStatus(d){
+  if(d.deactivated) return 'deactivated';
+  const t = todayISO();
+  if(d.end && d.end < t) return 'expired';
+  if(d.limit != null && discUsed(d) >= d.limit) return 'exhausted';
+  if(d.start && d.start > t) return 'scheduled';
+  return 'live';
+}
+/* default sort order: Live first, then by end date (9.5). */
+const DISC_ORDER = {live:0, scheduled:1, exhausted:2, expired:3, deactivated:4};
+const discStatusTag = d => tag(discStatus(d));   /* live→green, scheduled→amber, expired→red; exhausted/deactivated read plain */
+const discValidCell = d => `${dpFmt(d.start) || d.start} – ${dpFmt(d.end) || d.end}`;
+const discUsedCell  = d => d.limit == null ? `${discUsed(d)} · Unlimited` : `${discUsed(d)} / ${d.limit}`;
+/* a compact before/after snapshot for the audit line */
+const discSnap = d => `${d.pct}% · ${DISC_APPLIES[d.applies]} · ${dpFmt(d.start)}–${dpFmt(d.end)} · limit ${d.limit == null ? 'none' : d.limit}`;
+function discActs(d){
+  const st = discStatus(d);
+  const acts = [['view', 'View', `data-go="finance/discount/${d.id}"`]];
+  if(d.system){
+    /* the system-owned automatic discount toggles Enable / Disable (9.5) */
+    if(st === 'deactivated') acts.push(['play', 'Enable', `data-sheet="discenable:${d.id}"`]);
+    else if(st === 'live')   acts.push(['pause', 'Disable', `data-sheet="discdisable:${d.id}"`]);
+  } else if(st === 'scheduled' || st === 'live'){
+    acts.push(['edit', 'Edit', `data-sheet="discedit:${d.id}"`]);
+    acts.push(['close', 'Deactivate', `data-sheet="discdeact:${d.id}"`]);
+  }
+  return rowActs(acts);
+}
+function financeDiscounts(){
+  const sf = getFilter('dstatus', 'all'), af = getFilter('dapplies', 'all'), q = getFilter('q', '');
+  const base = DISCOUNTS;
+  const rows = base
+    .filter(d => sf === 'all' ? true : discStatus(d) === sf)
+    .filter(d => af === 'all' ? true : d.applies === af)
+    .filter(d => hit(q, d.code, d.name));
+  const sorted = rows.slice().sort((a, b) => {
+    const oa = DISC_ORDER[discStatus(a)], ob = DISC_ORDER[discStatus(b)];
+    if(oa !== ob) return oa - ob;
+    return String(a.end || '').localeCompare(String(b.end || ''));
+  });
+  const totalGiven = sorted.reduce((s, d) => s + discValue(d), 0);
+  return `
+  <section class="sec">
+    ${searchHead('Discount Codes', 'Every discount code and how much it has funded — what is live, what has run its course, and what has cost more than it was meant to.',
+      `${finExportBtn('Discount Codes')} <button class="btn btn-p btn-sm noic" data-sheet="disccreate">${I.add} Create Discount Code</button>`, 'Search by code or name')}
+    ${filterStrip('dstatus', 'all', [
+      ['all', 'All', base.length],
+      ['scheduled', 'Scheduled', base.filter(d => discStatus(d) === 'scheduled').length],
+      ['live', 'Live', base.filter(d => discStatus(d) === 'live').length],
+      ['expired', 'Expired', base.filter(d => discStatus(d) === 'expired').length],
+      ['exhausted', 'Exhausted', base.filter(d => discStatus(d) === 'exhausted').length],
+      ['deactivated', 'Deactivated', base.filter(d => discStatus(d) === 'deactivated').length]
+    ])}
+    ${lstTools('Search by code or name',
+      filterDd('dapplies', 'all', [['all', 'All'], ['course', 'Course fees'], ['interview', 'Interviews'], ['both', 'Both']], 'Applies to'))}
+    ${sorted.length ? table(
+      [{label:'Code'}, {label:'Name'}, {label:'Discount', num:true}, {label:'Applies to'}, {label:'Application'}, {label:'Valid'}, {label:'Used'}, {label:'Value given', num:true}, {label:'Status'}, ACT_COL],
+      sorted.map(d => ({id:d.id, go:'finance/discount/' + d.id, sv:[d.code, d.name], cells:[
+        `<b>${esc(d.code.toUpperCase())}</b>${d.system ? ' <span class="tag sm bordered">Automatic</span>' : ''}`,
+        esc(d.name),
+        d.pct + '%',
+        esc(DISC_APPLIES[d.applies] || d.applies),
+        esc(DISC_APPLY[d.application] || d.application),
+        discValidCell(d),
+        discUsedCell(d),
+        money(discValue(d)),
+        discStatusTag(d),
+        discActs(d)
+      ]})), {select:false})
+      : emptyState('ticket', 'No discount codes match', 'Nothing in this filter yet.')}
+  </section>
+  <section class="sec">
+    ${secHead('Totals for this view')}
+    ${kv([['Value given away', money(totalGiven), 'n']])}
+  </section>`;
+}
+/* EPIC 9.6 — VIEW DISCOUNT CODE DETAIL. Read-only; every change is made from the
+   listing. Summary + the redemption ledger (paged at 5, so the shown count matches
+   the summary's total). A redemption row links to its transaction where one exists. */
+function financeDiscount(){
+  const d = DISCOUNTS.find(x => x.id === S.id);
+  if(!d) return `${detailHead('finance/discounts')}
+    <section class="sec">${emptyState('ticket', 'Discount code not found', 'This code is no longer in the register.')}</section>`;
+  DETAIL_LABEL = d.code.toUpperCase();
+  const used = discUsed(d);
+  return `${detailHead('finance/discounts')}
+    <section class="sec">
+      ${aiHead(d.code.toUpperCase(), `${esc(d.name)} · ${d.pct}% off ${DISC_APPLIES[d.applies]}`)}
+    </section>
+    <section class="sec">
+      ${secHead('Summary')}
+      ${kv([
+        ['Code', esc(d.code.toUpperCase())],
+        ['Status', discStatusTag(d)],
+        ['Discount', `${d.pct}% off ${esc(DISC_APPLIES[d.applies])}`],
+        ['Application', esc(DISC_APPLY[d.application] || d.application)],
+        ['Valid', discValidCell(d)],
+        ['Redemption limit', d.limit == null ? 'No limit' : String(d.limit)],
+        ['Redemptions', d.limit == null ? `${used} · no limit` : `${used} / ${d.limit}`],
+        ['Value given away', money(discValue(d)), 'n']
+      ])}
+    </section>
+    <section class="sec">
+      ${secHead('Redemptions')}
+      ${(d.red && d.red.length) ? table(
+        [{label:'Candidate'}, {label:'Reference'}, {label:'Date'}, {label:'Original', num:true}, {label:'Discounted', num:true}, {label:'Paid', num:true}, {label:'Funding source'}],
+        d.red.map(r => ({go: r.txId ? 'finance/transaction/' + r.txId : undefined, sv:[r.cand], cells:[
+          personCell(r.cand, ''),
+          r.txId ? `<a data-go="finance/transaction/${r.txId}">${esc(r.ref)}</a>` : esc(r.ref),
+          dpFmt(r.date) || r.date,
+          money(r.original),
+          money(r.discounted),
+          money(r.paid),
+          esc(r.source)
+        ]})), {select:false})
+        : emptyState('ticket', 'No redemptions yet', 'No one has used this code.')}
+    </section>`;
+}
+/* ─── EPIC 9.5 DISCOUNT-CODE ACTIONS ───────────────────────────────────────────
+   CREATE (a plain form; a user code is always Entered at checkout). EDIT is
+   conditional on status — a Scheduled code opens every field but the code string, a
+   Live code only its end date and usage limit (the rest shown disabled) — with a
+   mandatory reason, the story's confirmation and the step-up password. DEACTIVATE
+   is a reason sheet + confirmation (no step-up). ENABLE / DISABLE toggle the
+   system-owned automatic discount, each a reason sheet + confirmation + step-up. */
+SHEETS.disccreate = () => ({
+  title:'Create discount code',
+  body:`
+    ${fieldHtml({k:'code', l:'Code', t:'text', req:1, ph:'The string a candidate enters, e.g. WELCOME20', max:24})}
+    ${fieldHtml({k:'name', l:'Name', t:'text', req:1, ph:'Internal name for the promotion'})}
+    ${fieldHtml({k:'pct', l:'Discount (%)', t:'number', req:1, ph:'1 to 100'})}
+    ${fieldHtml({k:'applies', l:'Applies to', t:'select', req:1, ph:'Choose what it applies to', opts:[['course', 'Course fees'], ['interview', 'Interviews'], ['both', 'Both']]})}
+    ${fieldHtml({k:'start', l:'Start date', t:'date', req:1, ph:'Today or later'})}
+    ${fieldHtml({k:'end', l:'End date', t:'date', req:1, ph:'On or after the start date'})}
+    ${fieldHtml({k:'limit', l:'Usage limit', t:'number', ph:'Leave blank for no limit'})}
+    ${fieldHtml({k:'perCand', l:'Limit per candidate', t:'number', ph:'Leave blank for no per-candidate limit'})}
+    <div class="sheet-help"><svg class="sheet-help-ic" viewBox="0 0 24 24" aria-hidden="true">${inner('info')}</svg><p class="t-desc">A user-created code is entered by the candidate at checkout. The automatic first-interview discount is system-owned and cannot be created here.</p></div>`,
+  ok:'Create Discount Code', act:'submitdisccreate'
+});
+ACTIONS.submitdisccreate = () => {
+  const v = readForm(), t = todayISO();
+  const code = String(v.code || '').trim().toUpperCase(), name = String(v.name || '').trim(), pct = Number(v.pct);
+  if(!code){ toast('A code is required', 'warn'); return 'keep'; }
+  if(DISCOUNTS.some(d => d.code.toUpperCase() === code)){ toast('That code already exists', 'warn'); return 'keep'; }
+  if(!name){ toast('A name is required', 'warn'); return 'keep'; }
+  if(v.pct === '' || isNaN(pct) || pct < 1 || pct > 100){ toast('Enter a discount between 1 and 100', 'warn'); return 'keep'; }
+  if(!v.applies){ toast('Choose what the code applies to', 'warn'); return 'keep'; }
+  if(!v.start){ toast('A start date is required', 'warn'); return 'keep'; }
+  if(v.start < t){ toast('The start date must be today or later', 'warn'); return 'keep'; }
+  if(!v.end){ toast('An end date is required', 'warn'); return 'keep'; }
+  if(v.end < v.start){ toast('The end date must be on or after the start date', 'warn'); return 'keep'; }
+  const limit = (v.limit === '' || v.limit == null) ? null : Number(v.limit);
+  if(limit != null && (isNaN(limit) || limit < 1)){ toast('The usage limit must be 1 or more', 'warn'); return 'keep'; }
+  const perCand = (v.perCand === '' || v.perCand == null) ? null : Number(v.perCand);
+  if(perCand != null && (isNaN(perCand) || perCand < 1)){ toast('The per-candidate limit must be 1 or more', 'warn'); return 'keep'; }
+  const d = {id:newId('dc', DISCOUNTS), code, name, pct, applies:v.applies, application:'checkout', start:v.start, end:v.end, limit, perCand, deactivated:false, system:false, red:[]};
+  DISCOUNTS.unshift(d);
+  audit('Created discount code', `${code} — ${pct}% off ${DISC_APPLIES[d.applies]}`, 'Finance & Settlement', 'high');
+  toast(`Discount code ${code} created`);
+};
+SHEETS.discedit = id => {
+  const d = DISCOUNTS.find(x => x.id === id); if(!d) return null;
+  const live = discStatus(d) === 'live';   /* Live locks all but end date + usage limit */
+  return {
+    title:`Edit discount code — ${d.code.toUpperCase()}`,
+    body:`
+      ${fieldHtml({k:'code', l:'Code', t:'text', ro:true}, d.code.toUpperCase())}
+      ${live ? fieldHtml({k:'nameRo', l:'Name', t:'text', ro:true}, d.name)
+             : fieldHtml({k:'name', l:'Name', t:'text', req:1}, d.name)}
+      ${live ? fieldHtml({k:'pctRo', l:'Discount (%)', t:'text', ro:true}, d.pct + '%')
+             : fieldHtml({k:'pct', l:'Discount (%)', t:'number', req:1}, d.pct)}
+      ${live ? fieldHtml({k:'appliesRo', l:'Applies to', t:'text', ro:true}, DISC_APPLIES[d.applies])
+             : fieldHtml({k:'applies', l:'Applies to', t:'select', req:1, opts:[['course', 'Course fees'], ['interview', 'Interviews'], ['both', 'Both']]}, d.applies)}
+      ${live ? fieldHtml({k:'startRo', l:'Start date', t:'text', ro:true}, dpFmt(d.start))
+             : fieldHtml({k:'start', l:'Start date', t:'date', req:1}, d.start)}
+      ${fieldHtml({k:'end', l:'End date', t:'date', req:1}, d.end)}
+      ${fieldHtml({k:'limit', l:'Usage limit', t:'number', ph:'Leave blank for no limit'}, d.limit == null ? '' : d.limit)}
+      ${live ? fieldHtml({k:'perCandRo', l:'Limit per candidate', t:'text', ro:true}, d.perCand == null ? 'No limit' : String(d.perCand))
+             : fieldHtml({k:'perCand', l:'Limit per candidate', t:'number', ph:'Leave blank for no per-candidate limit'}, d.perCand == null ? '' : d.perCand)}
+      ${fieldHtml({k:'reason', l:'Reason', t:'textarea', req:1, max:500, ph:'Recorded on the audit log (1–500 characters).'})}
+      <div class="sheet-help"><svg class="sheet-help-ic" viewBox="0 0 24 24" aria-hidden="true">${inner('info')}</svg><p class="t-desc">${live ? 'While a code is live, only the end date and the usage limit can be changed. The other fields are shown for reference.' : 'The code string is fixed for the life of the code. Every other field can be changed while the code is scheduled.'}</p></div>`,
+    ok:'Continue', act:'submitdiscedit:' + d.id
+  };
+};
+ACTIONS.submitdiscedit = key => {
+  const id = key.split(':')[1], d = DISCOUNTS.find(x => x.id === id); if(!d) return;
+  const live = discStatus(d) === 'live', v = readForm(), t = todayISO(), used = discUsed(d);
+  const reason = String(v.reason || '').trim();
+  let ch;
+  if(live){
+    if(!v.end){ toast('An end date is required', 'warn'); return 'keep'; }
+    if(v.end < t){ toast('The end date must be today or later', 'warn'); return 'keep'; }
+    if(v.end < d.start){ toast('The end date must be on or after the start date', 'warn'); return 'keep'; }
+    const limit = (v.limit === '' || v.limit == null) ? null : Number(v.limit);
+    if(limit != null && (isNaN(limit) || limit < 1)){ toast('The usage limit must be 1 or more', 'warn'); return 'keep'; }
+    if(limit != null && limit < used){ toast(`The usage limit can’t be below the ${used} already redeemed`, 'warn'); return 'keep'; }
+    ch = {end:v.end, limit};
+  } else {
+    const name = String(v.name || '').trim(), pct = Number(v.pct);
+    if(!name){ toast('A name is required', 'warn'); return 'keep'; }
+    if(v.pct === '' || isNaN(pct) || pct < 1 || pct > 100){ toast('Enter a discount between 1 and 100', 'warn'); return 'keep'; }
+    if(!v.applies){ toast('Choose what the code applies to', 'warn'); return 'keep'; }
+    if(!v.start){ toast('A start date is required', 'warn'); return 'keep'; }
+    if(v.start < t){ toast('The start date must be today or later', 'warn'); return 'keep'; }
+    if(!v.end){ toast('An end date is required', 'warn'); return 'keep'; }
+    if(v.end < v.start){ toast('The end date must be on or after the start date', 'warn'); return 'keep'; }
+    const limit = (v.limit === '' || v.limit == null) ? null : Number(v.limit);
+    if(limit != null && (isNaN(limit) || limit < 1)){ toast('The usage limit must be 1 or more', 'warn'); return 'keep'; }
+    const perCand = (v.perCand === '' || v.perCand == null) ? null : Number(v.perCand);
+    if(perCand != null && (isNaN(perCand) || perCand < 1)){ toast('The per-candidate limit must be 1 or more', 'warn'); return 'keep'; }
+    ch = {name, pct, applies:v.applies, start:v.start, end:v.end, limit, perCand};
+  }
+  if(!reason){ toast('A reason is required', 'warn'); return 'keep'; }
+  S._pending = {id, ch, reason};
+  askConfirm({mk:'warning', stepup:true, title:`Save these changes to ${d.code.toUpperCase()}?`,
+    body:'Discounts already given are unaffected. The new values apply to redemptions made from now on.',
+    ok:'Save Changes', act:'dodiscedit:' + id});
+};
+ACTIONS.dodiscedit = key => {
+  const id = key.split(':')[1], d = DISCOUNTS.find(x => x.id === id);
+  const p = (S._pending && S._pending.id === id) ? S._pending : null; S._pending = null; S.confirm = null;
+  if(!d || !p) return;
+  const from = discSnap(d); Object.assign(d, p.ch); const to = discSnap(d);
+  audit('Edited discount code', `${d.code.toUpperCase()} — ${from} → ${to}`, 'Finance & Settlement', 'high', {from, to});
+  toast(`Discount code ${d.code.toUpperCase()} updated`);
+};
+/* a reason-only sheet shared by Deactivate / Enable / Disable */
+const discReasonBody = hint => `${fieldHtml({k:'reason', l:'Reason', t:'textarea', req:1, max:500, ph:'Recorded on the audit log (1–500 characters).'})}
+  ${hint ? `<p class="t-desc" style="margin-top:var(--s03)">${hint}</p>` : ''}`;
+SHEETS.discdeact = id => { const d = DISCOUNTS.find(x => x.id === id) || {};
+  return {title:`Deactivate ${(d.code || '').toUpperCase()}`, body:discReasonBody('The code stops working immediately. Discounts already given are unaffected.'), ok:'Continue', act:'submitdiscdeact:' + id}; };
+ACTIONS.submitdiscdeact = key => {
+  const id = key.split(':')[1], d = DISCOUNTS.find(x => x.id === id); if(!d) return;
+  const reason = String(readForm().reason || '').trim(); if(!reason){ toast('A reason is required', 'warn'); return 'keep'; }
+  S._pending = {id, reason};
+  askConfirm({mk:'warning', danger:true, title:`Deactivate ${d.code.toUpperCase()}?`,
+    body:'It stops working immediately. Discounts already given are unaffected.', ok:'Deactivate', act:'dodiscdeact:' + id});
+};
+ACTIONS.dodiscdeact = key => {
+  const id = key.split(':')[1], d = DISCOUNTS.find(x => x.id === id);
+  const p = (S._pending && S._pending.id === id) ? S._pending : null; S._pending = null; S.confirm = null;
+  if(!d || !p) return;
+  d.deactivated = true;
+  audit('Deactivated discount code', `${d.code.toUpperCase()} — ${p.reason}`, 'Finance & Settlement', 'high', {from:'Live', to:'Deactivated'});
+  toast(`Discount code ${d.code.toUpperCase()} deactivated`);
+};
+SHEETS.discenable = id => { const d = DISCOUNTS.find(x => x.id === id) || {};
+  return {title:'Enable the automatic first-interview discount', body:discReasonBody('Eligible first interviews will become free to candidates. Existing bookings are unchanged.'), ok:'Continue', act:'submitdiscenable:' + id}; };
+ACTIONS.submitdiscenable = key => {
+  const id = key.split(':')[1], d = DISCOUNTS.find(x => x.id === id); if(!d) return;
+  const reason = String(readForm().reason || '').trim(); if(!reason){ toast('A reason is required', 'warn'); return 'keep'; }
+  S._pending = {id, reason};
+  askConfirm({mk:'warning', stepup:true, title:'Enable the automatic first-interview discount?',
+    body:'Eligible first interviews will become free to candidates. Existing bookings are unchanged.', ok:'Enable', act:'dodiscenable:' + id});
+};
+ACTIONS.dodiscenable = key => {
+  const id = key.split(':')[1], d = DISCOUNTS.find(x => x.id === id);
+  const p = (S._pending && S._pending.id === id) ? S._pending : null; S._pending = null; S.confirm = null;
+  if(!d || !p) return;
+  d.deactivated = false;
+  audit('Enabled automatic first-interview discount', p.reason, 'Finance & Settlement', 'high', {from:'Deactivated', to:'Live'});
+  toast('Automatic first-interview discount enabled');
+};
+SHEETS.discdisable = id => { const d = DISCOUNTS.find(x => x.id === id) || {};
+  return {title:'Disable the automatic first-interview discount', body:discReasonBody('Eligible first interviews will no longer be free to candidates. Existing bookings are unchanged.'), ok:'Continue', act:'submitdiscdisable:' + id}; };
+ACTIONS.submitdiscdisable = key => {
+  const id = key.split(':')[1], d = DISCOUNTS.find(x => x.id === id); if(!d) return;
+  const reason = String(readForm().reason || '').trim(); if(!reason){ toast('A reason is required', 'warn'); return 'keep'; }
+  S._pending = {id, reason};
+  askConfirm({mk:'warning', danger:true, stepup:true, title:'Disable the automatic first-interview discount?',
+    body:'Eligible first interviews will no longer be free to candidates. Existing bookings are unchanged.', ok:'Disable', act:'dodiscdisable:' + id});
+};
+ACTIONS.dodiscdisable = key => {
+  const id = key.split(':')[1], d = DISCOUNTS.find(x => x.id === id);
+  const p = (S._pending && S._pending.id === id) ? S._pending : null; S._pending = null; S.confirm = null;
+  if(!d || !p) return;
+  d.deactivated = true;
+  audit('Disabled automatic first-interview discount', p.reason, 'Finance & Settlement', 'high', {from:'Live', to:'Deactivated'});
+  toast('Automatic first-interview discount disabled');
+};
+
 V.finance = () => modView({transactions:financeTransactions, transaction:financeTransaction, payouts:financePayouts,
-  feesettings:financeFeeSettings, reconciliation:financeReconciliation, batch:financeBatch,
+  feesettings:financeFeeSettings, discounts:financeDiscounts, discount:financeDiscount, reconciliation:financeReconciliation, batch:financeBatch,
   /* retired (off the rail, deep-link reachable) — Epic 9, 29 Sep 2026 */
   overview:financeOverview, invoices:financeInvoices, refunds:financeRefunds, feeconfig:financeFeeConfig});
 

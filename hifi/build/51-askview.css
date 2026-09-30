@@ -317,6 +317,15 @@
   background-repeat:no-repeat}
 .app .ask-page .ask-foot::before{content:none}
 
+/* THE DAILY-LIMIT LINE AND THE OFF FIELD (story 15.5). At the limit the chip row
+   is replaced by this quiet notice and the composer below is disabled — dimmed
+   and non-interactive, but still on screen so the thread stays readable. §63 owns
+   the notice's type; this is layout only. */
+.app .ask-page .ask-limit{
+  text-align:center;color:var(--text-secondary);
+  padding:var(--s03) 0}
+.app .ask-page .askfield-off{opacity:.5;pointer-events:none}
+
 /* ------------------------------------------------------------------ 8 ---
    THE FIELD
 
