@@ -8188,12 +8188,12 @@ V.report = (f) => `<main class="main"><div class="page">
   <div class="sec">
     ${askChip('What does Explorer E3 mean in practice?','Ask Tal what E3 means')}
   </div>
-  ${''/* RATE THE TALENT AGENT — the last thing on the report (Maryam, 13 Sep
-        2026: "put at the end of the page so the candidate could rate and give
-        review to the talent agent"). The subject is who assessed and signed the
-        interview, named in `signedSummary` above — Priya. `reviewCard` carries
-        its own `.sec`. */}
-  ${reviewCard({key:'agent', title:`Rate your interview with ${COHORT_LEAD.n.split(' ')[0]}`, sub:'', capsule:`Rate your interview with ${COHORT_LEAD.n.split(' ')[0]}`})}
+  ${''/* RATE THE TALENT AGENT — NO LONGER ON THE LEVELLED REPORT (Maryam, 30 Sep
+        2026: "the candidate could rate the talent agent before they got levelled
+        ... do not show the talent agent rating option if the candidate got
+        levelled"). The rating now floats above the Tal dock on every page of the
+        HELD stage (interview held, report pending) — injected by `placeReviewFloat`
+        (ai4.js) while `S.stage==='held'` — and is gone once a level is set. */}
   ${''/* "DOWNLOAD REPORT AS PDF" IS GONE (Maryam, 2 Sep 2026) AND THE SECTION
         GOES WITH IT WHEN IT IS EMPTY. On `week1` and after, the enrol button is
         already suppressed, so what was left would have been a `.sec` holding an

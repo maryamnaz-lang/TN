@@ -546,12 +546,13 @@ function leadBuildSeries(c){
    THIS (never the seed cohort). Registers stay lazy (derived at read). */
 const LEAD_SESSIONS = {};
 LEAD_ALL().forEach(c => { LEAD_SESSIONS[c.id] = leadBuildSeries(c); });
-/* AUTHORED demo states on the active cohort (§74): week 2 produced no
-   participation data (leader never joined) so it reads "Attendance unavailable";
-   one extra ad-hoc Q&A was scheduled then cancelled with a reason. */
+/* AUTHORED demo states on the active cohort (§74): one extra ad-hoc Q&A was
+   scheduled then cancelled with a reason. The week-2 "Attendance unavailable"
+   demo state was dropped (Maryam 30 Sep 2026: "do not show unavailable
+   attendance, show attendance") — every held session now reads its computed
+   register, so no past row is a no-data state. */
 (function(){
   const ss = LEAD_SESSIONS[41]; if(!ss) return;
-  const w2 = ss.find(s => s.week === 2); if(w2) w2.unavail = true;
   ss.push({id:'s41x1', co:41, series:null, title:'Extra Q&A before assessment', chapter:'Hard Conversations',
     dISO:'2026-09-15', date:dPretty('2026-09-15'), time:'19:00', dur:45, repeat:'none', week:leadWeek(19),
     status:'cancelled', reason:'Clashed with the LightspeedVT maintenance window. I will fold the questions into Thursday.', unavail:false, adhoc:true});
@@ -1055,7 +1056,11 @@ const leadCallCard = (k, o) => `<div class="sec dark-card crow-dark">
              cohort ("Cohort 41" + the detail), so the header can be the generic
              kind of appointment. `lcTitle` is untouched — the dashboard's
              upcoming-calls cards still title themselves "Cohort N call". */}
-      <div class="dc-hd-r"><h2 class="dc-t">Upcoming Cohort Session</h2>
+      ${''/* THE TITLE IS "Week N Cohort Session" (Maryam 30 Sep 2026: "change black
+             card session name format to the one we are using Week (n) Cohort
+             Session"), matching the dashboard call card. The week is the record's
+             own (`k.week`). Was "Upcoming Cohort Session". */}
+      <div class="dc-hd-r"><h2 class="dc-t">Week ${k.week} Cohort Session</h2>
         <span class="dc-when">${I.time}${k.when}</span></div>
     </div>
     ${''/* THE ACTION IS A GATED JOIN, NOT "GENERATE THE BRIEF" (Maryam, 9 Sep 2026:
@@ -1167,6 +1172,10 @@ const lcalCard = (k, lead) => {
        read as a stack on the black ground. */
     const co = (typeof LEAD_COHORTS !== 'undefined') ? LEAD_COHORTS.find(c => c.id === k.co) : null;
     const faces = co ? co.members.slice(0, 2).map(m => avatar({i:m.ini, img:AV[m.img]}, 22)).join('') : '';
+    /* THE OVERFLOW COUNT rides the face stack as a third disc — a card-ground white
+       circle carrying "+N" (the roster minus the two shown) in the accent, small
+       and semibold so it reads inside the 22px disc (Maryam 30 Sep 2026). */
+    const moreFaces = Math.max(0, k.seats - 2);
     return `<div class="lcal lcal-next dark-card">
     <span class="lcal-slot">
       <span class="lcal-slot-ic">${I.calendar}</span>
@@ -1175,14 +1184,18 @@ const lcalCard = (k, lead) => {
     </span>
     <span class="lcal-body">
       <span class="lcal-h">
-        <span class="lcal-t t-h3">${lcTitle(k)}</span>
-        ${''/* THE ICON IS A SIBLING OF `.lcal-timer`, NOT A CHILD — `callTimerArm`
-               writes the countdown with `textContent`, which would wipe an svg
-               inside the timer span. The box holds the clock mark + the digits. */}
-        <span class="lcal-timerbox">${I.time}<span class="lcal-timer t-h4"${till ? ` data-calltill="${till}" style="font-variant-numeric:tabular-nums"` : ''}>${till ? callTimerFmt(till - Date.now()) : k.time}</span></span>
+        ${''/* THE TITLE IS "Week N Cohort Session" (Maryam 30 Sep 2026), the
+               week off the cohort record; `lcTitle`'s "Cohort N call" stays on the
+               other call surfaces. */}
+        <span class="lcal-t t-h3">Week ${k.week} Cohort Session</span>
+        ${''/* A STATIC COUNTDOWN LABEL (Maryam 30 Sep 2026: "instead of live now
+               show In 2hrs 40mins"). No `data-calltill`, so `callTimerArm` leaves
+               it alone — the demo card reads the call as still ahead, which also
+               keeps the Join in its accent-disabled state. */}
+        <span class="lcal-timerbox">${I.time}<span class="lcal-timer t-h4">In 2hrs 40mins</span></span>
       </span>
       <span class="lcal-seatsrow">
-        ${faces ? `<span class="lcal-faces">${faces}</span>` : ''}
+        ${faces ? `<span class="lcal-faces">${faces}${moreFaces ? `<span class="lcal-face-more">+${moreFaces}</span>` : ''}</span>` : ''}
         <span class="lcal-seats t-desc">${k.seats} candidates</span>
       </span>
       <span class="lcal-f">
@@ -1463,7 +1476,12 @@ render = function(){
     /* keep the page where it was on a roster re-render (kebab / pagination /
        sort / filter / search) before positioning the kebab — else `.main`
        resets to the top. The stash is set by `ldrRerender`. */
-    if(S.ldrKeepScroll != null){ const m = device.querySelector('.main'); if(m){ void m.scrollHeight; /* force layout so scrollTop is not clamped to 0 before the new content measures */ m.scrollTop = S.ldrKeepScroll; } S.ldrKeepScroll = null; }
+    if(S.ldrKeepScroll != null){ const m = device.querySelector('.main'); if(m){ void m.scrollHeight; /* force layout so scrollTop is not clamped to 0 before the new content measures */
+      /* `.main` is `scroll-behavior:smooth`, so a plain scrollTop assignment
+         ANIMATES from the reset 0 back down — the visible "jerk from the top to
+         here" Maryam saw opening/closing the roster level filter. Force `auto`
+         for the one assignment so it lands instantly (the agent portal's idiom). */
+      m.style.scrollBehavior = 'auto'; m.scrollTop = S.ldrKeepScroll; m.style.scrollBehavior = ''; } S.ldrKeepScroll = null; }
     if(typeof leadRestoreRosterFocus === 'function') leadRestoreRosterFocus();
     if(typeof placeLeadRowMenu === 'function') placeLeadRowMenu();
     /* `leadStick()` was called here to drive the sticky position-indicator; the

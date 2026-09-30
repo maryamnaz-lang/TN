@@ -586,6 +586,21 @@ render = function(){ _baseAsk(); try { placeAsk(); } catch(e){ console.warn('ask
    rebuilds `.main` each paint, so the float is back inside it and re-lifted). */
 function placeReviewFloat(){
   const col = device.querySelector('.view-col'); if(!col) return;
+  /* HELD STAGE — the candidate rates the talent agent BEFORE they are levelled
+     (Maryam, 30 Sep 2026: "the candidate could rate the talent agent before they
+     got levelled ... add the rating above tal floating field in the whole
+     prototype of interview held report pending, like on its all modules"). The
+     agent-rating capsule floats above the Tal dock on EVERY held-stage page, so
+     it is injected here (no view carries it) rather than in each of the ~six
+     early-nav views; it is gone once a level is set (V.report dropped it). Only
+     inject when the page has not rendered its own float and the reader has not
+     already rated (reviewCard returns '' when done/later). */
+  if(typeof S !== 'undefined' && S.stage === 'held' && typeof reviewCard === 'function' && !col.querySelector('.rev-float')){
+    const nm = (typeof COHORT_LEAD !== 'undefined' && COHORT_LEAD.n) ? COHORT_LEAD.n.split(' ')[0] : 'your agent';
+    const html = reviewCard({key:'agent', title:`Rate your interview with ${nm}`, sub:'', capsule:`Rate your interview with ${nm}`});
+    const main = col.querySelector('.main');
+    if(html && main) main.insertAdjacentHTML('beforeend', html);
+  }
   const rf = col.querySelector('.main .rev-float'); if(!rf) return;
   col.appendChild(rf);
   /* pages with no Tal dock (e.g. the cohort page) have nothing to clear, so the

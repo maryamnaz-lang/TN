@@ -559,7 +559,7 @@ const NAVSETS = {
      deep-link reachable, off the rail — the same treatment as `leadCalls`/
      `leadCohorts`; the notification rows and Tal answers that route to them still
      work. So the rail is the five story items. */
-  leader:  [['leadDash','My Cohort','group'],['leadSessions','Sessions','calendar'],['leadDiscussion','Discussion','chat'],['leadMessages','Messages','email',2],['leadEvals','Evaluations','edit']]
+  leader:  [['leadDash','My Cohort','group'],['leadSessions','Sessions','calendar'],['leadDiscussion','Discussion','comment'],['leadMessages','Messages','email',2],['leadEvals','Evaluations','edit']]
 };
 
 const PARENT = {report:'level', result:'level', agents:'interviews', agent:'interviews',

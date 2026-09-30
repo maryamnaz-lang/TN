@@ -867,8 +867,13 @@ function leadCohortHead(c){
              below carries what the reader needs, and the course is on every card. */}
       <h2 class="lead-cohd-n">${lname(c)}</h2>
     </div>
+    ${''/* the large "Day N of 90" read-out is removed (Maryam 30 Sep 2026); the
+          app bar already carries "Week N of 13" and the reader does not need the
+          day number shouted here. What stays — the week line and the date span —
+          reads at one size and colour (Maryam 30 Sep 2026: "Week 5 of 13 /
+          28 Aug 2026 – 26 Nov 2026 should be in same text size and color"). */}
     <div class="lead-cohd-day">
-      <span class="lead-cohd-dw"><b>Day ${c.day} of 90</b><span>Week ${leadWeek(c.day)} of 13</span></span>
+      <span class="lead-cohd-dw">Week ${leadWeek(c.day)} of 13</span>
       <span class="lead-cohd-dates">${c.start} &ndash; ${c.end}</span>
     </div>
     ${''/* THE FACT CELLS MOVED DOWN, below the call card (Maryam, 30 Sep 2026:

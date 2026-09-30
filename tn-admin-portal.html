@@ -14,7 +14,7 @@
      The <style> block is PROTOTYPE CHROME AND NOTHING ELSE (the device frame,
      the viewport picker, the wordmark size, a toast host) — no product rule.
      ========================================================================== -->
-<link rel="stylesheet" href="design-system/talentnext-ds.css?b=35f7e50b">
+<link rel="stylesheet" href="design-system/talentnext-ds.css?b=7499312e">
 <style id="admin-auth-slider">
 /* THE FRONT DOOR IS A SLIDER — ported verbatim from the candidate portal's
    §132 (hifi/build/132-authslide.css). That layer is hifi-only
@@ -1164,10 +1164,19 @@ input:-webkit-autofill:focus{
    the toolbar (never a native date input, §3), styled as inline pills beside the .fdd
    filters. */
 .app .lc-drange{display:inline-flex; gap:var(--s03); align-items:center; flex-wrap:wrap}
-.app .fdate-filter{display:inline-flex; align-items:center}
-.app .fdate-filter .fdate-t{display:inline-flex; align-items:center; gap:var(--s02); min-height:36px; padding:var(--s02) var(--s04); white-space:nowrap; width:auto}
+/* The filter date pill is a full BLOCK — a bordered box like the .fdd filter
+   dropdowns, not the .inp bottom-stroke underline it inherits (Maryam 30 Sep 2026:
+   "the date filter component in the whole portal should be in a block, not only
+   bottom stroke"). The border lives on the WRAPPER so it ENCLOSES both the trigger
+   and the clear × (Maryam 30 Sep 2026: "include the cross icons in the blocks not
+   out of it") — the × cannot nest inside the trigger `<button>`, so it is a sibling
+   inside the bordered wrapper. The trigger itself is borderless/transparent; the
+   focus rule keeps it so §12's .inp:focus can't draw an underline inside. */
+.app .fdate-filter{display:inline-flex; align-items:center; border:1px solid var(--rule); background:var(--layer-01); border-radius:0}
+.app .fdate-filter .fdate-t{display:inline-flex; align-items:center; gap:var(--s02); min-height:36px; padding:var(--s02) var(--s04); white-space:nowrap; width:auto; border:0; background:transparent; border-radius:0}
+.app .fdate-filter .fdate-t:focus{border:0; padding:var(--s02) var(--s04); background:transparent}
 .app .fdate-filter .fdate-ic{width:16px; height:16px}
-.app .fdate-filter .fdate-x{display:inline-flex; align-items:center; justify-content:center; margin-left:calc(-1 * var(--s02)); width:24px; height:36px; border:0; background:transparent; cursor:pointer; color:var(--icon-secondary)}
+.app .fdate-filter .fdate-x{display:inline-flex; align-items:center; justify-content:center; margin-left:calc(-1 * var(--s03)); margin-right:var(--s03); width:24px; height:36px; border:0; background:transparent; cursor:pointer; color:var(--icon-secondary)}
 .app .fdate-filter .fdate-x svg{width:14px; height:14px}
 .app .dcal-h{display:flex; align-items:center; justify-content:space-between; margin-bottom:var(--s03)}
 .app .dcal-m{font-size:13.5px; font-weight:var(--t-w-strong); color:var(--text-primary)}
@@ -1460,11 +1469,11 @@ input:-webkit-autofill:focus{
 .app .pearn-txt{display:flex; flex-direction:column; gap:2px; min-width:0; flex:1}
 .app .pearn-t{font-size:var(--t-h4-size); line-height:1.25; color:var(--text-primary); font-weight:var(--t-w-strong)}
 .app .pearn-d{font-size:var(--t-label-size); line-height:1.3; color:var(--text-secondary)}
-.app .pearn-spark{height:26px; width:auto; flex:none; display:block}   /* Maryam's supplied line-graph SVGs, sized by height, aspect kept from the viewBox (Maryam 30 Sep 2026) */
+.app .pearn-spark{height:19px; width:auto; flex:none; display:block}   /* Maryam's supplied line-graph SVGs, sized by height, aspect kept from the viewBox; smaller + thinner stroke (Maryam 30 Sep 2026) */
 .app .pearn-v{font-size:20px; line-height:1; color:var(--text-primary); font-weight:var(--t-w-strong); font-variant-numeric:tabular-nums; flex:none}
 /* Interviews section — the three counts as THREE blocks in a row (Maryam 30 Sep 2026); pin to 3 columns so the ≥700 4-col .stats rule doesn't leave an empty track painting a grey hairline */
 .app .page .iv-stats{grid-template-columns:repeat(3, minmax(0, 1fr))}
-.app .iv-chart-head{margin-top:var(--s06)}   /* gap between the three blocks and the monthly line chart */
+.app .iv-chart-head{margin-top:var(--s08)}   /* a little gap between the three blocks and the monthly line chart (Maryam 30 Sep 2026, was --s06) */
 .app .pbrk-row{display:flex; align-items:center; gap:var(--s03); font-size:var(--t-body-size); color:var(--text-secondary)}
 .app .pbrk-dot{width:10px; height:10px; border-radius:3px; flex:none}
 .app .pbrk-name{flex:1; min-width:0}
@@ -1474,12 +1483,23 @@ input:-webkit-autofill:focus{
    the Platform-earnings card uses is untouched. */
 .app .pbrk-bar.ubs-bar{height:13px}   /* half the shared 26px (Maryam 30 Sep 2026) */
 .app .dash-dates{display:inline-flex; align-items:center; gap:var(--s03); flex-wrap:wrap; justify-content:flex-end}   /* the heading-row period dropdown + date range (Maryam 30 Sep 2026) */
-.app .dash-dates .dash-period{display:inline-flex; margin-left:var(--s04)}   /* period sits to the RIGHT of the date range, a little gap between them (Maryam 30 Sep 2026) */
+.app .dash-dates .dash-period{display:inline-flex}   /* the period dropdown sits to the RIGHT of the date range; the wrapper's gap:--s03 is the ONE gap between all three blocks — equal From↔To↔period (Maryam 30 Sep 2026: "keep the space same between all three of these blocks"), the earlier extra margin-left removed */
 /* a section divider closes the welcome/head row, centred in the gap: --s06 below the head content, and the next section pays --s06 on top, so the line has equal air both sides (Maryam 30 Sep 2026). The section-rhythm :not() chain owns the padding, so !important per the sanctioned override precedent. The aiHead's .sec-h carries a dead 24px margin-bottom (nothing follows it) that would stack with the padding into 48px above the line — zero it so the gap above == the gap below */
 .app .main .sec.dash-head{position:relative; padding-bottom:var(--s06) !important}
 .app .main .sec.dash-head > .sec-h{margin-bottom:0 !important}
 /* the top-block-no-divider rule (.app .modhead + .sec:not(#_)::after) suppresses the head's foot line; :not(#_) re-boosts this above it without !important */
 .app .main .sec.dash-head:not(#_)::after{content:''; position:absolute; left:var(--pad-x); right:var(--pad-x); bottom:0; height:1px; background:var(--rule)}
+/* DASHBOARD DIVIDERS, hand-curated (Maryam 30 Sep 2026). The auto foot-line varies
+   by a section's content (a .stats/.facts block hides its ::after, a plain section
+   draws a full-bleed one), but the dashboard wants specific gaps. `dash-nodiv` drops
+   a section's foot line (and the ::before side-ticks); `dash-div` draws a clean
+   centred one inset to --pad-x at the section foot — both sections pay --s05, so it
+   sits 16 above == 16 below. :not(#_) boosts past the DS block-suppression (§138). */
+.app .page > .sec.dash-nodiv:not(#_)::after,
+.app .page > .sec.dash-nodiv:not(#_)::before{content:none; display:none}
+.app .page > .sec.dash-div{position:relative}
+.app .page > .sec.dash-div:not(#_)::before{content:none; display:none}
+.app .page > .sec.dash-div:not(#_)::after{content:''; display:block; position:absolute; left:var(--pad-x); right:var(--pad-x); bottom:0; height:1px; background:var(--rule)}
 /* Payouts concentric-ring radial (Maryam 30 Sep 2026, supplied SVG) — graph LEFT,
    legend vertical on the RIGHT (reference layout). */
 .app .pring-wrap{display:flex; flex-direction:row; align-items:center; gap:calc(var(--s07) + 20px); margin-top:var(--s05); flex-wrap:wrap}   /* +20px on the ring↔legend gap widens the max-content Payouts card by 20px (Maryam 30 Sep 2026) */
@@ -1593,7 +1613,7 @@ input:-webkit-autofill:focus{
   </div>
 </div>
 
-<script src="design-system/talentnext-ds.js?b=35f7e50b"></script>
+<script src="design-system/talentnext-ds.js?b=7499312e"></script>
 <script>
 /* ==========================================================================
    THE SUPER ADMIN PORTAL
@@ -3022,8 +3042,8 @@ function filterDd(key, def, opts, label){
    are handled by the `.fdate-filter` branches in the click router. `label` prefixes the
    trigger ("From" / "To"); no date reads "Any". A hidden [data-dfval] carries the picked
    ISO so month-nav keeps the selected-day highlight without a form input. */
-function filterDate(key, label, w){
-  const cur = getFilter(key, '');
+function filterDate(key, label, w, def){
+  const cur = getFilter(key, def || '');   /* `def` (ISO) is the fallback shown when nothing is picked — the dashboard passes the selected period's month range so From/To default to whole-month dates (Maryam 30 Sep 2026) */
   const iso = /^\d{4}-\d{2}-\d{2}$/.test(cur) ? cur : '';
   const now = new Date();
   const [vy, vm] = iso ? iso.split('-').map(Number) : [now.getFullYear(), now.getMonth() + 1];
@@ -3037,6 +3057,24 @@ function filterDate(key, label, w){
     ${iso ? `<button type="button" class="fdate-x" data-dfclear="${key}" aria-label="Clear ${esc(label)} date">${I.close}</button>` : ''}
     <div class="fdate-pop">${dateGrid(key, vy, vm - 1, iso)}</div>
   </div>`;
+}
+/* The [from, to] ISO range for a dashboard period (Maryam 30 Sep 2026) — This week =
+   Mon–Sun of the current week, This month = 1st–last of the current month, This quarter
+   = the current calendar quarter. The dashboard passes these as `filterDate` defaults so
+   the From/To fields show whole-period dates instead of "Any". */
+function periodDateRange(p){
+  const n = new Date(), y = n.getFullYear(), m = n.getMonth();
+  const iso = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  if(p === 'week'){
+    const dow = n.getDay() || 7, mon = new Date(n); mon.setDate(n.getDate() - (dow - 1));
+    const sun = new Date(mon); sun.setDate(mon.getDate() + 6);
+    return [iso(mon), iso(sun)];
+  }
+  if(p === 'quarter'){
+    const qs = Math.floor(m / 3) * 3;
+    return [iso(new Date(y, qs, 1)), iso(new Date(y, qs + 3, 0))];
+  }
+  return [iso(new Date(y, m, 1)), iso(new Date(y, m + 1, 0))];   /* month */
 }
 /* Parse a level-log date to comparable ISO. Rows carry free-text "12 Aug 2026" (seed) or
    MM-DD-YYYY (`today()`, runtime); both map to yyyy-mm-dd so a range compares
@@ -3604,7 +3642,10 @@ function table(cols, rows, opts){
      reserves the avatar + the longest line) and the OTHER columns give up a little,
      splitting what's left equally — the name and email then sit on one line each
      (Maryam 29 Sep 2026). Pinned columns come off the total first. */
-  const firstIsPerson = cols.length && !cols[0].act && ordered.some(r => /pcell/.test(String(((r.cells || [])[0]) ?? '')));
+  /* opts.evenCols opts out of the person-cell pin below, so EVERY data column takes an
+     equal share (the name cell just gets a full share too — fine for short names, keeps
+     a small table from bunching the first columns together). (Maryam 30 Sep 2026) */
+  const firstIsPerson = !opts.evenCols && cols.length && !cols[0].act && ordered.some(r => /pcell/.test(String(((r.cells || [])[0]) ?? '')));
   const pinW = cols.map((c, i) => c.act ? 0 : c.w ? c.w : (i === 0 && firstIsPerson ? colW[0] : 0));
   const pinnedW = pinW.reduce((s, w) => s + w, 0);
   const nData = cols.filter((c, i) => !c.act && !pinW[i]).length || 1;
@@ -4913,7 +4954,7 @@ function homeOverview(){
        filter (the shared `filterDate` month-grid picker Finance/Levelling use). Both
        presentational (the seed has no time series, SA-03 E1). */''}
   <section class="sec dash-head">${aiHead('Welcome Back, ' + esc(ME.name.split(' ')[0]) + '!', 'Monitor platform activity, users, transactions, and overall operations from one place.',
-    `<span class="dash-dates">${filterDate('dashfrom', 'From', 180)}${filterDate('dashto', 'To', 180)}<span class="dash-period">${filterDd('period', 'month', [['week', 'This week'], ['month', 'This month'], ['quarter', 'This quarter']], '')}</span></span>`)}</section>
+    `<span class="dash-dates">${(() => { const [dfrom, dto] = periodDateRange(getFilter('period', 'month')); return filterDate('dashfrom', 'From', 180, dfrom) + filterDate('dashto', 'To', 180, dto); })()}<span class="dash-period">${filterDd('period', 'month', [['week', 'This week'], ['month', 'This month'], ['quarter', 'This quarter']], '')}</span></span>`)}</section>
 
   ${/* The period selector is now the PERIOD DROPDOWN in the heading row above
        (Maryam 30 Sep 2026, replacing the tab strip); `periodBar` is left defined but
@@ -5024,7 +5065,7 @@ function homeOverview(){
     ], 'dash-stats')}
   </section>
 
-  <section class="sec">
+  <section class="sec dash-nodiv">
     ${group('Earnings & Payouts')}
     <div class="pay-row">
       ${(() => {
@@ -5036,12 +5077,12 @@ function homeOverview(){
            behind it — a course purchase, and a paid interview = a re-interview (a
            first interview is complimentary, §74 demo counts off the TXNS seed). */
         const courseN = TXNS.filter(t => t.cat === 'course' && t.dir === 'in').length;
-        const reintN = TXNS.filter(t => t.cat === 'interview' && t.dir === 'in').length;
+        const reintN = 22;   /* authored placeholder count (Maryam 30 Sep 2026, §74 — the seed TXNS holds only a demo few) */
         /* each row: mark · title+desc · a little green line-graph · the value. The two
            sparkline SVGs are Maryam's supplied artwork (30 Sep 2026), pasted verbatim
            (not redrawn); #04CE00 green, one per stream (authored §74 shape). */
-        const SPARK_COURSE = `<svg class="pearn-spark" width="95" height="25" viewBox="0 0 95 25" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 23.5L12.5943 19.8334L17.3294 15.7083L24.3647 21.5292L29.1 18.7792L34.1059 1.5L46.9588 18.4126L56.2941 12.775L74.1529 23.5L79.7 20.7959L83.0824 16.3042L93.5 12.775" stroke="#04CE00" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-        const SPARK_IV = `<svg class="pearn-spark" width="92" height="26" viewBox="0 0 92 26" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 18.5021L12.5943 14.8354L17.3294 10.7104L22.5 20.5L29.1 13.7813L33 3.5L46.9588 13.4146L57 24.5L65 11.3063L79.7 15.798L83.0824 11.3063L90 1.5" stroke="#04CE00" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+        const SPARK_COURSE = `<svg class="pearn-spark" width="95" height="25" viewBox="0 0 95 25" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 23.5L12.5943 19.8334L17.3294 15.7083L24.3647 21.5292L29.1 18.7792L34.1059 1.5L46.9588 18.4126L56.2941 12.775L74.1529 23.5L79.7 20.7959L83.0824 16.3042L93.5 12.775" stroke="#04CE00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+        const SPARK_IV = `<svg class="pearn-spark" width="92" height="26" viewBox="0 0 92 26" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 18.5021L12.5943 14.8354L17.3294 10.7104L22.5 20.5L29.1 13.7813L33 3.5L46.9588 13.4146L57 24.5L65 11.3063L79.7 15.798L83.0824 11.3063L90 1.5" stroke="#04CE00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
         const earnRow = (icon, title, desc, spark, val) => `<div class="pearn-row">
           <span class="pearn-ic">${ic(icon)}</span>
           <div class="pearn-txt"><div class="pearn-t">${title}</div><div class="pearn-d">${desc}</div></div>
@@ -5107,7 +5148,7 @@ function homeOverview(){
   ${/* ══ CANDIDATES BY BUCKET ══ three STAT CARDS (Figma 1:917, Maryam 22 Sep 2026):
        eyebrow · bucket · count · share chip · sparkline. The share % is real; the
        ↗ and the sparklines are illustrative placeholder (§74; no dated history). */''}
-  <section class="sec">
+  <section class="sec dash-nodiv">
     ${chartHead('Candidates by Track', {go: 'candidates/candidates', label: 'View candidates'})}
     ${(() => {
       /* Exact sparkline SVGs Maryam supplied (22 Sep 2026, path data pasted verbatim,
@@ -5128,7 +5169,7 @@ function homeOverview(){
   ${/* ══ COHORT HEALTH ══ RESTORED (Maryam, 30 Sep 2026 — story 2.2 oversight panel,
        Cohorts: View): every running cohort, how far through the 90-day loop it is and
        whether it has a leader. Reversing the 21 Sep hide, by instruction. */''}
-  ${true ? `<section class="sec">
+  ${true ? `<section class="sec dash-div">
     ${aiHead('Cohort health', 'Every running cohort, how far through the 90-day loop it is, and whether it has a leader.')}
     ${liveCohorts.length ? table(
       [{label:'Cohort'}, {label:'Progress'}, {label:'Members'}, {label:'Leader'}, {label:'', num:true}],
@@ -5150,7 +5191,7 @@ function homeOverview(){
        fitting description each; the line's note reads "Interviews this month". Counts
        + monthly split are AUTHORED PLACEHOLDER (§74 — the seed has no dated booking
        history, SA-03 E1). */''}
-  <section class="sec">
+  <section class="sec dash-div">
     ${chartHead('Interviews', {go: 'market/bookings', label: 'View interviews'})}
     ${stats([
       ['calendar', 'Interviews booked', String(ivBooked), 'Scheduled this month'],
@@ -5189,15 +5230,17 @@ function homeOverview(){
        decimal; a starting score is marked), with each agent's interviews-conducted
        beside it. Photo via personCell (agentFace). */''}
   <section class="sec">
-    ${chartHead('Agent standing', {go: 'agents/agents', label: 'View agents'})}
+    ${chartHead('Agent standing')}
     ${table(
-      [{label:'Agent'}, {label:'Agent Score', num:true}, {label:'Interviews conducted', num:true}],
-      topByScore.map(a => ({cells:[
+      [{label:'Agent'}, {label:'Rank'}, {label:'Agent Score', num:true}, {label:'Interviews conducted', num:true}, {label:'', num:true}],
+      topByScore.map((a, i) => ({id:a.id, go:'agents/detail/' + a.id, cells:[
         personCell(a.name, ''),
+        `#${i + 1}`,
         `${starMark} ${agScore(a).toFixed(1)}${a.scoreApproved === false ? ' <span class="t-caption">· Starting</span>' : ''}`,
-        `${a.interviewed} <span class="t-caption">interviews</span>`
+        `${a.interviewed} <span class="t-caption">interviews</span>`,
+        `<span class="row-arrow">${I.arrowRight}</span>`
       ]})),
-      {paginate:false, select:false}
+      {paginate:false, select:false, evenCols:true}
     )}
   </section>
 
@@ -5403,7 +5446,10 @@ KINDS.user = {
   label:'user', mod:'Users & Roles', after:'users/users',
   find: id => USER_BY_ID[id], name: u => u.name, detail: u => 'users/staffdetail/' + u.id,
   fields: u => [
-    {k:'name', l:'Full name', t:'text', req:1, ph:'First and last name'},
+    /* First + last name, not one "Full name" (Maryam 30 Sep 2026) — bridged to the
+       stored single `name` via splitName/joinName. */
+    {k:'first', l:'First name', t:'text', req:1, ph:'e.g. Dana', get: x => splitName(x.name).first},
+    {k:'last', l:'Last name', t:'text', req:1, ph:'e.g. Whitfield', get: x => splitName(x.name).last},
     {k:'email', l:'Email address', t:'email', req:1, ph:'name@company.com'},
     /* external roles only — internal staff are created through Add Staff Member
        (Epic 1); this directory holds external accounts. */
@@ -5418,12 +5464,12 @@ KINDS.user = {
        so it opens at status `invited` with a dated `invitedOn`, and the directory shows
        the 7-day "Expires in N days" countdown (`extInviteStatus`) rather than "Active"
        (Maryam, 24 Sep 2026). Matches the staff invite (`sendinvite`). */
-    const u = {id:newId('u', USERS), name:v.name, email:v.email, roles:v.roles, level:'—', status:'invited', joined:today(), origin:v.origin, last:'Never', internal: v.origin === 'internal', invitedOn:today(), invitedBy:ME.id};
+    const u = {id:newId('u', USERS), name:joinName(v), email:v.email, roles:v.roles, level:'—', status:'invited', joined:today(), origin:v.origin, last:'Never', internal: v.origin === 'internal', invitedOn:today(), invitedBy:ME.id};
     USERS.push(u); USER_BY_ID[u.id] = u;
     if(v.roles.includes('candidate')){ const c = {id:u.id, name:u.name, bucket:'Explorer', level:'E1', cohort:'—', agent:'—', consent:{video:0, ai:0, scenes:0, vis:0}, status:'invited', last:'Never'}; CANDS.push(c); CAND_BY_ID[c.id] = c; }
     return u;
   },
-  update: (u, v) => { u.name = v.name; u.email = v.email; u.roles = v.roles; u.origin = v.origin; u.internal = v.origin === 'internal'; if(v.status) u.status = v.status;
+  update: (u, v) => { const nm = joinName(v); if(nm) u.name = nm; u.email = v.email; u.roles = v.roles; u.origin = v.origin; u.internal = v.origin === 'internal'; if(v.status) u.status = v.status;
     const c = CAND_BY_ID[u.id]; if(c){ c.name = u.name; if(v.status) c.status = v.status; } },
   remove: u => { USERS.splice(USERS.indexOf(u), 1); delete USER_BY_ID[u.id]; const ci = CANDS.findIndex(c => c.id === u.id); if(ci >= 0){ CANDS.splice(ci, 1); delete CAND_BY_ID[u.id]; syncCohortSizes(); } },
   guard: u => u.id === 'u9' ? 'The Super Admin account can’t be deleted' : null,
@@ -7515,7 +7561,12 @@ KINDS.cand = {
   label:'candidate', mod:'Candidates', after:'candidates/candidates',
   find: id => CAND_BY_ID[id], name: c => c.name, detail: c => 'candidates/detail/' + c.id,
   fields: c => [
-    {k:'name', l:'Full name', t:'text', req:1},
+    /* First + last name, not one "Full name" (Maryam 30 Sep 2026: "on all super
+       admin forms where we are taking full name, change it to first name and last
+       name"). `splitName`/`joinName` bridge the split fields to the single `name`
+       the candidate + user records still store. */
+    {k:'first', l:'First name', t:'text', req:1, ph:'e.g. Ava', get: x => splitName(x.name).first},
+    {k:'last', l:'Last name', t:'text', req:1, ph:'e.g. Stone', get: x => splitName(x.name).last},
     ...(c ? [] : [{k:'email', l:'Email address', t:'email', req:1, ph:'name@example.com'}]),
     /* THE FULL LADDER, E1 to T5 (Maryam, 15 Sep 2026: "show all levels here, from
        e1 to t5"). The candidate form offers every one of `LVL_CODES` (E1–E5,
@@ -7547,13 +7598,14 @@ KINDS.cand = {
      alone. Other KINDS keep their own `help`. */
   okNew:'Add Candidate',
   create: v => {
-    const u = {id:newId('u', USERS), name:v.name, email:v.email, roles:['candidate'], level:v.level, status:'active', joined:today(), origin:'individual', last:'invited'};
+    const nm = joinName(v);
+    const u = {id:newId('u', USERS), name:nm, email:v.email, roles:['candidate'], level:v.level, status:'active', joined:today(), origin:'individual', last:'invited'};
     USERS.push(u); USER_BY_ID[u.id] = u;
-    const c = {id:u.id, name:v.name, bucket:bucketOf(v.level), level:v.level, cohort:v.cohort, course:v.course, agent:'—', consent:{video:0, ai:0, scenes:0, vis:0}, status:'active', last:'invited'};
+    const c = {id:u.id, name:nm, bucket:bucketOf(v.level), level:v.level, cohort:v.cohort, course:v.course, agent:'—', consent:{video:0, ai:0, scenes:0, vis:0}, status:'active', last:'invited'};
     CANDS.push(c); CAND_BY_ID[c.id] = c; syncCohortSizes(); return c;
   },
-  update: (c, v) => { c.name = v.name; c.level = v.level; c.bucket = bucketOf(v.level); c.cohort = v.cohort; /* course is read-only on edit (20 Sep 2026), not written back */ if(v.status) c.status = v.status;
-    const u = USER_BY_ID[c.id]; if(u){ u.name = v.name; u.level = v.level; if(v.status) u.status = v.status; } syncCohortSizes(); },
+  update: (c, v) => { const nm = joinName(v); if(nm) c.name = nm; c.level = v.level; c.bucket = bucketOf(v.level); c.cohort = v.cohort; /* course is read-only on edit (20 Sep 2026), not written back */ if(v.status) c.status = v.status;
+    const u = USER_BY_ID[c.id]; if(u){ if(nm) u.name = nm; u.level = v.level; if(v.status) u.status = v.status; } syncCohortSizes(); },
   remove: c => { CANDS.splice(CANDS.indexOf(c), 1); delete CAND_BY_ID[c.id]; const u = USER_BY_ID[c.id]; if(u){ u.roles = u.roles.filter(r => r !== 'candidate'); if(!u.roles.length){ USERS.splice(USERS.indexOf(u), 1); delete USER_BY_ID[u.id]; } } syncCohortSizes(); },
   delWarn: c => `${c.name}’s candidate record, level history and cohort membership are erased. Interview recordings are pulled from employer visibility. Receipts are kept under the accounting rule.`,
   status: (c, val) => val === 'inactive'
@@ -16205,6 +16257,23 @@ readHash();
 render();
 fitFrame();
 if(!ASK_ON){ ASK_ON = true; setInterval(askRotate, ASK_ROT_MS); }
+
+/* PLAY THE PLATFORM USERS GROW-IN ONCE THE PAGE HAS FINISHED LOADING (Maryam 30 Sep
+   2026: "start the interaction once the loading is complete"). Setting S.gperAnim at
+   boot fired the grow-in on the very first paint, while the page was still loading
+   (fonts, layout, the frame's fit) — so it ran during that load. Instead, arm it
+   after `load` (plus a short settle) by toggling `.lc-anim` on the Platform Users
+   chart directly — no re-render, and only once. setTimeout, not rAF (trap 17: rAF
+   never fires while the pane reports itself hidden). */
+function armPUGrow(){
+  const chart = [...device.querySelectorAll('.lchart')].find(c => c.querySelector('[data-act^="gper:pu:"]'));
+  if(!chart) return;
+  chart.classList.remove('lc-anim');
+  void chart.offsetWidth;              /* reflow so re-adding the class restarts the animation */
+  chart.classList.add('lc-anim');
+}
+if(document.readyState === 'complete') setTimeout(armPUGrow, 80);
+else window.addEventListener('load', () => setTimeout(armPUGrow, 80), {once:true});
 </script>
 </body>
 </html>

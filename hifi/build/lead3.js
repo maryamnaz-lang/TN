@@ -101,9 +101,12 @@ function sesBkRow(c, s){
      date against the cohort start. The "weekly" repeat tag is dropped — every
      session in the series is weekly, so it said nothing. */
   const wk = s.week || leadWeek(sesDayOf(c, s.dISO));
+  /* NO DESC UNDER THE SESSION NAME (Maryam 30 Sep 2026: "remove the desc below the
+     session names in both tabs"). The chapter/topic sub-line is dropped from both
+     the upcoming and past lists; the day/time column and the right-hand mark carry
+     what the row needs. A cancelled row still reads "Cancelled" on the right. */
   const body = `<span class="cardrow-b">
-      <span class="cardrow-t">Week ${wk} Cohort Session</span>
-      <span class="cardrow-s">${s.chapter}${cancelled&&s.reason?` &middot; ${s.reason}`:''}</span></span>`;
+      <span class="cardrow-t">Week ${wk} Cohort Session</span></span>`;
   let mark;
   if(cancelled) mark = `<span class="ses-mark ses-cancelled">Cancelled</span>`;
   else if(!past) mark = `<span class="ses-mark ses-upcoming">${sesCountdown(s)}</span>`;
@@ -126,7 +129,7 @@ V.leadSessions = () => {
   const next = leadNextSession(c);
   const upcoming = all.filter(s => sesEnd(s) >= LEAD_NOW && s.id !== (next&&next.id));
   const past = all.filter(s => sesEnd(s) < LEAD_NOW).reverse();
-  return `<main class="main"><div class="page">
+  return `<main class="main"><div class="page lead-ses-page">
   ${ph('Sessions')}
   ${''/* THE NEXT SESSION IS THE BLACK CALL CARD (Maryam, 30 Sep 2026: "bring
         back the black card for call") — `leadCallCard`, the same appointment

@@ -3057,6 +3057,15 @@
    day to match. (0,4,0) beats §6a's `.app .dark-card .t-desc` (0,3,0). */
 .app .lcal.lcal-next .lcal-slot-day{color:var(--on-dark)}
 
+/* 20d. THE "+N" FACE-STACK OVERFLOW DISC (Maryam 30 Sep 2026: "+8 text ... in
+   accent color and semibold but in small size to look good in the small circle").
+   Its disc geometry is §113; this owns the type — accent ink, the strong weight
+   (500, the platform's "semibold"), at the caption size so it fits the 22px disc. */
+.app .lcal-faces .lcal-face-more{
+  font-size:var(--t-caption-size);
+  font-weight:var(--t-w-strong);
+  color:var(--accent-text)}
+
 /* ==========================================================================
    22. THE STANDING COLUMN LOSES A TIER — §72's `.stand` inside `.pulse`
    Maryam, 31 Aug 2026: "reduce the right size content font sizes and make this

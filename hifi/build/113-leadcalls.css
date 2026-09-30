@@ -252,6 +252,12 @@
    `btn-sm`'s 32 (Maryam 30 Sep 2026: "button as well just like sessions module").
    `leadCallCard`'s crow Join renders at 40; this pins the same. */
 .app .lcal-next .lcal-f > .btn{min-height:40px}
+/* THE JOIN IS BOTTOM-ALIGNED WITH THE ROW CONTENT, not centred on the "N minutes"
+   text (Maryam 30 Sep 2026: "make join call button bottom aligned with the row
+   content not middle aligned"). `.lcal-f` is `align-items:center`, which floats the
+   40px button above the shorter minutes line; on the black card the foot bottom-
+   aligns so the button sits on the same baseline band as the minutes. */
+.app .lcal-next .lcal-f{align-items:flex-end}
 /* THE LIVE COUNTDOWN takes the header's right end on an auto margin, where the
    date's word-over-figure block sat on the light card. The clock mark leads the
    digits (28 Sep 2026); tabular figures (set inline) so it does not jitter. */
@@ -269,6 +275,21 @@
 .app .lcal-faces{display:inline-flex;flex:none;align-items:center}
 .app .lcal-faces .av-ph{box-shadow:0 0 0 2px var(--gray-100)}
 .app .lcal-faces .av-ph + .av-ph{margin-left:-8px}
+/* THE "+N" OVERFLOW DISC (Maryam 30 Sep 2026) — a card-ground white circle the
+   size of a roster face, tucked under the second one with the same 2px ring, so
+   the stack reads "two faces and eight more". Its geometry only; the accent,
+   semibold, small type is §63's (this layer sits after §63, so type stays there). */
+.app .lcal-faces .lcal-face-more{
+  width:22px;height:22px;flex:none;
+  display:inline-flex;align-items:center;justify-content:center;
+  margin-left:-8px;border-radius:50%;
+  background:var(--background);
+  box-shadow:0 0 0 2px var(--gray-100);
+  /* THE +N DISC SITS ON TOP OF THE PHOTO STACK (Maryam 30 Sep 2026: "take +8 white
+     circle above the image"). The avatars' `.av-ph` establish their own stacking,
+     so a later plain sibling paints behind them; a relative z-index lifts the disc
+     above the second face's edge. */
+  position:relative;z-index:2}
 
 /* THE JOIN IS THE ACCENT PRIMARY, DISABLED (Maryam, 28 Sep 2026: "the button is
    in accent color state but disabled since it is not clickable"). No override

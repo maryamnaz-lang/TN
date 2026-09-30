@@ -14,7 +14,7 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 6403.  Rules dropped as product-specific: 222.
+   Rules kept: 6409.  Rules dropped as product-specific: 222.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
@@ -5629,15 +5629,13 @@ button.btn-p:active,
 @container app (max-width:479.98px){
   .app .lead-hdr{display:none}
 }
-.app .lead-cohd{display:grid; gap:var(--s05)}
+.app .lead-cohd{display:grid; gap:var(--s03)}
 .app .lead-cohd-id{display:flex; flex-direction:column; gap:2px}
 .app .lead-cohd-n{font-size:var(--t-h1-size); line-height:var(--t-h1-lh); font-weight:var(--t-w-strong); color:var(--accent-text)}
 .app .lead-cohd-course{font-size:var(--t-desc-size); line-height:normal; color:var(--text-secondary)}
 .app .lead-cohd-day{display:flex; flex-wrap:wrap; align-items:baseline; gap:var(--s03) var(--s05)}
-.app .lead-cohd-dw{display:inline-flex; align-items:baseline; gap:var(--s03)}
-.app .lead-cohd-dw b{font-size:var(--t-h3-size); font-weight:var(--t-w-strong); color:var(--text-primary)}
-.app .lead-cohd-dw span{font-size:var(--t-body-size); color:var(--text-secondary)}
-.app .lead-cohd-dates{font-size:var(--t-caption-size); color:var(--text-helper)}
+.app .lead-cohd-dw,
+.app .lead-cohd-dates{font-size:var(--t-body-size); color:var(--text-secondary)}
 .app .lead-cohd-kv{display:grid; grid-template-columns:1fr; gap:0; border-top:1px solid var(--rule)}
 .app .lead-cohd-cell{display:flex; justify-content:space-between; align-items:baseline; gap:var(--s04); padding:var(--s04) 0; border-bottom:1px solid var(--rule)}
 .app .lead-cohd-l{font-size:var(--t-label-size); color:var(--text-secondary)}
@@ -5666,6 +5664,12 @@ button.btn-p:active,
 .app .lead-roster td.cell-low{color:var(--support-error)}
 .app .lead-roster .row-acts{display:inline-flex; gap:var(--s03); justify-content:flex-end; white-space:nowrap}
 .app th.lead-roster-act{text-align:right}
+.app .lead-ses-page > .dark-card.crow-dark{margin-top:var(--s06); margin-bottom:var(--s06)}
+.app .lead-ses-page > .dark-card.crow-dark + .sec-cs{padding-top:0; margin-top:0}
+.app .lead-past-row:hover .cardrow-t{color:var(--accent-text)}
+.app .lead-past-row:hover .tile-arrow{color:var(--accent-text)}
+.app .clk.bk-row:hover .cardrow-t{color:var(--accent-text)}
+.app .clk.bk-row:hover .tile-arrow{color:var(--accent-text)}
 .app th.srt{cursor:pointer; user-select:none}
 .app th.srt .srt-b{display:inline-flex; align-items:center; gap:2px}
 .app th.srt.num .srt-b{justify-content:flex-end}
@@ -7598,6 +7602,7 @@ button.btn-p:active,
 .app .dark-card .btn.btn-p[disabled]{color:var(--on-accent)}
 .app .plate .btn.btn-p[disabled]{color:var(--on-accent)}
 .app .lcal.lcal-next .lcal-slot-day{color:var(--on-dark)}
+.app .lcal-faces .lcal-face-more{font-size:var(--t-caption-size); font-weight:var(--t-w-strong); color:var(--accent-text)}
 .app .page .pulse .stand .stand-l{font-size:var(--t-compact-size); line-height:var(--t-compact-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-compact-ls); text-transform:none; color:var(--text-primary)}
 .app .page .pulse .stand .stand-v{font-size:var(--t-h3-size); line-height:var(--t-h3-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h3-ls); text-transform:none; color:var(--text-primary)}
 .app .page .pulse .stand .stand-v small{font-size:var(--t-caption-size); line-height:var(--t-caption-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-caption-ls); color:var(--text-secondary)}
@@ -9519,12 +9524,14 @@ button.btn-p:active,
 .app .lcal-slot-ic svg{width:18px; height:18px; display:block}
 .app .lcal-next > .lcal-body{flex:1 1 auto; min-width:0; display:flex; flex-direction:column; align-items:stretch; gap:var(--s04); padding:var(--s07) var(--s07) var(--s07) var(--s05)}
 .app .lcal-next .lcal-f > .btn{min-height:40px}
+.app .lcal-next .lcal-f{align-items:flex-end}
 .app .lcal-timerbox{margin-left:auto; flex:none; display:inline-flex; align-items:center; gap:var(--s02); white-space:nowrap}
 .app .lcal-timerbox svg{width:15px; height:15px; flex:none}
 .app .lcal-seatsrow{display:flex; align-items:center; gap:var(--s03); min-width:0}
 .app .lcal-faces{display:inline-flex; flex:none; align-items:center}
 .app .lcal-faces .av-ph{box-shadow:0 0 0 2px var(--gray-100)}
 .app .lcal-faces .av-ph + .av-ph{margin-left:-8px}
+.app .lcal-faces .lcal-face-more{width:22px; height:22px; flex:none; display:inline-flex; align-items:center; justify-content:center; margin-left:-8px; border-radius:50%; background:var(--background); box-shadow:0 0 0 2px var(--gray-100); position:relative; z-index:2}
 
 /* ---- 114-agenttable.css ---- */
 .app .agt{padding:0 var(--pad-x)}
@@ -10240,10 +10247,12 @@ button.btn-p:active,
 /* ---- 136-scrollbar.css ---- */
 .app .ask-thread,
 .app .sn-main,
-.app .tal-body{scrollbar-width:none}
+.app .tal-body,
+.app .tbl-wrap{scrollbar-width:none}
 .app .ask-thread::-webkit-scrollbar,
 .app .sn-main::-webkit-scrollbar,
-.app .tal-body::-webkit-scrollbar{width:0; height:0; display:none}
+.app .tal-body::-webkit-scrollbar,
+.app .tbl-wrap::-webkit-scrollbar{width:0; height:0; display:none}
 
 /* ---- 138-secrhythm.css ---- */
 @container app (min-width:900px){

@@ -26,13 +26,23 @@
 
 .app .ask-thread,
 .app .sn-main,
-.app .tal-body{
+.app .tal-body,
+.app .tbl-wrap{
   scrollbar-width:none;
 }
 .app .ask-thread::-webkit-scrollbar,
 .app .sn-main::-webkit-scrollbar,
-.app .tal-body::-webkit-scrollbar{
+.app .tal-body::-webkit-scrollbar,
+.app .tbl-wrap::-webkit-scrollbar{
   width:0;
   height:0;
   display:none;
 }
+/* `.tbl-wrap` IS THE THIRD VERTICAL SCROLLER §12 MISSED (Maryam, 30 Sep 2026: on
+   the leader roster "do not add scroll in the table, we are showing 5 rows and
+   that's it"). §02 gives it `overflow-x:auto` for wide tables, and the CSS spec
+   promotes the other axis to `auto` too, so on a machine set to always-show
+   scrollbars the paginated 5-row table wore the OS slab down its right — the same
+   symptom as `.ask-thread`. Hidden here like the rest; the table still paginates
+   at 5 and a genuinely-wide table still scrolls sideways by wheel/trackpad. Every
+   portal's tables via the DS. */

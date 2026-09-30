@@ -6865,15 +6865,13 @@ button.btn-p:active,
 .app .lead-hdr-w{font-size:var(--t-caption-size);color:var(--text-secondary)}
 @container app (max-width:719.98px){ .app .lead-hdr-w{display:none} }
 @container app (max-width:479.98px){ .app .lead-hdr{display:none} }
-.app .lead-cohd{display:grid;gap:var(--s05)}
+.app .lead-cohd{display:grid;gap:var(--s03)}
 .app .lead-cohd-id{display:flex;flex-direction:column;gap:2px}
 .app .lead-cohd-n{font-size:var(--t-h1-size);line-height:var(--t-h1-lh);font-weight:var(--t-w-strong);color:var(--accent-text)}
 .app .lead-cohd-course{font-size:var(--t-desc-size);line-height:normal;color:var(--text-secondary)}
 .app .lead-cohd-day{display:flex;flex-wrap:wrap;align-items:baseline;gap:var(--s03) var(--s05)}
-.app .lead-cohd-dw{display:inline-flex;align-items:baseline;gap:var(--s03)}
-.app .lead-cohd-dw b{font-size:var(--t-h3-size);font-weight:var(--t-w-strong);color:var(--text-primary)}
-.app .lead-cohd-dw span{font-size:var(--t-body-size);color:var(--text-secondary)}
-.app .lead-cohd-dates{font-size:var(--t-caption-size);color:var(--text-helper)}
+.app .lead-cohd-dw,
+.app .lead-cohd-dates{font-size:var(--t-body-size);color:var(--text-secondary)}
 .app .lead-cohd-kv{display:grid;grid-template-columns:1fr;gap:0;border-top:1px solid var(--rule)}
 .app .lead-cohd-cell{display:flex;justify-content:space-between;align-items:baseline;gap:var(--s04);
   padding:var(--s04) 0;border-bottom:1px solid var(--rule)}
@@ -6907,6 +6905,12 @@ button.btn-p:active,
 .app .lead-roster td.cell-low{color:var(--support-error)}
 .app .lead-roster .row-acts{display:inline-flex;gap:var(--s03);justify-content:flex-end;white-space:nowrap}
 .app th.lead-roster-act{text-align:right}
+.app .lead-ses-page > .dark-card.crow-dark{margin-top:var(--s06);margin-bottom:var(--s06)}
+.app .lead-ses-page > .dark-card.crow-dark + .sec-cs{padding-top:0;margin-top:0}
+.app .lead-past-row:hover .cardrow-t{color:var(--accent-text)}
+.app .lead-past-row:hover .tile-arrow{color:var(--accent-text)}
+.app .clk.bk-row:hover .cardrow-t{color:var(--accent-text)}
+.app .clk.bk-row:hover .tile-arrow{color:var(--accent-text)}
 .app th.srt{cursor:pointer;user-select:none}
 .app th.srt .srt-b{display:inline-flex;align-items:center;gap:2px}
 .app th.srt.num .srt-b{justify-content:flex-end}
@@ -10197,6 +10201,10 @@ button.btn-p:active,
 .app .dark-card .btn.btn-p[disabled]{color:var(--on-accent)}
 .app .plate .btn.btn-p[disabled]{color:var(--on-accent)}
 .app .lcal.lcal-next .lcal-slot-day{color:var(--on-dark)}
+.app .lcal-faces .lcal-face-more{
+  font-size:var(--t-caption-size);
+  font-weight:var(--t-w-strong);
+  color:var(--accent-text)}
 .app .page .pulse .stand .stand-l{
   font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-compact-ls);
@@ -13672,6 +13680,7 @@ button.btn-p:active,
   gap:var(--s04);
   padding:var(--s07) var(--s07) var(--s07) var(--s05)}
 .app .lcal-next .lcal-f > .btn{min-height:40px}
+.app .lcal-next .lcal-f{align-items:flex-end}
 .app .lcal-timerbox{
   margin-left:auto;flex:none;
   display:inline-flex;align-items:center;gap:var(--s02);
@@ -13682,6 +13691,13 @@ button.btn-p:active,
 .app .lcal-faces{display:inline-flex;flex:none;align-items:center}
 .app .lcal-faces .av-ph{box-shadow:0 0 0 2px var(--gray-100)}
 .app .lcal-faces .av-ph + .av-ph{margin-left:-8px}
+.app .lcal-faces .lcal-face-more{
+  width:22px;height:22px;flex:none;
+  display:inline-flex;align-items:center;justify-content:center;
+  margin-left:-8px;border-radius:50%;
+  background:var(--background);
+  box-shadow:0 0 0 2px var(--gray-100);
+  position:relative;z-index:2}
 .app .agt{padding:0 var(--pad-x)}
 .app .agt-r{
   display:grid;
@@ -15144,12 +15160,14 @@ button.btn-p:active,
 }
 .app .ask-thread,
 .app .sn-main,
-.app .tal-body{
+.app .tal-body,
+.app .tbl-wrap{
   scrollbar-width:none;
 }
 .app .ask-thread::-webkit-scrollbar,
 .app .sn-main::-webkit-scrollbar,
-.app .tal-body::-webkit-scrollbar{
+.app .tal-body::-webkit-scrollbar,
+.app .tbl-wrap::-webkit-scrollbar{
   width:0;
   height:0;
   display:none;
@@ -15360,6 +15378,7 @@ caretDown:'<path d="M18 9.00005C18 9.00005 13.5811 15 12 15C10.4188 15 6 9 6 9" 
 certificate:'<path d="M11.5 22C7.49306 22 5.48959 22 4.2448 20.5355C3 19.0711 3 16.714 3 12C3 7.28596 3 4.92893 4.2448 3.46447C5.48959 2 7.49306 2 11.5 2C15.5069 2 17.5104 2 18.7552 3.46447C19.7572 4.64332 19.9527 6.40054 19.9908 9.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" fill="none"/><path d="M8 8H15M8 13H11" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" fill="none"/><path d="M19.6092 18.1054C20.4521 17.4918 21 16.4974 21 15.375C21 13.511 19.489 12 17.625 12H17.375C15.511 12 14 13.511 14 15.375C14 16.4974 14.5479 17.4918 15.3908 18.1054M19.6092 18.1054C19.0523 18.5108 18.3666 18.75 17.625 18.75H17.375C16.6334 18.75 15.9477 18.5108 15.3908 18.1054M19.6092 18.1054L20.192 19.9404C20.4143 20.6403 20.5255 20.9903 20.4951 21.2082C20.4318 21.6617 20.0619 21.9984 19.6252 22C19.4154 22.0008 19.101 21.8358 18.4723 21.5059C18.2027 21.3644 18.0679 21.2936 17.93 21.252C17.649 21.1673 17.351 21.1673 17.07 21.252C16.9321 21.2936 16.7973 21.3644 16.5277 21.5059C15.899 21.8358 15.5846 22.0008 15.3748 22C14.9381 21.9984 14.5682 21.6617 14.5049 21.2082C14.4745 20.9903 14.5857 20.6403 14.808 19.9404L15.3908 18.1054" stroke="currentColor" stroke-width="1.5" fill="none"/>',
 chart:'<path d="M7 17L7 13" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" fill="none"/><path d="M12 17L12 7" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" fill="none"/><path d="M17 17L17 11" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" fill="none"/><path d="M2.5 12C2.5 7.52166 2.5 5.28249 3.89124 3.89124C5.28249 2.5 7.52166 2.5 12 2.5C16.4783 2.5 18.7175 2.5 20.1088 3.89124C21.5 5.28249 21.5 7.52166 21.5 12C21.5 16.4783 21.5 18.7175 20.1088 20.1088C18.7175 21.5 16.4783 21.5 12 21.5C7.52166 21.5 5.28249 21.5 3.89124 20.1088C2.5 18.7175 2.5 16.4783 2.5 12Z" stroke="currentColor" stroke-linejoin="round" stroke-width="1.5" fill="none"/>',
 chat:'<path d="M21.5 12C21.5 17.2467 17.2467 21.5 12 21.5C10.3719 21.5 8.8394 21.0904 7.5 20.3687C5.63177 19.362 4.37462 20.2979 3.26592 20.4658C3.09774 20.4913 2.93024 20.4302 2.80997 20.31C2.62741 20.1274 2.59266 19.8451 2.6935 19.6074C3.12865 18.5818 3.5282 16.6382 2.98341 15C2.6698 14.057 2.5 13.0483 2.5 12C2.5 6.75329 6.75329 2.5 12 2.5C17.2467 2.5 21.5 6.75329 21.5 12Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" fill="none"/><path d="M12.1257 12H12.0007M8.125 12H8M16.125 12H16M12.2507 12C12.2507 12.1381 12.1388 12.25 12.0007 12.25C11.8627 12.25 11.7507 12.1381 11.7507 12C11.7507 11.8619 11.8627 11.75 12.0007 11.75C12.1388 11.75 12.2507 11.8619 12.2507 12ZM8.25 12C8.25 12.1381 8.13807 12.25 8 12.25C7.86193 12.25 7.75 12.1381 7.75 12C7.75 11.8619 7.86193 11.75 8 11.75C8.13807 11.75 8.25 11.8619 8.25 12ZM16.25 12C16.25 12.1381 16.1381 12.25 16 12.25C15.8619 12.25 15.75 12.1381 15.75 12C15.75 11.8619 15.8619 11.75 16 11.75C16.1381 11.75 16.25 11.8619 16.25 12Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" fill="none"/>',
+comment:'<path d="M8 13.5H16M8 8.5H12" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" fill="none"/><path d="M6.09881 19C4.7987 18.8721 3.82475 18.4816 3.17157 17.8284C2 16.6569 2 14.7712 2 11V10.5C2 6.72876 2 4.84315 3.17157 3.67157C4.34315 2.5 6.22876 2.5 10 2.5H14C17.7712 2.5 19.6569 2.5 20.8284 3.67157C22 4.84315 22 6.72876 22 10.5V11C22 14.7712 22 16.6569 20.8284 17.8284C19.6569 19 17.7712 19 14 19C13.4395 19.0125 12.9931 19.0551 12.5546 19.155C11.3562 19.4309 10.2465 20.0441 9.14987 20.5789C7.58729 21.3408 6.806 21.7218 6.31569 21.3651C5.37769 20.6665 6.29454 18.5019 6.5 17.5" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" fill="none"/>',
 check:'<path d="M5 14L8.5 17.5L19 6.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" fill="none"/>',
 chevDown:'<path d="M18 9.00005C18 9.00005 13.5811 15 12 15C10.4188 15 6 9 6 9" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" fill="none"/>',
 chevUp:'<path d="M17.9998 15C17.9998 15 13.5809 9.00001 11.9998 9C10.4187 8.99999 5.99985 15 5.99985 15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" fill="none"/>',
@@ -15708,7 +15727,7 @@ const NAVSETS = {
   full:    [['dashboard','Dashboard','dashboard'],['level','My Level','growth'],['coursework','Coursework','book'],['transcript','Course Progress','chart'],['rewards','Achievements','trophy'],['cohort','Cohort','group'],['messages','Messages','chat',1],['interviews','Interviews','calendar'],['billing','Payments','wallet']],
   full90:  [['dashboard','Dashboard','dashboard'],['level','My Level','growth'],['transcript','Course Progress','chart'],['rewards','Achievements','trophy'],['cohort','Cohort','group'],['messages','Messages','chat',1],['interviews','Interviews','calendar'],['billing','Payments','wallet']],
   next:    [['dashboard','Dashboard','dashboard'],['level','My Level','growth'],['transcript','Course Progress','chart'],['rewards','Achievements','trophy'],['messages','Messages','chat',1],['enrol','Course Enrollment','ticket'],['interviews','Interviews','calendar'],['billing','Payments','wallet']],
-  leader:  [['leadDash','My Cohort','group'],['leadSessions','Sessions','calendar'],['leadDiscussion','Discussion','chat'],['leadMessages','Messages','email',2],['leadEvals','Evaluations','edit']]
+  leader:  [['leadDash','My Cohort','group'],['leadSessions','Sessions','calendar'],['leadDiscussion','Discussion','comment'],['leadMessages','Messages','email',2],['leadEvals','Evaluations','edit']]
 };
 
 const PARENT = {report:'level', result:'level', agents:'interviews', agent:'interviews',
@@ -20017,12 +20036,12 @@ V.report = (f) => `<main class="main"><div class="page">
   <div class="sec">
     ${askChip('What does Explorer E3 mean in practice?','Ask Tal what E3 means')}
   </div>
-  ${''/* RATE THE TALENT AGENT — the last thing on the report (Maryam, 13 Sep
-        2026: "put at the end of the page so the candidate could rate and give
-        review to the talent agent"). The subject is who assessed and signed the
-        interview, named in `signedSummary` above — Priya. `reviewCard` carries
-        its own `.sec`. */}
-  ${reviewCard({key:'agent', title:`Rate your interview with ${COHORT_LEAD.n.split(' ')[0]}`, sub:'', capsule:`Rate your interview with ${COHORT_LEAD.n.split(' ')[0]}`})}
+  ${''/* RATE THE TALENT AGENT — NO LONGER ON THE LEVELLED REPORT (Maryam, 30 Sep
+        2026: "the candidate could rate the talent agent before they got levelled
+        ... do not show the talent agent rating option if the candidate got
+        levelled"). The rating now floats above the Tal dock on every page of the
+        HELD stage (interview held, report pending) — injected by `placeReviewFloat`
+        (ai4.js) while `S.stage==='held'` — and is gone once a level is set. */}
   ${''/* "DOWNLOAD REPORT AS PDF" IS GONE (Maryam, 2 Sep 2026) AND THE SECTION
         GOES WITH IT WHEN IT IS EMPTY. On `week1` and after, the enrol button is
         already suppressed, so what was left would have been a `.sec` holding an
@@ -25770,6 +25789,12 @@ render = function(){ _baseAsk(); try { placeAsk(); } catch(e){ console.warn('ask
 
 function placeReviewFloat(){
   const col = device.querySelector('.view-col'); if(!col) return;
+  if(typeof S !== 'undefined' && S.stage === 'held' && typeof reviewCard === 'function' && !col.querySelector('.rev-float')){
+    const nm = (typeof COHORT_LEAD !== 'undefined' && COHORT_LEAD.n) ? COHORT_LEAD.n.split(' ')[0] : 'your agent';
+    const html = reviewCard({key:'agent', title:`Rate your interview with ${nm}`, sub:'', capsule:`Rate your interview with ${nm}`});
+    const main = col.querySelector('.main');
+    if(html && main) main.insertAdjacentHTML('beforeend', html);
+  }
   const rf = col.querySelector('.main .rev-float'); if(!rf) return;
   col.appendChild(rf);
   rf.classList.toggle('rev-float-nodock', !col.querySelector(':scope > .askdock'));
@@ -26790,7 +26815,6 @@ const LEAD_SESSIONS = {};
 LEAD_ALL().forEach(c => { LEAD_SESSIONS[c.id] = leadBuildSeries(c); });
 (function(){
   const ss = LEAD_SESSIONS[41]; if(!ss) return;
-  const w2 = ss.find(s => s.week === 2); if(w2) w2.unavail = true;
   ss.push({id:'s41x1', co:41, series:null, title:'Extra Q&A before assessment', chapter:'Hard Conversations',
     dISO:'2026-09-15', date:dPretty('2026-09-15'), time:'19:00', dur:45, repeat:'none', week:leadWeek(19),
     status:'cancelled', reason:'Clashed with the LightspeedVT maintenance window. I will fold the questions into Thursday.', unavail:false, adhoc:true});
@@ -26934,7 +26958,11 @@ const leadCallCard = (k, o) => `<div class="sec dark-card crow-dark">
              cohort ("Cohort 41" + the detail), so the header can be the generic
              kind of appointment. `lcTitle` is untouched — the dashboard's
              upcoming-calls cards still title themselves "Cohort N call". */}
-      <div class="dc-hd-r"><h2 class="dc-t">Upcoming Cohort Session</h2>
+      ${''/* THE TITLE IS "Week N Cohort Session" (Maryam 30 Sep 2026: "change black
+             card session name format to the one we are using Week (n) Cohort
+             Session"), matching the dashboard call card. The week is the record's
+             own (`k.week`). Was "Upcoming Cohort Session". */}
+      <div class="dc-hd-r"><h2 class="dc-t">Week ${k.week} Cohort Session</h2>
         <span class="dc-when">${I.time}${k.when}</span></div>
     </div>
     ${''/* THE ACTION IS A GATED JOIN, NOT "GENERATE THE BRIEF" (Maryam, 9 Sep 2026:
@@ -26955,6 +26983,7 @@ const lcalCard = (k, lead) => {
     const till = (typeof joinClock === 'function') ? joinClock(k.when) : null;
     const co = (typeof LEAD_COHORTS !== 'undefined') ? LEAD_COHORTS.find(c => c.id === k.co) : null;
     const faces = co ? co.members.slice(0, 2).map(m => avatar({i:m.ini, img:AV[m.img]}, 22)).join('') : '';
+    const moreFaces = Math.max(0, k.seats - 2);
     return `<div class="lcal lcal-next dark-card">
     <span class="lcal-slot">
       <span class="lcal-slot-ic">${I.calendar}</span>
@@ -26963,14 +26992,18 @@ const lcalCard = (k, lead) => {
     </span>
     <span class="lcal-body">
       <span class="lcal-h">
-        <span class="lcal-t t-h3">${lcTitle(k)}</span>
-        ${''/* THE ICON IS A SIBLING OF `.lcal-timer`, NOT A CHILD — `callTimerArm`
-               writes the countdown with `textContent`, which would wipe an svg
-               inside the timer span. The box holds the clock mark + the digits. */}
-        <span class="lcal-timerbox">${I.time}<span class="lcal-timer t-h4"${till ? ` data-calltill="${till}" style="font-variant-numeric:tabular-nums"` : ''}>${till ? callTimerFmt(till - Date.now()) : k.time}</span></span>
+        ${''/* THE TITLE IS "Week N Cohort Session" (Maryam 30 Sep 2026), the
+               week off the cohort record; `lcTitle`'s "Cohort N call" stays on the
+               other call surfaces. */}
+        <span class="lcal-t t-h3">Week ${k.week} Cohort Session</span>
+        ${''/* A STATIC COUNTDOWN LABEL (Maryam 30 Sep 2026: "instead of live now
+               show In 2hrs 40mins"). No `data-calltill`, so `callTimerArm` leaves
+               it alone — the demo card reads the call as still ahead, which also
+               keeps the Join in its accent-disabled state. */}
+        <span class="lcal-timerbox">${I.time}<span class="lcal-timer t-h4">In 2hrs 40mins</span></span>
       </span>
       <span class="lcal-seatsrow">
-        ${faces ? `<span class="lcal-faces">${faces}</span>` : ''}
+        ${faces ? `<span class="lcal-faces">${faces}${moreFaces ? `<span class="lcal-face-more">+${moreFaces}</span>` : ''}</span>` : ''}
         <span class="lcal-seats t-desc">${k.seats} candidates</span>
       </span>
       <span class="lcal-f">
@@ -27046,7 +27079,8 @@ render = function(){
   try {
     const app = device.querySelector('.app');
     if(app) app.dataset.portal = S.portal || 'candidate';
-    if(S.ldrKeepScroll != null){ const m = device.querySelector('.main'); if(m){ void m.scrollHeight; /* force layout so scrollTop is not clamped to 0 before the new content measures */ m.scrollTop = S.ldrKeepScroll; } S.ldrKeepScroll = null; }
+    if(S.ldrKeepScroll != null){ const m = device.querySelector('.main'); if(m){ void m.scrollHeight; /* force layout so scrollTop is not clamped to 0 before the new content measures */
+      m.style.scrollBehavior = 'auto'; m.scrollTop = S.ldrKeepScroll; m.style.scrollBehavior = ''; } S.ldrKeepScroll = null; }
     if(typeof leadRestoreRosterFocus === 'function') leadRestoreRosterFocus();
     if(typeof placeLeadRowMenu === 'function') placeLeadRowMenu();
   } catch(e){ console.warn('portal stamp', e); }
@@ -27501,8 +27535,13 @@ function leadCohortHead(c){
              below carries what the reader needs, and the course is on every card. */}
       <h2 class="lead-cohd-n">${lname(c)}</h2>
     </div>
+    ${''/* the large "Day N of 90" read-out is removed (Maryam 30 Sep 2026); the
+          app bar already carries "Week N of 13" and the reader does not need the
+          day number shouted here. What stays — the week line and the date span —
+          reads at one size and colour (Maryam 30 Sep 2026: "Week 5 of 13 /
+          28 Aug 2026 – 26 Nov 2026 should be in same text size and color"). */}
     <div class="lead-cohd-day">
-      <span class="lead-cohd-dw"><b>Day ${c.day} of 90</b><span>Week ${leadWeek(c.day)} of 13</span></span>
+      <span class="lead-cohd-dw">Week ${leadWeek(c.day)} of 13</span>
       <span class="lead-cohd-dates">${c.start} &ndash; ${c.end}</span>
     </div>
     ${''/* THE FACT CELLS MOVED DOWN, below the call card (Maryam, 30 Sep 2026:
@@ -28458,8 +28497,7 @@ function sesBkRow(c, s){
   const day = `<span class="bk-day"><span class="d">${sesDayLbl(s)}</span><span class="n">${t12(s.time)}</span></span>`;
   const wk = s.week || leadWeek(sesDayOf(c, s.dISO));
   const body = `<span class="cardrow-b">
-      <span class="cardrow-t">Week ${wk} Cohort Session</span>
-      <span class="cardrow-s">${s.chapter}${cancelled&&s.reason?` &middot; ${s.reason}`:''}</span></span>`;
+      <span class="cardrow-t">Week ${wk} Cohort Session</span></span>`;
   let mark;
   if(cancelled) mark = `<span class="ses-mark ses-cancelled">Cancelled</span>`;
   else if(!past) mark = `<span class="ses-mark ses-upcoming">${sesCountdown(s)}</span>`;
@@ -28480,7 +28518,7 @@ V.leadSessions = () => {
   const next = leadNextSession(c);
   const upcoming = all.filter(s => sesEnd(s) >= LEAD_NOW && s.id !== (next&&next.id));
   const past = all.filter(s => sesEnd(s) < LEAD_NOW).reverse();
-  return `<main class="main"><div class="page">
+  return `<main class="main"><div class="page lead-ses-page">
   ${ph('Sessions')}
   ${''/* THE NEXT SESSION IS THE BLACK CALL CARD (Maryam, 30 Sep 2026: "bring
         back the black card for call") — `leadCallCard`, the same appointment

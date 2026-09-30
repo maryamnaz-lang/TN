@@ -1536,7 +1536,16 @@ HOVER_KEEP = ('sn-item', 'btn-p', 'tal-fab', 'tal-star',
               # None end another selector's pre-hover compound (`.qa-c-mk`,
               # `.cco-ic`, `.qzp-r-ic` all end differently), so the `endswith`
               # match arms only these three cards.
-              'qa-c', 'cco', 'qzp-r')
+              'qa-c', 'cco', 'qzp-r',
+              # Maryam, 30 Sep 2026 — the leader dashboard's Past-cohort row lights
+              # its name and trailing arrow accent on hover. `lead-past-row` is
+              # minted for this and written nowhere else, which the `endswith`
+              # match needs (`.cardrow`/`.clk` would arm every card row).
+              'lead-past-row',
+              # Maryam, 30 Sep 2026 — a clickable (past) Sessions row lights its
+              # session name and trailing arrow accent on hover. `bk-row` is minted
+              # for this and written nowhere else.
+              'bk-row')
 _hover_n = 0
 
 def _disarm(m):

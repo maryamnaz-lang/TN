@@ -856,7 +856,7 @@
 @container app (max-width:479.98px){ .app .lead-hdr{display:none} }
 
 /* 12.2 — the cohort header */
-.app .lead-cohd{display:grid;gap:var(--s05)}
+.app .lead-cohd{display:grid;gap:var(--s03)}
 .app .lead-cohd-id{display:flex;flex-direction:column;gap:2px}
 /* the cohort title reads in the accent as ink (Maryam 30 Sep 2026: "make the
    cohort name in accent color"). §63 does not target this class, so its colour is
@@ -864,10 +864,13 @@
 .app .lead-cohd-n{font-size:var(--t-h1-size);line-height:var(--t-h1-lh);font-weight:var(--t-w-strong);color:var(--accent-text)}
 .app .lead-cohd-course{font-size:var(--t-desc-size);line-height:normal;color:var(--text-secondary)}
 .app .lead-cohd-day{display:flex;flex-wrap:wrap;align-items:baseline;gap:var(--s03) var(--s05)}
-.app .lead-cohd-dw{display:inline-flex;align-items:baseline;gap:var(--s03)}
-.app .lead-cohd-dw b{font-size:var(--t-h3-size);font-weight:var(--t-w-strong);color:var(--text-primary)}
-.app .lead-cohd-dw span{font-size:var(--t-body-size);color:var(--text-secondary)}
-.app .lead-cohd-dates{font-size:var(--t-caption-size);color:var(--text-helper)}
+/* The "Day N of 90" read-out was removed (Maryam 30 Sep 2026); what stays — the
+   week line and the date span — reads at ONE size and colour (Maryam 30 Sep 2026:
+   "Week 5 of 13 / 28 Aug 2026 – 26 Nov 2026 should be in same text size and
+   color"). Both are body size in --text-secondary now (the week line dropped its
+   h3-bold sibling; the dates lifted off the smaller caption/helper tier). */
+.app .lead-cohd-dw,
+.app .lead-cohd-dates{font-size:var(--t-body-size);color:var(--text-secondary)}
 .app .lead-cohd-kv{display:grid;grid-template-columns:1fr;gap:0;border-top:1px solid var(--rule)}
 .app .lead-cohd-cell{display:flex;justify-content:space-between;align-items:baseline;gap:var(--s04);
   padding:var(--s04) 0;border-bottom:1px solid var(--rule)}
@@ -905,6 +908,28 @@
 .app .lead-roster td.cell-low{color:var(--support-error)}
 .app .lead-roster .row-acts{display:inline-flex;gap:var(--s03);justify-content:flex-end;white-space:nowrap}
 .app th.lead-roster-act{text-align:right}
+/* THE SESSIONS BLACK CARD SITS 24px BELOW THE HEADER AND 24px ABOVE THE TABS
+   (Maryam 30 Sep 2026: "top padding and bottom gap of the black card with the
+   tabs should be 24px"). §75 gives `.dark-card` a --s05 (16) margin and the tab
+   strip pays no top padding, so the card sat 16 above the Upcoming/Past strip;
+   this lifts both the card's own margins to --s06 (24). Scoped to the Sessions
+   page so the dashboard/cohort call cards keep their own rhythm. (0,4,0) beats
+   §75's (0,2,0). */
+.app .lead-ses-page > .dark-card.crow-dark{margin-top:var(--s06);margin-bottom:var(--s06)}
+.app .lead-ses-page > .dark-card.crow-dark + .sec-cs{padding-top:0;margin-top:0}
+/* THE PAST-COHORT ROW LIGHTS ON HOVER (Maryam 30 Sep 2026: "the cohort name and
+   arrows should turn into accent color"). The row's name and trailing arrow take
+   the accent as ink; nothing else moves. Written plain — the build disarms every
+   `:hover` and `lead-past-row` is armed in `HOVER_KEEP`; (0,4,0) beats §63's
+   resting `.cardrow-t` colour regardless of layer order. */
+.app .lead-past-row:hover .cardrow-t{color:var(--accent-text)}
+.app .lead-past-row:hover .tile-arrow{color:var(--accent-text)}
+/* A CLICKABLE SESSION ROW LIGHTS ITS NAME + ARROW ON HOVER (Maryam 30 Sep 2026:
+   "the hover on a row should turn the session name and arrow in accent color").
+   Only the past (clickable) rows carry `.clk` + the arrow; `bk-row` is armed in
+   `HOVER_KEEP`. */
+.app .clk.bk-row:hover .cardrow-t{color:var(--accent-text)}
+.app .clk.bk-row:hover .tile-arrow{color:var(--accent-text)}
 /* sortable headers */
 .app th.srt{cursor:pointer;user-select:none}
 .app th.srt .srt-b{display:inline-flex;align-items:center;gap:2px}
