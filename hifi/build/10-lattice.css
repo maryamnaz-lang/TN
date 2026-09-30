@@ -571,6 +571,14 @@ textarea.inp{min-height:88px}
      cohort page it never had a heading (it was a tab), so this is the first
      board drawn under one. `> .board`, a direct child like the other members. */
   .sec:has(> .board),
+  /* `.ses-next` JOINS THEM (EPIC 12.5, leader Sessions). The "Schedule" section's
+     heading row carries a "Schedule a session" button, and the section's body is
+     the highlighted next-session card — not one of the row/block classes above —
+     so at desktop the heading dropped into the 184px spine and the button
+     squeezed "Schedule" to one letter a line (trap 13's exact failure). A
+     full-width card under a headed row wants its heading on top. `> .ses-next`, a
+     direct child. Leader-only; it crosses to the DS harmlessly. */
+  .sec:has(> .ses-next),
   .sec:has(.kv):not(:has(.chart-table)){display:block}
   .sec:has(.ch) > .sec-h,.sec:has(.ag) > .sec-h,.sec:has(.aw) > .sec-h,
   .sec:has(.mem) > .sec-h,.sec:has(.gcard) > .sec-h,
@@ -583,6 +591,7 @@ textarea.inp{min-height:88px}
   .sec:has(> .skl) > .sec-h,.sec:has(> .pfe-about) > .sec-h,.sec:has(> .tg) > .sec-h,
   .sec:has(> .qa) > .sec-h,
   .sec:has(> .board) > .sec-h,
+  .sec:has(> .ses-next) > .sec-h,
   .sec:has(.kv):not(:has(.chart-table)) > .sec-h{
     border-right:0;min-height:0;margin-bottom:var(--sec-h-gap);
     padding:0 var(--pad-x)}

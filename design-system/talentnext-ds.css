@@ -14,7 +14,7 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 6225.  Rules dropped as product-specific: 222.
+   Rules kept: 6383.  Rules dropped as product-specific: 222.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
@@ -1564,6 +1564,7 @@ textarea.inp{min-height:88px}
   .sec:has(> .tg),
   .sec:has(> .qa),
   .sec:has(> .board),
+  .sec:has(> .ses-next),
   .sec:has(.kv):not(:has(.chart-table)){display:block}
   .sec:has(.ch) > .sec-h,
   .sec:has(.ag) > .sec-h,
@@ -1586,6 +1587,7 @@ textarea.inp{min-height:88px}
   .sec:has(> .tg) > .sec-h,
   .sec:has(> .qa) > .sec-h,
   .sec:has(> .board) > .sec-h,
+  .sec:has(> .ses-next) > .sec-h,
   .sec:has(.kv):not(:has(.chart-table)) > .sec-h{border-right:0; min-height:0; margin-bottom:var(--sec-h-gap); padding:0 var(--pad-x)}
 }
 .pb + .note,
@@ -5612,6 +5614,72 @@ button.btn-p:active,
 @container app (max-width:599.98px){
   .app .bk-row > .cardrow-ic{display:none}
 }
+.app[data-portal="leader"] .lead-hdr{display:inline-flex; align-items:center; gap:var(--s03); padding:0 var(--s04) 0 0; margin-right:var(--s02); white-space:nowrap}
+.app .lead-hdr-n{font-size:var(--t-compact-size); font-weight:var(--t-w-strong); color:var(--text-primary)}
+.app .lead-hdr-w{font-size:var(--t-caption-size); color:var(--text-secondary)}
+@container app (max-width:719.98px){
+  .app .lead-hdr-w{display:none}
+}
+@container app (max-width:479.98px){
+  .app .lead-hdr{display:none}
+}
+.app .lead-cohd{display:grid; gap:var(--s05)}
+.app .lead-cohd-id{display:flex; flex-direction:column; gap:2px}
+.app .lead-cohd-n{font-size:var(--t-h1-size); line-height:var(--t-h1-lh); font-weight:var(--t-w-strong); color:var(--text-primary)}
+.app .lead-cohd-course{font-size:var(--t-desc-size); line-height:normal; color:var(--text-secondary)}
+.app .lead-cohd-day{display:flex; flex-wrap:wrap; align-items:baseline; gap:var(--s03) var(--s05)}
+.app .lead-cohd-dw{display:inline-flex; align-items:baseline; gap:var(--s03)}
+.app .lead-cohd-dw b{font-size:var(--t-h3-size); font-weight:var(--t-w-strong); color:var(--text-primary)}
+.app .lead-cohd-dw span{font-size:var(--t-body-size); color:var(--text-secondary)}
+.app .lead-cohd-dates{font-size:var(--t-caption-size); color:var(--text-helper)}
+.app .lead-cohd-kv{display:grid; grid-template-columns:1fr; gap:0; border-top:1px solid var(--rule)}
+.app .lead-cohd-cell{display:flex; justify-content:space-between; align-items:baseline; gap:var(--s04); padding:var(--s04) 0; border-bottom:1px solid var(--rule)}
+.app .lead-cohd-l{font-size:var(--t-label-size); color:var(--text-secondary)}
+.app .lead-cohd-v{font-size:var(--t-body-size); color:var(--text-primary); text-align:right}
+.app .lead-cohd-v b{font-weight:var(--t-w-strong)}
+@container app (min-width:900px){
+  .app .lead-cohd-kv{grid-template-columns:repeat(3,1fr); border-top:0}
+  .app .lead-cohd-cell{flex-direction:column; justify-content:flex-start; align-items:flex-start; padding:var(--s04) var(--s05) var(--s04) 0; border-bottom:0; border-left:1px solid var(--rule)}
+  .app .lead-cohd-cell:first-child{border-left:0; padding-left:0}
+  .app .lead-cohd-v{text-align:left}
+}
+.app .lead-roster-tools{display:flex; flex-wrap:wrap; gap:var(--s04); align-items:center; justify-content:space-between; margin-bottom:var(--s05)}
+.app .lead-search{position:relative; display:inline-flex; align-items:center; flex:1 1 240px; max-width:360px}
+.app .lead-search-mk{position:absolute; left:var(--s03); display:inline-flex; pointer-events:none; color:var(--text-secondary)}
+.app .lead-search-mk svg{width:18px; height:18px}
+.app .lead-search input{width:100%; font:inherit; font-size:var(--t-body-size); color:var(--text-primary); padding:var(--s03) var(--s03) var(--s03) calc(var(--s06) + 4px); border:1px solid var(--border-subtle-02); background:var(--background)}
+.app .lead-search input:focus{outline:none; border-color:var(--text-primary)}
+.app .lead-roster-filter{flex:0 0 auto; min-width:150px}
+.app .lead-roster .rname{display:inline-flex; align-items:center; gap:var(--s03)}
+.app .lead-roster .rname .av-ph{flex:0 0 auto; border-radius:50%}
+.app .lnm{display:inline-flex; flex-direction:column; line-height:1.25}
+.app .lnm-r{font-weight:var(--t-w-strong); color:var(--text-primary)}
+.app .lnm-h{font-size:var(--t-caption-size); color:var(--text-secondary)}
+.app .lnm-only{font-size:var(--t-compact-size); font-weight:var(--t-w-strong); color:var(--text-primary)}
+.app .lead-roster .cell-sub{display:block; font-size:var(--t-caption-size); color:var(--text-helper)}
+.app .lead-roster td.cell-low{color:var(--support-error)}
+.app .lead-roster .row-acts{display:inline-flex; gap:var(--s03); justify-content:flex-end; white-space:nowrap}
+.app th.lead-roster-act{text-align:right}
+.app th.srt{cursor:pointer; user-select:none}
+.app th.srt .srt-b{display:inline-flex; align-items:center; gap:2px}
+.app th.srt.num .srt-b{justify-content:flex-end}
+.app th.srt.on{color:var(--text-primary)}
+.app .srt-a{width:14px; height:14px; color:var(--accent-text)}
+.app .srt-a.srt-dn{transform:rotate(180deg)}
+.app .lead-sync{margin-top:var(--s04); font-size:var(--t-caption-size); color:var(--text-helper)}
+.app .lead-past-row{width:100%}
+.app .stat .stat-low{color:var(--support-error)}
+.app .crs-card .crs-lsvt{margin-top:var(--s05)}
+.app .atd-row{display:flex; align-items:center; justify-content:space-between; gap:var(--s04); padding:var(--s04) 0; border-bottom:1px solid var(--rule)}
+.app .atd-row:last-child{border-bottom:0}
+.app .atd-b{display:flex; flex-direction:column; gap:2px; min-width:0}
+.app .atd-t{font-size:var(--t-compact-size); color:var(--text-primary)}
+.app .atd-w{font-size:var(--t-caption-size); color:var(--text-helper)}
+.app .atd-note{color:var(--text-secondary)}
+.app .atd-mark{flex:0 0 auto; font-size:var(--t-label-size); white-space:nowrap}
+.app .atd-yes{color:var(--support-success-ink)}
+.app .atd-no{color:var(--text-secondary)}
+.app .atd-na{color:var(--text-helper); font-style:normal}
 
 /* ---- 32-week.css ---- */
 .app .wkc{display:flex; flex-direction:column}
@@ -5905,6 +5973,83 @@ button.btn-p:active,
   .app .ldr-dm-thread > .msgs{flex:1 1 auto; min-height:0; overflow-y:auto; overscroll-behavior:contain}
 }
 .app .page > .sec.sec-band{padding-top:var(--s04); padding-bottom:var(--s04)}
+.app .ses-next{border:1px solid var(--border-subtle-02); padding:var(--s05); background:color-mix(in srgb, var(--accent) 4%, var(--background))}
+.app .ses-next-h{display:flex; justify-content:space-between; gap:var(--s04); flex-wrap:wrap}
+.app .ses-next-eyebrow{display:block; font-size:var(--t-eyebrow-size); color:var(--accent-text); text-transform:none; margin-bottom:2px}
+.app .ses-next-t{font-size:var(--t-h3-size); font-weight:var(--t-w-strong); color:var(--text-primary)}
+.app .ses-next-when{display:block; font-size:var(--t-desc-size); color:var(--text-secondary); margin-top:2px}
+.app .ses-next-a{display:flex; gap:var(--s03); flex:0 0 auto}
+.app .ses-next-cov{display:flex; flex-direction:column; gap:2px; margin-top:var(--s04); padding-top:var(--s04); border-top:1px solid var(--rule)}
+.app .ses-next-ch{font-size:var(--t-body-size); font-weight:var(--t-w-strong); color:var(--text-primary)}
+.app .ses-next-sub{font-size:var(--t-caption-size); color:var(--text-secondary)}
+.app .ses-next-note{margin-top:var(--s03); font-size:var(--t-desc-size); color:var(--text-secondary)}
+.app .ses-next-foot{display:flex; align-items:center; gap:var(--s04); margin-top:var(--s05); flex-wrap:wrap}
+.app .ses-next-hint{font-size:var(--t-caption-size); color:var(--text-helper)}
+.app .ses-list .ses-row{display:flex; align-items:center; gap:var(--s04); width:100%; padding:var(--s04) 0; border-bottom:1px solid var(--rule); text-align:left; background:none; border-left:0; border-right:0; border-top:0; font:inherit; color:inherit}
+.app .ses-list .ses-row:last-child{border-bottom:0}
+.app .ses-row.clk{cursor:pointer}
+.app .ses-row-b{display:flex; flex-direction:column; gap:2px; min-width:0; flex:1 1 auto}
+.app .ses-row-t{font-size:var(--t-compact-size); font-weight:var(--t-w-strong); color:var(--text-primary)}
+.app .ses-row-s{font-size:var(--t-caption-size); color:var(--text-secondary)}
+.app .ses-repeat{font-size:var(--t-caption-size); font-weight:var(--t-w-book); color:var(--text-helper)}
+.app .ses-row-a{display:inline-flex; gap:var(--s02); flex:0 0 auto}
+.app .ses-row-go{flex:0 0 auto; color:var(--text-secondary); display:inline-flex}
+.app .ses-mark{flex:0 0 auto; font-size:var(--t-label-size); white-space:nowrap; text-align:right}
+.app .ses-att{color:var(--text-secondary)}
+.app .ses-upcoming{color:var(--accent-text)}
+.app .ses-na{color:var(--text-helper)}
+.app .ses-cancelled{color:var(--support-error)}
+.app .ses-reg .atd-row .rname{display:inline-flex; align-items:center; gap:var(--s03)}
+.app .ses-warn{display:flex; gap:var(--s04); padding:var(--s05); border:1px solid var(--support-attention); background:color-mix(in srgb, var(--support-attention) 8%, var(--background))}
+.app .ses-warn-mk{flex:0 0 auto; color:var(--support-attention)}
+.app .ses-warn-b h3{font-size:var(--t-h4-size); color:var(--text-primary)}
+.app .ses-warn-b p{font-size:var(--t-desc-size); color:var(--text-secondary); margin-top:2px}
+.app .ses-note-box{display:flex; flex-direction:column; gap:var(--s04)}
+.app .ses-note-a{display:flex; justify-content:flex-end}
+.app .ses-err{display:flex; align-items:flex-start; gap:var(--s02); margin-bottom:var(--s05); padding:var(--s03) var(--s04); font-size:var(--t-label-size); color:var(--support-error); background:color-mix(in srgb, var(--support-error) 8%, var(--background))}
+.app .ses-err svg{width:18px; height:18px; flex:0 0 auto}
+.app .f-tz,
+.app .f-opt,
+.app .f-req{font-size:var(--t-caption-size); color:var(--text-helper); font-weight:var(--t-w-book)}
+.app .f-lbl{display:block; font-size:var(--t-label-size); color:var(--text-secondary); margin-bottom:var(--s03)}
+.app .ses-scope{display:flex; flex-direction:column; gap:var(--s03)}
+.app .ses-scope-o{display:flex; align-items:center; gap:var(--s03); font-size:var(--t-body-size); color:var(--text-primary); cursor:pointer}
+.app .sheet.sheet-narrow{max-width:460px}
+.app .disc-compose,
+.app .disc-post{display:flex; gap:var(--s04)}
+.app .disc-av{flex:0 0 auto}
+.app .disc-av .av-ph{border-radius:50%}
+.app .disc-compose-b{flex:1 1 auto; display:flex; flex-direction:column; gap:var(--s03)}
+.app .disc-compose-a{display:flex; align-items:center; justify-content:space-between; gap:var(--s04)}
+.app .disc-pin-cb{display:inline-flex; align-items:center; gap:var(--s02); font-size:var(--t-label-size); color:var(--text-secondary); cursor:pointer}
+.app .disc-thread{padding:var(--s05) 0; border-bottom:1px solid var(--rule)}
+.app .disc-thread:last-child{border-bottom:0}
+.app .disc-b{flex:1 1 auto; min-width:0}
+.app .disc-head{display:flex; flex-wrap:wrap; align-items:baseline; gap:var(--s02) var(--s03)}
+.app .disc-nm{font-size:var(--t-compact-size); font-weight:var(--t-w-strong); color:var(--text-primary)}
+.app .disc-h{font-size:var(--t-caption-size); color:var(--text-secondary)}
+.app .disc-w{font-size:var(--t-caption-size); color:var(--text-helper)}
+.app .disc-badge{font-size:var(--t-caption-size); color:var(--accent-text); padding:1px var(--s02); border:1px solid var(--accent-text); border-radius:999px}
+.app .disc-you{font-size:var(--t-caption-size); color:var(--text-helper)}
+.app .disc-pin-tag{display:inline-flex; align-items:center; gap:2px; font-size:var(--t-caption-size); color:var(--text-secondary)}
+.app .disc-pin-tag svg{width:13px; height:13px}
+.app .disc-text{font-size:var(--t-body-size); line-height:var(--t-body-lh); color:var(--text-primary); margin-top:var(--s02); white-space:pre-wrap}
+.app .disc-acts{display:flex; gap:var(--s04); margin-top:var(--s03)}
+.app .disc-act{display:inline-flex; align-items:center; gap:var(--s02); font:inherit; font-size:var(--t-label-size); color:var(--text-secondary); background:none; border:0; cursor:pointer; padding:0}
+.app .disc-act svg{width:16px; height:16px}
+.app .disc-act.on{color:var(--accent-text)}
+.app .disc-replies{margin-top:var(--s04); padding-left:var(--s07); border-left:2px solid var(--rule); display:flex; flex-direction:column; gap:var(--s04)}
+.app .disc-reply .disc-text{font-size:var(--t-compact-size)}
+.app .disc-reply-box,
+.app .disc-edit{margin-top:var(--s04); display:flex; flex-direction:column; gap:var(--s03); padding-left:var(--s07)}
+.app .disc-edit{padding-left:0}
+.app .disc-reply-a,
+.app .disc-edit-a{display:flex; justify-content:flex-end; gap:var(--s03)}
+.app .eval-window{font-size:var(--t-desc-size); color:var(--text-secondary)}
+.app .eval-window b{color:var(--text-primary); font-weight:var(--t-w-strong)}
+.app .ldr-eval-a{display:flex; gap:var(--s04)}
+.app .ldr-draft-note{margin-top:var(--s04); font-size:var(--t-caption-size); color:var(--text-helper)}
+.app .f-req-err{font-size:var(--t-caption-size); color:var(--support-error); font-weight:var(--t-w-book); margin-left:var(--s02)}
 
 /* ---- 37-refit.css ---- */
 .app .page > .rail-wrap:has(+ .sec){position:relative}
@@ -8727,6 +8872,14 @@ button.btn-p:active,
 .app .note-form-b .btn.note-cancel::after{content:none}
 .app .page:not(.form-page) .sec:has(> .note-panel) > .sec-h,
 .app .page:not(.form-page) .sec:has(> .note-list) > .sec-h{padding-right:0}
+.app .note-types{display:flex; flex-wrap:wrap; gap:var(--s03); margin-bottom:var(--s04)}
+.app .note-type{display:inline-flex; align-items:center; gap:var(--s02); font:inherit; font-size:var(--t-label-size); color:var(--text-secondary); padding:var(--s02) var(--s04); border:1px solid var(--rule); border-radius:999px; background:var(--background); cursor:pointer}
+.app .note-type-dot{width:12px; height:12px; border-radius:50%; border:1.5px solid var(--border-subtle-02); flex:0 0 auto}
+.app .note-type.on{color:var(--note-ink); border-color:var(--note-ink); background:color-mix(in srgb, var(--note-ink) 10%, var(--background))}
+.app .note-type.on .note-type-dot{border-color:var(--note-ink); background:var(--note-ink)}
+.app .note-edited{color:var(--text-helper); font-size:var(--t-caption-size)}
+.app .note-group + .note-group{margin-top:var(--s05)}
+.app .note-group-h{font-size:var(--t-label-size); color:var(--text-secondary); margin-bottom:var(--s03)}
 
 /* ---- 100-msgui.css ---- */
 .app .mhead{display:flex; align-items:center; gap:var(--s05); padding:var(--s05) var(--pad-x); border-bottom:1px solid var(--rule)}
@@ -8754,6 +8907,25 @@ button.btn-p:active,
 .app .m-day > span{padding:0}
 .app .msg-page > .msg-foot{border-top:0}
 .app .msgs > *{padding-left:0; padding-right:0}
+.app .ldr-dm-tn .dm-h{font-size:var(--t-caption-size); color:var(--text-secondary); font-weight:var(--t-w-book)}
+.app .ldr-dm-lh-2{margin-top:var(--s05)}
+.app .m-b-voice,
+.app .m-b-file{padding-top:var(--s03); padding-bottom:var(--s03)}
+.app .m-voice{display:inline-flex; align-items:center; gap:var(--s03)}
+.app .m-voice svg{width:18px; height:18px; flex:0 0 auto}
+.app .m-voice-bar{display:inline-block; width:96px; height:3px; border-radius:999px; background:currentColor; opacity:.35}
+.app .m-voice-d{font-size:var(--t-caption-size); opacity:.85}
+.app .m-file{display:inline-flex; align-items:center; gap:var(--s03)}
+.app .m-file svg{width:20px; height:20px; flex:0 0 auto}
+.app .m-file-b{display:flex; flex-direction:column; line-height:1.3}
+.app .m-file-n{font-size:var(--t-compact-size)}
+.app .m-file-s{font-size:var(--t-caption-size); opacity:.75}
+.app .m-read{text-align:right; font-size:var(--t-caption-size); color:var(--text-helper); margin:2px var(--s02) var(--s03) 0}
+.app .dm-closed{padding:var(--s05); text-align:center; font-size:var(--t-desc-size); color:var(--text-secondary); background:var(--surface-2); border-top:1px solid var(--rule)}
+.app .composer-rec{align-items:center}
+.app .dm-rec-live{flex:1 1 auto; display:inline-flex; align-items:center; gap:var(--s03); font-size:var(--t-body-size); color:var(--text-primary)}
+.app .dm-rec-dot{width:10px; height:10px; border-radius:50%; background:var(--accent); flex:0 0 auto; animation:dmRecPulse 1.2s ease-in-out infinite}
+@keyframes dmRecPulse{0%,100%{opacity:1}50%{opacity:.25}}
 
 /* ---- 101-blockgap.css ---- */
 .app .page > .sec.dark-card:is(:has(+ .sec.dark-card), :has(+ .sec > .stats:first-child), :has(+ .sec > .facts:first-child), :has(+ .sec > .certban:first-child), :has(+ .sec > .tile:first-child), :has(+ .sec > .note:first-child)){margin-bottom:0}

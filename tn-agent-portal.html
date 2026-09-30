@@ -36,7 +36,7 @@
      rule sweep clean on 21 screens, 84 screen-width combos with no overflow,
      zero thrown errors.
      ========================================================================== -->
-<link rel="stylesheet" href="design-system/talentnext-ds.css?b=2fd184fe">
+<link rel="stylesheet" href="design-system/talentnext-ds.css?b=e49bb747">
 
 <style>
 /* ==========================================================================
@@ -203,6 +203,38 @@
 .app .iv-ladder .ladder-pick i{cursor:pointer}
 .app .iv-ladder .ladder-pick i:not(.done):not(.on):hover{background:var(--gray-20)}
 .app .iv-ladder .ladder-pick i:focus-visible{outline:2px solid var(--accent); outline-offset:1px}
+
+/* THE TALENT-LETTERS MULTI-SELECT (13.13) — the evaluation captures 1–6 letters,
+   not a single type. Round pills like the admin levelling picker; a picked chip
+   takes the accent as ground-tint + edge + ink (the review widget's own
+   affordance), the letter carried in a bold cap. `.ltr-cloud` opts out of the
+   label column via `.eval-form` already; this is only the chip skin. */
+.app .ltr-cloud{display:flex; flex-wrap:wrap; gap:var(--s03)}
+.app .ltr-chip{display:inline-flex; align-items:center; gap:var(--s02);
+  padding:7px 14px; border-radius:999px; border:1px solid var(--border-subtle-02);
+  background:var(--background); cursor:pointer; color:var(--text-secondary);
+  font-size:var(--t-body-size); line-height:1; transition:background .12s, border-color .12s, color .12s}
+.app .ltr-chip .ltr-c{font-weight:var(--t-w-strong); color:var(--text-primary)}
+.app .ltr-chip.on{border-color:var(--accent); background:color-mix(in srgb, var(--accent) 8%, transparent); color:var(--accent-text)}
+.app .ltr-chip.on .ltr-c{color:var(--accent-text)}
+.app .ltr-chip:focus-visible{outline:2px solid var(--accent); outline-offset:1px}
+.app .ltr-hint{display:block; margin-top:var(--s02); color:var(--text-secondary); font-size:var(--t-desc-size)}
+.app .ltr-tal{color:var(--text-secondary)}
+.app .ltr-tal b{color:var(--accent-text); font-weight:var(--t-w-strong)}
+/* The divergence note the form shows when the agent's rung differs from Tal's
+   (13.13 "recording the divergence"). A quiet secondary line, not an error. */
+.app .eval-diverge{margin-top:var(--s03); color:var(--text-secondary); font-size:var(--t-desc-size)}
+.app .eval-diverge b{color:var(--text-primary); font-weight:var(--t-w-strong)}
+/* An optional-field marker on a label, and the two-button evaluation action row. */
+.app .lbl-opt{color:var(--text-secondary); font-weight:var(--t-w-book)}
+.app .eval-actions{display:flex; gap:var(--s04); flex-wrap:wrap}
+/* The read-only training-module status (13.16). Complete reads as a green tick +
+   line; the Open-training link is the platform's one blue. */
+.app .tm-done{display:inline-flex; align-items:center; gap:var(--s02)}
+.app .tm-done svg{width:18px; height:18px; color:var(--support-success-ink)}
+.app .tm-link{color:var(--link); text-decoration:none; display:inline-flex; align-items:center; gap:var(--s02)}
+.app .tm-link svg{width:16px; height:16px}
+.app .tm-link:where(.__nh):hover{color:var(--link-hover)}
 </style>
 </head>
 <body>
@@ -244,7 +276,7 @@
        somebody choosing a stage would want it. -->
 </div>
 
-<script src="design-system/talentnext-ds.js?b=2fd184fe"></script>
+<script src="design-system/talentnext-ds.js?b=e49bb747"></script>
 <script>
 /* ==========================================================================
    THE TALENT AGENT PORTAL
@@ -1201,9 +1233,31 @@ const SPECIALISMS = ['Delegation', 'Hard conversations', 'First-time managers',
   'Delivery under pressure', 'Prioritisation', 'Stakeholder management',
   'Coaching for growth', 'Remote and hybrid teams'];
 
+/* INDUSTRIES + INTENTS (13.1 / 13.16, Maryam 30 Sep 2026). Two of the three
+   signals Tal matches an agent to a candidate on (the third is the assessment
+   range). They are captured at agent onboarding in the stories; since the
+   onboarding gate is not built as a screen here (Maryam's call), they are
+   editable on the Public Profile / My Profile tab and shown candidate-facing.
+   `INDUSTRIES` is the SAME list the candidate chooses from at onboarding (the
+   hifi `OB_Q` industry set, 21 Sep), so agent and candidate always match against
+   one list. `INTENTS` is the same three intents, in the stories' order. */
+const INDUSTRIES = ['Security', 'Franchise ownership', 'Retail',
+  'Food and hospitality', 'Trades and construction', 'Healthcare',
+  'Transportation and logistics', 'Sales', 'Education', 'Technology'];
+const INTENTS = ['Develop in my current role', 'Develop for another role',
+  'Develop for ownership'];
+
 const PUB = {
   headline: 'Eleven years in delivery, six of them managing managers',
   bio: 'I interview for how somebody actually ran a week, not for how they describe themselves.',
+  /* INDUSTRIES + INTENTS the agent works with (13.1/13.16), authored placeholder
+     (§74). Multi: at least one of each. Shown candidate-facing on Public Profile,
+     editable on My Profile. `LightspeedVT training` is a read-only status (13.16):
+     Complete on a date, or Not complete with an Open-training link; it does not
+     expire. Owen is certified on every operating stage, so it reads Complete. */
+  industries: ['Technology', 'Sales'],
+  intents: ['Develop in my current role', 'Develop for ownership'],
+  trainingDate: '18 Jun 2024',
   /* AUTHORED PLACEHOLDER, EXPANDED — Maryam, 7 Sep 2026: "add the about content
      more". Kept in Owen's own voice and consistent with the headline (eleven
      years in delivery, six managing managers) and the "What to expect" list. */
@@ -4510,10 +4564,22 @@ V.interview = v => {
        mark the agent's own pick (`curCode` off `curLvl`), not Tal's read. Clicking
        a rung writes `S.slotForm.evalLevel` through the shared `dd()` handler. */
     const curCode = (curLvl.split(/[–-]/).pop() || '').trim();
-    /* T·A·L·E·N·T type: Tal's suggested lens, and the agent's own pick prefilled
-       to it (Maryam, 22 Sep 2026). `evalType` reuses the `dd()` store/handler. */
+    /* Tal's own suggested rung, off `talLevel`, so the ladder can carry the
+       "Tal recommends [level]" marker (13.13) and divergence can be measured. */
+    const talCode = (x.talLevel.split(/[–-]/).pop() || '').trim();
+    /* T·A·L·E·N·T LETTERS (13.13) — Tal's suggested letters, and the agent's own
+       pick prefilled to them; a 1–6 MULTI-select on `S.slotForm.evalLetters`,
+       toggled by `data-ltrtoggle`. This REPLACES the single TALENT-type picker
+       (Maryam, 30 Sep 2026). `talType` is kept for Tal's read line. */
     const talType = talTypeOf(x);
-    const curType = (S.slotForm && S.slotForm.evalType) || talType;
+    const talLetters = talLettersOf(x);
+    const curLetters = (S.slotForm && S.slotForm.evalLetters) || talLetters;
+    /* DIVERGENCE (13.13): recorded whenever the agent's rung differs from Tal's,
+       with its distance and direction. A letters-only difference is NOT a
+       divergence. */
+    const talRung = LVL_CODES.indexOf(talCode) + 1, ownRung = LVL_CODES.indexOf(curCode) + 1;
+    const diverges = talRung > 0 && ownRung > 0 && ownRung !== talRung;
+    const divDist = Math.abs(ownRung - talRung), divDir = ownRung > talRung ? 'higher' : 'lower';
     return band(null, true) + `
     ${/* THE FACTS OF THE CALL — the 4-block figure row. The old fourth cell was
           the 24-hour REPORT deadline; there is no report now, so it becomes the
@@ -4577,29 +4643,49 @@ V.interview = v => {
           analysis. `.eval-form` opts the section out of the label column
           (§10.15). */''}
     <section class="sec">
-      <div class="sec-h"><h2>Your recommendation</h2></div>
+      <div class="sec-h"><h2>Your decision</h2></div>
       <div class="eval-form">
-        <p class="t-body-02">Tal suggests <b>${x.talLevel}</b> off the transcript. Set the level you would give ${first} across the fifteen rungs. TalentNext confirms the final level after analysis.</p>
-        ${/* The "Your suggested level" field sits ABOVE the blocks, and the blocks
-              themselves are the picker (Maryam, 22 Sep 2026). */''}
+        <p class="t-body-02">Tal suggests <b>${x.talLevel}</b> off the transcript. Set the level you would give ${first} across the fifteen rungs, and the TALENT letters that describe what they showed. TalentNext confirms the final level after analysis.</p>
+        ${/* THE LEVEL LADDER IS THE PICKER (Maryam, 22 Sep 2026), and Tal's own
+              suggested rung is marked beside it (13.13 "Tal recommends [level]").
+              The divergence note appears when the agent's rung differs from Tal's. */''}
         <div class="f"><span class="lbl">Your suggested level</span>
-          <div class="iv-ladder">${ivLadder(curCode, true)}</div></div>
-        ${/* THE T·A·L·E·N·T TYPE picker (Maryam, 22 Sep 2026) — the agent picks
-              the lens too, prefilled to Tal's read; the meaning of the current
-              pick sits under it. Reuses the `dd()` store/handler (`S.slotForm.evalType`). */''}
-        <div class="f mt5"><span class="lbl">TALENT type</span>
-          ${dd('evalType', TALENT_OPTS, curType, {desc: talentDesc})}</div>
+          <p class="ltr-tal">Tal recommends <b>${x.talLevel}</b>.</p>
+          <div class="iv-ladder">${ivLadder(curCode, true)}</div>
+          ${diverges ? `<p class="eval-diverge">This is <b>${divDist} rung${divDist === 1 ? '' : 's'} ${divDir}</b> than Tal's suggestion. The difference and your reason are recorded for the reviewer.</p>` : ''}</div>
+        ${/* THE T·A·L·E·N·T LETTERS multi-select (13.13) — 1 to 6, in fixed TALENT
+              order, prefilled to Tal's suggested letters; the agent may pick any
+              combination. Toggled by `data-ltrtoggle`, stored on
+              `S.slotForm.evalLetters`. This REPLACES the single TALENT-type picker. */''}
+        <div class="f mt5"><span class="lbl">TALENT letters</span>
+          <p class="ltr-tal">Tal recommends <b>${lettersLabel(talLetters)}</b>.</p>
+          ${lettersPicker(curLetters)}
+          <span class="ltr-hint">Pick one to six. They describe what ${first} demonstrated, and a candidate can show more than one thing.</span></div>
+        ${/* WHY THIS LEVEL (mandatory) — the "Overall" field renamed to the story's
+              own label; it seeds from Tal's read so the agent edits rather than
+              starts blank. */''}
+        <label class="f mt5"><span class="lbl">Why this level</span>
+          <textarea class="inp" rows="3">${x.seedWhy}</textarea></label>
+        ${/* WHY NOT TAL'S LEVEL — shown ONLY when the agent's rung differs from
+              Tal's suggested rung, and mandatory then (13.13). */''}
+        ${diverges ? `<label class="f mt5"><span class="lbl">Why not ${x.talLevel}</span>
+          <textarea class="inp" rows="3" placeholder="What made you set a different level from Tal's suggestion."></textarea></label>` : ''}
         <label class="f mt5"><span class="lbl">Strengths</span>
           <textarea class="inp" rows="3">${x.seedStrength}</textarea></label>
         <label class="f mt5"><span class="lbl">Growth areas</span>
           <textarea class="inp" rows="3">${x.seedGrowth}</textarea></label>
-        <label class="f mt5"><span class="lbl">Overall &mdash; what you make of ${first}</span>
-          <textarea class="inp" rows="3">${x.seedWhy}</textarea></label>
+        <label class="f mt5"><span class="lbl">Anything else about ${first} <span class="lbl-opt">(optional)</span></span>
+          <textarea class="inp" rows="3" placeholder="Internal only — not shown to the candidate."></textarea></label>
       </div>
     </section>
 
+    ${/* SAVE DRAFT + SEND EVALUATION (13.13). A draft keeps the interview in the
+          Evaluations queue with the payout blocked; sending goes to a reviewer who
+          has 24 hours to approve, and the agent cannot change it after. */''}
     <section class="sec">
-      <div class="btn-row"><button class="btn btn-p noic ic-l" data-confirm="sendrec">${I.checkFilled}Send Recommendation</button></div>
+      <div class="btn-row eval-actions">
+        <button class="btn btn-g noic" data-confirm="savedraft">Save Draft</button>
+        <button class="btn btn-p noic ic-l" data-confirm="sendrec">${I.checkFilled}Send Evaluation</button></div>
     </section>`;
   }
 
@@ -5628,6 +5714,20 @@ V.profile = v => head({title: 'Profile'}) + `
     `}
   </section>
 
+  ${/* TRAINING MODULE — read-only (13.16). "Complete on [date]" where the
+        LightspeedVT training module is done (or a Super Admin overrode the gate),
+        else "Not complete" with an Open-training link. Completion does not expire.
+        Owen is certified on every operating stage, so it reads Complete. Hidden
+        while the details form is open. */''}
+  ${S.pfEdit === 'details' ? '' : `
+  <section class="sec">
+    <div class="sec-h"><h2>Training module</h2></div>
+    ${v.certified
+      ? `<p class="t-body-02 tm-done">${I.checkOutline} Complete on ${PUB.trainingDate}. Completion does not expire.</p>`
+      : `<p class="t-body-02">Not complete. <a href="https://www.lightspeedvt.com/" target="_blank" rel="noopener" class="tm-link">Open training module ${I.arrowRight}</a></p>
+         <p class="help mt5">Your listing stays blocked until the LightspeedVT training module is complete, or a Super Admin overrides the gate.</p>`}
+  </section>`}
+
   ${/* ABOUT — hidden while the details form is open, because About is the form's
         last field there (one bio, one editor). */''}
   ${S.pfEdit === 'details' ? '' : `
@@ -5669,6 +5769,25 @@ V.profile = v => head({title: 'Profile'}) + `
       <div class="skl">${(S.spec || SPECIALISMS).map(t => `<span class="skl-c">${t}</span>`).join('')}</div>
     `}
   </section>
+
+  ${/* INDUSTRIES + INTENTS (13.1/13.16). Two of the three signals Tal matches an
+        agent to a candidate on (level, then intent, then industry). Multi-select,
+        at least one of each; the industry list is the SAME one candidates choose
+        from. Neither restricts anything — every listed agent is bookable by every
+        candidate. A settings-style always-editable chip cloud (`data-multi`), not
+        a pencil edit-mode, because a fixed option set toggles in place. Hidden
+        while the details form is open. */''}
+  ${S.pfEdit === 'details' ? '' : `
+  <section class="sec">
+    <div class="sec-h"><h2>Industries you work with</h2></div>
+    ${multiPicker('pubInd', INDUSTRIES, S.pubInd || PUB.industries)}
+    <span class="ltr-hint">Pick at least one. Tal shows candidates the agents who fit them first.</span>
+  </section>
+  <section class="sec">
+    <div class="sec-h"><h2>Intents you work with</h2></div>
+    ${multiPicker('pubInt', INTENTS, S.pubInt || PUB.intents)}
+    <span class="ltr-hint">Pick at least one. These help Tal put you in front of the right candidates.</span>
+  </section>`}
 
   ${v.listed ? `
   <section class="sec">
@@ -5753,9 +5872,20 @@ V.profile = v => head({title: 'Profile'}) + `
   ${/* SPECIALITIES — the READ half of My Profile's Specialities (one editor, one
         list: `S.spec`); `.sec:has(> .skl)` stacks the heading. Keeps its own foot
         rule as the tab's last section. */''}
-  <section class="sec">
+  <section class="sec sec-noline">
     <div class="sec-h"><h2>Specialities</h2></div>
     <div class="skl">${(S.spec || SPECIALISMS).map(t => `<span class="skl-c">${t}</span>`).join('')}</div>
+  </section>
+
+  ${/* INDUSTRIES + INTENTS the agent works with, candidate-facing (13.16). Read
+        chip clouds; editing is on My Profile. */''}
+  <section class="sec sec-noline">
+    <div class="sec-h"><h2>Industries</h2></div>
+    <div class="skl">${(S.pubInd || PUB.industries).map(t => `<span class="skl-c">${t}</span>`).join('')}</div>
+  </section>
+  <section class="sec">
+    <div class="sec-h"><h2>Intents I work with</h2></div>
+    <div class="skl">${(S.pubInt || PUB.intents).map(t => `<span class="skl-c">${t}</span>`).join('')}</div>
   </section>` : ''}
 
   ${/* "HOW I WORK", "WHAT TO EXPECT" AND "BOOKING AND FEE" ARE OFF THIS TAB
@@ -6402,11 +6532,15 @@ const CONFIRMS = {
      generic warning. Copy matches the candidate's Closing your account block. */
   delacct: ['Delete your account?', 'This removes your profile, your notes and your interview recordings. Certificates you have already earned stay valid and stay downloadable. This cannot be undone.', 'Delete my account', CAND_DOC + '#signup/login', 'misuse'],
   sign:   ['Confirm the recording?', 'This confirms the interview happened and the recording is clean. It releases your payout after the three working days, and hands Tal’s read to TalentNext to set the level. It cannot be undone.', 'Confirm recording', null, 'checkFilled'],
-  /* SEND YOUR RECOMMENDATION (Maryam, 18 Sep 2026). The agent recommends a level
-     with strengths, growth areas and an overall read; TalentNext confirms the
-     final level after analysis. It also confirms the recording, so the payout
-     clock runs from the call as before. */
-  sendrec: ['Send your recommendation?', 'This sends your recommended level, strengths, growth areas and overall read to TalentNext, together with the recording. TalentNext confirms the final level after analysis, and your payout releases three working days after the call. It cannot be undone.', 'Send recommendation', null, 'checkFilled'],
+  /* SEND EVALUATION (13.13, Maryam 30 Sep 2026). The agent's proposed level and
+     letters, Tal's proposal, and the written sections go to a reviewer who has 24
+     hours to approve. The agent cannot change or withdraw it after sending. Filing
+     it starts the payout release delay (three working days from the call). */
+  sendrec: ['Send this evaluation?', 'Your proposed level and TALENT letters go to a reviewer, who has 24 hours to approve them. You cannot change them after sending. This files your report and releases your payout three working days after the call.', 'Send Evaluation', null, 'checkFilled'],
+  /* SAVE DRAFT (13.13). A draft is visible to nobody but the agent; it keeps the
+     interview in the Evaluations queue and the payout blocked until it is sent.
+     A prototype, so it does not persist — the dialog states what a real draft does. */
+  savedraft: ['Draft saved', 'Your evaluation is saved and visible only to you. The interview stays in Evaluations and your payout stays blocked until you send it.', 'Done', null, 'checkOutline'],
   /* CLOSING A SLOT IS CONFIRMED, because it is the one thing on the Availability
      page that takes away something a candidate may be looking at right now. It
      is reversible — you can open the same time again — but not by undo, so it
@@ -6551,6 +6685,48 @@ const talentDesc = k => (TALENT_TYPES.find(t => t.k === k) || {}).d || '';
 /* Tal's suggested type for a record: its own `talType`, else a stable per-id pick
    (authored placeholder, §74 — no transcript pass in this build). */
 const talTypeOf = x => x.talType || TALENT_OPTS[[...x.id].reduce((a, c) => a + c.charCodeAt(0), 0) % TALENT_OPTS.length];
+/* THE T·A·L·E·N·T LETTERS (13.13, Maryam 30 Sep 2026) — the evaluation captures a
+   candidate's letters as a 1–6 MULTI-select in fixed TALENT order, matching the
+   admin levelling model and REPLACING the single TALENT-type picker (which
+   reverses the 22 Sep 2026 single-select). The six letters ARE the six TALENT
+   lenses' initials; the word TALENT repeats T (Top Performer / Team Player), so
+   the keys disambiguate (t1/a/l/e/n/t2) while the display char is T·A·L·E·N·T.
+   A candidate holds ONE track and one level plus one-to-six letters, printed in
+   fixed order however the agent chose them. See DESIGN.md §3. */
+const TALENT_LETTERS = TALENT_TYPES.map((t, i) => ({
+  k: ['t1', 'a', 'l', 'e', 'n', 't2'][i], c: t.k[0], name: t.k, d: t.d }));
+const LTR_ORDER = TALENT_LETTERS.map(l => l.k);
+const lettersLabel = arr => (arr || []).slice()
+  .sort((a, b) => LTR_ORDER.indexOf(a) - LTR_ORDER.indexOf(b))
+  .map(k => (TALENT_LETTERS.find(l => l.k === k) || {}).c).filter(Boolean).join(', ') || '—';
+/* Tal's suggested letters for a record: authored `talLetters`, else its own
+   `talType`'s letter plus a stable second (authored placeholder, §74 — no
+   transcript pass in this build). */
+const talLettersOf = x => x.talLetters || (() => {
+  const first = (TALENT_LETTERS.find(l => l.name === talTypeOf(x)) || TALENT_LETTERS[0]).k;
+  const second = LTR_ORDER[[...x.id].reduce((a, c) => a + c.charCodeAt(0), 0) % LTR_ORDER.length];
+  return second === first ? [first] : [first, second];
+})();
+/* The multi-select chip cloud. `sel` is the current keys. Each chip toggles via
+   `data-ltrtoggle` (its own router branch, re-rendering like the level ladder;
+   the eval form is a documented non-persisting prototype, so a re-render on toggle
+   is consistent with the existing dd-driven fields). */
+function lettersPicker(sel){
+  sel = sel || [];
+  return `<div class="ltr-cloud">${TALENT_LETTERS.map(l => `
+    <button type="button" class="ltr-chip${sel.includes(l.k) ? ' on' : ''}" data-ltrtoggle="${l.k}"
+      aria-pressed="${sel.includes(l.k)}" title="${l.name} — ${l.d}">
+      <span class="ltr-c">${l.c}</span><span class="ltr-n">${l.name}</span></button>`).join('')}</div>`;
+}
+/* A FIXED-OPTION MULTI-SELECT chip cloud (13.16, Industries + Intents), reusing
+   the letters-chip skin. `key` is the S list key (`pubInd`/`pubInt`), `opts` the
+   options, `sel` the current selection; each chip toggles via `data-multi`. */
+function multiPicker(key, opts, sel){
+  sel = sel || [];
+  return `<div class="ltr-cloud">${opts.map(o => `
+    <button type="button" class="ltr-chip${sel.includes(o) ? ' on' : ''}" data-multi="${key}:${o}"
+      aria-pressed="${sel.includes(o)}"><span class="ltr-n">${o}</span></button>`).join('')}</div>`;
+}
 /* THE RECORDING STILL is a captured frame of the video call (Maryam,
    21 Sep 2026, image supplied) — a real frame dropped in, replacing the
    candidate-photo stand-in. One 16:9 WebP for every recording preview; the
@@ -7100,7 +7276,7 @@ device.addEventListener('click', e => {
      for it is written, the markup carries the attribute, and the click never
      reaches either because `closest` was not looking for it. `data-peek` cost
      exactly that. */
-  const t = e.target.closest('[data-go],[data-stage],[data-portal],[data-toggle],[data-close],[data-tab],[data-pftab],[data-pfedit],[data-pfpw],[data-specdel],[data-specadd],[data-specaddopen],[data-specaddclose],[data-specdiscard],[data-req],[data-confirm],[data-sheet],[data-peek],[data-readall],[data-cal],[data-calview],[data-cal-nav],[data-cal-today],[data-cal-day],[data-ddtoggle],[data-ddset],[data-txf],[data-feesave],[data-feedone],[data-paytab],[data-addcard],[data-setdef],[data-delcard],[data-payclose]');
+  const t = e.target.closest('[data-go],[data-stage],[data-portal],[data-toggle],[data-close],[data-tab],[data-pftab],[data-pfedit],[data-pfpw],[data-specdel],[data-specadd],[data-specaddopen],[data-specaddclose],[data-specdiscard],[data-req],[data-confirm],[data-sheet],[data-peek],[data-readall],[data-cal],[data-calview],[data-cal-nav],[data-cal-today],[data-cal-day],[data-ddtoggle],[data-ddset],[data-ltrtoggle],[data-multi],[data-txf],[data-feesave],[data-feedone],[data-paytab],[data-addcard],[data-setdef],[data-delcard],[data-payclose]');
 
   /* A CLICK OUTSIDE THE ACCOUNT MENU SHUTS IT, AND IT IS ANSWERED BEFORE THE
      GUARD ABOVE RETURNS — that is the whole reason this sits here rather than
@@ -7275,6 +7451,34 @@ device.addEventListener('click', e => {
     const i = d.ddset.indexOf(':');
     S.slotForm = Object.assign({}, S.slotForm, {[d.ddset.slice(0, i)]: d.ddset.slice(i + 1)});
     S.dd = null;
+    return render();
+  }
+  /* THE T·A·L·E·N·T LETTERS TOGGLE (13.13). A multi-select on
+     `S.slotForm.evalLetters`: click adds or removes a letter. Seeded from Tal's
+     suggested letters the first time the agent touches it, so removing one from
+     the default set works. Re-renders like the level ladder (documented
+     non-persisting prototype form). */
+  if(d.ltrtoggle !== undefined){
+    const cur = (S.slotForm && S.slotForm.evalLetters) ? S.slotForm.evalLetters.slice()
+      : talLettersOf(iv(S.iv)).slice();
+    const at = cur.indexOf(d.ltrtoggle);
+    if(at >= 0) cur.splice(at, 1); else cur.push(d.ltrtoggle);
+    S.slotForm = Object.assign({}, S.slotForm, {evalLetters: cur});
+    return render();
+  }
+  /* A FIXED-OPTION MULTI-SELECT (13.16) — Industries and Intents on the profile.
+     `data-multi="listKey:value"` toggles `value` in `S[listKey]`, which is lazily
+     seeded from `PUB` on first touch (`pubInd` -> PUB.industries, `pubInt` ->
+     PUB.intents). Re-renders like the chip clouds; a prototype, so it does not
+     round-trip past a Reset. Split on the FIRST colon (values carry none here,
+     but the rule matches the dd handler). */
+  if(d.multi !== undefined){
+    const i = d.multi.indexOf(':'), key = d.multi.slice(0, i), val = d.multi.slice(i + 1);
+    const seed = key === 'pubInd' ? PUB.industries : PUB.intents;
+    const cur = (S[key] || seed).slice();
+    const at = cur.indexOf(val);
+    if(at >= 0){ if(cur.length > 1) cur.splice(at, 1); } else cur.push(val);
+    S[key] = cur;
     return render();
   }
   /* THE LEVEL LADDER BRANCH IS GONE (client, 15 Sep 2026) — the agent no longer

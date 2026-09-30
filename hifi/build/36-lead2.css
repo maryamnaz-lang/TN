@@ -1001,3 +1001,10 @@
 .app .disc-reply-box,.app .disc-edit{margin-top:var(--s04);display:flex;flex-direction:column;gap:var(--s03);padding-left:var(--s07)}
 .app .disc-edit{padding-left:0}
 .app .disc-reply-a,.app .disc-edit-a{display:flex;justify-content:flex-end;gap:var(--s03)}
+
+/* EPIC 12.9 — evaluation window line, draft, mandatory markers */
+.app .eval-window{font-size:var(--t-desc-size);color:var(--text-secondary)}
+.app .eval-window b{color:var(--text-primary);font-weight:var(--t-w-strong)}
+.app .ldr-eval-a{display:flex;gap:var(--s04)}
+.app .ldr-draft-note{margin-top:var(--s04);font-size:var(--t-caption-size);color:var(--text-helper)}
+.app .f-req-err{font-size:var(--t-caption-size);color:var(--support-error);font-weight:var(--t-w-book);margin-left:var(--s02)}

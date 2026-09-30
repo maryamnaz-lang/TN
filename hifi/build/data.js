@@ -79,10 +79,38 @@ const STAGES = [
      its existing path to `promoted`. */
   ['held',    'Interview held, report pending','The call happened. The agent has 24 hours to sign the report; no level yet.'],
   ['assessed','Levelled, not enrolled','Report signed, level confirmed at E3. Enroll appears in the nav.'],
+  /* ENROLLED, COHORT NOT YET STARTED (story 15.1/15.2, Maryam 30 Sep 2026).
+     The gap between enrolling and the cohort's start day. Course Enrollment has
+     left the nav (18.1 is closed) but Coursework / Course Progress / Achievements
+     have NOT arrived yet — they appear on the start day. So the nav is the
+     just-joined five PLUS Cohort and Messages. The dashboard shows "Your cohort
+     starts in n days" with Meet your cohort.
+
+     IT IS THE LANDING AFTER ENROLLMENT (Maryam 30 Sep 2026): completing the
+     course-enrolment flow lands here rather than on `week1`; the reader picks
+     `week1` (the running cohort) from the stage menu themselves. In the menu
+     alongside the other stages, like every stage in this list. */
+  ['enrolPre','Enrolled, cohort not started','Enrolment done, cohort has not begun. Cohort and Messages appear; coursework does not until the start day.'],
   ['week1',   'Week 1',                'Cohort 41 has started. Full navigation, eight items. Nothing done yet.'],
   ['day34',   'Day 34',                'Mid-course. Chapter 4 has stalled and one task is overdue.'],
   ['day90',   'Day 90, course finished','All 13 chapters done. The re-interview unlocks now.'],
   ['promoted','Promoted to E4',        'Cohort closed, level moved up one, next course offered.'],
+  /* TWO OFF-PATH DASHBOARD STATES, MENU-ONLY (story 15.2, Maryam 30 Sep 2026).
+     Neither is reached by any button, arrow-key journey or route — they exist
+     so the two dashboard blocks below can be SHOWN from the stage menu and
+     nowhere else (Maryam: "they will be existing in the stages menu and i will
+     open them manually"). They fork no other stage's data; each carries its own
+     CFG / NOTIF / dashboard branch. They sit after `promoted` so the nine rows
+     above still read top-to-bottom as one candidate's ninety days.
+
+     `cancelled` — the candidate's cohort was cancelled and they were moved to a
+     replacement that has not started (story 7.6 / 15.2). Draws the "Your cohort
+     was cancelled" block then the pre-start waiting state.
+     `rebook`  — the interview could not take place and a rebooking credit was
+     issued (story 8.3 / 15.2). Draws "Your interview could not take place" with
+     the credit and Book another interview. */
+  ['cancelled','Cohort cancelled',      'Cohort cancelled, candidate moved to a replacement that has not started. Menu-only demo state.'],
+  ['rebook',  'Rebooking available',    'Interview could not take place; a rebooking credit is active. Menu-only demo state.'],
   /* TEMPORARY, AND LAST BECAUSE IT IS NOT PART OF THE JOURNEY (Maryam,
      31 Aug 2026). A frozen copy of Day 34 drawn in solid #FF0000, to show
      somebody what a red accent looks like. It sits after `promoted` rather
@@ -227,10 +255,26 @@ const CFG = {
      shared reader. See the `held` row in STAGES for the argument. */
   held:    {nav:'early',  track:'Explorer', pred:true,  booked:true, held:true},
   assessed:{nav:'assessed',track:'Explorer',level:'E3',pred:false},
+  /* ENROLLED, COHORT NOT YET STARTED — levelled and enrolled, but the cohort
+     has not begun, so `enrolled:true` with `day:0`. `preStart:true` is the flag
+     the dashboard reads to draw the "Your cohort starts in n days" block; the
+     nav (`enrolPre`) has Cohort and Messages but no coursework. `startIn` is the
+     days-to-start the block counts down. */
+  enrolPre:{nav:'enrolPre',track:'Explorer',level:'E3',pred:false, enrolled:true, preStart:true, startIn:6, day:0, week:0, done:0, open:0, avg:null, mins:0},
   week1:   {nav:'full',   track:'Explorer', level:'E3', pred:false, enrolled:true, day:4,  week:1,  done:0,  open:0, avg:null, mins:0},
   day34:   {nav:'full',   track:'Explorer', level:'E3', pred:false, enrolled:true, day:34, week:5,  done:5,  open:3, avg:75,   mins:260},
-  day90:   {nav:'full',   track:'Explorer', level:'E3', pred:false, enrolled:true, day:90, week:13, done:13, open:12, avg:83,  mins:700, reinterview:true, finished:true},
+  /* DAY 90 KEEPS THE FULL NAV MINUS COURSEWORK (story 15.1). Coursework leaves at
+     day 90 under the access rules in 19.1; Cohort stays until the later Completed
+     point. So day90 reads `full90`, which is `full` with Coursework removed. */
+  day90:   {nav:'full90', track:'Explorer', level:'E3', pred:false, enrolled:true, day:90, week:13, done:13, open:12, avg:83,  mins:700, reinterview:true, finished:true},
   promoted:{nav:'next',   track:'Explorer', level:'E4', pred:false, complete:true, day:90, week:13, done:13, avg:83, mins:700},
+  /* THE TWO MENU-ONLY OFF-PATH STATES (story 15.2). `cancelled` is a moved-to-a-
+     replacement candidate waiting for it to start — it reuses the `enrolPre`
+     waiting nav and carries `cancelled:true` so the dashboard leads with the
+     "Your cohort was cancelled" block. `rebook` is pre-course still (interview
+     could not take place), so `early` nav, no level, `rebook:true`. */
+  cancelled:{nav:'enrolPre',track:'Explorer',level:'E3',pred:false, enrolled:true, preStart:true, cancelled:true, startIn:12, day:0, week:0, done:0, open:0, avg:null, mins:0},
+  rebook:  {nav:'early',  track:'Explorer', pred:true,  booked:false, rebook:true},
   /* THE RED ACCENT DEMO — day 34's record, copied. Typed out rather than
      spread from `CFG.day34` so the two can be edited apart; see `RED_DEMO`. */
   reddemo: {nav:'full',   track:'Explorer', level:'E3', pred:false, enrolled:true, day:34, week:5,  done:5,  open:3, avg:75,   mins:260}
@@ -416,6 +460,11 @@ const NOTIF = {
 const NAVSETS = {
   early:   [['dashboard','Dashboard','dashboard'],['level','My Level','growth'],['interviews','Interviews','calendar'],['billing','Payments','wallet']],
   assessed:[['dashboard','Dashboard','dashboard'],['level','My Level','growth'],['interviews','Interviews','calendar'],['enrol','Course Enrollment','ticket'],['billing','Payments','wallet']],
+  /* ENROLLED, COHORT NOT STARTED (story 15.1) — the just-joined four PLUS Cohort
+     and Messages, and Course Enrollment is GONE (18.1 closed once enrolled).
+     Coursework / Course Progress / Achievements are NOT here: they arrive on the
+     start day (`full`). Profile is drawn in the rail foot, so it is not listed. */
+  enrolPre:[['dashboard','Dashboard','dashboard'],['level','My Level','growth'],['interviews','Interviews','calendar'],['billing','Payments','wallet'],['cohort','Cohort','group'],['messages','Messages','chat',1]],
   /* THE MODULE IS "ACHIEVEMENTS" AND THE CURRENCY IS STILL "POINTS" (Maryam,
      31 Aug 2026). The rename is the module's NAME — this label, the page's
      `ph()`, its `crumb()`, Tal's `where` map and the "Open Achievements" button
@@ -427,7 +476,18 @@ const NAVSETS = {
      the page is where the two meet. The key stays `rewards`, which is neither
      word and is what `PARENT`, `TALCTX` and every `data-go` already use. */
   full:    [['dashboard','Dashboard','dashboard'],['level','My Level','growth'],['coursework','Coursework','book'],['transcript','Course Progress','chart'],['rewards','Achievements','trophy'],['cohort','Cohort','group'],['messages','Messages','chat',1],['interviews','Interviews','calendar'],['billing','Payments','wallet']],
-  next:    [['dashboard','Dashboard','dashboard'],['level','My Level','growth'],['transcript','Course Progress','chart'],['rewards','Achievements','trophy'],['enrol','Next course','ticket'],['interviews','Interviews','calendar'],['billing','Payments','wallet']],
+  /* DAY 90 UNTIL COMPLETED — `full` with Coursework removed (story 15.1). The
+     candidate keeps the cohort, messages, progress and achievements; only the
+     coursework module goes at day 90 per 19.1. */
+  full90:  [['dashboard','Dashboard','dashboard'],['level','My Level','growth'],['transcript','Course Progress','chart'],['rewards','Achievements','trophy'],['cohort','Cohort','group'],['messages','Messages','chat',1],['interviews','Interviews','calendar'],['billing','Payments','wallet']],
+  /* CYCLE FINISHED, COHORT CLOSED (story 15.1) — Dashboard, My Level, Course
+     Progress, Achievements, Messages, Course Enrollment, Interviews, Payments.
+     Coursework and Cohort are gone (the cohort closed); Messages STAYS (the
+     leader thread survives, read-only). Course Enrollment REAPPEARS here because
+     the re-interview result is approved and the candidate is levelled + unenrolled
+     again — it is the SAME item under the SAME name for the life of the account
+     (15.1), so it reads "Course Enrollment", not "Next course". */
+  next:    [['dashboard','Dashboard','dashboard'],['level','My Level','growth'],['transcript','Course Progress','chart'],['rewards','Achievements','trophy'],['messages','Messages','chat',1],['enrol','Course Enrollment','ticket'],['interviews','Interviews','calendar'],['billing','Payments','wallet']],
   /* THE COHORT LEADER'S SEVEN MODULES, ported from the Cohort Leader portal in
      tn-portals.html. Same order, same names, with one correction the wireframe
      already made and this set keeps: there is no Earnings module. A cohort

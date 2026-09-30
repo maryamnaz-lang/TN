@@ -14,7 +14,7 @@
      The <style> block is PROTOTYPE CHROME AND NOTHING ELSE (the device frame,
      the viewport picker, the wordmark size, a toast host) — no product rule.
      ========================================================================== -->
-<link rel="stylesheet" href="design-system/talentnext-ds.css?b=2fd184fe">
+<link rel="stylesheet" href="design-system/talentnext-ds.css?b=e49bb747">
 <style id="admin-auth-slider">
 /* THE FRONT DOOR IS A SLIDER — ported verbatim from the candidate portal's
    §132 (hifi/build/132-authslide.css). That layer is hifi-only
@@ -700,26 +700,36 @@ input:-webkit-autofill:focus{
    zero its bottom padding and the strip's own margin, and pull the content up to a
    single --s05 gap. `.set-tabs` (the Settings module's own inner-tab strip,
    21 Sep 2026) shares the same handle so its strip meets its pane the same way. */
-.app .sec.iv-tabs,.app .sec.set-tabs{padding-top:var(--s05); padding-bottom:0}
-.app .sec.iv-tabs > .cs,.app .sec.set-tabs > .cs{margin-bottom:0}
+/* ============================================================================
+   DETAIL-PAGE TAB STRIP — ONE STANDARD FOR EVERY DETAIL PAGE THAT HAS TABS
+   (Maryam, 30 Sep 2026: "set a standard ... match the first table page tabs above
+   and below gaps ... correct this on all detail pages who has tabs"). The tab row
+   sits the SAME 32 above (to the header) as below (to the content), exactly like a
+   module LIST page's filter strip (`.cs.lst-filt`, which renders 32/32). Recipe: the
+   header pays 16 below its text, the strip's own `.cs` pays 16 above AND 16 below the
+   tab row, and the content pays 16 above — 16 + 16 on each side = 32, balanced. The
+   `.sec` wrapper contributes NO vertical padding or margin of its own. `!important` is
+   the sanctioned section-rhythm override (the ~30-class `:not()`/`:has()` padding chain
+   + the `.iv-detail-body > .sec + .sec` margin, the authtight-card precedent) — no plain
+   selector outweighs them. THIS REPLACES every per-page tab-gap rule tried before it
+   (the 18/24/25/28 Sep interview / approval / recording / lc-body patches): interview,
+   level-approval, recording, settlement-batch details and the Settings inner tabs all
+   render identically now. Do NOT add another per-page tab-gap rule — change this block.
+   ============================================================================ */
+.app .sec.iv-tabs,.app .sec.set-tabs{padding-top:0 !important; padding-bottom:0 !important; margin-top:0 !important; margin-bottom:0 !important}
+.app .sec.iv-tabs > .cs,.app .sec.set-tabs > .cs{margin-top:var(--s05) !important; margin-bottom:var(--s05) !important}
 .app .sec.iv-tabs::after,.app .sec.set-tabs::after{content:none}
-.app .sec.iv-tabs + .sec,.app .sec.set-tabs + .sec{padding-top:var(--s05)}
-/* THE LEVEL-APPROVAL TAB STRIP sits the SAME distance below the head as above its
-   content (Maryam, 25 Sep 2026: "remove the unusual gap above the tabs ... reduce it to
-   the gap below the tabs"). The head→tabs `.sec + .sec` 24px margin stacked on the
-   strip's own top padding, making the gap above the tab labels (~57px) far larger than
-   the gap below them (~40px). Dropping that section margin and setting a fixed 12px top
-   padding lands the above gap at ~41px, level with below. Higher specificity + the child
-   combinator beat the `.iv-detail-body > .sec + .sec` margin; scoped so the interview-
-   detail and Settings strips are untouched. */
-.app .iv-detail-body > .sec.iv-tabs.iv-tabs-tight{margin-top:0; padding-top:var(--s04)}
-/* .lc-body's uniform 16/16 section padding re-inflated the gap ABOVE the tab strip on the
-   level-approval page (it gave the head and the strip a 16px bottom padding the tuned
-   .iv-tabs rules had zeroed). Restore those zeros so above == below again (Maryam,
-   28 Sep 2026). Scoped to lc-body pages carrying a tab strip; the change detail has none. */
-.app .lc-body.iv-detail-body > .sec:has(+ .sec.iv-tabs){padding-bottom:0; margin-bottom:0}
-.app .lc-body.iv-detail-body > .sec.iv-tabs{padding-top:var(--s02); padding-bottom:0; margin-top:0}
-.app .lc-body.iv-detail-body > .sec.iv-tabs > .cs{margin-top:0}
+.app .sec.iv-tabs + .sec,.app .sec.set-tabs + .sec{padding-top:var(--s05) !important; margin-top:0 !important}
+.app .sec:has(+ .sec.iv-tabs),.app .sec:has(+ .sec.set-tabs){padding-bottom:var(--s05) !important; margin-bottom:0 !important}
+/* and the header's aiHead (`.sec-h`) drops its heading-to-content gap (the 24px it would
+   pay to content BELOW it) — the tab strip is a separate section, so that gap is wasted
+   trailing space that pushed the tab row ~24px further from the header text than from the
+   content (57 vs 32). Zeroing it lands the rendered desc→tab gap on 32, level with below. */
+.app .sec:has(+ .sec.iv-tabs) > .sec-h,.app .sec:has(+ .sec.set-tabs) > .sec-h{margin-bottom:0 !important}
+/* the Settings head (`.set-head`) carries its own `padding-bottom:0 !important` (line ~1039,
+   for the no-tabs profile/general heads); when it sits above the Settings tab strip it must
+   pay the standard 16 instead, so this higher-specificity `:has(+ .sec.set-tabs)` restores it. */
+.app .main .sec.set-head:has(+ .sec.set-tabs){padding-bottom:var(--s05) !important}
 /* THE LEVEL-APPROVAL ACTION ROW (Maryam, 25 Sep 2026): the Approve-Tal and Reviewer-
    override ghosts carry a VISIBLE light-grey outline — the ghost's default --rule
    (#efefef) edge is near-invisible on white, so `.appr-out` steps it to the findable
@@ -728,16 +738,11 @@ input:-webkit-autofill:focus{
    its 288px default to a 22px button mark. */
 .app .appr-out{border-color:var(--border-subtle-02)}
 .app .appr-orb{--borb-size:22px; flex:none}
-/* the head section above the tabs gives up its bottom padding so the tabs sit a
-   single --s05 below the interview title, not a full section gap (Maryam, 18 Sep
-   2026: "remove unnecessary spaces above and below tabs row"). */
-.app .sec:has(+ .sec.iv-tabs),.app .sec:has(+ .sec.set-tabs){padding-bottom:0}
-/* the interview head sits tight to the tabs (Maryam, 24 Sep 2026: "remove the
-   unnecessary gap above the tabs"). The section-rhythm `:not()` chain sets this
-   section's padding and no plain selector outweighs it, so `.iv-head` carries the
-   sanctioned `!important` (the authtight-card precedent); its heading also drops the
-   gap-to-content it does not use (the section holds only the title). */
-.app .sec.iv-head{padding-bottom:0 !important}
+/* (the head-before-tabs bottom padding is set by the ONE tab-strip standard above —
+   16 below the header text, mirroring the 16 above the content — so no separate rule
+   is needed here any more. §18 Sep / §24 Sep per-page head rules removed 30 Sep 2026.)
+   `.iv-head`'s heading still drops the gap-to-content it does not use (the section holds
+   only the title); its bottom padding is the standard's 16. */
 .app .sec.iv-head > .sec-h{margin-bottom:0 !important}
 /* Tal's read runs the FULL page width here (Maryam, 24 Sep 2026: "give tals read full
    page width") — the DS caps `.ai-body`/`.ai-body p` at the ~68ch reading measure. */
@@ -1546,7 +1551,7 @@ input:-webkit-autofill:focus{
   </div>
 </div>
 
-<script src="design-system/talentnext-ds.js?b=2fd184fe"></script>
+<script src="design-system/talentnext-ds.js?b=e49bb747"></script>
 <script>
 /* ==========================================================================
    THE SUPER ADMIN PORTAL
@@ -2651,7 +2656,7 @@ const MODULES=[
  {k:'catalogue', t:'Course Catalogue', ic:'book', subs:[
    {k:'catalogue', t:'Course Catalogue'}, {k:'coursedetail', t:'Course', hidden:true}]},
  {k:'market', t:'Interviews', ic:'market', subs:[
-   {k:'bookings', t:'Interviews'}, {k:'recordings', t:'Recordings & Transcripts'},
+   {k:'bookings', t:'Interviews'}, {k:'recordings', t:'Recording, Scenes & Transcript'},
    {k:'booking', t:'Booking', hidden:true}, {k:'recording', t:'Transcript', hidden:true}]},
  /* LEVELLING (Epic 5, Maryam 25 Sep 2026) — surfaced as its own module after Interviews.
     The level change log (5.1), the approval queue (5.2, moved out of Interviews) and Levels
@@ -10313,7 +10318,7 @@ const recStatus = b => b.recDeleted ? 'Deleted' : 'Available';
     const s = b.stage;
     if(b.fee){
       if(s === 'reported') b.escrow = 'released';         // Paid
-      else if(s === 'resolved') b.escrow = 'refunded';    // Returned
+      else if(s === 'resolved') b.escrow = 'released';    // Paid (Maryam 30 Sep 2026: a resolved interview reads Paid, not Returned)
       else if(b.escrow !== 'refunded') b.escrow = 'held'; // In escrow (booked/held/await/awaitcand/nothld)
     }
     if(s === 'held'){ b.overdue = (i % 2 === 0); b.overdueDays = b.overdue ? 1 + (i % 3) : 0; }
@@ -10509,7 +10514,7 @@ function marketApproval(){
   <section class="sec">
     ${aiHead('Level approval', `${esc(iv.cand)} · ${esc(iv.agent)} · ${esc(iv.when)}`)}
   </section>
-  <section class="sec sec-cs iv-tabs iv-tabs-tight">
+  <section class="sec sec-cs iv-tabs">
     ${filterStrip('apptab', 'recommendation', [['recommendation', 'Recommendation'], ['transcript', 'Transcript']])}
   </section>
   ${tab === 'transcript'
@@ -11105,7 +11110,7 @@ function marketRecordingDetail(){
   DETAIL_LABEL = `${b.cand} — recording`;
   /* A deleted recording keeps its row but has no content to play (8.4). */
   if(b.recDeleted) return `${detailHead('market/recordings')}
-    <section class="sec">${aiHead('Interview recording', `${esc(b.cand)} with ${esc(b.agent)} · ${esc(b.kind)} · ${esc(bkWhen(b))}`)}</section>
+    <section class="sec">${aiHead('Interview Assets', `${esc(b.cand)} with ${esc(b.agent)} · ${esc(b.kind)} · ${esc(bkWhen(b))}`)}</section>
     <section class="sec">${emptyState('video', 'Recording deleted', 'The recording and its transcript were deleted here. The row remains as a record that the interview happened; the candidate’s level is unaffected.')}</section>`;
   const A = String(b.agent).split(' ')[0], C = String(b.cand).split(' ')[0];
   /* THREE TABS (Maryam, 21 Sep 2026: "there should be 3 tabs, Recording / Scenes /
@@ -11115,8 +11120,24 @@ function marketRecordingDetail(){
      Reuses the interview detail's `.iv-tabs` strip + `filterStrip`/`data-filter`
      (no new handler); the transcript search/filter render only inside their pane. */
   const tab = getFilter('rectab', 'recording');
-  const recordingPane = `<section class="sec">${recPlayer(b)}</section>`;
   const scenesPane = admScenes([b]);
+  /* RECORDING & SCENES ARE ONE TAB (Maryam, 30 Sep 2026): the recording shows as the
+     compact `.iv-rec` ATTACHMENT card — as on the interview detail pages, not the big
+     16:9 player — and the scenes section sits below it. (`recPlayer` is kept defined but
+     no longer reached from here.) */
+  const recordingPane = `
+    <section class="sec iv-rec-sec">
+      ${aiHead('Recording', `The recorded interview of ${esc(b.cand)} with ${esc(b.agent)}.`,
+        `<div class="iv-rec" style="cursor:default">
+          <span class="iv-rec-thumb"><img src="assets/agent/iv-recording-still.webp" alt="" loading="lazy"></span>
+          <span class="iv-rec-b">
+            <span class="iv-rec-n t-body">Interview with ${esc(b.cand)}.mp4</span>
+            <span class="iv-rec-m t-desc">Video recording${b.recLen ? ' &middot; ' + esc(b.recLen) : ''}</span>
+          </span>
+          <span class="iv-rec-open">${I.play}</span>
+        </div>`)}
+    </section>
+    ${scenesPane}`;
   let transcriptPane;
   {
     const all = TX_LINES_ADM();
@@ -11155,13 +11176,13 @@ function marketRecordingDetail(){
   return `${detailHead('market/recordings')}
   <section class="sec">
     ${''/* Header action in a kebab (Maryam, 18 Sep 2026). */}
-    ${aiHead('Interview recording', `${esc(b.cand)} with ${esc(b.agent)} · ${esc(b.kind)} · ${esc(b.slot)}${b.recLen ? ' · ' + esc(b.recLen) + ' recorded' : ''}`,
+    ${aiHead('Interview Assets', `${esc(b.cand)} with ${esc(b.agent)} · ${esc(b.kind)} · ${esc(b.slot)}${b.recLen ? ' · ' + esc(b.recLen) + ' recorded' : ''}`,
       rowActs([['download', 'Download Transcript', `data-act="dltranscript:${b.id}"`]]))}
   </section>
   <section class="sec sec-cs iv-tabs">
-    ${filterStrip('rectab', 'recording', [['recording', 'Recording'], ['scenes', 'Scenes'], ['transcript', 'Transcript']])}
+    ${filterStrip('rectab', 'recording', [['recording', 'Recording & Scenes'], ['transcript', 'Transcript']])}
   </section>
-  ${tab === 'scenes' ? scenesPane : tab === 'transcript' ? transcriptPane : recordingPane}`;
+  ${tab === 'transcript' ? transcriptPane : recordingPane}`;
 }
 /* PLAYBACK AND TRANSCRIPT OPENS ARE LOGGED (8.4): a High-severity audit line is
    written when playback starts or a transcript is opened, then the recording detail
@@ -11869,8 +11890,9 @@ function financeTransactions(){
       ['all', 'All', base.length],
       ['course', 'Course fees', base.filter(t => t.type === 'course').length],
       ['interview', 'Interview fees', base.filter(t => t.type === 'interview').length],
-      /* Scenes kept (Maryam's ruling) alongside the story's four types. */
-      ['scene', 'Scenes', base.filter(t => t.type === 'scene').length],
+      /* Scenes tab HIDDEN for now (Maryam 30 Sep 2026). Restore the line below to bring
+         it back; the scene rows still exist in the data and count under "All". */
+      /* ['scene', 'Scenes', base.filter(t => t.type === 'scene').length], */
       ['payout', 'Payouts', base.filter(t => t.type === 'payout').length],
       ['rbcredit', 'Rebooking credit', base.filter(t => t.type === 'rbcredit').length]
     ])}

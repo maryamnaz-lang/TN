@@ -1769,6 +1769,7 @@ textarea.inp{min-height:88px}
   .sec:has(> .skl),.sec:has(> .pfe-about),.sec:has(> .tg),
   .sec:has(> .qa),
   .sec:has(> .board),
+  .sec:has(> .ses-next),
   .sec:has(.kv):not(:has(.chart-table)){display:block}
   .sec:has(.ch) > .sec-h,.sec:has(.ag) > .sec-h,.sec:has(.aw) > .sec-h,
   .sec:has(.mem) > .sec-h,.sec:has(.gcard) > .sec-h,
@@ -1781,6 +1782,7 @@ textarea.inp{min-height:88px}
   .sec:has(> .skl) > .sec-h,.sec:has(> .pfe-about) > .sec-h,.sec:has(> .tg) > .sec-h,
   .sec:has(> .qa) > .sec-h,
   .sec:has(> .board) > .sec-h,
+  .sec:has(> .ses-next) > .sec-h,
   .sec:has(.kv):not(:has(.chart-table)) > .sec-h{
     border-right:0;min-height:0;margin-bottom:var(--sec-h-gap);
     padding:0 var(--pad-x)}
@@ -7498,6 +7500,11 @@ button.btn-p:active,
 .app .disc-reply-box,.app .disc-edit{margin-top:var(--s04);display:flex;flex-direction:column;gap:var(--s03);padding-left:var(--s07)}
 .app .disc-edit{padding-left:0}
 .app .disc-reply-a,.app .disc-edit-a{display:flex;justify-content:flex-end;gap:var(--s03)}
+.app .eval-window{font-size:var(--t-desc-size);color:var(--text-secondary)}
+.app .eval-window b{color:var(--text-primary);font-weight:var(--t-w-strong)}
+.app .ldr-eval-a{display:flex;gap:var(--s04)}
+.app .ldr-draft-note{margin-top:var(--s04);font-size:var(--t-caption-size);color:var(--text-helper)}
+.app .f-req-err{font-size:var(--t-caption-size);color:var(--support-error);font-weight:var(--t-w-book);margin-left:var(--s02)}
 .app .page > .rail-wrap:has(+ .sec){position:relative}
 .app .page > .rail-wrap:has(+ .sec)::after{
   content:'';position:absolute;bottom:0;
@@ -15502,10 +15509,13 @@ const STAGES = [
   ['resched', 'Interview Reschedule',  'The booked page again, as the stage a candidate reaches it from to move the appointment.'],
   ['held',    'Interview held, report pending','The call happened. The agent has 24 hours to sign the report; no level yet.'],
   ['assessed','Levelled, not enrolled','Report signed, level confirmed at E3. Enroll appears in the nav.'],
+  ['enrolPre','Enrolled, cohort not started','Enrolment done, cohort has not begun. Cohort and Messages appear; coursework does not until the start day.'],
   ['week1',   'Week 1',                'Cohort 41 has started. Full navigation, eight items. Nothing done yet.'],
   ['day34',   'Day 34',                'Mid-course. Chapter 4 has stalled and one task is overdue.'],
   ['day90',   'Day 90, course finished','All 13 chapters done. The re-interview unlocks now.'],
   ['promoted','Promoted to E4',        'Cohort closed, level moved up one, next course offered.'],
+  ['cancelled','Cohort cancelled',      'Cohort cancelled, candidate moved to a replacement that has not started. Menu-only demo state.'],
+  ['rebook',  'Rebooking available',    'Interview could not take place; a rebooking credit is active. Menu-only demo state.'],
   ['reddemo', 'Red Accent Demo',       'A frozen copy of Day 34 in solid #FF0000. Temporary, for a demo &mdash; nothing else in the product links to it.']
 ];
 
@@ -15541,10 +15551,13 @@ const CFG = {
   resched: {nav:'early',  track:'Explorer', pred:true,  booked:true},
   held:    {nav:'early',  track:'Explorer', pred:true,  booked:true, held:true},
   assessed:{nav:'assessed',track:'Explorer',level:'E3',pred:false},
+  enrolPre:{nav:'enrolPre',track:'Explorer',level:'E3',pred:false, enrolled:true, preStart:true, startIn:6, day:0, week:0, done:0, open:0, avg:null, mins:0},
   week1:   {nav:'full',   track:'Explorer', level:'E3', pred:false, enrolled:true, day:4,  week:1,  done:0,  open:0, avg:null, mins:0},
   day34:   {nav:'full',   track:'Explorer', level:'E3', pred:false, enrolled:true, day:34, week:5,  done:5,  open:3, avg:75,   mins:260},
-  day90:   {nav:'full',   track:'Explorer', level:'E3', pred:false, enrolled:true, day:90, week:13, done:13, open:12, avg:83,  mins:700, reinterview:true, finished:true},
+  day90:   {nav:'full90', track:'Explorer', level:'E3', pred:false, enrolled:true, day:90, week:13, done:13, open:12, avg:83,  mins:700, reinterview:true, finished:true},
   promoted:{nav:'next',   track:'Explorer', level:'E4', pred:false, complete:true, day:90, week:13, done:13, avg:83, mins:700},
+  cancelled:{nav:'enrolPre',track:'Explorer',level:'E3',pred:false, enrolled:true, preStart:true, cancelled:true, startIn:12, day:0, week:0, done:0, open:0, avg:null, mins:0},
+  rebook:  {nav:'early',  track:'Explorer', pred:true,  booked:false, rebook:true},
   reddemo: {nav:'full',   track:'Explorer', level:'E3', pred:false, enrolled:true, day:34, week:5,  done:5,  open:3, avg:75,   mins:260}
 };
 
@@ -15639,8 +15652,10 @@ const NOTIF = {
 const NAVSETS = {
   early:   [['dashboard','Dashboard','dashboard'],['level','My Level','growth'],['interviews','Interviews','calendar'],['billing','Payments','wallet']],
   assessed:[['dashboard','Dashboard','dashboard'],['level','My Level','growth'],['interviews','Interviews','calendar'],['enrol','Course Enrollment','ticket'],['billing','Payments','wallet']],
+  enrolPre:[['dashboard','Dashboard','dashboard'],['level','My Level','growth'],['interviews','Interviews','calendar'],['billing','Payments','wallet'],['cohort','Cohort','group'],['messages','Messages','chat',1]],
   full:    [['dashboard','Dashboard','dashboard'],['level','My Level','growth'],['coursework','Coursework','book'],['transcript','Course Progress','chart'],['rewards','Achievements','trophy'],['cohort','Cohort','group'],['messages','Messages','chat',1],['interviews','Interviews','calendar'],['billing','Payments','wallet']],
-  next:    [['dashboard','Dashboard','dashboard'],['level','My Level','growth'],['transcript','Course Progress','chart'],['rewards','Achievements','trophy'],['enrol','Next course','ticket'],['interviews','Interviews','calendar'],['billing','Payments','wallet']],
+  full90:  [['dashboard','Dashboard','dashboard'],['level','My Level','growth'],['transcript','Course Progress','chart'],['rewards','Achievements','trophy'],['cohort','Cohort','group'],['messages','Messages','chat',1],['interviews','Interviews','calendar'],['billing','Payments','wallet']],
+  next:    [['dashboard','Dashboard','dashboard'],['level','My Level','growth'],['transcript','Course Progress','chart'],['rewards','Achievements','trophy'],['messages','Messages','chat',1],['enrol','Course Enrollment','ticket'],['interviews','Interviews','calendar'],['billing','Payments','wallet']],
   leader:  [['leadDash','My Cohort','group'],['leadSessions','Sessions','calendar'],['leadDiscussion','Discussion','chat'],['leadMessages','Messages','email',2],['leadEvals','Evaluations','edit'],['leadReports','Course Reports','chart'],['leadCerts','Certifications','certificate']]
 };
 
