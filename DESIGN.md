@@ -585,6 +585,10 @@ Components
 - A DASHBOARD is the "unless a proportion needs a chart" case: a split or a funnel reads faster as a shape. Two chart shapes, both admin (§120.1f) — `donut(segs)` for a 2–4 slice split (arc as a stroke-dasharray length, total in the hole, figures in the legend) and `hbars(rows)` for a ranked list or a funnel (`[label, valueText, barValue]`). Both draw from the `--dv-*` data-viz ramp — a green scale, NEVER the brand red (categorical data-viz never rides the brand colour) — and keep the figure in the legend / bar label, so the graph adds the shape without losing the number. Money lists (Revenue by line, Payments) stay `.kv`; wide stat rows and tables stay full-width. (§120.1f, Maryam 8 Sep 2026)
 - A booking/interview card shows the interview FEE only (`v.fee`), never the agent's split (`v.share` / "of it yours") — the split is admin-configurable and belongs on the Earnings module, the one page whose subject is the agent's take. (Maryam 6 Sep, agent portal)
 
+Responsive and mobile
+- MOBILE INTEGRITY IS A SHIP GATE, NOT A FOLLOW-UP (Maryam 1 Oct 2026, off a phone recording). A screen is not DONE until it is clean at **390 and 744**, on every portal, against the three failures the recording showed and that recur here: **(1) NO sideways scroll and no odd scroller.** The frame scrolls VERTICALLY only — nothing pans left-right, there is no horizontal overflow, and no inner `overflow:auto/scroll` region fights the page or double-scrolls inside it. The ONLY horizontal scroller allowed is a deliberate carousel (`.scv`/`.cov-row`), which must be a real `overflow-x` container the test walks up to (respcheck already does), never a row the whole viewport has to pan. **(2) NOTHING BREAKS THE FRAME.** Every box sits inside the device/`.app` content width — no component, control, card, image, chip, table, kv value or divider hangs past the right wall, bleeds off the edge, or is clipped by it (a `--pad-x` negative-margin bleed must still land inside the frame; a fixed-px child in a narrow column is the usual culprit, trap 15). **(3) NO BROKEN COMPOSITION.** No overlap or collision, no two-line button label (§56), no desktop two-column / side-by-side block left un-stacked, no `.sec-h` heading colliding with its own content (trap 13's label column live below 900), no absolutely-positioned divider still drawn after the columns stacked (§72.3 — `content:none`, not re-pointed). Authored at desktop, VERIFIED at mobile in the SAME task — the desktop pass does not close the ticket. (§7, traps 3/13/15, supersedes the thin "Responsive is part of done" line below by stating what "done" means)
+- THE SWEEP THAT ENFORCES IT: `cd hifi && node respcheck.mjs` for the compiled candidate + leader portals (390/744/1024/1280; `--edge` adds the 900 breakpoint seam, `--quick` triages), and `/design-check <portal>` for the hand-written agent + admin portals. Run one before calling mobile done; its silence is the pass, a finding is the fix-list. Measure with the Browser pane OPEN and motion OFF — a hidden pane reports `window.innerWidth === 0` and entrance animations (trap 2) both read a clean layout as broken. (§7)
+
 Data and copy
 - Nothing is typed twice: read the record (`bkStamp`, `AGENTS[k].price`, `CH`, `PF`, `COHORT_LEAD`). (§76, `bkStamp`)
 - No invented claims or data; authored placeholder copy is flagged in its source note (`CH_SYL`, `COURSE_NAME.E1`). (§74)
@@ -710,6 +714,12 @@ the label column live below 900, a heading past three lines in it, content escap
 a button label on two lines, a divider still drawn after the columns stacked, `console.warn`.
 Measure with the Browser pane OPEN (`window.innerWidth === 0` means nothing is measurable), with
 motion off, using `offsetWidth`. `/design-check <portal>` runs the computed rule sweep.
+
+**390 and 744 are the mobile ship gate** (§3, Responsive and mobile). The compiled candidate +
+leader portals run it with `cd hifi && node respcheck.mjs`; the hand-written agent + admin portals
+run it with `/design-check <portal>`. No screen is mobile-done until one of these is clean at those
+two widths: no sideways scroll or odd scroller, nothing past the frame edge, nothing overlapping or
+un-stacked.
 
 ## 8. Flagged, not fixed
 
