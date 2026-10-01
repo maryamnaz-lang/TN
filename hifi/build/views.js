@@ -6522,14 +6522,12 @@ create: () => `${authShell()}
           disables Set Password until BOTH `.cbx-req` boxes are ticked. Native
           checkboxes, so `:has()` re-reads live on each toggle with no render —
           nothing here keeps state in the DOM (trap 9), the checkbox IS the
-          state. The third (marketing) is optional and not a `.cbx-req`. */}
+          state. The optional marketing box was removed (Maryam 1 Oct 2026). */}
     <div class="cbx-list">
       <label class="cbx cbx-req"><input type="checkbox"><span class="box">${I.check}</span>
         <span class="txt">I accept the <a data-go="terms">Terms of Service</a> and <a data-go="terms">Privacy Policy</a>.</span></label>
       <label class="cbx cbx-req"><input type="checkbox"><span class="box">${I.check}</span>
         <span class="txt">I consent to my interviews being recorded and transcribed.</span></label>
-      <label class="cbx"><input type="checkbox"><span class="box">${I.check}</span>
-        <span class="txt">Send me occasional product and course emails.</span></label>
     </div>
     </div>
   <div class="sec sec-act"><div class="foot-row foot-stack"><div class="mt6"><button class="btn btn-p btn-full" data-go="login">Set Password ${I.arrowRight}</button></div></div>
