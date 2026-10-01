@@ -425,7 +425,7 @@ const NOTIF = {
   /* the wait — the call is done, the report is not. Nothing here asks the
      candidate to do anything; the bell reports the state. */
   held:[
-    {ic:'checkOutline' ,t:'Interview complete',         b:'Priya is writing up your report. Your result is ready within 48 hours.', w:'Just now', go:'interviews', unread:1},
+    {ic:'checkOutline' ,t:'Interview complete',         b:'Priya is writing up your report. Your result is ready within 24 hours.', w:'Just now', go:'interviews', unread:1},
     {ic:'document', t:'Your report is on its way',     b:'You will be told the moment Priya signs it. There is nothing to do.', w:'Just now', go:'level',     unread:1, kind:'cond'},
     {ic:'video',    t:'Interview recorded',            b:'The recording and transcript are what your report is built from.',    w:'Just now', go:'interviews', unread:0}
   ],

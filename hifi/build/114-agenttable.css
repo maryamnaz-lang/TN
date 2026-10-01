@@ -42,6 +42,11 @@
 
    §63 §48 OWNS EVERY SIZE, WEIGHT, CASE AND INK IN HERE. Not one font-size,
    font-weight, text-transform or text colour is stated in this file.
+
+   NOW FIVE COLUMNS, NOT SIX (Maryam, 1 Oct 2026): the "Next available" column
+   was removed — the long track note below ("next available 200", six grid-column
+   assignments) is history. The live grid is agent / expertise / experience /
+   rate / actions, and `.agt-next` no longer exists in the markup.
    ========================================================================== */
 
 /* ---- the block ----
@@ -57,6 +62,13 @@
    rule — that is §14's "TWO 1px rules one pixel apart", which §76 hit from the
    same direction when three panels became one. */
 .app .agt{padding:0 var(--pad-x)}
+/* 20px BELOW THE HEADING SECTION'S DIVIDER (Maryam, 1 Oct 2026: "add 20px gap
+   below the divider which is after the heading and desc row"). The "Choose an
+   agent" `.sec` closes with its own §10/§14 hairline; the table sits straight
+   under it, so this is the one gap between that rule and the head row. A literal
+   20 — between `--s05` (16) and `--s06` (24), the same stated in-between §101/§138
+   reach for. */
+.app .agt{margin-top:20px}
 
 /* ---- a row ----
    STACKED IS THE BASE AND THE TABLE IS THE EXCEPTION, which is the way round
@@ -81,10 +93,12 @@
 
 .app .agt-who{grid-column:1 / -1;grid-row:1}
 .app .agt-tags{grid-column:1 / -1;grid-row:2}
+/* NEXT AVAILABLE IS GONE (Maryam, 1 Oct 2026), so the stacked card pairs the two
+   facts that remain — experience and rate — on one row and gives the actions
+   their own full-width row below, in place of the old exp|next / fee|act pair. */
 .app .agt-exp{grid-column:1;grid-row:3}
-.app .agt-next{grid-column:2;grid-row:3}
-.app .agt-fee{grid-column:1;grid-row:4}
-.app .agt-act{grid-column:2;grid-row:4}
+.app .agt-fee{grid-column:2;grid-row:3}
+.app .agt-act{grid-column:1 / -1;grid-row:4}
 
 /* THE HEAD ROW IS NOT DRAWN BELOW 900. There is nothing for it to head — the
    cells are stacked and each one reads as its own line — and six labels over a
@@ -183,7 +197,7 @@
 .app .agt-tag{flex:none;border-radius:999px}
 
 /* ---- the two-line cells ---- */
-.app .agt-exp,.app .agt-next{
+.app .agt-exp{
   display:flex;flex-direction:column;gap:2px;min-width:0}
 /* THE DATE LEADS WITH THE CALENDAR MARK AND THE TIME DOES NOT. The reference
    draws one glyph per cell, against the date — the mark says what KIND of fact
@@ -319,7 +333,7 @@
   .app .agt{
     display:grid;
     grid-template-columns:
-      auto minmax(0,auto) auto auto auto var(--agt-act-w);
+      auto minmax(0,auto) auto auto var(--agt-act-w);
     column-gap:var(--s06);
     /* `stretch`, NOT `space-between` — 4 Sep 2026 (Maryam: "the table
        component needs to give equal spacing in between all columns and the
@@ -359,9 +373,8 @@
   .app .agt-who{grid-column:1;grid-row:auto}
   .app .agt-tags{grid-column:2;grid-row:auto}
   .app .agt-exp{grid-column:3;grid-row:auto}
-  .app .agt-next{grid-column:4;grid-row:auto}
-  .app .agt-fee{grid-column:5;grid-row:auto}
-  .app .agt-act{grid-column:6;grid-row:auto}
+  .app .agt-fee{grid-column:4;grid-row:auto}
+  .app .agt-act{grid-column:5;grid-row:auto}
 
   /* THE HEAD ROW CARRIES THE RULE AND NO PADDING ABOVE IT. It is a label strip
      rather than a row of the table, so it pays half a row's air below and none
@@ -371,6 +384,13 @@
   .app .agt-h{
     padding:0 0 var(--s03);
     border-bottom:1px solid var(--rule)}
+
+  /* 8px AFTER THE HEAD ROW (Maryam, 1 Oct 2026: "add 8px gap after the table
+     header row"). The head carries the rule; the FIRST data row otherwise pays a
+     full `--s05` (16) top, which read as too much air under the labels. Only the
+     first row is pulled to `--s03` (8) — every later row keeps its 16/16 rhythm,
+     so the between-row spacing is untouched. */
+  .app .agt-h + .agt-r{padding-top:var(--s03)}
 
   /* THE CHIPS DO NOT WRAP AT DESKTOP AND THE OVERFLOW IS WHY THEY DO NOT NEED
      TO. Three chips and a `+N` in a 1.9fr track is ~380px at the frame this is

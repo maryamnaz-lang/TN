@@ -660,20 +660,11 @@ function agentTags(a){
 function agentRow(key){
   const a = AGENTS[key];
   const rec = key === recKey() ? '<span class="ag-rec">Recommended</span>' : '';
-  /* THE SLOT IS SPLIT SO THE TIME CAN BE DROPPED (Maryam, 4 Sep 2026: "remove
-     the time from this column"). Every other surface prints `a.slot` whole —
-     'Thu, Aug 20 · 6:30 PM' — and this column wants the DAY only: an
-     availability column answers "how soon", and the hour is a fact you need
-     once you are choosing a slot, which is the booking page's own grid two
-     clicks on (§76). Six rows of "6:30 PM / 5:00 PM / 7:00 PM" was a column of
-     figures nothing on this screen compares.
-
-     THE SPLIT STAYS AND THE RECORD STAYS ONE STRING, which is the reason this
-     was a split rather than two fields in `AGENTS`. `[0]` is the date; the note
-     that used to be here about `[1] || ''` printing an empty time rather than
-     `undefined` is retired with the second line — there is no `[1]` reader
-     left, and `slot` is unchanged for the five surfaces that print it whole. */
-  const parts = a.slot.split(' · ');
+  /* THE NEXT-AVAILABLE COLUMN WAS REMOVED (Maryam, 1 Oct 2026: "remove next
+     availability column"). It read the DAY off `a.slot` — the split that used
+     to live here is gone with it; `slot` is unchanged for the five surfaces
+     that print it whole, and the booking grid two clicks on (§76) is where the
+     hour is a fact you actually need. The table is five columns now. */
   return `<div class="agt-r draw">
     <span class="agt-c agt-who">
       ${avatar(a,48)}
@@ -692,15 +683,6 @@ function agentRow(key){
           of the social-proof row. The count stays where it identifies the
           agent; the column keeps the fact it is named after. */}
     <span class="agt-c agt-exp"><span class="agt-v">${a.yrs} yrs</span></span>
-    ${''/* AND NEXT AVAILABLE IS THE DAY, WITH NO CALENDAR MARK. `parts[1]` — the
-          hour — is dropped (the note over the split has the argument), and the
-          leading `I.calendar` came off too (Maryam, 9 Sep 2026: "remove the
-          calendar icons from this column items"). The column header already
-          names it "Next available", so a glyph on every one of six date rows
-          was label repeated as decoration; the date stands on its own. */}
-    <span class="agt-c agt-next">
-      <span class="agt-v">${parts[0]}</span>
-    </span>
     <span class="agt-c agt-fee">${a.price}</span>
     <span class="agt-c agt-act">
       ${talStar('What is '+a.n.split(' ')[0]+' like to be interviewed by?')}
@@ -724,7 +706,6 @@ const agentsTable = () => `
       <span class="agt-c">Agent</span>
       <span class="agt-c">Expertise</span>
       <span class="agt-c">Experience</span>
-      <span class="agt-c">Next available</span>
       <span class="agt-c">Rate</span>
       <span class="agt-c"></span>
     </div>
@@ -5120,14 +5101,16 @@ setInterval(joinArm, 20000);
    arrives with the right answer, and the next `render()` recomputes the same
    string. Not DOM state (trap 9): the text is a pure function of `Date.now()`
    and the element's own `data-heldtill`. */
-/* THE PROMISE IS 48 HOURS, NOT 24 (story 15.2, Maryam 30 Sep 2026). The candidate
-   result promise is the report deadline captured when the interview was held (24h)
-   plus the reviewer's fixed 24-hour window, so it ships at 48. `heldOverdue()` is
-   true once that has passed; the held card then reads the "taking a little longer"
-   line instead of the countdown. In a session the 48h never elapses, so this is
-   the correct code path rather than a live-triggered state. */
+/* THE PROMISE IS 24 HOURS (Maryam, 1 Oct 2026: "it should be 24 hours timer only",
+   reversing the 30 Sep story-15.2 48h = report-deadline + reviewer-window sum). The
+   candidate-facing surface now carries ONE number, 24h — the subtitle, the summary
+   body and this countdown all say it. `heldOverdue()` is true once that has passed;
+   the held card then reads the "taking a little longer" line instead of the
+   countdown. In a session the 24h never elapses, so this is the correct code path
+   rather than a live-triggered state. (The admin-side report/approval deadlines are
+   their own constants and are untouched.) */
 function heldTill(){
-  if(!S.heldTill) S.heldTill = Date.now() + 48 * 3600 * 1000;
+  if(!S.heldTill) S.heldTill = Date.now() + 24 * 3600 * 1000;
   return S.heldTill;
 }
 const heldOverdue = () => heldTill() - Date.now() <= 0;
@@ -6125,12 +6108,12 @@ const QA_NEW = [
      mark followed the words with no second edit. */
   {mk:() => pfRing(), t:'Complete Your Profile',
    d:'Set how you want to be seen.', go:'account', edit:() => pfFirstGap()},
-  /* `peek`, NOT `go`. Opening the breakdown as a right-hand column keeps the
-     dashboard on screen beside it, which is §44's whole argument and is what
-     Maryam's frame draws. `V.result` is still the full page and still reachable
-     from `SUMDROP.quiz` and the microsite; this is the summary read in place. */
+  /* `modal`, NOT `peek` (Maryam, 1 Oct 2026). It used to open the breakdown as a
+     right-hand column (`quizPeek`); now it opens a centred dialog showing the
+     same read as the Summary-by-Tal quiz highlight (`quizModal`, ai6.js) with a
+     Close button. `V.result` is still the full page, reachable from the microsite. */
   {ic:I.trophy,    hue:'ic-quiz', t:'Open Quiz Results',
-   d:'Review your score and quiz performance.', peek:'quiz'},
+   d:'Review your score and quiz performance.', modal:'quiz'},
   {ic:I.lightning, hue:'ic-prep', t:'Quick-Start Preparation',
    d:'Ask Tal to prepare you for the interview.', ask:'Prepare me for my level interview'}
 ];
@@ -6147,6 +6130,7 @@ const quickActions = (cards) => `<div class="sec sec-qa">
   <div class="sec-h"><h2>Quick Actions</h2></div>
   <div class="qa">${(cards || QA_NEW).map(c => `
     <button class="qa-c${c.mk ? ' qa-c-mk' : ''}" ${c.ask ? `data-tal-ask="${c.ask}"`
+      : c.modal ? `data-quizmodal="${c.modal}"`
       : c.peek ? `data-peek="${c.peek}"` : `data-go="${c.go}"`}${c.disc?` data-disc="${c.disc}"`:''}${
       c.edit?` data-pfedit="${c.edit()}"`:''}>
       ${''/* A WRAPPER ROUND THE MARK AND THE TEXT WAS BUILT AND TAKEN OUT.
@@ -6941,7 +6925,7 @@ V.dashboard = (f) => {
     <div class="sec">
       <div class="ai-aura tile">
         <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
-        <div class="ai-body"><p>Your interview with <b>Priya</b> is done. It is being analysed now, and <b>TalentNext sets your level</b> from it within 48 hours. There is nothing to do but wait.</p></div>
+        <div class="ai-body"><p>Your interview with <b>Priya</b> is done. It is being analysed now, and <b>TalentNext sets your level</b> from it within 24 hours. There is nothing to do but wait.</p></div>
       </div>
     </div>
     ${''/* THE INTERVIEW THAT HAPPENED, IN THE SAME BLACK CARD SLOT `booked` USES
@@ -8882,7 +8866,11 @@ V.agent = (f) => {
                 <span class="rec-v">${I.verified}</span></span></p>
             <p class="rec-r">${I.star}${a.r.toFixed(1)} &middot; ${a.ivs} interviews</p>
           </div>
-          <p class="rec-f"><span>${I.wallet}${ivCharged(isRe)?a.price+' Interview Fee':'Complimentary'}</span>
+          ${''/* COMPLIMENTARY SHOWS THE STRUCK PRICE "$95 Free", not the word
+                 "Complimentary" + wallet mark (Maryam, 1 Oct 2026). `ivFeeLabel`
+                 is the same label the dashboard rec card and booking fee use; the
+                 charged case keeps the wallet + "$X Interview Fee". */}
+          <p class="rec-f"><span>${ivCharged(isRe)?I.wallet+a.price+' Interview Fee':ivFeeLabel(false, a.price)}</span>
             <span>${I.video}${(rec||{}).mins||'45 mins call'}</span></p>
         </div>
       </div>
@@ -8951,15 +8939,16 @@ V.agent = (f) => {
         the page's rhythm is unchanged — §76.1's 32px either side of the two
         seams and §76.1b's centred 830px measure — and the picture fills it.
 
-        A RELATIVE PATH, NOT A BASE64 EMBED. build.py inlines the artwork it
-        owns (the covers, the award marks, the call stills) because those are
-        product assets it generates the list for; this is a screen capture that
-        will be replaced by the live embed, so it stays a file next to the
-        build. Vercel serves this repo statically and the built HTML sits in
-        `hifi/`, so `build/…` resolves for both the local server and
-        production. */}
+        A BASE64 EMBED (`CALENDLY_SHOT`), NOT A RELATIVE PATH — fixed 1 Oct 2026.
+        It shipped as `src="build/calendly-booking.png"`, which resolves on a
+        local `file://` open (the built HTML sits in `hifi/`, so `build/…` is
+        `hifi/build/…`) but 404s on Vercel: the portal is served at `/candidate`
+        and nothing maps `/build/`, so the image came back broken in production.
+        build.py now inlines it like every other asset (see its `CALENDLY_SHOT`
+        note), so it is host-independent. Still the embed-a-picture rule — a live
+        Calendly iframe would replace the token, not the mechanism. */}
   <div class="bks-w">
-    <img class="bkshot" src="build/calendly-booking.png"
+    <img class="bkshot" src="${CALENDLY_SHOT}"
       alt="Calendly booking for ${a.n} — select a date and time">
   </div>
 
@@ -9141,7 +9130,11 @@ V.checkout = (f) => {
                 <span class="rec-v">${I.verified}</span></span></p>
             <p class="rec-r">${I.star}${a.r.toFixed(1)} &middot; ${a.ivs} interviews</p>
           </div>
-          <p class="rec-f"><span>${I.wallet}${ivCharged(isRe)?a.price+' Interview Fee':'Complimentary'}</span>
+          ${''/* COMPLIMENTARY SHOWS THE STRUCK PRICE "$95 Free", not the word
+                 "Complimentary" + wallet mark (Maryam, 1 Oct 2026). `ivFeeLabel`
+                 is the same label the dashboard rec card and booking fee use; the
+                 charged case keeps the wallet + "$X Interview Fee". */}
+          <p class="rec-f"><span>${ivCharged(isRe)?I.wallet+a.price+' Interview Fee':ivFeeLabel(false, a.price)}</span>
             <span>${I.video}${(rec||{}).mins||'45 mins call'}</span></p>
         </div>
       </div>
@@ -10170,6 +10163,39 @@ const ivBookedModal = () => {
       </div>
       <div class="sheet-f conf-a">
         <button class="btn btn-p noic" data-ivbooked="0">View My Dashboard</button>
+      </div>
+    </div>
+  </div>`;
+};
+
+/* THE LEVEL-REACHED DIALOG — Maryam, 1 Oct 2026. On FIRST landing on the
+   `assessed` dashboard (interview done, confirmed at E3, not yet enrolled), a
+   dialog announces the level the interview set and offers the two things to do
+   with it: read the evaluation or enrol. It is the shared `.conf` shell — one
+   solid accent disc (§134) carrying the trophy, the level as the title, two
+   sentences under it, and a two-action foot. It is PLAIN `.conf`, not
+   `.conf-ok`: the success variant greys its `.btn-p` to a quiet single CTA
+   (§109.119), and this dialog needs a real secondary/primary pair — View
+   evaluation (`.btn-s`) and Enroll in course (`.btn-p`). View evaluation carries
+   `data-levelgo` (set the seen flag, then `go()` to the write-up); Enroll in
+   course carries `data-levelclose` — it only dismisses, leaving the reader on
+   the dashboard where the enrolment card and its "View Course" already are (the
+   modal is an announcement, not a second route to the same page). The backdrop
+   is the quiet third exit, also setting the flag. `S.levelSeen` gates
+   it, so it shows once per session and never again — the chrome-state rule:
+   this is a per-reader moment (a `localStorage`/session preference), not app
+   state, so it lives in `S` rather than the hash. */
+const levelModal = () => {
+  return `<div class="modal on" data-close="level">
+    <div class="sheet conf conf-level" role="dialog" aria-modal="true" aria-label="You are now Explorer E3">
+      <div class="sheet-b conf-b">
+        <span class="conf-mk">${I.trophy}</span>
+        <h2 class="conf-t">You&rsquo;re now Explorer &ndash; E3</h2>
+        <p class="conf-x">Your interview evaluation places you at Level E3 on the Explorer track. You&rsquo;re ready to take the next step in your TALENTnext journey.</p>
+      </div>
+      <div class="sheet-f conf-a">
+        <button class="btn btn-s noic" data-levelgo="report">View evaluation</button>
+        <button class="btn btn-p noic" data-levelclose="1">Enroll in course</button>
       </div>
     </div>
   </div>`;
@@ -15693,6 +15719,10 @@ function render(){
             `S.ivBooked` is set by the booking action, which lands on `booked`,
             so it shows once on that dashboard and is cleared on dismiss. */
          + (S.ivBooked && (S.stage==='booked' || S.stage===RESCHED) ? ivBookedModal() : '')
+         /* THE LEVEL-REACHED DIALOG — gated on the MOMENT like `ivBookedModal`:
+            the `assessed` dashboard, shown once (`!S.levelSeen`) the first time
+            the reader lands there, dismissed by either action or the backdrop. */
+         + (S.view==='dashboard' && S.stage==='assessed' && !S.levelSeen ? levelModal() : '')
          /* THE PAYMENT-SUCCESS DIALOG (Maryam, 19 Sep 2026) — shown over the
             payment step (`V.checkout`) once `data-payok` fires, before the
             calendar. Gated on the view so it clears itself the moment Continue
@@ -15700,7 +15730,12 @@ function render(){
          + (S.view==='checkout' && S.paySuccess ? paySuccessModal() : '')
          /* THE SCENES UPSELL — gated on the report view and the flag the Save
             action sets once the three are committed. */
-         + (S.view==='report' && S.scenesUpsell ? scenesUpsellModal(S.scenesUpsell) : '');
+         + (S.view==='report' && S.scenesUpsell ? scenesUpsellModal(S.scenesUpsell) : '')
+         /* THE QUIZ-RESULTS MODAL (Maryam, 1 Oct 2026) — opened from the "Open
+            Quiz Results" Quick Action; gated on its own flag, not a view, since
+            that card rides several dashboards. `quizModal` is defined in ai6.js,
+            hoisted before this runs. */
+         + (S.quizModal ? quizModal() : '');
   }
   /* THE CALL IS PART OF THE KEY, because it is a whole surface arriving and
      leaving: without it, joining a call is a repaint of the same stage and
@@ -15990,6 +16025,14 @@ device.addEventListener('click', e => {
   if(ivbk){ S.ivBooked = ivbk.dataset.ivbooked === '1'; render(); return; }
   if(t.closest('[data-close="ivbooked"]') && !t.closest('.sheet')){ S.ivBooked=false; render(); return; }
 
+  /* THE LEVEL-REACHED DIALOG — every exit sets the seen flag so it never
+     re-opens. View evaluation navigates to the agent write-up; Enroll in course
+     and the backdrop only dismiss, leaving the reader on the dashboard. */
+  const lvg = t.closest('[data-levelgo]');
+  if(lvg){ S.levelSeen = true; go(lvg.dataset.levelgo); return; }
+  if(t.closest('[data-levelclose]')){ S.levelSeen=true; render(); return; }
+  if(t.closest('[data-close="level"]') && !t.closest('.sheet')){ S.levelSeen=true; render(); return; }
+
   /* Close, and the backdrop — the shape the skills sheet uses, and the second
      test is that the press did not land inside `.sheet` so a click on the
      dialog itself is not a dismiss. */
@@ -16151,6 +16194,17 @@ device.addEventListener('click', e => {
      BEFORE `[data-go]`: the panel's rows and its footer ARE `data-go`, and they
      live inside the peek, so this branch has to be the one that does not match
      them. It does not, because they carry no `data-peek`. */
+  /* THE QUIZ-RESULTS MODAL (Maryam, 1 Oct 2026) — the Quick Action opens
+     `quizModal` (ai6.js) instead of the peek column. `data-quizmodal` opens it;
+     `data-quizclose` (the Close button AND the backdrop) shuts it, with
+     `receiptModal`'s backdrop guard: a click that resolves to the `.modal`
+     element itself closes, a click inside the sheet does not. Before `[data-go]`
+     and `[data-peek]`, like the other modal branches. */
+  const qmc = t.closest('[data-quizmodal]');
+  if(qmc){ S.quizModal = true; S.notif = false; S.acct = false; S.peek = null; render(); return; }
+  const qmx = t.closest('[data-quizclose]');
+  if(qmx){ if(qmx.classList.contains('modal') && e.target !== qmx) return; S.quizModal = false; render(); return; }
+
   const pkc = t.closest('[data-peek]');
   if(pkc){
     const k = pkc.dataset.peek;

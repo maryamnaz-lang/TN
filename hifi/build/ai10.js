@@ -31,7 +31,7 @@
    WHAT IT DOES NOT DO. It does not move the stage. Ending a session returns
    you to the page you pressed Join on and the prototype's stage picker still
    walks the journey — an interview that levelled you the moment you left the
-   call would take the assessment, the report and the 48 hours the product
+   call would take the assessment, the report and the 24 hours the product
    describes and throw them away. The last caption says the recording is with
    your agent, which is true and is where the wait starts.
 

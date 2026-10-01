@@ -2032,6 +2032,20 @@ payart_js = 'const PAY_ART = {\n  ' + _pa + '\n};\n'
 print(f'payment form artwork embedded: {len(PAY_ART)} states, {len(payart_js)/1024:.0f} KB')
 
 # ==========================================================================
+# THE CALENDLY SHOT IS EMBEDDED, NOT A PATH (Maryam, 1 Oct 2026 — broken on
+# Vercel). `V.agent` drew it with `src="build/calendly-booking.png"`, a relative
+# path that resolves on a local `file://` open (the built HTML sits in hifi/, so
+# `build/…` is `hifi/build/…`) but 404s on the deploy, where the portal is served
+# at /candidate and nothing maps `/build/`. Every other image here is a base64
+# data URI for exactly this reason; this one was left a path. `CALENDLY_SHOT`
+# carries it like `PAY_ART`, so it is host-independent — `V.agent` reads the const.
+# The Calendly embed-as-a-picture rule (a third party is never redrawn) is unchanged.
+calendly_js = ("const CALENDLY_SHOT = 'data:image/png;base64,"
+    + base64.b64encode((here / 'calendly-booking.png').read_bytes()).decode()
+    + "';\n")
+print(f'calendly booking shot embedded: {(here / "calendly-booking.png").stat().st_size/1024:.0f} KB')
+
+# ==========================================================================
 # THE 120px MARK IS A VIDEO, AND THE OTHER SEVEN SIZES ARE NOT
 #
 # `tal-blob.webp` — the animated WebP `--tal-mark` resolves to — serves every
@@ -2139,7 +2153,7 @@ print(f'Tal greeting audio embedded: {_speech.stat().st_size/1024:.0f} KB')
 # after ai5's view stamp, not before it. It reads `AV` and `V` from data.js and
 # views.js, and calls nothing that nil.js declares, so nothing about its
 # position is load-bearing beyond being last.
-js = award_js + '\n\n' + payart_js + '\n\n' + call_js + '\n\n' + cohort_js + '\n\n' + cert_js + '\n\n' + pfart_js + '\n\n' + avatars_js + '\n\n' + blob_js + '\n\n' + speech_js + '\n\n' + '\n\n'.join((here / f).read_text() for f in ['icons.js', 'data.js', 'views.js', 'ai.js', 'ai2.js', 'ai3.js', 'ai4.js', 'ai5.js', 'nil.js', 'lead.js',
+js = award_js + '\n\n' + payart_js + '\n\n' + calendly_js + '\n\n' + call_js + '\n\n' + cohort_js + '\n\n' + cert_js + '\n\n' + pfart_js + '\n\n' + avatars_js + '\n\n' + blob_js + '\n\n' + speech_js + '\n\n' + '\n\n'.join((here / f).read_text() for f in ['icons.js', 'data.js', 'views.js', 'ai.js', 'ai2.js', 'ai3.js', 'ai4.js', 'ai5.js', 'nil.js', 'lead.js',
                                                         # The leader's seven module pages, plus the four pages under
                                                         # them. After lead.js because they read its data
                                                         # (`LEAD_COHORTS`, `LEAD_EVALS`, `LEADER`, `lpace`, `lavg`)

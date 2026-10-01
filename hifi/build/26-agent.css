@@ -120,13 +120,22 @@
 .app .agh-book .agh-nn{
   min-width:0;
   display:block}
-.app .agh-book .ag-rec{
+/* THE PILL IS UNIVERSAL AND THE GROUND IS A LIGHT ACCENT (Maryam, 1 Oct 2026:
+   "make the recommended word a chip … a light accent color chip with accent
+   color text"). The geometry was scoped to `.agh-book` (the dashboard card),
+   so the SAME `.ag-rec` on the agents table (§114, inside `.agt-n`) was still
+   plain text. Dropping the `.agh-book` scope gives both the pill; the card keeps
+   its own `margin-left` because `.agh-nn` is a block, while `.agt-n` is a flex
+   row whose `gap` already spaces the chip. The #e5f3f9 blue ground went to the
+   `.rank-chip` light-accent tint — see §63's note for the ink and why this
+   reverses the "not the accent" decision. */
+.app .ag-rec{
   display:inline-flex;align-items:center;flex:none;
   height:18px;padding:0 6px;
-  margin:0 0 0 6px;
   border-radius:100px;
-  background:#e5f3f9;
+  background:color-mix(in srgb, var(--accent) 12%, var(--background));
   vertical-align:middle;white-space:nowrap}
+.app .agh-book .ag-rec{margin:0 0 0 6px}
 
 /* the fee is now the tallest thing on the row and nothing may reflow around
    it, so the identity column has to clear it on its own account: 40 of fee

@@ -1366,6 +1366,7 @@ const dsQuickActions = (cards) => `<div class="sec sec-qa">
   <div class="sec-h"><h2>Quick Actions</h2></div>
   <div class="qa">${(cards || []).map(c => `
     <button class="qa-c${c.mk ? ' qa-c-mk' : ''}" ${c.ask ? `data-tal-ask="${c.ask}"`
+      : c.modal ? `data-quizmodal="${c.modal}"`
       : c.peek ? `data-peek="${c.peek}"` : `data-go="${c.go}"`}${c.disc?` data-disc="${c.disc}"`:''}${
       c.edit?` data-pfedit="${c.edit()}"`:''}>
       ${''/* A WRAPPER ROUND THE MARK AND THE TEXT WAS BUILT AND TAKEN OUT.

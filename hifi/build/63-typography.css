@@ -1711,15 +1711,21 @@
    not. §70.5's note makes the identical substitution for the identical reason
    and records that `--link` IS that hue darkened for exactly this.
 
-   NOT THE ACCENT, and that is the decision. This chip shipped orange for one
-   round: the accent is the Book button on all six cards, so an accent chip on
-   one of them competes with the control it sits above. Blue is §12's "this is a
-   fact about the object" ink and it is the only other ink on these cards. */
+   NOW THE ACCENT, as ink on a light-accent ground (Maryam, 1 Oct 2026: "a light
+   accent color chip with accent color text"). This reverses the blue decision
+   below, whose argument is kept because it is still true: the accent is the Book
+   button on every row, so an accent chip does sit with the control above it —
+   Maryam's call is that the recommendation and the action reading as one accent
+   family is what she wants. `--accent-text` is the accent AS INK (§3, AA on
+   white and on the 12% tint), the same pairing `.rank-chip` uses; §26 draws the
+   ground. The superseded reasoning: blue (`--link`) on §26's old #e5f3f9 ground
+   was §12's "this is a fact about the object" ink, chosen so the chip would not
+   compete with the Book button. */
 .app .ag-rec{
   font-size:var(--t-eyebrow-size);line-height:var(--t-eyebrow-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-eyebrow-ls);
   text-transform:none;
-  color:var(--link)}
+  color:var(--accent-text)}
 
 /* THE ONE CLAIM THE BLOCK MAKES — 581:6539, 14px Kräftig #973177. Strong,
    because the file sets it so and because it is the sentence the whole block

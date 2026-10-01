@@ -14,7 +14,7 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 6412.  Rules dropped as product-specific: 222.
+   Rules kept: 6415.  Rules dropped as product-specific: 222.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
@@ -5223,7 +5223,8 @@ button.btn-p:active,
 .app .agh-book .agh-n{position:relative; font-size:17px; line-height:23px; font-weight:600; letter-spacing:-.1px; color:var(--text-primary)}
 .app .agh-book .agh-n .ag-price{position:absolute; right:0; top:0; font-size:24px; line-height:30px; font-weight:600; letter-spacing:-.4px; color:var(--text-primary); white-space:nowrap}
 .app .agh-book .agh-nn{min-width:0; display:block}
-.app .agh-book .ag-rec{display:inline-flex; align-items:center; flex:none; height:18px; padding:0 6px; margin:0 0 0 6px; border-radius:100px; background:#e5f3f9; vertical-align:middle; white-space:nowrap}
+.app .ag-rec{display:inline-flex; align-items:center; flex:none; height:18px; padding:0 6px; border-radius:100px; background:color-mix(in srgb, var(--accent) 12%, var(--background)); vertical-align:middle; white-space:nowrap}
+.app .agh-book .ag-rec{margin:0 0 0 6px}
 .app .page .agh.agh-book > .agh-m{min-height:17px}
 .app .agh-book .agh-n{min-height:23px}
 @container app (max-width:479.98px){
@@ -7482,7 +7483,7 @@ button.btn-p:active,
 .app .rec-tag{font-size:var(--t-compact-size); line-height:var(--t-compact-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-compact-ls); text-transform:none}
 .app .rec-tag.need{color:#973177}
 .app .rec-tag.has{color:#0488c5}
-.app .ag-rec{font-size:var(--t-eyebrow-size); line-height:var(--t-eyebrow-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-eyebrow-ls); text-transform:none; color:var(--link)}
+.app .ag-rec{font-size:var(--t-eyebrow-size); line-height:var(--t-eyebrow-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-eyebrow-ls); text-transform:none; color:var(--accent-text)}
 .app .rec-why{font-size:var(--t-compact-size); line-height:var(--t-compact-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-compact-ls); text-transform:none; color:var(--on-dark)}
 .app .rec-alt{font-style:italic; color:transparent}
 .app .qa-c{color:var(--text-primary)}
@@ -8037,6 +8038,7 @@ button.btn-p:active,
              -40px 40px 40px 0 rgba(0,0,0,.04)}
 .app .sumdrop .sd-b{display:flex; flex-direction:column; gap:var(--s03); width:100%}
 .app .sumdrop p{margin:0}
+.app .sumdrop.sd-flat{position:static; width:auto; max-width:none; padding:0; background:none; border:0; box-shadow:none}
 .app .sumdrop .sd-next{display:flex; flex-direction:column; gap:var(--s02); width:100%; padding-top:20px; border-top:1px solid var(--rule)}
 .app .sumdrop .sd-act{appearance:none; -webkit-appearance:none; margin:0; padding:0; border:0; background:none; display:inline-flex; align-items:center; gap:var(--s03); text-align:left; cursor:pointer; background-image:var(--ai-grad-alt); -webkit-background-clip:text; background-clip:text}
 .app .sumdrop .sd-ic{flex:none; display:grid; place-items:center; width:18px; height:18px}
@@ -9396,6 +9398,7 @@ button.btn-p:active,
 .app .conf.conf-ok .conf-mk{margin-bottom:var(--s04)}
 .app .conf.conf-ok > .conf-a{padding-top:0}
 .app .conf.conf-ok .conf-a .btn-p{background:var(--layer-02); border:1px solid var(--rule)}
+.app .conf.conf-level .conf-a .btn-s{background:var(--rule); border-color:var(--rule)}
 
 /* ---- 110-outline.css ---- */
 .app .ol .acc-h .ttl{display:flex; flex-direction:column; align-items:flex-start}
@@ -9538,13 +9541,13 @@ button.btn-p:active,
 
 /* ---- 114-agenttable.css ---- */
 .app .agt{padding:0 var(--pad-x)}
+.app .agt{margin-top:20px}
 .app .agt-r{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:var(--s04); padding:var(--s05) 0; border-bottom:1px solid var(--rule)}
 .app .agt-who{grid-column:1 / -1; grid-row:1}
 .app .agt-tags{grid-column:1 / -1; grid-row:2}
 .app .agt-exp{grid-column:1; grid-row:3}
-.app .agt-next{grid-column:2; grid-row:3}
-.app .agt-fee{grid-column:1; grid-row:4}
-.app .agt-act{grid-column:2; grid-row:4}
+.app .agt-fee{grid-column:2; grid-row:3}
+.app .agt-act{grid-column:1 / -1; grid-row:4}
 .app .agt-h{display:none}
 .app .agt-who{display:flex; align-items:center; gap:var(--s04); min-width:0}
 .app .agt-wb{display:flex; flex-direction:column; gap:2px; min-width:0}
@@ -9553,24 +9556,23 @@ button.btn-p:active,
 .app .agt-rate .stars svg{margin:0; display:block}
 .app .agt-tags{display:flex; flex-wrap:wrap; gap:var(--s02); min-width:0}
 .app .agt-tag{flex:none; border-radius:999px}
-.app .agt-exp,
-.app .agt-next{display:flex; flex-direction:column; gap:2px; min-width:0}
+.app .agt-exp{display:flex; flex-direction:column; gap:2px; min-width:0}
 .app .agt-v{display:flex; align-items:center; gap:var(--s02); min-width:0}
 .app .agt-v svg{flex:none; width:16px; height:16px; fill:currentColor; display:block}
 .app .agt-act{display:flex; align-items:center; gap:var(--s03); justify-self:end}
 @container app (min-width:900px){
   .app .agt-h{display:grid}
   .app .agt{display:grid; grid-template-columns:
-      auto minmax(0,auto) auto auto auto var(--agt-act-w); column-gap:var(--s06); justify-content:stretch}
+      auto minmax(0,auto) auto auto var(--agt-act-w); column-gap:var(--s06); justify-content:stretch}
   .app .agt-h,
   .app .agt-r{grid-column:1 / -1; display:grid; grid-template-columns:subgrid; column-gap:var(--s06); align-items:center}
   .app .agt-who{grid-column:1; grid-row:auto}
   .app .agt-tags{grid-column:2; grid-row:auto}
   .app .agt-exp{grid-column:3; grid-row:auto}
-  .app .agt-next{grid-column:4; grid-row:auto}
-  .app .agt-fee{grid-column:5; grid-row:auto}
-  .app .agt-act{grid-column:6; grid-row:auto}
+  .app .agt-fee{grid-column:4; grid-row:auto}
+  .app .agt-act{grid-column:5; grid-row:auto}
   .app .agt-h{padding:0 0 var(--s03); border-bottom:1px solid var(--rule)}
+  .app .agt-h + .agt-r{padding-top:var(--s03)}
   .app .agt-tags{align-content:center}
   .app .agt-who{align-items:center}
   .app .agt{--agt-act-w:200px}

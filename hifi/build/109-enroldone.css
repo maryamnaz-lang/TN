@@ -119,6 +119,18 @@
 .app .conf.conf-ok .conf-a .btn-p{
   background:var(--layer-02);border:1px solid var(--rule)}
 
+/* THE LEVEL-REACHED DIALOG'S SECONDARY IS A GREY FILL, NOT AN OUTLINE — Maryam,
+   1 Oct 2026 ("the secondary button we are using on modals have an #efefef bg
+   not outline"). A `.conf` `.btn-s` is transparent with a `--rule` outline
+   (§105.6, which argues the outline for the logout/cancel pair against a RED
+   fill); this dialog's pair is a grey secondary + a black primary, so the
+   secondary reads as a filled button on the `--rule` #efefef ground — border
+   the same colour so no edge draws. Scoped to `.conf-level` so §105.6's
+   deliberate outline on the logout and cancel dialogs is untouched. The token
+   is `--rule` (#efefef), not a hex (§3). */
+.app .conf.conf-level .conf-a .btn-s{
+  background:var(--rule);border-color:var(--rule)}
+
 /* The desc-to-CTA gap is now §134's job — it zeroes `.conf-b` padding and puts a
    16px (`--s05`) foot on `.conf-a`, uniform across every portal's modals — so the
    20 Sep per-`.conf-x` padding-bottom is removed (it would have beaten §134's

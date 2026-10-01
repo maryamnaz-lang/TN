@@ -331,12 +331,12 @@ const PAGESUM = {
        point a popover at, and every clause here is settled. No em dash (Tal
        voice). The card in the body is `.ai-aura` too, so this replaces it via
        `placePageSummary` — trap 11 needs this entry to exist for the stage. */
-    /* 48h PROMISE, WITH THE OVERDUE LINE (story 15.2). A function so the overdue
-       state can differ; `heldOverdue` is a views.js const, parsed before this
-       file. Neither branch has a `data-sum` phrase: there is no next action. */
+    /* 24h PROMISE, WITH THE OVERDUE LINE (Maryam, 1 Oct 2026 — one number, 24h).
+       A function so the overdue state can differ; `heldOverdue` is a views.js const,
+       parsed before this file. Neither branch has a `data-sum` phrase: no next action. */
     held: () => (typeof heldOverdue === 'function' && heldOverdue())
       ? 'Your interview result is taking a little longer than usual. We will have it to you shortly.'
-      : 'Your interview with Priya Nair is done. It is being analysed now, and TalentNext sets your level from it within <b>48 hours</b>. There is nothing to do but wait.',
+      : 'Your interview with Priya Nair is done. It is being analysed now, and TalentNext sets your level from it within <b>24 hours</b>. There is nothing to do but wait.',
 
     assessed: 'Welcome Back, Maryam! You are <b data-sum="level">Explorer &ndash; E3</b>, rung 3 of 15, set by TalentNext on 21 August after your interview, with <b data-sum="growth">delegation and hard conversations</b> as your growth areas. <b data-sum="enrol">Enrolling</b> is the only thing left.',
 
@@ -1628,8 +1628,11 @@ const SUMDROP = {
       lead: `You scored 64 of 100 on the Next in Leadership quiz on ${qzTaken()}, across five bands.`,
       label: 'What it measured:',
       read: `${hiN} came out highest at ${hiV}, and ${low[0][0]} lowest at ${low[0][1]}. A quiz sets the track, not the level. It is the interview that decides which of E1 to E5 you sit on.`,
-      next: 'Open the full breakdown to see all five bands scored, and the two chapters built on the ones you scored lowest.',
-      act: {ic: I.trophy, go: 'result', t: 'Open your quiz results'}
+      next: 'Open the full breakdown to see all five bands scored, and the two chapters built on the ones you scored lowest.'
+      /* NO ACTION BUTTON (Maryam, 1 Oct 2026: "remove open quiz button from this
+         summary highlight modal"). The popover is a read, not a launcher; the
+         quiz breakdown is its own modal off the Quick Action now. `sumDropCard`
+         renders no `.sd-act` when `act` is absent. */
     };
   },
 
@@ -1882,11 +1885,32 @@ function sumDropCard(key){
       <p class="sd-nt">Your Next Step</p>
       <p class="sd-nb">${d.next}</p>
     </div>
-    <button class="sd-act" ${d.act.ask
+    ${d.act ? `<button class="sd-act" ${d.act.ask
       ? `data-tal-ask="${d.act.ask}"`
       : d.act.call
         ? `data-call="${d.act.call}"`
-        : `data-go="${d.act.go}"`}><span class="sd-ic">${d.act.ic}</span>${d.act.t}</button>`;
+        : `data-go="${d.act.go}"`}><span class="sd-ic">${d.act.ic}</span>${d.act.t}</button>` : ''}`;
+}
+
+/* THE QUIZ-RESULTS MODAL (Maryam, 1 Oct 2026: "on clicking quiz results action
+   item, do not open right slider, just open a modal and show the content we are
+   showing in the summary quiz results highlight modal and a secondary button of
+   'Close'"). The Quick Action used to open `quizPeek` as a right-hand column
+   (`data-peek="quiz"`); it opens this centred dialog instead. The body is the
+   EXACT `SUMDROP.quiz` read `sumDropCard` draws in the highlight popover — now
+   with no action button — wrapped in `.sumdrop.sd-flat` so the `.sd-*`
+   typography applies while §70 drops the floating card's own position, border,
+   shadow and width cap. `S.quizModal` gates it; `data-quizclose` and the
+   backdrop close it. `quizPeek`/`peekPanel` stay defined (reachable by nothing
+   on the dashboard now). */
+function quizModal(){
+  if(!S.quizModal) return '';
+  return `<div class="modal on" data-quizclose="1">
+    <div class="sheet" role="dialog" aria-modal="true" aria-label="Your quiz results">
+      <div class="sheet-b"><div class="sumdrop sd-flat">${sumDropCard('quiz')}</div></div>
+      <div class="sheet-f"><button class="btn btn-s noic" data-quizclose="1">Close</button></div>
+    </div>
+  </div>`;
 }
 
 /* --- the pass -------------------------------------------------------------
@@ -1910,7 +1934,12 @@ function sumDropCard(key){
    measured pixels that only exist at runtime, which is the one thing inline
    style is for. Everything about how the card LOOKS is in §70.8. */
 function placeSumDrop(){
-  device.querySelectorAll('.sumdrop').forEach(n => n.remove());
+  /* `:not(.sd-flat)` — the floating popover is a `.sumdrop` this pass appends and
+     removes; the quiz MODAL (`quizModal`) reuses `.sumdrop` for its typography and
+     carries `.sd-flat`, and it is part of the base render's own HTML, so this
+     cleanup must leave it alone or the modal body empties on the next tick
+     (Maryam, 1 Oct 2026). */
+  device.querySelectorAll('.sumdrop:not(.sd-flat)').forEach(n => n.remove());
   /* the open phrase is marked in BOTH copies — the live one because that is
      what the reader sees, the ghost because it is the one holding the box and
      a class that changes its metrics would shift the line under the other */

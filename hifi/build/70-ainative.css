@@ -1324,6 +1324,16 @@
 .app .sumdrop .sd-b{display:flex;flex-direction:column;gap:var(--s03);width:100%}
 .app .sumdrop p{margin:0}
 
+/* FLATTENED FOR THE QUIZ MODAL (Maryam, 1 Oct 2026). `quizModal` (ai6.js) reuses
+   `.sumdrop`'s `.sd-*` typography inside a `.sheet` so the content reads exactly
+   as the highlight popover — but the floating-callout chrome has to come off:
+   `.sd-flat` lays it in flow (the sheet IS the card now), takes the sheet's
+   width and drops the popover's own position, border, shadow and padding. The
+   inner `gap` and the `.sd-next` top hairline stay. (0,3,0) beats the base. */
+.app .sumdrop.sd-flat{
+  position:static;width:auto;max-width:none;padding:0;
+  background:none;border:0;box-shadow:none}
+
 /* THE HAIRLINE IS THE `.sd-next` BLOCK'S TOP EDGE rather than an element of its
    own — 596:7385 is a line at 178 in a 20-gap stack, which is the gap itself
    with a rule through it. A `<hr>` in the markup would be a third child to keep
