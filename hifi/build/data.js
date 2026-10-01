@@ -490,9 +490,13 @@ const NAVSETS = {
   assessed:[['dashboard','Dashboard','dashboard'],['level','My Level','growth'],['interviews','Interviews','calendar'],['enrol','Course Enrollment','ticket'],['billing','Payments','wallet']],
   /* ENROLLED, COHORT NOT STARTED (story 15.1) — the just-joined four PLUS Cohort
      and Messages, and Course Enrollment is GONE (18.1 closed once enrolled).
-     Coursework / Course Progress / Achievements are NOT here: they arrive on the
-     start day (`full`). Profile is drawn in the rail foot, so it is not listed. */
-  enrolPre:[['dashboard','Dashboard','dashboard'],['level','My Level','growth'],['interviews','Interviews','calendar'],['billing','Payments','wallet'],['cohort','Cohort','group'],['messages','Messages','chat',1]],
+     Course Progress / Achievements are NOT here: they arrive on the start day
+     (`full`). COURSEWORK *IS* HERE NOW (Maryam, 1 Oct 2026) — before the cohort
+     starts it does not open the LightSpeed player (the chapters are locked); it
+     shows the course name and the full outline so the candidate can read what
+     they are about to study. `V.coursework` branches on `f.preStart` to draw the
+     preview rather than the frame. Profile is drawn in the rail foot. */
+  enrolPre:[['dashboard','Dashboard','dashboard'],['level','My Level','growth'],['coursework','Coursework','book'],['interviews','Interviews','calendar'],['billing','Payments','wallet'],['cohort','Cohort','group'],['messages','Messages','chat',1]],
   /* THE MODULE IS "ACHIEVEMENTS" AND THE CURRENCY IS STILL "POINTS" (Maryam,
      31 Aug 2026). The rename is the module's NAME — this label, the page's
      `ph()`, its `crumb()`, Tal's `where` map and the "Open Achievements" button

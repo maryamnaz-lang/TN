@@ -187,3 +187,9 @@
 .app .dm-rec-dot{width:10px;height:10px;border-radius:50%;background:var(--accent);flex:0 0 auto;
   animation:dmRecPulse 1.2s ease-in-out infinite}
 @keyframes dmRecPulse{0%,100%{opacity:1}50%{opacity:.25}}
+
+/* THE PRE-START COMPOSER IS OFF — Maryam, 1 Oct 2026. On `enrolPre` the cohort
+   has not started, so the candidate cannot message yet: the composer dims and
+   refuses the pointer (its controls also carry `disabled`), and its placeholder
+   says when it opens. One class on the `.composer`, reversible with the stage. */
+.app .composer-off{opacity:.55;pointer-events:none}

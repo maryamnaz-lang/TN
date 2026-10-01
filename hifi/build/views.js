@@ -5129,6 +5129,40 @@ function heldArm(){
 }
 setInterval(heldArm, 1000);
 
+/* THE COUNTDOWN TO THE COHORT START — the `enrolPre` dashboard's black card
+   (Maryam, 1 Oct 2026: "a card with days count down, just like we have for the
+   report pending screen"). The enrolment is done and the cohort begins in a few
+   days, so the black card's time slot is a countdown to the start day — the
+   `held` card's pattern (its note is the argument) with a DAYS field, since the
+   gap is measured in days not hours.
+
+   THE DEADLINE IS FIXED ONCE IN `S`, exactly like `heldTill`: a prototype has no
+   real start timestamp (`enrolPre` only knows `startIn` days), so this seats it
+   `startIn` days out on the first read and holds across re-renders because the
+   markup and `startArm` read the same `S` value. `startFmt` shows `Nd HH:MM:SS`
+   while days remain and drops to `HH:MM:SS` in the last day, so the card ends on
+   the same shape the results clock uses. `startArm` is `heldArm`'s loop. */
+function cohortStartTill(f){
+  if(!S.cohortStartTill) S.cohortStartTill = Date.now() + ((f && f.startIn) || 0) * 24 * 3600 * 1000;
+  return S.cohortStartTill;
+}
+function startFmt(ms){
+  const s = Math.max(0, Math.floor(ms / 1000));
+  const d = Math.floor(s / 86400);
+  const p = n => String(n).padStart(2, '0');
+  const hms = `${p(Math.floor(s % 86400 / 3600))}:${p(Math.floor(s % 3600 / 60))}:${p(s % 60)}`;
+  return d > 0 ? `${d}d ${hms}` : hms;
+}
+function startArm(){
+  const els = (typeof device !== 'undefined' && device)
+    ? device.querySelectorAll('.start-timer[data-starttill]') : [];
+  els.forEach(el => {
+    const t = +el.dataset.starttill;
+    if(t) el.textContent = startFmt(t - Date.now());
+  });
+}
+setInterval(startArm, 1000);
+
 /* THE COUNTDOWN TO A COHORT CALL — the leader dashboard's black call card
    (Maryam, 28 Sep 2026). `heldArm`'s pattern exactly (its note is the argument):
    the text is a pure function of `Date.now()` and the element's own
@@ -6606,18 +6640,49 @@ created: () => `${authShell()}
    ============================================================ */
 const V = {};
 
+/* THE COHORT THE CANDIDATE IS ENROLLED ON — its course, stated once. The
+   pre-start block, the cohort page and the coursework preview all read it, so a
+   change here moves every surface together (DESIGN.md "nothing is typed twice").
+   A different course from the `assessed` recommendation (Business Fundamentals):
+   the candidate chose this one at enrolment, and `CH`/`CH_SYL` is its outline. */
+const COHORT_COURSE = 'Communicating with Impact';
+
 /* THE PRE-START WAITING BLOCK (story 15.2), shared by `enrolPre` and the moved
-   `cancelled` state. "Your cohort starts in n days" (or "Starts today"), the
-   course, the start date and the cohort leader, and one Meet your cohort action
-   opening the roster (19.4). A plain white section: `.kv` opts out of the label
-   column and stacks under the heading (trap 13), so heading over the facts. */
-const preStartBlock = (f) => `<div class="sec">
-  <div class="sec-h"><h2>${f.startIn>0?`Your cohort starts in ${f.startIn} days`:'Starts today'}</h2></div>
-  <div class="kv"><span class="k">Course</span><span class="v">Communicating with Impact</span></div>
-  <div class="kv"><span class="k">Starts</span><span class="v">${f.cancelled?'12 Mar 2026':'Monday, 18 August 2026'}</span></div>
-  <div class="kv"><span class="k">Cohort leader</span><span class="v">Priya Nair</span></div>
-  <div style="margin-top:var(--s05)"><button class="btn btn-p noic" data-go="cohort">Meet your cohort ${I.arrowRight}</button></div>
-</div>`;
+   `cancelled` state, now a BLACK CARD WITH A DAYS COUNTDOWN (Maryam, 1 Oct 2026:
+   "a card with days count down, just like we have for the report pending
+   screen"). It is the `held` card's exact recipe — §75's `.dark-card`, §77's
+   `.crow-dark`, the `.dc-when` time slot — with the 24h results clock swapped for
+   `startFmt`'s days-aware countdown to the start day. The leader row is written
+   by hand in `crow`'s own classes (not `crow()`, which carries call-specific
+   Join/gate logic this card has no use for): Priya's face, her name with the
+   verified tick, "Cohort leader", and the course + start date on the third line.
+   The one action is Meet your cohort, promoted into the row like `crow`'s
+   `join:false` secondary. `.dark-card` is not in `DARK_CARD`, so `placeDark`
+   leaves it in the body rather than hoisting it into the head band. */
+const preStartBlock = (f) => {
+  const till = cohortStartTill(f);
+  const dateStr = f.cancelled ? '12 Mar 2026' : 'Monday, 18 August 2026';
+  const coh = f.cancelled ? 'Cohort 47' : 'Cohort 41';
+  return `<div class="sec sec-call dark-card crow-dark">
+    <div class="dc-hd">
+      <div class="dc-hd-r"><h2 class="dc-t">You&rsquo;re enrolled on ${coh}</h2>
+        <span class="dc-when">${I.time}Starts in <span class="start-timer" data-starttill="${till}" style="font-variant-numeric:tabular-nums">${startFmt(till - Date.now())}</span></span></div>
+    </div>
+    <div class="crow">
+      <div class="crow-who">
+        <span class="crow-ph"><img src="${COHORT_LEAD.img}" alt="" loading="lazy" onerror="this.style.display='none'"></span>
+        <div class="crow-b">
+          <p class="crow-id"><span class="crow-n">Priya Nair</span><span class="crow-v">${I.checkFilled}</span></p>
+          <p class="crow-role">Cohort leader</p>
+          <p class="crow-x">${COHORT_COURSE} &middot; starts ${dateStr}</p>
+        </div>
+      </div>
+      <div class="crow-a crow-a1">
+        <button class="btn btn-sm noic" data-go="cohort">Meet your cohort ${I.arrowRight}</button>
+      </div>
+    </div>
+  </div>`;
+};
 
 V.dashboard = (f) => {
   let body = '';
@@ -7573,7 +7638,13 @@ V.level = (f) => {
         or face. It comes after the two blocks about YOUR level (the ladder, the
         certificate) and before "How the ladder works", which is the only block
         on this page that is not about you. */}
-  ${f.level ? `<div class="sec sec-rank">
+  ${''/* THE RANKING IS HIDDEN BEFORE THE COHORT STARTS (Maryam, 1 Oct 2026). On
+        `enrolPre`/`cancelled` the candidate has a level but has not begun the
+        journey, so a standing board among peers reads as odd — there is nothing
+        yet to stand against. The board returns on the start day with the rest of
+        the running-cohort surfaces. Gated on `!f.preStart` on top of the level
+        test, so the confirmed-and-running stages are unchanged. */}
+  ${f.level && !f.preStart ? `<div class="sec sec-rank">
     <div class="sec-h"><h2>Ranking</h2><span class="t-desc">Candidates at your level across TALENTnext, from any cohort.</span></div>
     ${boardList()}
   </div>` : ''}
@@ -10201,6 +10272,29 @@ const levelModal = () => {
   </div>`;
 };
 
+/* THE COHORT-STARTED DIALOG — Maryam, 1 Oct 2026 ("show a modal on this stage
+   as well when I first land on it, just like the modal we show for the level
+   assigned"). On first landing on the `week1` dashboard (the cohort has just gone
+   active, day 1 of 90), a dialog marks the start of the 90 days. Same shell and
+   first-landing mechanism as `levelModal`: the §134 accent disc with a learning
+   mark, a title, two sentences, and one primary. Continue Learning only
+   DISMISSES, leaving the reader on the dashboard (Maryam, 1 Oct 2026) — like the
+   level modal's primary; the dashboard's own "Open Chapter 1" is the route in.
+   `S.beganSeen` gates it so it shows once per session; the button and the
+   backdrop both set it. */
+const beganModal = () => `<div class="modal on" data-close="began">
+    <div class="sheet conf" role="dialog" aria-modal="true" aria-label="Your learning journey has begun">
+      <div class="sheet-b conf-b">
+        <span class="conf-mk">${I.book}</span>
+        <h2 class="conf-t">Your learning journey has begun</h2>
+        <p class="conf-x">Your 90-day cohort is now active. Start exploring Business Fundamentals and continue your learning journey.</p>
+      </div>
+      <div class="sheet-f conf-a">
+        <button class="btn btn-p noic" data-beganclose="1">Continue Learning</button>
+      </div>
+    </div>
+  </div>`;
+
 /* THE SCENES UPSELL — Maryam, 20 Sep 2026. Once the candidate commits their
    three included scenes, an OPTIONAL prompt offers the rest: buy the remaining
    scenes and keep the whole interview. It is opt-in — "Continue with 3" and the
@@ -10368,7 +10462,24 @@ V.welcome = () => `<main class="main"><div class="page">
 const lsvtFrame = () => `<main class="main lsvt-blank"><div class="page"><div class="lsvt-slot">
   <iframe class="lsvt-if" title="Coursework &mdash; LightspeedVT"></iframe></div></div></main>`;
 
-V.coursework = lsvtFrame;
+/* THE COURSEWORK OUTLINE PREVIEW (Maryam, 1 Oct 2026). Before the cohort starts
+   (`enrolPre`/`cancelled`, `f.preStart`) the chapters are locked in LightSpeed,
+   so Coursework does not open the player — but the candidate can read the full
+   outline of the course they are about to take. This stage's Coursework is the
+   course name, a one-line note that it unlocks on the start day, and `outlineSec`
+   (the §04 accordion, the same outline the enrol page draws). Once the cohort
+   starts, `V.coursework` is the LightSpeed frame again. A plain page with no
+   `.ai-aura`, so `placePageSummary` leaves it alone (no PAGESUM entry needed). */
+const courseworkPreview = (f) => `<main class="main"><div class="page">
+  ${crumb(['Dashboard','dashboard'],'Coursework')}
+  <div class="sec">
+    <div class="sec-h"><h2>${COHORT_COURSE}</h2></div>
+    <div class="note"><span>${I.info}</span><div class="nb">Your cohort has not started yet. This is the full outline of what you&rsquo;ll cover; the chapters open in LightSpeed VT when the cohort begins${f.startIn>0?`, in ${f.startIn} days`:' today'}.</div></div>
+  </div>
+  ${outlineSec(f.level || 'E3')}
+</div></main>`;
+
+V.coursework = (f) => (f && f.preStart) ? courseworkPreview(f) : lsvtFrame();
 V.chapter = lsvtFrame;
 
 const PARKED = {};
@@ -11335,7 +11446,42 @@ V.transcript = (f) => {
 </div></main>`;
 };
 
-V.cohort = (f) => `<main class="main"><div class="page">
+/* THE COHORT PAGE BEFORE IT STARTS (Maryam, 1 Oct 2026). On `enrolPre` the cohort
+   has not begun, so the running-cohort surfaces — "week N of 13", the Thursday
+   call black card, the Discussion room, the per-member activity — all read as
+   odd. This branch is what "Meet your cohort" promised instead: the leader in the
+   head band (same column as the running page), the Tal summary (its own preStart
+   copy), and a plain roster of who is joining — names and faces, no activity,
+   with a line that the discussion opens on the start day. The Members/Discussion
+   tabs, the next-call card and the "what to bring Thursday" card are all absent;
+   they return with `V.cohort`'s running body once the cohort starts. */
+const cohortPreStart = (f) => `<main class="main"><div class="page">
+  ${crumb(['Dashboard','dashboard'],'Cohort 41')}
+  ${ph('Cohort 41',`Ten people at Explorer &ndash; E3 &middot; led by Priya Nair &middot; ${f.startIn>0?`starts in ${f.startIn} days`:'starts today'}`)}
+  <div class="sec head-sec head-col sec-lead">
+    <div class="jrn">
+      <div class="jrn-h"><h2 class="jrn-t">Your cohort leader</h2></div>
+      <div class="row-lead">
+        ${avatar(COHORT_LEAD)}
+        <div style="flex:1">
+          <div class="t-heading-compact-01">${COHORT_LEAD.n}</div>
+          <div class="t-helper-01 mt3">Cohort leader &middot; leads Cohort 41</div>
+        </div>
+        <button class="btn btn-t btn-sm noic lead-msg" data-go="messages"
+          aria-label="Message ${COHORT_LEAD.n.split(' ')[0]}">${I.chat}</button>
+      </div>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="sec-h"><h2>Who&rsquo;s in your cohort</h2><span class="t-desc">The ten of you start together on Monday, 18 August. The discussion opens on the start day.</span></div>
+    ${''/* NO ACTIVITY META BEFORE THE START — nobody has a chapter or a last-active
+          yet, so the "you" row drops its running-cohort meta too; every row is a
+          face and a name. */}
+    <div class="tile-stack">${COHORT.map(([n,i,img,meta,you])=>mem(n,i,'',you,img)).join('')}</div>
+  </div>
+</div></main>`;
+
+V.cohort = (f) => f.preStart ? cohortPreStart(f) : `<main class="main"><div class="page">
   ${crumb(['Dashboard','dashboard'],'Cohort 41')}
   ${''/* THIS ONE WAS THE DUPLICATION AT ITS PLAINEST — Tal's summary used to
         open "Ten of you at E3 with Priya leading, week 5 of 13", which is
@@ -11568,6 +11714,40 @@ V.messages = (f) => {
     <span class="fa-ic">${I.document}</span>
     <span class="fa-b"><b>${n}</b><span>${s}</span></span>
     <span class="fa-dl">${I.download}</span></span>`;
+  /* MESSAGES BEFORE THE COHORT STARTS (Maryam, 1 Oct 2026). The cohort has not
+     begun, so the week-5 thread, the attachments and a live composer are all
+     odd — there is nothing to message about yet. This branch keeps the same
+     chat header (the leader, reachable) and shows one welcome note from Priya,
+     then a DISABLED composer reading that messaging opens on the start day. The
+     running thread returns with the rest of the cohort surfaces once it starts. */
+  if(f.preStart) return `<main class="main"><div class="page msg-page">
+  <div class="ph"><h1>Messages</h1></div>
+  <div class="mhead">
+    <span class="mhead-av">${avatar(her)}<i class="av-on" aria-hidden="true"></i></span>
+    <span class="mhead-b">
+      <span class="mhead-n">Priya Nair<i class="mhead-dot" aria-hidden="true"></i></span>
+      <span class="mhead-s">Cohort leader &middot; your cohort starts Monday, 18 August</span>
+    </span>
+    <span class="mhead-a">
+      <button class="mhead-act" title="Call" aria-label="Call">${I.phone}</button>
+      <button class="mhead-act" title="Video call" aria-label="Video call">${I.video}</button>
+      <button class="mhead-act" title="About this thread" aria-label="About this thread">${I.info}</button>
+      <button class="mhead-act" title="More" aria-label="More">${I.overflow}</button>
+    </span>
+  </div>
+  <div class="msgs">
+    <div class="m-day"><span>Before you start</span></div>
+    ${m('them','Priya Nair','Welcome to Cohort 41. I&rsquo;m Priya, your cohort leader. We begin on Monday, 18 August. I&rsquo;ll be in touch here once we start, so there is nothing you need to do until then. Looking forward to the ninety days with you.','10:20 AM')}
+  </div>
+  <div class="msg-foot">
+    <div class="composer composer-off">
+      <button class="composer-act composer-lead" aria-label="Attach a file" disabled>${I.attachment}</button>
+      <input class="inp" placeholder="Messaging opens when your cohort starts" aria-label="Message" disabled>
+      <button class="composer-act" aria-label="Record a voice message" disabled>${I.microphone}</button>
+      <button class="composer-send" aria-label="Send" disabled>${I.send}</button>
+    </div>
+  </div>
+</div></main>`;
   /* THE THREAD OPENS ON A CHAT HEADER, NOT ON A PAGE HEADING (Maryam,
         2 Sep 2026, with a reference). The `.ph` stays and stays EMPTY: §78
         strips the `<h1>` and the in-page crumb out of every page and stamps
@@ -14349,23 +14529,17 @@ function setStage(k,keepView){
   const reachable = NAVSETS[f.nav].map(n=>n[0]).concat(['account','report','agents','agent','courses','booking','payment','chapter','terms','rewards','ivt','mem']);
   if(!DEFAULT_VIEW[k] && !reachable.includes(PARENT[S.view]||S.view)) S.view='dashboard';
   if(DEFAULT_VIEW[k]) S.view = DEFAULT_VIEW[k];
-  /* THE SCENES A STAGE ARRIVES WITH.
-     `assessed` is the stage the choice happens at — the level interview is
-     done, its six scenes are waiting, and nothing is enrolled yet — so it
-     starts with `level:null` and the Interviews module opens on the chooser.
-     Every stage after it starts with the three already chosen, because those
-     stages are AFTER the choosing: a prototype of day 34 that asked you to
-     pick your scenes would be showing you a step you took two months ago.
-     The first three are the default set; a person who picks a different three
-     at `assessed` keeps them until they change stage.
-
-     `re` only exists at `promoted`, which is the only stage with a second
-     interview behind it — two past interviews, three scenes each. Stages
-     before it get `null` and never ask for it. */
-  S.scenes = {
-    level: k === 'assessed' ? null : [0,1,2],
-    re: k === 'promoted' ? [0,1,2] : null
-  };
+  /* THE REPORT ALWAYS ARRIVES ON THE SCENE CHOOSER (Maryam, 1 Oct 2026). Both
+     keys start `null`, so `sceneDone` is false and `V.report` draws "Choose your
+     scenes" on first landing AND after a stage switch. Saving three (the
+     `data-scenesave` handler) sets the key and flips it to the kept row, and it
+     stays kept until the next stage switch (this reset) or a reload (which does
+     not call `setStage`, so `S.scenes` is simply unset — `sceneKeep` treats that
+     the same as `null`). This reverses the earlier default where every stage
+     after `assessed` arrived with the three already chosen: the prototype now
+     demonstrates the choosing flow from each stage rather than only at
+     `assessed`. `re` only exists at `promoted`; both are `null` here. */
+  S.scenes = { level: null, re: null };
   S.scPick = {level:[], re:[]};
   /* ARRIVING AT THE ONBOARDING STARTS IT, AND ONLY ARRIVING DOES. Walk away
      from step 3 with the stage picker and come back, and without this you land
@@ -15687,12 +15861,16 @@ function render(){
        control over somebody else's control. It is also the one region of the
        product where Tal can see nothing: the chapter is in a frame we do not
        read. Tal is a rail away on every page that leads here. */
+    /* COURSEWORK SUPPRESSES THE TAL DOCK ONLY AS THE LIGHTSPEED FRAME — on the
+       pre-start outline preview (`f.preStart`) it is an ordinary page and keeps
+       the dock like every other page in the stage. */
     const NO_FAB = ['terms','coursework','chapter'];
+    const fabOff = NO_FAB.includes(S.view) && !(S.view==='coursework' && f && f.preStart);
     /* THE PEEK IS A THIRD CHILD OF `.shell-body`, AFTER `.view-col`, and §44's
        head note is why: in flow, so the page narrows instead of being covered
        and dimmed. It is `typeof`-guarded nowhere because `peekPanel` is a
        function declaration in this file, hoisted above this line. */
-    html = shell() + '<div class="shell-body">' + sidenav(f) + '<div class="view-col">' + view(f) + '</div>' + peekPanel(f) + '</div>' + (NO_FAB.includes(S.view)?'':talFab())
+    html = shell() + '<div class="shell-body">' + sidenav(f) + '<div class="view-col">' + view(f) + '</div>' + peekPanel(f) + '</div>' + (fabOff?'':talFab())
          + talPanel(f) + notifPanel() + (['billing','payment','checkout'].includes(S.view)?cardSheet():'')
          + (S.view==='account'?photoSheet():'')
          /* THE ENROL PAGE'S SKILLS DIALOG WAS HERE and is deleted with the
@@ -15723,6 +15901,10 @@ function render(){
             the `assessed` dashboard, shown once (`!S.levelSeen`) the first time
             the reader lands there, dismissed by either action or the backdrop. */
          + (S.view==='dashboard' && S.stage==='assessed' && !S.levelSeen ? levelModal() : '')
+         /* THE COHORT-STARTED DIALOG — the `week1` dashboard, first landing only
+            (`!S.beganSeen`), gated on the start stage so it does not reappear on
+            day34/day90. */
+         + (S.view==='dashboard' && S.stage==='week1' && !S.beganSeen ? beganModal() : '')
          /* THE PAYMENT-SUCCESS DIALOG (Maryam, 19 Sep 2026) — shown over the
             payment step (`V.checkout`) once `data-payok` fires, before the
             calendar. Gated on the view so it clears itself the moment Continue
@@ -16032,6 +16214,12 @@ device.addEventListener('click', e => {
   if(lvg){ S.levelSeen = true; go(lvg.dataset.levelgo); return; }
   if(t.closest('[data-levelclose]')){ S.levelSeen=true; render(); return; }
   if(t.closest('[data-close="level"]') && !t.closest('.sheet')){ S.levelSeen=true; render(); return; }
+
+  /* THE COHORT-STARTED DIALOG — Continue Learning and the backdrop both only
+     dismiss (set the seen flag, repaint in place), leaving the reader on the
+     dashboard. */
+  if(t.closest('[data-beganclose]')){ S.beganSeen=true; render(); return; }
+  if(t.closest('[data-close="began"]') && !t.closest('.sheet')){ S.beganSeen=true; render(); return; }
 
   /* Close, and the backdrop — the shape the skills sheet uses, and the second
      test is that the press did not land inside `.sheet` so a click on the

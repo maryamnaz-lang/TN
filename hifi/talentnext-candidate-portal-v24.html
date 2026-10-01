@@ -12607,6 +12607,7 @@ button.btn-p:active,
 .app .dm-rec-dot{width:10px;height:10px;border-radius:50%;background:var(--accent);flex:0 0 auto;
   animation:dmRecPulse 1.2s ease-in-out infinite}
 @keyframes dmRecPulse{0%,100%{opacity:1}50%{opacity:.25}}
+.app .composer-off{opacity:.55;pointer-events:none}
 .app .page > .sec.dark-card:is(:has(+ .sec.dark-card),:has(+ .sec > .stats:first-child),:has(+ .sec > .facts:first-child),:has(+ .sec > .certban:first-child),:has(+ .sec > .tile:first-child),:has(+ .sec > .note:first-child)){
   margin-bottom:0}
 .app .page > .sec:not(.dark-card):is(:has(> .stats:last-child),:has(> .facts:last-child),:has(> .certban:last-child),:has(> .tile:last-child),:has(> .note:last-child),:has(> .lcal-row:last-child)):is(:has(+ .sec.dark-card),:has(+ .sec > .stats:first-child),:has(+ .sec > .facts:first-child),:has(+ .sec > .certban:first-child),:has(+ .sec > .tile:first-child),:has(+ .sec > .note:first-child)){
@@ -15759,7 +15760,7 @@ const NOTIF = {
 const NAVSETS = {
   early:   [['dashboard','Dashboard','dashboard'],['level','My Level','growth'],['interviews','Interviews','calendar'],['billing','Payments','wallet']],
   assessed:[['dashboard','Dashboard','dashboard'],['level','My Level','growth'],['interviews','Interviews','calendar'],['enrol','Course Enrollment','ticket'],['billing','Payments','wallet']],
-  enrolPre:[['dashboard','Dashboard','dashboard'],['level','My Level','growth'],['interviews','Interviews','calendar'],['billing','Payments','wallet'],['cohort','Cohort','group'],['messages','Messages','chat',1]],
+  enrolPre:[['dashboard','Dashboard','dashboard'],['level','My Level','growth'],['coursework','Coursework','book'],['interviews','Interviews','calendar'],['billing','Payments','wallet'],['cohort','Cohort','group'],['messages','Messages','chat',1]],
   full:    [['dashboard','Dashboard','dashboard'],['level','My Level','growth'],['coursework','Coursework','book'],['transcript','Course Progress','chart'],['rewards','Achievements','trophy'],['cohort','Cohort','group'],['messages','Messages','chat',1],['interviews','Interviews','calendar'],['billing','Payments','wallet']],
   full90:  [['dashboard','Dashboard','dashboard'],['level','My Level','growth'],['transcript','Course Progress','chart'],['rewards','Achievements','trophy'],['cohort','Cohort','group'],['messages','Messages','chat',1],['interviews','Interviews','calendar'],['billing','Payments','wallet']],
   next:    [['dashboard','Dashboard','dashboard'],['level','My Level','growth'],['transcript','Course Progress','chart'],['rewards','Achievements','trophy'],['messages','Messages','chat',1],['enrol','Course Enrollment','ticket'],['interviews','Interviews','calendar'],['billing','Payments','wallet']],
@@ -18024,6 +18025,27 @@ function heldArm(){
 }
 setInterval(heldArm, 1000);
 
+function cohortStartTill(f){
+  if(!S.cohortStartTill) S.cohortStartTill = Date.now() + ((f && f.startIn) || 0) * 24 * 3600 * 1000;
+  return S.cohortStartTill;
+}
+function startFmt(ms){
+  const s = Math.max(0, Math.floor(ms / 1000));
+  const d = Math.floor(s / 86400);
+  const p = n => String(n).padStart(2, '0');
+  const hms = `${p(Math.floor(s % 86400 / 3600))}:${p(Math.floor(s % 3600 / 60))}:${p(s % 60)}`;
+  return d > 0 ? `${d}d ${hms}` : hms;
+}
+function startArm(){
+  const els = (typeof device !== 'undefined' && device)
+    ? device.querySelectorAll('.start-timer[data-starttill]') : [];
+  els.forEach(el => {
+    const t = +el.dataset.starttill;
+    if(t) el.textContent = startFmt(t - Date.now());
+  });
+}
+setInterval(startArm, 1000);
+
 function callTimerFmt(ms){
   if(ms <= 0) return 'Live now';
   const m = Math.floor(ms / 60000);
@@ -18859,13 +18881,32 @@ created: () => `${authShell()}
 
 const V = {};
 
-const preStartBlock = (f) => `<div class="sec">
-  <div class="sec-h"><h2>${f.startIn>0?`Your cohort starts in ${f.startIn} days`:'Starts today'}</h2></div>
-  <div class="kv"><span class="k">Course</span><span class="v">Communicating with Impact</span></div>
-  <div class="kv"><span class="k">Starts</span><span class="v">${f.cancelled?'12 Mar 2026':'Monday, 18 August 2026'}</span></div>
-  <div class="kv"><span class="k">Cohort leader</span><span class="v">Priya Nair</span></div>
-  <div style="margin-top:var(--s05)"><button class="btn btn-p noic" data-go="cohort">Meet your cohort ${I.arrowRight}</button></div>
-</div>`;
+const COHORT_COURSE = 'Communicating with Impact';
+
+const preStartBlock = (f) => {
+  const till = cohortStartTill(f);
+  const dateStr = f.cancelled ? '12 Mar 2026' : 'Monday, 18 August 2026';
+  const coh = f.cancelled ? 'Cohort 47' : 'Cohort 41';
+  return `<div class="sec sec-call dark-card crow-dark">
+    <div class="dc-hd">
+      <div class="dc-hd-r"><h2 class="dc-t">You&rsquo;re enrolled on ${coh}</h2>
+        <span class="dc-when">${I.time}Starts in <span class="start-timer" data-starttill="${till}" style="font-variant-numeric:tabular-nums">${startFmt(till - Date.now())}</span></span></div>
+    </div>
+    <div class="crow">
+      <div class="crow-who">
+        <span class="crow-ph"><img src="${COHORT_LEAD.img}" alt="" loading="lazy" onerror="this.style.display='none'"></span>
+        <div class="crow-b">
+          <p class="crow-id"><span class="crow-n">Priya Nair</span><span class="crow-v">${I.checkFilled}</span></p>
+          <p class="crow-role">Cohort leader</p>
+          <p class="crow-x">${COHORT_COURSE} &middot; starts ${dateStr}</p>
+        </div>
+      </div>
+      <div class="crow-a crow-a1">
+        <button class="btn btn-sm noic" data-go="cohort">Meet your cohort ${I.arrowRight}</button>
+      </div>
+    </div>
+  </div>`;
+};
 
 V.dashboard = (f) => {
   let body = '';
@@ -19651,7 +19692,13 @@ V.level = (f) => {
         or face. It comes after the two blocks about YOUR level (the ladder, the
         certificate) and before "How the ladder works", which is the only block
         on this page that is not about you. */}
-  ${f.level ? `<div class="sec sec-rank">
+  ${''/* THE RANKING IS HIDDEN BEFORE THE COHORT STARTS (Maryam, 1 Oct 2026). On
+        `enrolPre`/`cancelled` the candidate has a level but has not begun the
+        journey, so a standing board among peers reads as odd — there is nothing
+        yet to stand against. The board returns on the start day with the rest of
+        the running-cohort surfaces. Gated on `!f.preStart` on top of the level
+        test, so the confirmed-and-running stages are unchanged. */}
+  ${f.level && !f.preStart ? `<div class="sec sec-rank">
     <div class="sec-h"><h2>Ranking</h2><span class="t-desc">Candidates at your level across TALENTnext, from any cohort.</span></div>
     ${boardList()}
   </div>` : ''}
@@ -21430,6 +21477,19 @@ const levelModal = () => {
   </div>`;
 };
 
+const beganModal = () => `<div class="modal on" data-close="began">
+    <div class="sheet conf" role="dialog" aria-modal="true" aria-label="Your learning journey has begun">
+      <div class="sheet-b conf-b">
+        <span class="conf-mk">${I.book}</span>
+        <h2 class="conf-t">Your learning journey has begun</h2>
+        <p class="conf-x">Your 90-day cohort is now active. Start exploring Business Fundamentals and continue your learning journey.</p>
+      </div>
+      <div class="sheet-f conf-a">
+        <button class="btn btn-p noic" data-beganclose="1">Continue Learning</button>
+      </div>
+    </div>
+  </div>`;
+
 const scenesUpsellModal = (kind) => {
   return `<div class="modal on" data-scenesclose="1">
     <div class="sheet conf" role="dialog" aria-modal="true" aria-label="Keep more of your interview">
@@ -21524,7 +21584,16 @@ V.welcome = () => `<main class="main"><div class="page">
 const lsvtFrame = () => `<main class="main lsvt-blank"><div class="page"><div class="lsvt-slot">
   <iframe class="lsvt-if" title="Coursework &mdash; LightspeedVT"></iframe></div></div></main>`;
 
-V.coursework = lsvtFrame;
+const courseworkPreview = (f) => `<main class="main"><div class="page">
+  ${crumb(['Dashboard','dashboard'],'Coursework')}
+  <div class="sec">
+    <div class="sec-h"><h2>${COHORT_COURSE}</h2></div>
+    <div class="note"><span>${I.info}</span><div class="nb">Your cohort has not started yet. This is the full outline of what you&rsquo;ll cover; the chapters open in LightSpeed VT when the cohort begins${f.startIn>0?`, in ${f.startIn} days`:' today'}.</div></div>
+  </div>
+  ${outlineSec(f.level || 'E3')}
+</div></main>`;
+
+V.coursework = (f) => (f && f.preStart) ? courseworkPreview(f) : lsvtFrame();
 V.chapter = lsvtFrame;
 
 const PARKED = {};
@@ -22210,7 +22279,33 @@ V.transcript = (f) => {
 </div></main>`;
 };
 
-V.cohort = (f) => `<main class="main"><div class="page">
+const cohortPreStart = (f) => `<main class="main"><div class="page">
+  ${crumb(['Dashboard','dashboard'],'Cohort 41')}
+  ${ph('Cohort 41',`Ten people at Explorer &ndash; E3 &middot; led by Priya Nair &middot; ${f.startIn>0?`starts in ${f.startIn} days`:'starts today'}`)}
+  <div class="sec head-sec head-col sec-lead">
+    <div class="jrn">
+      <div class="jrn-h"><h2 class="jrn-t">Your cohort leader</h2></div>
+      <div class="row-lead">
+        ${avatar(COHORT_LEAD)}
+        <div style="flex:1">
+          <div class="t-heading-compact-01">${COHORT_LEAD.n}</div>
+          <div class="t-helper-01 mt3">Cohort leader &middot; leads Cohort 41</div>
+        </div>
+        <button class="btn btn-t btn-sm noic lead-msg" data-go="messages"
+          aria-label="Message ${COHORT_LEAD.n.split(' ')[0]}">${I.chat}</button>
+      </div>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="sec-h"><h2>Who&rsquo;s in your cohort</h2><span class="t-desc">The ten of you start together on Monday, 18 August. The discussion opens on the start day.</span></div>
+    ${''/* NO ACTIVITY META BEFORE THE START — nobody has a chapter or a last-active
+          yet, so the "you" row drops its running-cohort meta too; every row is a
+          face and a name. */}
+    <div class="tile-stack">${COHORT.map(([n,i,img,meta,you])=>mem(n,i,'',you,img)).join('')}</div>
+  </div>
+</div></main>`;
+
+V.cohort = (f) => f.preStart ? cohortPreStart(f) : `<main class="main"><div class="page">
   ${crumb(['Dashboard','dashboard'],'Cohort 41')}
   ${''/* THIS ONE WAS THE DUPLICATION AT ITS PLAINEST — Tal's summary used to
         open "Ten of you at E3 with Priya leading, week 5 of 13", which is
@@ -22435,6 +22530,34 @@ V.messages = (f) => {
     <span class="fa-ic">${I.document}</span>
     <span class="fa-b"><b>${n}</b><span>${s}</span></span>
     <span class="fa-dl">${I.download}</span></span>`;
+  if(f.preStart) return `<main class="main"><div class="page msg-page">
+  <div class="ph"><h1>Messages</h1></div>
+  <div class="mhead">
+    <span class="mhead-av">${avatar(her)}<i class="av-on" aria-hidden="true"></i></span>
+    <span class="mhead-b">
+      <span class="mhead-n">Priya Nair<i class="mhead-dot" aria-hidden="true"></i></span>
+      <span class="mhead-s">Cohort leader &middot; your cohort starts Monday, 18 August</span>
+    </span>
+    <span class="mhead-a">
+      <button class="mhead-act" title="Call" aria-label="Call">${I.phone}</button>
+      <button class="mhead-act" title="Video call" aria-label="Video call">${I.video}</button>
+      <button class="mhead-act" title="About this thread" aria-label="About this thread">${I.info}</button>
+      <button class="mhead-act" title="More" aria-label="More">${I.overflow}</button>
+    </span>
+  </div>
+  <div class="msgs">
+    <div class="m-day"><span>Before you start</span></div>
+    ${m('them','Priya Nair','Welcome to Cohort 41. I&rsquo;m Priya, your cohort leader. We begin on Monday, 18 August. I&rsquo;ll be in touch here once we start, so there is nothing you need to do until then. Looking forward to the ninety days with you.','10:20 AM')}
+  </div>
+  <div class="msg-foot">
+    <div class="composer composer-off">
+      <button class="composer-act composer-lead" aria-label="Attach a file" disabled>${I.attachment}</button>
+      <input class="inp" placeholder="Messaging opens when your cohort starts" aria-label="Message" disabled>
+      <button class="composer-act" aria-label="Record a voice message" disabled>${I.microphone}</button>
+      <button class="composer-send" aria-label="Send" disabled>${I.send}</button>
+    </div>
+  </div>
+</div></main>`;
   return `<main class="main"><div class="page msg-page">
   <div class="ph"><h1>Messages</h1></div>
   <div class="mhead">
@@ -23850,10 +23973,7 @@ function setStage(k,keepView){
   const reachable = NAVSETS[f.nav].map(n=>n[0]).concat(['account','report','agents','agent','courses','booking','payment','chapter','terms','rewards','ivt','mem']);
   if(!DEFAULT_VIEW[k] && !reachable.includes(PARENT[S.view]||S.view)) S.view='dashboard';
   if(DEFAULT_VIEW[k]) S.view = DEFAULT_VIEW[k];
-  S.scenes = {
-    level: k === 'assessed' ? null : [0,1,2],
-    re: k === 'promoted' ? [0,1,2] : null
-  };
+  S.scenes = { level: null, re: null };
   S.scPick = {level:[], re:[]};
   if(k === 'onboard'){
     S.obStep = 0; S.obSpoken = false;
@@ -24489,7 +24609,8 @@ function render(){
   } else {
     const view = V[S.view] || (isLead() && V.leadDash) || V.dashboard;
     const NO_FAB = ['terms','coursework','chapter'];
-    html = shell() + '<div class="shell-body">' + sidenav(f) + '<div class="view-col">' + view(f) + '</div>' + peekPanel(f) + '</div>' + (NO_FAB.includes(S.view)?'':talFab())
+    const fabOff = NO_FAB.includes(S.view) && !(S.view==='coursework' && f && f.preStart);
+    html = shell() + '<div class="shell-body">' + sidenav(f) + '<div class="view-col">' + view(f) + '</div>' + peekPanel(f) + '</div>' + (fabOff?'':talFab())
          + talPanel(f) + notifPanel() + (['billing','payment','checkout'].includes(S.view)?cardSheet():'')
          + (S.view==='account'?photoSheet():'')
          + (S.view==='transcript'?scoresSheet(f):'')
@@ -24498,6 +24619,7 @@ function render(){
          + (S.view==='interviews' && S.ivCancel ? ivCancelModal() : '')
          + (S.ivBooked && (S.stage==='booked' || S.stage===RESCHED) ? ivBookedModal() : '')
          + (S.view==='dashboard' && S.stage==='assessed' && !S.levelSeen ? levelModal() : '')
+         + (S.view==='dashboard' && S.stage==='week1' && !S.beganSeen ? beganModal() : '')
          + (S.view==='checkout' && S.paySuccess ? paySuccessModal() : '')
          + (S.view==='report' && S.scenesUpsell ? scenesUpsellModal(S.scenesUpsell) : '')
          + (S.quizModal ? quizModal() : '');
@@ -24636,6 +24758,9 @@ device.addEventListener('click', e => {
   if(lvg){ S.levelSeen = true; go(lvg.dataset.levelgo); return; }
   if(t.closest('[data-levelclose]')){ S.levelSeen=true; render(); return; }
   if(t.closest('[data-close="level"]') && !t.closest('.sheet')){ S.levelSeen=true; render(); return; }
+
+  if(t.closest('[data-beganclose]')){ S.beganSeen=true; render(); return; }
+  if(t.closest('[data-close="began"]') && !t.closest('.sheet')){ S.beganSeen=true; render(); return; }
 
   const eo = t.closest('[data-enrolok]');
   if(eo){ S.enrolOk = eo.dataset.enrolok === '1'; render(); return; }
@@ -30229,7 +30354,7 @@ const PAGESUM = {
 
     assessed: 'Welcome Back, Maryam! You are <b data-sum="level">Explorer &ndash; E3</b>, rung 3 of 15, set by TalentNext on 21 August after your interview, with <b data-sum="growth">delegation and hard conversations</b> as your growth areas. <b data-sum="enrol">Enrolling</b> is the only thing left.',
 
-    enrolPre: 'You are enrolled on <b>Cohort 41</b>, led by <b>Priya Nair</b>. It starts in 6 days. Coursework, Course Progress and Achievements open on the start day; until then, you can meet your cohort.',
+    enrolPre: 'You are enrolled on <b>Cohort 41</b>, led by <b>Priya Nair</b>. It starts in 6 days. You can <b>read the course outline</b> and meet your cohort now; the chapters, Course Progress and Achievements open on the start day.',
 
     cancelled: 'Your cohort was cancelled, and you have been moved to <b>Cohort 47</b>, which starts on 12 Mar 2026. Your place and your payment carried over, so there is nothing to pay again.',
 
@@ -30290,6 +30415,7 @@ const PAGESUM = {
 
   coursework: f => {
     const cur = CH[f.open];
+    if(f.preStart) return `Your cohort has not started yet${f.startIn>0?`, it begins in ${f.startIn} days`:''}. This is the full outline of the thirteen chapters; they unlock in LightSpeed VT on the start day, one a week.`;
     if(f.done >= 13) return `All 13 chapters finished at ${f.avg}%. Nothing left to unlock. The re-interview is what turns the record into a level.`;
     if(!f.done) return `None of the 13 finished yet${cur ? `, and chapter ${f.open + 1}, ${cur[0]}, is open` : ''}. They&rsquo;re 45 to 70 minutes each and one unlocks a week.`;
     return `${f.done} of 13 chapters done at ${f.avg}%${cur ? `, and chapter ${f.open + 1}, ${cur[0]}, is open, ${cur[1]} minutes` : ''}. One more unlocks each week.`;
@@ -30317,6 +30443,8 @@ const PAGESUM = {
 
   cohort: (f) => (f.finished || f.complete)
     ? 'Cohort 41 has finished all thirteen weeks with Priya leading. The discussion stays open for the ten of you to keep working through what changed.'
+    : f.preStart
+    ? `Cohort 41 has not started yet${f.startIn>0?`, it begins in ${f.startIn} days`:''}. The ten of you are listed below with Priya leading; the discussion and the weekly calls open on the start day.`
     : 'Thursday&rsquo;s call is at 6:00 PM ET on hard conversations, and Priya has asked everyone to bring a real one to talk through.',
 
   messages: 'Priya can see your chapters, scores and attendance already, so you never have to explain where you are.',

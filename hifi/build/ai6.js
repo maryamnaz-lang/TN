@@ -344,7 +344,7 @@ const PAGESUM = {
        thing to do is a section on the page (meet your cohort), not a popover, and
        the rest is settled. No em dash (Tal voice). trap 11 needs this entry so
        the placeholder card has a summary to become. */
-    enrolPre: 'You are enrolled on <b>Cohort 41</b>, led by <b>Priya Nair</b>. It starts in 6 days. Coursework, Course Progress and Achievements open on the start day; until then, you can meet your cohort.',
+    enrolPre: 'You are enrolled on <b>Cohort 41</b>, led by <b>Priya Nair</b>. It starts in 6 days. You can <b>read the course outline</b> and meet your cohort now; the chapters, Course Progress and Achievements open on the start day.',
 
     /* COHORT CANCELLED, MOVED TO A REPLACEMENT (story 7.6 / 15.2). The admin&rsquo;s
        reason is internal and is never shown here. */
@@ -736,6 +736,7 @@ const PAGESUM = {
      same clause on all four stages, still being explained on day 90. */
   coursework: f => {
     const cur = CH[f.open];
+    if(f.preStart) return `Your cohort has not started yet${f.startIn>0?`, it begins in ${f.startIn} days`:''}. This is the full outline of the thirteen chapters; they unlock in LightSpeed VT on the start day, one a week.`;
     if(f.done >= 13) return `All 13 chapters finished at ${f.avg}%. Nothing left to unlock. The re-interview is what turns the record into a level.`;
     if(!f.done) return `None of the 13 finished yet${cur ? `, and chapter ${f.open + 1}, ${cur[0]}, is open` : ''}. They&rsquo;re 45 to 70 minutes each and one unlocks a week.`;
     return `${f.done} of 13 chapters done at ${f.avg}%${cur ? `, and chapter ${f.open + 1}, ${cur[0]}, is open, ${cur[1]} minutes` : ''}. One more unlocks each week.`;
@@ -791,6 +792,8 @@ const PAGESUM = {
      summary wont be this"). `f.finished` is day90, `f.complete` is promoted. */
   cohort: (f) => (f.finished || f.complete)
     ? 'Cohort 41 has finished all thirteen weeks with Priya leading. The discussion stays open for the ten of you to keep working through what changed.'
+    : f.preStart
+    ? `Cohort 41 has not started yet${f.startIn>0?`, it begins in ${f.startIn} days`:''}. The ten of you are listed below with Priya leading; the discussion and the weekly calls open on the start day.`
     : 'Thursday&rsquo;s call is at 6:00 PM ET on hard conversations, and Priya has asked everyone to bring a real one to talk through.',
 
   /* PARKED — `.msg-page` is excluded, for the reason written at the pass
