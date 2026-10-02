@@ -14,7 +14,7 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 6416.  Rules dropped as product-specific: 222.
+   Rules kept: 6419.  Rules dropped as product-specific: 222.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
@@ -210,15 +210,15 @@ body{background:var(--surround); color:var(--text-primary); font-family:var(--fo
 .btn-p{background:var(--brand-primary); color:var(--on-brand)}
 .btn-p:hover{background:var(--brand-primary-hover)}
 .btn-p:active{background:var(--brand-primary-active)}
-.btn-s,
 .btn-t,
 .btn-g{background:transparent; color:var(--text-primary); border-color:var(--border-strong-01)}
-.btn-s:hover:where(.__nh),
 .btn-t:hover:where(.__nh),
 .btn-g:hover:where(.__nh){background:var(--overlay-hover); border-color:var(--text-primary)}
-.btn-s:active,
 .btn-t:active,
 .btn-g:active{background:var(--overlay-pressed)}
+.btn-s{background:var(--rule); color:var(--text-primary); border-color:transparent}
+.btn-s:hover:where(.__nh){background:var(--gray-20); border-color:transparent}
+.btn-s:active{background:var(--border-subtle-02)}
 .btn.ghost{border-color:transparent; padding-left:var(--s04); padding-right:var(--s04)}
 .btn.ghost:hover:where(.__nh){background:var(--overlay-hover); border-color:transparent}
 .btn-d{background:var(--support-error); color:var(--pure-white)}
@@ -486,7 +486,7 @@ svg.arrow,
 .modal.on{opacity:1; visibility:visible}
 .sheet{width:100%; max-width:520px; max-height:88%; display:flex; flex-direction:column; background:var(--layer-01); border-radius:var(--radius); transform:translateY(16px); transition:transform var(--dur-standard) var(--ease-decelerate)}
 .modal.on .sheet{transform:translateY(0)}
-.sheet-h{flex:none; display:flex; align-items:center; gap:var(--s04); padding:var(--s06) var(--s05) var(--s06) var(--s06); position:relative}
+.sheet-h{flex:none; display:flex; align-items:center; gap:var(--s04); padding:var(--s06) var(--s05) var(--s04) var(--s06); position:relative}
 .sheet-h::after{content:''; position:absolute; left:var(--s06); right:var(--s06); bottom:0; height:1px; background:var(--border-subtle-01)}
 .sheet-h h2{font-size:18px; line-height:24px; font-weight:600; letter-spacing:-.2px}
 .sheet-h .x{margin-left:auto; width:44px; height:44px; display:grid; place-items:center; flex:none}
@@ -6348,7 +6348,7 @@ button.btn-p:active,
 .app .cal-out{background:var(--layer-02)}
 .app .cal-out .cal-n{color:var(--text-placeholder)}
 .app .cal-today .cal-n{display:grid; place-items:center; width:22px; height:22px; margin:-2px 0 0 -3px; background:var(--accent); border-radius:50%; color:var(--on-accent)}
-.app .cal-slot{--cal-color:var(--cal-open); display:flex; align-items:center; gap:var(--s02); width:100%; text-align:left; padding:2px var(--s03); background-color:var(--cal-fill); border:0; border-radius:6px}
+.app .cal-slot{--cal-color:var(--cal-open); display:flex; align-items:center; gap:var(--s02); width:100%; text-align:left; padding:2px var(--s03); background-color:var(--cal-color); border:0; border-radius:6px}
 .app .cal-slot:hover:where(.__nh){cursor:pointer}
 .app .cal-slot.k-iv{--cal-color:var(--cal-iv)}
 .app .cal-slot.k-reiv{--cal-color:var(--cal-reiv)}
@@ -6420,7 +6420,7 @@ button.btn-p:active,
 .app .calw-col.today{background:var(--surface-3)}
 .app .calw-cell{display:block; height:var(--row); border-top:1px solid var(--rule)}
 .app .calw-cell:first-child{border-top:0}
-.app .calw-ev{--cal-color:var(--cal-open); position:absolute; left:4px; right:4px; top:calc(var(--top) * var(--row) + 3px); min-height:calc(var(--dur) * var(--row) - 6px); display:flex; flex-direction:column; gap:2px; padding:var(--s03); text-align:left; overflow:hidden; background-color:var(--cal-fill); border:0; border-radius:8px}
+.app .calw-ev{--cal-color:var(--cal-open); position:absolute; left:4px; right:4px; top:calc(var(--top) * var(--row) + 3px); min-height:calc(var(--dur) * var(--row) - 6px); display:flex; flex-direction:column; gap:2px; padding:var(--s03); text-align:left; overflow:hidden; background-color:var(--cal-color); border:0; border-radius:8px}
 .app .calw-ev.k-iv{--cal-color:var(--cal-iv)}
 .app .calw-ev.k-reiv{--cal-color:var(--cal-reiv)}
 .app .calw-ev.on{box-shadow:inset 0 0 0 1.5px var(--text-primary)}

@@ -85,11 +85,23 @@
 .btn-p{background:var(--brand-primary);color:var(--on-brand)}
 .btn-p:hover{background:var(--brand-primary-hover)}
 .btn-p:active{background:var(--brand-primary-active)}
-/* outlined */
-.btn-s,.btn-t,.btn-g{background:transparent;color:var(--text-primary);
+/* outlined (ghost / text) — the transparent, bordered role for a quiet action
+   that is NOT one of a pair of answers: a heading action, a "way out" link. */
+.btn-t,.btn-g{background:transparent;color:var(--text-primary);
   border-color:var(--border-strong-01)}
-.btn-s:hover,.btn-t:hover,.btn-g:hover{background:var(--overlay-hover);border-color:var(--text-primary)}
-.btn-s:active,.btn-t:active,.btn-g:active{background:var(--overlay-pressed)}
+.btn-t:hover,.btn-g:hover{background:var(--overlay-hover);border-color:var(--text-primary)}
+.btn-t:active,.btn-g:active{background:var(--overlay-pressed)}
+/* SECONDARY IS A FILLED GREY BUTTON (Maryam, 2 Oct 2026: "for secondary buttons
+   like the cancel button we are using a bg of #efefef, apply it wherever we need
+   it"). `.btn-s` — the Cancel half of every Cancel/Save pair, "Keep the interview",
+   "Discard", the quiet pair-member in a sheet or confirm footer — carries a
+   `--rule` #efefef ground and no border, so it reads as a soft grey button beside
+   the black primary rather than a bordered outline. Ghost/text (`.btn-g`/`.btn-t`,
+   above) keep the transparent treatment, so an admin heading ghost is untouched.
+   Hover steps one grey darker; `--rule` is read, never the hex (§3). */
+.btn-s{background:var(--rule);color:var(--text-primary);border-color:transparent}
+.btn-s:hover{background:var(--gray-20);border-color:transparent}
+.btn-s:active{background:var(--border-subtle-02)}
 /* text */
 .btn.ghost{border-color:transparent;padding-left:var(--s04);padding-right:var(--s04)}
 .btn.ghost:hover{background:var(--overlay-hover);border-color:transparent}
@@ -443,9 +455,14 @@ svg.arrow,.tile-arrow,.card-go{
    full 24 there would push the mark too far in. `position:relative` for the
    inset divider below. The `padding-left` override in §10.375 is dropped for
    `.sheet-h` in the same edit so this shorthand is not re-overridden. */
+/* THE HEADER→DIVIDER GAP IS TIGHTER THAN THE OTHER THREE WALLS (Maryam, 2 Oct
+   2026: "reduce the gap between modal heading row and the divider below it"). The
+   title keeps `--s06` (24) top, right `--s05` for the `.x`, left `--s06`; only the
+   bottom drops to `--s04` (12) so the divider sits close under the title rather
+   than floating 24 below it. The body still pays its own `--s06` under the rule. */
 .sheet-h{
   flex:none;display:flex;align-items:center;gap:var(--s04);
-  padding:var(--s06) var(--s05) var(--s06) var(--s06);
+  padding:var(--s06) var(--s05) var(--s04) var(--s06);
   position:relative}
 /* THE HEADER DIVIDER IS INSET, not attached to the walls (same ask). A
    `border-bottom` runs the sheet's full width and meets the sheet's own 1px

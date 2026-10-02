@@ -230,7 +230,7 @@ const setW = w => page.evaluate(w => {
 }, w);
 
 /* ------------------------------------------------------------------ sweep -- */
-const F = {overflow: [], labelcol: [], headwrap: [], escape: [], btn2: [], divider: [], leak: []};
+const F = {overflow: [], oddscroll: [], labelcol: [], headwrap: [], escape: [], btn2: [], divider: [], leak: []};
 const push = (k, w, c, detail) => F[k].push({w, at: `${c[0] === 'leader' ? 'leader/' : ''}${c[1]}/${c[2]}`, detail});
 
 /* THE QUICK SET IS NOT "THE DASHBOARDS", and the difference is one of the two
@@ -276,7 +276,7 @@ for(const w of WIDTHS){
         return !(cs.display === 'none' || cs.visibility === 'hidden'); };
       const name = el => el.tagName.toLowerCase() + (typeof el.className === 'string' && el.className
         ? '.' + el.className.trim().split(/\s+/).slice(0, 2).join('.') : '');
-      const out = {overflow: [], labelcol: [], headwrap: [], escape: [], btn2: [], divider: []};
+      const out = {overflow: [], oddscroll: [], labelcol: [], headwrap: [], escape: [], btn2: [], divider: []};
 
       /* A CHILD OF A HORIZONTAL SCROLLER IS NOT AN OVERFLOW, AND THE TEST HAS
          TO BE COMPUTED RATHER THAN LISTED. The first cut named the four
@@ -411,8 +411,61 @@ for(const w of WIDTHS){
           }
         }
       }
+      // ---- 7. the frame must scroll VERTICALLY ONLY ------------------
+      // DESIGN.md §3 (Responsive and mobile), 1 Oct 2026: the odd-scroller /
+      // frame-out clause. Check #1 catches a visible BOX past the frame edge,
+      // but it excludes scrollers, SVGs, the side panels, modals and the dark
+      // glow — so an excluded element, an `inScroller` child, or sub-pixel
+      // bleed can push the page's own scroll root horizontally without any one
+      // box crossing `frame.right`, which is what reads on a phone as the whole
+      // page panning sideways. A sanctioned carousel (`.scv-row` / `.cov-row` /
+      // `.tbl-wrap` / `.cs` / `.daystrip` / `.calw`) contains its own overflow,
+      // so it never inflates its parent's scrollWidth — which makes the page
+      // ROOTS an allowlist-free place to assert the invariant: #device, .app,
+      // .main and .view-col must never be horizontally scrollable.
+      //
+      // BUT scrollWidth ALONE FLOODS. The rail, the Tal panel and the notif
+      // drawer sit off-canvas and are clipped by the root's `overflow-x:hidden`
+      // — present in scrollWidth, invisible and UNPANNABLE on screen — so a
+      // bare `scrollWidth > clientWidth` fired on ~300 screens that do not
+      // actually pan (the same off-canvas chrome check #1 excludes by name).
+      // The felt bug is the page MOVING sideways, which needs the root to be a
+      // real horizontal scroll container: computed `overflow-x` of `auto` or
+      // `scroll` AND content past it. `hidden`/`clip` clips the chrome and is
+      // not a finding.
+      //
+      // AND IT MUST NAME A CULPRIT, OR IT IS A PHANTOM. The `:has(> .auth-card)`
+      // auth scenes report a bogus `scrollWidth` on their `<main>` in THIS
+      // harness — the container query behind the split evaluates against a stale
+      // width when #device is resized and scaled, so `.main` reads
+      // scrollWidth 750 > clientWidth with NO child actually past its box, and
+      // `scrollLeft` cannot move in a real 390 viewport (verified in the pane:
+      // the screen does not pan). A real sideways pan always has a child
+      // overflowing the root's content box on one side; the phantom has none.
+      // So the finding is gated on a NAMED overflowing child — that both kills
+      // the auth-scene false alarm and makes the report point at the culprit the
+      // way check #4 does. (Every width; a pan at 1024/1280 is a rarer bug.)
+      for(const el of [dev, dev.querySelector('.app'), dev.querySelector('.main'),
+                       dev.querySelector('.view-col')].filter(Boolean)){
+        if(!vis(el)) continue;
+        const ox = getComputedStyle(el).overflowX;
+        if(ox !== 'auto' && ox !== 'scroll') continue;
+        if(el.scrollWidth - el.clientWidth <= 1) continue;
+        const rb = el.getBoundingClientRect(); let worst = null, worstBy = 0, worstSide = '';
+        for(const ch of el.querySelectorAll('*')){
+          if(ch.closest('.sidenav,.notif,.tal-panel,.modal') || ch.classList.contains('dark-glow')) continue;
+          const cb = ch.getBoundingClientRect(); if(!cb.width) continue;
+          const r = cb.right - rb.right, l = rb.left - cb.left;
+          if(r > worstBy){ worstBy = r; worst = ch; worstSide = 'right'; }
+          if(l > worstBy){ worstBy = l; worst = ch; worstSide = 'left'; }
+        }
+        if(worst && worstBy > 1)
+          out.oddscroll.push(`${name(el)} pans sideways — ${name(worst)} +${Math.round(worstBy)}px off ${worstSide}`);
+      }
+
       return {
         overflow: [...new Set(out.overflow)].slice(0, 4),
+        oddscroll: [...new Set(out.oddscroll)].slice(0, 4),
         labelcol: [...new Set(out.labelcol)].slice(0, 3),
         headwrap: [...new Set(out.headwrap)].slice(0, 3),
         escape: [...new Set(out.escape)].slice(0, 3),
@@ -422,7 +475,7 @@ for(const w of WIDTHS){
       };
     }, w);
 
-    for(const k of ['overflow', 'labelcol', 'headwrap', 'escape', 'btn2', 'divider'])
+    for(const k of ['overflow', 'oddscroll', 'labelcol', 'headwrap', 'escape', 'btn2', 'divider'])
       if(r[k].length) push(k, w, c, r[k]);
     if(/undefined|NaN|\[object/.test(r.text)) push('leak', w, c, ['rendered text']);
   }
@@ -433,6 +486,7 @@ await browser.close();
 /* ----------------------------------------------------------------- report -- */
 const TITLES = {
   overflow: 'horizontal overflow',
+  oddscroll: 'frame pans sideways (odd scroller)',
   labelcol: 'label column below 900',
   headwrap: 'heading wraps past 3 lines',
   escape:   'content escapes its section',

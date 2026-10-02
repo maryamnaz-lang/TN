@@ -1189,13 +1189,13 @@ const lcalCard = (k, lead, opts) => {
                week off the cohort record; `lcTitle`'s "Cohort N call" stays on the
                other call surfaces. */}
         <span class="lcal-t t-h3">Week ${k.week} Cohort Session</span>
-        ${''/* A STATIC COUNTDOWN LABEL (Maryam 30 Sep 2026: "instead of live now
-               show In 2hrs 40mins"). No `data-calltill`, so `callTimerArm` leaves
-               it alone — the demo card reads the call as still ahead, which also
-               keeps the Join in its accent-disabled state. */}
-        ${''/* the countdown label; callers may override it (the Sessions page passes
-               "In 02:40", the HH:MM form — Maryam 30 Sep 2026). */}
-        <span class="lcal-timerbox">${I.time}<span class="lcal-timer t-h4">${o.countdown || 'In 2hrs 40mins'}</span></span>
+        ${''/* A STATIC COUNTDOWN LABEL in the HH:MM form, "In 02:40" (Maryam 2 Oct
+               2026: "the black card time count should be In 02:40" — the dashboard
+               now matches the Sessions page). No `data-calltill`, so `callTimerArm`
+               leaves it alone — the demo card reads the call as still ahead, which
+               also keeps the Join in its accent-disabled state. Callers may still
+               override it. */}
+        <span class="lcal-timerbox">${I.time}<span class="lcal-timer t-h4">${o.countdown || 'In 02:40'}</span></span>
       </span>
       <span class="lcal-seatsrow">
         ${faces ? `<span class="lcal-faces">${faces}${moreFaces ? `<span class="lcal-face-more">+${moreFaces}</span>` : ''}</span>` : ''}

@@ -36,7 +36,7 @@
      rule sweep clean on 21 screens, 84 screen-width combos with no overflow,
      zero thrown errors.
      ========================================================================== -->
-<link rel="stylesheet" href="design-system/talentnext-ds.css?b=d0825e5b">
+<link rel="stylesheet" href="design-system/talentnext-ds.css?b=2c4b66d9">
 
 <style>
 /* ==========================================================================
@@ -179,8 +179,10 @@
 .app .tal-eval .ai-body p{max-width:none}
 
 /* THE RECOMMENDATION FORM breathes (Maryam, 22 Sep 2026: "sub sections are too
-   close ... gaps around 20px"). 20px between fields, a clear label-to-control gap. */
-.app .eval-form > .f{margin-top:20px}
+   close ... gaps around 20px"; bumped to 32 on 2 Oct 2026: "all these sections
+   should have the 32px spaces between them"). 32px between every field, a clear
+   label-to-control gap. The rule is (0,3,0), so it beats each field's `.mt5`. */
+.app .eval-form > .f{margin-top:var(--s07)}
 .app .eval-form > .f > .lbl{display:block; margin-bottom:var(--s03)}
 
 /* A DROPDOWN OPTION MAY CARRY A DESCRIPTION (Maryam, 22 Sep 2026) — used by the
@@ -235,6 +237,25 @@
 .app .tm-link{color:var(--link); text-decoration:none; display:inline-flex; align-items:center; gap:var(--s02)}
 .app .tm-link svg{width:16px; height:16px}
 .app .tm-link:where(.__nh):hover{color:var(--link-hover)}
+/* ACCENT LINK (Maryam, 2 Oct 2026) — a no-box button whose label and trailing
+   arrow are both the accent as ink. Used for "Update Payout Destination". */
+.app .btn.acc-link{background:transparent; border:0; min-height:0; padding:0;
+  color:var(--accent-text); gap:var(--s02)}
+.app .btn.acc-link svg{fill:var(--accent-text)}
+.app .btn.acc-link:where(.__nh):hover{background:transparent; color:var(--accent-text)}
+/* PAYOUT DESTINATION ROW (Maryam, 2 Oct 2026) — the state tick sits inline after
+   the bank name on the top row; the two rows are 4px apart. */
+.app .dest-b{display:flex; flex-direction:column; gap:var(--s02)}
+.app .dest-t{display:inline-flex; align-items:center; gap:var(--s02)}
+.app .dest-tick svg{width:16px; height:16px}
+/* LIST-ROW LEADING MARKS ARE BARE ICONS, NOT BOXED CHIPS (Maryam, 2 Oct 2026:
+   "remove this block of icons, only icons are enough"). Portal-wide: `.cardrow-ic`
+   sheds its 40px box, background and border, leaving the glyph. `.app .main` is
+   (0,3,0), matching the DS `.sec:has(> .tile-stack) .cardrow-ic` rule and winning
+   the tie by loading later. A row that WANTS a face (the Earnings holding list)
+   uses `.mem-av` instead, so this only touches rows that kept an icon. */
+.app .main .cardrow-ic{width:auto; height:auto; background:transparent;
+  background-image:none; border:0}
 </style>
 </head>
 <body>
@@ -276,7 +297,7 @@
        somebody choosing a stage would want it. -->
 </div>
 
-<script src="design-system/talentnext-ds.js?b=d0825e5b"></script>
+<script src="design-system/talentnext-ds.js?b=2c4b66d9"></script>
 <script>
 /* ==========================================================================
    THE TALENT AGENT PORTAL
@@ -5226,14 +5247,22 @@ function payoutDest(d){
   return `<div class="tile-stack">
     <div class="cardrow">
       <span class="cardrow-ic">${I.wallet}</span>
-      <span class="cardrow-b">
-        <span class="cardrow-t">${d.bank} &bull;&bull;&bull;&bull; ${d.last}</span>
-        <span class="cardrow-d"><span class="flag-t ${s[1]}">${I[s[2]]}${s[0]}</span> &middot; ${detail}</span>
+      ${/* THE STATE TICK RIDES THE TOP ROW NEXT TO THE BANK NAME (Maryam, 2 Oct
+            2026), and the sub-line drops its tick + state word, keeping only the
+            date detail. The two rows sit 4px apart (`.dest-b`). */''}
+      <span class="cardrow-b dest-b">
+        <span class="cardrow-t dest-t">${d.bank} &bull;&bull;&bull;&bull; ${d.last} <span class="flag-t ${s[1]} dest-tick">${I[s[2]]}</span></span>
+        <span class="cardrow-d">${detail}</span>
       </span>
-      <span class="cardrow-a"><button class="btn btn-g btn-sm noic" data-addcard="1">Update payout destination</button></span>
+      ${/* UPDATE IS AN ACCENT LINK WITH A TRAILING ARROW (Maryam, 2 Oct 2026:
+            "both icon and text should be in accent color"), not the grey ghost
+            button. `.acc-link` (agent-local) strips the box and inks the label +
+            arrow `--accent-text`. */''}
+      <span class="cardrow-a"><button class="btn btn-sm noic acc-link" data-addcard="1">Update Payout Destination ${I.arrowRight}</button></span>
     </div>
-  </div>
-  <p class="help">Shown as Stripe describes it. TalentNext never sees your account number. Changing it returns the destination to Pending until Stripe confirms, and you stay listed and bookable while it does.</p>`;
+  </div>`;
+  /* THE "Shown as Stripe describes it …" help line is removed (Maryam, 2 Oct
+     2026) — the state tag + date already say what the reader needs. */
 }
 /* WHY AN AGENT IS OR IS NOT LISTED (13.1/13.9). Listed needs a verified payout
    destination AND certification AND a written public profile. Either missing is
@@ -5242,7 +5271,10 @@ function listingLine(v){
   const destOk = v.paid && S.payout.state === 'verified';
   const certOk = !!v.certified;
   const bioOk  = v.listing !== false && !(v.cardGaps && v.cardGaps.includes('bio'));
-  if(destOk && certOk && bioOk) return `<span class="flag-t green">${I.checkFilled}Listed and bookable</span>`;
+  /* THE "Listed and bookable" POSITIVE LINE IS REMOVED (Maryam, 2 Oct 2026) — a
+     verified destination already reads as settled, so the green restatement was
+     noise. Only the NOT-listed warning (which names the missing piece) remains. */
+  if(destOk && certOk && bioOk) return '';
   const missing = [];
   if(!bioOk)  missing.push('a written public profile');
   if(!destOk) missing.push('a verified payout destination');
@@ -5293,21 +5325,29 @@ V.earnings = v => {
       ['receipt',    'Each',       money(v.share),   `80% of ${money(v.fee)}`]])}
   </section>` : ''}
 
-  ${/* WHAT IS BLOCKING PAYMENT (13.7) — every held interview whose recording is
-        not confirmed, with the share waiting on it and a route to confirm. It
+  ${/* WHAT IS BLOCKING PAYMENT (13.7) — the held interviews whose recording is
+        not confirmed, with the share waiting on it and a route to evaluate. It
         leads the ledger because it is the only thing on the page that is ON the
-        agent; when nothing is outstanding the panel drops. */''}
+        agent; when nothing is outstanding the panel drops. SHOWS AT MOST TWO
+        (Maryam, 2 Oct 2026: "show only 2 … entries, not these much") — the whole
+        held list is the Interviews module's Evaluations tab; this is the nudge,
+        not the list. The ROW ACTION reads "Evaluate {first}" (Maryam, 2 Oct 2026),
+        because the button opens the recommendation screen (13.13), not a bare
+        recording confirmation. */''}
   ${connected && owed.length ? `
   <section class="sec">
     <div class="sec-h"><h2>What’s holding up your pay</h2></div>
     <div class="tile-stack">
-      ${owed.map(x => `<div class="cardrow">
-        <span class="cardrow-ic">${I.warning}</span>
+      ${owed.slice(0, 2).map(x => `<div class="cardrow">
+        ${/* THE LEADING MARK IS THE CANDIDATE'S PHOTO, not an alert icon (Maryam,
+              2 Oct 2026) — the row is about that person, so their face reads faster
+              than a warning triangle. A round disc via `avatar`, like the diary rows. */''}
+        <span class="mem-av mem-ph">${avatar(x.i, PHOTOS[x.id], 40)}</span>
         <span class="cardrow-b">
           <span class="cardrow-t">${x.n}</span>
           <span class="cardrow-d">Interviewed ${x.day.replace(/^\w+ /, '')} &middot; ${money(v.share)} waiting on the recording</span>
         </span>
-        <span class="cardrow-a"><button class="btn btn-p btn-sm noic" data-go="interview" data-iv="${x.id}">Confirm recording ${I.arrowRight}</button></span>
+        <span class="cardrow-a"><button class="btn btn-sm noic acc-link" data-go="interview" data-iv="${x.id}">Evaluate ${x.n.split(' ')[0]} ${I.arrowRight}</button></span>
       </div>`).join('')}
     </div>
   </section>` : ''}
@@ -6517,9 +6557,13 @@ function confirmSheet(){
               exactly this — a second control would be a second thing to keep in
               step with the first. */''}
         ${/* THE FEE-CHANGE OK CARRIES `data-feedone`, which clears the confirm AND
-              the edit form in one branch; every other confirm keeps the generic
+              the edit form in one branch. SEND EVALUATION LEAVES THE PAGE (Maryam,
+              2 Oct 2026: "on clicking send evaluation this page should be closed") —
+              it carries `data-go="interviews"`, and the `d.go` branch now clears
+              `S.confirm`, so the dialog and the interview page both close and the
+              agent lands back on Interviews. Every other confirm keeps the generic
               close/stage/portal wiring. */''}
-        <button class="btn btn-p noic"${S.confirm === 'feechange' ? ' data-feedone="1"' : (c && c[3] && c[3].includes('.html') ? ` data-portal="${c[3]}"` : ` data-close="confirm"${c && c[3] ? ` data-stage="${c[3]}"` : ''}`)}>${c ? c[2] : ''}</button>
+        <button class="btn btn-p noic"${S.confirm === 'feechange' ? ' data-feedone="1"' : S.confirm === 'sendrec' ? ' data-go="interviews"' : (c && c[3] && c[3].includes('.html') ? ` data-portal="${c[3]}"` : ` data-close="confirm"${c && c[3] ? ` data-stage="${c[3]}"` : ''}`)}>${c ? c[2] : ''}</button>
       </div>
     </div>
   </div>`;
@@ -6775,7 +6819,12 @@ function editSheet(){
       <div class="sheet-b${S.dd ? ' dd-open' : ''}">${s ? (typeof s[1] === 'function' ? s[1]() : s[1]) : ''}</div>
       <div class="sheet-f">
         <button class="btn btn-s noic" data-close="sheet">${isCancel ? 'Keep the interview' : 'Cancel'}</button>
-        <button class="btn ${isCancel ? 'btn-p danger' : 'btn-p'} noic" data-close="sheet">${saveLabel}</button>
+        ${/* THE SLOT SHEET'S SAVE ACTUALLY ADDS THE SLOT (Maryam, 2 Oct 2026: "when
+              I add a slot and click add I should see it in the calendar"). It carries
+              `data-saveslot`, whose handler pushes the chosen day+time into `SLOTS`
+              on the viewed week and re-renders, so the new block appears; every other
+              sheet is still a prototype that just closes. */''}
+        <button class="btn ${isCancel ? 'btn-p danger' : 'btn-p'} noic"${S.sheet === 'slot' ? ' data-saveslot="1"' : ' data-close="sheet"'}>${saveLabel}</button>
       </div>
     </div>
   </div>`;
@@ -7214,7 +7263,7 @@ device.addEventListener('click', e => {
      for it is written, the markup carries the attribute, and the click never
      reaches either because `closest` was not looking for it. `data-peek` cost
      exactly that. */
-  const t = e.target.closest('[data-go],[data-stage],[data-portal],[data-toggle],[data-close],[data-tab],[data-pftab],[data-pfedit],[data-pfpw],[data-specdel],[data-specadd],[data-specaddopen],[data-specaddclose],[data-specdiscard],[data-req],[data-confirm],[data-sheet],[data-peek],[data-readall],[data-cal],[data-calview],[data-cal-nav],[data-cal-today],[data-cal-day],[data-ddtoggle],[data-ddset],[data-ltrtoggle],[data-multi],[data-txf],[data-feesave],[data-feedone],[data-paytab],[data-addcard],[data-setdef],[data-delcard],[data-payclose]');
+  const t = e.target.closest('[data-go],[data-stage],[data-portal],[data-toggle],[data-close],[data-tab],[data-pftab],[data-pfedit],[data-pfpw],[data-specdel],[data-specadd],[data-specaddopen],[data-specaddclose],[data-specdiscard],[data-req],[data-confirm],[data-sheet],[data-peek],[data-readall],[data-cal],[data-calview],[data-cal-nav],[data-cal-today],[data-cal-day],[data-ddtoggle],[data-ddset],[data-ltrtoggle],[data-multi],[data-txf],[data-feesave],[data-feedone],[data-paytab],[data-addcard],[data-setdef],[data-delcard],[data-payclose],[data-saveslot]');
 
   /* A CLICK OUTSIDE THE ACCOUNT MENU SHUTS IT, AND IT IS ANSWERED BEFORE THE
      GUARD ABOVE RETURNS — that is the whole reason this sits here rather than
@@ -7334,6 +7383,23 @@ device.addEventListener('click', e => {
     S.pfEdit = null; return render();
   }
   if(d.feedone !== undefined){ S.confirm = false; S.pfEdit = null; return render(); }
+  /* ADD A SLOT COMMITS TO THE CALENDAR (Maryam, 2 Oct 2026: "when I add a slot and
+     click add I should see it in the calendar"). The sheet is still a prototype
+     elsewhere, but Save Slot now pushes the chosen weekday + start time into `SLOTS`
+     on the WEEK THE CALENDAR IS SHOWING (`weekDaysOf(S.calAnchor)`), matched by
+     weekday index so the block lands in the right column, then closes the sheet.
+     A duplicate day+time is skipped so a double-press does not stack two blocks. */
+  if(d.saveslot !== undefined){
+    const frm = S.slotForm || {};
+    const wd = SLOT_DAYS.indexOf(frm.day);
+    const t = frm.start;
+    const cell = wd >= 0 ? weekDaysOf(S.calAnchor).find(c => c.wd === wd) : null;
+    if(cell && t && !SLOTS.some(s => s.y === cell.y && s.m === cell.m && s.d === cell.d && s.t === t)){
+      SLOTS.push({id: 'sadd' + Date.now(), y: cell.y, m: cell.m, d: cell.d, t});
+    }
+    S.sheet = false; S.dd = null;
+    return render();
+  }
   if(d.sheet){
     S.sheet = d.sheet; S.dd = null;
     /* THE ADD-SLOT SHEET OPENS ON A FRESH FORM. Defaults match the reference —
@@ -7552,7 +7618,7 @@ device.addEventListener('click', e => {
         S.hist.push({view: S.view, label});
       }
     }
-    S.view = d.go; S.nav = false; S.notif = false; S.tal = false; S.typing = false;
+    S.view = d.go; S.nav = false; S.notif = false; S.tal = false; S.typing = false; S.confirm = false;
     /* ARRIVING AT INTERVIEWS LANDS ON WHATEVER IS ASKED OF YOU, and on "Coming
        up" when nothing is. This line used to force `next` unconditionally, and
        the reason was the two Quick Actions: "Awaiting Decisions" and "Upcoming

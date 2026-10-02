@@ -399,10 +399,13 @@ body{background:var(--surround);color:var(--text-primary);
 .btn-p{background:var(--brand-primary);color:var(--on-brand)}
 .btn-p:hover{background:var(--brand-primary-hover)}
 .btn-p:active{background:var(--brand-primary-active)}
-.btn-s,.btn-t,.btn-g{background:transparent;color:var(--text-primary);
+.btn-t,.btn-g{background:transparent;color:var(--text-primary);
   border-color:var(--border-strong-01)}
-.btn-s:hover:where(.__nh),.btn-t:hover:where(.__nh),.btn-g:hover:where(.__nh){background:var(--overlay-hover);border-color:var(--text-primary)}
-.btn-s:active,.btn-t:active,.btn-g:active{background:var(--overlay-pressed)}
+.btn-t:hover:where(.__nh),.btn-g:hover:where(.__nh){background:var(--overlay-hover);border-color:var(--text-primary)}
+.btn-t:active,.btn-g:active{background:var(--overlay-pressed)}
+.btn-s{background:var(--rule);color:var(--text-primary);border-color:transparent}
+.btn-s:hover:where(.__nh){background:var(--gray-20);border-color:transparent}
+.btn-s:active{background:var(--border-subtle-02)}
 .btn.ghost{border-color:transparent;padding-left:var(--s04);padding-right:var(--s04)}
 .btn.ghost:hover:where(.__nh){background:var(--overlay-hover);border-color:transparent}
 .btn-d{background:var(--support-error);color:var(--pure-white)}
@@ -652,7 +655,7 @@ svg.arrow,.tile-arrow,.card-go{
 .modal.on .sheet{transform:translateY(0)}
 .sheet-h{
   flex:none;display:flex;align-items:center;gap:var(--s04);
-  padding:var(--s06) var(--s05) var(--s06) var(--s06);
+  padding:var(--s06) var(--s05) var(--s04) var(--s06);
   position:relative}
 .sheet-h::after{content:'';position:absolute;left:var(--s06);right:var(--s06);
   bottom:0;height:1px;background:var(--border-subtle-01)}
@@ -8022,7 +8025,7 @@ button.btn-p:active,
   display:flex;align-items:center;gap:var(--s02);
   width:100%;text-align:left;
   padding:2px var(--s03);
-  background-color:var(--cal-fill);border:0;border-radius:6px}
+  background-color:var(--cal-color);border:0;border-radius:6px}
 .app .cal-slot:hover:where(.__nh){cursor:pointer}
 .app .cal-slot.k-iv{--cal-color:var(--cal-iv)}
 .app .cal-slot.k-reiv{--cal-color:var(--cal-reiv)}
@@ -8166,7 +8169,7 @@ button.btn-p:active,
   min-height:calc(var(--dur) * var(--row) - 6px);
   display:flex;flex-direction:column;gap:2px;
   padding:var(--s03);text-align:left;overflow:hidden;
-  background-color:var(--cal-fill);border:0;border-radius:8px}
+  background-color:var(--cal-color);border:0;border-radius:8px}
 .app .calw-ev.k-iv{--cal-color:var(--cal-iv)}
 .app .calw-ev.k-reiv{--cal-color:var(--cal-reiv)}
 .app .calw-ev.on{box-shadow:inset 0 0 0 1.5px var(--text-primary)}
@@ -27207,13 +27210,13 @@ const lcalCard = (k, lead, opts) => {
                week off the cohort record; `lcTitle`'s "Cohort N call" stays on the
                other call surfaces. */}
         <span class="lcal-t t-h3">Week ${k.week} Cohort Session</span>
-        ${''/* A STATIC COUNTDOWN LABEL (Maryam 30 Sep 2026: "instead of live now
-               show In 2hrs 40mins"). No `data-calltill`, so `callTimerArm` leaves
-               it alone — the demo card reads the call as still ahead, which also
-               keeps the Join in its accent-disabled state. */}
-        ${''/* the countdown label; callers may override it (the Sessions page passes
-               "In 02:40", the HH:MM form — Maryam 30 Sep 2026). */}
-        <span class="lcal-timerbox">${I.time}<span class="lcal-timer t-h4">${o.countdown || 'In 2hrs 40mins'}</span></span>
+        ${''/* A STATIC COUNTDOWN LABEL in the HH:MM form, "In 02:40" (Maryam 2 Oct
+               2026: "the black card time count should be In 02:40" — the dashboard
+               now matches the Sessions page). No `data-calltill`, so `callTimerArm`
+               leaves it alone — the demo card reads the call as still ahead, which
+               also keeps the Join in its accent-disabled state. Callers may still
+               override it. */}
+        <span class="lcal-timerbox">${I.time}<span class="lcal-timer t-h4">${o.countdown || 'In 02:40'}</span></span>
       </span>
       <span class="lcal-seatsrow">
         ${faces ? `<span class="lcal-faces">${faces}${moreFaces ? `<span class="lcal-face-more">+${moreFaces}</span>` : ''}</span>` : ''}

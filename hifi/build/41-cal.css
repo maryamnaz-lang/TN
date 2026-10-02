@@ -170,7 +170,10 @@
   display:flex;align-items:center;gap:var(--s02);
   width:100%;text-align:left;
   padding:2px var(--s03);
-  background-color:var(--cal-fill);border:0;border-radius:6px}
+  /* FILLED in the type's colour (Maryam, 2 Oct 2026, same fix as `.calw-ev`):
+     `--cal-fill` was never assigned, so the month chip rendered transparent
+     against §41's "filled by type" intent. Read the defined `--cal-color`. */
+  background-color:var(--cal-color);border:0;border-radius:6px}
 .app .cal-slot:hover{cursor:pointer}
 .app .cal-slot.k-iv{--cal-color:var(--cal-iv)}
 .app .cal-slot.k-reiv{--cal-color:var(--cal-reiv)}
@@ -413,7 +416,15 @@
   min-height:calc(var(--dur) * var(--row) - 6px);
   display:flex;flex-direction:column;gap:2px;
   padding:var(--s03);text-align:left;overflow:hidden;
-  background-color:var(--cal-fill);border:0;border-radius:8px}
+  /* THE BLOCK IS A FILLED CARD (Maryam, 2 Oct 2026: "a slot after the half-hour
+     like the 5:30 one must not touch the bottom — give it the padding the 4:00
+     slot has at the top"). `--cal-fill` was never assigned anywhere, so the card
+     rendered transparent and its 3px top/bottom air (the `+3` / `-6` above) was
+     invisible — the text then read as sitting ON the hour line a half-hour block
+     crosses. Reading the defined `--cal-color` paints the card, and the gridline
+     now passes BEHIND it, so every block floats with equal air top and bottom.
+     Matches §41's documented "slots are filled by type". */
+  background-color:var(--cal-color);border:0;border-radius:8px}
 .app .calw-ev.k-iv{--cal-color:var(--cal-iv)}
 .app .calw-ev.k-reiv{--cal-color:var(--cal-reiv)}
 .app .calw-ev.on{box-shadow:inset 0 0 0 1.5px var(--text-primary)}
