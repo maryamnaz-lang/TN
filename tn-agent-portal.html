@@ -212,6 +212,13 @@
    affordance), the letter carried in a bold cap. `.ltr-cloud` opts out of the
    label column via `.eval-form` already; this is only the chip skin. */
 .app .ltr-cloud{display:flex; flex-wrap:wrap; gap:var(--s03)}
+/* THE "TALENT letters" HEADING SITS AN ADDED 8px CLEAR OF THE CHIPS (Maryam,
+   2 Oct 2026: "still congested — do the 8px gap addition with the heading and the
+   chips as well"). The default label margin (8) + the asked 8 = 16, but two
+   adjacent block margins COLLAPSE to 8, so the gap is set on the label in one
+   value (`--s05` 16) rather than split across both. Scoped to the letters field
+   via `:has(> .ltr-cloud)`, so the textarea fields keep their 8. */
+.app .eval-form > .f:has(> .ltr-cloud) > .lbl{margin-bottom:var(--s05)}
 .app .ltr-chip{display:inline-flex; align-items:center; gap:var(--s02);
   padding:7px 14px; border-radius:999px; border:1px solid var(--border-subtle-02);
   background:var(--background); cursor:pointer; color:var(--text-secondary);
@@ -220,8 +227,11 @@
 .app .ltr-chip.on{border-color:var(--accent); background:color-mix(in srgb, var(--accent) 8%, transparent); color:var(--accent-text)}
 .app .ltr-chip.on .ltr-c{color:var(--accent-text)}
 .app .ltr-chip:focus-visible{outline:2px solid var(--accent); outline-offset:1px}
-.app .ltr-hint{display:block; margin-top:var(--s02); color:var(--text-secondary); font-size:var(--t-desc-size)}
-.app .ltr-tal{color:var(--text-secondary)}
+.app .ltr-hint{display:block; margin-top:var(--s03); color:var(--text-secondary); font-size:var(--t-desc-size)}
+/* 8px between the TALENT-letters sub-rows (Maryam, 2 Oct 2026: "too congested,
+   give them more gap of 8px") — "Tal recommends" → chips, and chips → hint (the
+   `.ltr-hint` above). The same `--s03` sits under the ladder's "Tal recommends". */
+.app .ltr-tal{color:var(--text-secondary); margin-bottom:var(--s03)}
 .app .ltr-tal b{color:var(--accent-text); font-weight:var(--t-w-strong)}
 /* The divergence note the form shows when the agent's rung differs from Tal's
    (13.13 "recording the divergence"). A quiet secondary line, not an error. */
@@ -4697,8 +4707,9 @@ V.interview = v => {
               order, prefilled to Tal's suggested letters; the agent may pick any
               combination. Toggled by `data-ltrtoggle`, stored on
               `S.slotForm.evalLetters`. This REPLACES the single TALENT-type picker. */''}
+        ${/* The "Tal recommends {letters}" line is removed (Maryam, 2 Oct 2026);
+              the chips carry Tal's suggestion as their prefilled selection. */''}
         <div class="f mt5"><span class="lbl">TALENT letters</span>
-          <p class="ltr-tal">Tal recommends <b>${lettersLabel(talLetters)}</b>.</p>
           ${lettersPicker(curLetters)}
           <span class="ltr-hint">Pick one to six. They describe what ${first} demonstrated, and a candidate can show more than one thing.</span></div>
         ${/* WHY THIS LEVEL (mandatory) — the "Overall" field renamed to the story's
