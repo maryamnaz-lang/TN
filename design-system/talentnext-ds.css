@@ -14,7 +14,7 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 6419.  Rules dropped as product-specific: 222.
+   Rules kept: 6420.  Rules dropped as product-specific: 225.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
@@ -1495,10 +1495,7 @@ textarea.inp{min-height:88px}
 }
 .sec:empty,
 .sec:has(> :only-child:empty){display:none}
-:root{--pad-x:16px}
-@container app (min-width:600px){
-  :root{--pad-x:24px}
-}
+:root{--pad-x:24px}
 @container app (min-width:1200px){
   :root{--pad-x:32px}
 }
@@ -4506,6 +4503,8 @@ button{font-family:var(--font-sans)}
 .app .auth-brand .auth-foot{font-size:12px; line-height:20px; font-weight:400; letter-spacing:.16px}
 .app .auth-card .btn{font-size:14px; line-height:18px; font-weight:600; letter-spacing:.16px}
 .app .auth-card .otp input{font-size:24px; line-height:32px; font-weight:400; letter-spacing:.16px}
+.app:has(> .auth-card)::before{content:none}
+.app:has(> .auth-card) .auth-card::before{content:none}
 
 /* ---- 18-contain.css ---- */
 @container app (min-width:900px){

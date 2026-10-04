@@ -1727,8 +1727,7 @@ textarea.inp{min-height:88px}
 .tabs{padding-left:var(--gutter)}
 @container app (min-width:900px){.tabs{padding-left:var(--s07)}}
 .sec:empty,.sec:has(> :only-child:empty){display:none}
-:root{--pad-x:16px}
-@container app (min-width:600px){:root{--pad-x:24px}}
+:root{--pad-x:24px}
 @container app (min-width:1200px){:root{--pad-x:32px}}
 .sec,.sec.tight{padding-left:var(--pad-x);padding-right:var(--pad-x)}
 .ph{padding:var(--s07) var(--pad-x) var(--s06)}
@@ -4964,6 +4963,8 @@ body,.app,.pt-bar,.pt-sel,input,select,textarea,button{font-family:var(--font-sa
     font-size:14px;line-height:18px;font-weight:600;letter-spacing:.16px}
 .app .auth-card .otp input{
   font-size:24px;line-height:32px;font-weight:400;letter-spacing:.16px}
+.app:has(> .auth-card)::before{content:none}
+.app:has(> .auth-card) .auth-card::before{content:none}
 @container app (min-width:900px){
   
   .app .sec::after,
@@ -6452,13 +6453,17 @@ button.btn-p:active,
   .nil .nil-nav{display:none}
   .nil .nil-logo{height:32px}
 }
-.nil .nil-scroll{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch}
+.nil .nil-scroll{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;
+  scrollbar-width:thin;scrollbar-color:var(--rule) transparent}
+.nil .nil-scroll::-webkit-scrollbar{width:8px;height:8px}
+.nil .nil-scroll::-webkit-scrollbar-track{background:transparent}
+.nil .nil-scroll::-webkit-scrollbar-thumb{background:var(--rule);border-radius:999px}
 .nil .nil-wrap{max-width:1064px;margin:0 auto;padding:var(--s09) var(--s06) var(--s10)}
 .nil .nil-wrap.wide{max-width:1196px}
 .nil .nil-wrap.plain{max-width:1240px;padding-top:var(--s10)}
 @container app (max-width:899px){
   .nil .nil-wrap,.nil .nil-wrap.wide,.nil .nil-wrap.plain{
-    padding:var(--s06) var(--s05) var(--s08)}
+    padding:var(--s06) var(--s06) var(--s08)}
 }
 .nil .nil-card{
   background:#fff;border:1px solid var(--nil-card-line);border-radius:10px;
@@ -6548,7 +6553,7 @@ button.btn-p:active,
 }
 @container app (max-width:899px){
   .nil .nil-res-tab{display:none}
-  .nil .nil-res-grid{grid-template-columns:1fr}
+  .nil .nil-res-grid{grid-template-columns:minmax(0,1fr)}
 }
 .nil .nil-you{background:var(--nil-lime);display:flex;flex-direction:column}
 .nil .nil-you-head{
@@ -18677,11 +18682,14 @@ login: () => `${authShell()}
     </div>
   </div>
   ${''/* THE LOG IN BUTTON GOES TO THE TAL ONBOARDING PROTOTYPE (Maryam, 18 Sep
-        2026), not the candidate dashboard. It is a plain `stage:onboard` `go()`
-        — `data-loginas` was the sign-straight-into-a-portal gesture and is not
-        what this arrival is any more. */}
+        2026), not the candidate dashboard — now THROUGH THE TN LOADER (Maryam,
+        4 Oct 2026: "on clicking login, before going to onboarding screen i need
+        a loader screen first"). `data-loadgo="onboard"` runs the load convention:
+        it paints the three-blade `.tn-loader` for 2s on the onboard stage, then
+        the onboarding welcome arrives. It REPLACES the plain `stage:onboard`
+        `go()`; `data-loginas` (sign-straight-into-a-portal) was already retired. */}
   <div class="sec sec-act">
-    <div class="foot-row foot-stack"><div><button class="btn btn-p btn-full" data-go="stage:onboard">Log in ${I.arrowRight}</button></div></div>
+    <div class="foot-row foot-stack"><div><button class="btn btn-p btn-full" data-loadgo="onboard">Log in ${I.arrowRight}</button></div></div>
     ${''/* SIGN-UP ROW (Maryam, 22 Sep 2026): a closing line below the button.
           "Sign up" is the accent as ink (--accent-text), semibold (the platform's
           strong weight, 500) and underlined; the lead-in is the secondary grey.
@@ -24876,6 +24884,14 @@ device.addEventListener('click', e => {
     sendBtn.dataset.sending = '1'; sendBtn.style.pointerEvents = 'none'; sendBtn.textContent = 'Sending...';
     const to = sendBtn.dataset.send;
     setTimeout(() => go(to), 900);
+    return; }
+
+  const ld = t.closest('[data-loadgo]');
+  if(ld){ e.preventDefault();
+    if(S.obLoading) return;
+    S.obLoading = true;
+    setStage('onboard');
+    setTimeout(() => { S.obLoading = false; render(); }, 2000);
     return; }
 
   const g = t.closest('[data-go]');

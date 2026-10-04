@@ -138,13 +138,28 @@
    `.app` is a fixed-height flex column with overflow hidden, so the run-up
    scrolls inside its own box rather than moving the frame.
    ========================================================================== */
-.nil .nil-scroll{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch}
+.nil .nil-scroll{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;
+  /* THE SCROLLER'S BAR IS THIN AND `--rule`, NOT THE OS SLAB (Maryam, 4 Oct 2026:
+     "reduce the scroller bar width to half of what it is right now, and its color
+     should be #efefef"). The rest of the platform hides its scrollbars (§12/§136);
+     the NIL run-up keeps a visible one but refines it — ~8px (about half the ~15px
+     native slab) with a `--rule` #efefef thumb on a transparent track. `--rule` is
+     the hairline token, so this reads the colour rather than hardcoding the hex.
+     `scrollbar-width:thin` + `scrollbar-color` cover Firefox; `::-webkit-scrollbar`
+     covers Chrome/WebKit, where the width is controllable to the exact 8px. */
+  scrollbar-width:thin;scrollbar-color:var(--rule) transparent}
+.nil .nil-scroll::-webkit-scrollbar{width:8px;height:8px}
+.nil .nil-scroll::-webkit-scrollbar-track{background:transparent}
+.nil .nil-scroll::-webkit-scrollbar-thumb{background:var(--rule);border-radius:999px}
 .nil .nil-wrap{max-width:1064px;margin:0 auto;padding:var(--s09) var(--s06) var(--s10)}
 .nil .nil-wrap.wide{max-width:1196px}
 .nil .nil-wrap.plain{max-width:1240px;padding-top:var(--s10)}
 @container app (max-width:899px){
+  /* side gutter 24 (`--s06`), not 16, to sit on the platform's 24px mobile margin
+     (Maryam, 4 Oct 2026 — the --pad-x raise; the NIL wrap hardcodes its own padding
+     rather than reading the token, so it moves here by hand). */
   .nil .nil-wrap,.nil .nil-wrap.wide,.nil .nil-wrap.plain{
-    padding:var(--s06) var(--s05) var(--s08)}
+    padding:var(--s06) var(--s06) var(--s08)}
 }
 
 /* ==========================================================================
@@ -276,7 +291,14 @@
 }
 @container app (max-width:899px){
   .nil .nil-res-tab{display:none}
-  .nil .nil-res-grid{grid-template-columns:1fr}
+  /* `minmax(0,1fr)`, not a bare `1fr` (Maryam, 4 Oct 2026: "no outgrown content or
+     horizontal scroll"). A `1fr` track is `minmax(auto,1fr)`, and the two stacked
+     panels (`.nil-you` / `.nil-side`) default to `min-width:auto`, so the track grew
+     to the panels' content min-width (~407px) and overflowed the ~354px column —
+     the "Career ideas" text ran off the right edge and the whole page panned
+     sideways. `minmax(0,1fr)` floors the track at 0, so the panels shrink to the
+     column and their text wraps. One line; the panel contents already wrap. */
+  .nil .nil-res-grid{grid-template-columns:minmax(0,1fr)}
 }
 
 /* --- the left panel ----------------------------------------------------- */

@@ -6411,11 +6411,14 @@ login: () => `${authShell()}
     </div>
   </div>
   ${''/* THE LOG IN BUTTON GOES TO THE TAL ONBOARDING PROTOTYPE (Maryam, 18 Sep
-        2026), not the candidate dashboard. It is a plain `stage:onboard` `go()`
-        — `data-loginas` was the sign-straight-into-a-portal gesture and is not
-        what this arrival is any more. */}
+        2026), not the candidate dashboard — now THROUGH THE TN LOADER (Maryam,
+        4 Oct 2026: "on clicking login, before going to onboarding screen i need
+        a loader screen first"). `data-loadgo="onboard"` runs the load convention:
+        it paints the three-blade `.tn-loader` for 2s on the onboard stage, then
+        the onboarding welcome arrives. It REPLACES the plain `stage:onboard`
+        `go()`; `data-loginas` (sign-straight-into-a-portal) was already retired. */}
   <div class="sec sec-act">
-    <div class="foot-row foot-stack"><div><button class="btn btn-p btn-full" data-go="stage:onboard">Log in ${I.arrowRight}</button></div></div>
+    <div class="foot-row foot-stack"><div><button class="btn btn-p btn-full" data-loadgo="onboard">Log in ${I.arrowRight}</button></div></div>
     ${''/* SIGN-UP ROW (Maryam, 22 Sep 2026): a closing line below the button.
           "Sign up" is the accent as ink (--accent-text), semibold (the platform's
           strong weight, 500) and underlined; the lead-in is the secondary grey.
@@ -16471,6 +16474,24 @@ device.addEventListener('click', e => {
     sendBtn.dataset.sending = '1'; sendBtn.style.pointerEvents = 'none'; sendBtn.textContent = 'Sending...';
     const to = sendBtn.dataset.send;
     setTimeout(() => go(to), 900);
+    return; }
+
+  /* `data-loadgo="onboard"` IS THE LOAD CONVENTION ON LOG IN (Maryam, 4 Oct 2026:
+     "before going to onboarding screen i need a loader screen first"). It shows the
+     three-blade `.tn-loader` for 2 seconds, THEN lands on the Tal onboarding — the
+     same beat "Let's Get Started" and "Find an Agent" already play (ob.js), reused
+     at the front door. `S.obLoading` is set BEFORE `setStage('onboard')`, so the
+     setStage render paints `obLoaderScreen()` (obScreen returns it while the flag is
+     up) rather than the welcome; the 2s `setTimeout` (never rAF — trap 17) clears the
+     flag and re-renders into the onboarding chat. Guarded so a second press during
+     the wait is ignored. Only `onboard` has a loader screen, so that is the one
+     target; a wider loader-go would need a frame-level overlay. */
+  const ld = t.closest('[data-loadgo]');
+  if(ld){ e.preventDefault();
+    if(S.obLoading) return;
+    S.obLoading = true;
+    setStage('onboard');
+    setTimeout(() => { S.obLoading = false; render(); }, 2000);
     return; }
 
   const g = t.closest('[data-go]');

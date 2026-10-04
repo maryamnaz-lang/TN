@@ -533,3 +533,23 @@
 /* 24/32 — a digit of the code */
 .app .auth-card .otp input{
   font-size:24px;line-height:32px;font-weight:400;letter-spacing:.16px}
+
+/* ==========================================================================
+   NO BACK WASH ON THE AUTH FLOW (Maryam, 4 Oct 2026: "we do not need the
+   gradient drop at the back on account creation prototype flow" — the account
+   creation, Set New Password, Log In and Reset Password screens). The two rose
+   decorations are off: Ellipse 42 (`.app:has(> .auth-card)::before`, the top
+   band read as the "gradient drop"/warm wash at every width) and Ellipse 43
+   (`.auth-card::before`, the desktop brand-corner pool). The account/sign-in
+   screens stand on a plain ground now — white on a phone, `--surface-2` on
+   desktop — which the shell/page already reveal (their `background:transparent`
+   above was only there to let the wash show through, so it is now harmless).
+   Kept as ONE suppression at the file's foot so the washes' own geometry +
+   blur rules stay intact above: deleting these two lines restores the door's
+   warmth exactly. It wins at every width by landing last with equal or higher
+   specificity (a container query adds none, trap 3). Crosses to the DS, so the
+   talent-agent and super-admin front doors lose it too. The LEFT panel's own
+   treatment is untouched — the hifi photo slider (§132) and the DS brand panel
+   (§57) keep their backdrops; this removes only the wash BEHIND the card. */
+.app:has(> .auth-card)::before{content:none}
+.app:has(> .auth-card) .auth-card::before{content:none}

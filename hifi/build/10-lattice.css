@@ -380,8 +380,16 @@ textarea.inp{min-height:88px}
    padding, page headers, list rows and cells all resolve to --pad-x, so the
    column has a single spine no matter which component is drawn in it.
    -------------------------------------------------------------------------- */
-:root{--pad-x:16px}
-@container app (min-width:600px){:root{--pad-x:24px}}
+/* THE MOBILE SIDE GUTTER IS 24, not 16 (Maryam, 4 Oct 2026: "set the page left and
+   right margins on mobile app to 24px ... the whole mobile design, not only on
+   candidate and cohort leader portals but also on talent agent portal"). The ladder
+   used to step 16 (<600) / 24 (600-1199) / 32 (>=1200); the base is now 24, so a phone
+   page sits 24 off each wall like a tablet, and the 600 step is folded in (it set the
+   same value). Desktop stays 32. One token, so the whole mobile design moves at once:
+   candidate + cohort leader here, talent agent + super admin through build-ds.py. A
+   wider inset is not an overflow risk; it is a narrower content column, so the sweep
+   watches for a fixed-px child in it (trap 15). */
+:root{--pad-x:24px}
 @container app (min-width:1200px){:root{--pad-x:32px}}
 
 .sec,.sec.tight{padding-left:var(--pad-x);padding-right:var(--pad-x)}
