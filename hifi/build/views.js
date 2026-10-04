@@ -287,6 +287,10 @@ const otherPortal = () => PORTALS.find(([k]) => k !== S.portal);
    three answers and "which portal is this render" has two. Both readers write
    the constant and nothing else ever writes it. */
 const AGENT_PORTAL = '../tn-agent-portal.html';
+/* The Super Admin portal is its own file at the repo root (this portal lives in
+   `hifi/`), reached like the agent portal — a `data-doc` page navigation. A
+   convenience jump, not a role this account holds (Maryam, 2 Oct 2026). */
+const ADMIN_PORTAL = '../tn-admin-portal.html';
 
 /* THE SCHEDULER IS A PICTURE OF CALENDLY FOR NOW, so there is no URL in this
    file. `CALENDLY_URL` and the per-agent `cal` override were written for a live
@@ -422,6 +426,10 @@ function acctMenu(){
     <button class="acct-i" role="menuitem" data-doc="${AGENT_PORTAL}">
       <span class="acct-i-mk acct-i-av"><img src="${AV.owen}" alt=""></span>
       <span class="acct-i-t">Switch to Talent Agent</span>
+    </button>
+    <button class="acct-i" role="menuitem" data-doc="${ADMIN_PORTAL}">
+      <span class="acct-i-mk acct-i-av"><img src="${AV.samuel}" alt=""></span>
+      <span class="acct-i-t">Switch to Super Admin</span>
     </button>
     <button class="acct-i" role="menuitem" data-go="stage:signup/login">
       <span class="acct-i-mk">${I.logout}</span>

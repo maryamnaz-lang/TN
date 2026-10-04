@@ -4710,8 +4710,8 @@ V.interview = v => {
         ${/* The "Tal recommends {letters}" line is removed (Maryam, 2 Oct 2026);
               the chips carry Tal's suggestion as their prefilled selection. */''}
         <div class="f mt5"><span class="lbl">TALENT letters</span>
-          ${lettersPicker(curLetters)}
-          <span class="ltr-hint">Pick one to six. They describe what ${first} demonstrated, and a candidate can show more than one thing.</span></div>
+          ${/* The "Pick one to six …" hint is removed (Maryam, 2 Oct 2026). */''}
+          ${lettersPicker(curLetters)}</div>
         ${/* WHY THIS LEVEL (mandatory) — the "Overall" field renamed to the story's
               own label; it seeds from Tal's read so the agent edits rather than
               starts blank. */''}
@@ -6198,6 +6198,20 @@ function acctMenu(){
     <button class="acct-i" role="menuitem" data-portal="${CAND_DOC}#leader/leadDash">
       <span class="acct-i-mk acct-i-av"><img src="${AV.priya}" alt=""></span>
       <span class="acct-i-t">Switch to Cohort Leader</span>
+    </button>
+    ${/* SWITCH TO SUPER ADMIN (Maryam, 2 Oct 2026) — a convenience jump to the
+          admin portal (its own file), not a role this account actually holds; it is
+          a plain `data-portal` load like the other two switches. */''}
+    <button class="acct-i" role="menuitem" data-portal="tn-admin-portal.html">
+      <span class="acct-i-mk acct-i-av"><img src="${AV.samuel}" alt=""></span>
+      <span class="acct-i-t">Switch to Super Admin</span>
+    </button>
+    ${/* SIGN OUT (Maryam, 2 Oct 2026) — the other portals' account menus carry it,
+          so this one does too. It runs the logout confirm (`data-confirm="logout"`),
+          which leaves for the candidate login. */''}
+    <button class="acct-i" role="menuitem" data-confirm="logout">
+      <span class="acct-i-mk">${I.logout}</span>
+      <span class="acct-i-t">Sign out</span>
     </button>
   </div>`;
 }
