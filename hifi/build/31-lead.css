@@ -866,7 +866,20 @@
    page's `.iv-tabs` uses. */
 .app .sec.sec-cs.lead-evtabs{padding-bottom:0}
 .app .sec.sec-cs.lead-evtabs > .cs{margin-bottom:0}
-.app .sec.lead-evbody{padding-top:var(--s05)}
+/* AND TIGHTER AGAIN (Maryam, 7 Oct 2026: "reduce the gap between tab and bottom
+   content on both pages"). The first row is a `.tile` that pays its own 24px top
+   inset, so the section's 16 stacked on it read as ~40. The section pays none now;
+   the row's 24 is the whole tab-to-content gap, on both tabs. */
+.app .sec.lead-evbody{padding-top:0}
+/* ≥900 THE TWO ABOVE LOST, AND THE FIRST "FIX" SHIPPED DEAD (7 Oct 2026). The
+   section-rhythm chain inside `@container app (min-width:900px)` — `.app .page >
+   .sec:not(...)` x ~30 — pays both sections 24, so desktop still read 73px from
+   the strip to the avatar while 390 read 25. No plain selector outweighs that
+   chain; `!important` is the sanctioned answer (the authtight-card precedent). */
+.app .sec.sec-cs.lead-evtabs{padding-bottom:0 !important}
+/* …and 0 read too close (Maryam, 7 Oct 2026: "this is too close now, add a little
+   gap"): 12 on the section + the row's 24 = ~37 from the strip to the avatar. */
+.app .sec.lead-evbody{padding-top:var(--s04) !important}
 .app .lead-cohd-id{display:flex;flex-direction:column;gap:2px}
 /* the cohort title reads in the accent as ink (Maryam 30 Sep 2026: "make the
    cohort name in accent color"). §63 does not target this class, so its colour is

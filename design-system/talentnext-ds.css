@@ -14,7 +14,7 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 6420.  Rules dropped as product-specific: 225.
+   Rules kept: 6426.  Rules dropped as product-specific: 225.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
@@ -3994,7 +3994,7 @@ button{font-family:var(--font-sans)}
 .app .b-mk img{display:block; width:100%; height:100%; object-fit:contain}
 .app .b-earn-t{font-size:11.5px; line-height:16px; color:var(--text-secondary); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 .app .b-pts{grid-column:3; grid-row:1; text-align:right; font-size:14px; line-height:19px; font-weight:600; font-variant-numeric:tabular-nums}
-.app .brow.mine{background-color:var(--accent-tint)}
+.app .brow.mine{background-color:color-mix(in srgb, var(--accent) 6%, var(--background))}
 .app .brow.mine .b-nm,
 .app .brow.mine .b-pts{color:var(--accent-on-2)}
 .app .brow.mine .b-n{color:var(--accent-on-2)}
@@ -5632,7 +5632,9 @@ button.btn-p:active,
 .app .lead-cohd{display:grid; gap:var(--s02)}
 .app .sec.sec-cs.lead-evtabs{padding-bottom:0}
 .app .sec.sec-cs.lead-evtabs > .cs{margin-bottom:0}
-.app .sec.lead-evbody{padding-top:var(--s05)}
+.app .sec.lead-evbody{padding-top:0}
+.app .sec.sec-cs.lead-evtabs{padding-bottom:0 !important}
+.app .sec.lead-evbody{padding-top:var(--s04) !important}
 .app .lead-cohd-id{display:flex; flex-direction:column; gap:2px}
 .app .lead-cohd-n{font-size:var(--t-h1-size); line-height:var(--t-h1-lh); font-weight:var(--t-w-strong); color:var(--accent-text)}
 .app .lead-cohd-course{font-size:var(--t-desc-size); line-height:normal; color:var(--text-secondary)}
@@ -8351,6 +8353,8 @@ button.btn-p:active,
 .app .dark-card .btn:not(.btn-p){border-color:transparent}
 .app .dark-card .tile,
 .app .dark-card .note{background-color:transparent}
+.app .dark-card .btn.btn-s,
+.app .dark-card .btn.btn-s:hover:where(.__nh){background-color:transparent}
 
 /* ---- 76-bookpage.css ---- */
 .app .sec-bk{display:flex; flex-direction:column; gap:0}
@@ -9164,11 +9168,11 @@ button.btn-p:active,
 .app .ob-mode.on .ob-mode-bars > i{background:var(--on-dark)}
 .app .ob-stage-chat{justify-content:center; gap:var(--s07); overflow-y:auto; padding:var(--s06) 0}
 .app .ob-open-chat .ob-stage-chat > *{width:100%; max-width:460px; margin:0 auto}
-.app .ob-open-chat{--ob-orb-sm:104px}
+.app .ob-open-chat{--ob-orb-sm:144px}
 .app .ob-chat-head{display:flex; flex-direction:column; align-items:center; text-align:center}
 .app .ob-chat-lede{width:100%}
 .app .ob-chat-act{margin-top:var(--s07)}
-.app .ob-orb-sm{width:var(--ob-orb-sm); height:var(--ob-orb-sm); aspect-ratio:auto; margin-bottom:var(--s06)}
+.app .ob-orb-sm{width:var(--ob-orb-sm); height:var(--ob-orb-sm); aspect-ratio:auto; margin-bottom:var(--s06); position:relative; top:-20px}
 .app .ob-orb-sm .ob-bars{font-size:calc(var(--ob-orb-sm) * .036)}
 .app .ob-chat-lede > p{margin:0 0 var(--s05)}
 .app .ob-chat-lede > p:last-child{margin-bottom:0}
@@ -10230,6 +10234,9 @@ button.btn-p:active,
 .app .conf.conf-ok .conf-mk{background:var(--accent); box-shadow:none; margin-bottom:var(--s04)}
 .app .conf .conf-mk svg,
 .app .conf.conf-ok .conf-mk svg{color:var(--on-accent)}
+.app .conf .conf-b > .f{align-self:stretch; width:100%}
+.app .conf .dd-cx{width:20px; height:20px; margin:0 0 0 auto; color:var(--icon-primary)}
+.app .conf .dd-tick{width:18px; height:18px; margin:0; color:var(--accent-text)}
 
 /* ---- 135-tblob.css ---- */
 .borb{--tblob-rose:#ff6e60}

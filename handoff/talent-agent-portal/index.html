@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TalentNext — Talent Agent portal</title>
+
+<!-- ==========================================================================
+     THE DESIGN SYSTEM. Two files, fonts embedded in the first, so this is the
+     whole dependency. Serve over http — a browser blocks a linked stylesheet
+     on file://:
+         python3 -m http.server 8799 --bind 127.0.0.1
+     Every class used below is a real class from design-system/gallery.html.
+     The <style> block is prototype chrome and NOTHING ELSE — the wordmark's
+     size, and the stage's foot padding, which the design system sizes for a
+     caption row this file does not print. It held one product rule until §78
+     took the app bar's role label out for the breadcrumb trail; that rule is
+     deleted and its note records what it argued. Nothing here restyles a
+     component.
+
+     SYNCED TO THE CURRENT COMPONENT GENERATION, 4 Sep 2026 (/portal-sync).
+     The first pass compared the classes this file writes with the classes
+     the box ships and called it current; Maryam saw the first screen and did
+     not agree, and she was right — a class inventory cannot see an older
+     SHAPE of a component whose classes still ship. `hifi/compdiff.mjs` puts a
+     hifi screen and this file's screen side by side and is the method now.
+     What it found and what moved: the Tal dock takes §70's travelling light
+     (`AI_RUN`, hifi's `ai4.js` verbatim) and the forward arrow, with no mic
+     because this file has no dictation; the Interviews strip is `.sec.sec-cs`
+     + `.cs` like every other tab row on the three portals, not `.tabs`; two
+     sections lost an `.info` class no layer styles; `.prog-fb`'s label is a
+     bare text node per hifi's recipe. In the layers, only this portal draws
+     `41-cal.css`, so its eleven literal sizes and weights now read the type
+     roles, and nine literal 600s in shared components read `--t-w-strong`
+     (§63 §50 has the list and the 289 that remain, flagged). Verified: the
+     rule sweep clean on 21 screens, 84 screen-width combos with no overflow,
+     zero thrown errors.
+     ========================================================================== -->
+<link rel="stylesheet" href="css/design-system.css">
+
+<link rel="stylesheet" href="css/agent-portal.css">
+
+<link rel="stylesheet" href="css/agent-portal-2.css">
+
+<link rel="stylesheet" href="css/agent-portal-3.css">
+</head>
+<body>
+
+<!-- prototype chrome — a floating FAB in the product's own UI, matching hifi
+     (Maryam, 16 Sep 2026: "the talent agent top black prototype switcher bar has
+     become this. please implement the floating button here as well"). The old
+     `.pt-bar` is gone so the app fills the page height; the `.pt-menu`/`.pt-*`
+     styles come from the design system this page links, and the controls keep
+     their ids (#pick / #vp) so the chrome JS below wires them. -->
+<div class="pt-menu" id="ptMenu">
+  <button class="pt-toggle" id="ptToggle" aria-label="Prototype controls" aria-haspopup="true" aria-expanded="false">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="12" cy="19" r="1.7"/></svg>
+  </button>
+  <div class="pt-panel" id="ptPanel">
+    <span class="pt-lab">Stage</span>
+    <div class="pt-stages" id="pick" role="group" aria-label="Agent stage"></div>
+    <span class="pt-lab">Device</span>
+    <div class="pt-vp" id="vp" role="group" aria-label="Viewport">
+      <button data-vp="mobile">Mobile</button>
+      <button data-vp="tablet">Tablet</button>
+      <button data-vp="fluid" class="on">Desktop</button>
+      <span class="pt-scale" id="vpscale">100%</span>
+    </div>
+  </div>
+</div>
+
+<div class="pt-stage">
+  <div class="pt-fit" id="fit">
+    <div class="device" id="device" data-vp="fluid"></div>
+  </div>
+  <!-- NO CAPTION UNDER THE DEVICE. `.pt-cap` used to print the stage's own
+       sentence here — "A working week. Stage 4. Two interviews ahead, one report
+       due tonight…" — which is the same job Tal's card does at the head of every
+       page, in the product, where the reader is looking. Two summaries of one
+       screen, and the outer one was the only thing at the foot of the frame, so
+       it read as the portal's own bottom bar. The stage prose is still written:
+       it is the `title` on each option in the stage picker above, which is where
+       somebody choosing a stage would want it. -->
+</div>
+
+<script src="js/01-design-system.js"></script>
+<script src="js/02-agent-portal.js"></script>
+</body>
+</html>

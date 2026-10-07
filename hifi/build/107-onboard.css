@@ -837,7 +837,8 @@
    `--ob-orb-sm` IS A TOKEN BECAUSE TWO RULES READ IT — the box here and the
    voice bars' `em` base in §0c. Stated once so the indicator cannot drift out
    of proportion with the orb it sits inside. */
-.app .ob-open-chat{--ob-orb-sm:104px}
+   /* 144px (Maryam, 7 Oct 2026: "make the blob bigger"), was 104. */
+.app .ob-open-chat{--ob-orb-sm:144px}
 /* THE WHOLE BLOCK CENTRES, ORB AND PROSE TOGETHER (Maryam, 3 Sep 2026: "the
    good morning and the other text should be middle aligned to blob and it
    should be center aligned on the page"). It shipped left-aligned for one
@@ -863,7 +864,11 @@
 .app .ob-chat-act{margin-top:var(--s07)}
 .app .ob-orb-sm{
   width:var(--ob-orb-sm);height:var(--ob-orb-sm);
-  aspect-ratio:auto;margin-bottom:var(--s06)}
+  aspect-ratio:auto;margin-bottom:var(--s06);
+  /* 20px higher (Maryam, 7 Oct 2026: "take it 20px above"). `top`, not a
+     transform or margin: an entrance keyframe owns transform (trap 2), and a
+     margin would shift the centred block and move the text with it. */
+  position:relative;top:-20px}
 .app .ob-orb-sm .ob-bars{font-size:calc(var(--ob-orb-sm) * .036)}
 
 /* THE OPENING MESSAGE IS PROSE, NOT A BUBBLE — reference 3 draws it as the

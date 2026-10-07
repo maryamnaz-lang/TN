@@ -1,0 +1,54 @@
+/* ==========================================================================
+   PROTOTYPE CHROME ONLY — not product design.
+
+   `.pt-bar`, `.pt-stage`, `.pt-fit` and `.device` all come from the design
+   system, including `container-type:inline-size; container-name:app` on
+   `.device`, which is the host requirement — nothing in this system responds
+   to the browser window, every breakpoint is `@container app (min-width:…)`.
+
+   What is left here is the mark. `TN_MARK` carries a viewBox and no size — on
+   purpose, so a call site can scale it — and the portal ships a PNG lockup we
+   do not have, so the bar and the app bar each say how big it is and, on the
+   black bar, what colour.
+   ========================================================================== */
+.pt-bar img{height:18px;width:auto;flex:none}
+
+/* AND THE CAPTION'S ROOM GOES WITH THE CAPTION. `.pt-stage` is
+   `padding:var(--s06) var(--s05) var(--s10)` in the design system — 64px at the
+   foot, which was the band the caption row sat in, plus a 16px flex `gap` to
+   separate the two. This file has no caption any more (see the note where
+   `.pt-cap` used to be), so both were reserving space for an element that is
+   not there: the phone and tablet frames floated 64px above the bottom of an
+   empty white strip. It is overridden HERE rather than in the stylesheet
+   because `gallery.html` and `starter.html` still print a caption and still
+   want the room — this is one file's chrome, which is what this block is for.
+   The foot matches the head (§ line 2418 already takes the top to `--s05`), so
+   the frame sits in an even margin rather than against the window edge. */
+.pt-stage{padding-bottom:var(--s05);gap:0}
+
+/* ==========================================================================
+   THERE IS NO PRODUCT RULE IN THIS FILE ANY MORE, AND THAT IS THE POINT
+
+   A `.shell .shell-name` block was here — three declarations restyling the app
+   bar's role label for this portal only: 20px of left padding off the nav
+   toggle, `#000000` rather than the system's #111111, and `font-weight:600`
+   because the label's inherited 500 was being synthesised off the 400 file
+   (the platform face is embedded at 400 and 600 and nothing between).
+
+   IT IS DELETED BECAUSE §78 TOOK THE LABEL OUT OF THE BAR. The breadcrumb
+   trail has that slot now, and nothing in this file writes `.shell-name` — so
+   the rule was the "gate nothing writes" tell, in the one place this file
+   writes CSS at all. §63 §18 states the trail's three inks and §78 its
+   spacing, both out of the design system, so the replacement needs no local
+   rule either.
+
+   The two arguments worth keeping if a bar label ever comes back: the shell's
+   own `gap` is `var(--s02)` — 4px, a gap between controls rather than a gutter
+   for type — and a weight between 400 and 600 is a faux-bold of Regular rather
+   than the real SemiBold, so it must be written as one of the two the face has.
+
+   THIS FILE'S TYPEFACE CHANGED ON 4 SEP 2026 AND IT NEEDED NO EDIT, which is
+   the design system working as designed. Söhne became Plus Jakarta Sans in
+   `hifi/build/11-type.css`; `build-ds.py` embeds whatever that layer names, and
+   this page links `talentnext-ds.css`. Re-running that build IS the change
+   here. Do not add an `@font-face` or a `font-family` to this file. */

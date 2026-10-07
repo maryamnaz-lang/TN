@@ -6395,7 +6395,7 @@ login: () => `${authShell()}
         under the password, a "Remember me" box and one Log In button. `Log In`
         is the supplied casing (kept exactly). The button logs into the
         candidate dashboard (`data-loginas`). */}
-  ${ph('Log In','Enter your details to sign in to your account.')}
+  ${ph('Log In','Enter your account details to successfully signin.')}
   <div class="sec sec-rule">
     <div class="f"><label for="lem">Email Address</label>
       <input class="inp fill" id="lem" type="email" placeholder="Enter your email address"></div>
@@ -6688,9 +6688,9 @@ const preStartBlock = (f) => {
           <p class="crow-x">${COHORT_COURSE} &middot; starts ${dateStr}</p>
         </div>
       </div>
-      <div class="crow-a crow-a1">
-        <button class="btn btn-sm noic" data-go="cohort">Meet your cohort ${I.arrowRight}</button>
-      </div>
+      ${''/* NO ACTION ON THIS CARD (Maryam, 7 Oct 2026: "no need of meet your
+            cohort button"). The `.crow-a` group is omitted, not emptied, so no
+            empty column is reserved; the Cohort page stays on the rail. */}
     </div>
   </div>`;
 };
@@ -7384,7 +7384,7 @@ V.dashboard = (f) => {
     <div class="sec">
       <div class="ai-aura tile">
         <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
-        <div class="ai-body"><p>You are enrolled on <b>Cohort 41</b>, led by <b>Priya Nair</b>. It starts in ${f.startIn} days. Coursework opens on the start day; until then, you can meet your cohort.</p></div>
+        <div class="ai-body"><p>You are enrolled on <b>Cohort 41</b>, led by <b>Priya Nair</b>. It starts in ${f.startIn} days. Your cohort and the coursework open on the start day.</p></div>
       </div>
     </div>
     ${preStartBlock(f)}`;
@@ -8163,11 +8163,13 @@ V.report = (f) => `<main class="main"><div class="page">
         and signed by Priya Nair" 400px below this card. The crumb above says
         Report. §05's `.lvl-hero .eb` rules keep a caller — `V.level`'s
         pre-interview state — so nothing is orphaned. */}
-  <div class="lvl-hero">
-    <div class="big">${lvlName(f.level)}</div>
-    <div class="sub">Level ${rungOf(f.level)} of 15 on the Explorer track</div>
-    ${ladder(f.level)}
-  </div>
+  ${''/* THE LEVEL CARD IS MY LEVEL'S OWN BLACK CARD (Maryam, 7 Oct 2026: "the
+        interview detail page black card should be like the my level page black
+        card"). `lvlWing(f)` replaces the old `.lvl-hero` (big name, "Level N of
+        15" sub, bare ladder) so the two pages draw one card: "Where you are on
+        the ladder", the level, the confirmed line, "N of 15", the labelled
+        fifteen-rung bar. */}
+  ${lvlWing(f)}
   ${''/* THE SCENES ARE THE SECOND BLOCK ON THE PAGE.
         First is the level card, which `placeDark` lifts into the module head
         band (trap 12) — so this is the first thing in the page proper, above
@@ -8350,7 +8352,8 @@ function ivTopicBlock(){
    dialog with our dropdown for the reason (a note when "Other"), then Cancel
    returns to the marketplace (`data-ivcanceldo` -> `setStage('new')`). `.dd-open`
    on the body while the dropdown is open keeps its menu from being clipped
-   (§123.4). Reason lives in `S.ddVal.ivcancel`, note in `S.ivCancelNote`. */
+   (§123.4). Reason lives in `S.ddVal.ivcancel`, note in `S.ivCancelNote`.
+   Cancel is the FILLED danger button with no cross (Maryam, 7 Oct 2026). */
 const IV_CANCEL_REASONS = ['Something came up','I want a different agent','I am not ready','Other'];
 function ivCancelModal(){
   const reason = S.ddVal.ivcancel || IV_CANCEL_REASONS[0];
@@ -8365,7 +8368,7 @@ function ivCancelModal(){
       </div>
       <div class="sheet-f conf-a">
         <button class="btn btn-s noic" data-ivcancelclose="1">Keep it</button>
-        <button class="btn btn-t danger noic" data-ivcanceldo="1">Cancel interview ${I.close}</button>
+        <button class="btn btn-p danger noic" data-ivcanceldo="1">Cancel interview</button>
       </div>
     </div>
   </div>`;
@@ -10240,8 +10243,11 @@ const ivBookedModal = () => {
     <div class="sheet conf conf-ok" role="dialog" aria-modal="true" aria-label="Interview booked">
       <div class="sheet-b conf-b">
         <span class="conf-mk">${I.checkFilled}</span>
-        <h2 class="conf-t">Interview booked</h2>
-        <p class="conf-x">Your time with ${a.n} is confirmed. It is on your dashboard, and the interview is what sets your level.</p>
+        ${''/* COPY (Maryam, 7 Oct 2026, supplied, kept exactly). The price is
+              `ivFeeLabel`, so a complimentary first interview reads the struck
+              price + "Free" and a re-interview its charged fee. */}
+        <h2 class="conf-t">Interview Booked!</h2>
+        <p class="conf-x">You have booked an interview with ${a.n} in ${ivFeeLabel(!!cfg(S.stage).reinterview, a.price)}. Join the interview on your selected slot and get to know of your level.</p>
       </div>
       <div class="sheet-f conf-a">
         <button class="btn btn-p noic" data-ivbooked="0">View My Dashboard</button>

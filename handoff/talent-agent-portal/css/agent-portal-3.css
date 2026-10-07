@@ -1,0 +1,110 @@
+/* ==========================================================================
+   INTERVIEW SCREEN — stack "Interview recording" and "Tal's read" (Maryam,
+   22 Sep 2026: "both content should be below the heading, the Tal's read
+   paragraph full width"). §10.15's label column keys its opt-out on the
+   content class; `.iv-rec` and `.tal-eval` are not on that list, so they got
+   the 184px spine. This restates the DS opt-out (its exact declarations) for
+   those two, so they read like "The interview" (.stats) and "Your
+   recommendation" (.eval-form): heading above, content full width. Inside the
+   ≥900 tier per trap 3; agent-portal-local markup, so kept out of the DS.
+   ========================================================================== */
+@container app (min-width:900px){
+  .app .sec:has(> .iv-rec),
+  .app .sec:has(> .tal-eval){display:block}
+  .app .sec:has(> .iv-rec) > .sec-h,
+  .app .sec:has(> .tal-eval) > .sec-h{border-right:0; min-height:0; margin-bottom:var(--sec-h-gap); padding:0 var(--pad-x)}
+}
+/* Tal's read paragraph runs full width (Maryam, 22 Sep 2026). The DS caps BOTH
+   `.ai-body` and `.ai-body p` at 68ch (the reading measure) and lifts them only
+   for `.ai-aura`; `.tal-eval` is not `.ai-aura`, so lift both here too. */
+.app .tal-eval .ai-body,
+.app .tal-eval .ai-body p{max-width:none}
+
+/* THE RECOMMENDATION FORM breathes (Maryam, 22 Sep 2026: "sub sections are too
+   close ... gaps around 20px"; bumped to 32 on 2 Oct 2026: "all these sections
+   should have the 32px spaces between them"). 32px between every field, a clear
+   label-to-control gap. The rule is (0,3,0), so it beats each field's `.mt5`. */
+.app .eval-form > .f{margin-top:var(--s07)}
+.app .eval-form > .f > .lbl{display:block; margin-bottom:var(--s03)}
+
+/* A DROPDOWN OPTION MAY CARRY A DESCRIPTION (Maryam, 22 Sep 2026) — used by the
+   TALENT-type picker so the agent knows what each acronym means. `dd(...,{desc})`
+   stacks the label over its meaning; the tick sits at the top-right. */
+.app .dd-opt-2{align-items:flex-start}
+.app .dd-opt-main{display:flex; flex-direction:column; gap:3px; min-width:0}
+.app .dd-opt-d{font-size:12px; line-height:1.45; color:var(--text-secondary); font-weight:400; white-space:normal}
+.app .dd-opt-2 .dd-tick{margin-top:3px; flex:none}
+
+/* The unreached ladder rungs read #efefef, not the beige --layer-accent-01
+   (Maryam, 22 Sep 2026: "the grey on the tiles needs to be #efefef"). The passed
+   (.done, accent) and current (.on, tint) rungs have higher specificity, so only
+   the plain future tiles change. */
+.app .iv-ladder .ladder i{background:var(--rule)}
+
+/* THE LADDER IS THE LEVEL PICKER (Maryam, 22 Sep 2026) — rungs are clickable; the
+   label sits above them. Cursor + a hover/focus affordance so it reads as pickable. */
+.app .eval-form .f > .iv-ladder{margin-top:0}
+.app .iv-ladder .ladder-pick i{cursor:pointer}
+.app .iv-ladder .ladder-pick i:not(.done):not(.on):hover{background:var(--gray-20)}
+.app .iv-ladder .ladder-pick i:focus-visible{outline:2px solid var(--accent); outline-offset:1px}
+
+/* THE TALENT-LETTERS MULTI-SELECT (13.13) — the evaluation captures 1–6 letters,
+   not a single type. Round pills like the admin levelling picker; a picked chip
+   takes the accent as ground-tint + edge + ink (the review widget's own
+   affordance), the letter carried in a bold cap. `.ltr-cloud` opts out of the
+   label column via `.eval-form` already; this is only the chip skin. */
+.app .ltr-cloud{display:flex; flex-wrap:wrap; gap:var(--s03)}
+/* THE "TALENT letters" HEADING SITS AN ADDED 8px CLEAR OF THE CHIPS (Maryam,
+   2 Oct 2026: "still congested — do the 8px gap addition with the heading and the
+   chips as well"). The default label margin (8) + the asked 8 = 16, but two
+   adjacent block margins COLLAPSE to 8, so the gap is set on the label in one
+   value (`--s05` 16) rather than split across both. Scoped to the letters field
+   via `:has(> .ltr-cloud)`, so the textarea fields keep their 8. */
+.app .eval-form > .f:has(> .ltr-cloud) > .lbl{margin-bottom:var(--s05)}
+.app .ltr-chip{display:inline-flex; align-items:center; gap:var(--s02);
+  padding:7px 14px; border-radius:999px; border:1px solid var(--border-subtle-02);
+  background:var(--background); cursor:pointer; color:var(--text-secondary);
+  font-size:var(--t-body-size); line-height:1; transition:background .12s, border-color .12s, color .12s}
+.app .ltr-chip .ltr-c{font-weight:var(--t-w-strong); color:var(--text-primary)}
+.app .ltr-chip.on{border-color:var(--accent); background:color-mix(in srgb, var(--accent) 8%, transparent); color:var(--accent-text)}
+.app .ltr-chip.on .ltr-c{color:var(--accent-text)}
+.app .ltr-chip:focus-visible{outline:2px solid var(--accent); outline-offset:1px}
+.app .ltr-hint{display:block; margin-top:var(--s03); color:var(--text-secondary); font-size:var(--t-desc-size)}
+/* 8px between the TALENT-letters sub-rows (Maryam, 2 Oct 2026: "too congested,
+   give them more gap of 8px") — "Tal recommends" → chips, and chips → hint (the
+   `.ltr-hint` above). The same `--s03` sits under the ladder's "Tal recommends". */
+.app .ltr-tal{color:var(--text-secondary); margin-bottom:var(--s03)}
+.app .ltr-tal b{color:var(--accent-text); font-weight:var(--t-w-strong)}
+/* The divergence note the form shows when the agent's rung differs from Tal's
+   (13.13 "recording the divergence"). A quiet secondary line, not an error. */
+.app .eval-diverge{margin-top:var(--s03); color:var(--text-secondary); font-size:var(--t-desc-size)}
+.app .eval-diverge b{color:var(--text-primary); font-weight:var(--t-w-strong)}
+/* An optional-field marker on a label, and the two-button evaluation action row. */
+.app .lbl-opt{color:var(--text-secondary); font-weight:var(--t-w-book)}
+.app .eval-actions{display:flex; gap:var(--s04); flex-wrap:wrap}
+/* The read-only training-module status (13.16). Complete reads as a green tick +
+   line; the Open-training link is the platform's one blue. */
+.app .tm-done{display:inline-flex; align-items:center; gap:var(--s02)}
+.app .tm-done svg{width:18px; height:18px; color:var(--support-success-ink)}
+.app .tm-link{color:var(--link); text-decoration:none; display:inline-flex; align-items:center; gap:var(--s02)}
+.app .tm-link svg{width:16px; height:16px}
+.app .tm-link:where(.__nh):hover{color:var(--link-hover)}
+/* ACCENT LINK (Maryam, 2 Oct 2026) — a no-box button whose label and trailing
+   arrow are both the accent as ink. Used for "Update Payout Destination". */
+.app .btn.acc-link{background:transparent; border:0; min-height:0; padding:0;
+  color:var(--accent-text); gap:var(--s02)}
+.app .btn.acc-link svg{fill:var(--accent-text)}
+.app .btn.acc-link:where(.__nh):hover{background:transparent; color:var(--accent-text)}
+/* PAYOUT DESTINATION ROW (Maryam, 2 Oct 2026) — the state tick sits inline after
+   the bank name on the top row; the two rows are 4px apart. */
+.app .dest-b{display:flex; flex-direction:column; gap:var(--s02)}
+.app .dest-t{display:inline-flex; align-items:center; gap:var(--s02)}
+.app .dest-tick svg{width:16px; height:16px}
+/* LIST-ROW LEADING MARKS ARE BARE ICONS, NOT BOXED CHIPS (Maryam, 2 Oct 2026:
+   "remove this block of icons, only icons are enough"). Portal-wide: `.cardrow-ic`
+   sheds its 40px box, background and border, leaving the glyph. `.app .main` is
+   (0,3,0), matching the DS `.sec:has(> .tile-stack) .cardrow-ic` rule and winning
+   the tie by loading later. A row that WANTS a face (the Earnings holding list)
+   uses `.mem-av` instead, so this only touches rows that kept an icon. */
+.app .main .cardrow-ic{width:auto; height:auto; background:transparent;
+  background-image:none; border:0}

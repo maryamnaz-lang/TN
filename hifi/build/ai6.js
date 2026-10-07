@@ -344,7 +344,7 @@ const PAGESUM = {
        thing to do is a section on the page (meet your cohort), not a popover, and
        the rest is settled. No em dash (Tal voice). trap 11 needs this entry so
        the placeholder card has a summary to become. */
-    enrolPre: 'You are enrolled on <b>Cohort 41</b>, led by <b>Priya Nair</b>. It starts in 6 days. You can <b>read the course outline</b> and meet your cohort now; the chapters, Course Progress and Achievements open on the start day.',
+    enrolPre: 'You are enrolled on <b>Cohort 41</b>, led by <b>Priya Nair</b>. It starts in 6 days. You can <b>read the course outline</b> now; your cohort, the chapters, Course Progress and Achievements open on the start day.',
 
     /* COHORT CANCELLED, MOVED TO A REPLACEMENT (story 7.6 / 15.2). The admin&rsquo;s
        reason is internal and is never shown here. */

@@ -90,7 +90,7 @@ const STAGES = [
      course-enrolment flow lands here rather than on `week1`; the reader picks
      `week1` (the running cohort) from the stage menu themselves. In the menu
      alongside the other stages, like every stage in this list. */
-  ['enrolPre','Enrolled, cohort not started','Enrolment done, cohort has not begun. Cohort and Messages appear; coursework does not until the start day.'],
+  ['enrolPre','Enrolled, cohort not started','Enrolment done, cohort has not begun. Messages appears; the Cohort page and coursework open on the start day.'],
   ['week1',   'Week 1',                'Cohort 41 has started. Full navigation, eight items. Nothing done yet.'],
   ['day34',   'Day 34',                'Mid-course. Chapter 4 has stalled and one task is overdue.'],
   ['day90',   'Day 90, course finished','All 13 chapters done. The re-interview unlocks now.'],
@@ -437,8 +437,8 @@ const NOTIF = {
   /* ENROLLED, COHORT NOT STARTED — enrolment confirmed, the leader assigned, the
      cohort still to begin. */
   enrolPre:[
-    {ic:'ticket',   t:'You are enrolled',              b:'Cohort 41 on Communicating with Impact. It starts in 6 days.',  w:'1h ago', go:'cohort',    unread:1},
-    {ic:'group',    t:'Your leader is Priya Nair',     b:'She will lead your cohort through the 90 days.',                 w:'2h ago', go:'cohort',    unread:1},
+    {ic:'ticket',   t:'You are enrolled',              b:'Cohort 41 on Communicating with Impact. It starts in 6 days.',  w:'1h ago', go:'dashboard',    unread:1},
+    {ic:'group',    t:'Your leader is Priya Nair',     b:'She will lead your cohort through the 90 days.',                 w:'2h ago', go:'dashboard',    unread:1},
     {ic:'creditCard',t:'Payment received',             b:'$120 for Cohort 41. Receipt in Payments.',                      w:'Yesterday', go:'billing', unread:0}
   ],
   week1:[
@@ -465,8 +465,8 @@ const NOTIF = {
   ],
   /* COHORT CANCELLED, MOVED TO A REPLACEMENT (story 7.6 / 15.6). */
   cancelled:[
-    {ic:'warning',  t:'Your cohort was cancelled',     b:'You have been moved to Cohort 47, which starts on 12 Mar 2026.', w:'1h ago', go:'cohort',    unread:1},
-    {ic:'group',    t:'Your leader is Priya Nair',     b:'She will lead your new cohort through the 90 days.',              w:'2h ago', go:'cohort',    unread:1},
+    {ic:'warning',  t:'Your cohort was cancelled',     b:'You have been moved to Cohort 47, which starts on 12 Mar 2026.', w:'1h ago', go:'dashboard',    unread:1},
+    {ic:'group',    t:'Your leader is Priya Nair',     b:'She will lead your new cohort through the 90 days.',              w:'2h ago', go:'dashboard',    unread:1},
     {ic:'checkOutline',t:'Your paid enrolment carried over',b:'No new payment is needed for the replacement cohort.',       w:'Yesterday', go:'billing', unread:0}
   ],
   /* INTERVIEW COULD NOT TAKE PLACE, REBOOKING CREDIT ACTIVE (story 8.3 / 15.6). */
@@ -496,7 +496,10 @@ const NAVSETS = {
      shows the course name and the full outline so the candidate can read what
      they are about to study. `V.coursework` branches on `f.preStart` to draw the
      preview rather than the frame. Profile is drawn in the rail foot. */
-  enrolPre:[['dashboard','Dashboard','dashboard'],['level','My Level','growth'],['coursework','Coursework','book'],['interviews','Interviews','calendar'],['billing','Payments','wallet'],['cohort','Cohort','group'],['messages','Messages','chat',1]],
+  enrolPre:[['dashboard','Dashboard','dashboard'],['level','My Level','growth'],['coursework','Coursework','book'],['interviews','Interviews','calendar'],['billing','Payments','wallet'],['messages','Messages','chat',1]],
+  /* NO COHORT PAGE BEFORE THE START DAY (Maryam, 7 Oct 2026: "i do not think we
+     need to show this page before the cohort starts"). `cohort` left this set; it
+     returns with `week1`'s nav. */
   /* THE MODULE IS "ACHIEVEMENTS" AND THE CURRENCY IS STILL "POINTS" (Maryam,
      31 Aug 2026). The rename is the module's NAME — this label, the page's
      `ph()`, its `crumb()`, Tal's `where` map and the "Open Achievements" button

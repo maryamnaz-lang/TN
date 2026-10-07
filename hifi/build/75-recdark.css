@@ -562,3 +562,11 @@
   border-color:var(--on-dark-rule)}
 .app .dark-card .btn:not(.btn-p){border-color:transparent}
 .app .dark-card .tile,.app .dark-card .note{background-color:transparent}
+
+/* A QUIET BUTTON ON A BLACK CARD HAS NO FILL (Maryam, 7 Oct 2026: "why did you
+   add the grey fill in the top right button on black card"). §02's 2 Oct rule
+   made `.btn-s` a filled `--rule` grey for the light ground (the Cancel half of
+   a sheet's pair); it reached every `.btn-s` on a `.dark-card` too, so "View
+   Other Courses" became white ink on a pale grey slab. On the black card the
+   quiet button stays what it was: no ground, no edge, white words + arrow. */
+.app .dark-card .btn.btn-s,.app .dark-card .btn.btn-s:hover{background-color:transparent}

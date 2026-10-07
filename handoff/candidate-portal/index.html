@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TalentNext — Candidate Portal · v24 · Material UI · Responsive</title>
+<link rel="stylesheet" href="css/portal.css">
+</head>
+<body>
+<!-- prototype chrome — not part of the product -->
+<!-- THE CHROME IS A FLOATING MENU, not the old top black bar (Maryam, 16 Sep
+     2026). §01's `.pt-menu` recipe: a kebab FAB bottom-right whose panel opens
+     upward and lists the stages and the device switcher INLINE — no logo row,
+     no nested <select>, no back/reset. `#pick` is now the `.pt-stages` container
+     (views.js fills it with `.pt-stage-opt` buttons); `#vp` / `#vpscale` are the
+     viewport switcher the tail script drives. The IDs the JS reads are kept. -->
+<div class="pt-stage">
+  <div class="pt-fit" id="fit">
+    <div class="device" id="device" data-vp="mobile"></div>
+  </div>
+</div>
+
+<div class="pt-menu" id="ptMenu">
+  <button class="pt-toggle" id="ptToggle" type="button" title="Prototype options" aria-label="Prototype options" aria-expanded="false"><svg viewBox="0 0 24 24"><path d="M12 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm0 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm0 6a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z"/></svg></button>
+  <div class="pt-panel">
+    <span class="pt-lab">Stage</span>
+    <div class="pt-stages" id="pick"></div>
+    <span class="pt-lab">Device</span>
+    <div class="pt-vp" id="vp" role="group" aria-label="Viewport">
+      <button data-vp="mobile" class="on">Mobile</button>
+      <button data-vp="tablet">Tablet</button>
+      <button data-vp="fluid">Desktop</button>
+      <span class="pt-scale" id="vpscale">100%</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     THE FRAME IS RESTORED BEFORE THE FIRST PAINT, NOT AFTER THE BUNDLE
+     Maryam, 31 Aug 2026, with a screen recording: a reload showed a phone
+     bezel on the dark stage, an empty white block inside it, and then the
+     desktop frame sliding out from under it.
+
+     ALL THREE ARE THE SAME CAUSE. `vpSet` is the LAST statement of the
+     script below, so the stored preference could not be applied until two
+     megabytes of bundle had parsed and rendered — until then the markup's
+     own `data-vp="mobile"` stood, which is the bezel. §01 then gives
+     `.device` a `transition` on `max-width` and `height`, so the correction
+     was not a jump but a 240ms slide, which is what made it read as the page
+     reloading twice.
+
+     THIS SCRIPT IS TINY AND IT IS FIRST. It stamps the attribute and the
+     switcher's `.on` before anything paints — and because the element has
+     no previous computed style at that point, THE TRANSITION DOES NOT RUN.
+     That is the whole fix for the slide; nothing had to be turned off, and
+     the transition is still there for a real press of the switcher, which is
+     the interaction it was written for.
+
+     AND THE BOX IS HIDDEN UNTIL THE APP IS IN IT, which is the third part —
+     a correctly sized empty white rectangle is still an empty white
+     rectangle for as long as the bundle takes to parse. `visibility` rather
+     than `display`, so the frame keeps its space and the stage does not
+     reflow when it arrives; and it is set from JS onto the element's own
+     style rather than stated in §01, DELIBERATELY: `.device` crosses into
+     `design-system/`, `tn-agent-portal.html` hosts itself in one, and a rule
+     hiding it until some class arrives would hide a hand-authored page for
+     good. A prototype-chrome concern belongs in the prototype's chrome.
+
+     IF THE BUNDLE NEVER PARSES the box stays hidden, and that is the right
+     failure: the alternative was an empty frame that looked like a rendered
+     product with nothing in it, which is the exact symptom the `node --check`
+     below exists to prevent shipping.
+     ============================================================ -->
+<script src="js/00-boot-1.js"></script>
+
+<script src="js/01-generated-assets.js"></script>
+<script src="js/02-icons.js"></script>
+<script src="js/03-data.js"></script>
+<script src="js/04-views.js"></script>
+<script src="js/05-ai.js"></script>
+<script src="js/06-ai2.js"></script>
+<script src="js/07-ai3.js"></script>
+<script src="js/08-ai4.js"></script>
+<script src="js/09-ai5.js"></script>
+<script src="js/10-nil.js"></script>
+<script src="js/11-lead.js"></script>
+<script src="js/12-lead2.js"></script>
+<script src="js/13-lead3.js"></script>
+<script src="js/14-lead4.js"></script>
+<script src="js/15-ai6.js"></script>
+<script src="js/16-ai7.js"></script>
+<script src="js/17-ai8.js"></script>
+<script src="js/18-lead5.js"></script>
+<script src="js/19-ai9.js"></script>
+<script src="js/20-ai10.js"></script>
+<script src="js/21-ai11.js"></script>
+<script src="js/22-tmpaccent.js"></script>
+<script src="js/23-ob.js"></script>
+<script src="js/24-orb.js"></script>
+<script src="js/25-orb-wire.js"></script>
+<script src="js/26-prototype-frame.js"></script>
+</body>
+</html>

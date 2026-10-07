@@ -32,3 +32,14 @@
 .app .conf .conf-mk,.app .conf.conf-ok .conf-mk{
   background:var(--accent);box-shadow:none;margin-bottom:var(--s04)}
 .app .conf .conf-mk svg,.app .conf.conf-ok .conf-mk svg{color:var(--on-accent)}
+
+/* A FIELD IN A `.conf` RUNS THE FULL WIDTH, AND ITS DROPDOWN CHEVRON IS THE
+   DROPDOWN'S OWN — Maryam, 7 Oct 2026, on the cancel-interview dialog ("give the
+   field full width, correct chevron size and color"). The body is a centred
+   flex column, so a `.f` shrank to its content; it stretches now. And §03.461's
+   `.conf svg` (40px, success green, auto margin — written for the old mark)
+   reaches every svg in the dialog, so the `dd()` chevron and the menu ticks drew
+   as 40px green marks. Restated here to §123's values at (0,3,0). */
+.app .conf .conf-b > .f{align-self:stretch;width:100%}
+.app .conf .dd-cx{width:20px;height:20px;margin:0 0 0 auto;color:var(--icon-primary)}
+.app .conf .dd-tick{width:18px;height:18px;margin:0;color:var(--accent-text)}

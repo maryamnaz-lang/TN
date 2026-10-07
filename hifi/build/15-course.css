@@ -1662,7 +1662,10 @@
   font-size:14px;line-height:19px;font-weight:600;
   font-variant-numeric:tabular-nums}
 /* your own standing */
-.app .brow.mine{background-color:var(--accent-tint)}
+/* A LIGHTER WASH (Maryam, 7 Oct 2026: "this highlighted row should be lesser in
+   tone"). Was the shared `--accent-tint`; the token is left alone for its other
+   readers and only this row drops to 6% accent over the card ground. */
+.app .brow.mine{background-color:color-mix(in srgb, var(--accent) 6%, var(--background))}
 .app .brow.mine .b-nm,.app .brow.mine .b-pts{color:var(--accent-on-2)}
 .app .brow.mine .b-n{color:var(--accent-on-2)}
 
