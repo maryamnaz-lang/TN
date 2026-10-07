@@ -5898,9 +5898,11 @@ button.btn-p:active,
 .app .steps .s-n svg{width:18px; height:18px; display:block; color:var(--support-success)}
 @container app (min-width:900px){
   .app .sec:has(> .msgs),
-  .app .sec:has(> .ivt-lines){display:block}
+  .app .sec:has(> .ivt-lines),
+  .app .sec:has(> .note-group){display:block}
   .app .sec:has(> .msgs) > .sec-h,
-  .app .sec:has(> .ivt-lines) > .sec-h{border-right:0; min-height:0; margin-bottom:var(--sec-h-gap); padding:0 var(--pad-x)}
+  .app .sec:has(> .ivt-lines) > .sec-h,
+  .app .sec:has(> .note-group) > .sec-h{border-right:0; min-height:0; margin-bottom:var(--sec-h-gap); padding:0 var(--pad-x)}
 }
 .app .cs button > .lf-n{margin-left:var(--s03); font-size:11px; font-weight:600; font-variant-numeric:tabular-nums; color:var(--text-helper)}
 .app .cs button.on > .lf-n{color:inherit; opacity:.7}

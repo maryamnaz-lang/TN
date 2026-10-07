@@ -49,6 +49,14 @@ const ldrSumOf = id => LEAD_SUMMARIES.filter(s => s.id === id)[0] || LEAD_SUMMAR
 S.ldrSum = null;
 S.ldrRec = null;
 S.ldrErr = false;
+/* RESTORE THE SUMMARY A RELOAD WAS ON — views.js writes its id as the hash's
+   fourth segment (`#leader/leadSum/<stage>/<id>`). Same prefill the row click
+   does, so a saved draft comes back too. */
+{ if(S.view === 'leadSum' && S.bootRec){
+    const id = S.bootRec;
+    if(LEAD_SUMMARIES.some(s => s.id === id)){
+      S.ldrSum = id; const d = ldrSumOf(id).draft;
+      S.ldrRec = d ? d.rec : 'promote'; S.ldrSumWhy = d ? d.why : ''; S.ldrGrowth = d ? d.growth : ''; S.ldrDev = d ? d.develop : ''; } } }
 /* EPIC 12.9 — the two written sections are mandatory, the send confirms, and a
    draft can be kept. */
 S.ldrGrowErr = false;
@@ -957,98 +965,41 @@ V.leadSum = () => {
         §91.5's `.sump-top` / `.sump-st` RULES GO WITH IT rather than being left
         as the "gate nothing writes" tell; `.note succ` is §02's and has other
         callers, so it stays. */''}
+  ${''/* THE PUBLISHED SUMMARY IS ONE COLUMN NOW (Maryam, 7 Oct 2026: "four cards
+         on top that tells the stats which are on the left right now and the
+         right side content should be below the cards"). §91's two columns
+         (candidate + figures left, recommendation right) give way to the same
+         stack the WAITING branch draws: the `.idhead` (with "View Candidates
+         Progress" in place of the column-foot "Their full record"), the four
+         figures as a `.stats` band, then "Your recommendation" below them. The
+         ring's figure becomes the Chapters cell; the recommendation strip and
+         the prose blocks are unchanged. */}
   <div class="sec">
-    <div class="sump">
-      ${/* THE LEFT COLUMN IS THE CANDIDATE, AND ITS HEADING IS ITS OWN.
-            `.idhead` is gone: it is a full-width header row with the face, three
-            lines and a button on one line, which is the shape this page had
-            before it had a column to put them in. The face is 88px and round —
-            §89.2's argument for the round mark, and the reference's own
-            drawing — with the name under it rather than beside it, because a
-            280px column reads down.
-            "Their full record" SURVIVES as the column's foot: it is the one
-            route off this page that is not the decision, and it was the
-            `.idhead`'s only reason to hold a button. */''}
-      <div class="sump-c">
-        <div class="sec-h"><h2>Candidate</h2></div>
-        <div class="sump-id">
-          <span class="av-ph sump-face" style="width:88px;height:88px"><i>${s.i}</i><img src="${AV[s.img]}" alt=""></span>
-          <span class="idname">${s.name}</span>
-          <span class="idmeta">${lname(c)} &middot; ${llevel(c)}</span>
-        </div>
-        ${/* THE RING IS THE PROGRESS FIGURE AND THE OTHER THREE ARE ROWS, which
-              is the reference's own split and it is right: the ring is the one
-              figure that is a PROPORTION of something whole, and the other
-              three are quantities. `ring()` is §32's component (two circles and
-              `--arc` as a dasharray length) at 48px here.
-              THE HUES ARE NAMED, NOT CYCLED — §65's rule and §72's. Blue for
-              the course, violet for the assessments, green for time, rose for
-              retakes, so a figure keeps its colour if the order ever changes. */''}
-        <div class="sump-ring">
-          ${ring(m.pc, `${m.pc}% of the course complete`)}
-          <span class="sump-rb"><span class="sump-fl">Overall progress</span>
-            <span class="sub">${lchDone(m)} of 13 chapters</span></span>
-        </div>
-        <div class="sump-figs">
-          ${figRow(I.chart, 'var(--mk-3)', 'Assessment average', m.avg + '<small>%</small>')}
-          ${figRow(I.time,  'var(--mk-2)', 'Time on the course', lhrs(lmins(m)))}
-          ${figRow(I.renew, 'var(--mk-4)', 'Chapters retaken', retakes)}
-        </div>
-        <button class="btn btn-g btn-sm noic sump-go" data-ldrco="${c.id}" data-ldrmem="${s.name}" data-go="leadMember">Their full record</button>
+    <div class="idhead">
+      <span class="av-ph" style="width:72px;height:72px"><i>${s.i}</i><img src="${AV[s.img]}" alt=""></span>
+      <div class="idhead-b">
+        <span class="idname">${s.name} ${ldrRecTag(s.rec)}</span>
+        <span class="idmeta">${lname(c)} &middot; 90 days complete</span>
+        <span class="tag sm">${llevel(c)}</span>
       </div>
-
-      <div class="sump-b">
-        ${/* NO HELPER LINE (Maryam, 2 Sep 2026: "remove the What you published
-              text"). It labelled the block as a record at the same moment the
-              block became one — the strip below now draws only the answer that
-              was given, in green, which says "published" better than the words
-              did. The draft branch keeps ITS helper ("This is what the next agent
-              reads") because there the sentence is a warning about a thing that
-              has not happened yet. */''}
-        <div class="sec-h"><h2>Your recommendation</h2></div>
-        ${/* ONLY THE ANSWER IS DRAWN (Maryam, 2 Sep 2026: "since the cohort
-              leader has already recommended so show only one green row that he
-              has recommended, exclude the other 4 rows from this block, also
-              remove the border of this block, green fill is enough").
-
-              THIS TURNS OVER THE PREVIOUS BUILD'S ARGUMENT, WHICH IS RECORDED
-              RATHER THAN DELETED. That version drew all five as one strip on the
-              reasoning that "a published summary that prints only the answer says
-              what was chosen, and a strip with one cell lit says what it was
-              chosen INSTEAD OF". The instruction is that the four unchosen rows
-              are not information on THIS page: the decision is taken, the leader
-              made it, and four grey rows saying what did not happen is the page
-              re-running a form it has already submitted. The alternatives are
-              still on the draft, which is where a choice is live.
-              WITH ONE ROW THE BOX IS THE ROW, so §91.3's outer `border` and the
-              per-row `border-top` both come off — a 1px rectangle around a single
-              green cell is the second frame §74 and §39 both argue against, and
-              the green ground already bounds it.
-              `LDR_RECS` IS STILL THE SOURCE and the row is still FOUND in it
-              rather than printed from `s.rec` — that is what keeps the
-              description in step with the label, and `ldrPub` only ever writes a
-              label that came out of this list (lead3's publish handler). A record
-              whose `rec` matched nothing would draw nothing, which is the honest
-              empty rather than a row with a blank description. */''}
-        ${/* THE LIT CELL IS GREEN, NOT THE ACCENT (Maryam, 1 Sep 2026: "for the
-              candidates that have already been assessed I can see that you
-              didn't follow the colors … from the reference"). It shipped for one
-              build in `--brand-tint-2` with `--accent-text` on the title, on the
-              reasoning that orange is this product's "you chose this" (§76's
-              slot picker). That reasoning is about a choice you are MAKING; a
-              published summary is a decision that has been taken, and the
-              reference draws it in the success register — a light green ground
-              and a green tick — which is also what this page's ring and its
-              notice now use. §91.3 states the two values.
-              `I.checkFilled` RATHER THAN THE REFERENCE'S STAR: a tick is what
-              this build draws for a thing that is settled, and the star is
-              Tal's mark (§70). */''}
-        <div class="sump-recs">
-          ${LDR_RECS.filter(([k,l]) => s.rec === l).map(([k,l,d]) => `<div class="sump-r on">
-              <span class="sump-rm">${I.checkFilled}</span>
-              <span class="sump-rb2"><span class="ttl">${l}</span><span class="sub">${d}</span></span>
-            </div>`).join('')}
-        </div>
+      <div class="idhead-a"><button class="btn btn-g" data-ldrco="${c.id}" data-ldrmem="${s.name}" data-go="leadMember">View Candidates Progress ${I.arrowRight}</button></div>
+    </div>
+  </div>
+  <div class="sec sec-noline">
+    <div class="stats">
+      ${statCell(I.book,  'Overall progress', m.pc + '<small>%</small>', lchDone(m) + ' of 13 chapters')}
+      ${statCell(I.chart, 'Assessment average', m.avg + '<small>%</small>', m.avg >= 85 ? 'well above the pass mark' : 'above the pass mark')}
+      ${statCell(I.time,  'Time on the course', lhrs(lmins(m)), Math.round(lmins(m)/Math.max(1,lchDone(m))) + ' min a chapter')}
+      ${statCell(I.renew, 'Chapters retaken', retakes, m.att.toFixed(1) + ' attempts on average')}
+    </div>
+  </div>
+  <div class="sec">
+    <div class="sump-b">
+      <div class="sec-h"><h2>Your recommendation</h2></div>
+        ${''/* NO GREEN BANNER (Maryam, 7 Oct 2026: "remove the green banner and
+              show a ready to promote chip next to the name just like we have on
+              the previous page"). The recommendation is `ldrRecTag(s.rec)` beside
+              the name in the `.idhead`, the Evaluated list's own chip. */}
         ${/* THE THREE PROSE BLOCKS ARE HEADED PARAGRAPHS, NOT `.kv` ROWS. That
               band gave a three-sentence answer a 184px label column and set it
               in the value's own 13.5px — which is right for "Recommendation —
@@ -1067,33 +1018,6 @@ V.leadSum = () => {
           ${!s.why && !s.growth && !s.develop
             ? `<p class="t-helper-01">No notes were added to this summary.</p>` : ''}
         </div>
-        ${''/* THE EMPTY STATE IS STILL HERE AND IT SHOULD NOW BE UNREACHABLE for
-               every record in the build: all six published summaries carry
-               `growth` and `develop`, and the three holds carry `why` as well.
-               It stays because the publish handler stores whatever was typed and
-               all three boxes are optional — a leader who publishes a promotion
-               with both boxes blank is allowed, and this is what that record
-               looks like rather than a column of headings with nothing under
-               them. */}
-        ${/* THE FOOT IS GONE — BOTH HALVES OF IT (Maryam, 2 Sep 2026: "remove
-              the bottom published by priya and back to evaluations button").
-
-              THE SIGNATURE was added one build earlier on the argument that "a
-              90-day summary is a document somebody signed and the only name on it
-              was in the app bar". The name is still in the app bar, and it is the
-              signed-in leader's own — this page is only ever reached from that
-              leader's own queue, so the line was telling the reader something
-              they are. It reads as provenance on a document that has been handed
-              over, and this page is the author's copy.
-              THE BUTTON was a second way out of a page that already has two: §78
-              put the trail in the top bar ("Evaluations ›") and the rail slot is
-              live. A black `.btn-p` at the foot also made the LAST thing on a
-              published record a call to action, which is the one thing a record
-              does not want — §60's neighbourhood, from the other end.
-              `.sump-sig`'s RULE GOES WITH IT (§91.4) rather than being left as a
-              gate nothing writes. `LEADER` and `avatar` both keep other readers
-              in this file and in lead4, so nothing else moves. */''}
-      </div>
     </div>
   </div>
 </div></main>`;

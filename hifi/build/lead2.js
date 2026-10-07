@@ -53,6 +53,8 @@
    -------------------------------------------------------------------------- */
 S.ldrCo = LEAD_COHORTS[0].id;
 S.ldrMem = null;
+/* RESTORE THE MEMBER A RELOAD WAS ON (`#leader/leadMember/<stage>/<name>`). */
+if(S.view === 'leadMember' && S.bootRec) S.ldrMem = S.bootRec;
 /* THE REPORTS PAGE OPENS ON A COHORT, NOT ON "ALL COHORTS" (Maryam, 2 Sep
    2026: "remove all cohorts tab just show the other three"). It was `'all'`,
    which is the only value that was never one of the three tabs — so the tab

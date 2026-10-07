@@ -477,7 +477,11 @@ function shell(){
     <button class="shell-logo" data-go="${isLead()?'leadDash':'dashboard'}" aria-label="TalentNext home"><img src="${LOGO_K}" alt="TalentNext"></button>
     ${crumbBar()}
     <div class="shell-right">
-      ${isLead() && V.leadDash ? leadHeaderChip() : ''/* EPIC 12 (12.1): the leader header carries
+      ${''/* THE COHORT CHIP IS REMOVED (Maryam, 7 Oct 2026: "remove this Cohort 41
+             Week 5 of 13 from the cohort leader portal"). Was
+             `isLead() && V.leadDash ? leadHeaderChip() : ''`; `leadHeaderChip`
+             stays defined in lead.js, so restoring it is that one expression.
+             The original note: EPIC 12 (12.1): the leader header carries
              the current cohort name and week. The `V.leadDash` guard is the
              cross-file TDZ fence lead.js records: on a `#leader/...` deep link
              views.js's boot render runs BEFORE lead.js initialises its consts,
@@ -15989,8 +15993,17 @@ function render(){
      back, and without this you would return to `new` rather than to the
      candidate you left. Two segments still restore correctly — the reader
      defaults the third — so a bookmarked `#leader/leadEvals` keeps working. */
+  /* A LEADER RECORD PAGE CARRIES ITS RECORD (Maryam, 7 Oct 2026: reloading
+     Samuel's 90-day summary landed on Owen's). `leadSum` / `leadMember` draw
+     whichever record S holds, and the hash only said the VIEW, so a reload fell
+     back to the first record. A fourth segment names it; lead2/lead3 read it
+     back after they initialise their own state. */
+  /* `?? S.bootRec`: the boot render runs before lead2/lead3 have set their
+     state, so it keeps the id the boot reader captured rather than erasing it. */
+  const leadRec = !isLead() ? '' : S.view === 'leadSum' ? (S.ldrSum ?? S.bootRec)
+    : S.view === 'leadMember' ? (S.ldrMem ?? S.bootRec) : '';
   histWrite('replaceState',null,'',
-    isLead() ? '#leader/'+S.view+'/'+S.stage : '#'+S.stage+'/'+S.view);
+    isLead() ? '#leader/'+S.view+'/'+S.stage+(leadRec ? '/'+encodeURIComponent(leadRec) : '') : '#'+S.stage+'/'+S.view);
   for(const pass of [talFirst, enhanceTalCards, mountLsvt]){
     try { pass(); } catch(e) { console.warn('pass failed:', e); }
   }
@@ -17024,6 +17037,7 @@ if(hash[0] === 'leader'){
   S.portal = 'leader';
   S.view = hash[1] || 'leadDash';
   S.stage = CFG[hash[2]] ? hash[2] : 'new';
+  S.bootRec = hash[3] ? decodeURIComponent(hash[3]) : null;   /* the record a leader page was on */
   S.ch = CFG[S.stage].open;
   render();
 }

@@ -307,9 +307,12 @@
    gives it the specificity to win outright rather than by document order.
    -------------------------------------------------------------------------- */
 @container app (min-width:900px){
-  .app .sec:has(> .msgs),.app .sec:has(> .ivt-lines){display:block}
+  /* + `.note-group` (Maryam, 7 Oct 2026: "the Your notes on Owen content should
+     be below it, not side by side") — the 90-day summary's read-only notes. */
+  .app .sec:has(> .msgs),.app .sec:has(> .ivt-lines),.app .sec:has(> .note-group){display:block}
   .app .sec:has(> .msgs) > .sec-h,
-  .app .sec:has(> .ivt-lines) > .sec-h{
+  .app .sec:has(> .ivt-lines) > .sec-h,
+  .app .sec:has(> .note-group) > .sec-h{
     border-right:0;min-height:0;margin-bottom:var(--sec-h-gap);
     padding:0 var(--pad-x)}
 }

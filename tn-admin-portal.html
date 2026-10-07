@@ -14,7 +14,7 @@
      The <style> block is PROTOTYPE CHROME AND NOTHING ELSE (the device frame,
      the viewport picker, the wordmark size, a toast host) — no product rule.
      ========================================================================== -->
-<link rel="stylesheet" href="design-system/talentnext-ds.css?b=8a2fee1a">
+<link rel="stylesheet" href="design-system/talentnext-ds.css?b=82fbb70f">
 <style id="admin-auth-slider">
 /* THE FRONT DOOR IS A SLIDER — ported verbatim from the candidate portal's
    §132 (hifi/build/132-authslide.css). That layer is hifi-only
@@ -686,6 +686,15 @@ input:-webkit-autofill:focus{
    even block, so every role row keeps the same padding. Equal specificity, later. */
 .app[data-portal="admin"] .perm-grid tr:first-child + tr td{padding-top:var(--s04)}
 .app .perm-grid-name{font-weight:var(--t-w-strong);color:var(--text-primary)}
+/* the role rows (7 Oct 2026): name over its granted count, the grid full width inside */
+.app .perm-acc .acc-h .ttl{display:flex; flex-direction:column; align-items:flex-start; gap:2px}
+.app .perm-acc .acc-b{max-width:none; padding-bottom:var(--s06)}
+.app .perm-acc .perm-wrap{margin-bottom:0}
+/* the row header (8 Oct 2026): title fills, then the row's Edit / Cancel + Update, then the chevron */
+.app .perm-acc .perm-acc-h{display:flex; align-items:center; gap:var(--s05)}
+.app .perm-acc .perm-acc-t{flex:1; min-width:0; display:flex; align-items:center; background:transparent; border:0; padding:0; text-align:left; cursor:pointer; color:inherit; font:inherit}
+.app .perm-acc .perm-acc-a{display:flex; align-items:center; gap:var(--s05); flex:none}
+.app .perm-acc .perm-acc-c{flex:none; display:grid; place-items:center; background:transparent; border:0; padding:0; cursor:pointer; color:inherit}
 /* Sensitive / Reserved "Governs" tables: the Permission is the anchor column, the
    Governs prose wraps freely and reads in the description grey. */
 .app .perm-gov td:last-child{color:var(--text-secondary);white-space:normal}
@@ -964,10 +973,13 @@ input:-webkit-autofill:focus{
 /* the candidate's level beside the name in the leader picker — accent as ink */
 .app .cand-lvl{color:var(--accent-text); margin-left:var(--s02)}
 .app .adduser-leaderpick{display:none}
-.app .adduser-form:has(input[data-f="role"][value="leader"]:checked) .adduser-leaderpick{display:block}
+.app .adduser-form:has(input[data-f="role"][value="leader"]) .adduser-leaderpick{display:block}
+/* the internal roles add Phone / Job title / Department (8 Oct 2026) */
+.app .adduser-internal{display:none}
+.app .adduser-form:has(input[data-f="role"]:is([value="reviewer"],[value="supervisor"],[value="manager"],[value="admin2"])) .adduser-internal{display:block}
 /* The Talent-Agent commercials reveal only when the Agent radio is checked. */
 .app .adduser-agentonly{display:none}
-.app .adduser-form:has(input[data-f="role"][value="agent"]:checked) .adduser-agentonly{display:block}
+.app .adduser-form:has(input[data-f="role"][value="agent"]) .adduser-agentonly{display:block}
 /* The 5-star initial-rating picker: siblings, row-reverse, so a checked star and
    every lower one fill gold; hover previews the same. */
 .app .star-pick{display:inline-flex; flex-direction:row-reverse; justify-content:flex-end; gap:var(--s01); margin-top:var(--s02)}
@@ -1623,7 +1635,7 @@ input:-webkit-autofill:focus{
   </div>
 </div>
 
-<script src="design-system/talentnext-ds.js?b=8a2fee1a"></script>
+<script src="design-system/talentnext-ds.js?b=82fbb70f"></script>
 <script>
 /* ==========================================================================
    THE SUPER ADMIN PORTAL
@@ -1862,12 +1874,27 @@ const permNonReserved = () => permAllKeys().filter(k => !permIsReserved(k));
 const BUILTIN_ROLES = ['admin', 'admin2', 'reviewer', 'supervisor', 'manager'];
 const roleIsBuiltin = k => BUILTIN_ROLES.includes(k);
 /* per-role grant SET (the story's starting sets): Super Admin holds everything;
-   Admin everything but the two reserved; Reviewer / Supervisor / Manager nothing.
-   A custom role starts empty. Applied here as a deployment step. */
+   Admin everything but the two reserved. A custom role starts empty. Applied here as
+   a deployment step.
+   THE THREE OPERATIONAL ROLES GET A STARTING SET (Maryam, 8 Oct 2026: "grant some
+   permissions to reviewer, supervisor, and manager of agents as well"). AUTHORED
+   PLACEHOLDER (§74), read off each role's own description — editable per row:
+   - Reviewer (owns candidate level decisions): sees the people, interviews and the
+     levelling queue, edits interviews, and holds Approve candidate level.
+   - Supervisor (reviews agents above the manager line; adjusts an agent's level and
+     ranking): sees and edits users and the marketplace, sees interviews, levelling,
+     cohorts and finance, and holds Approve agent score.
+   - Manager of Agents (a book of agents; calibration and escalations): sees and edits
+     users, the marketplace and interviews, sees levelling and cohorts. */
 const PERMSET = {
   admin: new Set(permAllKeys()),
   admin2: new Set(permNonReserved()),
-  reviewer: new Set(), supervisor: new Set(), manager: new Set()
+  reviewer: new Set(['dashboard:view', 'users:view', 'levelling:view', 'interviews:view', 'interviews:edit',
+    'cohorts:view', 'marketplace:view', 'onboarding:view', 'approvelevel']),
+  supervisor: new Set(['dashboard:view', 'users:view', 'users:edit', 'marketplace:view', 'marketplace:edit',
+    'interviews:view', 'levelling:view', 'cohorts:view', 'finance:view', 'approvescore']),
+  manager: new Set(['dashboard:view', 'users:view', 'users:edit', 'marketplace:view', 'marketplace:edit',
+    'interviews:view', 'interviews:edit', 'levelling:view', 'cohorts:view'])
 };
 /* the roles shown as matrix columns / listed in the role table: built-in first
    (story order), then any custom internal role. */
@@ -2062,7 +2089,16 @@ const USERS=[
  {id:'u29', name:'Mia Rossi', email:'mia@rossi.it', roles:['candidate'], level:'E1', status:'active', joined:'03-31-2026', origin:'individual', last:'3h ago'},
  {id:'u30', name:'Kofi Mensah', email:'kofi@mensah.gh', roles:['candidate'], level:'B1', status:'active', joined:'02-28-2026', origin:'signal', last:'2d ago'},
  {id:'u31', name:'Lucia Moretti', email:'lucia@moretti.it', roles:['candidate'], level:'E2', status:'active', joined:'03-16-2026', origin:'individual', last:'5h ago'},
- {id:'u32', name:'Aaron Feld', email:'aaron@feld.io', roles:['candidate'], level:'E1', status:'active', joined:'04-02-2026', origin:'individual', last:'7d ago'}
+ {id:'u32', name:'Aaron Feld', email:'aaron@feld.io', roles:['candidate'], level:'E1', status:'active', joined:'04-02-2026', origin:'individual', last:'7d ago'},
+ /* The cohort-leader applicants with no account (Maryam, 7 Oct 2026): All Users now
+    holds the leader pipeline, and a LEADER_REQS row with no USERS record would drop out
+    of it. AUTHORED PLACEHOLDER (§74), levels/buckets copied from their LEADER_REQS row. */
+ {id:'u53', name:'Marcus Reyes', email:'marcus.reyes@reyes.co', roles:['candidate','leader'], level:'B2 · Builder', status:'active', joined:'02-14-2026', origin:'individual', last:'1d ago'},
+ {id:'u54', name:'Elena Fischer', email:'elena.fischer@fischer.de', roles:['candidate','leader'], level:'T2 · Trailblazer', status:'active', joined:'01-27-2026', origin:'individual', last:'2d ago'},
+ {id:'u55', name:'Priya Nair', email:'priya.nair@nair.in', roles:['candidate','leader'], level:'B2 · Builder', status:'active', joined:'02-03-2026', origin:'individual', last:'4h ago'},
+ {id:'u56', name:'Tomas Vidal', email:'tomas.vidal@vidal.es', roles:['candidate','leader'], level:'T3 · Trailblazer', status:'active', joined:'01-12-2026', origin:'individual', last:'6h ago'},
+ {id:'u57', name:'Sofia Marin', email:'sofia.marin@marin.ro', roles:['candidate'], level:'B1 · Builder', status:'active', joined:'03-04-2026', origin:'individual', last:'3d ago'},
+ {id:'u58', name:'Zoe Park', email:'zoe.park@park.kr', roles:['candidate'], level:'T1 · Trailblazer', status:'active', joined:'02-18-2026', origin:'individual', last:'1d ago'}
 ];
 const USER_BY_ID={}; USERS.forEach(u => USER_BY_ID[u.id]=u);
 const ME = USER_BY_ID.u9;   /* signed in as Derek Sole, Super Admin */
@@ -2173,7 +2209,14 @@ const CANDS=[
  {id:'u29', name:'Mia Rossi', bucket:'Explorer', level:'E1', cohort:'Cohort 4', agent:'—', consent:{video:1,ai:1,scenes:0,vis:1}, status:'active', last:'3h ago'},
  {id:'u30', name:'Kofi Mensah', bucket:'Builder', level:'B1', cohort:'Cohort 5', agent:'Naomi Frost', consent:{video:1,ai:1,scenes:1,vis:1}, status:'active', last:'2d ago'},
  {id:'u31', name:'Lucia Moretti', bucket:'Explorer', level:'E2', cohort:'Cohort 2', agent:'Dana Whitfield', consent:{video:1,ai:1,scenes:1,vis:1}, status:'active', last:'5h ago'},
- {id:'u32', name:'Aaron Feld', bucket:'Explorer', level:'E1', cohort:'Cohort 4', agent:'—', consent:{video:1,ai:1,scenes:0,vis:0}, status:'active', last:'7d ago'}
+ {id:'u32', name:'Aaron Feld', bucket:'Explorer', level:'E1', cohort:'Cohort 4', agent:'—', consent:{video:1,ai:1,scenes:0,vis:0}, status:'active', last:'7d ago'},
+ /* the six leader applicants above (7 Oct 2026, authored placeholder §74) */
+ {id:'u53', name:'Marcus Reyes', bucket:'Builder', level:'B2', cohort:'—', agent:'—', consent:{video:1,ai:1,scenes:0,vis:1}, status:'active', last:'1d ago'},
+ {id:'u54', name:'Elena Fischer', bucket:'Trailblazer', level:'T2', cohort:'—', agent:'—', consent:{video:1,ai:1,scenes:0,vis:1}, status:'active', last:'2d ago'},
+ {id:'u55', name:'Priya Nair', bucket:'Builder', level:'B2', cohort:'—', agent:'—', consent:{video:1,ai:1,scenes:0,vis:1}, status:'active', last:'4h ago'},
+ {id:'u56', name:'Tomas Vidal', bucket:'Trailblazer', level:'T3', cohort:'—', agent:'—', consent:{video:1,ai:1,scenes:0,vis:1}, status:'active', last:'6h ago'},
+ {id:'u57', name:'Sofia Marin', bucket:'Builder', level:'B1', cohort:'—', agent:'—', consent:{video:1,ai:1,scenes:0,vis:1}, status:'active', last:'3d ago'},
+ {id:'u58', name:'Zoe Park', bucket:'Trailblazer', level:'T1', cohort:'—', agent:'—', consent:{video:1,ai:1,scenes:0,vis:1}, status:'active', last:'1d ago'}
 ];
 const CAND_BY_ID={}; CANDS.forEach(c => CAND_BY_ID[c.id]=c);
 /* NEW (flow review, 11 Sep 2026): the levelling chain is Tal (AI) -> agent -> admin.
@@ -2310,10 +2353,10 @@ const BOOKINGS=[
    the candidate pays zero, the agent's full fee goes into escrow. `cr` (credit)
    rides a rebooking-credit row. Amounts/refs are authored placeholder (§74). */
 const TXNS=[
- {id:'t1',  ref:'TXN-9042', stripeRef:'ch_3Rk8vA', when:'Sep 28', date:'2026-09-28', time:'2:14 PM', type:'course',    cat:'course',    who:'Maryam Naz',   party:'Candidate',    email:'maryam.naz@gmail.com',   kind:'Course — Foundations of Leadership', desc:'Foundations of Leadership · 90-day cycle', amt:100, dir:'in',  method:'Visa •4242',       fee:3.20, status:'succeeded', cause:{l:'Course enrolment', go:'candidates/candidates'}},
+ {id:'t1',  ref:'TXN-9042', stripeRef:'ch_3Rk8vA', when:'Sep 28', date:'2026-09-28', time:'2:14 PM', type:'course',    cat:'course',    who:'Maryam Naz',   party:'Candidate',    email:'maryam.naz@gmail.com',   kind:'Course — Foundations of Leadership', desc:'Foundations of Leadership · 90-day cycle', amt:100, dir:'in',  method:'Visa •4242',       fee:3.20, status:'succeeded', cause:{l:'Course enrolment', go:'users/users?role=candidate'}},
  {id:'t2',  ref:'TXN-9040', stripeRef:'ch_3Rk7pQ', when:'Sep 28', date:'2026-09-28', time:'9:40 AM', type:'interview', cat:'interview', who:'Jordan Vale',  party:'Candidate',    email:'jordan.vale@gmail.com',  kind:'Interview with Priya Raman', desc:'Interview · Priya Raman', amt:225, dir:'in',  method:'Visa •1180',       fee:6.83, status:'pending',   funder:'Candidate', agent:'Priya Raman', sp:{fee:225, share:180, pct:20, com:45}, cause:{l:'Interview booking', go:'market/bookings'}},
  {id:'t3',  ref:'TXN-9038', stripeRef:'ch_3Rk6mZ', when:'Sep 27', date:'2026-09-27', time:'7:50 AM', type:'scene',     cat:'scene',     who:'Sophia Ali',   party:'Candidate',    email:'sophia.ali@gmail.com',   kind:'Interview scenes ×2', desc:'2 saved scenes, beyond the free set', amt:30,  dir:'in',  method:'Visa •4242',       fee:0.98, status:'pending',   cause:{l:'Interview', go:'market/bookings'}},
- {id:'t4',  ref:'TXN-9036', stripeRef:'ch_3Rk5jY', when:'Sep 27', date:'2026-09-27', time:'6:03 PM', type:'course',    cat:'course',    who:'Ava Thompson', party:'Candidate',    email:'ava.thompson@gmail.com', kind:'Course — Foundations of Leadership', desc:'Foundations of Leadership · 90-day cycle', amt:100, dir:'in',  method:'Mastercard •5100', fee:3.20, status:'pending',   cause:{l:'Course enrolment', go:'candidates/candidates'}},
+ {id:'t4',  ref:'TXN-9036', stripeRef:'ch_3Rk5jY', when:'Sep 27', date:'2026-09-27', time:'6:03 PM', type:'course',    cat:'course',    who:'Ava Thompson', party:'Candidate',    email:'ava.thompson@gmail.com', kind:'Course — Foundations of Leadership', desc:'Foundations of Leadership · 90-day cycle', amt:100, dir:'in',  method:'Mastercard •5100', fee:3.20, status:'pending',   cause:{l:'Course enrolment', go:'users/users?role=candidate'}},
  {id:'t14', ref:'TXN-9034', stripeRef:'ch_3Rk4hX', when:'Sep 26', date:'2026-09-26', time:'4:20 PM', type:'interview', cat:'interview', who:'TALENTnext',   party:'Platform',     email:'',                       kind:'First interview — Grace Kim with Marcus Ozoro', desc:'First interview · Grace Kim · Marcus Ozoro · 100% discount', amt:95, dir:'in', method:'Platform funded', fee:0, status:'succeeded', funder:'Platform', agent:'Marcus Ozoro', sp:{fee:95, share:76, pct:20, com:19}, cause:{l:'Interview booking', go:'market/bookings'}},
  {id:'t5',  ref:'TXN-9032', stripeRef:'ch_3Rk3gW', when:'Sep 26', date:'2026-09-26', time:'3:22 PM', type:'interview', cat:'interview', who:'Emma Novak',   party:'Candidate',    email:'emma.novak@gmail.com',   kind:'Re-interview with Dana Whitfield', desc:'Re-interview · Dana Whitfield', amt:180, dir:'in',  method:'Amex •3007',       fee:5.52, status:'failed',    funder:'Candidate', agent:'Dana Whitfield', sp:{fee:180, share:144, pct:20, com:36}, cause:{l:'Interview booking', go:'market/bookings'}},
  {id:'t6',  ref:'TXN-9030', stripeRef:'po_1Rk2fV', when:'Sep 26', date:'2026-09-26', time:'12:03 AM', type:'payout',   cat:'payout',    who:'Marcus Ozoro', party:'Talent agent', email:'marcus.ozoro@gmail.com', kind:'Payout — interview with Sophia Ali', desc:'Payout · interview with Sophia Ali', amt:150, dir:'out', method:'Bank ••2231', fee:0, status:'succeeded', funder:'Candidate', agent:'Marcus Ozoro', sp:{fee:150, share:120, pct:20, com:30}, cause:{l:'Payout run', go:'finance/payouts'}},
@@ -2323,7 +2366,7 @@ const TXNS=[
  {id:'t10', ref:'TXN-9022', stripeRef:'ch_3Rj8bR', when:'Sep 24', date:'2026-09-24', time:'9:12 AM', type:'interview', cat:'interview', who:'Sophia Ali',   party:'Candidate',    email:'sophia.ali@gmail.com',   kind:'Interview with Marcus Ozoro', desc:'Interview · Marcus Ozoro', amt:150, dir:'in',  method:'Mastercard •6621', fee:4.65, status:'succeeded', funder:'Candidate', agent:'Marcus Ozoro', sp:{fee:150, share:120, pct:20, com:30}, cause:{l:'Interview booking', go:'market/bookings'}},
  {id:'t19', ref:'TXN-9020', stripeRef:'ch_3Rj7aQ', when:'Sep 23', date:'2026-09-23', time:'2:30 PM', type:'scene',     cat:'scene',     who:'Kai Andersen', party:'Candidate',    email:'kai.andersen@gmail.com', kind:'Interview scenes ×3', desc:'3 saved scenes, beyond the free set', amt:45,  dir:'in',  method:'Visa •9931',       fee:1.36, status:'succeeded', cause:{l:'Interview', go:'market/bookings'}},
  {id:'t12', ref:'TXN-9018', stripeRef:'po_1Rj6ZP', when:'Sep 23', date:'2026-09-23', time:'12:00 AM', type:'payout',   cat:'payout',    who:'Priya Raman',  party:'Talent agent', email:'priya.raman@gmail.com',  kind:'Payout — interview with Emma Novak', desc:'Payout · interview with Emma Novak', amt:225, dir:'out', method:'Bank ••5540', fee:0, status:'failed',    funder:'Candidate', agent:'Priya Raman', sp:{fee:225, share:180, pct:20, com:45}, cause:{l:'Payout run', go:'finance/payouts'}},
- {id:'t13', ref:'TXN-9016', stripeRef:'ch_3Rj5YO', when:'Sep 22', date:'2026-09-22', time:'11:04 AM', type:'course',   cat:'course',    who:'Liam Chen',    party:'Candidate',    email:'liam.chen@gmail.com',    kind:'Course — Foundations of Leadership', desc:'Foundations of Leadership · 90-day cycle', amt:100, dir:'in',  method:'Visa •8823',       fee:3.20, status:'succeeded', cause:{l:'Course enrolment', go:'candidates/candidates'}},
+ {id:'t13', ref:'TXN-9016', stripeRef:'ch_3Rj5YO', when:'Sep 22', date:'2026-09-22', time:'11:04 AM', type:'course',   cat:'course',    who:'Liam Chen',    party:'Candidate',    email:'liam.chen@gmail.com',    kind:'Course — Foundations of Leadership', desc:'Foundations of Leadership · 90-day cycle', amt:100, dir:'in',  method:'Visa •8823',       fee:3.20, status:'succeeded', cause:{l:'Course enrolment', go:'users/users?role=candidate'}},
  {id:'t20', ref:'TXN-9014', stripeRef:'po_1Rj4XN', when:'Sep 22', date:'2026-09-22', time:'12:00 AM', type:'payout',    cat:'payout',    who:'Marcus Ozoro', party:'Talent agent', email:'marcus.ozoro@gmail.com', kind:'Payout — first interview with Grace Kim', desc:'Payout · first interview with Grace Kim', amt:95, dir:'out', method:'Bank ••2231', fee:0, status:'succeeded', funder:'Platform', agent:'Marcus Ozoro', sp:{fee:95, share:76, pct:20, com:19}, cause:{l:'Payout run', go:'finance/payouts'}},
  /* REBOOKING CREDITS (Epic 8's Not-held → Resolved flow, surfaced here as its own
     transaction type). `cr` carries the original amount, what was applied to a
@@ -2571,7 +2614,7 @@ const DECISIONS=[
  {t:'Agent compensation model is contradictory', d:'A flat <b>$100/mo listing fee</b> (27 Jul) and a <b>percentage payout share</b> (30 Jul) are both on record and neither was withdrawn.', area:'Finance', owner:'Reed', src:'Money flow · Agent flow #8 · SA-08 A2', ic:'money', go:'finance/feeconfig', sev:'high', sa:'SA-08', kind:'open', blocks:'the agent split line in Fee Configuration'},
  {t:'Placement fee has no basis, trigger or detection', d:'The single largest revenue line. % of salary / flat / tiered all floated; no enforcement to detect an off-platform hire.', area:'Finance', owner:'Reed', src:'Employer flow #8 · SA-07 E2', ic:'alert', go:'employers/placements', sev:'high', sa:'SA-07', kind:'blocked', blocks:'two placement invoices in draft'},
  {t:'Settlement mechanics are a deliberate black box', d:'Who gets paid what, and when, was explicitly parked on 30 Jul — and parked a second time since. Payment release timing still undefined; the banking entity is a non-software blocker.', area:'Finance', owner:'Reed', src:'Money flow · SA-07 E1/E3', ic:'bank', go:'finance/payouts', sev:'high', sa:'SA-07', kind:'blocked', blocks:'the payout release cycle and every refund source rule'},
- {t:'Cohort-leader bootstrap paradox', d:'Builders lead Explorer cohorts, but nobody becomes a Builder without finishing an Explorer cohort. There is no one to lead the first ones.', area:'Cohorts', owner:'Derek', src:'Cohort-leader flow #1', ic:'route', go:'cohorts/assign', sev:'high', sa:'SA-12', kind:'open', blocks:'who may be allotted to the first cohorts'},
+ {t:'Cohort-leader bootstrap paradox', d:'Builders lead Explorer cohorts, but nobody becomes a Builder without finishing an Explorer cohort. There is no one to lead the first ones.', area:'Cohorts', owner:'Derek', src:'Cohort-leader flow #1', ic:'route', go:'users/users?role=leader', sev:'high', sa:'SA-12', kind:'open', blocks:'who may be allotted to the first cohorts'},
  {t:'Contact enforcement is unspecified', d:'Contact must happen on-platform, but no enforcement exists. Leakage accepted as inevitable — no design followed.', area:'Employers', owner:'Umair', src:'Employer flow #6', ic:'link', go:'employers/placements', sev:'med'},
  {t:'Safeguarding for 18–24 interviews undefined', d:'Agents conduct recorded 1:1 video interviews with 18–24 year-olds. Background checking is a safeguarding question, and no vetting bar is set.', area:'Vetting', owner:'—', src:'Agent flow, Stage 1 · SA-09 E3', ic:'shield', go:'vetting/applications', sev:'high', sa:'SA-09', kind:'open', blocks:'the age gate on an account action'},
  {t:'Sponsoring-employer track is out of MVP scope', d:'Org hierarchy (parent/child/franchise), employer billing and defaulted-off visibility are structurally required later but explicitly deferred.', area:'Employers', owner:'Umair', src:'Employer flow, Stage 1', ic:'store', go:'employers/employers', sev:'med'},
@@ -2581,8 +2624,8 @@ const DECISIONS=[
  {t:'Who grants Super Admin, and for how long', d:'Bootstrap the first admin at go-live out of band, a time-boxed grant with auto-expiry, or Tkxel holding it through build and pilot. With one holder the second-approver rule cannot be satisfied.', area:'Users', owner:'Derek', src:'SA-01 A1–A3 · E1', ic:'lock', go:'users/roles', sev:'high', sa:'SA-01', kind:'open', blocks:'the approver step of the grant sheet — a sole admin grants single-approver, logged high'},
  {t:'Staff sign-in is undecided', d:'Step-up auth at the point of action rather than only at login, role switching for a multi-role holder, read-only mobile. Lost MFA device recovery, a break-glass credential for an SSO outage, alert-or-block on an anomalous sign-in — none ruled.', area:'System', owner:'Umair', src:'SA-02 A1–A3 · E1–E3', ic:'lock', go:'settings/security', sev:'high', sa:'SA-02', kind:'blocked', blocks:'the sign-in screen beyond email + password + code, and every recovery path'},
  {t:'Console model: one portal or several', d:'Model A, one portal with role-scoped views, against Model B, multiple portals plus a switcher. No KPIs are defined for any persona, and six MVP dashboards have no data layer named.', area:'System', owner:'Umair', src:'SA-03 A1–A2 · E1–E2', ic:'home', go:'home/home', sev:'high', sa:'SA-03', kind:'blocked', blocks:'which figures the dashboard shows — the ones here are read off the seed, not signed off'},
- {t:'Level override: disclosure, criteria and the Trailblazer track', d:'Does the candidate see an override? E1→E2 promotion criteria are undefined. Trailblazer is out of MVP but stays in the data model. AI employment-decision law may compel a decision trail.', area:'Candidates', owner:'Derek', src:'SA-04 E1–E5', ic:'route', go:'candidates/candidates', sev:'med', sa:'SA-04', kind:'open', blocks:'whether the disclosure switch on the override sheet notifies anyone'},
- {t:'Score override waits on the double-blind carve-out', d:'Void a score and grant a free re-interview, void without penalising the agent share, or batch-recalibrate on a faulty model version — but whether the re-interviewer sees the prior recording (blinded or unblinded) is unruled, and a Twilio recording may already be past retention.', area:'Candidates', owner:'Derek', src:'SA-05 A1–A3 · E1–E2', ic:'eye', go:'candidates/candidates', sev:'high', sa:'SA-05', kind:'blocked', blocks:'the view a re-interviewer is given after a void'},
+ {t:'Level override: disclosure, criteria and the Trailblazer track', d:'Does the candidate see an override? E1→E2 promotion criteria are undefined. Trailblazer is out of MVP but stays in the data model. AI employment-decision law may compel a decision trail.', area:'Candidates', owner:'Derek', src:'SA-04 E1–E5', ic:'route', go:'users/users?role=candidate', sev:'med', sa:'SA-04', kind:'open', blocks:'whether the disclosure switch on the override sheet notifies anyone'},
+ {t:'Score override waits on the double-blind carve-out', d:'Void a score and grant a free re-interview, void without penalising the agent share, or batch-recalibrate on a faulty model version — but whether the re-interviewer sees the prior recording (blinded or unblinded) is unruled, and a Twilio recording may already be past retention.', area:'Candidates', owner:'Derek', src:'SA-05 A1–A3 · E1–E2', ic:'eye', go:'users/users?role=candidate', sev:'high', sa:'SA-05', kind:'blocked', blocks:'the view a re-interviewer is given after a void'},
  {t:'Refund rules wait on the settlement model', d:'Clawback from the platform share first, cohort refunds pro-rated by intent price, the sponsoring employer as payer, goodwill credit instead of cash. No threshold above which a Super Admin is required; a chargeback may already be in flight; the agent payout may already have settled.', area:'Finance', owner:'Reed', src:'SA-06 A1–A4 · E1–E3', ic:'scale', go:'finance/refunds', sev:'high', sa:'SA-06', kind:'blocked', blocks:'the refund approval threshold and the clawback order'},
  {t:'Cohort price by intent, sponsored pricing and the first-interview discount', d:'A cohort price per stated intent with no figures set; Signal sponsored pricing is an action with Derek; the discounted first interview is absorbed by Reed. Reed decides, the Super Admin only executes; in-flight enrolments must not retro-bill; USD-only at MVP is unconfirmed.', area:'Finance', owner:'Reed', src:'SA-08 A1, A3–A4 · E1–E3', ic:'money', go:'finance/feeconfig', sev:'med', sa:'SA-08', kind:'open', blocks:'three fee lines that read “Not set”'},
  {t:'Account actions per role', d:'A candidate is paused from visibility, never deleted; an agent’s in-flight interviews need reassigning; a cohort leader mid-cohort; an employer with active sponsored employees; merging duplicate accounts; a hard delete on request. A party suspended mid-transaction, the deletion right against recording retention, and the age gate were never discussed.', area:'Users', owner:'Umair', src:'SA-09 A1–A6 · E1–E3', ic:'users', go:'users/users', sev:'high', sa:'SA-09', kind:'open', blocks:'the consequence text on Deactivate — drawn from the seed, not from a ruling'},
@@ -2605,8 +2648,8 @@ const SA_CASES=[
  {id:'SA-01', t:'Grant Super Admin', stage:'S0 · Provisioning', st:'open', owner:'Derek', where:'users/roles', alts:['Bootstrap: first admin at go-live, out of band', 'Time-boxed grant with auto-expiry', 'Tkxel or vendor holds it through build and pilot'], exc:['Sole admin: second-approver rule unsatisfiable', 'Self-escalation attempt from a lower role', 'Holder is also an agent or cohort leader']},
  {id:'SA-02', t:'Sign in', stage:'S1 · Entry', st:'blocked', owner:'Umair', where:'settings/security', alts:['Step-up auth at point of action, not only login', 'Role switching for multi-role holders', 'Mobile access, read-only proposed'], exc:['MFA device lost: recovery is a standing backdoor', 'SSO outage: is there a break-glass credential', 'Anomalous sign-in: alert or block']},
  {id:'SA-03', t:'Console landing', stage:'S2 · Console', st:'blocked', owner:'Umair', where:'home/home', alts:['Model A: one portal, role-scoped views', 'Model B: multiple portals plus a switcher'], exc:['No KPIs defined for any persona', 'Six MVP dashboards with no data layer named']},
- {id:'SA-04', t:'Level override', stage:'S4 · Intervention', st:'confirmed', owner:'Derek', where:'candidates/candidates', alts:['Upward: aligns with the no-failing promise', 'Downward: sits against two live rulings', 'Pre-review, ahead of the human reviewer', 'Bulk correction after migration or model change', 'Reverse a prior override, both kept in history'], exc:['Candidate disclosure: does the person see it', 'E1 to E2 promotion criteria still undefined', 'Override lands mid-cohort', 'Trailblazer out of MVP, keep in data model', 'AI employment-decision law may compel a trail']},
- {id:'SA-05', t:'Score override', stage:'S4 · Intervention', st:'blocked', owner:'Derek', where:'candidates/candidates', alts:['Void and grant a free re-interview', 'Void without penalising the agent share', 'Batch recalibration on a faulty model version'], exc:['Double-blind: blinded or unblinded view', 'Twilio recording already past retention']},
+ {id:'SA-04', t:'Level override', stage:'S4 · Intervention', st:'confirmed', owner:'Derek', where:'users/users?role=candidate', alts:['Upward: aligns with the no-failing promise', 'Downward: sits against two live rulings', 'Pre-review, ahead of the human reviewer', 'Bulk correction after migration or model change', 'Reverse a prior override, both kept in history'], exc:['Candidate disclosure: does the person see it', 'E1 to E2 promotion criteria still undefined', 'Override lands mid-cohort', 'Trailblazer out of MVP, keep in data model', 'AI employment-decision law may compel a trail']},
+ {id:'SA-05', t:'Score override', stage:'S4 · Intervention', st:'blocked', owner:'Derek', where:'users/users?role=candidate', alts:['Void and grant a free re-interview', 'Void without penalising the agent share', 'Batch recalibration on a faulty model version'], exc:['Double-blind: blinded or unblinded view', 'Twilio recording already past retention']},
  {id:'SA-06', t:'Refunds', stage:'S4 · Intervention', st:'blocked', owner:'Reed', where:'finance/refunds', alts:['Interview refund, clawback from platform share first', 'Cohort refund, pro-rated by intent price', 'Sponsored employee: employer is the payer', 'Goodwill credit instead of cash'], exc:['Threshold above which Super Admin is required', 'Chargeback already in flight: double pay', 'Agent payout already settled']},
  {id:'SA-07', t:'Payout override', stage:'S4 · Intervention', st:'blocked', owner:'Reed', where:'finance/payouts', alts:['Hold a suspect payout', 'Release a held payout', 'Manual reconciliation adjustment', 'Correct agent bank details'], exc:['Settlement parked twice as a black box', 'Placement fee basis and trigger undecided', 'Banking entity is a non-software blocker']},
  {id:'SA-08', t:'Pricing config', stage:'S4 · Intervention', st:'open', owner:'Reed', where:'finance/feeconfig', alts:['Cohort price by intent, no figures set', 'Agent split: monthly listing fee never withdrawn', 'Signal sponsored pricing, Derek action open', 'Discounted first interview, Reed absorbs cost'], exc:['Reed decides, Super Admin only executes', 'In-flight enrolments must not retro-bill', 'USD-only at MVP unconfirmed']},
@@ -2726,7 +2769,7 @@ const ADMIN_NOTIF=[
  {ic:'alert', h:'Open decision',       t:'Agent compensation is still unreconciled — $100/mo listing fee vs a percentage payout share.', w:'1h ago', rd:false, go:'finance/feeconfig'},
  {ic:'money', h:'Finance & settlement',t:'Payment settlement rules are undefined — 12 payouts are pending release.', w:'3h ago', rd:false, go:'finance/payouts'},
  {ic:'users', h:'New account',         t:'Employer account created — Signal Home Office. Verification not yet run.', w:'Yesterday', rd:true, go:'employers/empverify'},
- {ic:'route', h:'Cohorts',             t:'Bootstrap gap: no Builders are available to lead the first Explorer cohorts.', w:'Yesterday', rd:true, go:'cohorts/assign'}
+ {ic:'route', h:'Cohorts',             t:'Bootstrap gap: no Builders are available to lead the first Explorer cohorts.', w:'Yesterday', rd:true, go:'users/users?role=leader'}
 ];
 
 /* ======================================================================
@@ -2747,10 +2790,14 @@ const ADMIN_NOTIF=[
 const MODULES=[
  {k:'home', t:'Dashboard', ic:'home', subs:[{k:'home', t:'Overview'}, {k:'rulings', t:'Rulings Register', hidden:true}, {k:'notifs', t:'Notifications', hidden:true}]},
  {k:'users', t:'Users & Roles', ic:'users', subs:[
-   {k:'users', t:'All Users'}, {k:'staff', t:'Staff Members'}, {k:'roles', t:'Roles & Permissions'}, {k:'import', t:'Bulk Import', hidden:true}, {k:'staffdetail', t:'Staff', hidden:true}]},
+   {k:'users', t:'All Users'}, {k:'staff', t:'Staff Members', hidden:true}, {k:'roles', t:'Roles & Permissions'}, {k:'import', t:'Bulk Import', hidden:true}, {k:'staffdetail', t:'Staff', hidden:true}]},
  {k:'vetting', t:'Vetting & Approvals', ic:'vetting', hidden:true, subs:[
    {k:'applications', t:'Agent Applications'}, {k:'appdetail', t:'Application', hidden:true}, {k:'empverify', t:'Employer Verification'}, {k:'empverifydetail', t:'Employer', hidden:true}]},
- {k:'candidates', t:'Candidates', ic:'candidates', subs:[
+ /* ONE DIRECTORY (Maryam, 7 Oct 2026): Candidates, Talent Agents & Marketplace,
+    Cohort Leaders and Staff Members are HIDDEN — All Users lists everyone and its
+    Role filter tells them apart. Each stays defined and deep-link reachable, and its
+    detail page is still the target a row opens. Delete `hidden` to bring one back. */
+ {k:'candidates', t:'Candidates', ic:'candidates', hidden:true, subs:[
    {k:'candidates', t:'All Candidates'}, {k:'detail', t:'Candidate', hidden:true}]},
  /* TALENT AGENTS & MARKETPLACE (Epic 6, Maryam 28 Sep 2026). One module, two
     visible submodules honouring Maryam's intent (which reverses the stories' own
@@ -2759,10 +2806,10 @@ const MODULES=[
     carrying the full story-6.1 columns because it holds every listing state; and
     "Marketplace" is the LISTED-ONLY, ranked bookable roster — what candidates see
     and in what order. `detail`/`interview` stay hidden drill-ins. */
- {k:'agents', t:'Talent Agents & Marketplace', ic:'agents', subs:[
+ {k:'agents', t:'Talent Agents & Marketplace', ic:'agents', hidden:true, subs:[
    {k:'agents', t:'All Agents'}, {k:'marketplace', t:'Marketplace'}, {k:'detail', t:'Agent', hidden:true}, {k:'interview', t:'Interview', hidden:true}]},
- {k:'cohorts', t:'Cohort Management', ic:'cohorts', subs:[
-   {k:'cohorts', t:'Cohorts'}, {k:'assign', t:'Cohort Leaders'}, {k:'detail', t:'Cohort', hidden:true},
+ {k:'cohorts', t:'Cohorts', ic:'cohorts', subs:[  /* renamed from "Cohort Management" (Maryam, 7 Oct 2026) */
+   {k:'cohorts', t:'Cohorts'}, {k:'assign', t:'Cohort Leaders', hidden:true}, {k:'detail', t:'Cohort', hidden:true},
    /* the leader's own per-person profile, opened by the app-bar ROLE SWITCHER
       (Maryam, 25 Sep 2026) — a candidate who also leads a cohort has no other
       single-page leadership view, so this is its target. Hidden (reached from the
@@ -4146,6 +4193,9 @@ function syncSettingsSave(){
 }
 function syncSheetSubmit(){
   syncSettingsSave();
+  /* a restored form draft sets `.value`; mirror it to the attribute so attribute-keyed
+     CSS reveals (Add User's role sections) follow it after a re-render. */
+  device.querySelectorAll('.adduser-form input[type="hidden"][data-f]').forEach(i => i.setAttribute('value', i.value));
   const btn = device.querySelector('.sheet-f [data-submit="1"]');
   if(!btn) return;
   const vals = readForm();
@@ -4257,7 +4307,7 @@ ACTIONS.del = key => {
   S.confirm = null;
   /* on the record's own page? go back to its list */
   const sub = MOD_BY_K[S.mod]._sub[S.sub];
-  if(sub && sub.hidden && K.after){ const a = K.after.split('/'); S.mod = a[0]; S.sub = a[1]; S.id = null; }
+  if(sub && sub.hidden && K.after){ const [dest, preset] = splitPreset(K.after); const a = dest.split('/'); S.mod = a[0]; S.sub = a[1]; S.id = null; applyPreset(preset); }
 };
 /* a status flip with a confirmation — `askstatus:<kind>:<id>:<value>` */
 ACTIONS.askstatus = key => {
@@ -4446,17 +4496,17 @@ const talq = () => {
     ],
     candidates: [
       ['How are candidates spread across tracks?', `${CANDS.filter(c => c.bucket === 'Explorer').length} Explorer, ${CANDS.filter(c => c.bucket === 'Builder').length} Builder and ${CANDS.filter(c => c.bucket === 'Trailblazer').length} Trailblazer, ${CANDS.length} in all. ${CANDS.filter(c => c.agent === '—').length} have no assessing agent yet.`,
-        null, ['Open the directory', 'candidates/candidates']]
+        null, ['Open the directory', 'users/users?role=candidate']]
     ],
     agents: [
       ['Who leads the ranking?', top ? `${top.name}, rated ${top.rating} over ${top.interviewed} interviews at ${money(top.fee)}. Ranking is rating first, then interviews conducted, recalculated weekly.` : 'No agents are listed.',
-        null, ['Open agents', 'agents/agents']],
+        null, ['Open agents', 'users/users?role=agent']],
       ['What do agents charge?', `From ${money(Math.min(...agents.map(a => a.fee)))} to ${money(Math.max(...agents.map(a => a.fee)))}. They set their own fee; a candidate’s first interview is free and the platform takes its configured share of the rest.`,
         null, ['Fee configuration', 'finance/feeconfig']]
     ],
     cohorts: [
       ['Which cohorts need a leader?', `${COHORTS.filter(c => c.leader === 'Unassigned').map(c => c.name).join(', ') || 'None'}. ${LEADER_REQS.filter(r => r.stage === 'feedback').length} leaders are recommended and ready to allot.`,
-        null, ['Allot a leader', 'cohorts/assign']],
+        null, ['Allot a leader', 'users/users?role=leader']],
       ['How full are the cohorts?', COHORTS.filter(c => c.status === 'running').map(c => `${c.name} ${cohortSize(c)} member${cohortSize(c) === 1 ? '' : 's'}`).join(', ') + '. Each cohort runs the 90-day loop.',
         null, ['Open cohorts', 'cohorts/cohorts']]
     ],
@@ -4683,7 +4733,7 @@ function usersBulk(ids){
   const out = [];
   if(users.some(active)) out.push(['deactivate', many ? 'Deactivate All' : 'Deactivate', 'data-act="bulkuserdeact"']);
   else if(users.length && users.every(u => u.status === 'inactive')) out.push(['play', many ? 'Reactivate All' : 'Reactivate', 'data-act="bulkuserreact"']);
-  out.push(['delete', many ? 'Delete All' : 'Delete', 'data-act="bulkuserdel"', 'danger']);
+  /* NO USER IS EVER DELETED (Maryam, 7 Oct 2026) — Deactivate is the only way out; the delete sheets stay defined, unreached. */
   return out;
 }
 ACTIONS.bulkuserdeact = () => {
@@ -4922,15 +4972,15 @@ function homeOverview(){
      decisions so hide it from the needs attention as well"). The Rulings
      Register still exists; it is simply not surfaced as a live queue here. */
   const attn = [
-    cohortsNoLeader && ['cohorts', 'Cohorts without a leader', `${cohortsNoLeader} active cohort${cohortsNoLeader === 1 ? '' : 's'} to assign`, 'cohorts/assign'],
-    leadReady && ['group', 'Cohort leaders ready to allot', `${leadReady} recommended and interviewed`, 'cohorts/assign'],
+    cohortsNoLeader && ['cohorts', 'Cohorts without a leader', `${cohortsNoLeader} active cohort${cohortsNoLeader === 1 ? '' : 's'} to assign`, 'users/users?role=leader'],
+    leadReady && ['group', 'Cohort leaders ready to allot', `${leadReady} recommended and interviewed`, 'users/users?role=leader'],
     ivOverdue && ['market', 'Interview reports overdue', `${ivOverdue} held interview${ivOverdue === 1 ? '' : 's'} past 24h`, 'market/bookings'],
     heldPo && ['bank', 'Payouts to release', `${heldPo} pending settlement`, 'finance/payouts'],
     /* STORY 2.2 — built now, surfaced later (gated by ATTN_EXTRA_ON). Each links to
        the directory; the pre-filter (invited status / not-listed state) is wired when
        the tile is turned on. */
     ATTN_EXTRA_ON && invitedAcct && ['mail', 'Outstanding invitations', `${invitedAcct} invite${invitedAcct === 1 ? '' : 's'} awaiting acceptance`, 'users/users'],
-    ATTN_EXTRA_ON && agUnlisted && ['agents', 'Agents active but not listed', `${agUnlisted} not on the marketplace`, 'agents/agents']
+    ATTN_EXTRA_ON && agUnlisted && ['agents', 'Agents active but not listed', `${agUnlisted} not on the marketplace`, 'users/users?role=agent']
   ].filter(Boolean);
   const attnRows = attn.map(([ic_, t, s, go]) => `<button class="tile clk gcard" data-go="${go}">
       <span class="cardrow-ic">${ic(ic_)}</span>
@@ -4994,7 +5044,7 @@ function homeOverview(){
       ['candidates', 'Candidates', String(activeCands), `in ${activeCohorts} cohort${activeCohorts === 1 ? '' : 's'}`],
       ['user', 'Cohort Leaders', String(cohortLeaderCount), `${moderatorCount} moderator${moderatorCount === 1 ? '' : 's'}`],
       ['agents', 'Talent Agents', String(agentListed), 'listed & bookable'],
-      ['shield', 'Staff Members', String(staffCount), 'internal'],
+      ['shield', 'Internal Users', String(staffCount), 'reviewers, managers & admins'],
       ['book', 'Courses', String(COURSES.length), `${liveCourses} live · ${draftCourses} draft`],
       ['cohorts', 'Running Cohorts', String(activeCohorts), `${draftCohorts} forming`],
       ['money', 'Earnings', money(platTake), 'platform take']
@@ -5159,7 +5209,7 @@ function homeOverview(){
        eyebrow · bucket · count · share chip · sparkline. The share % is real; the
        ↗ and the sparklines are illustrative placeholder (§74; no dated history). */''}
   <section class="sec dash-nodiv">
-    ${chartHead('Candidates by Track', {go: 'candidates/candidates', label: 'View candidates'})}
+    ${chartHead('Candidates by Track', {go: 'users/users?role=candidate', label: 'View candidates'})}
     ${(() => {
       /* Exact sparkline SVGs Maryam supplied (22 Sep 2026, path data pasted verbatim,
          not redrawn); all three stroked in the accent (Maryam 22 Sep 2026: "all these
@@ -5733,8 +5783,9 @@ const leadingCell = u => { const n = leadingCount(u); return n ? `${n} cohort${n
    agent detail — falling back to the generic user detail for an employer. */
 const mainRole = u => ['candidate', 'agent', 'employer'].find(r => u.roles.includes(r)) || (u.roles[0] || '—');
 const typeLabel = u => (ROLE_BY_K[mainRole(u)] || {}).name || '—';
-const userDetailRoute = u => u.roles.includes('candidate') ? 'candidates/detail/' + u.id
+const userDetailRoute = u => u.roles.includes('candidate') && CAND_BY_ID[u.id] ? 'candidates/detail/' + u.id
   : u.roles.includes('agent') ? 'agents/detail/' + u.id
+  : u.roles.includes('leader') ? 'cohorts/leaderdetail/' + u.id
   : 'users/staffdetail/' + u.id;
 const USER_STATUS_LABEL = {invited:'Invited', active:'Active', ok:'Active', inactive:'Deactivated', deleting:'Deletion in progress', deleted:'Deleted'};
 const userStatusTag = u => tag(u.status === 'ok' ? 'active' : u.status, USER_STATUS_LABEL[u.status] || cap(u.status));
@@ -5755,70 +5806,206 @@ const extInviteStatus = u => {
 };
 const candLevel = u => { const c = CAND_BY_ID[u.id]; const lv = (c && c.level) || (u.level && u.level !== '—' ? u.level : ''); return lv || 'Not yet levelled'; };
 
-/* EXTERNAL accounts only — internal staff live in the Staff directory (Epic 1).
-   Shared by the view and the CSV export so both read one filtered set. */
+/* ======================================================================
+   ONE DIRECTORY (Maryam, 7 Oct 2026). All Users lists EVERY account the Super
+   Admin manages — candidates, talent agents, cohort leaders (incl. the leader
+   application pipeline) and internal accounts — and the Role filter tells them
+   apart. The Candidates, Talent Agents & Marketplace, Cohort Leaders and Staff
+   Members surfaces are hidden; their tables' filters live here, shown only while
+   that role is picked. There is NO umbrella word for internal accounts: each is
+   filtered by its own role (Reviewer / Supervisor / Manager of Agents / Admin).
+   Super Admins are not listed (as Staff Members never listed them), and employers
+   are out of the system for now (19 Sep).
+   ====================================================================== */
+const USERS_ROLE_OPTS = () => [['all', 'All'], ['candidate', 'Candidate'], ['agent', 'Talent Agent'], ['leader', 'Cohort Leader'], ...staffRoleOpts(false)];
+/* which family of filters/columns a Role pick opens */
+const roleGroup = rf => rf === 'all' ? 'all' : STAFF_ROLE_KEYS.includes(rf) ? 'internal' : rf;
+/* every role's own sub-filter keys — cleared when the Role changes, so a stale
+   agent filter can never empty a candidate view. */
+const USERS_SUBFILTERS = ['ctrack', 'clevel', 'ccohort', 'agstate', 'agtrain', 'agrange', 'lstage', 'ltype', 'dept'];
+const usersBase = () => USERS.filter(u => !u.roles.includes('employer') && !(u.internal && staffRole(u) === 'admin'));
+/* THE LEADER PIPELINE, per person (moved in from Cohort Leaders). A person is in
+   the Cohort Leader view if they lead a cohort now, hold the capability, or have
+   an application in `LEADER_REQS` (matched by name, external accounts only). */
+const lrOf = u => u.internal ? null : (LEADER_REQS.find(r => r.name === u.name) || null);
+function leaderStage(u){
+  if(u.internal) return null;
+  if(leaderCohorts(u.name).length) return 'leading';
+  const r = lrOf(u);
+  if(r) return r.stage === 'feedback' ? 'approved' : r.stage;
+  return u.roles.includes('leader') ? 'approved' : null;
+}
+const LEAD_STAGE = {leading:['active', 'Leading'], approved:['', 'Approved'], applied:['warn', 'Awaiting interview'], scheduled:['warn', 'Interview pending']};
+const leaderStageTag = u => { const st = leaderStage(u); return st ? tag(LEAD_STAGE[st][0], LEAD_STAGE[st][1]) : '—'; };
+const leaderType = u => u.addedBy ? 'moderator' : 'candidate';
+const roleMatch = (u, rf) => rf === 'all' ? true
+  : rf === 'leader' ? leaderStage(u) != null
+  : STAFF_ROLE_KEYS.includes(rf) ? (!!u.internal && staffRole(u) === rf)
+  : !u.internal && u.roles.includes(rf);
+const userTypeName = u => u.internal ? staffRoleName(u) : typeLabel(u);
+/* THE ACCOUNT STATUS SET (Maryam, 7 Oct 2026: "make sure about everything"). An
+   account is only ever Invited, Active or Deactivated — no user is deleted. Invited
+   splits in two because the column prints two different words for it (an invite is
+   live for 7 days, then reads "Invitation Expired"), and a filter's options mirror the
+   column's words (§128). Listed / Paused / Not listed are NOT account statuses: they
+   are a talent agent's marketplace LISTING state, filtered under Talent Agent. A
+   leader's Leading / Approved / … is the leader-pipeline STAGE. */
+const userStatusKey = u => u.status === 'invited'
+  ? ((inviteDaysLeft(u) != null && inviteDaysLeft(u) <= 0) ? 'invexpired' : 'invpending')
+  : (u.status === 'ok' ? 'active' : u.status);
+const USER_STATUS_OPTS = [['all', 'All'], ['invpending', 'Invitation pending'], ['invexpired', 'Invitation expired'], ['active', 'Active'], ['inactive', 'Deactivated']];
+const userStatusCell = u => u.internal ? (u.status === 'invited' ? staffInviteStatus(u) : staffStatusTag(u)) : extInviteStatus(u);
+const userCand = u => CAND_BY_ID[u.id] || null;
+const userTrack = u => { const c = userCand(u), r = lrOf(u); return (c && c.bucket) || (r && r.bucket) || '—'; };
+
+/* The one filtered set the view and the CSV export share. */
 function usersRowsFiltered(){
-  const rf = getFilter('role', 'all'), q = getFilter('q', ''), sf = getFilter('status', 'all'), ef = getFilter('erasure', 'all');
-  const ext = USERS.filter(u => !u.internal && !u.roles.includes('employer'));
-  return ext.filter(u => rf === 'all' ? true : u.roles.includes(rf))
-    .filter(u => { if(sf === 'all') return true; const st = u.status === 'ok' ? 'active' : u.status; return st === sf; })
-    .filter(u => ef === 'all' ? true : erasureState(u) === ef)
-    .filter(u => hit(q, u.name, u.email, u.company));
+  const rf = getFilter('role', 'all'), g = roleGroup(rf), q = getFilter('q', ''), sf = getFilter('status', 'all'), ef = getFilter('erasure', 'all');
+  const f = k => getFilter(k, 'all');
+  let rows = usersBase().filter(u => roleMatch(u, rf))
+    .filter(u => sf === 'all' || userStatusKey(u) === sf)
+    .filter(u => g === 'internal' || ef === 'all' ? true : erasureState(u) === ef);
+  if(g === 'candidate'){
+    rows = rows.filter(u => f('ctrack') === 'all' || userTrack(u) === f('ctrack'))
+      .filter(u => { const c = userCand(u); return f('clevel') === 'all' || (c && c.level === f('clevel')); })
+      .filter(u => { const c = userCand(u), co = (c && c.cohort) || '—', v = f('ccohort');
+        return v === 'all' || (v === 'none' ? (co === '—' || !co) : co === v); });
+  }
+  if(g === 'agent'){
+    rows = rows.filter(u => f('agstate') === 'all' || agState(u) === f('agstate'))
+      .filter(u => f('agtrain') === 'all' || agTraining(u) === f('agtrain'))
+      .filter(u => f('agrange') === 'all' || rangeCovers(agRange(u), f('agrange')))
+      .slice().sort((a, b) => (a.rank || 99) - (b.rank || 99) || a.name.localeCompare(b.name));
+  }
+  if(g === 'leader'){
+    rows = rows.filter(u => f('lstage') === 'all' || leaderStage(u) === f('lstage'))
+      .filter(u => f('ltype') === 'all' || leaderType(u) === f('ltype'));
+  }
+  if(g === 'internal') rows = rows.filter(u => f('dept') === 'all' || u.dept === f('dept'));
+  return rows.filter(u => { const c = userCand(u); return hit(q, u.name, u.email, u.company, c && c.level, c && c.cohort, u.job); });
 }
 /* the row action menu, by status: a deleting/deleted account offers only View. */
 function usersRowMenu(u){
+  /* ONE FIXED ORDER for a candidate / cohort leader (Maryam, 7 Oct 2026): View · Edit ·
+     the leader-pipeline step (Book Interview / Allot a Cohort) · the cohort-leader
+     toggle (Mark as / Remove as Cohort Leader) · Deactivate or Reactivate. An invited
+     account offers only Resend / Cancel Invite. No Delete, ever. */
   const active = u.status === 'active' || u.status === 'ok';
   const acts = [['view', 'View', `data-go="${userDetailRoute(u)}"`]];
-  if(u.status === 'deleting' || u.status === 'deleted') return acts;
   if(u.status === 'invited'){
-    acts.push(['renew', 'Resend invite', `data-act="staffresend:${u.id}"`], ['close', 'Cancel invite', `data-act="staffcancelinvite:${u.id}"`]);
-  } else {
-    acts.push(active ? ['deactivate', 'Deactivate', `data-sheet="deactext:${u.id}"`] : ['play', 'Reactivate', `data-sheet="reactext:${u.id}"`]);
-    /* "View as" (impersonation) is hidden (Maryam, 24 Sep 2026); `askviewas` stays
-       defined, just not surfaced from the row menu. */
-    /* A candidate at level E5+ who is not already a leader can be invited to lead a
-       cohort, right from the row (Maryam, 24 Sep 2026) — the same action as the
-       detail page, opening the invite confirmation. A candidate who IS a leader gets
-       the counterpart "Remove as Cohort Leader" (assign a replacement first). */
-    if(active && u.roles.includes('leader')) acts.push(['close', 'Remove as Cohort Leader', `data-sheet="rmleader:${u.id}"`]);
-    else if(active && leaderEligible(u)) acts.push(['verified', 'Mark as Cohort Leader', `data-act="askmarkleader:${u.id}"`]);
+    acts.push(['renew', 'Resend Invite', `data-act="staffresend:${u.id}"`], ['close', 'Cancel Invite', `data-act="staffcancelinvite:${u.id}"`]);
+    return acts;
   }
-  /* "Merge into another account" is hidden (Maryam, 24 Sep 2026); the merge sheet /
-     askmerge / domerge stay defined, just not surfaced from the row menu. */
-  acts.push(['delete', 'Delete', `data-sheet="delext:${u.id}"`]);
+  if(CAND_BY_ID[u.id]) acts.push(['edit', 'Edit', `data-sheet="rec:cand:${u.id}"`]);
+  const r = lrOf(u), st = leaderStage(u);
+  if(active && r && r.stage === 'applied') acts.push(['calendar', 'Book Interview', `data-act="leadsched:${r.id}"`]);
+  if(active && r && r.stage === 'feedback' && st !== 'leading') acts.push(['check', 'Allot a Cohort', `data-act="askallot:${r.id}"`]);
+  if(active){
+    /* a capability holder is removed through the replacement picker (`rmleader`); an
+       applicant leaves the leader queue (`askremovelead`); an eligible E5+ candidate
+       with neither is invited to lead. */
+    if(u.roles.includes('leader')) acts.push(['close', 'Remove as Cohort Leader', `data-sheet="rmleader:${u.id}"`]);
+    else if(r) acts.push(['close', 'Remove as Cohort Leader', `data-act="askremovelead:${r.id}"`]);
+    else if(leaderEligible(u)) acts.push(['verified', 'Mark as Cohort Leader', `data-act="askmarkleader:${u.id}"`]);
+  }
+  acts.push(active ? ['deactivate', 'Deactivate', `data-sheet="deactext:${u.id}"`] : ['play', 'Reactivate', `data-sheet="reactext:${u.id}"`]);
   return acts;
 }
+/* EVERY ROW'S MENU follows the PERSON, whichever role is picked: an internal
+   account keeps the internal guards (`staffRowActs`), a talent agent carries the
+   marketplace actions moved in from All Agents / Marketplace, and anyone in the
+   leader pipeline carries its actions (Book interview / Allot a cohort / Remove)
+   moved in from Cohort Leaders. */
+/* ONE MENU PER PERSON (Maryam, 7 Oct 2026: "the menu items on the same user is
+   different on the table and user detail page"). `userMenuActs` is the single source:
+   the All Users row draws it whole, and EVERY person detail page (candidate, talent
+   agent, cohort leader, internal user) draws it minus View (`detailMenu`) — so the two
+   can never drift again. Do not build a detail kebab by hand; change this. */
+function userRowActs(u){ return rowActs(userMenuActs(u)); }
+const detailMenu = u => rowActs(userMenuActs(u).filter(a => a && a[1] !== 'View'));
+function userMenuActs(u){
+  if(u.internal) return staffMenuActs(u);
+  if(u.roles.includes('agent') && !u.roles.includes('candidate')){
+    if(u.status === 'invited') return [['view', 'View', `data-go="agents/detail/${u.id}"`],
+      ['renew', 'Resend Invite', `data-act="staffresend:${u.id}"`], ['close', 'Cancel Invite', `data-act="staffcancelinvite:${u.id}"`]];
+    /* same order as every other person: View · Edit · the role's own steps · Deactivate */
+    const [view, ...market] = agMarketActs(u);
+    return [view, ['edit', 'Edit', `data-sheet="rec:agent:${u.id}"`], ...market,
+      (u.status === 'active' || u.status === 'ok') ? ['deactivate', 'Deactivate', `data-sheet="deactext:${u.id}"`] : ['play', 'Reactivate', `data-sheet="reactext:${u.id}"`]];
+  }
+  return usersRowMenu(u);
+}
+/* the bulk bar while Cohort Leader is picked adds the leaders table's own removal */
+const usersLeaderBulk = ids => [...usersBulk(ids), ['close', ids.length > 1 ? 'Remove as cohort leaders' : 'Remove as cohort leader', 'data-act="bulkleadremoveu"', 'danger']];
+ACTIONS.bulkleadremoveu = () => { const ctx = bulkCtx(); if(!ctx) return; S._pending = {ids: ctx.ids.slice(), selKey: ctx.key};
+  askConfirm({mk:'warning', title:`Remove ${ctx.ids.length} cohort leader${ctx.ids.length === 1 ? '' : 's'}?`, body:'Their cohort-leader access is revoked and any cohort they lead returns to no leader. Logged at high severity.', ok:ctx.ids.length === 1 ? 'Remove' : 'Remove All', danger:true, act:'dobulkleadremoveu'}); };
+ACTIONS.dobulkleadremoveu = () => { const p = S._pending || {}; S._pending = null; S.confirm = null; let n = 0;
+  (p.ids || []).forEach(id => { const u = USER_BY_ID[id]; if(!u) return; removeAsLeader(lrOf(u) || {name:u.name}); n++; });
+  if(p.selKey) S.sel[p.selKey] = {}; toast(`${n} cohort leader${n === 1 ? '' : 's'} removed`); };
+
 function usersAll(){
-  const q = getFilter('q', '');
-  /* Employers are not part of the system for now (Maryam, 19 Sep 2026). Role is a
-     TAB STRIP (Maryam 13 Sep 2026, overriding the doc's Type dropdown). */
-  const ext = USERS.filter(u => !u.internal && !u.roles.includes('employer'));
-  const extTabs = ROLE_OPTS.filter(([v]) => v !== 'admin' && v !== 'employer')
-    .map(([v, l]) => [v, l, v === 'all' ? ext.length : ext.filter(u => u.roles.includes(v)).length]);
+  const q = getFilter('q', ''), rf = getFilter('role', 'all'), g = roleGroup(rf);
   const rows = usersRowsFiltered();
+  const dash = '<span class="t-caption">—</span>';
+  /* NO USER IS EVER DELETED (Maryam, 7 Oct 2026), so the Erasure filter/column and
+     the Deletion-in-progress / Deleted statuses are gone — Deactivate is the end state. */
+  const statusOpts = USER_STATUS_OPTS;
+  const erasure = '';
+  const cohortNames = [...new Set(CANDS.map(c => c.cohort).filter(c => c && c !== '—'))].sort((a, b) => a.localeCompare(b, undefined, {numeric:true}));
+  const roleFilters = {
+    all: erasure,
+    candidate: filterDd('ctrack', 'all', [['all', 'All'], ...BUCKETS.map(b => [b.name, b.name])], 'Track')
+      + filterDd('clevel', 'all', [['all', 'All'], ...LVL_CODES.map(l => [l, l])], 'Level')
+      + filterDd('ccohort', 'all', [['all', 'All'], ...cohortNames.map(c => [c, c]), ['none', 'No cohort']], 'Cohort') + erasure,
+    agent: filterDd('agstate', 'all', [['all', 'All'], ['listed', 'Listed'], ['paused', 'Paused'], ['notlisted', 'Not listed'], ['invited', 'Invited'], ['deactivated', 'Deactivated']], 'Listing')
+      + filterDd('agtrain', 'all', [['all', 'All'], ['complete', 'Complete'], ['notcomplete', 'Not complete'], ['overridden', 'Overridden']], 'Training')
+      + filterDd('agrange', 'all', [['all', 'All'], ...LADDER.map(l => [l, l])], 'Assesses'),
+    leader: filterDd('lstage', 'all', [['all', 'All'], ['leading', 'Leading'], ['approved', 'Approved'], ['applied', 'Awaiting interview'], ['scheduled', 'Interview pending']], 'Stage')
+      + filterDd('ltype', 'all', [['all', 'All'], ['candidate', 'Candidate leader'], ['moderator', 'Moderator']], 'Type'),
+    internal: filterDd('dept', 'all', [['all', 'All'], ...deptNames().map(d => [d, d])], 'Department')
+  }[g];
+  const filters = filterDd('role', 'all', USERS_ROLE_OPTS(), 'Role')
+    + (g === 'agent' ? '' : filterDd('status', 'all', statusOpts, 'Status'))
+    + roleFilters;
+  /* the columns of the table that role used to have */
+  const COLS = {
+    all: [['User'], ['Type'], ['Cohort leader'], ['Level'], ['Status'], ['Joined'], ['Last active']],
+    candidate: [['User'], ['Level'], ['Track'], ['Cohort'], ['Status'], ['Last active']],
+    agent: [['User'], ['Rank', 1], ['Agent Score'], ['Interviews', 1], ['Training'], ['Assesses'], ['Fee', 1], ['State']],
+    leader: [['User'], ['Level'], ['Track'], ['Cohorts led', 1], ['Current cohort'], ['Added by'], ['Stage']],
+    internal: [['User'], ['Job title'], ['Department'], ['Status'], ['Last signed in'], ['Added']]
+  }[g];
+  const cellsFor = u => {
+    const c = userCand(u), r = lrOf(u);
+    const name = u.internal && u.status === 'deleted' ? `<div>Former user</div><div class="t-caption">Erased</div>` : personCell(u.name, u.email);
+    if(g === 'candidate') return [name, c ? esc(c.level) : esc(candLevel(u)), esc(userTrack(u)), c && c.cohort && c.cohort !== '—' ? esc(c.cohort) : dash, userStatusCell(u), esc(u.last)];
+    if(g === 'agent') return [name, u.rank ? String(u.rank) : '—', u.status === 'invited' ? '—' : agScoreCell(u), String(u.interviewed || 0),
+      u.status === 'invited' ? '—' : agTrainCell(u), rangeLabel(agRange(u)), u.fee ? money(u.fee) : '—', u.status === 'invited' ? extInviteStatus(u) : agStateTag(u)];
+    if(g === 'leader'){ const cur = leaderCohorts(u.name);
+      return [name, esc((r && r.level) || (c && c.level) || candLevel(u)), esc(userTrack(u)), String(Math.max(leadingCount(u), (r && r.led) || 0, cur.length) || '—'),
+        cur.length ? esc(cur.map(x => x.name).join(', ')) : dash, addedByLabel(u), leaderStageTag(u)]; }
+    if(g === 'internal') return [name, esc(u.job || '—'), esc(u.dept || '—'), userStatusCell(u), esc(u.last || 'Never'), esc(u.joined)];
+    return [name, esc(userTypeName(u)),
+      u.roles.includes('leader') ? '<span class="tag sm">Cohort leader</span>' : dash,
+      u.roles.includes('candidate') ? esc(candLevel(u)) : dash,
+      userStatusCell(u), esc(u.joined), esc(u.last)];
+  };
+  /* Add User covers every role: with an internal role picked it opens the internal
+     invite straight away (role, job title, department, 7-day invite). */
+  const addBtnHtml = `<button class="btn btn-p btn-sm noic" data-sheet="adduser">${I.add} Invite User</button>`;
   return `
   <section class="sec">
-    ${searchHead('All users', 'Every candidate, agent and cohort leader on the platform. Internal staff are in the Staff directory. A row opens the full record.',
+    ${searchHead('All users', 'Everyone with an account on the platform. Pick a role to filter by what matters for it. A row opens the full record.',
       `<button class="btn btn-g btn-sm noic" data-go="users/import">${I.download} Bulk Import</button>
        <button class="btn btn-g btn-sm noic" data-act="usersexport">${I.download} Export</button>
-       <button class="btn btn-p btn-sm noic" data-sheet="adduser">${I.add} Add User</button>`)}
-    ${filterStrip('role', 'all', extTabs)}
-    ${lstTools('Search by name or email',
-      filterDd('status', 'all', [['all', 'All'], ['invited', 'Invited'], ['active', 'Active'], ['inactive', 'Deactivated'], ['deleting', 'Deletion in progress'], ['deleted', 'Deleted']], 'Status')
-      + filterDd('erasure', 'all', [['all', 'All'], ['none', 'None'], ['progress', 'Deletion in progress'], ['overdue', 'Overdue'], ['deleted', 'Deleted']], 'Erasure'))}
+       ${g === 'leader' ? `<button class="btn btn-g btn-sm noic" data-sheet="invitelead">${I.add} Invite A Leader</button>` : ''}
+       ${addBtnHtml}`)}
+    ${lstTools(g === 'candidate' ? 'Search by name, email, level or cohort' : 'Search by name or email', filters)}
+    ${g === 'agent' ? rankBanner() : ''}
     ${rows.length ? table(
-      [{label:'User'}, {label:'Type'}, {label:'Cohort leader'}, {label:'Level'}, {label:'Status'}, {label:'Erasure'}, {label:'Joined'}, {label:'Last active'}, ACT_COL],
-      rows.map(u => ({id:u.id, go:userDetailRoute(u), sv:[u.name], cells:[
-        personCell(u.name, u.email),
-        esc(typeLabel(u)),
-        u.roles.includes('leader') ? '<span class="tag sm">Cohort leader</span>' : '<span class="t-caption">—</span>',
-        u.roles.includes('candidate') ? esc(candLevel(u)) : '<span class="t-caption">—</span>',
-        extInviteStatus(u),
-        erasureCell(u),
-        esc(u.joined),
-        esc(u.last),
-        rowActs(usersRowMenu(u))
-      ]})), {bulk: usersBulk})
+      [...COLS.map(([label, num]) => num ? {label, num:true} : {label}), ACT_COL],
+      rows.map(u => ({id:u.id, go:userDetailRoute(u), sv:[u.name], cells:[...cellsFor(u), userRowActs(u)]})),
+      {bulk: g === 'leader' ? usersLeaderBulk : usersBulk})
       : emptyState('users', 'No accounts match', q ? `Nothing matches “${q}” in this filter.` : 'Nothing in this filter yet.')}
   </section>`;
 }
@@ -5894,11 +6081,12 @@ const lastSAGuard = u => isSA(u) && activeSAs().length <= 1 ? 'This is the only 
 /* the row's action menu, by status and guard (1.7). View is always there;
    Invited swaps Edit/Deactivate for Resend / Cancel invite; Delete rides at any
    status unless a guard blocks it. */
-function staffRowActs(u){
+function staffRowActs(u){ return rowActs(staffMenuActs(u)); }
+function staffMenuActs(u){
   const acts = [['view', 'View', `data-go="users/staffdetail/${u.id}"`]];
   const prot = staffProtect(u);
   /* A deletion in flight or complete offers nothing but View. */
-  if(u.status === 'deleting' || u.status === 'deleted') return rowActs(acts);
+  if(u.status === 'deleting' || u.status === 'deleted') return acts;
   if(u.status === 'invited'){
     /* Resend only once the invite has EXPIRED — a live invite still in its window
        cannot be re-sent (Maryam, 24 Sep 2026). `inviteDaysLeft` <= 0 is expired;
@@ -5926,8 +6114,8 @@ function staffRowActs(u){
   /* No Delete on an invited row — Cancel Invite already removes the account
      (Maryam, 24 Sep 2026: "remove the delete option since cancel invite is doing
      the same thing"). Delete rides every other unprotected status. */
-  if(u.status !== 'invited' && !prot && !lastSAGuard(u)) acts.push(['delete', 'Delete', `data-sheet="delstaff:${u.id}"`]);
-  return rowActs(acts);
+  /* NO USER IS EVER DELETED (Maryam, 7 Oct 2026) — Deactivate is the only way out; the delete sheets stay defined, unreached. */
+  return acts;
 }
 
 PAGESUM['users/staff'] = () => {
@@ -5952,7 +6140,7 @@ function usersStaff(){
     ['active', 'Active', scount('active')], ['inactive', 'Deactivated', scount('inactive')]];
   const rows = base.filter(u => sf === 'all' || u.status === sf);
   const nameCell = u => u.status === 'deleted'
-    ? `<div>Former staff member</div><div class="t-caption">Erased</div>`
+    ? `<div>Former user</div><div class="t-caption">Erased</div>`
     : `<div>${esc(u.name)}${u.orig ? ' <span class="tag sm brand">Default</span>' : ''}</div><div class="t-caption">${esc(u.email)}</div>`;
   return `
   <section class="sec">
@@ -6012,7 +6200,7 @@ ACTIONS.staffexport = () => {
 function deptField(val){
   if(!activeDepts().length) return `<label class="f"><span class="lbl">Department <span class="req-star" aria-hidden="true">*</span></span>
     <button type="button" class="inp fdd-t" disabled aria-disabled="true" style="width:100%;justify-content:space-between;min-height:40px;opacity:.55;cursor:not-allowed"><span class="fdd-val fdd-ph">No departments yet</span></button>
-    <span class="f-msg">No departments have been added yet. Staff cannot be invited until at least one exists.</span></label>`;
+    <span class="f-msg">No departments have been added yet. Internal users cannot be invited until at least one exists.</span></label>`;
   return fieldHtml({k:'dept', l:'Department', t:'select', req:1, ph:'Select a department', opts:activeDepts().map(d => [d, d])}, val);
 }
 /* Validation rule sets for the staff sheets (Epic 1). Phone is OPTIONAL and only
@@ -6028,7 +6216,7 @@ const STAFF_ADD_RULES = () => [
 ];
 SHEETS.addstaff = () => {
   return {
-    title:'Add staff member',
+    title:'Add an internal user',
     body: [
       fieldHtml({k:'first', l:'First name', t:'text', req:1, ph:'e.g. Dana', max:50}),
       fieldHtml({k:'last', l:'Last name', t:'text', req:1, ph:'e.g. Whitfield', max:50}),
@@ -6047,7 +6235,7 @@ SHEETS.addstaff = () => {
   };
 };
 ACTIONS.sendinvite = () => {
-  if(!activeDepts().length){ toast('Add a department in Settings before inviting staff', 'warn'); return 'keep'; }
+  if(!activeDepts().length){ toast('Add a department in Settings before inviting an internal user', 'warn'); return 'keep'; }
   const {ok, v} = validateSheet(STAFF_ADD_RULES());
   if(!ok) return 'stay';
   if(v.role === 'admin' && !isSA(ME)){ markFieldErr('role', 'Only a Super Admin can assign the Super Admin role.'); return 'stay'; }
@@ -6067,6 +6255,10 @@ ACTIONS.sendinvite = () => {
    reveals a picker to promote an EXISTING candidate instead of inviting a new
    one. The reveal is pure CSS (`.adduser-form:has(input[value="leader"]:checked)`),
    so a radio change fires no render() and the half-typed name/email survive. */
+/* the roles Add User offers, and the one it opens on: the All Users Role filter's
+   pick when that is an addable role, else Talent Agent (Maryam, 8 Oct 2026). */
+const ADDUSER_ROLES = () => [['agent', 'Talent Agent'], ['leader', 'Cohort Leader'], ...staffRoleOpts(false)];
+const addUserDefaultRole = () => { const rf = (S.filter['users/users'] || {}).role; return ADDUSER_ROLES().some(([k]) => k === rf) ? rf : 'agent'; };
 SHEETS.adduser = () => {
   /* Only Talent Agent and Cohort Leader are addable here (Maryam, 24 Sep 2026:
      "remove candidate and employer options in the roles"): candidates self-serve
@@ -6083,11 +6275,13 @@ SHEETS.adduser = () => {
     title:'Add a user',
     body:
       `<div class="adduser-form">
-        <div class="f"><span class="lbl">Role <span class="req-star" aria-hidden="true">*</span></span>
-          <div class="adduser-roles mt4" role="radiogroup" aria-label="Role">
-            ${roleOpts.map(r => `<label class="rdo"><input type="radio" name="adduser-role" data-f="role" value="${esc(r.k)}"${r.k === 'agent' ? ' checked' : ''}><span class="rdo-dot"></span><span class="rdo-txt">${esc(r.name)}</span></label>`).join('')}
-          </div>
-        </div>
+        ${''/* ROLE IS ONE DROPDOWN OF EVERY ROLE (Maryam, 8 Oct 2026: "instead of radio
+              buttons and red row in roles section just give a dropdown of all these
+              roles"): Talent Agent · Cohort Leader · then each internal role. The pick is
+              DOM-only (formDd), and the fields for that role reveal by CSS off the hidden
+              input's value attribute, so the half-typed form survives. An internal role
+              adds Phone / Job title / Department and submits through the internal invite. */}
+        ${formDd({k:'role', l:'Role', t:'select', req:1, opts:ADDUSER_ROLES()}, addUserDefaultRole())}
         ${fieldHtml({k:'first', l:'First name', t:'text', req:1, ph:'First name'})}
         ${fieldHtml({k:'last', l:'Last name', t:'text', req:1, ph:'Last name'})}
         ${fieldHtml({k:'email', l:'Email address', t:'email', req:1, ph:'name@company.com'})}
@@ -6098,6 +6292,11 @@ SHEETS.adduser = () => {
               set at creation. Revealed by pure CSS only when the Agent radio is
               checked (`.adduser-form:has(input[value="agent"]:checked)`), so the
               radio change fires no render() and the half-typed name/email survive. */}
+        <div class="adduser-internal">
+          ${fieldHtml({k:'phone', l:'Phone number', t:'text', ph:'+1 (415) 555-0100', max:30})}
+          ${fieldHtml({k:'job', l:'Job title', t:'text', req:1, ph:'e.g. Level Reviewer', max:100})}
+          ${deptField()}
+        </div>
         <div class="adduser-agentonly">
           ${fieldHtml({k:'commission', l:'Commission (%)', t:'number', ph:'The platform’s share of this agent’s fee — defaults to 20%'})}
           <div class="f"><span class="lbl">Initial rating <span class="req-star" aria-hidden="true">*</span></span>
@@ -6124,6 +6323,7 @@ SHEETS.adduser = () => {
       /* Commission is optional now (defaults to 20% — Maryam, 28 Sep 2026); an agent
          needs first + last name, email and an initial rating. */
       if(v.role === 'agent') return !(has('first') && has('last') && has('email') && has('rating'));
+      if(STAFF_ROLE_KEYS.includes(v.role)) return !(has('first') && has('last') && has('email') && has('job') && has('dept'));
       if(v.leadercand) return false;   /* promoting an existing candidate */
       return !(has('first') && has('last') && has('email'));
     }
@@ -6142,6 +6342,8 @@ function starPick(key, cur){
 ACTIONS.submitadduser = () => {
   const v = readForm();
   if(!v.role){ toast('Choose a role', 'warn'); return 'keep'; }
+  /* an internal role is the internal invite (job title, department, 7-day link) */
+  if(STAFF_ROLE_KEYS.includes(v.role)) return ACTIONS.sendinvite();
   /* THE "OR" PATH — promote an existing candidate to cohort leader. */
   if(v.role === 'leader' && v.leadercand){
     const u = USER_BY_ID[v.leadercand]; if(!u){ toast('Pick a candidate to promote', 'warn'); return 'keep'; }
@@ -6232,10 +6434,10 @@ SHEETS.changerole = id => {
   const u = USER_BY_ID[id]; if(!u) return {title:'Change role', body:'', ok:''};
   return {
     title:`Change ${u.name}’s role`,
-    body: roField('Staff member', `${u.name} · ${u.email}`)
+    body: roField('User', `${u.name} · ${u.email}`)
       + roField('Current role', staffRoleName(u))
       + fieldHtml({k:'role', l:'New role', t:'select', req:1, opts:staffRoleOpts(isSA(ME))}, staffRole(u))
-      + sheetHelp('The role replaces the current one, never adds to it. The staff member is notified and their access changes immediately.'),
+      + sheetHelp('The role replaces the current one, never adds to it. They are notified and their access changes immediately.'),
     ok:'Confirm',
     act:'submitchangerole:' + id
   };
@@ -6245,7 +6447,7 @@ ACTIONS.submitchangerole = key => {
   const v = readForm(); const nr = v.role;
   clearFieldErr('role');
   if(nr === staffRole(u)){ markFieldErr('role', 'Select a different role to continue.'); return 'stay'; }
-  if(nr !== 'admin' && lastSAGuard(u)){ markFieldErr('role', 'This is the only Super Admin account. Assign Super Admin to another staff member first.'); return 'stay'; }
+  if(nr !== 'admin' && lastSAGuard(u)){ markFieldErr('role', 'This is the only Super Admin account. Assign Super Admin to another internal user first.'); return 'stay'; }
   if(nr === 'admin' && !isSA(ME)){ markFieldErr('role', 'Only a Super Admin can assign the Super Admin role.'); return 'stay'; }
   S._pending = {role:nr};
   askConfirm({mk:'warning', title:`Change ${u.name} from ${staffRoleName(u)} to ${(ROLE_BY_K[nr] || {}).name}?`,
@@ -6266,7 +6468,7 @@ SHEETS.deactivate = id => {
   const u = USER_BY_ID[id]; if(!u) return {title:'Deactivate', body:'', ok:''};
   return {
     title:`Deactivate ${u.name}`,
-    body: fieldHtml({k:'note', l:'Reason', t:'textarea', req:1, max:500, ph:'Why this account is being switched off. Internal only — the staff member never sees it.'})
+    body: fieldHtml({k:'note', l:'Reason', t:'textarea', req:1, max:500, ph:'Why this account is being switched off. Internal only — they never see it.'})
       + sheetHelp('They are signed out immediately and can’t sign in again. The record, role and history stay intact so the account can be reactivated later.'),
     ok:'Deactivate', danger:true,
     act:'submitdeactivate:' + id,
@@ -6362,9 +6564,8 @@ ACTIONS.dodelstaff = key => {
   audit('Deleted account', `${nm} · ${v.note || ''}`, 'Users & Roles', 'high');
   toast(`${nm} deleted. Personal data is erased; the audit trail is kept.`);
   /* A delete opened from the staff detail page has nothing left to draw — return
-     to the Staff Members directory. */
-  if(S.mod === 'users' && S.sub === 'staff' && S.id === u.id){ S.id = null; }
-  else if(S.mod !== 'users' || S.sub !== 'staff'){ S.mod = 'users'; S.sub = 'staff'; S.id = null; }
+     to All Users (Staff Members is hidden, 7 Oct 2026). */
+  if(S.mod !== 'users' || S.sub !== 'users'){ S.mod = 'users'; S.sub = 'users'; S.id = null; }
 };
 /* Mocked processor confirmation (the send is out of a prototype's scope). When all
    five are in, the account reaches "Deleted" and its personal data reads as a
@@ -6671,21 +6872,21 @@ ACTIONS.dodeactext = key => {
   /* reassign every live cohort to the replacement chosen in the modal (3.4). */
   if(v.repl) leaderCohorts(u.name).forEach(c => { if(v.repl[c.id]) c.leader = v.repl[c.id]; });
   u.status = 'inactive'; u.last = 'Signed out'; if(u.roles.includes('agent')) u.onboarded = false;
-  /* schedule the grace-period erasure and mark how the account got here (3.4) */
-  u.deactivatedOn = isoToday(); u.deactivateNote = v.note || ''; u.erasure = {beginsOn: isoPlus(isoToday(), GRACE_DAYS), by:'admin'};
+  /* NO USER IS EVER DELETED (Maryam, 7 Oct 2026): deactivation is the end state and
+     schedules no erasure — it only records when and why, for the Reactivate sheet. */
+  u.deactivatedOn = isoToday(); u.deactivateNote = v.note || ''; delete u.erasure;
   const c = CAND_BY_ID[u.id]; if(c) c.status = 'inactive';
-  audit('Deactivated account', `${u.name} · erasure scheduled ${dpFmt(u.erasure.beginsOn)} · ${v.note || ''}`, 'Users & Roles', 'high');
-  toast(`${u.name} deactivated. Erasure scheduled for ${dpFmt(u.erasure.beginsOn)} unless reactivated.`);
+  audit('Deactivated account', `${u.name} · ${v.note || ''}`, 'Users & Roles', 'high');
+  toast(`${u.name} deactivated. They can be reactivated at any time.`);
   S.clearNote = ''; S.clearNoteFor = null; S.clearRepl = {};
 };
 SHEETS.reactext = id => {
   const u = USER_BY_ID[id]; if(!u) return {title:'Reactivate', body:'', ok:''};
   /* read-only context (story 3.5): when the account was deactivated, the internal
      note captured then, and the erasure it is counting down to. */
-  const ctx = u.erasure ? kv([
-    ['Deactivated on', u.deactivatedOn ? dpFmt(u.deactivatedOn) : '—'],
-    ['Reason given', u.deactivateNote || '—'],
-    ['Erasure begins', `${dpFmt(u.erasure.beginsOn)} · ${Math.max(0, isoDaysLeft(u.erasure.beginsOn))} days remaining`]
+  const ctx = u.deactivatedOn ? kv([
+    ['Deactivated on', dpFmt(u.deactivatedOn)],
+    ['Reason given', u.deactivateNote || '—']
   ]) : '';
   return {
     title:`Reactivate ${u.name}`,
@@ -6711,8 +6912,8 @@ ACTIONS.doreactext = key => {
      resumed, it is gone (story 3.5). */
   delete u.erasure; delete u.deactivatedOn;
   const c = CAND_BY_ID[u.id]; if(c) c.status = 'active';
-  audit('Reactivated account', `${u.name} · pending erasure cancelled · ${v.note || ''}`, 'Users & Roles', 'high');
-  toast(`${u.name} reactivated. The scheduled erasure is cancelled.`);
+  audit('Reactivated account', `${u.name} · ${v.note || ''}`, 'Users & Roles', 'high');
+  toast(`${u.name} reactivated.`);
 };
 SHEETS.delext = id => {
   const u = USER_BY_ID[id]; if(!u) return {title:'Delete', body:'', ok:''};
@@ -6796,7 +6997,8 @@ function usersRoles(){
   const roles = permRoleCols();
   const RESERVED_MSG = 'This permission is held by Super Admin only and cannot be granted to another role.';
   const permInfo = msg => `<span class="perm-info" title="${esc(msg)}" tabindex="0" aria-label="${esc(msg)}"><svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">${inner('info')}</svg></span>`;
-  const editing = !!S.editPerms;
+  /* EDIT IS PER ROLE (Maryam, 8 Oct 2026): `S.editPerms` holds the role key being edited, or false. */
+  const editing = S.editPerms || false;
   /* EVERY grid shows all four CRUD columns (Maryam, 25 Sep 2026). THE SUPER ADMIN
      ROW IS ALWAYS ALL TICKS — the Super Admin is unrestricted and holds every
      permission on the platform (Maryam, 25 Sep 2026: "super admin cannot delete a
@@ -6812,7 +7014,7 @@ function usersRoles(){
     const exists = acts.includes(a); const pk = mkey + ':' + a;
     const on = exists && !!(PERMSET[r.k] && PERMSET[r.k].has(pk));
     if(!exists) return `<td class="num pm-off">${pmNo}</td>`;
-    if(!editing) return `<td class="num ${on ? 'pm-on' : 'pm-off'}">${on ? pmYes : pmNo}</td>`;
+    if(editing !== r.k) return `<td class="num ${on ? 'pm-on' : 'pm-off'}">${on ? pmYes : pmNo}</td>`;
     return `<td class="num ${on ? 'pm-on' : 'pm-off'}"><button class="btn btn-g btn-sm" data-act="toggleperm:${r.k}:${pk}" aria-pressed="${on}" aria-label="${esc(r.name)}: ${esc(PERM_ACT_LABEL[a])}, ${on ? 'granted' : 'not granted'}">${on ? I.checkFilled : I.checkOutline}</button></td>`;
   };
   /* ONE GRID PER ROLE (Maryam, 28 Sep 2026, off her sketch: "each permissions table
@@ -6820,9 +7022,42 @@ function usersRoles(){
      cell, all four CRUD actions across the top, every MODULE as a row, a tick where the
      role holds that module's action and a dash otherwise. This reverses the 25 Sep
      one-grid-per-module layout. `cellFor` is unchanged (role + module + action). */
+  /* EACH ROLE IS A COLLAPSED ROW (Maryam, 7 Oct 2026: "i need each permissions table
+     in a collapsed row, on opening a collapsed row than could see the table"). The row
+     names the role and how many of the module permissions it holds; opening it shows
+     that role's grid. `S.permOpen` holds the open roles (several may be open at once,
+     so two can be compared while editing). The grid's top-left cell now reads
+     "Module", since the role name is the row above it. */
+  const grantedOf = r => r.k === 'admin' ? PERM_MODULES.reduce((n, m) => n + 4, 0)
+    : PERM_MODULES.reduce((n, [m, , acts]) => n + acts.filter(a => PERMSET[r.k] && PERMSET[r.k].has(m + ':' + a)).length, 0);
+  const totalPerms = PERM_MODULES.reduce((n, [, , acts]) => n + acts.length, 0);   /* the grantable ones — a module's missing action is never grantable */
+  /* EACH ROW CARRIES ITS OWN EDIT, left of the chevron (Maryam, 8 Oct 2026: "the edit
+     button should be in each row on the left of the chevron"). The section-level Edit
+     Permissions button is gone. Edit opens the row in edit mode for THAT role only; the
+     row then swaps Edit for Cancel + Update Permissions. One role is edited at a time,
+     so the other rows hide their Edit meanwhile. Super Admin holds everything and has
+     no Edit. The header is a div, not a button, so the row's buttons are not nested. */
+  const rowActsHtml = r => {
+    if(r.k === 'admin') return '';
+    if(editing === r.k) return `<button class="btn btn-g btn-sm noic" data-act="cancelperms">Cancel</button><button class="btn btn-p btn-sm noic" data-act="saveperms"${permsChanged() ? '' : ' disabled'}>Update Permissions</button>`;
+    if(editing) return '';
+    return `<button class="btn btn-g btn-sm noic" data-act="editperms:${esc(r.k)}">${I.edit} Edit</button>`;
+  };
+  const roleRow = r => { const open = !!(S.permOpen || {})[r.k] || editing === r.k;
+    return `<div class="acc-i perm-acc-i${open ? ' on' : ''}">
+      <div class="acc-h perm-acc-h">
+        <button class="perm-acc-t" data-permopen="${esc(r.k)}" aria-expanded="${open}">
+          <span class="ttl"><span class="perm-acc-n">${esc(r.name)}</span>
+            <span class="t-desc">${r.k === 'admin' ? 'Every permission, always' : `${grantedOf(r)} of ${totalPerms} permissions granted`}</span></span>
+        </button>
+        <span class="perm-acc-a">${rowActsHtml(r)}</span>
+        <button class="perm-acc-c" data-permopen="${esc(r.k)}" aria-label="${open ? 'Collapse' : 'Expand'} ${esc(r.name)}"><svg class="chev" viewBox="0 0 24 24" aria-hidden="true">${inner('chevDown')}</svg></button>
+      </div>
+      <div class="acc-b">${roleGrid(r)}</div>
+    </div>`; };
   const roleGrid = r => `
     <div class="tbl-wrap perm-wrap"><table class="tbl perm-grid">
-      <tr><th class="perm-grid-name">${esc(r.name)}</th>${ALL_ACTS.map(a => `<th class="num">${esc(PERM_ACT_LABEL[a])}</th>`).join('')}</tr>
+      <tr><th class="perm-grid-name">Module</th>${ALL_ACTS.map(a => `<th class="num">${esc(PERM_ACT_LABEL[a])}</th>`).join('')}</tr>
       ${PERM_MODULES.map(([m, label, acts]) => `<tr><td>${esc(label)}</td>${ALL_ACTS.map(a => cellFor(r, m, a, acts)).join('')}</tr>`).join('')}
     </table></div>`;
   const govRows = list => list.map(([pk, l, gov, reserved]) =>
@@ -6844,11 +7079,8 @@ function usersRoles(){
   </section>
 
   <section class="sec">
-    ${aiHead('Permissions', 'Each role lists what it can do across every module. A tick is a granted permission; the Super Admin holds them all.',
-      editing
-        ? `<span style="display:flex;align-items:center;gap:var(--s05)"><button class="btn btn-g btn-sm noic" data-act="cancelperms">Cancel</button><button class="btn btn-p btn-sm noic" data-act="saveperms"${permsChanged() ? '' : ' disabled'}>Update Permissions</button></span>`
-        : '<button class="btn btn-g btn-sm noic" data-act="editperms">' + I.edit + ' Edit Permissions</button>')}
-    ${roles.map(r => roleGrid(r)).join('')}
+    ${aiHead('Permissions', 'Each role lists what it can do across every module. A tick is a granted permission; the Super Admin holds them all.')}
+    <div class="acc perm-acc">${roles.map(r => roleRow(r)).join('')}</div>
   </section>`;
   /* The "Sensitive permissions" and "Reserved to Super Admin" governance tables were
      removed (Maryam, 28 Sep 2026). PERM_SENSITIVE / PERM_RESERVED / govRows stay defined
@@ -6873,14 +7105,14 @@ function usersRoles(){
    writes one audit line. Cancel restores the snapshot. */
 const permSnapshot = () => JSON.stringify(Object.fromEntries(Object.keys(PERMSET).map(k => [k, [...PERMSET[k]].sort()])));
 const permsChanged = () => S.permsSnap != null && permSnapshot() !== S.permsSnap;
-ACTIONS.editperms = () => { if(!S.editPerms){ S.editPerms = true; S.permsSnap = permSnapshot(); } };
+ACTIONS.editperms = key => { const rk = String(key).split(':')[1]; if(!rk || S.editPerms) return; S.editPerms = rk; S.permsSnap = permSnapshot(); S.permOpen = S.permOpen || {}; S.permOpen[rk] = true; };
 ACTIONS.cancelperms = () => {
   if(S.permsSnap != null){ const snap = JSON.parse(S.permsSnap); Object.keys(PERMSET).forEach(k => { PERMSET[k] = new Set(snap[k] || []); }); }
   S.editPerms = false; S.permsSnap = null;
 };
 ACTIONS.toggleperm = key => {
   const parts = key.split(':'); const rk = parts[1]; const pk = parts.slice(2).join(':');
-  const r = ROLE_BY_K[rk]; if(!r || rk === 'admin') return;   /* Super Admin is read-only */
+  const r = ROLE_BY_K[rk]; if(!r || rk === 'admin' || rk !== S.editPerms) return;   /* Super Admin is read-only; only the role in edit */
   if(permIsReserved(pk)) return;                              /* reserved is not grantable */
   PERMSET[rk] = PERMSET[rk] || new Set();
   if(PERMSET[rk].has(pk)) PERMSET[rk].delete(pk); else PERMSET[rk].add(pk);
@@ -7052,7 +7284,7 @@ ACTIONS.impdo = () => {
    lines. Actions mirror the directory row, guards and all. */
 function staffDetailView(u){
   const deleted = u.status === 'deleted';
-  const dispName = deleted ? 'Former staff member' : u.name;
+  const dispName = deleted ? 'Former user' : u.name;
   const dispEmail = deleted ? 'Erased' : u.email;
   DETAIL_LABEL = dispName;
   const days = inviteDaysLeft(u);
@@ -7066,37 +7298,13 @@ function staffDetailView(u){
   let acts;
   if(u.orig){
     acts = '<span class="tag sm brand">Default Super Admin — protected</span>';
-  } else if(u.status === 'deleting' || u.status === 'deleted'){
-    /* A deletion in flight or complete offers no actions — the record is on its
-       way out and cannot be edited, deactivated or re-deleted. */
-    acts = staffStatusTag(u);
-  } else if(u.status === 'invited'){
-    /* No Delete on an invited account — Cancel Invite already removes it; Resend
-       only once the invite has EXPIRED (Maryam, 24 Sep 2026). */
-    acts = rowActs([
-      (days == null || days <= 0) ? ['renew', 'Resend Invite', `data-act="staffresend:${u.id}"`] : null,
-      ['close', 'Cancel Invite', `data-act="staffcancelinvite:${u.id}"`]
-    ]);
   } else {
-    /* No "Mark As Cohort Leader" here — a staff member is never a cohort leader;
-       that capability is added only in the Users module (Maryam, 23 Sep 2026). */
-    /* A DEACTIVATED account offers Reactivate + Delete only — no Edit or Change
-       Role, its details and role are frozen until it is brought back (Maryam,
-       24 Sep 2026). */
-    const active = u.status === 'active';
-    acts = rowActs([
-      (active && !prot) ? ['edit', 'Edit', `data-sheet="editstaff:${u.id}"`] : null,
-      (active && !prot) ? ['settings', 'Change Role', `data-sheet="changerole:${u.id}"`] : null,
-      active
-        ? (prot || lastSAGuard(u) ? null : ['deactivate', 'Deactivate', `data-sheet="deactivate:${u.id}"`])
-        : ['play', 'Reactivate', `data-sheet="reactivate:${u.id}"`],
-      prot || lastSAGuard(u) ? null : ['delete', 'Delete', `data-sheet="delstaff:${u.id}"`]
-    ]);
+    acts = detailMenu(u);   /* the person's ONE menu, minus View (Maryam, 7 Oct 2026) */
   }
   const caps = CAPS.filter(c => (MATRIX[staffRole(u)] || {})[c.k]);
   const invitedBy = u.invitedBy && USER_BY_ID[u.invitedBy] ? (USER_BY_ID[u.invitedBy].id === ME.id ? 'You' : USER_BY_ID[u.invitedBy].name) : '—';
   return `
-  ${detailHead('users/staff', sum)}
+  ${detailHead('users/users?role=' + staffRole(u), sum)}
   <section class="sec">
     ${aiHead(esc(dispName), esc(dispEmail), acts)}
     ${kv([
@@ -7149,17 +7357,7 @@ function usersStaffDetail(){
   /* Header actions in a kebab, status tag stays visible (Maryam, 18 Sep 2026). */
   const acts = u.id === 'u9'
     ? '<span class="tag sm brand">Super Admin — protected</span>'
-    : rowActs([
-        ['edit', 'Edit', `data-sheet="rec:user:${u.id}"`],
-        ['renew', 'Reset Password', `data-act="askreset:${u.id}"`],
-        u.roles.some(isFullAccess) ? null : ['view', 'View As', `data-act="askviewas:${u.id}"`],
-        isAdmin(u) ? ['close', 'Revoke Super Admin', `data-sheet="revokeadmin:${u.id}"`]
-          : (u.internal && isActive ? ['verified', 'Grant Super Admin', `data-sheet="grant:${u.id}"`] : null),
-        isActive
-          ? ['deactivate', 'Deactivate', `data-act="askstatus:user:${u.id}:inactive"`]
-          : ['play', 'Reactivate', `data-act="askstatus:user:${u.id}:active"`],
-        ['delete', 'Delete', `data-act="askdel:user:${u.id}"`]
-      ]);
+    : detailMenu(u);
   return `
   ${detailHead('users/users', sum)}
   <section class="sec">
@@ -7568,7 +7766,7 @@ PAGESUM['candidates/candidates'] = () => {
 };
 
 KINDS.cand = {
-  label:'candidate', mod:'Candidates', after:'candidates/candidates',
+  label:'candidate', mod:'Candidates', after:'users/users?role=candidate',
   find: id => CAND_BY_ID[id], name: c => c.name, detail: c => 'candidates/detail/' + c.id,
   fields: c => [
     /* First + last name, not one "Full name" (Maryam 30 Sep 2026: "on all super
@@ -7649,7 +7847,7 @@ function candidatesAll(){
         esc(c.cohort),
         tag(c.status, c.status === 'inactive' ? 'Deactivated' : undefined),
         esc(c.last),
-        rowActs([['view', 'View', `data-go="candidates/detail/${c.id}"`], editBtn('cand', c.id), delBtn('cand', c.id)])
+        rowActs([['view', 'View', `data-go="candidates/detail/${c.id}"`], editBtn('cand', c.id)])
       ]})), {selectKind:'cand'})
       : emptyState('candidates', 'No candidates match', q ? `Nothing matches “${q}” in this filter.` : 'Nothing in this filter yet.')}
   </section>`;
@@ -8344,23 +8542,12 @@ function candidatesDetail(){
   /* THE ACTIONS ARE A KEBAB MENU, not a row of inline buttons (Maryam, 15 Sep
      2026): Edit / the cohort-leader toggle / Deactivate / Erase live in the
      dropdown `rowActs` draws. */
-  const menu = rowActs([
-    ['edit', 'Edit', `data-sheet="rec:cand:${c.id}"`],
-    /* Mark OR Remove as cohort leader (Maryam 24 Sep 2026 — this REVERSES the 20 Sep
-       "no remove on the candidate detail" note): an eligible non-leader is invited;
-       a current leader is removed via the replacement-picker modal (`rmleader`). */
-    u && u.roles.includes('leader')
-      ? ['close', 'Remove as Cohort Leader', `data-sheet="rmleader:${c.id}"`]
-      : (u && leaderEligible(u) ? ['verified', 'Mark As Cohort Leader', `data-act="askmarkleader:${c.id}"`] : null),
-    c.status === 'active'
-      ? ['deactivate', 'Deactivate', `data-act="askstatus:cand:${c.id}:inactive"`]
-      : ['play', 'Reactivate', `data-act="askstatus:cand:${c.id}:active"`],
-    ['delete', 'Erase', `data-act="askdel:cand:${c.id}"`]
-  ]);
+  /* the person's ONE menu, minus View (`detailMenu`, Maryam 7 Oct 2026) */
+  const menu = u ? detailMenu(u) : '';
   return `
   ${''/* NO TAL SUMMARY on this page (Maryam, 15 Sep 2026) — `detailHead` with no
          `sum` keeps only the back arrow. */}
-  ${detailHead('candidates/candidates')}
+  ${detailHead('users/users?role=candidate')}
   <section class="sec">
     ${''/* THE IDENTITY ROW — a round portrait on the left of the name, the
            candidate portal's own `.idhead`; the kebab rides the right. */}
@@ -8419,7 +8606,7 @@ function candidatesDetail(){
   ${admQuiz(c)}
   ${''/* ERASURE — the grace countdown or the 5-processor deletion record, once the
          account is deactivated-with-a-schedule or being deleted (Epic 3, 3.4/3.6). */}
-  ${u ? externalErasurePanel(u) : ''}`;
+  ${''/* erasure panel off: no user is ever deleted (7 Oct 2026) */}`;
 }
 V.candidates = () => modView({candidates:candidatesAll, detail:candidatesDetail});
 
@@ -8654,7 +8841,7 @@ function agMarketActs(a){
 }
 
 KINDS.agent = {
-  label:'talent agent', an:'a', mod:'Talent Agents', after:'agents/agents',
+  label:'talent agent', an:'a', mod:'Talent Agents', after:'users/users?role=agent',
   find: id => USER_BY_ID[id], name: a => a.name, detail: a => 'agents/detail/' + a.id,
   fields: a => [
     /* First and last name captured separately (Maryam, 28 Sep 2026). */
@@ -8759,7 +8946,7 @@ function agentsAll(){
               ...agMarketActs(a),
               ['edit', 'Edit', `data-sheet="rec:agent:${a.id}"`],
               (a.status === 'active' || a.status === 'ok') ? ['deactivate', 'Deactivate', `data-sheet="deactext:${a.id}"`] : ['play', 'Reactivate', `data-sheet="reactext:${a.id}"`],
-              ['delete', 'Delete', `data-sheet="delext:${a.id}"`]
+              null /* no delete, 7 Oct 2026 */
             ])
       ]})), {selectKind:'agent'})
       : emptyState('agents', 'No agents match', q || sf !== 'all' || rf !== 'all' || tf !== 'all' ? 'Nothing matches the current filters.' : 'No agents yet.')}
@@ -8915,7 +9102,7 @@ function agentsDetail(){
      20% platform share (authored figure off the seed's counts, §74). */
   const earnings = Math.round((a.interviewed || 0) * (a.fee || 0) * 0.8);
   return `
-  ${detailHead('agents/agents')}
+  ${detailHead('users/users?role=agent')}
   <section class="sec">
     ${''/* IDENTITY ROW — the agent's portrait on the LEFT of the name (Maryam, 15
            Sep 2026), the candidate detail's own `.idhead`. The header actions are
@@ -8930,17 +9117,7 @@ function agentsDetail(){
       </div>
       ${''/* Header actions in a kebab (Maryam, 18 Sep 2026); the Deactivated tag stays. */}
       <span class="idhead-act" style="display:flex;align-items:center;gap:var(--s03)">${acct ? '' : tag('inactive', 'Deactivated')}
-        ${rowActs([
-          /* Agent detail menu (Maryam, 24 Sep 2026): Edit, Pause/Restore Listing,
-             Deactivate/Reactivate, Delete (View is the current page). */
-          ['edit', 'Edit', `data-sheet="rec:agent:${a.id}"`],
-          ...(agState(a) === 'listed' ? [['pause', 'Pause Listing', `data-sheet="agpause:${a.id}"`]] : []),
-          ...(agState(a) === 'paused' ? [['play', 'Restore Listing', `data-sheet="agrestore:${a.id}"`]] : []),
-          acct
-            ? ['deactivate', 'Deactivate', `data-sheet="deactext:${a.id}"`]
-            : ['play', 'Reactivate', `data-sheet="reactext:${a.id}"`],
-          ['delete', 'Delete', `data-sheet="delext:${a.id}"`]
-        ])}</span>
+        ${detailMenu(a)}</span>
     </div>
     ${stats([
       ['bank', 'Total earnings', money(earnings), 'Net amount'],
@@ -8992,7 +9169,7 @@ function agentsDetail(){
          account is being deactivated/deleted. */}
   ${agentReportsPanel(a)}
   ${agentEarningsPanel(a)}
-  ${externalErasurePanel(a)}`;
+  ${''/* erasure panel off: no user is ever deleted (7 Oct 2026) */}`;
 }
 
 /* PAST INTERVIEWS — authored placeholder (§74): the seed has no interview history
@@ -9293,8 +9470,8 @@ function agentsInterview(){
   const piv = PAST_IVS.find(x => x.id === S.id), bk = BOOKINGS.find(x => x.id === S.id);
   const iv = piv || bk;
   const agent = iv ? AGENTS().find(x => x.name === iv.agent) : null;
-  const backTo = agent ? 'agents/detail/' + agent.id : 'agents/agents';
-  if(!iv) return `${detailHead('agents/agents')}
+  const backTo = agent ? 'agents/detail/' + agent.id : 'users/users?role=agent';
+  if(!iv) return `${detailHead('users/users?role=agent')}
     <section class="sec">${emptyState('video', 'Interview not found', 'This interview is no longer available.')}</section>`;
   DETAIL_LABEL = `${iv.cand} — interview`;
   const when = piv ? iv.when : iv.slot;
@@ -9676,7 +9853,7 @@ function cohortsList(){
         cohortHasLeader(c) ? personCell(leaderName(c), '') : '<span class="tag sm warn">Unassigned</span>',
         c.status === 'running' ? `Day ${c.day} of 90` : '—',
         rowActs([
-          ['launch', 'View', `data-go="cohorts/detail/${c.id}"`],
+          ['view', 'View', `data-go="cohorts/detail/${c.id}"`],
           COHORT_ACTIVE(c) ? [cohortHasLeader(c) ? 'renew' : 'user', cohortHasLeader(c) ? 'Change leader' : 'Assign leader', `data-sheet="assignlead:${c.id}"`] : null,
           COHORT_ACTIVE(c) ? ['edit', 'Intervene', `data-sheet="intervene:${c.id}"`] : null,
           editBtn('cohort', c.id),
@@ -9853,7 +10030,7 @@ function cohortsDetail(){
         personCell(m.name, ''), esc(memHandle(m)), esc(m.level || '—'), esc(memCourse(m) || '—'), dpFmt(m.enrolled || c.start) || '—', memProgress(m, c),
         '<span class="tag sm green">Active</span>',
         rowActs([
-          ['launch', 'Open record', `data-go="candidates/detail/${m.id}"`],
+          ['view', 'View', `data-go="candidates/detail/${m.id}"`],
           COHORT_ACTIVE(c) ? ['renew', 'Move to another cohort', `data-sheet="moveco:${c.id}:${m.id}"`] : null,
           COHORT_ACTIVE(c) ? ['delete', 'Remove from cohort', `data-sheet="removemem:${c.id}:${m.id}"`] : null
         ])
@@ -10142,7 +10319,7 @@ function cohortsCatalogue(){
       rows.map(c => ({id:c.id, go:'catalogue/coursedetail/' + c.id, cells:[
         esc(c.name), esc(c.track), esc((c.levels || []).join(', ') || '—'), esc(intentSummary(c.intent)), tag(c.status), '90 days', String(c.chapters || 12), money(c.price),
         rowActs([
-          ['launch', 'View', `data-go="catalogue/coursedetail/${c.id}"`],
+          ['view', 'View', `data-go="catalogue/coursedetail/${c.id}"`],
           editBtn('course', c.id),
           ['wallet', 'Change price', `data-sheet="courseprice:${c.id}"`],
           c.status === 'live' ? ['pause', 'Archive', `data-act="askstatus:course:${c.id}:archived"`] : ['play', 'Publish', `data-act="askstatus:course:${c.id}:live"`],
@@ -10421,11 +10598,9 @@ function cohortsLeaderDetail(){
   const isMod = !!u.addedBy;
   const member = (u.cohorts || []).filter(c => /\(member\)/i.test(c)).map(c => bare(c));
   const lvl = (u.level && u.level !== '—') ? u.level : 'Not levelled';
-  const menu = (u.roles || []).includes('leader')
-    ? rowActs([['close', 'Remove as Cohort Leader', `data-sheet="rmleader:${u.id}"`]])
-    : '';
+  const menu = detailMenu(u);   /* the person's ONE menu, minus View (Maryam, 7 Oct 2026) */
   return `
-  ${detailHead('cohorts/assign')}
+  ${detailHead('users/users?role=leader')}
   <section class="sec">
     <div class="idhead">
       <span class="idphoto"><img src="${agentFace(u.name)}" alt="" class="idhead-ph"></span>
@@ -13525,7 +13700,7 @@ function systemOverview(){
         (Tal's scope is the standing one: the module's live records, never the
         billing ledger); the cap reads “Not set” because it is the open ruling. */''}
   <section class="sec">
-    ${aiHead('Quiz, Tal and notification routing', 'Product inputs the platform reads at run time. A change here changes what candidates and staff are shown.', `<button class="btn btn-g btn-sm noic" data-sheet="routingcfg">${I.edit} Edit</button>`)}
+    ${aiHead('Quiz, Tal and notification routing', 'Product inputs the platform reads at run time. A change here changes what candidates and the team are shown.', `<button class="btn btn-g btn-sm noic" data-sheet="routingcfg">${I.edit} Edit</button>`)}
     ${kv(ROUTING.map(([k, v]) => [esc(k), esc(v)]))}
   </section>`;
 }
@@ -13635,7 +13810,7 @@ SHEETS.auditline = id => {
 };
 SHEETS.auditalert = () => ({title:'Audit alert rules',
   body:`${fieldHtml({k:'high', l:'On a high-severity line', t:'select', opts:[['email', 'Email me at once'], ['digest', 'Daily digest'], ['none', 'Nothing']]}, 'email')}
-    ${fieldHtml({k:'staff', l:'On a staff sign-in from a new device', t:'select', opts:[['email', 'Email me at once'], ['digest', 'Daily digest'], ['none', 'Nothing']]}, 'email')}
+    ${fieldHtml({k:'staff', l:'On an internal sign-in from a new device', t:'select', opts:[['email', 'Email me at once'], ['digest', 'Daily digest'], ['none', 'Nothing']]}, 'email')}
     ${fieldHtml({k:'export', l:'On a data export request', t:'select', opts:[['email', 'Email me at once'], ['digest', 'Daily digest'], ['none', 'Nothing']]}, 'digest')}`,
   ok:'Save Rules', act:'doauditalert'});
 ACTIONS.doauditalert = () => { audit('Changed audit alert rules', 'Audit log', 'System & Audit', 'notice'); toast('Alert rules saved'); };
@@ -13731,13 +13906,13 @@ const REPORTS = {
       ['Employers verified', EMPLOYERS.filter(e => e.verify === 'ok').length],
       ['Flagged for safeguarding', APPLICATIONS.filter(a => a.safeguarding === 'flagged').length]],
     todo: () => [['Applications awaiting review', openApps()], ['Employers to verify', unverifiedEmp()]]},
-  candidates: {short:'Candidates', go:'candidates/candidates', mods:['Candidates'],
+  candidates: {short:'Candidates', go:'users/users?role=candidate', mods:['Candidates'],
     sum: () => `<b>${countActive(CANDS)} active candidates</b>, ${CANDS.filter(c => c.cohort && c.cohort !== '—').length} placed in a cohort.`,
     happening: () => [['Active candidates', countActive(CANDS)],
       ['In a cohort', CANDS.filter(c => c.cohort && c.cohort !== '—').length],
       ['Explorer / Builder / Trailblazer', BUCKETS.map(b => CANDS.filter(c => c.bucket === b.name).length).join(' / ')]],
     todo: () => [['Candidates without a cohort', CANDS.filter(c => !c.cohort || c.cohort === '—').length]]},
-  agents: {short:'Talent Agents', go:'agents/agents', mods:['Talent Agents'],
+  agents: {short:'Talent Agents', go:'users/users?role=agent', mods:['Talent Agents'],
     sum: () => `<b>${USERS.filter(u => u.roles.includes('agent')).length} agents</b> on the marketplace; ${openApps()} awaiting vetting.`,
     happening: () => [['Active agents', USERS.filter(u => u.roles.includes('agent')).length],
       ['Interviews run (all time)', USERS.filter(u => u.roles.includes('agent')).reduce((n, u) => n + (u.interviewed || 0), 0)],
@@ -13873,7 +14048,7 @@ PAGESUM['settings/security'] = () => `Your own password, phone number and sessio
 function settingsGeneral(){
   return `
   <section class="sec">
-    ${aiHead('Identity', 'How the platform names itself to staff and in email.',
+    ${aiHead('Identity', 'How the platform names itself to the team and in email.',
       '<button class="btn btn-p btn-sm noic" data-act="savegeneral">Save</button>')}
     ${settingsForm([
       {k:'org', l:'Organisation name', t:'text', v:GENERAL.org},
@@ -13905,14 +14080,14 @@ function settingsProfile(){
   const invitedBy = ME.orig ? 'The platform (original account)' : (USER_BY_ID[ME.invitedBy] || {}).name || '—';
   return `
   <section class="sec">
-    ${aiHead('Your details', 'Your name on everything you do. Email, job title and department are set in the Staff module.',
+    ${aiHead('Your details', 'Your name on everything you do. Email, job title and department are set on your record in All Users.',
       '<button class="btn btn-p btn-sm noic" data-act="saveprofile">Save Changes</button>')}
     <div class="mt4" data-form="1">
       ${fieldHtml({k:'first', l:'First name', t:'text', req:1}, first)}
       ${fieldHtml({k:'last', l:'Last name', t:'text', req:1}, last)}
       ${roField('Email address', ME.email, 'The sign-in identifier. It is never changed on an existing account.')}
-      ${roField('Job title', ME.job || '—', 'Set by someone holding Staff: Edit, not here.')}
-      ${roField('Department', ME.dept || '—', 'Set in the Staff module.')}
+      ${roField('Job title', ME.job || '—', 'Set on your record in All Users, by someone holding Staff: Edit.')}
+      ${roField('Department', ME.dept || '—', 'Set on your record in All Users.')}
     </div>
   </section>
   <section class="sec">
@@ -14130,8 +14305,8 @@ ACTIONS.savebilling = () => { Object.assign(BILLING, readPageForm()); audit('Sav
 /* the numeric groups, in the story's order after Departments. `hint` may be a
    function of SETTINGS so a derived line (the report-ready promise) stays live. */
 const SET_GROUPS = {
-  sessions:{title:'Sessions', desc:'How long a staff session may sit idle before it ends. A change applies to sessions started after it; one already running keeps the period it started under.', fields:[
-    {k:'autoSignout', l:'Auto sign-out period', unit:'minutes', min:5, max:240, hint:'Staff accounts only. Candidates and agents have no inactivity sign-out.'}]},
+  sessions:{title:'Sessions', desc:'How long an internal user’s session may sit idle before it ends. A change applies to sessions started after it; one already running keeps the period it started under.', fields:[
+    {k:'autoSignout', l:'Auto sign-out period', unit:'minutes', min:5, max:240, hint:'Internal accounts only. Candidates and agents have no inactivity sign-out.'}]},
   exports:{title:'Exports', desc:'Every export tests the size of its filtered set against this before a file is generated. A change applies to exports requested after it.', fields:[
     {k:'exportLimit', l:'Export row limit', unit:'rows', min:1000, max:250000, hint:'An export already generating finishes.'}]},
   interviews:{title:'Interviews', desc:'The report clock and the rebooking window. A change applies to interviews held / credits issued after it; one already running does not move.', fields:[
@@ -14143,7 +14318,7 @@ const SET_GROUPS = {
   tal:{title:'Tal', desc:'The Ask Tal ceiling — each question is a call the platform pays for. Counted per candidate per calendar day in their own time zone. A change applies to days beginning after it.', fields:[
     {k:'talLimit', l:'Tal question limit', unit:'questions per day', min:5, max:200, hint:'A suggestion chip counts against it. Tal’s compulsory onboarding conversation is outside this limit.'}]},
   closure:{title:'Account closure and deactivation', desc:'How long an external account stays Deactivated after administrator deactivation or self-closure before it moves automatically to Deleted. A change applies to deactivations committed after it.', fields:[
-    {k:'closureGrace', l:'Closure grace period', unit:'days', min:7, max:90, hint:'Reactivating during the grace period cancels the move to Deleted. A staff account stays Deactivated indefinitely.'}]}
+    {k:'closureGrace', l:'Closure grace period', unit:'days', min:7, max:90, hint:'Reactivating during the grace period cancels the move to Deleted. An internal account stays Deactivated indefinitely.'}]}
 };
 /* one numeric field — whole numbers only, pre-filled with the value in force. */
 function setNum(f){
@@ -14197,15 +14372,15 @@ function departmentsGroup(){
         : [['edit', 'Rename', `data-sheet="setdept:${i}"`], ['delete', 'Retire', `data-act="setdeptretire:${i}"`]];
     return {cells:[
       esc(d.name) + (d._new ? ' <span class="tag sm warn">New</span>' : ''),
-      n ? `${n} staff member${n === 1 ? '' : 's'}` : '—',
+      n ? `${n} user${n === 1 ? '' : 's'}` : '—',
       d.status === 'retired' ? tag('inactive', 'Retired') : tag('active', 'Active'),
       rowActs(ra)]};
   });
   return `<section class="sec" data-setgroup="departments">
-    ${aiHead('Departments', 'The list that fills the Department dropdown on every staff invite and record. A retired department stays on staff already assigned but leaves the dropdown for new assignments. Changes are staged until you save this group.', acts)}
+    ${aiHead('Departments', 'The list that fills the Department dropdown on every internal invite and record. A retired department stays on users already assigned but leaves the dropdown for new assignments. Changes are staged until you save this group.', acts)}
     <div style="margin:var(--s04) 0"><button class="btn acc-link btn-sm noic" data-sheet="setdept:new">${I.add} Add Department</button></div>
-    ${active.length === 0 ? note('', 'No active departments', 'No departments have been added yet. Staff cannot be invited until at least one exists.') : ''}
-    ${draft.length ? table([{label:'Department'}, {label:'Staff assigned'}, {label:'Status'}, ACT_COL], rows, {select:false, paginate:false}) : emptyState('group', 'No departments yet', 'Add a department before inviting staff.')}
+    ${active.length === 0 ? note('', 'No active departments', 'No departments have been added yet. Internal users cannot be invited until at least one exists.') : ''}
+    ${draft.length ? table([{label:'Department'}, {label:'Users assigned'}, {label:'Status'}, ACT_COL], rows, {select:false, paginate:false}) : emptyState('group', 'No departments yet', 'Add a department before inviting staff.')}
   </section>`;
 }
 SHEETS.setdept = arg => {
@@ -14420,7 +14595,7 @@ function settingsPlatform(){
   return departmentsGroup()
     + numGroup('sessions') + numGroup('exports') + numGroup('interviews')
     + cohortModeGroup() + numGroup('cohorts') + numGroup('tal') + moneyGroup()
-    + workingDaysGroup() + numGroup('closure');
+    + workingDaysGroup();   /* Account closure is hidden: no user is ever deleted, so there is no grace period to set (Maryam, 7 Oct 2026). numGroup('closure') restores it. */
 }
 
 /* ======================================================================
@@ -14544,7 +14719,7 @@ function settingsTemplates(){
     ${aiHead('Notification templates', 'The wording and on/off of every in-app notification. Templates cannot be added or removed — a new event needs a release. English only; email and SMS wording is fixed in the build.')}
     ${lstTools('Search by title',
       filterDd('tplon', 'all', [['all', 'All'], ['on', 'On'], ['off', 'Off']], 'Status')
-      + filterDd('tplrcp', 'all', [['all', 'All'], ['staff', 'Internal staff'], ['agent', 'Talent Agent'], ['candidate', 'Candidate'], ['leader', 'Cohort Leader']], 'Recipient'))}
+      + filterDd('tplrcp', 'all', [['all', 'All'], ['staff', 'Internal users'], ['agent', 'Talent Agent'], ['candidate', 'Candidate'], ['leader', 'Cohort Leader']], 'Recipient'))}
     ${rows.length ? table([{label:'Notification'}, {label:'Recipient'}, {label:'Type'}, {label:'Sent when'}, {label:'On/Off'}, {label:'Last edited'}, ACT_COL], tableRows, {select:false})
       : emptyState('notification', 'No templates match', 'Clear the filters or search to see the full set.')}
   </section>`;
@@ -15030,7 +15205,7 @@ ACTIONS.actsetpw = () => {
   if(np !== cp){ toast('Both passwords must match.', 'warn'); return; }
   const u = USER_BY_ID[S.activate.id];
   if(u){ u.status = 'active'; u.last = 'Just now'; audit('Activated staff account', `${u.name} · email`, 'Users & Roles', 'notice'); }
-  S.activate = null; S.mod = 'users'; S.sub = 'staff'; S.id = null;
+  S.activate = null; S.mod = 'users'; S.sub = 'users'; S.id = null;
   toast(`${u ? u.name : 'The account'} is now active`);
 };
 
@@ -15065,7 +15240,7 @@ const ROLE_VIEWS = [
   {role:'candidate', label:'View as Candidate',     mod:'candidates', sub:'detail',       route:u => 'candidates/detail/' + u.id},
   {role:'leader',    label:'View as Cohort Leader', mod:'cohorts',    sub:'leaderdetail', route:u => 'cohorts/leaderdetail/' + u.id},
   {role:'agent',     label:'View as Talent Agent',  mod:'agents',     sub:'detail',       route:u => 'agents/detail/' + u.id},
-  {role:'staff',     label:'View as a Staff',       mod:'users',      sub:'staffdetail',  route:u => 'users/staffdetail/' + u.id}
+  {role:'staff',     label:'View as Internal User', mod:'users',      sub:'staffdetail',  route:u => 'users/staffdetail/' + u.id}
 ];
 /* the person whose detail page we are on, or null if this is not a person-detail
    page — every such page keys on the USERS id via `S.id` (candidate/agent ids
@@ -15137,7 +15312,7 @@ function sidenav(){
      counts is a one-line revert. */
   const badge = n => '';
   const item = m => {
-    const on = m.k === S.mod;
+    const on = m.k === railMod();
     const vis = m.subs.filter(s => !s.hidden);
     const hasSubs = vis.length > 1;
     /* THE SUB-BLOCK IS ALWAYS IN THE DOM FOR A PARENT MODULE — Maryam, 7 Sep
@@ -15151,7 +15326,7 @@ function sidenav(){
        hover-only flyout in the collapsed rail. A sub reads `.on` only inside the
        CURRENT module's block. */
     const subs = hasSubs
-      ? `<div class="sn-subs">${vis.map(s => `<button class="sn-item sn-sub ${on && s.k === S.sub ? 'on' : ''}" data-go="${m.k}/${s.k}"${on && s.k === S.sub ? ' aria-current="page"' : ''}><span>${esc(s.t)}</span>${badge(subBadge(m.k, s.k))}</button>`).join('')}</div>`
+      ? `<div class="sn-subs">${vis.map(s => `<button class="sn-item sn-sub ${on && s.k === railSub() ? 'on' : ''}" data-go="${m.k}/${s.k}"${on && s.k === railSub() ? ' aria-current="page"' : ''}><span>${esc(s.t)}</span>${badge(subBadge(m.k, s.k))}</button>`).join('')}</div>`
       : '';
     /* A MODULE WITH SUB-PAGES CARRIES A CHEVRON so you know it opens a tree
        (Maryam, 7 Sep 2026); the queue count sits to its LEFT. The two ride in a
@@ -15322,7 +15497,16 @@ function sidePeek(){
    THE BREADCRUMB TRAIL — §78, filled by a pass after the page renders.
    Module > sub-page, and Module > list > record on a detail page.
    ====================================================================== */
+/* ONE DIRECTORY (Maryam, 7 Oct 2026): a person's detail page whose own list is
+   hidden (Candidates, Talent Agents, Cohort Leaders, Staff Members) belongs to All
+   Users — the rail lights Users & Roles › All Users and the trail reads that way. */
+function foldedDetail(){
+  return ['candidates/detail', 'agents/detail', 'agents/interview', 'cohorts/leaderdetail', 'users/staffdetail'].includes(S.mod + '/' + S.sub);
+}
+function railMod(){ return foldedDetail() ? 'users' : S.mod; }
+function railSub(){ return foldedDetail() ? 'users' : S.sub; }
 function trailParts(){
+  if(foldedDetail()) return [{label:'Users & Roles', go:'users/users'}, {label:'All Users', go:'users/users'}, {label:detailRecordLabel() || MOD_BY_K[S.mod]._sub[S.sub].t}];
   const m = MOD_BY_K[S.mod];
   const sub = m._sub[S.sub];
   const out = [{label:m.t, go:m.k + '/' + firstSub(m)}];
@@ -15752,7 +15936,21 @@ window.addEventListener('hashchange', () => {
    render. `data-go` carries `mod/sub[/id]`; everything else is a flag.
    ====================================================================== */
 const routeOf = () => S.mod + '/' + S.sub + (S.id ? '/' + S.id : '');
+/* A ROUTE MAY CARRY A FILTER PRESET — `users/users?role=candidate` lands on All
+   Users with that role picked (Maryam, 7 Oct 2026: the hidden Candidates / Agents /
+   Cohort Leaders / Staff list links now open All Users, pre-filtered). The preset
+   replaces the page's filters; the hash and the Back stack keep the bare route. */
+function splitPreset(dest){
+  const s = String(dest || ''), qi = s.indexOf('?');
+  return qi < 0 ? [s, null] : [s.slice(0, qi), new URLSearchParams(s.slice(qi + 1))];
+}
+function applyPreset(preset){
+  if(!preset) return;
+  S.filter[pageKey()] = {};
+  preset.forEach((v, n) => setFilter(n, v));
+}
 function go(dest, keepNav){
+  let preset; [dest, preset] = splitPreset(dest);
   const p = String(dest).split('/');
   const mod = p[0], sub = p[1], id = p[2];
   if(!MOD_BY_K[mod] || !V[mod]) return;
@@ -15764,6 +15962,7 @@ function go(dest, keepNav){
   S.mod = mod;
   S.sub = (sub && MOD_BY_K[mod]._sub[sub]) ? sub : firstSub(MOD_BY_K[mod]);
   S.id = id || null;
+  applyPreset(preset);
   /* THE RAIL STAYS OPEN when you moved from inside it at desktop — a tree you
      have to reopen after every press is not a tree. On a phone it is a drawer
      over the page and shuts, as it always did. */
@@ -15784,12 +15983,14 @@ function go(dest, keepNav){
 function goBack(fallback){
   let dest = S.hist.pop();
   if(dest){ const m = dest.split('/')[0]; if(!MOD_BY_K[m] || !V[m]) dest = null; }
-  if(!dest) dest = fallback;
+  let preset = null;
+  if(!dest) [dest, preset] = splitPreset(fallback);
   const p = String(dest || '').split('/'), mod = p[0], sub = p[1], id = p[2];
   if(!MOD_BY_K[mod] || !V[mod]) return;
   S.mod = mod;
   S.sub = (sub && MOD_BY_K[mod]._sub[sub]) ? sub : firstSub(MOD_BY_K[mod]);
   S.id = id || null;
+  applyPreset(preset);
   S.nav = false; S.notif = false; S.acct = false; S.tal = false; S.editPerms = false; S.rowMenu = null; S.pgOpen = null; S.fdOpen = null; S.roleSw = false;
   render();
   const main = device.querySelector('.main');
@@ -15848,7 +16049,7 @@ device.addEventListener('click', e => {
   const fds = e.target.closest('[data-formddset]');
   if(fds){
     const fdd = fds.closest('.fdd'), hid = fdd.querySelector('input[data-f]'), vl = fdd.querySelector('.fdd-val');
-    if(hid) hid.value = fds.dataset.formddset;
+    if(hid){ hid.value = fds.dataset.formddset; hid.setAttribute('value', hid.value); }
     /* innerHTML, not textContent — an option may carry an avatar (`fddAv`); the
        trigger must keep it when selected (Maryam, 15 Sep 2026). The option's HTML
        is our own markup with escaped labels. */
@@ -16054,7 +16255,7 @@ device.addEventListener('change', e => {
 });
 
 device.addEventListener('click', e => {
-  const t = e.target.closest('[data-go],[data-back],[data-toggle],[data-close],[data-confirm],[data-do],[data-readall],[data-tab],[data-filter],[data-act],[data-sheet],[data-sort],[data-rowmenu],[data-ivopen],[data-crsopen],[data-pg],[data-pgsize],[data-pgddtoggle],[data-fdtoggle],[data-payopen],[data-paytab],[data-payclose],[data-improleopen],[data-improleset],[data-sel],[data-selall],[data-selclearall]');
+  const t = e.target.closest('[data-go],[data-back],[data-toggle],[data-close],[data-confirm],[data-do],[data-readall],[data-tab],[data-filter],[data-act],[data-sheet],[data-sort],[data-rowmenu],[data-ivopen],[data-crsopen],[data-permopen],[data-pg],[data-pgsize],[data-pgddtoggle],[data-fdtoggle],[data-payopen],[data-paytab],[data-payclose],[data-improleopen],[data-improleset],[data-sel],[data-selall],[data-selclearall]');
 
   if(S.acct && !e.target.closest('.acct-t, .acct-menu')){ S.acct = false; render(); }
   /* the app-bar ROLE SWITCHER closes on any click outside its trigger or menu */
@@ -16132,6 +16333,7 @@ device.addEventListener('click', e => {
   /* CLEAR SELECTION — the action bar's × empties the active table's picks. */
   if(d.selclearall !== undefined){ const ctx = bulkCtx(); if(ctx) S.sel[ctx.key] = {}; return render(); }
   if(d.ivopen !== undefined){ S.ivOpen = S.ivOpen === d.ivopen ? null : d.ivopen; return render(); }
+  if(d.permopen !== undefined){ S.permOpen = S.permOpen || {}; S.permOpen[d.permopen] = !S.permOpen[d.permopen]; return render(); }
   if(d.crsopen !== undefined){ S.crsOpen = S.crsOpen === d.crsopen ? null : d.crsopen; return render(); }
   if(d.tab !== undefined){ setTab(d.tab); return render(); }
   if(d.fdtoggle !== undefined){          /* §128 — open/close a filter dropdown */
@@ -16151,7 +16353,12 @@ device.addEventListener('click', e => {
   if(d.filter !== undefined){
     const i = d.filter.indexOf(':');
     setFilter(d.filter.slice(0, i), d.filter.slice(i + 1));
-    S.fdOpen = null;                       /* a chosen filter closes the dropdown (§128) */
+    /* All Users: a new Role clears the previous role's own filters (7 Oct 2026). */
+    if(pageKey() === 'users/users' && d.filter.slice(0, i) === 'role'){
+      USERS_SUBFILTERS.forEach(k => setFilter(k, 'all'));
+      if(roleGroup(d.filter.slice(i + 1)) === 'agent') setFilter('status', 'all');
+    }
+    S.fdOpen = null;                      /* a chosen filter closes the dropdown (§128) */
     return render();
   }
   if(d.sort !== undefined){
