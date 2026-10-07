@@ -839,8 +839,15 @@ input:-webkit-autofill:focus{
    it down, so the body simply reveals it — no jump, no clipping, no dead scroll. Scoped to
    `.peek-form`, so centered modals keep the floating popup. */
 .app .peek-form .sheet-b.dd-open{overflow-y:auto}
-.app .peek-form .sheet-b .fdd.fdd-form.on .fdd-menu{position:relative; top:auto; left:0; right:0; margin-top:var(--s02); box-shadow:none}
-.app .peek-form .sheet-b .fdate.on .fdate-pop{position:relative; top:auto; right:auto; left:0; margin-top:var(--s02); box-shadow:none}
+/* THE POPUP NOW OVERLAYS THE FIELDS BELOW IT (Maryam, 8 Oct 2026: "the dropdown should
+   be opened above the content, not pushing the content down"). It stays absolutely
+   positioned (the DS default), floating over the next fields; the body above still keeps
+   `overflow-y:auto`, so there is no scroll jump — an absolute child inside the scroller
+   only extends its scroll area when it reaches the foot, never collapses it. This
+   supersedes the 30 Sep in-flow layout. */
+.app .peek-form .sheet-b .fdd.fdd-form{position:relative}
+.app .peek-form .sheet-b .fdd.fdd-form.on{z-index:40}
+.app .peek-form .sheet-b .fdd.fdd-form.on .fdd-menu{left:0; right:0}
 
 /* A formDd OPTION MAY CARRY RIGHT-ALIGNED TRAILING META (Maryam, 22 Sep 2026:
    "the count should be right aligned on the row") — a 4th tuple element, e.g. the
@@ -7140,34 +7147,52 @@ ACTIONS.dosaveperms = () => {
    State is `S.imp` (never the DOM — trap 9). The role cell is a native
    `<select class="inp">`, the admin's own form-field select (see `fieldHtml`). */
 const IMP_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const IMP_ROLE_KEYS = ROLES.map(r => r.k);
+/* SUPER ADMIN CAN NEVER BE BULK-IMPORTED (Maryam, 8 Oct 2026) — the role is granted
+   only through the grant flow, never by a CSV row, so it is off the role dropdown and a
+   row that names it is refused. */
+/* NOR A CANDIDATE (Maryam, 8 Oct 2026: "we cant add them, they will join the platform
+   on their own") — and no Employer, who is out of the system for now (19 Sep). The
+   import offers exactly what Add User offers: Talent Agent, Cohort Leader and the
+   internal roles. */
+const IMP_NOT = ['admin', 'candidate', 'employer'];
+const IMP_ROLES = () => ROLES.filter(r => !IMP_NOT.includes(r.k));
+const IMP_ROLE_KEYS = ROLES.filter(r => !IMP_NOT.includes(r.k)).map(r => r.k);
 /* sample rows the "Load sample data" button runs through the validator — four
    clean, four each tripping a different rule (invalid email · missing role ·
    duplicate of an existing account · unknown role key). Authored (§74). */
+/* FIRST AND LAST NAME ARE SEPARATE COLUMNS (Maryam, 8 Oct 2026), like every other
+   person form on the portal. A row is first_name, last_name, email, role. */
 const IMP_SAMPLE = [
-  ['Ava Stone', 'ava@brightpath.io', 'candidate'], ['Max Lee', 'max@northgate.health', 'agent'],
-  ['Joan Roy', 'joan@signal.co', 'employer'], ['Dev Kapoor', 'dev@talentnext.io', 'reviewer'],
-  ['Sam Poe', 'not-an-email', 'candidate'], ['No Role Here', 'norole@acme.io', ''],
-  ['Dupe Account', 'dana@talentnext.io', 'agent'], ['Zoe Fields', 'zoe@acme.io', 'wizard']
+  ['Ava', 'Stone', 'ava@brightpath.io', 'leader'], ['Max', 'Lee', 'max@northgate.health', 'agent'],
+  ['Joan', 'Roy', 'joan@talentnext.io', 'supervisor'], ['Dev', 'Kapoor', 'dev@talentnext.io', 'reviewer'],
+  ['Sam', 'Poe', 'not-an-email', 'agent'], ['No Role', 'Here', 'norole@acme.io', ''],
+  ['Dupe', 'Account', 'dana@talentnext.io', 'agent'], ['Zoe', 'Fields', 'zoe@acme.io', 'wizard']
 ];
 function impParse(text){
   return (text || '').split(/\r?\n/).map(l => l.trim()).filter(Boolean)
-    .filter(l => !/^\s*name\s*,\s*email\s*,\s*role/i.test(l))
-    .map(l => { const c = l.split(','); return {name:(c[0] || '').trim(), email:(c[1] || '').trim(), role:(c[2] || '').trim()}; });
+    .filter(l => !/^\s*(first[\s_]*name|name)\s*,/i.test(l))
+    .map(l => { const c = l.split(',').map(x => (x || '').trim());
+      /* an older three-column row (name,email,role) still parses — its name is split */
+      if(c.length <= 3){ const nm = splitName(c[0] || ''); return {first:nm.first, last:nm.last, email:c[1] || '', role:c[2] || ''}; }
+      return {first:c[0], last:c[1], email:c[2], role:c[3]}; });
 }
 function impValidate(rows){
   const seen = {}, existing = new Set(USERS.map(u => u.email.toLowerCase()));
   return rows.map(r => {
-    const name = (r.name || '').trim(), email = (r.email || '').trim(), role = (r.role || '').trim().toLowerCase();
+    const first = (r.first || '').trim(), last = (r.last || '').trim(), email = (r.email || '').trim(), role = (r.role || '').trim().toLowerCase();
     let st;
-    if(!name) st = {k:'err', t:'Missing name'};
+    if(!first) st = {k:'err', t:'Missing first name'};
+    else if(!last) st = {k:'err', t:'Missing last name'};
     else if(!IMP_EMAIL.test(email)) st = {k:'err', t:'Invalid email'};
     else if(!role) st = {k:'warn', t:'Missing role'};
+    else if(role === 'admin' || role === 'super admin' || role === 'superadmin') st = {k:'err', t:'Super Admin can’t be imported'};
+    else if(role === 'candidate') st = {k:'err', t:'Candidates join on their own'};
+    else if(role === 'employer') st = {k:'err', t:'Employers can’t be imported'};
     else if(!IMP_ROLE_KEYS.includes(role)) st = {k:'err', t:`Unknown role "${(r.role || '').trim()}"`};
     else if(existing.has(email.toLowerCase()) || seen[email.toLowerCase()]) st = {k:'err', t:'Duplicate email'};
     else st = {k:'ok', t:'Ready'};
     if(email) seen[email.toLowerCase()] = true;
-    return {name:r.name, email:r.email, role:r.role, st};
+    return {first:r.first, last:r.last, email:r.email, role:r.role, st};
   });
 }
 const impTag = st => tag(st.k === 'ok' ? 'active' : st.k === 'warn' ? 'requested' : 'flagged', st.t);
@@ -7191,7 +7216,7 @@ function usersImport(){
       <label for="impFile" style="display:block;border:1.5px dashed var(--border-subtle-02);padding:var(--s08) var(--s06);text-align:center;cursor:pointer;background:var(--surface-2)">
         <span style="width:44px;height:44px;border-radius:999px;background:var(--background);border:1px solid var(--rule);display:inline-flex;align-items:center;justify-content:center">${I.download}</span>
         <span class="t-h4" style="display:block;margin-top:var(--s04)">Choose a CSV file</span>
-        <span class="t-desc" style="display:block">Click to browse. Columns: <b>name</b>, <b>email</b>, <b>role</b>.</span>
+        <span class="t-desc" style="display:block">Click to browse. Columns: <b>first_name</b>, <b>last_name</b>, <b>email</b>, <b>role</b>.</span>
         <input type="file" id="impFile" accept=".csv,text/csv" hidden>
       </label>
       <div class="btn-row" style="justify-content:center;margin-top:var(--s05)">
@@ -7200,7 +7225,7 @@ function usersImport(){
       </div>
       <div style="border-top:1px solid var(--rule);margin:var(--s06) 0"></div>
       <h3 class="t-h4" style="margin:0 0 var(--s04)">Or paste CSV rows</h3>
-      <textarea class="inp" id="impText" data-imptext rows="4" style="min-height:96px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px" placeholder="name,email,role&#10;Ava Stone,ava@example.com,candidate">${esc(S.imp.text || '')}</textarea>
+      <textarea class="inp" id="impText" data-imptext rows="4" style="min-height:96px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px" placeholder="first_name,last_name,email,role&#10;Max,Lee,max@example.com,agent">${esc(S.imp.text || '')}</textarea>
       <p class="t-desc" style="margin:var(--s04) 0 0">Accepted roles: ${IMP_ROLE_KEYS.join(', ')}.</p>
       <div class="btn-row" style="margin-top:var(--s05);justify-content:flex-end"><button class="btn btn-p noic" data-act="impparse"${(S.imp.text || '').trim() ? '' : ' disabled'}>Parse rows ${I.arrowRight}</button></div>
     </div></section>`;
@@ -7214,20 +7239,21 @@ function usersImport(){
      READS as a field at rest. The role cell is OUR dropdown (`.fdd`, `impRoleCell`),
      never a native <select>. */
   const impFld = 'width:100%;min-height:38px;height:38px;padding:0 var(--s04);border:1px solid var(--border-subtle-02);border-bottom:1px solid var(--border-subtle-02);border-radius:var(--radius);background:var(--background)';
-  const impRoleCell = (i, role) => { const k = (role || '').trim().toLowerCase(), cur = ROLES.find(ro => ro.k === k), open = S.impRoleOpen === i;
+  const impRoleCell = (i, role) => { const k = (role || '').trim().toLowerCase(), cur = IMP_ROLES().find(ro => ro.k === k), open = S.impRoleOpen === i;
     return `<div class="fdd${open ? ' on' : ''}" style="display:block">
       <button type="button" class="fdd-t" data-improleopen="${i}" aria-haspopup="listbox" aria-expanded="${open}" style="width:100%;justify-content:space-between;min-height:38px;height:38px;border-color:var(--border-subtle-02);background:var(--background)">
         <span style="${cur ? '' : 'color:var(--text-helper)'}">${cur ? esc(cur.name) : 'Choose role…'}</span>
         <svg class="fdd-cx" viewBox="0 0 24 24" aria-hidden="true">${inner('chevDown')}</svg></button>
-      <div class="fdd-menu" role="listbox">${ROLES.map(ro => `<button type="button" class="fdd-opt${ro.k === k ? ' on' : ''}" role="option" aria-selected="${ro.k === k}" data-improleset="${i}:${ro.k}">${esc(ro.name)}</button>`).join('')}</div>
+      <div class="fdd-menu" role="listbox">${IMP_ROLES().map(ro => `<button type="button" class="fdd-opt${ro.k === k ? ' on' : ''}" role="option" aria-selected="${ro.k === k}" data-improleset="${i}:${ro.k}">${esc(ro.name)}</button>`).join('')}</div>
     </div>`; };
   const review = `
     <section class="sec"><div style="padding:0 var(--s05)">
       <div style="overflow:visible"><table class="tbl">
-        <tr><th style="width:52px">Sr. #</th><th>Name</th><th>Email</th><th style="width:210px">Role</th><th style="width:160px">Status</th></tr>
+        <tr><th style="width:52px">Sr. #</th><th>First name</th><th>Last name</th><th>Email</th><th style="width:210px">Role</th><th style="width:160px">Status</th></tr>
         ${rows.map((r, i) => `<tr>
           <td><span class="t-caption" style="color:var(--text-helper)">${i + 1}</span></td>
-          <td><input class="inp" data-impcell="${i}:name" value="${esc(r.name)}" style="${impFld}" aria-label="Row ${i + 1} name"></td>
+          <td><input class="inp" data-impcell="${i}:first" value="${esc(r.first || '')}" style="${impFld}" aria-label="Row ${i + 1} first name"></td>
+          <td><input class="inp" data-impcell="${i}:last" value="${esc(r.last || '')}" style="${impFld}" aria-label="Row ${i + 1} last name"></td>
           <td><input class="inp" data-impcell="${i}:email" value="${esc(r.email)}" style="${impFld}" aria-label="Row ${i + 1} email"></td>
           <td>${impRoleCell(i, r.role)}</td>
           <td>${impTag(r.st)}</td>
@@ -7246,6 +7272,10 @@ function usersImport(){
         <h3 class="t-h3" style="margin:var(--s05) 0 var(--s03)">Imported ${imp.count} user${imp.count === 1 ? '' : 's'}</h3>
         <p class="t-desc">Users have been successfully added to the platform.</p>
         <div class="btn-row" style="justify-content:center;margin-top:var(--s06)">
+          ${''/* beside the black button, a way straight back to the directory the rows
+                landed in (Maryam, 8 Oct 2026); secondary grey, so Import More stays primary.
+                The preset clears any old filter so every new account is in view. */}
+          <button class="btn btn-s noic" data-go="users/users?role=all">View all users</button>
           <button class="btn btn-p noic" data-act="impmore">${I.download} Import more users</button>
         </div>
       </div>
@@ -7257,11 +7287,11 @@ function usersImport(){
   ${imp.step === 'upload' ? upload : imp.step === 'review' ? review : done}`;
 }
 ACTIONS.imptemplate = () => {
-  try { const csv = 'name,email,role\nAva Stone,ava@example.com,candidate\nMax Lee,max@example.com,agent\n';
+  try { const csv = 'first_name,last_name,email,role\nAva,Stone,ava@example.com,leader\nMax,Lee,max@example.com,agent\n';
     const a = document.createElement('a'); a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv); a.download = 'user-import-template.csv'; a.click(); } catch(e){}
-  toast('Template downloaded (name, email, role)');
+  toast('Template downloaded (first_name, last_name, email, role)');
 };
-ACTIONS.impsample = () => { S.imp.rows = impValidate(IMP_SAMPLE.map(r => ({name:r[0], email:r[1], role:r[2]}))); S.imp.step = 'review'; };
+ACTIONS.impsample = () => { S.imp.rows = impValidate(IMP_SAMPLE.map(r => ({first:r[0], last:r[1], email:r[2], role:r[3]}))); S.imp.step = 'review'; };
 ACTIONS.impparse = () => {
   const rows = impParse(S.imp.text || '');
   if(!rows.length){ toast('Nothing to parse — paste rows or load the sample', 'warn'); return 'keep'; }
@@ -7272,7 +7302,10 @@ ACTIONS.impmore = () => { S.imp = {step:'upload', rows:[], count:0, text:''}; };
 ACTIONS.impdo = () => {
   const ready = S.imp.rows.filter(r => r.st.k === 'ok');
   if(!ready.length){ toast('No rows are ready to import', 'warn'); return 'keep'; }
-  ready.forEach(r => { const u = {id:newId('u', USERS), name:r.name.trim(), email:r.email.trim(), roles:[r.role.trim().toLowerCase()], level:'—', status:'active', joined:today(), origin:'individual', last:'invited'}; USERS.push(u); USER_BY_ID[u.id] = u; });
+  ready.forEach(r => { const role = r.role.trim().toLowerCase(), internal = STAFF_ROLE_KEYS.includes(role);
+    /* an internal role lands as an internal, invited account (it shows under its role in All Users) */
+    const u = {id:newId('u', USERS), name:joinName({first:r.first, last:r.last}), email:r.email.trim(), roles:[role], level:'—', status:internal ? 'invited' : 'active', joined:today(), origin:internal ? 'internal' : 'individual', last:internal ? 'Never' : 'invited', ...(internal ? {internal:true, invitedOn:today(), invitedBy:ME.id} : {})};
+    USERS.push(u); USER_BY_ID[u.id] = u; });
   S.imp.count = ready.length;
   audit('Bulk imported users', `${ready.length} account${ready.length === 1 ? '' : 's'} from CSV`, 'Users & Roles', 'high');
   S.imp.step = 'done';
