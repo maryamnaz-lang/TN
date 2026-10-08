@@ -414,13 +414,13 @@ const NOTIF = {
   booked:[
     {ic:'calendar', t:'Interview confirmed',          b:'Priya Nair, Thursday, August 20 at 6:30 PM ET.',                 w:'1h ago', go:'interviews', unread:1, kind:'cond'},
     {ic:'email',    t:'Calendar invite sent',         b:'Check maryam.naz@tkxel.io for the joining link.',               w:'1h ago', go:'interviews', unread:1},
-    {ic:'creditCard',t:'Payment received',            b:'$95 for your interview. Receipt in Payments.',                 w:'Yesterday', go:'billing',  unread:0}
+    {ic:'creditCard',t:'Card saved',                  b:'Your first interview is complimentary, so nothing was charged.', w:'Yesterday', go:'billing',  unread:0}
   ],
   /* THE RESCHEDULE FORK — `booked`'s three, copied. See the row in STAGES. */
   resched:[
     {ic:'calendar', t:'Interview confirmed',          b:'Priya Nair, Thursday, August 20 at 6:30 PM ET.',                 w:'1h ago', go:'interviews', unread:1, kind:'cond'},
     {ic:'email',    t:'Calendar invite sent',         b:'Check maryam.naz@tkxel.io for the joining link.',               w:'1h ago', go:'interviews', unread:1},
-    {ic:'creditCard',t:'Payment received',            b:'$95 for your interview. Receipt in Payments.',                 w:'Yesterday', go:'billing',  unread:0}
+    {ic:'creditCard',t:'Card saved',                  b:'Your first interview is complimentary, so nothing was charged.', w:'Yesterday', go:'billing',  unread:0}
   ],
   /* the wait — the call is done, the report is not. Nothing here asks the
      candidate to do anything; the bell reports the state. */
@@ -439,7 +439,7 @@ const NOTIF = {
   enrolPre:[
     {ic:'ticket',   t:'You are enrolled',              b:'Cohort 41 on Communicating with Impact. It starts in 6 days.',  w:'1h ago', go:'dashboard',    unread:1},
     {ic:'group',    t:'Your leader is Priya Nair',     b:'She will lead your cohort through the 90 days.',                 w:'2h ago', go:'dashboard',    unread:1},
-    {ic:'creditCard',t:'Payment received',             b:'$120 for Cohort 41. Receipt in Payments.',                      w:'Yesterday', go:'billing', unread:0}
+    {ic:'creditCard',t:'Payment received',             b:'$690 for Cohort 41. Receipt in Payments.',                      w:'Yesterday', go:'billing', unread:0}
   ],
   week1:[
     {ic:'book',     t:'Chapter 1 is unlocked',        b:'Why We Exist. 45 minutes, opens in LightSpeed VT.',            w:'Today', go:'coursework',  unread:1},

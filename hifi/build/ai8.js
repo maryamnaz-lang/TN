@@ -276,17 +276,18 @@ const cand = (re, fn, what) => [re, () => isLead() ? leadNA(what) : fn()];
 /* WHAT IT COSTS, ALL OF IT, INCLUDING THE PART THAT IS ALREADY SPENT. The
    candidate's mental model is one number, and the product charges twice — an
    interview and then a course, with the first credited against the second.
-   Stating the three lines in the order the money moves is what makes $95 plus
-   $595 read as $690 rather than as a surprise. */
+   Stating the lines in the order the money moves keeps the one number honest.
+   THE FIRST INTERVIEW IS COMPLIMENTARY NOW (`IV_FIRST_FREE`), so there is no $95
+   to credit and the course is $690 in full; the re-interview after day 90 is
+   charged at the agent's own fee (8 Oct 2026, every figure re-checked). */
 function wCost(){
   return tw(twIc('wallet','acc') + 'What the 90 days cost',
     `<span class="tw-lines">
-       <span><b>$95</b>the interview that sets your level, paid to the agent</span>
-       <span><b>$690</b>the Explorer &ndash; E3 course</span>
-       <span><b>&minus;$95</b>your interview, credited against it</span>
-       <span><b>$595</b>due when you enroll</span>
+       <span><b>Free</b>your first interview, the one that sets your level</span>
+       <span><b>$690</b>the Explorer &ndash; E3 course, due when you enroll</span>
+       <span><b>Agent&rsquo;s fee</b>the re-interview after day 90, if you take it</span>
      </span>
-     <span class="tw-k">${hl('One payment')}. Nothing recurs, no card is kept on file by us, and the re-interview at day 91 is included. The agent&rsquo;s fee is theirs and it varies: $80 to $110 across the twenty-four.</span>`,
+     <span class="tw-k">${hl('One payment')} for the course. Nothing recurs. The re-interview is paid when you book it, at the agent&rsquo;s own fee: $80 to $110 across the twenty-four.</span>`,
     twBtn('Open Enroll','enrol'));
 }
 
@@ -294,7 +295,7 @@ function wCost(){
    was. Its own route, because folding it into `wCost` buried the answer in
    the fourth line of a table. */
 function wReCost(){
-  return `The re-interview is ${hl('included')}. You paid an agent $95 to set your level at the start; the one at day 91 that decides whether you move up is part of the $690 course fee, and there is nothing further to pay for it.`
+  return `The re-interview is ${hl('charged at the agent&rsquo;s own fee')}, paid when you book it. Your first interview was complimentary; the one after day 90 that decides whether you move up is not part of the $690 course fee. With Priya it is $95.`
     + twChips(['What happens at the re-interview?','What would move me to E4?']);
 }
 
@@ -534,7 +535,7 @@ const NEXT = {
   booked:   ['Spend ten minutes preparing', 'Priya Nair, Thursday 20 August, 6:30 PM ET. She opens with a situation from your own answers, so the useful preparation is one story you can actually tell, not revision. I can run it with you now.', 'Run a mock interview with me', 'interviews'],
   /* THE RESCHEDULE FORK — `booked`'s row, copied. See its STAGES row. */
   resched:  ['Spend ten minutes preparing', 'Priya Nair, Thursday 20 August, 6:30 PM ET. She opens with a situation from your own answers, so the useful preparation is one story you can actually tell, not revision. I can run it with you now.', 'Run a mock interview with me', 'interviews'],
-  assessed: ['Enroll in the Explorer &ndash; E3 course', 'Your report is signed and E3 is confirmed. The cohort is assigned for you and the 90 days start when it does, $595 with your interview credited.', 'What do the 90 days ask of me?', 'enrol'],
+  assessed: ['Enroll in the Explorer &ndash; E3 course', 'Your report is signed and E3 is confirmed. The cohort is assigned for you and the 90 days start when it does. The course is $690.', 'What do the 90 days ask of me?', 'enrol'],
   week1:    ['Finish chapter 1', 'Forty-five minutes, and nothing this week is assessed. Four of the ten in Cohort 41 have already done it, so the only thing between you and their pace is the chapter itself.', 'What is next week about?', 'coursework'],
   day34:    ['Finish chapter 4', 'You are 12 minutes into it after four opens, it is 70 minutes long, and it is the growth area Priya named in your report. It is the one place extra time changes your level rather than your average.', 'How do I catch up?', 'chapter:3'],
   day90:    ['Book the re-interview', 'All 13 chapters are done at 83% and your 90-day summary is written. Priya signs it once the re-interview is booked, and whoever you pick reads it before the call. There is nothing further to pay.', 'What happens at the re-interview?', 'interviews'],

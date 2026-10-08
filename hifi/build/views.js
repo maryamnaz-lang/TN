@@ -9992,8 +9992,12 @@ const outlineSec = (lvl) => `<div class="sec">
 const checkoutPlate = lvl => `<div class="sec">
     <div class="plate">
       <div class="plate-t">Your enrolment</div>
-      <div class="plate-d">One payment, and the re-interview that can move you up is included.</div>
-      <div class="plate-b">Course fee <b>$690</b> &middot; ${ENROL_CREDIT[lvl]} <b>&minus;$95</b> &middot; Due today <b>$595</b></div>
+      ${''/* NO INTERVIEW CREDIT (Maryam, 8 Oct 2026: "course price is 690 and payment
+            button says 595? correct this"). The −$95 credit dates from when the first
+            interview was paid; it is complimentary now (`IV_FIRST_FREE`), so there is
+            nothing to credit and the course is charged at its full $690. */}
+      <div class="plate-d">One payment for the 90 days.</div>
+      <div class="plate-b">Course fee <b>$690</b> &middot; Due today <b>$690</b></div>
       <div class="note acc plate-n"><span>${I.calendar}</span><div class="nb"><b>${ENROL_OPENS[lvl][0]}</b>${ENROL_OPENS[lvl][1]?`<span class="sub">${ENROL_OPENS[lvl][1]}</span>`:''}</div></div>
       <div class="plate-a">
         <button class="btn btn-p btn-sm noic" data-go="payment">Continue to payment ${I.arrowRight}</button>
@@ -10171,7 +10175,7 @@ V.payment = (f) => {
           rows in `PARENT` / `TALCTX` / ai4's crumb table and two entries in
           `respcheck.mjs` with it — a screen's worth of deletion that this ask
           does not name. */}
-    <div class="bkpay-go"><button class="btn btn-p" data-paid="1">Pay $595 and start ${I.arrowRight}</button></div>
+    <div class="bkpay-go"><button class="btn btn-p" data-paid="1">Pay $690 and start ${I.arrowRight}</button></div>
     </div>
   </div>
 </div></main>`;
@@ -10238,10 +10242,11 @@ const enrolSheet = () => {
         ${''/* THE FEE IS ITS OWN ROW, like the pay-success dialog (Maryam, 20 Sep
               2026): a "Course Fee" label over the amount, the shared
               `.bkc-fee`/`.bkc-fl`/`.bkc-fv` treatment centred in `.pay-fee`. The
-              copy no longer repeats the figure. $595 is the enrol flow's own
-              due-today literal (course $690 less the $95 interview credit). */}
+              copy no longer repeats the figure. $690 is the course fee in full: the
+              first interview is complimentary, so no interview credit comes off it
+              (8 Oct 2026). */}
         <div class="bkc-fee pay-fee" style="align-items:center"><span class="bkc-fl">Course Fee</span>
-          <span class="bkc-fv">$595</span></div>
+          <span class="bkc-fv">$690</span></div>
         <p class="conf-x">Your payment was successful, and your enrollment is confirmed. You&rsquo;re all set to begin your TalentNext journey.</p>
       </div>
       <div class="sheet-f conf-a">
@@ -10407,7 +10412,7 @@ V.welcome = () => `<main class="main"><div class="page">
         the thing to do. §64 gives it its own arrow, so no icon is written. */}
   <div class="sec">
     <div class="note succ note-act"><span>${I.checkFilled}</span>
-      <div class="nb"><b>You are enrolled</b>$595 paid on Visa ending 4242. Your receipt is in Payments and a copy is in your email.</div>
+      <div class="nb"><b>You are enrolled</b>$690 paid on Visa ending 4242. Your receipt is in Payments and a copy is in your email.</div>
       <button class="btn btn-t btn-sm note-cta" data-go="billing">View payment</button></div>
   </div>
   ${''/* THE LEADER AND THE COHORT ARE TWO CARDS ABREAST — the reference's
@@ -11881,7 +11886,7 @@ const PAY_E2 = ['Explorer Track &ndash; E2','Feb 4, 2026','$490','Mastercard','8
    both render as "Complimentary". */
 function payRows(f){
   const rows = [];
-  if(f.enrolled||f.complete) rows.push(['Explorer Track &ndash; E3','Aug 14, 2026','$595','Visa','4242']);
+  if(f.enrolled||f.complete) rows.push(['Explorer Track &ndash; E3','Aug 14, 2026','$690','Visa','4242']);
   /* THE FIRST INTERVIEW — complimentary while `IV_FIRST_FREE` (client, 15 Sep
      2026). One row for the level interview, shown once it has been booked/held
      or is behind the reader; the card cells are empty when it is not charged. */

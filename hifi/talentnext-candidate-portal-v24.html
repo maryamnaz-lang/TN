@@ -15723,12 +15723,12 @@ const NOTIF = {
   booked:[
     {ic:'calendar', t:'Interview confirmed',          b:'Priya Nair, Thursday, August 20 at 6:30 PM ET.',                 w:'1h ago', go:'interviews', unread:1, kind:'cond'},
     {ic:'email',    t:'Calendar invite sent',         b:'Check maryam.naz@tkxel.io for the joining link.',               w:'1h ago', go:'interviews', unread:1},
-    {ic:'creditCard',t:'Payment received',            b:'$95 for your interview. Receipt in Payments.',                 w:'Yesterday', go:'billing',  unread:0}
+    {ic:'creditCard',t:'Card saved',                  b:'Your first interview is complimentary, so nothing was charged.', w:'Yesterday', go:'billing',  unread:0}
   ],
   resched:[
     {ic:'calendar', t:'Interview confirmed',          b:'Priya Nair, Thursday, August 20 at 6:30 PM ET.',                 w:'1h ago', go:'interviews', unread:1, kind:'cond'},
     {ic:'email',    t:'Calendar invite sent',         b:'Check maryam.naz@tkxel.io for the joining link.',               w:'1h ago', go:'interviews', unread:1},
-    {ic:'creditCard',t:'Payment received',            b:'$95 for your interview. Receipt in Payments.',                 w:'Yesterday', go:'billing',  unread:0}
+    {ic:'creditCard',t:'Card saved',                  b:'Your first interview is complimentary, so nothing was charged.', w:'Yesterday', go:'billing',  unread:0}
   ],
   held:[
     {ic:'checkOutline' ,t:'Interview complete',         b:'Priya is writing up your report. Your result is ready within 24 hours.', w:'Just now', go:'interviews', unread:1},
@@ -15743,7 +15743,7 @@ const NOTIF = {
   enrolPre:[
     {ic:'ticket',   t:'You are enrolled',              b:'Cohort 41 on Communicating with Impact. It starts in 6 days.',  w:'1h ago', go:'dashboard',    unread:1},
     {ic:'group',    t:'Your leader is Priya Nair',     b:'She will lead your cohort through the 90 days.',                 w:'2h ago', go:'dashboard',    unread:1},
-    {ic:'creditCard',t:'Payment received',             b:'$120 for Cohort 41. Receipt in Payments.',                      w:'Yesterday', go:'billing', unread:0}
+    {ic:'creditCard',t:'Payment received',             b:'$690 for Cohort 41. Receipt in Payments.',                      w:'Yesterday', go:'billing', unread:0}
   ],
   week1:[
     {ic:'book',     t:'Chapter 1 is unlocked',        b:'Why We Exist. 45 minutes, opens in LightSpeed VT.',            w:'Today', go:'coursework',  unread:1},
@@ -21287,8 +21287,12 @@ const outlineSec = (lvl) => `<div class="sec">
 const checkoutPlate = lvl => `<div class="sec">
     <div class="plate">
       <div class="plate-t">Your enrolment</div>
-      <div class="plate-d">One payment, and the re-interview that can move you up is included.</div>
-      <div class="plate-b">Course fee <b>$690</b> &middot; ${ENROL_CREDIT[lvl]} <b>&minus;$95</b> &middot; Due today <b>$595</b></div>
+      ${''/* NO INTERVIEW CREDIT (Maryam, 8 Oct 2026: "course price is 690 and payment
+            button says 595? correct this"). The −$95 credit dates from when the first
+            interview was paid; it is complimentary now (`IV_FIRST_FREE`), so there is
+            nothing to credit and the course is charged at its full $690. */}
+      <div class="plate-d">One payment for the 90 days.</div>
+      <div class="plate-b">Course fee <b>$690</b> &middot; Due today <b>$690</b></div>
       <div class="note acc plate-n"><span>${I.calendar}</span><div class="nb"><b>${ENROL_OPENS[lvl][0]}</b>${ENROL_OPENS[lvl][1]?`<span class="sub">${ENROL_OPENS[lvl][1]}</span>`:''}</div></div>
       <div class="plate-a">
         <button class="btn btn-p btn-sm noic" data-go="payment">Continue to payment ${I.arrowRight}</button>
@@ -21466,7 +21470,7 @@ V.payment = (f) => {
           rows in `PARENT` / `TALCTX` / ai4's crumb table and two entries in
           `respcheck.mjs` with it — a screen's worth of deletion that this ask
           does not name. */}
-    <div class="bkpay-go"><button class="btn btn-p" data-paid="1">Pay $595 and start ${I.arrowRight}</button></div>
+    <div class="bkpay-go"><button class="btn btn-p" data-paid="1">Pay $690 and start ${I.arrowRight}</button></div>
     </div>
   </div>
 </div></main>`;
@@ -21481,10 +21485,11 @@ const enrolSheet = () => {
         ${''/* THE FEE IS ITS OWN ROW, like the pay-success dialog (Maryam, 20 Sep
               2026): a "Course Fee" label over the amount, the shared
               `.bkc-fee`/`.bkc-fl`/`.bkc-fv` treatment centred in `.pay-fee`. The
-              copy no longer repeats the figure. $595 is the enrol flow's own
-              due-today literal (course $690 less the $95 interview credit). */}
+              copy no longer repeats the figure. $690 is the course fee in full: the
+              first interview is complimentary, so no interview credit comes off it
+              (8 Oct 2026). */}
         <div class="bkc-fee pay-fee" style="align-items:center"><span class="bkc-fl">Course Fee</span>
-          <span class="bkc-fv">$595</span></div>
+          <span class="bkc-fv">$690</span></div>
         <p class="conf-x">Your payment was successful, and your enrollment is confirmed. You&rsquo;re all set to begin your TalentNext journey.</p>
       </div>
       <div class="sheet-f conf-a">
@@ -21578,7 +21583,7 @@ V.welcome = () => `<main class="main"><div class="page">
         the thing to do. §64 gives it its own arrow, so no icon is written. */}
   <div class="sec">
     <div class="note succ note-act"><span>${I.checkFilled}</span>
-      <div class="nb"><b>You are enrolled</b>$595 paid on Visa ending 4242. Your receipt is in Payments and a copy is in your email.</div>
+      <div class="nb"><b>You are enrolled</b>$690 paid on Visa ending 4242. Your receipt is in Payments and a copy is in your email.</div>
       <button class="btn btn-t btn-sm note-cta" data-go="billing">View payment</button></div>
   </div>
   ${''/* THE LEADER AND THE COHORT ARE TWO CARDS ABREAST — the reference's
@@ -22674,7 +22679,7 @@ const PAY_E2 = ['Explorer Track &ndash; E2','Feb 4, 2026','$490','Mastercard','8
 
 function payRows(f){
   const rows = [];
-  if(f.enrolled||f.complete) rows.push(['Explorer Track &ndash; E3','Aug 14, 2026','$595','Visa','4242']);
+  if(f.enrolled||f.complete) rows.push(['Explorer Track &ndash; E3','Aug 14, 2026','$690','Visa','4242']);
   if(!f.pred || isBooked(S.stage) || S.stage==='held')
     rows.push(ivCharged(false)
       ? ['Interview &middot; Priya Nair','Aug 13, 2026','$95','Visa','4242']
@@ -31355,17 +31360,16 @@ const cand = (re, fn, what) => [re, () => isLead() ? leadNA(what) : fn()];
 function wCost(){
   return tw(twIc('wallet','acc') + 'What the 90 days cost',
     `<span class="tw-lines">
-       <span><b>$95</b>the interview that sets your level, paid to the agent</span>
-       <span><b>$690</b>the Explorer &ndash; E3 course</span>
-       <span><b>&minus;$95</b>your interview, credited against it</span>
-       <span><b>$595</b>due when you enroll</span>
+       <span><b>Free</b>your first interview, the one that sets your level</span>
+       <span><b>$690</b>the Explorer &ndash; E3 course, due when you enroll</span>
+       <span><b>Agent&rsquo;s fee</b>the re-interview after day 90, if you take it</span>
      </span>
-     <span class="tw-k">${hl('One payment')}. Nothing recurs, no card is kept on file by us, and the re-interview at day 91 is included. The agent&rsquo;s fee is theirs and it varies: $80 to $110 across the twenty-four.</span>`,
+     <span class="tw-k">${hl('One payment')} for the course. Nothing recurs. The re-interview is paid when you book it, at the agent&rsquo;s own fee: $80 to $110 across the twenty-four.</span>`,
     twBtn('Open Enroll','enrol'));
 }
 
 function wReCost(){
-  return `The re-interview is ${hl('included')}. You paid an agent $95 to set your level at the start; the one at day 91 that decides whether you move up is part of the $690 course fee, and there is nothing further to pay for it.`
+  return `The re-interview is ${hl('charged at the agent&rsquo;s own fee')}, paid when you book it. Your first interview was complimentary; the one after day 90 that decides whether you move up is not part of the $690 course fee. With Priya it is $95.`
     + twChips(['What happens at the re-interview?','What would move me to E4?']);
 }
 
@@ -31531,7 +31535,7 @@ const NEXT = {
   new:      ['Book the interview that sets your level', 'Your quiz put you on the Explorer track, and that is a title rather than a level. Forty-five minutes with an agent is what turns it into E1 to E5, and the course you can enroll on follows from it.', 'Book an interview with a top agent', 'agents'],
   booked:   ['Spend ten minutes preparing', 'Priya Nair, Thursday 20 August, 6:30 PM ET. She opens with a situation from your own answers, so the useful preparation is one story you can actually tell, not revision. I can run it with you now.', 'Run a mock interview with me', 'interviews'],
   resched:  ['Spend ten minutes preparing', 'Priya Nair, Thursday 20 August, 6:30 PM ET. She opens with a situation from your own answers, so the useful preparation is one story you can actually tell, not revision. I can run it with you now.', 'Run a mock interview with me', 'interviews'],
-  assessed: ['Enroll in the Explorer &ndash; E3 course', 'Your report is signed and E3 is confirmed. The cohort is assigned for you and the 90 days start when it does, $595 with your interview credited.', 'What do the 90 days ask of me?', 'enrol'],
+  assessed: ['Enroll in the Explorer &ndash; E3 course', 'Your report is signed and E3 is confirmed. The cohort is assigned for you and the 90 days start when it does. The course is $690.', 'What do the 90 days ask of me?', 'enrol'],
   week1:    ['Finish chapter 1', 'Forty-five minutes, and nothing this week is assessed. Four of the ten in Cohort 41 have already done it, so the only thing between you and their pace is the chapter itself.', 'What is next week about?', 'coursework'],
   day34:    ['Finish chapter 4', 'You are 12 minutes into it after four opens, it is 70 minutes long, and it is the growth area Priya named in your report. It is the one place extra time changes your level rather than your average.', 'How do I catch up?', 'chapter:3'],
   day90:    ['Book the re-interview', 'All 13 chapters are done at 83% and your 90-day summary is written. Priya signs it once the re-interview is booked, and whoever you pick reads it before the call. There is nothing further to pay.', 'What happens at the re-interview?', 'interviews'],
