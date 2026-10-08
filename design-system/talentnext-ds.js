@@ -1520,6 +1520,14 @@ function dsAgentCard(a, key){
   </div>`;
 }
 
+const dsAcctTrigger = (img, ini, name, role, open) =>
+  `<button class="shell-act acct-t ${open ? 'on' : ''}" data-toggle="acct"
+    aria-label="Account" aria-haspopup="menu" aria-expanded="${open ? 'true' : 'false'}">
+    <span class="shell-avatar"><img src="${img}" alt="">${ini ? `<i>${ini}</i>` : ''}</span>
+    <span class="acct-id"><span class="acct-n">${name}</span><span class="acct-r">${role}</span></span>
+    <svg class="acct-c" viewBox="0 0 24 24" aria-hidden="true">${inner('chevDown')}</svg>
+  </button>`;
+
 
 /* ---- the authored builders (patterns the portal writes inline) ---- */
 

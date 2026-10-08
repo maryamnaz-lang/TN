@@ -175,6 +175,14 @@
   width:16px;height:16px;flex:none;
   transition:transform var(--dur-short) var(--ease-standard)}
 .app .acct-t.on .acct-c{transform:rotate(180deg)}
+/* THE NAME AND ROLE BESIDE THE FACE (Maryam, 8 Oct 2026). A two-line stack between
+   the face and the chevron, left-aligned; the face keeps its own size. §63 sets
+   the type. Below 600 the bar is a phone's and the pair would push the bell off,
+   so it drops and the control is face + chevron as before. */
+.app .acct-t .acct-id{display:flex; flex-direction:column; align-items:flex-start; gap:1px; margin-left:var(--s03); margin-right:var(--s02); text-align:left; white-space:nowrap}
+@container app (max-width:599.98px){
+  .app .acct-t .acct-id{display:none}
+}
 
 /* ------------------------------------------------------------------ 78.4 ---
    THE MENU

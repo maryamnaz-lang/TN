@@ -36,7 +36,7 @@
      rule sweep clean on 21 screens, 84 screen-width combos with no overflow,
      zero thrown errors.
      ========================================================================== -->
-<link rel="stylesheet" href="design-system/talentnext-ds.css?b=82fbb70f">
+<link rel="stylesheet" href="design-system/talentnext-ds.css?b=430befa2">
 
 <style>
 /* ==========================================================================
@@ -307,7 +307,7 @@
        somebody choosing a stage would want it. -->
 </div>
 
-<script src="design-system/talentnext-ds.js?b=82fbb70f"></script>
+<script src="design-system/talentnext-ds.js?b=430befa2"></script>
 <script>
 /* ==========================================================================
    THE TALENT AGENT PORTAL
@@ -4125,8 +4125,7 @@ V.dashboard = v => {
       av: next.i, photo: AV.lena, name: next.n,
       role: `${next.kind} &middot; ${next.band}`,
       detail: `45 minutes, recorded &middot; ${money(v.fee)} already paid into escrow`,
-      actions: `<button class="btn btn-sm noic ic-l" data-go="interview" data-iv="${next.id}">${I.document}View candidate profile</button>
-        <button class="btn btn-p btn-sm noic">Join the call ${I.video}</button>`
+      actions: `<button class="btn btn-p btn-sm noic">Join the call ${I.video}</button>`
     })) + `
     ${/* THE FOUR FIGURE CELLS AND THEIR RULE ARE GONE (Maryam, 2 Sep 2026:
           "remove the 4 blocks below the black card and the line below those 4
@@ -4391,8 +4390,7 @@ V.interviews = v => {
       detail: `45 minutes, recorded &middot; ` + (soon.summary
           ? 'their 90-day summary is attached, so you read that first'
           : `${money(v.fee)} already in escrow`),
-      actions: `<button class="btn btn-sm noic ic-l" data-go="interview" data-iv="${soon.id}">${I.document}View candidate profile</button>
-        <button class="btn btn-p btn-sm noic">Join the call ${I.video}</button>`
+      actions: `<button class="btn btn-p btn-sm noic">Join the call ${I.video}</button>`
     }) : ''}
   <section class="sec">
     ${/* "Awaiting Decisions" — reports still owed — lives on the Past Interviews
@@ -4700,7 +4698,8 @@ V.interview = v => {
               suggested rung is marked beside it (13.13 "Tal recommends [level]").
               The divergence note appears when the agent's rung differs from Tal's. */''}
         <div class="f"><span class="lbl">Your suggested level</span>
-          <p class="ltr-tal">Tal recommends <b>${x.talLevel}</b>.</p>
+          ${/* The "Tal recommends {level}" line is removed (Maryam, 8 Oct 2026);
+                Tal's suggestion is stated once, in the paragraph above. */''}
           <div class="iv-ladder">${ivLadder(curCode, true)}</div>
           ${diverges ? `<p class="eval-diverge">This is <b>${divDist} rung${divDist === 1 ? '' : 's'} ${divDir}</b> than Tal's suggestion. The difference and your reason are recorded for the reviewer.</p>` : ''}</div>
         ${/* THE T·A·L·E·N·T LETTERS multi-select (13.13) — 1 to 6, in fixed TALENT
@@ -5095,7 +5094,6 @@ const calPop = (s, v) => {
       <span class="v">${money(v.fee)} &middot; paid</span></div>
     <div class="cal-pop-a">
       <button class="btn btn-p btn-sm noic">Join the call ${I.video}</button>
-      <button class="btn btn-g btn-sm noic" data-go="interview" data-iv="${x.id}">View candidate profile</button>
     </div>`
     : `
     <div class="cal-row"><span class="l">Status</span>
@@ -6304,11 +6302,7 @@ function shell(v){
             `.av-ph.sm` CAME OFF WITH IT. §78's face is `.shell-avatar` alone —
             the `sm` modifier sized the old link's 28px mark, and inside
             `.acct-t` the avatar's box is the button's to state. */''}
-      <button class="shell-act acct-t ${S.acct ? 'on' : ''}" data-toggle="acct"
-        aria-label="Account" aria-haspopup="menu" aria-expanded="${S.acct ? 'true' : 'false'}">
-        <span class="shell-avatar"><img src="${AV.owen}" alt=""><i>${A.i}</i></span>
-        <svg class="acct-c" viewBox="0 0 24 24" aria-hidden="true">${inner('chevDown')}</svg>
-      </button>
+      ${dsAcctTrigger(AV.owen, A.i, A.n, 'Talent Agent', S.acct)}
       ${acctMenu()}
     </div>
   </header>`;

@@ -2051,6 +2051,8 @@ DS_RENAME = {
     # BACKLOG ROUND 3 — the marketplace agent card, split to a pure builder.
     # `talStar` is its "Ask Tal" button, reusable on its own.
     'agentCardOf': 'dsAgentCard', 'talStar': 'dsTalStar',
+    # the app bar's account control: face + name + role + chevron (8 Oct 2026)
+    'acctTrigger': 'dsAcctTrigger',
     # helpers the above reach for
     'joinLive': 'dsJoinLive', 'joinShut': 'dsJoinShut',
     'joinClock': 'dsJoinClock', 'nextBadge': 'dsNextBadge',
@@ -2069,7 +2071,7 @@ DS_BUILDERS = [
     'scenesCarousel', 'scvScroll',
     'twIc', 'tw', 'twBtn', 'twChips', 'quickActions', 'scoreCard',
     'segsOf', 'barChart', 'lineChart', 'stackChart',
-    'talStar', 'agentCardOf',
+    'talStar', 'agentCardOf', 'acctTrigger',
 ]
 
 # THE TWO THAT NEEDED AN ARGUMENT, AND WHY EACH IS ONE LINE.

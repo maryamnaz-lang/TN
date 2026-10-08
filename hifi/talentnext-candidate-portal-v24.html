@@ -10145,6 +10145,14 @@ button.btn-p:active,
 .app .crumb-trail a.crumb-l{color:var(--text-helper)}
 .app .crumb-trail .crumb-now .crumb-l{color:var(--text-primary)}
 .app .crumb-sep{color:var(--gray-50)}
+.app .acct-t .acct-n{
+  font-size:var(--t-desc-size);line-height:18px;
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-desc-ls);
+  text-transform:none;color:var(--text-primary)}
+.app .acct-t .acct-r{
+  font-size:var(--t-label-size);line-height:var(--t-label-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-label-ls);
+  text-transform:none;color:var(--text-secondary)}
 .app .acct-i-t{
   font-size:var(--t-body-size);line-height:var(--t-body-lh);
   font-weight:var(--t-w-book);letter-spacing:var(--t-body-ls);
@@ -11812,6 +11820,10 @@ button.btn-p:active,
   width:16px;height:16px;flex:none;
   transition:transform var(--dur-short) var(--ease-standard)}
 .app .acct-t.on .acct-c{transform:rotate(180deg)}
+.app .acct-t .acct-id{display:flex; flex-direction:column; align-items:flex-start; gap:1px; margin-left:var(--s03); margin-right:var(--s02); text-align:left; white-space:nowrap}
+@container app (max-width:599.98px){
+  .app .acct-t .acct-id{display:none}
+}
 .app .shell-right{position:relative}
 .app .acct-menu{
   position:absolute;top:calc(100% - var(--s02));right:0;z-index:40;
@@ -15864,7 +15876,6 @@ const TAL_ROUTES = [
 
 const PTS = [
   {n:'Daily sign in',           d:'Sign in daily and earn 10 points every time',                   v:10},
-  {n:'Sign in 100 times',       d:'Sign in 100 times and earn 250 points',                         v:250},
   {n:'Chapter completion',      d:'Complete any chapter and earn 25 points, up to 10 a day',       v:25},
   {n:'Course completion',       d:'Complete any course and earn 250 points',                       v:250},
   {n:'Start a new conversation',d:'Post a new conversation in the community',                      v:10},
@@ -15888,11 +15899,11 @@ const RANKS = [
 ];
 
 const GAME = {
-  week1:   {pts:985,  got:[0,1,3],           badges:0, rank:1, last:['08/13/2026','07/23/2026','','07/23/2026','','','','',''], weeks:[20]},
-  day34:   {pts:1095, got:[0,1,2,3],         badges:0, rank:1, last:['08/13/2026','07/23/2026','08/04/2026','07/23/2026','','','','',''], weeks:[52,61,48,55,12]},
-  day90:   {pts:2955, got:[0,1,2,3,4,5,6],   badges:1, rank:1, last:['08/13/2026','07/23/2026','11/14/2026','11/16/2026','09/12/2026','09/21/2026','09/24/2026','',''], weeks:[52,61,48,55,62,58,70,49,55,60,52,66,58]},
-  promoted:{pts:3205, got:[0,1,2,3,4,5,6],   badges:1, rank:1, last:['08/13/2026','07/23/2026','11/18/2026','11/21/2026','09/12/2026','09/21/2026','09/24/2026','',''], weeks:[52,61,48,55,62,58,70,49,55,60,52,66,58]},
-  reddemo: {pts:1095, got:[0,1,2,3],         badges:0, rank:1, last:['08/13/2026','07/23/2026','08/04/2026','07/23/2026','','','','',''], weeks:[52,61,48,55,12]}
+  week1:   {pts:985,  got:[0,2],           badges:0, rank:1, last:['08/13/2026','','07/23/2026','','','','',''], weeks:[20]},
+  day34:   {pts:1095, got:[0,1,2],         badges:0, rank:1, last:['08/13/2026','08/04/2026','07/23/2026','','','','',''], weeks:[52,61,48,55,12]},
+  day90:   {pts:2955, got:[0,1,2,3,4,5],   badges:1, rank:1, last:['08/13/2026','11/14/2026','11/16/2026','09/12/2026','09/21/2026','09/24/2026','',''], weeks:[52,61,48,55,62,58,70,49,55,60,52,66,58]},
+  promoted:{pts:3205, got:[0,1,2,3,4,5],   badges:1, rank:1, last:['08/13/2026','11/18/2026','11/21/2026','09/12/2026','09/21/2026','09/24/2026','',''], weeks:[52,61,48,55,62,58,70,49,55,60,52,66,58]},
+  reddemo: {pts:1095, got:[0,1,2],         badges:0, rank:1, last:['08/13/2026','08/04/2026','07/23/2026','','','','',''], weeks:[52,61,48,55,12]}
 };
 
 const WEEK_TARGET = 55;
@@ -16145,15 +16156,24 @@ function shell(){
             glyph in this bar at 24px and fills it `--icon-primary`; at 24 next
             to a 32px face it reads as a second control rather than as the
             face's own disclosure. §77 sizes it and §63 §17 inks it. */''}
-      <button class="shell-act acct-t ${S.acct?'on':''}" data-toggle="acct"
-        aria-label="Account" aria-haspopup="menu" aria-expanded="${S.acct?'true':'false'}">
-        <span class="shell-avatar"><img src="${isLead()?AV.priya:AV.hana}" alt=""><i>${isLead()?'PN':'MN'}</i></span>
-        <svg class="acct-c" viewBox="0 0 24 24" aria-hidden="true">${inner('chevDown')}</svg>
-      </button>
+      ${/* `LEADER` is a const in lead.js, later in the same bundle, so on a
+            `#leader/...` deep link the boot render meets it in its temporal dead
+            zone — `typeof` does not guard that, it throws. Read it in a try. */''}
+      ${isLead()
+        ? acctTrigger(AV.priya, 'PN', (() => { try { return LEADER.n; } catch(e){ return 'Priya Nair'; } })(), 'Cohort Leader', S.acct)
+        : acctTrigger(AV.hana, 'MN', PF.general.name, 'Candidate', S.acct)}
       ${acctMenu()}
     </div>
   </header>`;
 }
+
+const acctTrigger = (img, ini, name, role, open) =>
+  `<button class="shell-act acct-t ${open ? 'on' : ''}" data-toggle="acct"
+    aria-label="Account" aria-haspopup="menu" aria-expanded="${open ? 'true' : 'false'}">
+    <span class="shell-avatar"><img src="${img}" alt="">${ini ? `<i>${ini}</i>` : ''}</span>
+    <span class="acct-id"><span class="acct-n">${name}</span><span class="acct-r">${role}</span></span>
+    <svg class="acct-c" viewBox="0 0 24 24" aria-hidden="true">${inner('chevDown')}</svg>
+  </button>`;
 
 function authShell(back){
   return `
@@ -16824,8 +16844,8 @@ const CERTIFS = [
     on:()      => 'November 18, 2026'},
   {k:'pace',   n:'Fast Tracker',     gate:(f,g) => (g.weeks||[]).filter(w => w >= WEEK_TARGET).length >= 8,
     on:()      => 'October 30, 2026'},
-  {k:'cohort', n:'Cohort Champion',  gate:(f,g) => [4,5,6].every(i => g.got.includes(i)),
-    on:(f,g)   => longDate(g.last[6])},
+  {k:'cohort', n:'Cohort Champion',  gate:(f,g) => [3,4,5].every(i => g.got.includes(i)),
+    on:(f,g)   => longDate(g.last[5])},
   {k:'top',    n:'Top Performer',    gate:(f,g) => g.pts >= BDG[0].need,
     on:()      => longDate(BRONZE_ON)}
 ];
@@ -17309,7 +17329,6 @@ function awardRow({name,desc,val,state,when,pct,art,ph,mk}){
 }
 const PTS_MK = [
   {ph:'flame',          mk:'--support-attention'},
-  {ph:'sealCheck',      mk:'--support-attention'},
   {ph:'bookOpenText',   mk:'--mk-1'},
   {ph:'graduationCap',  mk:'--mk-3'},
   {ph:'chatNew',        mk:'--mk-4'},
@@ -27341,7 +27360,7 @@ render = function(){
     if(S.ldrKeepScroll != null){ const m = device.querySelector('.main'); if(m){ void m.scrollHeight; /* force layout so scrollTop is not clamped to 0 before the new content measures */
       m.style.scrollBehavior = 'auto'; m.scrollTop = S.ldrKeepScroll; m.style.scrollBehavior = ''; } S.ldrKeepScroll = null; }
     if(typeof leadRestoreRosterFocus === 'function') leadRestoreRosterFocus();
-    if(typeof placeLeadRowMenu === 'function') placeLeadRowMenu();
+    if(typeof placeLeadRowMenu === 'function'){ placeLeadRowMenu(); setTimeout(placeLeadRowMenu, 0); }
   } catch(e){ console.warn('portal stamp', e); }
 };
 
@@ -27772,10 +27791,10 @@ function leadRosterTable(c){
       return `<tr data-rname="${leadPlain(m).toLowerCase()}">
         <td><span class="rname">${mAv(m,32)}${leadName(m)}</span></td>
         <td>${mlevel(m)}</td>
-        <td class="num">${done} <span class="t-helper-01">of 13</span><span class="cell-sub">${m.pc}%</span></td>
+        <td class="num">${done} <span class="t-helper-01">of 13</span></td>
         <td class="num${low?' cell-low':''}">${m.avg?m.avg+'%':'<span class="t-helper-01">&mdash;</span>'}</td>
-        <td class="num">${rt?rt+' retaken':'<span class="t-helper-01">0</span>'}<span class="cell-sub">avg ${(m.att||0).toFixed(1)}</span></td>
-        <td class="num">${mins?lTimeFull(mins):'None'}${mins?`<span class="cell-sub">${Math.round(mins/Math.max(1,done))} min a chapter</span>`:''}</td>
+        <td class="num">${rt?rt+' retaken':'<span class="t-helper-01">0</span>'}</td>
+        <td class="num">${mins?lTimeFull(mins):'None'}</td>
         <td class="num">${a.held?a.att+' of '+a.held:'<span class="t-helper-01">&mdash;</span>'}</td>
         <td>${m.last==='Never'?'Never':m.last}</td>
         <td class="tbl-act lead-roster-act">${ldrRowMenu([
@@ -28243,27 +28262,30 @@ V.leadMember = () => {
   return `<main class="main"><div class="page">
   ${crumb(['My Cohort','leadDash'], m.name)}
   ${ph(m.name)}
-  <div class="sec">
+  ${''/* NO DIVIDER ABOVE OR BELOW THE FOUR FIGURES (Maryam, 8 Oct 2026): the identity
+        section and the figures section both carry `.sec-noline`, so the head, the
+        four blocks and the Course section read as one run. */}
+  <div class="sec sec-noline">
     <div class="idhead">
       <span class="av-ph" style="width:72px;height:72px"><i>${m.ini}</i><img src="${AV[m.img]}" alt=""></span>
       <div class="idhead-b">
         <span class="idname">${leadName(m)}</span>
         <span class="idmeta">${mlevel(m)} &middot; Day ${c.day} of 90 &middot; Week ${leadWeek(c.day)} of 13${joinWk>1?` &middot; joined week ${joinWk}`:''}</span>
-        ${m.flag ? lflagTag(m.flag) : '<span class="tag green sm">On track</span>'}
+        ${/* the green "On track" chip is removed (Maryam, 8 Oct 2026); a flag still shows */ m.flag ? lflagTag(m.flag) : ''}
       </div>
       <div class="idhead-a">
         <button class="ldr-chip chip-msg" data-ldrdm="${m.name}">${I.chat} Contact Candidate</button>
       </div>
     </div>
   </div>
-  <div class="sec">
+  <div class="sec sec-noline">
     <div class="stats">
       ${statCell(I.growth, 'Chapters',   done + '<small> of 13</small>', m.pc + '% complete')}
       ${statCell(I.chart,  'Assessment', m.avg ? `<span class="${low?'stat-low':''}">${m.avg}<small>%</small></span>` : '<small>Not yet</small>', m.avg ? (low?'below the 75% pass mark':'course average') : 'not assessed yet')}
-      ${statCell(I.renew,  'Attempts',   lretaken(m) ? lretaken(m) : '<small>0</small>', (m.att||0).toFixed(1) + ' on average')}
+      ${statCell(I.renew,  'Attempts',   lretaken(m) ? lretaken(m) : '<small>0</small>', String(+(m.att||0).toFixed(1)) + ' on average')}   ${''/* no trailing .0: 1.0 reads "1", 1.2 stays (Maryam, 8 Oct 2026) */}
       ${statCell(I.time,   'Time on course', lmins(m) ? lTimeFull(lmins(m)) : '<small>None</small>', done ? Math.round(lmins(m)/done) + ' min a chapter' : 'not started')}
     </div>
-    <p class="lead-sync">Course figures last read from LightspeedVT ${LEAD_SYNC} (${LEAD_TZ}).</p>
+    ${''/* the "Course figures last read from LightspeedVT …" line is removed from the member page (Maryam, 8 Oct 2026) */}
   </div>
   <div class="sec">
     <div class="sec-h"><h2>Course</h2></div>

@@ -1487,7 +1487,13 @@ render = function(){
          for the one assignment so it lands instantly (the agent portal's idiom). */
       m.style.scrollBehavior = 'auto'; m.scrollTop = S.ldrKeepScroll; m.style.scrollBehavior = ''; } S.ldrKeepScroll = null; }
     if(typeof leadRestoreRosterFocus === 'function') leadRestoreRosterFocus();
-    if(typeof placeLeadRowMenu === 'function') placeLeadRowMenu();
+    /* PLACE THE KEBAB AGAIN ONCE THE RENDER HAS SETTLED (Maryam, 8 Oct 2026: "i have
+       clicked on the first row menu and the dropdown opened this far"). This wrapper
+       runs before the later render passes (the head band, the page summary), which
+       still move the content above the roster, so a menu measured here landed ~130px
+       off its row. A zero-delay timeout runs after every synchronous pass (setTimeout,
+       not rAF — trap 17). The first call stays so the menu is never unplaced. */
+    if(typeof placeLeadRowMenu === 'function'){ placeLeadRowMenu(); setTimeout(placeLeadRowMenu, 0); }
     /* `leadStick()` was called here to drive the sticky position-indicator; the
        bar and its scroll-spy were removed 9 Sep 2026 (see the note above), so the
        wrapper now only stamps `data-portal`, which both stylesheets scope on. */

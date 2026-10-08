@@ -14,7 +14,7 @@
      The <style> block is PROTOTYPE CHROME AND NOTHING ELSE (the device frame,
      the viewport picker, the wordmark size, a toast host) — no product rule.
      ========================================================================== -->
-<link rel="stylesheet" href="design-system/talentnext-ds.css?b=82fbb70f">
+<link rel="stylesheet" href="design-system/talentnext-ds.css?b=430befa2">
 <style id="admin-auth-slider">
 /* THE FRONT DOOR IS A SLIDER — ported verbatim from the candidate portal's
    §132 (hifi/build/132-authslide.css). That layer is hifi-only
@@ -849,6 +849,29 @@ input:-webkit-autofill:focus{
 .app .peek-form .sheet-b .fdd.fdd-form.on{z-index:40}
 .app .peek-form .sheet-b .fdd.fdd-form.on .fdd-menu{left:0; right:0}
 
+/* A CENTRED MODAL'S DROPDOWN FLOATS OVER THE MODAL, NOT INSIDE IT (Maryam, 8 Oct 2026:
+   "the dropdown should not open within the modal but above it so it does not cut from
+   below"). Nothing clipped it: its own 260px cap made it scroll and end flush with the
+   sheet's foot, so it read as cut by the modal. The cap is lifted to 360px and the menu
+   carries the rail flyout's lift, so it visibly hangs past the sheet edge over the dim. */
+.app .modal .sheet-b .fdd.fdd-form .fdd-menu{max-height:360px !important; box-shadow:0 8px 24px rgba(17,17,17,.12); z-index:80}
+
+/* MULTI-SELECT form dropdown (`formDdMulti`, Maryam 8 Oct 2026: "multi selection for
+   adding the members ... on closing the dropdown the candidates will be shown in chips").
+   Each option leads with the table's row-select box (light edge at rest, accent fill +
+   white tick when on); the menu stays open while picking. The picks show as round
+   removable chips under the field (`.fdd-chips`); a chip's x unpicks it. */
+.app .fdd-multi .fdd-opt{display:flex; align-items:center; gap:var(--s04)}
+.app .fdd-multi .fdd-ck{flex:none; width:16px; height:16px; border-radius:5px; border:1.5px solid var(--gray-30); background:var(--background); display:flex; align-items:center; justify-content:center}
+.app .fdd-multi .fdd-ck svg{width:10px; height:10px; color:var(--on-accent); display:none}
+.app .fdd-multi .fdd-opt.on .fdd-ck{background:var(--accent); border-color:var(--accent)}
+.app .fdd-multi .fdd-opt.on .fdd-ck svg{display:block}
+.app .fdd-chips{display:flex; flex-wrap:wrap; gap:var(--s03); margin-top:var(--s04)}
+.app .fdd-chips:empty{display:none}
+.app .fdd-chip{display:inline-flex; align-items:center; gap:var(--s02); padding:var(--s02) var(--s02) var(--s02) var(--s04); border:1px solid var(--rule); border-radius:999px; background:var(--layer-02); color:var(--text-primary); line-height:1.2}
+.app .fdd-chip-x{appearance:none; border:0; background:none; padding:2px; margin:0; cursor:pointer; display:inline-flex; color:var(--text-secondary)}
+.app .fdd-chip-x svg{width:14px; height:14px; display:block}
+
 /* A formDd OPTION MAY CARRY RIGHT-ALIGNED TRAILING META (Maryam, 22 Sep 2026:
    "the count should be right aligned on the row") — a 4th tuple element, e.g. the
    cohort picker's member count. The option row goes flex so `.fdd-meta` sits at
@@ -1642,7 +1665,7 @@ input:-webkit-autofill:focus{
   </div>
 </div>
 
-<script src="design-system/talentnext-ds.js?b=82fbb70f"></script>
+<script src="design-system/talentnext-ds.js?b=430befa2"></script>
 <script>
 /* ==========================================================================
    THE SUPER ADMIN PORTAL
@@ -2257,10 +2280,16 @@ const COHORTS=[
  {id:'ch4', name:'Cohort 4', leader:'Unassigned', min:6, cap:12, chapters:12, week:0, day:0, start:'2026-10-12', status:'forming', completeDelay:7, leadFrom:null, leadHist:[], sessions:[]},
  {id:'ch5', name:'Cohort 5', leader:'Unassigned', min:1, cap:10, chapters:12, week:0, day:0, start:'2026-09-20', status:'forming', completeDelay:7, leadFrom:null, leadHist:[], sessions:[]},
  {id:'ch6', name:'Cohort 6', leader:'Marcus Reyes (Builder)', min:8, cap:12, chapters:12, week:0, day:0, start:'2026-10-05', status:'forming', completeDelay:7, leadFrom:'2026-09-22', leadHist:[], sessions:[{id:'ch6s1', title:'Kick-off and goals', week:1, dur:60, mode:'Live'}]},
- {id:'ch7', name:'Cohort 7', leader:'Elena Fischer (Trailblazer)', min:5, cap:12, chapters:12, week:13, day:90, start:'2026-05-01', status:'completed', completeDelay:7, leadFrom:'2026-04-25', leadHist:[], completedOn:'2026-08-06', sessions:[{id:'ch7s1', title:'Kick-off and goals', week:1, dur:60, mode:'Live'}, {id:'ch7s2', title:'Closing showcase', week:13, dur:90, mode:'Workshop'}]},
+ {id:'ch7', name:'Cohort 7', leader:'Elena Fischer (Trailblazer)', min:5, cap:12, chapters:12, week:13, day:90, start:'2026-05-01', status:'completed', completeDelay:7, leadFrom:'2026-04-25', leadHist:[], completedOn:'2026-08-06', alumni:['u25','u31','u17','u7','u20','u23'], sessions:[{id:'ch7s1', title:'Kick-off and goals', week:1, dur:60, mode:'Live'}, {id:'ch7s2', title:'Closing showcase', week:13, dur:90, mode:'Workshop'}]},
  {id:'ch8', name:'Cohort 8', leader:'Unassigned', min:5, cap:10, chapters:12, week:0, day:0, start:'2026-08-25', status:'cancelled', completeDelay:7, leadFrom:null, leadHist:[], cancelledOn:'2026-08-24', cancelReason:'Could not reach the minimum by its start date and no leader was available.', sessions:[]}
 ];
-function syncCohortSizes(){ COHORTS.forEach(c => { c.size = CANDS.filter(x => x.cohort === c.name).length; }); }
+/* A COMPLETED cohort keeps its roster (Maryam, 8 Oct 2026: "if a cohort is at day 90,
+   then why this have no members? show members"). Its graduates have moved on, so their
+   `cohort` names their CURRENT place (or none); the finished cohort reads its members off
+   its own `alumni` id list instead. Authored placeholder (§74). Every other cohort is the
+   live `CANDS` filter, as before. */
+function cohortRoster(c){ return c.alumni ? c.alumni.map(id => CAND_BY_ID[id]).filter(Boolean) : CANDS.filter(x => x.cohort === c.name); }
+function syncCohortSizes(){ COHORTS.forEach(c => { c.size = cohortRoster(c).length; }); }
 syncCohortSizes();
 const COHORT_BY_ID={}; COHORTS.forEach(c => COHORT_BY_ID[c.id]=c);
 const COURSES=[
@@ -4019,6 +4048,28 @@ function formDd(f, val){
       <div class="fdd-menu" role="listbox" style="left:0;right:0;max-height:260px;overflow-y:auto">${opts.map(([ov, ol, oimg, ometa]) =>
         `<button type="button" class="fdd-opt${String(ov) === String(cv) ? ' on' : ''}${ometa ? ' has-meta' : ''}" role="option" aria-selected="${String(ov) === String(cv) ? 'true' : 'false'}" data-formddset="${esc(ov)}">${fddAv(oimg)}${rlbl(ol)}${ometa ? `<span class="fdd-meta">${esc(ometa)}</span>` : ''}</button>`).join('')}</div>
     </div></label>`;
+}
+/* MULTI-SELECT variant of formDd (Maryam, 8 Oct 2026). Same trigger + menu; the hidden
+   `[data-f]` holds a comma list of picked values; an option (or a chip's x) toggles via
+   `data-formddmulti` (DOM-only, no render, menu stays open). The picks show as chips
+   under the field; the trigger reads "N selected" or the placeholder. */
+function fddMultiLabel(n, ph){ return n ? `${n} selected` : ph; }
+function fddChip(v, name){ return `<span class="fdd-chip t-label">${esc(name)}<button type="button" class="fdd-chip-x" data-formddmulti="${esc(v)}" aria-label="Remove ${esc(name)}">${I.close}</button></span>`; }
+function formDdMulti(f, vals){
+  const opts = (typeof f.opts === 'function' ? f.opts() : f.opts).map(o => Array.isArray(o) ? o : [o, o, o[1]]);
+  const set = (vals || []).map(String);
+  const picked = opts.filter(o => set.includes(String(o[0])));
+  return `<div class="f"><span class="lbl">${esc(f.l)}${f.req ? ' <span class="req-star" aria-hidden="true">*</span>' : ''}</span>
+    <div class="fdd fdd-form fdd-multi" style="display:block" data-ph="${esc(f.ph || '')}">
+      <input type="hidden" data-f="${f.k}" value="${esc(set.join(','))}">
+      <button type="button" class="fdd-t" data-formddtoggle aria-haspopup="listbox" aria-expanded="false" style="width:100%;justify-content:space-between;min-height:40px">
+        <span class="fdd-val${picked.length ? '' : ' fdd-ph'}">${esc(fddMultiLabel(picked.length, f.ph || ''))}</span>
+        <svg class="fdd-cx" viewBox="0 0 24 24" aria-hidden="true">${inner('chevDown')}</svg></button>
+      <div class="fdd-menu" role="listbox" aria-multiselectable="true" style="left:0;right:0;overflow-y:auto">${opts.map(([ov, ol, chip]) => {
+        const on = set.includes(String(ov));
+        return `<button type="button" class="fdd-opt${on ? ' on' : ''}" role="option" aria-selected="${on}" data-formddmulti="${esc(ov)}" data-chip="${esc(chip || ol)}"><span class="fdd-ck">${I.check}</span>${esc(ol)}</button>`; }).join('')}</div>
+      <div class="fdd-chips">${picked.map(o => fddChip(o[0], o[2] || o[1])).join('')}</div>
+    </div></div>`;
 }
 /* re-sync a formDd trigger's VISIBLE label to its hidden `[data-f]` value. The pick
    handler (`data-formddset`) does this on click; the form-draft restore in `render()`
@@ -10017,7 +10068,7 @@ function cohortsDetail(){
      course; the header shows the lifecycle state, dates and capacity, a leader panel
      with the assignment date + replacement history, a members table, and the LMS
      progress note. Every action is governed by its own module's permission. */
-  const roster = CANDS.filter(x => x.cohort === c.name);
+  const roster = cohortRoster(c);
   const forming = c.status === 'forming', running = c.status === 'running';
   const size = roster.length;
   const missed = cohortMissed(c);
@@ -10061,7 +10112,7 @@ function cohortsDetail(){
       [{label:'Candidate'}, {label:'Handle'}, {label:'Level'}, {label:'Course'}, {label:'Enrolled'}, {label:'Progress'}, {label:'State'}, ACT_COL],
       roster.map(m => ({id:m.id, cells:[
         personCell(m.name, ''), esc(memHandle(m)), esc(m.level || '—'), esc(memCourse(m) || '—'), dpFmt(m.enrolled || c.start) || '—', memProgress(m, c),
-        '<span class="tag sm green">Active</span>',
+        c.status === 'completed' ? '<span class="tag sm">Completed</span>' : '<span class="tag sm green">Active</span>',
         rowActs([
           ['view', 'View', `data-go="candidates/detail/${m.id}"`],
           COHORT_ACTIVE(c) ? ['renew', 'Move to another cohort', `data-sheet="moveco:${c.id}:${m.id}"`] : null,
@@ -10195,18 +10246,22 @@ ACTIONS.domovestart = key => { const c = COHORT_BY_ID[key.split(':')[1]]; const 
   toast(`${c.name} start moved to ${dpFmt(v.start)}`); evalStart(c); };
 /* Add a candidate (Forming/Running) — a candidate with a level and no cohort place;
    may take the cohort past its maximum; joins at the current chapter. */
+/* No reason is asked to ADD a member (Maryam, 8 Oct 2026: "we do not need a reason
+   to add a member"), so picking the candidate is the whole form. */
 SHEETS.addmember = arg => {
   const c = COHORT_BY_ID[String(arg).split(':')[0]] || COHORT_BY_ID[S.id]; if(!c) return {title:'Add candidate', body:'', ok:''};
   const free = CANDS.filter(x => (x.cohort === '—' || x.cohort === 'Awaiting') && x.level && x.status !== 'inactive');
-  return {title:`Add a candidate to ${c.name}`, ok: free.length ? 'Add Candidate' : '', act:'doaddmember:' + c.id,
-    body: free.length ? `${fieldHtml({k:'cand', l:'Candidate', t:'select', req:1, ph:'Choose a candidate', opts: free.map(x => [x.id, `${x.name} · ${x.level}${x.cohort === 'Awaiting' ? ' · awaiting a cohort' : ''}`])})}
-      ${fieldHtml({k:'reason', l:'Reason', t:'textarea', req:1, ph:'Why this candidate is being added'})}`
+  return {title:`Add candidates to ${c.name}`, ok: free.length ? 'Add Candidates' : '', act:'doaddmember:' + c.id,
+    body: free.length ? `${formDdMulti({k:'cand', l:'Candidates', req:1, ph:'Choose one or more candidates', opts: free.map(x => [x.id, `${x.name} · ${x.level}${x.cohort === 'Awaiting' ? ' · awaiting a cohort' : ''}`, x.name])}, [])}`
       : note('warn', 'No candidate to add', 'Every candidate with a level already holds a cohort place.')};
 };
-ACTIONS.doaddmember = key => { const c = COHORT_BY_ID[key.split(':')[1]]; const v = readForm(); const m = CAND_BY_ID[v.cand]; if(!c || !m){ toast('Pick a candidate', 'warn'); return 'keep'; } if(!v.reason){ toast('A reason is required', 'warn'); return 'keep'; }
-  m.cohort = c.name; syncCohortSizes();
-  audit('Added candidate to cohort', `${m.name} → ${c.name} · ${v.reason}`, 'Cohort Management', 'notice', {from:'—', to:c.name});
-  toast(`${m.name} added to ${c.name}`); evalStart(c); };
+ACTIONS.doaddmember = key => { const c = COHORT_BY_ID[key.split(':')[1]]; const v = readForm();
+  const ms = String(v.cand || '').split(',').map(id => CAND_BY_ID[id]).filter(Boolean);
+  if(!c || !ms.length){ toast('Pick at least one candidate', 'warn'); return 'keep'; }
+  ms.forEach(m => { const from = m.cohort; m.cohort = c.name;
+    audit('Added candidate to cohort', `${m.name} → ${c.name}`, 'Cohort Management', 'notice', {from, to:c.name}); });
+  syncCohortSizes();
+  toast(ms.length === 1 ? `${ms[0].name} added to ${c.name}` : `${ms.length} candidates added to ${c.name}`); evalStart(c); };
 /* Remove a candidate (Forming/Running) — reason, then a confirmation; the fee is not
    returned. Opened member-locked as `removemem:<cohortId>:<memberId>`. */
 SHEETS.removemem = arg => { const [cid, mid] = String(arg).split(':'); const c = COHORT_BY_ID[cid]; const m = CAND_BY_ID[mid]; if(!c || !m) return {title:'Remove', body:'', ok:''};
@@ -14107,43 +14162,69 @@ const deptCount = name => USERS.filter(u => u.internal && u.dept === name).lengt
    (Staff module / role flow). The role is shown WITH the permissions it carries,
    so the actor can see what they may do. A save logs Medium and sends no
    notification (the actor made it themselves). */
+/* MY PROFILE FOLLOWS THE CANDIDATE PROFILE'S STYLING, ON ITS OWN CONTENT (Maryam,
+   8 Oct 2026). The read view is the candidate's `pfSecView.general` shape: the
+   `.idhead` (round portrait, name, email beneath) with a ghost "Edit Details" pencil
+   on the right, then the eight-fact `.facts pf-facts` grid (two rows of four ≥900,
+   §105.1a) holding the account record, then a "Permissions" `.skl` chip cloud like
+   the candidate's Skills. No heading/description band above it, as on the candidate
+   page (the bar names the page). "Edit Details" opens the candidate's in-place edit:
+   the same idhead with Discard / Save in the heading row (`.pfe-acts`), and a
+   three-across `.pfe-g pfe-g3` field grid where only First and Last name are
+   editable; email, job title and department are `[readonly]` `.pfe-ro` (set on the
+   record in All Users). `S.meEdit` is the state. */
 function settingsProfile(){
   const parts = String(ME.name).trim().split(/\s+/); const first = parts.shift() || ''; const last = parts.join(' ');
   const caps = CAPS.filter(c => (MATRIX[staffRole(ME)] || {})[c.k]);
-  const invitedBy = ME.orig ? 'The platform (original account)' : (USER_BY_ID[ME.invitedBy] || {}).name || '—';
-  return `
-  <section class="sec">
-    ${aiHead('Your details', 'Your name on everything you do. Email, job title and department are set on your record in All Users.',
-      '<button class="btn btn-p btn-sm noic" data-act="saveprofile">Save Changes</button>')}
-    <div class="mt4" data-form="1">
+  const invitedBy = ME.orig ? 'The platform' : (USER_BY_ID[ME.invitedBy] || {}).name || '—';
+  const photo = `<span class="idphoto"><img src="${agentFace(ME.name)}" alt="" class="idhead-ph"></span>`;
+  if(S.meEdit) return `
+  <section class="sec" data-form="1">
+    <div class="sec-h"><div class="pfe-acts">
+      <button class="btn btn-t btn-sm danger pfe-discard" data-act="medisc">${I.delete} Discard Changes</button>
+      <button class="btn btn-p btn-sm noic" data-act="saveprofile">Save Changes ${I.check}</button>
+    </div></div>
+    <div class="idhead pfe-id">${photo}
+      <div class="idhead-b"><span class="idname">${esc(ME.name)}</span><span class="idmeta">${esc(ME.email)}</span></div>
+    </div>
+    <div class="pfe-g pfe-g3 mt6">
       ${fieldHtml({k:'first', l:'First name', t:'text', req:1}, first)}
       ${fieldHtml({k:'last', l:'Last name', t:'text', req:1}, last)}
-      ${roField('Email address', ME.email, 'The sign-in identifier. It is never changed on an existing account.')}
-      ${roField('Job title', ME.job || '—', 'Set on your record in All Users, by someone holding Staff: Edit.')}
-      ${roField('Department', ME.dept || '—', 'Set on your record in All Users.')}
+      ${fieldHtml({k:'email', l:'Email address', t:'text', ro:true}, ME.email)}
+      ${fieldHtml({k:'job', l:'Job title', t:'text', ro:true}, ME.job || '—')}
+      ${fieldHtml({k:'dept', l:'Department', t:'text', ro:true}, ME.dept || '—')}
+    </div>
+  </section>`;
+  return `
+  <section class="sec">
+    <div class="idhead">${photo}
+      <div class="idhead-b"><span class="idname">${esc(ME.name)}</span><span class="idmeta">${esc(ME.email)}</span></div>
+      <span class="idhead-act"><button class="btn btn-g btn-sm noic" data-act="meedit">Edit Details ${I.edit}</button></span>
+    </div>
+    <div class="facts pf-facts">
+      ${admFact(I.shield, '--mk-1', 'Role', staffRoleName(ME))}
+      ${admFact(I.user, '--mk-2', 'Job title', ME.job || '—')}
+      ${admFact(I.group, '--mk-3', 'Department', ME.dept || '—')}
+      ${admFact(I.check, '--mk-4', 'Status', STAFF_STATUS_LABEL[ME.status] || cap(ME.status))}
+      ${admFact(I.calendar, '--mk-1', 'Member since', ME.joined || '—')}
+      ${admFact(I.add, '--mk-2', 'Invited by', invitedBy)}
+      ${admFact(I.time, '--mk-3', 'Last signed in', ME.last || '—')}
+      ${admFact(I.phone || I.user, '--mk-4', 'Phone', ME.phone || '—')}
     </div>
   </section>
   <section class="sec">
-    ${aiHead(`Your role — ${staffRoleName(ME)}`, 'What your role lets you do. Changed only through the role assignment flow, never here.')}
+    ${secHead('Permissions')}
     ${caps.length ? `<div class="skl">${caps.map(c => `<span class="skl-c">${esc(c.t)}</span>`).join('')}</div>` : note('', '', 'This role carries no platform permissions.')}
-  </section>
-  <section class="sec">
-    ${secHead('Account')}
-    ${''/* a two-column record: label at the LEFT end, value at the RIGHT end
-          (Maryam's QA, 23 Sep 2026), the dashboard `.dcol .kv` recipe */}
-    <div class="kv-ends">${kv([
-      ['Status', staffStatusTag(ME)],
-      ['Member since', esc(ME.joined)],
-      ['Invited by', esc(invitedBy)],
-      ['Password &amp; phone', '<a data-go="settings/security">Login &amp; Security</a>']
-    ])}</div>
   </section>`;
 }
+ACTIONS.meedit = () => { S.meEdit = true; };
+ACTIONS.medisc = () => { S.meEdit = false; };
 ACTIONS.saveprofile = () => {
   const v = readPageForm();
   if(!v.first || !v.last){ toast('Enter a first and last name', 'warn'); return; }
   const from = ME.name;
   ME.name = `${v.first} ${v.last}`.trim();
+  S.meEdit = false;
   audit('Edited own profile', ME.name, 'Settings', 'med', {from, to:ME.name});
   toast('Profile saved');
 };
@@ -14173,48 +14254,29 @@ function settingsNotifications(){
    route in the product for that. A prototype accepts a non-empty current password
    and does not store the new one; the flow, the rules and the consequences (other
    sessions ended, OTP before a new number commits) are what is built. */
+/* PASSWORD AND PHONE OPEN IN A MODAL, NOT AS OPEN FIELDS ON FIRST VIEW (Maryam,
+   8 Oct 2026: "do not just open fields to change everything on first view, give
+   change password button and then open a modal to update the password" / "same with
+   the phone number section"). Each section reads its current value and carries one
+   button; the fields live in `SHEETS.secpw` / `SHEETS.secphone` (the phone sheet's
+   second step is the code to the new number, `S.secPhone === 'code'`). */
 function settingsSecurity(){
-  const phoneStep = S.secPhone === 'code';
   return `
   <section class="sec">
     ${aiHead('Password', 'Changing it signs out every other session and keeps this one.',
-      '<button class="btn btn-p btn-sm noic" data-act="changepw">Change Password</button>')}
-    <div class="mt4" data-form="pw">
-      <label class="f"><span class="lbl">Current password <span class="req-star" aria-hidden="true">*</span></span>
-        <div class="pw-wrap"><input class="inp fill" data-f="cur" id="pwcur" type="password" placeholder="Your current password" autocomplete="current-password">
-          <button class="pw-eye" data-eye="pwcur" aria-label="Show password">${I.view}</button></div></label>
-      <label class="f"><span class="lbl">New password <span class="req-star" aria-hidden="true">*</span></span>
-        <div class="pw-wrap"><input class="inp fill" data-f="np" id="pwnew" type="password" placeholder="Enter a new password" autocomplete="new-password">
-          <button class="pw-eye" data-eye="pwnew" aria-label="Show password">${I.view}</button></div></label>
-      <label class="f last"><span class="lbl">Confirm new password <span class="req-star" aria-hidden="true">*</span></span>
-        <input class="inp fill" data-f="cp" type="password" placeholder="Re-enter the new password" autocomplete="new-password"></label>
-      <p class="t-desc mt5">${PW_RULE_TEXT} It must differ from your current password.</p>
-    </div>
+      `<button class="btn btn-g btn-sm noic" data-sheet="secpw">${I.edit} Change Password</button>`)}
   </section>
 
   <section class="sec">
-    ${aiHead('Phone number', 'Where a one-time code is sent when you choose SMS at sign-in. A change needs your password and a code to the new number.')}
-    <div class="mt4" data-form="phone">
-      ${roField('Current number', otpMaskPhone(ME.phone))}
-      ${phoneStep ? `
-        ${roField('New number', otpMaskPhone(S._newPhone || ''))}
-        <label class="f last"><span class="lbl">Code sent to the new number <span class="req-star" aria-hidden="true">*</span></span>
-          <input class="inp fill" data-f="pcode" id="pcode" inputmode="numeric" placeholder="6-digit code" maxlength="6"></label>
-        <p class="t-desc mt5">The old number stays in force until the new one is verified.</p>
-        <div class="btn-row mt4"><button class="btn btn-g btn-sm noic" data-act="phonecancel">Cancel</button>
-          <button class="btn btn-p btn-sm noic" data-act="phoneverify">Verify &amp; Save</button></div>`
-      : `
-        <label class="f"><span class="lbl">New number <span class="req-star" aria-hidden="true">*</span></span>
-          <input class="inp fill" data-f="newphone" type="tel" placeholder="+1 (415) 555-0100" autocomplete="off"></label>
-        <label class="f last"><span class="lbl">Current password <span class="req-star" aria-hidden="true">*</span></span>
-          <input class="inp fill" data-f="phonepw" type="password" placeholder="Your current password" autocomplete="current-password"></label>
-        <div class="btn-row mt4"><button class="btn btn-p btn-sm noic" data-act="phonesend">Send Code To New Number</button></div>`}
-    </div>
+    ${aiHead('Phone number', 'Where a one-time code is sent when you choose SMS at sign-in.',
+      `<button class="btn btn-g btn-sm noic" data-act="openphone">${I.edit} Change Phone Number</button>`)}
+    ${''/* the full number as plain text, not a read-only field (Maryam, 8 Oct 2026) */}
+    <p class="t-body mt4" style="color:var(--text-primary)">${esc(ME.phone || '—')}</p>
   </section>
 
   <section class="sec">
-    ${aiHead('Signed-in sessions', 'Where your account is signed in. End any you do not recognise.',
-      SESSIONS.filter(s => !s.current).length ? '<button class="btn btn-g btn-sm noic" data-act="askrevokeall">Sign Out Everywhere Else</button>' : '')}
+    ${''/* "Sign Out Everywhere Else" removed (Maryam, 8 Oct 2026); each other session keeps its own Sign Out. `askrevokeall` stays defined, unreached. */}
+    ${aiHead('Signed-in sessions', 'Where your account is signed in. End any you do not recognise.')}
     <div class="tile-stack">
       ${SESSIONS.map(s => cardRow(sessIcon(s),
         `${esc(s.dev)} ${s.current ? '<span class="tag sm green">This device</span>' : ''}`,
@@ -14234,14 +14296,37 @@ function settingsSecurity(){
       swToggle('Step-up password on the highest-severity actions', 'sec.stepup', SEC.stepup !== false))}
   </section>`;
 }
+SHEETS.secpw = () => ({title:'Change password', ok:'Change Password', act:'changepw',
+  body:`<label class="f"><span class="lbl">Current password <span class="req-star" aria-hidden="true">*</span></span>
+      <div class="pw-wrap"><input class="inp fill" data-f="cur" id="pwcur" type="password" placeholder="Your current password" autocomplete="current-password">
+        <button class="pw-eye" data-eye="pwcur" aria-label="Show password">${I.view}</button></div></label>
+    <label class="f"><span class="lbl">New password <span class="req-star" aria-hidden="true">*</span></span>
+      <div class="pw-wrap"><input class="inp fill" data-f="np" id="pwnew" type="password" placeholder="Enter a new password" autocomplete="new-password">
+        <button class="pw-eye" data-eye="pwnew" aria-label="Show password">${I.view}</button></div></label>
+    <label class="f last"><span class="lbl">Confirm new password <span class="req-star" aria-hidden="true">*</span></span>
+      <input class="inp fill" data-f="cp" type="password" placeholder="Re-enter the new password" autocomplete="new-password"></label>
+    <p class="t-desc mt5">${PW_RULE_TEXT} It must differ from your current password. Changing it signs out every other session.</p>`});
+SHEETS.secphone = () => S.secPhone === 'code'
+  ? {title:'Change phone number', ok:'Verify & Save', act:'phoneverify',
+     body:`${roField('New number', otpMaskPhone(S._newPhone || ''))}
+      <label class="f last"><span class="lbl">Code sent to the new number <span class="req-star" aria-hidden="true">*</span></span>
+        <input class="inp fill" data-f="pcode" id="pcode" inputmode="numeric" placeholder="6-digit code" maxlength="6"></label>
+      <p class="t-desc mt5">The old number stays in force until the new one is verified.</p>`}
+  : {title:'Change phone number', ok:'Send Code', act:'phonesend',
+     body:`<label class="f"><span class="lbl">New number <span class="req-star" aria-hidden="true">*</span></span>
+        <input class="inp fill" data-f="newphone" type="tel" placeholder="+1 (415) 555-0100" autocomplete="off"></label>
+      <label class="f last"><span class="lbl">Current password <span class="req-star" aria-hidden="true">*</span></span>
+        <input class="inp fill" data-f="phonepw" type="password" placeholder="Your current password" autocomplete="current-password"></label>
+      <p class="t-desc mt5">We send a code to the new number; it takes over once the code is entered.</p>`};
+ACTIONS.openphone = () => { S.secPhone = 'idle'; S._newPhone = null; S.sheet = 'secphone'; return 'keep'; };
 ACTIONS.changepw = () => {
   const cur = (device.querySelector('#pwcur') || {}).value || '';
   const np = (device.querySelector('#pwnew') || {}).value || '';
   const cp = (device.querySelector('[data-f="cp"]') || {}).value || '';
-  if(!cur){ toast('Enter your current password', 'warn'); return; }
-  if(!pwOK(np)){ toast(PW_RULE_TEXT, 'warn'); return; }
-  if(np === cur){ toast('Choose a password you have not used as your current one', 'warn'); return; }
-  if(np !== cp){ toast('Both new passwords must match', 'warn'); return; }
+  if(!cur){ toast('Enter your current password', 'warn'); return 'stay'; }
+  if(!pwOK(np)){ toast(PW_RULE_TEXT, 'warn'); return 'stay'; }
+  if(np === cur){ toast('Choose a password you have not used as your current one', 'warn'); return 'stay'; }
+  if(np !== cp){ toast('Both new passwords must match', 'warn'); return 'stay'; }
   for(let i = SESSIONS.length - 1; i >= 0; i--) if(!SESSIONS[i].current) SESSIONS.splice(i, 1);
   audit('Changed own password', ME.name, 'Settings', 'high');
   toast('Password changed. Every other session has been signed out.');
@@ -14249,15 +14334,16 @@ ACTIONS.changepw = () => {
 ACTIONS.phonesend = () => {
   const np = ((device.querySelector('[data-f="newphone"]') || {}).value || '').trim();
   const pw = (device.querySelector('[data-f="phonepw"]') || {}).value || '';
-  if(!np || np.replace(/[^\d]/g, '').length < 7){ toast('Enter a valid mobile number', 'warn'); return; }
-  if(!pw){ toast('Enter your current password to change where codes are sent', 'warn'); return; }
+  if(!np || np.replace(/[^\d]/g, '').length < 7){ toast('Enter a valid mobile number', 'warn'); return 'stay'; }
+  if(!pw){ toast('Enter your current password to change where codes are sent', 'warn'); return 'stay'; }
   S._newPhone = np; S.secPhone = 'code';
   toast('Code sent to the new number');
+  return 'keep';
 };
-ACTIONS.phonecancel = () => { S.secPhone = 'idle'; S._newPhone = null; };
+ACTIONS.phonecancel = () => { S.secPhone = 'idle'; S._newPhone = null; };   /* kept: no caller now the steps live in SHEETS.secphone */
 ACTIONS.phoneverify = () => {
   const code = ((device.querySelector('#pcode') || {}).value || '').trim();
-  if(!/^\d{6}$/.test(code)){ toast('That code is not right', 'warn'); return; }
+  if(!/^\d{6}$/.test(code)){ toast('That code is not right', 'warn'); return 'stay'; }
   const from = otpMaskPhone(ME.phone); ME.phone = S._newPhone;
   S.secPhone = 'idle'; S._newPhone = null;
   audit('Changed own phone number', ME.name, 'Settings', 'high', {from, to:otpMaskPhone(ME.phone)});
@@ -14360,11 +14446,23 @@ function setNum(f){
     <input class="inp" data-f="${f.k}" type="number" inputmode="numeric" min="${f.min}" max="${f.max}" step="1" value="${SETTINGS[f.k]}" placeholder="A whole number between ${f.min} and ${f.max}" autocomplete="off">
     ${hint ? `<span class="f-hint">${esc(hint)}</span>` : ''}</label>`;
 }
+/* EVERY PLATFORM GROUP OPENS READ-ONLY (Maryam, 8 Oct 2026: "why everything is in
+   edit view by default, please improve these as well"). A group shows its values as a
+   label-left / value-right record (`.kv-ends`) with one "Edit" in the heading row;
+   Edit (`S.setEdit = <group>`) swaps in the fields with Cancel + Save, and a committed
+   save (or Cancel) returns it to the record. One group edits at a time. */
+const setEditActs = g => S.setEdit === g
+  ? `<span style="display:flex;gap:var(--s03);align-items:center"><button class="btn btn-s btn-sm noic" data-act="setcancel">Cancel</button><button class="btn btn-p btn-sm noic" data-act="setsave:${g}" disabled>Save</button></span>`
+  : `<button class="btn btn-g btn-sm noic" data-act="setedit:${g}">${I.edit} Edit</button>`;
+ACTIONS.setedit = key => { S.setEdit = key.split(':')[1]; };
+ACTIONS.setcancel = () => { S.setEdit = null; };
 function numGroup(g){
   const G = SET_GROUPS[g];
   return `<section class="sec" data-setgroup="${g}">
-    ${aiHead(G.title, G.desc, `<button class="btn btn-p btn-sm noic" data-act="setsave:${g}" disabled>Save</button>`)}
-    <div class="mt4">${G.fields.map(setNum).join('')}</div>
+    ${aiHead(G.title, G.desc, setEditActs(g))}
+    ${S.setEdit === g
+      ? `<div class="mt4">${G.fields.map(setNum).join('')}</div>`
+      : `<div class="kv-ends mt4">${kv(G.fields.map(f => [esc(f.l), `${SETTINGS[f.k]} ${esc(f.unit)}`]))}</div>`}
   </section>`;
 }
 /* MONEY — payout release delay (numeric) + payout run day (our dropdown). Carries
@@ -14374,12 +14472,14 @@ const PAYOUT_DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Sa
 function moneyGroup(){
   return `<section class="sec" data-setgroup="money">
     ${aiHead('Money', 'Escrow release timing and the weekly payout run. These carry the Change fee permission — a reason and a re-authentication step. A change applies to reports filed after it; escrow already releasable is unaffected.',
-      `<button class="btn btn-p btn-sm noic" data-act="setsave:money" disabled>Save</button>`)}
-    <div class="mt4">
+      setEditActs('money'))}
+    ${S.setEdit !== 'money' ? `<div class="kv-ends mt4">${kv([
+      ['Payout release delay', `${SETTINGS.payoutDelay} working days`],
+      ['Payout run day', `${esc(SETTINGS.payoutRunDay)}, 12:00 AM`]])}</div>` : `<div class="mt4">
       ${setNum({k:'payoutDelay', l:'Payout release delay', unit:'working days', min:0, max:30, hint:'How long after a report is filed before escrow becomes releasable. Counted against the working-days calendar below.'})}
       ${formDd({k:'payoutRunDay', l:'Payout run day', opts:PAYOUT_DAYS.map(d => [d, d])}, SETTINGS.payoutRunDay)}
       <p class="t-desc mt5">The payout run executes at 12:00 AM on this day, in your time zone.</p>
-    </div>
+    </div>`}
   </section>`;
 }
 
@@ -14395,7 +14495,11 @@ const deptDirty = () => S.setDraft && S.setDraft.dept && deptSnap(S.setDraft.dep
 function departmentsGroup(){
   const draft = deptDraft(); const dirty = deptDirty();
   const active = draft.filter(d => d.status !== 'retired');
-  const acts = `<span style="display:flex;gap:var(--s03);align-items:center">${dirty ? `<button class="btn btn-s btn-sm noic" data-act="setdeptdiscard">Discard</button>` : ''}<button class="btn btn-p btn-sm noic" data-act="setsave:departments"${dirty ? '' : ' disabled'}>Save</button></span>`;
+  /* NO DISCARD / SAVE ON DEPARTMENTS (Maryam, 8 Oct 2026: "we do not need discard or
+     save with the departments, take the add department button in place of the discard
+     and save button"). Add / rename / retire / restore apply at once (`deptApply`, an
+     audit line each); "Add Department" takes the heading row's action slot. */
+  const acts = `<button class="btn acc-link btn-sm noic" data-sheet="setdept:new">${I.add} Add Department</button>`;
   const rows = draft.map((d, i) => {
     const n = deptCount(d.name);
     const ra = d._new
@@ -14410,8 +14514,7 @@ function departmentsGroup(){
       rowActs(ra)]};
   });
   return `<section class="sec" data-setgroup="departments">
-    ${aiHead('Departments', 'The list that fills the Department dropdown on every internal invite and record. A retired department stays on users already assigned but leaves the dropdown for new assignments. Changes are staged until you save this group.', acts)}
-    <div style="margin:var(--s04) 0"><button class="btn acc-link btn-sm noic" data-sheet="setdept:new">${I.add} Add Department</button></div>
+    ${aiHead('Departments', 'The list that fills the Department dropdown on every internal invite and record. A retired department stays on users already assigned but leaves the dropdown for new assignments.', acts)}
     ${active.length === 0 ? note('', 'No active departments', 'No departments have been added yet. Internal users cannot be invited until at least one exists.') : ''}
     ${draft.length ? table([{label:'Department'}, {label:'Users assigned'}, {label:'Status'}, ACT_COL], rows, {select:false, paginate:false}) : emptyState('group', 'No departments yet', 'Add a department before inviting staff.')}
   </section>`;
@@ -14432,12 +14535,24 @@ ACTIONS.setdeptstage = key => {
   if(!name){ toast('Enter a department name', 'warn'); return 'stay'; }
   if(name.length > 100){ toast('Keep the name under 100 characters', 'warn'); return 'stay'; }
   if(draft.some((d, j) => d.name.toLowerCase() === name.toLowerCase() && j !== idx)){ toast('That department already exists', 'warn'); return 'stay'; }
-  if(idx == null) draft.push({name, status:'active', _new:true});
+  const was = idx == null ? null : draft[idx].name;
+  if(idx == null) draft.push({name, status:'active'});
   else draft[idx].name = name;
-  S.sheet = null;   /* staged only — commits on the group Save */
+  S.sheet = null;
+  deptApply(idx == null ? `Added ${name}` : `Renamed ${was} to ${name}`);
 };
-ACTIONS.setdeptretire = key => { const d = deptDraft()[+key.split(':')[1]]; if(d) d.status = 'retired'; };
-ACTIONS.setdeptrestore = key => { const d = deptDraft()[+key.split(':')[1]]; if(d) d.status = 'active'; };
+/* apply the working copy to the live list at once (renames carried onto user
+   records), with one audit line and a toast naming the change */
+function deptApply(what){
+  const draft = deptDraft();
+  draft.forEach((d, i) => { const live = DEPARTMENTS[i]; if(live && live.name !== d.name) USERS.forEach(u => { if(u.dept === live.name) u.dept = d.name; }); });
+  DEPARTMENTS.length = 0; draft.forEach(d => DEPARTMENTS.push({name:d.name, status:d.status}));
+  S.setDraft.dept = null;
+  audit('Updated departments', what, 'Settings', 'notice');
+  toast(what);
+}
+ACTIONS.setdeptretire = key => { const d = deptDraft()[+key.split(':')[1]]; if(d){ d.status = 'retired'; deptApply(`Retired ${d.name}`); } };
+ACTIONS.setdeptrestore = key => { const d = deptDraft()[+key.split(':')[1]]; if(d){ d.status = 'active'; deptApply(`Restored ${d.name}`); } };
 ACTIONS.setdeptremove = key => { const draft = deptDraft(); const i = +key.split(':')[1]; if(draft[i] && draft[i]._new) draft.splice(i, 1); };
 ACTIONS.setdeptdiscard = () => { if(S.setDraft) S.setDraft.dept = null; };
 /* the group Save — name each staged change, then commit on confirm */
@@ -14490,7 +14605,7 @@ function applySettingsLive(){ EXPORT_ROW_LIMIT = SETTINGS.exportLimit; REPORT_DE
 ACTIONS.setcommit = () => {
   const p = S._pending || {}; S._pending = null; S.confirm = null;
   if(!p.next) return;
-  Object.assign(SETTINGS, p.next); applySettingsLive();
+  Object.assign(SETTINGS, p.next); applySettingsLive(); S.setEdit = null;
   audit(`Updated ${SET_GROUPS[p.g] ? SET_GROUPS[p.g].title.toLowerCase() : p.g} settings`, p.changes.map(c => `${c.l}: ${c.from} → ${c.to}`).join('; '), 'Settings', 'notice');
   toast('Settings saved');
 };
@@ -14518,13 +14633,14 @@ function holChangeLines(draft){
 }
 function workingDaysGroup(){
   const draft = holDraft().slice().sort((a, b) => a.date < b.date ? -1 : 1); const dirty = holDirty();
-  const acts = `<span style="display:flex;gap:var(--s03);align-items:center">${dirty ? `<button class="btn btn-s btn-sm noic" data-act="setholdiscard">Discard</button>` : ''}<button class="btn btn-p btn-sm noic" data-act="setsave:workingdays"${dirty ? '' : ' disabled'}>Save</button></span>`;
+  /* Like Departments, no Discard / Save: a holiday added, edited or deleted applies at
+     once (`holApply`), and "Add Holiday" takes the heading's action slot (8 Oct 2026). */
+  const acts = `<button class="btn acc-link btn-sm noic" data-sheet="sethol:new">${I.add} Add Holiday</button>`;
   const rows = draft.map(h => ({cells:[
     dpFmt(h.date), esc(h.name), (h.date.split('-')[0]),
     rowActs([['edit', 'Edit', `data-sheet="sethol:${h.date}"`], ['delete', 'Delete', `data-act="setholdel:${h.date}"`]])]}));
   return `<section class="sec" data-setgroup="workingdays">
-    ${aiHead('Working days', 'The holiday calendar the payout release delay counts against. Weekends are excluded as a standing rule and cannot be added here. Changes are staged until you save this group.', acts)}
-    <div style="margin:var(--s04) 0"><button class="btn acc-link btn-sm noic" data-sheet="sethol:new">${I.add} Add Holiday</button></div>
+    ${aiHead('Working days', 'The holiday calendar the payout release delay counts against. Weekends are excluded as a standing rule and cannot be added here.', acts)}
     ${draft.length ? table([{label:'Date'}, {label:'Name'}, {label:'Year'}, ACT_COL], rows, {select:false, paginate:false}) : emptyState('calendar', 'No holidays yet', 'Add a date to keep it out of the working-days count.')}
   </section>`;
 }
@@ -14550,8 +14666,15 @@ ACTIONS.setholstage = key => {
   if(arg === 'new') draft.push({date, name});
   else { const h = draft.find(x => x.date === arg); if(h){ h.date = date; h.name = name; } }
   S.sheet = null;
+  holApply(arg === 'new' ? `Added ${name}, ${dpFmt(date)}` : `Updated ${name}, ${dpFmt(date)}`);
 };
-ACTIONS.setholdel = key => { const date = key.slice(key.indexOf(':') + 1); const draft = holDraft(); const i = draft.findIndex(h => h.date === date); if(i >= 0) draft.splice(i, 1); };
+function holApply(what){
+  HOLIDAYS = holDraft().map(h => ({date:h.date, name:h.name})).sort((a, b) => a.date < b.date ? -1 : 1);
+  S.setDraft.hol = null;
+  audit('Updated working days', what, 'Settings', 'notice');
+  toast(what);
+}
+ACTIONS.setholdel = key => { const date = key.slice(key.indexOf(':') + 1); const draft = holDraft(); const i = draft.findIndex(h => h.date === date); if(i >= 0){ const h = draft.splice(i, 1)[0]; holApply(`Removed ${h.name}, ${dpFmt(h.date)}`); } };
 ACTIONS.setholdiscard = () => { if(S.setDraft) S.setDraft.hol = null; };
 ACTIONS.setholcommit = () => {
   const draft = (S.setDraft && S.setDraft.hol) || null; S.confirm = null; if(!draft) return;
@@ -14593,7 +14716,7 @@ ACTIONS.moneyReason = () => {
   askConfirm({stepup:true, mk:'check', title:'Confirm your identity', body:'Re-enter your current password to save this money change.', ok:'Save Changes', act:'moneyCommit'});
 };
 ACTIONS.moneyCommit = () => {
-  const p = S._pending || {}; S._pending = null; S.confirm = null; if(!p.next) return;
+  const p = S._pending || {}; S._pending = null; S.confirm = null; if(!p.next) return; S.setEdit = null;
   Object.assign(SETTINGS, p.next); applySettingsLive();
   /* A change to the payout release delay or run day is a fee value, so it also lands
      in the Fee Settings history (9.4). */
@@ -14618,8 +14741,10 @@ function cohortModeGroup(){
       <span style="flex:1;min-width:0"><span class="t-body"><b>${title}</b>${on ? ' <span class="tag sm green">In force</span>' : disabled ? ' <span class="tag sm warn">Not yet available</span>' : ''}</span><span class="cardrow-d" style="display:block;margin-top:2px">${desc}</span></span></div>`; };
   return `<section class="sec">
     ${aiHead('Cohort creation', 'How cohorts are created on the platform. Manual is in force; Automatic is planned and cannot be selected yet.')}
-    <div class="tile-stack mt4">
-      ${row('manual', 'Manual', 'Staff create each cohort by hand. A cohort belongs to no course, has no minimum and no maximum, and starts once it has a leader and at least one member. Candidates enrol on a course and wait at Awaiting cohort until staff add them to a cohort.', false)}
+    ${''/* a plain wrapper, not `.tile-stack`: the DS bleeds a tile-stack to the column
+          edges, which hung these two options outside the page padding (8 Oct 2026) */}
+    <div class="mt4">
+      ${row('manual', 'Manual', 'Admins create each cohort by hand. A cohort belongs to no course, has no minimum and no maximum, and starts once it has a leader and at least one member. Candidates enrol on a course and wait at Awaiting cohort until an admin adds them to a cohort.', false)}
       ${row('automatic', 'Automatic', 'A course creates a cohort for every future start date, and candidates fill it first come, first served up to its maximum. Not yet available.', true)}
     </div>
   </section>`;
@@ -14641,9 +14766,13 @@ function settingsPlatform(){
    (wording + on/off) stay pending in a working copy until Save.
    ====================================================================== */
 const NT_TYPE = {C:'Condition-based', I:'Informational'};
-const NT_RCP = {staff:'Internal staff', agent:'Talent Agent', candidate:'Candidate', leader:'Cohort Leader'};
+/* No "internal staff" / "staff member" wording (Maryam, 8 Oct 2026: "we do not have
+   words like internal users and staff members anymore ... recipients will have the role
+   name"). The internal group's recipient reads its role, Admin, and its rows name the
+   role ("An admin's role is changed"); its placeholder is {admin}. */
+const NT_RCP = {staff:'Admin', agent:'Talent Agent', candidate:'Candidate', leader:'Cohort Leader'};
 /* sample values the Preview and a test notification substitute for placeholders */
-const NT_SAMPLE = {name:'Jordan Blake', first:'Jordan', staff:'Dana Whitfield', agent:'Priya Nair',
+const NT_SAMPLE = {name:'Jordan Blake', first:'Jordan', admin:'Dana Whitfield', agent:'Priya Nair',
   leader:'Bruno Adler', cohort:'Cohort 3', course:'Communicating with Impact', chapter:'Chapter 4',
   level:'E3', date:'12-03-2026', time:'3:00 PM', amount:'$95', count:'3', department:'Talent Success',
   role:'Reviewer', badge:'Fast Starter', points:'50', rank:'#12'};
@@ -14652,13 +14781,13 @@ const ntDef = (recipient, rows) => rows.map(([name, type, sentWhen, title, body,
   ({id:'nt' + (NT_SEQ++), recipient, name, type, sentWhen, title, body, ph: ph || [], on:true, by:null, at:null}));
 const NOTIF_TEMPLATES = [].concat(
   ntDef('staff', [
-    ['Staff role changed', 'I', 'A staff member’s role is changed', 'A staff role was changed', '{staff}’s role is now {role}.', ['staff', 'role']],
-    ['Staff details changed', 'I', 'A staff member’s details are changed', 'Staff details were changed', '{staff}’s account details were updated.', ['staff']],
+    ['Admin role changed', 'I', 'An admin’s role is changed', 'An admin’s role was changed', '{admin}’s role is now {role}.', ['admin', 'role']],
+    ['Admin details changed', 'I', 'An admin’s details are changed', 'An admin’s details were changed', '{admin}’s account details were updated.', ['admin']],
     ['Password changed', 'I', 'Your password is changed', 'Your password was changed', 'Your password was changed. Every other session was signed out.', []],
     ['Phone number changed', 'I', 'Your phone number is changed', 'Your phone number was changed', 'The number where your sign-in codes are sent was updated.', []],
-    ['Staff access restored', 'I', 'A deactivated staff account is restored', 'Staff access restored', '{staff}’s access has been restored.', ['staff']],
-    ['Staff member marked as a Cohort Leader', 'I', 'A staff member is marked as a Cohort Leader', 'Marked as a Cohort Leader', '{staff} can now lead a cohort.', ['staff']],
-    ['Cohort Leader marking removed', 'I', 'A staff member’s Cohort Leader marking is removed', 'Cohort Leader marking removed', '{staff} is no longer marked as a Cohort Leader.', ['staff']],
+    ['Admin access restored', 'I', 'A deactivated admin account is restored', 'An admin’s access was restored', '{admin}’s access has been restored.', ['admin']],
+    ['Admin marked as a Cohort Leader', 'I', 'An admin is marked as a Cohort Leader', 'Marked as a Cohort Leader', '{admin} can now lead a cohort.', ['admin']],
+    ['Cohort Leader marking removed', 'I', 'An admin’s Cohort Leader marking is removed', 'Cohort Leader marking removed', '{admin} is no longer marked as a Cohort Leader.', ['admin']],
     ['Requested export ready', 'I', 'An export you requested is ready', 'Your export is ready', 'The export you requested is ready to download for the next 7 days.', []],
     ['Interview report overdue', 'C', 'A report passes its deadline', 'An interview report is overdue', '{agent}’s report for their interview with {name} is past its deadline.', ['agent', 'name']],
     ['Interview not held and awaiting resolution', 'C', 'An interview is not held', 'An interview was not held', '{name}’s interview with {agent} was not held and is awaiting resolution.', ['name', 'agent']],
@@ -14752,7 +14881,7 @@ function settingsTemplates(){
     ${aiHead('Notification templates', 'The wording and on/off of every in-app notification. Templates cannot be added or removed — a new event needs a release. English only; email and SMS wording is fixed in the build.')}
     ${lstTools('Search by title',
       filterDd('tplon', 'all', [['all', 'All'], ['on', 'On'], ['off', 'Off']], 'Status')
-      + filterDd('tplrcp', 'all', [['all', 'All'], ['staff', 'Internal users'], ['agent', 'Talent Agent'], ['candidate', 'Candidate'], ['leader', 'Cohort Leader']], 'Recipient'))}
+      + filterDd('tplrcp', 'all', [['all', 'All'], ['staff', 'Admin'], ['agent', 'Talent Agent'], ['candidate', 'Candidate'], ['leader', 'Cohort Leader']], 'Recipient'))}
     ${rows.length ? table([{label:'Notification'}, {label:'Recipient'}, {label:'Type'}, {label:'Sent when'}, {label:'On/Off'}, {label:'Last edited'}, ACT_COL], tableRows, {select:false})
       : emptyState('notification', 'No templates match', 'Clear the filters or search to see the full set.')}
   </section>`;
@@ -14847,9 +14976,7 @@ V.settings = () => {
 /* MY PROFILE and GENERAL SETTINGS are standalone pages (own modules, off the
    rail), opened from the account-menu chevron. They render the same panes, just
    without the Settings tab strip. */
-V.profile = () => head(pageSummary())
-  + `<section class="sec set-head">${aiHead('My Profile', 'Your own account. Correct your name here; email, job title and role are managed in the Staff module.')}</section>`
-  + settingsProfile();
+V.profile = () => head(pageSummary()) + settingsProfile();
 V.general = () => head(pageSummary())
   + `<section class="sec set-head">${aiHead('General Settings', 'The platform’s identity and how dates, currency and the timezone read across the admin.')}</section>`
   + settingsGeneral();
@@ -15318,11 +15445,7 @@ function shell(){
       <button class="shell-act ${S.notif ? 'on' : ''}" data-toggle="notif"
         aria-label="Notifications" aria-expanded="${S.notif}" title="Notifications">${I.notification}${unreadCount()
           ? `<span class="shell-badge">${unreadCount()}</span>` : ''}</button>
-      <button class="shell-act acct-t ${S.acct ? 'on' : ''}" data-toggle="acct"
-        aria-label="Account" aria-haspopup="menu" aria-expanded="${S.acct ? 'true' : 'false'}">
-        <span class="shell-avatar av-ph"><img src="${agentFace(ME.name)}" alt="${esc(ME.name)}"></span>
-        <svg class="acct-c" viewBox="0 0 24 24" aria-hidden="true">${inner('chevDown')}</svg>
-      </button>
+      ${dsAcctTrigger(agentFace(ME.name), '', esc(ME.name), esc(staffRoleName(ME)), S.acct)}
       ${acctMenu()}
     </div>
   </header>`;
@@ -16004,7 +16127,7 @@ function go(dest, keepNav){
   /* leaving a page discards any UNSAVED staged Settings CRUD (story 11.1:
      Departments / Working days changes are staged in the group and do not commit
      until the group Save). A fresh visit to the Platform tab re-snapshots live. */
-  S.setDraft = null; S.tplEdit = null;
+  S.setDraft = null; S.tplEdit = null; S.setEdit = null;
   render();
   const main = device.querySelector('.main');
   if(main) main.scrollTop = 0;
@@ -16078,6 +16201,20 @@ device.addEventListener('click', e => {
     const pos = Math.min(start + token.length, nv.length); try { el.setSelectionRange(pos, pos); } catch(_){}
     const c = device.querySelector(`[data-tplcount="${k}"]`); if(c) c.textContent = `${nv.length}/${max}`;
     tplPreviewUpdate(); return;
+  }
+  const fdm = e.target.closest('[data-formddmulti]');
+  if(fdm){
+    const fdd = fdm.closest('.fdd'), hid = fdd.querySelector('input[data-f]'), vl = fdd.querySelector('.fdd-val');
+    const v = fdm.dataset.formddmulti;
+    const opt = [...fdd.querySelectorAll('.fdd-opt')].find(o => o.dataset.formddmulti === v);
+    if(opt){ opt.classList.toggle('on'); opt.setAttribute('aria-selected', String(opt.classList.contains('on'))); }
+    const picked = [...fdd.querySelectorAll('.fdd-opt.on')];
+    if(hid){ hid.value = picked.map(o => o.dataset.formddmulti).join(','); hid.setAttribute('value', hid.value); }
+    if(vl){ vl.textContent = fddMultiLabel(picked.length, fdd.dataset.ph || ''); vl.classList.toggle('fdd-ph', !picked.length); }
+    const chips = fdd.querySelector('.fdd-chips');
+    if(chips) chips.innerHTML = picked.map(o => fddChip(o.dataset.formddmulti, o.dataset.chip)).join('');
+    syncSheetSubmit();
+    return;
   }
   const fds = e.target.closest('[data-formddset]');
   if(fds){

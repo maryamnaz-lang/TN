@@ -2837,6 +2837,17 @@
 .app .crumb-trail a.crumb-l{color:var(--text-helper)}
 .app .crumb-trail .crumb-now .crumb-l{color:var(--text-primary)}
 .app .crumb-sep{color:var(--gray-50)}
+/* THE ACCOUNT CONTROL'S NAME AND ROLE (§78.3, Maryam 8 Oct 2026): the name at the
+   description size in the strong weight ("semibold" is 500 here), primary ink;
+   the role a step smaller at the label size, book weight, the description grey. */
+.app .acct-t .acct-n{
+  font-size:var(--t-desc-size);line-height:18px;
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-desc-ls);
+  text-transform:none;color:var(--text-primary)}
+.app .acct-t .acct-r{
+  font-size:var(--t-label-size);line-height:var(--t-label-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-label-ls);
+  text-transform:none;color:var(--text-secondary)}
 .app .acct-i-t{
   font-size:var(--t-body-size);line-height:var(--t-body-lh);
   font-weight:var(--t-w-book);letter-spacing:var(--t-body-ls);

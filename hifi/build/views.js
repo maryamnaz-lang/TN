@@ -512,15 +512,33 @@ function shell(){
             glyph in this bar at 24px and fills it `--icon-primary`; at 24 next
             to a 32px face it reads as a second control rather than as the
             face's own disclosure. §77 sizes it and §63 §17 inks it. */''}
-      <button class="shell-act acct-t ${S.acct?'on':''}" data-toggle="acct"
-        aria-label="Account" aria-haspopup="menu" aria-expanded="${S.acct?'true':'false'}">
-        <span class="shell-avatar"><img src="${isLead()?AV.priya:AV.hana}" alt=""><i>${isLead()?'PN':'MN'}</i></span>
-        <svg class="acct-c" viewBox="0 0 24 24" aria-hidden="true">${inner('chevDown')}</svg>
-      </button>
+      ${/* `LEADER` is a const in lead.js, later in the same bundle, so on a
+            `#leader/...` deep link the boot render meets it in its temporal dead
+            zone — `typeof` does not guard that, it throws. Read it in a try. */''}
+      ${isLead()
+        ? acctTrigger(AV.priya, 'PN', (() => { try { return LEADER.n; } catch(e){ return 'Priya Nair'; } })(), 'Cohort Leader', S.acct)
+        : acctTrigger(AV.hana, 'MN', PF.general.name, 'Candidate', S.acct)}
       ${acctMenu()}
     </div>
   </header>`;
 }
+
+/* THE ACCOUNT CONTROL — ONE COMPONENT ON ALL FOUR PORTALS (Maryam, 8 Oct 2026:
+   "on all portals use one single component change for this, we gonna show the
+   name and the role of the portal person here"). Bell, then this: the face, the
+   person's NAME over their ROLE, then the chevron. A pure function of what it is
+   handed, so it ships in the design system as `dsAcctTrigger` and the agent and
+   admin portals call the same markup. §78 lays the pair out (and drops it below
+   600, where the bar has no room); §63 sets the type: name at the description
+   size in the strong weight and primary ink, role a step smaller (label size),
+   book weight, secondary grey. */
+const acctTrigger = (img, ini, name, role, open) =>
+  `<button class="shell-act acct-t ${open ? 'on' : ''}" data-toggle="acct"
+    aria-label="Account" aria-haspopup="menu" aria-expanded="${open ? 'true' : 'false'}">
+    <span class="shell-avatar"><img src="${img}" alt="">${ini ? `<i>${ini}</i>` : ''}</span>
+    <span class="acct-id"><span class="acct-n">${name}</span><span class="acct-r">${role}</span></span>
+    <svg class="acct-c" viewBox="0 0 24 24" aria-hidden="true">${inner('chevDown')}</svg>
+  </button>`;
 
 function authShell(back){
   return `
@@ -1818,11 +1836,11 @@ const certsFor = f => f.complete ? CERTS : CERTS.slice(0, 1);
      Fast Tracker      eight of thirteen weeks at or above `WEEK_TARGET`.
                        `GAME[stage].weeks` has nine on day 90 and two at day 34.
      Cohort Champion   all three community point rows earned (post, reply,
-                       reaction) — `GAME.got` indexes 4, 5 and 6.
+                       reaction) — `GAME.got` indexes 3, 4 and 5.
      Top Performer     `g.pts >= 2500`, which is `BDG[0].need`, the Bronze
                        threshold. Read from the record rather than typed.
 
-   TWO DATES ARE READ AND TWO ARE STATED. Cohort Champion takes `g.last[6]` —
+   TWO DATES ARE READ AND TWO ARE STATED. Cohort Champion takes `g.last[5]` —
    the day the last of its three rows was awarded, already in `GAME` — and Top
    Performer takes the Bronze badge's own date. Assessment Ace and Fast Tracker
    have no date anywhere in the build, so they carry one here, in the same way
@@ -1836,8 +1854,8 @@ const CERTIFS = [
     on:()      => 'November 18, 2026'},
   {k:'pace',   n:'Fast Tracker',     gate:(f,g) => (g.weeks||[]).filter(w => w >= WEEK_TARGET).length >= 8,
     on:()      => 'October 30, 2026'},
-  {k:'cohort', n:'Cohort Champion',  gate:(f,g) => [4,5,6].every(i => g.got.includes(i)),
-    on:(f,g)   => longDate(g.last[6])},
+  {k:'cohort', n:'Cohort Champion',  gate:(f,g) => [3,4,5].every(i => g.got.includes(i)),
+    on:(f,g)   => longDate(g.last[5])},
   {k:'top',    n:'Top Performer',    gate:(f,g) => g.pts >= BDG[0].need,
     on:()      => longDate(BRONZE_ON)}
 ];
@@ -3029,13 +3047,12 @@ function awardRow({name,desc,val,state,when,pct,art,ph,mk}){
    spent yet. Green is deliberately left out of this list rather than given to
    something for the sake of using it.
 
-   THE PENALTY HUE IS UNREACHABLE TODAY AND IS STATED ANYWAY. Rows 8 and 9 are
+   THE PENALTY HUE IS UNREACHABLE TODAY AND IS STATED ANYWAY. Rows 7 and 8 are
    in no stage's `got`, and §94 drains every unearned mark to grey, so the red
    cannot render on any screen in this build. It is here because the day a
    penalty lands the row must not come up in the community's rose. */
 const PTS_MK = [
   {ph:'flame',          mk:'--support-attention'},
-  {ph:'sealCheck',      mk:'--support-attention'},
   {ph:'bookOpenText',   mk:'--mk-1'},
   {ph:'graduationCap',  mk:'--mk-3'},
   {ph:'chatNew',        mk:'--mk-4'},

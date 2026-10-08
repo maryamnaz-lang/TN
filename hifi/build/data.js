@@ -760,9 +760,10 @@ const TAL_ROUTES = [
   [/reflection|note|turn this into/i, () => 'Here is your note turned into something you could bring to the call.' + wDraft()]
 ];
 
+/* "Sign in 100 times" (+250) is removed (Maryam, 8 Oct 2026). `GAME.got` /
+   `last`, `PTS_MK` and Cohort Champion's indexes were shifted down one with it. */
 const PTS = [
   {n:'Daily sign in',           d:'Sign in daily and earn 10 points every time',                   v:10},
-  {n:'Sign in 100 times',       d:'Sign in 100 times and earn 250 points',                         v:250},
   {n:'Chapter completion',      d:'Complete any chapter and earn 25 points, up to 10 a day',       v:25},
   {n:'Course completion',       d:'Complete any course and earn 250 points',                       v:250},
   {n:'Start a new conversation',d:'Post a new conversation in the community',                      v:10},
@@ -786,12 +787,12 @@ const RANKS = [
 ];
 
 const GAME = {
-  week1:   {pts:985,  got:[0,1,3],           badges:0, rank:1, last:['08/13/2026','07/23/2026','','07/23/2026','','','','',''], weeks:[20]},
-  day34:   {pts:1095, got:[0,1,2,3],         badges:0, rank:1, last:['08/13/2026','07/23/2026','08/04/2026','07/23/2026','','','','',''], weeks:[52,61,48,55,12]},
-  day90:   {pts:2955, got:[0,1,2,3,4,5,6],   badges:1, rank:1, last:['08/13/2026','07/23/2026','11/14/2026','11/16/2026','09/12/2026','09/21/2026','09/24/2026','',''], weeks:[52,61,48,55,62,58,70,49,55,60,52,66,58]},
-  promoted:{pts:3205, got:[0,1,2,3,4,5,6],   badges:1, rank:1, last:['08/13/2026','07/23/2026','11/18/2026','11/21/2026','09/12/2026','09/21/2026','09/24/2026','',''], weeks:[52,61,48,55,62,58,70,49,55,60,52,66,58]},
+  week1:   {pts:985,  got:[0,2],           badges:0, rank:1, last:['08/13/2026','','07/23/2026','','','','',''], weeks:[20]},
+  day34:   {pts:1095, got:[0,1,2],         badges:0, rank:1, last:['08/13/2026','08/04/2026','07/23/2026','','','','',''], weeks:[52,61,48,55,12]},
+  day90:   {pts:2955, got:[0,1,2,3,4,5],   badges:1, rank:1, last:['08/13/2026','11/14/2026','11/16/2026','09/12/2026','09/21/2026','09/24/2026','',''], weeks:[52,61,48,55,62,58,70,49,55,60,52,66,58]},
+  promoted:{pts:3205, got:[0,1,2,3,4,5],   badges:1, rank:1, last:['08/13/2026','11/18/2026','11/21/2026','09/12/2026','09/21/2026','09/24/2026','',''], weeks:[52,61,48,55,62,58,70,49,55,60,52,66,58]},
   /* THE RED ACCENT DEMO — day 34's row, copied. See `RED_DEMO` in this file. */
-  reddemo: {pts:1095, got:[0,1,2,3],         badges:0, rank:1, last:['08/13/2026','07/23/2026','08/04/2026','07/23/2026','','','','',''], weeks:[52,61,48,55,12]}
+  reddemo: {pts:1095, got:[0,1,2],         badges:0, rank:1, last:['08/13/2026','08/04/2026','07/23/2026','','','','',''], weeks:[52,61,48,55,12]}
 };
 
 const WEEK_TARGET = 55;

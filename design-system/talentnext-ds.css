@@ -14,7 +14,7 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 6426.  Rules dropped as product-specific: 225.
+   Rules kept: 6430.  Rules dropped as product-specific: 225.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
@@ -7580,6 +7580,8 @@ button.btn-p:active,
 .app .crumb-trail a.crumb-l{color:var(--text-helper)}
 .app .crumb-trail .crumb-now .crumb-l{color:var(--text-primary)}
 .app .crumb-sep{color:var(--gray-50)}
+.app .acct-t .acct-n{font-size:var(--t-desc-size); line-height:18px; font-weight:var(--t-w-strong); letter-spacing:var(--t-desc-ls); text-transform:none; color:var(--text-primary)}
+.app .acct-t .acct-r{font-size:var(--t-label-size); line-height:var(--t-label-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-label-ls); text-transform:none; color:var(--text-secondary)}
 .app .acct-i-t{font-size:var(--t-body-size); line-height:var(--t-body-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-body-ls); text-transform:none; color:var(--text-primary)}
 .app .ph-back-t{font-size:var(--t-compact-size); line-height:var(--t-compact-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-compact-ls); text-transform:none; color:var(--text-primary)}
 .app .page .sec.dark-card > .sec-h.aih > .aih-b > h2.aih-t{color:var(--on-dark)}
@@ -8428,6 +8430,10 @@ button.btn-p:active,
 .app .shell-act.acct-t{width:auto; height:48px; display:flex; align-items:center; gap:var(--s02); padding:0 var(--s02) 0 var(--s03)}
 .app .acct-t .acct-c{width:16px; height:16px; flex:none; transition:transform var(--dur-short) var(--ease-standard)}
 .app .acct-t.on .acct-c{transform:rotate(180deg)}
+.app .acct-t .acct-id{display:flex; flex-direction:column; align-items:flex-start; gap:1px; margin-left:var(--s03); margin-right:var(--s02); text-align:left; white-space:nowrap}
+@container app (max-width:599.98px){
+  .app .acct-t .acct-id{display:none}
+}
 .app .shell-right{position:relative}
 .app .acct-menu{position:absolute; top:calc(100% - var(--s02)); right:0; z-index:40; min-width:248px; display:flex; flex-direction:column; background:var(--layer-01); border:1px solid var(--rule); opacity:0; visibility:hidden; transform:translateY(-4px); transition:opacity var(--dur-short) var(--ease-standard),
              transform var(--dur-short) var(--ease-standard),

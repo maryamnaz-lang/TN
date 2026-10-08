@@ -839,13 +839,16 @@ function leadRosterTable(c){
     ${rows.length ? rows.map(m=>{
       const a = leadAttn(m,c), done = lchDone(m), mins = lmins(m), rt = lretaken(m);
       const low = m.avg>0 && m.avg<75;
+      /* ONE LINE PER CELL (Maryam, 8 Oct 2026): the Chapters percentage, the Attempts
+         "avg N" and Time on course's "N min a chapter" sub-lines are removed; the
+         member page still carries those figures. */
       return `<tr data-rname="${leadPlain(m).toLowerCase()}">
         <td><span class="rname">${mAv(m,32)}${leadName(m)}</span></td>
         <td>${mlevel(m)}</td>
-        <td class="num">${done} <span class="t-helper-01">of 13</span><span class="cell-sub">${m.pc}%</span></td>
+        <td class="num">${done} <span class="t-helper-01">of 13</span></td>
         <td class="num${low?' cell-low':''}">${m.avg?m.avg+'%':'<span class="t-helper-01">&mdash;</span>'}</td>
-        <td class="num">${rt?rt+' retaken':'<span class="t-helper-01">0</span>'}<span class="cell-sub">avg ${(m.att||0).toFixed(1)}</span></td>
-        <td class="num">${mins?lTimeFull(mins):'None'}${mins?`<span class="cell-sub">${Math.round(mins/Math.max(1,done))} min a chapter</span>`:''}</td>
+        <td class="num">${rt?rt+' retaken':'<span class="t-helper-01">0</span>'}</td>
+        <td class="num">${mins?lTimeFull(mins):'None'}</td>
         <td class="num">${a.held?a.att+' of '+a.held:'<span class="t-helper-01">&mdash;</span>'}</td>
         <td>${m.last==='Never'?'Never':m.last}</td>
         <td class="tbl-act lead-roster-act">${ldrRowMenu([
@@ -1460,27 +1463,30 @@ V.leadMember = () => {
   return `<main class="main"><div class="page">
   ${crumb(['My Cohort','leadDash'], m.name)}
   ${ph(m.name)}
-  <div class="sec">
+  ${''/* NO DIVIDER ABOVE OR BELOW THE FOUR FIGURES (Maryam, 8 Oct 2026): the identity
+        section and the figures section both carry `.sec-noline`, so the head, the
+        four blocks and the Course section read as one run. */}
+  <div class="sec sec-noline">
     <div class="idhead">
       <span class="av-ph" style="width:72px;height:72px"><i>${m.ini}</i><img src="${AV[m.img]}" alt=""></span>
       <div class="idhead-b">
         <span class="idname">${leadName(m)}</span>
         <span class="idmeta">${mlevel(m)} &middot; Day ${c.day} of 90 &middot; Week ${leadWeek(c.day)} of 13${joinWk>1?` &middot; joined week ${joinWk}`:''}</span>
-        ${m.flag ? lflagTag(m.flag) : '<span class="tag green sm">On track</span>'}
+        ${/* the green "On track" chip is removed (Maryam, 8 Oct 2026); a flag still shows */ m.flag ? lflagTag(m.flag) : ''}
       </div>
       <div class="idhead-a">
         <button class="ldr-chip chip-msg" data-ldrdm="${m.name}">${I.chat} Contact Candidate</button>
       </div>
     </div>
   </div>
-  <div class="sec">
+  <div class="sec sec-noline">
     <div class="stats">
       ${statCell(I.growth, 'Chapters',   done + '<small> of 13</small>', m.pc + '% complete')}
       ${statCell(I.chart,  'Assessment', m.avg ? `<span class="${low?'stat-low':''}">${m.avg}<small>%</small></span>` : '<small>Not yet</small>', m.avg ? (low?'below the 75% pass mark':'course average') : 'not assessed yet')}
-      ${statCell(I.renew,  'Attempts',   lretaken(m) ? lretaken(m) : '<small>0</small>', (m.att||0).toFixed(1) + ' on average')}
+      ${statCell(I.renew,  'Attempts',   lretaken(m) ? lretaken(m) : '<small>0</small>', String(+(m.att||0).toFixed(1)) + ' on average')}   ${''/* no trailing .0: 1.0 reads "1", 1.2 stays (Maryam, 8 Oct 2026) */}
       ${statCell(I.time,   'Time on course', lmins(m) ? lTimeFull(lmins(m)) : '<small>None</small>', done ? Math.round(lmins(m)/done) + ' min a chapter' : 'not started')}
     </div>
-    <p class="lead-sync">Course figures last read from LightspeedVT ${LEAD_SYNC} (${LEAD_TZ}).</p>
+    ${''/* the "Course figures last read from LightspeedVT …" line is removed from the member page (Maryam, 8 Oct 2026) */}
   </div>
   <div class="sec">
     <div class="sec-h"><h2>Course</h2></div>
