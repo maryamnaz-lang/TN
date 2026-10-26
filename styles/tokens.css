@@ -156,6 +156,8 @@
   --drawer-w-admin: 310px;
   --rail-item-h: 48px;
   --rail-bar-w: 2px;          /* the selected module's accent bar, full row height (Phase 1 §14) */
+  --rail-flyout-w: 212px;     /* the shut rail's sub-module flyout, min width (Phase 1 §120.1c) */
+  --rail-flyout-row-h: 36px;  /* one row in that flyout (Phase 1 §120.1c) */
   --nav-mark: 21px;           /* the TN mark in the shut rail's bar cell */
   --nav-close-w: 56px;        /* the open drawer's close X cell */
   --nav-logo-h: 26px;         /* the TALENTnext wordmark in the open drawer's bar cell */
@@ -189,7 +191,6 @@
   /* the candidate report's three evaluation cards (Phase 1 hifi .sig-c titles) */
   --sig-green: #1c7a5e; --sig-violet: #7c4bb0; --sig-blue: #0f6ba8;
   --rec-meta-ic-gap: 6px;
-  --ob-radio-w: 1.5px;
   /* the h1 role below 900 (24/30), kept for the survey question at every width */
   --t-h1-base-size: 24px; --t-h1-base-lh: 30px; --t-h1-base-ls: -.5px;          /* Phase 1 .shell-act */
   --badge-h: 15px;       /* Phase 1 .shell-badge */

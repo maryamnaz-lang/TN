@@ -66,7 +66,8 @@ export const LEGAL: { key: string; title: string; short?: string; sections: [str
   { key: "terms", title: "Terms of Service", sections: [
     ["1. Your Account", "You sign in through our identity provider and are responsible for keeping your credentials secure. Your sign-in email identifies your account and cannot be changed."],
     ["2. Using the Service", "Use TALENTnext for your own leadership development. Do not misuse the platform, access another person’s records without permission, or disrupt the service."],
-    ["3. Payments", "Your first interview is complimentary. Subsequent interviews and course enrollments are charged at the prices shown before payment. Receipts are available under Payments."],
+    /* No "first interview is complimentary" line (Maryam 26 Oct 2026): the first interview carries no price wording anywhere. */
+    ["3. Payments", "Re-interviews and course enrollments are charged at the prices shown before payment. Receipts are available under Payments."],
     ["4. Changes to These Terms", "We may update these terms. If a change is material, you’ll be asked to accept the updated terms at your next sign-in."],
   ] },
   { key: "privacy", title: "Privacy Notice", sections: [

@@ -64,6 +64,8 @@
 .cbx input:checked::after { content: ""; width: var(--s02); height: var(--s03); border: solid var(--on-accent); border-width: 0 var(--tab-mark) var(--tab-mark) 0; transform: rotate(45deg) translate(-1px, -1px); }
 .cbx a { color: var(--link); text-decoration: underline; }
 
-.link { color: var(--accent-text); align-self: flex-start; }
+/* "Forgot Password?" stands 12 below the password field's line (Maryam 26 Oct 2026: it sat
+   right against it). inline-block so the margin applies to the link. */
+.link { display: inline-block; margin-top: var(--s04); color: var(--accent-text); align-self: flex-start; }
 .alt { color: var(--text-secondary); }
 .alt a { color: var(--accent-text); font-weight: var(--t-w-strong); text-decoration: underline; }

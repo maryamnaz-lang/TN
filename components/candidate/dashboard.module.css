@@ -65,7 +65,6 @@
 .meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s02) var(--rec-meta-gap); color: var(--on-dark-2); }
 .meta > span { display: flex; align-items: center; gap: var(--rec-meta-ic-gap); }
 .meta svg { width: var(--s05); height: var(--s05); }
-.free { color: inherit; }
 
 /* ---- Enrolment offer (Phase 1 .eo, measured) ---- */
 .eoHd { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s04) var(--s05); }

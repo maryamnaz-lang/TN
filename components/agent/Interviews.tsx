@@ -20,7 +20,7 @@ import { Icon } from "../Icon";
 import { NextCall } from "./Dashboard";
 import {
   AGENT as A, IVS, PHOTO, PAST_COUNT, TX, TX_TAGS, LVL_CODES, TALENT, CANCEL_REASONS,
-  ivById, first, dayDate, relDay, schedDay, daysOut, kindLabel, levelLine, lvlName, lvlCode, type Iv,
+  ivById, first, dayDate, relDay, schedDay, daysOut, kindLabel, levelLine, lvlName, lvlCode, ivFee, ivPrice, type Iv,
 } from "@/data/agent";
 import s from "./agent.module.css";
 
@@ -63,7 +63,7 @@ export function AgentInterviews() {
                   day={schedDay(x.day)} time={x.time}
                   lines={x.kind === "Re-interview"
                     ? ["Re-interview · 45 minutes · Recorded"]
-                    : [`First Interview · 45 minutes · Recorded · $${A.fee} already paid and held`]} />
+                    : [`First Interview · 45 minutes · Recorded · $${ivFee(x)} already paid and held`]} />
               ))}
             </PersonList>
           </Section>
@@ -142,7 +142,7 @@ function Upcoming({ x }: { x: Iv }) {
           ["Current Level", level],
           ["Assessment Areas", `${(x.asked ?? "").replace(", and ", " and ")}.`],
           ["Booking Status", `Booked · ${(x.paid ?? "").replace("Paid at booking, ", "Paid at booking on ")}`],
-          ["Interview Fee", `$${A.fee}`],
+          ["Interview Fee", `$${ivFee(x)}`],
           /* CUT (G8): "Cohort Leader Evaluation" and its 90-day summary sheet. */
         ]} />
       </Section>
@@ -318,7 +318,8 @@ function Done({ x }: { x: Iv }) {
       </Section>
       <Section>
         <SectionHeader title="The fee" />
-        <KV rows={[["Candidate paid", `$${A.price}`], ["Platform fee", `$${A.cut}`], ["Your fee", `$${A.share}`], ["Status", x.money]]} />
+        {/* Per-track fee and the commission (26 Oct 2026, data/fees.ts). */}
+        <KV rows={[["Candidate paid", `$${ivPrice(x)}`], [`Commission (${A.commission}%)`, `$${ivPrice(x) - ivFee(x)}`], ["Your fee", `$${ivFee(x)}`], ["Status", x.money]]} />
       </Section>
     </Page>
   );

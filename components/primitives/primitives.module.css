@@ -110,6 +110,16 @@
 .shActs { display: flex; align-items: center; gap: var(--s04); flex: none; margin-left: auto; }
 /* Super Admin heading actions are all 40 tall, an accent link included (Phase 1 §120). */
 :global([data-portal="admin"]) .shActs > * { height: var(--s08); }
+/* SUPER ADMIN HEADING ACTIONS SIT 24 APART (Maryam 26 Oct 2026: "Bulk Import, Export and
+   Invite User are very close ... apply this on the other pages too"). An admin ghost button
+   carries no side padding (ui.module.css), so the row's gap is the WHOLE space between two
+   labels; 12 read as cramped. One rule for every page heading and section heading row,
+   reaching the `<Stack row>` most pages wrap their buttons in (its own g3 is 12) as well
+   as the slot itself, so no page has to restate it. */
+:global([data-portal="admin"]) .phActs,
+:global([data-portal="admin"]) .shActs,
+:global([data-portal="admin"]) .phActs > .row,
+:global([data-portal="admin"]) .shActs > .row { gap: var(--s06); }
 /* The candidate's heading actions sit at 36 (Phase 1 .sec-h-act). */
 :global([data-portal="candidate"]) .shActs > * { height: var(--filter-h); }
 

@@ -45,8 +45,14 @@
 .field { margin-top: var(--s07); display: flex; flex-direction: column; gap: var(--s04); }
 .opt { display: flex; align-items: center; gap: var(--s04); width: 100%; padding: var(--s05); background: var(--layer-02); border: var(--hairline) solid transparent; text-align: left; color: var(--text-primary); }
 .opt.on { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, var(--background)); }
-.radio { width: var(--icon-page); height: var(--icon-page); flex: none; border-radius: var(--radius-pill); border: var(--ob-radio-w) solid var(--border-strong-01); }
+/* THE PLATFORM'S RADIO (cards.module.css .rad), so it reads as a radio (Maryam 26 Oct 2026:
+   "the selection radio buttons are broken" — picked, it was a flat solid red disc with no
+   centre, i.e. a dot, not a radio). A 20px ring on the control edge; picked, the ring fills
+   and a white 8px dot sits at its centre. The fill is the accent, matching the accent-tinted
+   selected pill around it (the card picker's is black on a white row). */
+.radio { width: var(--icon-rail); height: var(--icon-rail); flex: none; display: grid; place-items: center; border-radius: var(--radius-pill); border: var(--hairline) solid var(--border-strong-01); background: var(--background); }
 .on .radio { border-color: var(--accent); background: var(--accent); }
+.on .radio::after { content: ""; width: var(--s03); height: var(--s03); border-radius: var(--radius-pill); background: var(--on-accent); }
 .foot { margin-top: var(--s08); display: flex; align-items: center; gap: var(--s04); }
 .foot > :last-child { margin-left: auto; }
 .foot button { height: var(--ob-btn-h); }

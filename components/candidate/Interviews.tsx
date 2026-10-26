@@ -5,21 +5,28 @@ import { Page, PageHeader, Section, SectionHeader, Stack, Text } from "../primit
 import { DarkCard } from "../ui/DarkCard";
 import { Button } from "../ui/Button";
 import { Dialog } from "../ui/Dialog";
-import { FreeFee } from "../ui/Fee";
 import { Disclosure, HowItWorks } from "../ui/Disclosure";
-import { CardPicker, PayModal } from "../ui/CardPicker";
+import { CardPicker, PayModal, defaultCard } from "../ui/CardPicker";
+import { ReceiptModal } from "../ui/Receipt";
+import { DiscountField, type Applied } from "../ui/DiscountField";
+import { redeem, saleFor } from "@/data/discounts";
+import { Price } from "../ui/Price";
+import { COMMISSION_PCT } from "@/data/fees";
+import { PEOPLE } from "@/data/seed";
+import { purchase, type Payment } from "@/data/payments";
 import { LevelCard } from "./LevelCard";
 import { Field, TextArea } from "../ui/Field";
 import { Icon } from "../Icon";
 import { useDemo } from "@/lib/demo";
 import { atLeast } from "@/lib/demo";
-import { AGENTS, HOW_IT_WORKS, PAST, REPORT, SAVED_CARDS, SCENES, SCENES_PRICE, SCENE_STILL, SHARE_NETS, agentByKey, isReinterview, type Agent } from "@/data/interviews";
+import { AGENTS, HOW_IT_WORKS, PAST, REPORT, SAVED_CARDS, SCENES, SCENES_PRICE, SCENE_STILL, SHARE_NETS, CAND_TRACK, agentByKey, isReinterview, type Agent } from "@/data/interviews";
 import { CallRow, When } from "./CallRow";
 import s from "./interviews.module.css";
 
 const BASE = "/candidate/interviews";
-/* Where "Book" goes: a re-interview pays first (checkout), a first interview
-   is complimentary and goes straight to the calendar (Phase 1, 13 Oct 2026). */
+/* Where "Book" goes: a re-interview pays first (checkout); a first interview goes straight
+   to the calendar and is booked there, with no price, "Free" or "$0" anywhere on the way
+   (Maryam 26 Oct 2026; Phase 1 13 Oct 2026 for the skipped payment step). */
 export const bookHref = (stage: string, key = "priya") =>
   `${BASE}/${isReinterview(stage) ? "checkout" : "book"}/${key}/`;
 
@@ -85,10 +92,12 @@ export function AgentsPage() {
 function AgentsTable() {
   const { stage } = useDemo();
   const charged = isReinterview(stage);
+  /* A first interview is booked with no price shown anywhere (Maryam 26 Oct 2026): no Rate column. */
+  const heads = charged ? ["Agent", "Expertise", "Experience", "Rate", ""] : ["Agent", "Expertise", "Experience", ""];
   return (
-    <div className={s.agt}>
+    <div className={`${s.agt} ${charged ? "" : s.noRate}`}>
       <div className={s.agtH}>
-        {["Agent", "Expertise", "Experience", "Rate", ""].map((h, i) => <Text key={i} role="compact" as="span" strong ink="primary">{h}</Text>)}
+        {heads.map((h, i) => <Text key={i} role="compact" as="span" strong ink="primary">{h}</Text>)}
       </div>
       {AGENTS.map((a) => (
         <div key={a.key} className={s.agtR}>
@@ -110,7 +119,7 @@ function AgentsTable() {
             {a.tags.length > 2 && <Text role="label" as="span" className={s.tag}>+{a.tags.length - 2}</Text>}
           </div>
           <div><Text role="caption" as="span" className={s.cellL}>Experience</Text><Text role="compact" as="span">{a.yrs} yrs</Text></div>
-          <div><Text role="caption" as="span" className={s.cellL}>Rate</Text><Text role="h4" as="span">{charged ? `$${a.price}` : <FreeFee />}</Text></div>
+          {charged && <div><Text role="caption" as="span" className={s.cellL}>Rate</Text><Text role="h4" as="span"><Price amount={a.price} /></Text></div>}
           <div className={s.act}><Button kind="primary" size="sm" href={bookHref(stage, a.key)}>Book</Button></div>
         </div>
       ))}
@@ -154,9 +163,8 @@ function AgentHead({ a, charged }: { a: Agent; charged: boolean }) {
         <span className={s.nameRow}><Text role="h3" as="span">{a.name}</Text><Icon name="verified" className={s.verified} /></span>
         <Text role="compact" as="span" className={s.rating}><Icon name="star" />{a.rating} · {a.ivs} interviews</Text>
         <Text role="compact" as="span" className={s.meta}>
-          {charged
-            ? <span><Icon name="wallet" />${a.price} Interview Fee</span>
-            : <span><FreeFee quiet /></span>}
+          {/* A first interview shows no fee line at all (Maryam 26 Oct 2026). */}
+          {charged && <span><Icon name="wallet" /><Price amount={a.price} /> Interview Fee</span>}
           <span><Icon name="video" />45 mins call</span>
         </Text>
       </div>
@@ -177,7 +185,10 @@ export function BookPage({ agent }: { agent: string }) {
   const charged = isReinterview(stage);
   const confirm = () => {
     setUi({ ivBooked: { agent: a.key, charged } });
-    if (stage !== "resched") setStage("booked");
+    /* A first booking moves to the "booked" stage; a paid RE-interview stays on its own
+       stage (day 90), or the candidate would drop back to the first-interview journey and
+       lose the course from Payments (26 Oct 2026). */
+    if (!charged && stage !== "resched") setStage("booked");
     router.push("/candidate/");
   };
   return (
@@ -206,25 +217,45 @@ export function BookPage({ agent }: { agent: string }) {
 export function CheckoutPage({ agent }: { agent: string }) {
   const a = agentByKey(agent);
   const router = useRouter();
+  const { ui, setUi } = useDemo();
   const [add, setAdd] = useState(false);
+  const [card, setCard] = useState(defaultCard(SAVED_CARDS));
+  const [review, setReview] = useState(false);
   const [paid, setPaid] = useState(false);
+  /* The receipt the candidate reviews BEFORE paying (Maryam 26 Oct 2026) is the row the
+     Payments ledger keeps afterwards: same item, card, date and amount. */
+  const [disc, setDisc] = useState<Applied>(null);
+  /* A discount code works on the candidate's track fee with TalentNext's commission in; the
+     candidate portal's agents carry no platform fee (data/interviews.ts). */
+  const auto = saleFor(a.price);
+  const eff: Applied = disc ?? (auto ? { code: auto.name, off: auto.off, d: auto.d } : null);
+  const bill = purchase("re", `Re-interview · ${a.name}`, a.price, SAVED_CARDS[card], eff ?? undefined);
+  const confirm = () => {
+    if (eff) redeem(eff.d, PEOPLE.maryam.name, `TXN-${String(Date.now()).slice(-4)}`, a.price, eff.off);
+    const made = (ui.purchases as Payment[] | undefined) ?? [];
+    setUi({ purchases: [bill, ...made.filter((p) => p.id !== bill.id)] });
+    setReview(false);
+    setPaid(true);
+  };
   return (
     <Page>
       <PageHeader title="Checkout" back={`${BASE}/`} desc="Choose a saved card to pay for your interview." />
       <Section><AgentHead a={a} charged /></Section>
       <Section kind="block">
-        <div className={s.col}>
+        <div className={`${s.col} ${s.full}`}>
           <div>
             <SectionHeader small title="Pay with" actions={<Button kind="link" icon="add" asIs onClick={() => setAdd(true)}>Add a Card</Button>} />
-            <CardPicker cards={SAVED_CARDS} />
+            <CardPicker cards={SAVED_CARDS} value={card} onChange={setCard} />
           </div>
-          <div className={s.go}><Button kind="primary" go onClick={() => setPaid(true)}>Pay ${a.price}</Button></div>
+          <DiscountField ctx={{ kind: "interview", track: CAND_TRACK, fee: a.fees[CAND_TRACK], pct: COMMISSION_PCT, platform: 0 }} cand={PEOPLE.maryam.name} value={disc} onChange={setDisc} auto={auto} />
+          <div className={s.go}><Button kind="primary" go onClick={() => setReview(true)}>Pay ${a.price - (eff?.off ?? 0)}</Button></div>
         </div>
       </Section>
       {add && <PayModal onClose={() => setAdd(false)} />}
+      {review && <ReceiptModal r={bill} review onClose={() => setReview(false)} onConfirm={confirm} />}
       {paid && (
         <Dialog icon="checkFilled" title="Payment successful"
-          fee={{ label: "Interview Fee", value: `$${a.price}` }}
+          fee={{ label: "Interview Fee", value: <Price amount={a.price} paid={a.price - (eff?.off ?? 0)} /> }}
           desc="Your payment was successfully processed. You can now continue to select a time for your interview."
           actions={<Button kind="primary" onClick={() => router.push(`${BASE}/book/${a.key}/`)}>Pick a slot</Button>} />
       )}
@@ -239,9 +270,12 @@ export function BookedDialog() {
   if (!b) return null;
   const a = agentByKey(b.agent);
   const close = () => setUi({ ivBooked: undefined });
+  /* What was actually paid for the re-interview (Maryam 26 Oct 2026), after any code or sale. */
+  const bought = ((ui.purchases as Payment[] | undefined) ?? []).find((p) => p.id === "re");
+  const paid = bought ? Number(bought.amount.replace(/[^\d.]/g, "")) : undefined;
   return (
     <Dialog icon="checkFilled" title="Interview Booked!" onClose={close}
-      desc={<>{b.charged ? <>You have booked an interview with {a.name} for ${a.price}.</> : <>You have booked a <FreeFee /> interview with {a.name}.</>} Join the interview on your selected slot and get to know of your level.</>}
+      desc={<>{b.charged ? <>You have booked an interview with {a.name} for <Price amount={a.price} paid={paid} />.</> : <>You have booked an interview with {a.name}.</>} Join the interview on your selected slot and get to know of your level.</>}
       actions={<Button kind="primary" onClick={close}>View My Dashboard</Button>} />
   );
 }

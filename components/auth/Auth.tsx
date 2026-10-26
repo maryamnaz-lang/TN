@@ -18,7 +18,7 @@ import s from "./auth.module.css";
    /auth/<screen>/ — the candidate's front door, copied from Phase 1's
    AUTH screens as they render (15 Oct 2026):
      create  Set Your Password → Log In
-     login   Log In → the Just joined dashboard (the Tal onboarding is hidden, 19 Oct 2026)
+     login   Log In → (2s loader) → onboarding (restored 26 Oct 2026)
      forgot  Reset Password → Continue ("Sending…") → reset
      reset   Set New Password → Log In
      terms   the legal notices
@@ -122,8 +122,9 @@ function Login() {
         <Pw label="Password" placeholder="Enter your password" value="Talentnext1!" />
         <Link href="/auth/forgot/" className={`${s.link} t-label`}>Forgot Password?</Link>
       </div>
-      <label className={`${s.cbx} t-label`}><input type="checkbox" defaultChecked /> <span>Remember me</span></label>
-      <div><Button kind="primary" go onClick={() => { setStage("new"); router.push("/candidate/?stage=new"); }}>Log In</Button></div>
+      {/* No "Remember me" box (Maryam 26 Oct 2026). */}
+      {/* Log In → the 2s loader → the Tal onboarding (restored 26 Oct 2026; 19 Oct went straight to the dashboard). */}
+      <div><Button kind="primary" go onClick={() => { setStage("onboard"); router.push("/onboarding/?load=1"); }}>Log In</Button></div>
       <Text role="body" className={s.alt}>New to TALENTnext? <a href="https://web-puce-six-27.vercel.app/new/get-started" target="_blank" rel="noopener">Sign up</a></Text>
     </>
   );

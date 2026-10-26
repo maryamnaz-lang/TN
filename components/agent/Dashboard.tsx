@@ -6,7 +6,7 @@ import { QuickActions } from "../ui/QuickActions";
 import { ProgressWing } from "../ui/ProgressWing";
 import { Stats, Stat } from "../ui/Figures";
 import { Button } from "../ui/Button";
-import { AGENT as A, IVS, PHOTO, dayDate, kindLabel, levelLine } from "@/data/agent";
+import { AGENT as A, IVS, PHOTO, dayDate, kindLabel, levelLine, ivFee, FEE_SPAN, HELD_FOR_YOU, HELD_TOTAL } from "@/data/agent";
 
 /* ============================================================
    AGENT HOME — Phase 1 V.dashboard on the working week, minus the Tal
@@ -25,7 +25,7 @@ export function AgentDashboard() {
       <Section>
         <ProgressWing full title="Your earnings"
           big={`$${A.earned}`} bigLabel="Earned This Month"
-          right={`$${A.escrow}`} rightLabel="Awaiting Release"
+          right={`$${HELD_FOR_YOU}`} rightLabel="Awaiting Release"
           segs={["done", "done", "done", "done", "now", "now", "now"]} />
       </Section>
       {/* The three figures: their own block section of three joint cards inside the band,
@@ -33,8 +33,9 @@ export function AgentDashboard() {
       <Section kind="block" bare>
         <Stats cols={3}>
           <Stat icon="video" label="Interviews Completed" value={String(A.month)} desc="This month" />
-          <Stat icon="wallet" label="Fee per Interview" value={`$${A.share}`} desc="Paid to you in full" />
-          <Stat icon="creditCard" label="Gross Held" value={`$${A.grossHeld}`} desc="Released once you send the evaluation" />
+          {/* Per-track fees (26 Oct 2026): the range, set by the candidate's level. */}
+          <Stat icon="wallet" label="Fee per Interview" value={FEE_SPAN} desc="By level, paid to you in full" />
+          <Stat icon="creditCard" label="Gross Held" value={`$${HELD_TOTAL}`} desc="Released once you send the evaluation" />
         </Stats>
       </Section>
       </HeadBand>
@@ -58,7 +59,7 @@ export function NextCall({ id, actions }: { id: string; actions?: React.ReactNod
   const x = IVS.find((i) => i.id === id)!;
   return (
     <CallRow img={PHOTO[x.id]} name={x.n}
-      lines={[`${kindLabel(x)} · ${levelLine(x)}`, `45 minutes · Recorded · $${A.fee} already paid and held`]}
+      lines={[`${kindLabel(x)} · ${levelLine(x)}`, `45 minutes · Recorded · $${ivFee(x)} already paid and held`]}
       action={actions ?? <Button kind="accent" iconEnd="video" disabled>Join Call</Button>} />
   );
 }

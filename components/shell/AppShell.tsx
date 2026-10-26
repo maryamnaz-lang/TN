@@ -47,8 +47,10 @@ export function AppShell({ portal, children }: { portal: PortalKey; children: Re
 
   const railItem = (n: NavItem) => {
     const on = slug[0] === n.key || (!n.key && slug.length === 0);
+    // An admin parent answers hover with its sub-module flyout, so it carries no tooltip (Phase 1).
+    const flyout = portal === "admin" && !!n.subs;
     const link = (
-      <Link href={href(portal, n.key, n.subs?.[0].key ?? "")} className={`${s.item} ${on ? s.on : ""}`} title={n.title}>
+      <Link href={href(portal, n.key, n.subs?.[0].key ?? "")} className={`${s.item} ${on ? s.on : ""}`} title={flyout ? undefined : n.title}>
         <Icon name={n.icon} />
         <span className={`${s.label} t-compact w-strong`}>{n.title}</span>
         {n.subs && <span className={`${s.chev} ${on ? s.up : ""}`}><Icon name="chevDown" /></span>}
@@ -58,7 +60,7 @@ export function AppShell({ portal, children }: { portal: PortalKey; children: Re
     return (
       <li key={n.key} className={s.node}>
         {link}
-        {/* Open rail: subs show under the current module. Collapsed rail: flyout on hover. */}
+        {/* Open rail: subs show under the current module. Collapsed rail: the admin's flyout on hover (shell.module.css). */}
         <ul className={s.subs} hidden={open && !on}>
           {n.subs.map((x) => (
             <li key={x.key}>

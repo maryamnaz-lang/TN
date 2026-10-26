@@ -2102,7 +2102,7 @@
    "fee": 0,
    "escrow": "n/a",
    "paid": false,
-   "kind": "First (discounted)",
+   "kind": "First interview",
    "status": "pending",
    "stage": "booked",
    "recExists": false
@@ -2149,7 +2149,7 @@
    "fee": 0,
    "escrow": "n/a",
    "paid": false,
-   "kind": "First (discounted)",
+   "kind": "First interview",
    "status": "pending",
    "stage": "booked",
    "recExists": false
@@ -2211,7 +2211,7 @@
    "fee": 0,
    "escrow": "n/a",
    "paid": false,
-   "kind": "First (discounted)",
+   "kind": "First interview",
    "status": "pending",
    "stage": "booked",
    "recExists": false
@@ -2411,7 +2411,7 @@
    "party": "Platform",
    "email": "",
    "kind": "First interview — Grace Kim with Marcus Ozoro",
-   "desc": "First interview · Grace Kim · Marcus Ozoro · 100% discount",
+   "desc": "First interview · Grace Kim · Marcus Ozoro",
    "amt": 95,
    "dir": "in",
    "method": "Platform funded",
@@ -3143,16 +3143,6 @@
    "by": "Umair"
   },
   {
-   "k": "firstiv",
-   "t": "First interview discount",
-   "v": "100%",
-   "unit": "first booking",
-   "note": "The first interview is free; the cost is absorbed by the platform (SA-08 A4)",
-   "state": "set",
-   "effective": "2026-06-01",
-   "by": "Reed"
-  },
-  {
    "k": "intent",
    "t": "Cohort price by intent",
    "v": "Not set",
@@ -3271,74 +3261,19 @@
  ],
  "DISCOUNTS": [
   {
-   "id": "dc1",
-   "code": "FIRST-INTERVIEW",
-   "name": "Automatic first-interview discount",
-   "pct": 100,
-   "applies": "interview",
-   "application": "automatic",
-   "start": "2026-01-01",
-   "end": "2027-12-31",
-   "limit": null,
-   "perCand": 1,
-   "deactivated": false,
-   "system": true,
-   "red": [
-    {
-     "cand": "Grace Kim",
-     "ref": "TXN-9034",
-     "txId": "t14",
-     "date": "2026-09-26",
-     "original": 95,
-     "discounted": 95,
-     "paid": 0,
-     "source": "Platform"
-    },
-    {
-     "cand": "Noah Kim",
-     "ref": "TXN-8980",
-     "txId": "",
-     "date": "2026-09-20",
-     "original": 95,
-     "discounted": 95,
-     "paid": 0,
-     "source": "Platform"
-    },
-    {
-     "cand": "Lucas Ferreira",
-     "ref": "TXN-8944",
-     "txId": "",
-     "date": "2026-09-14",
-     "original": 110,
-     "discounted": 110,
-     "paid": 0,
-     "source": "Platform"
-    },
-    {
-     "cand": "Chris Boone",
-     "ref": "TXN-8901",
-     "txId": "",
-     "date": "2026-09-08",
-     "original": 95,
-     "discounted": 95,
-     "paid": 0,
-     "source": "Platform"
-    }
-   ]
-  },
-  {
    "id": "dc2",
    "code": "WELCOME20",
    "name": "Welcome — 20% off",
-   "pct": 20,
-   "applies": "both",
-   "application": "checkout",
+   "kind": "pct",
+   "value": 20,
+   "scope": "track",
+   "tracks": [
+    "*"
+   ],
+   "courses": [],
    "start": "2026-09-01",
    "end": "2026-12-31",
-   "limit": 100,
-   "perCand": 1,
    "deactivated": false,
-   "system": false,
    "red": [
     {
      "cand": "Maryam Naz",
@@ -3348,7 +3283,7 @@
      "original": 100,
      "discounted": 20,
      "paid": 80,
-     "source": "Candidate"
+     "source": "Next in Leadership"
     },
     {
      "cand": "Ava Thompson",
@@ -3358,7 +3293,7 @@
      "original": 100,
      "discounted": 20,
      "paid": 80,
-     "source": "Candidate"
+     "source": "Next in Leadership"
     },
     {
      "cand": "Oliver Grant",
@@ -3368,7 +3303,7 @@
      "original": 195,
      "discounted": 39,
      "paid": 156,
-     "source": "Candidate"
+     "source": "Next in Leadership"
     },
     {
      "cand": "Liam Chen",
@@ -3378,7 +3313,7 @@
      "original": 100,
      "discounted": 20,
      "paid": 80,
-     "source": "Candidate"
+     "source": "Next in Leadership"
     }
    ]
   },
@@ -3386,30 +3321,30 @@
    "id": "dc3",
    "code": "AUTUMN15",
    "name": "Autumn course promotion",
-   "pct": 15,
-   "applies": "course",
-   "application": "checkout",
+   "kind": "pct",
+   "value": 15,
+   "scope": "course",
+   "tracks": [],
+   "courses": [
+    "E3"
+   ],
    "start": "2026-10-15",
    "end": "2026-12-15",
-   "limit": 50,
-   "perCand": 1,
    "deactivated": false,
-   "system": false,
    "red": []
   },
   {
    "id": "dc4",
    "code": "LAUNCH25",
    "name": "Launch — 25% off interviews",
-   "pct": 25,
-   "applies": "interview",
-   "application": "checkout",
+   "kind": "pct",
+   "value": 25,
+   "scope": "interview",
+   "tracks": [],
+   "courses": [],
    "start": "2026-06-01",
    "end": "2026-08-31",
-   "limit": 80,
-   "perCand": 1,
    "deactivated": false,
-   "system": false,
    "red": [
     {
      "cand": "Emma Novak",
@@ -3419,7 +3354,7 @@
      "original": 180,
      "discounted": 45,
      "paid": 135,
-     "source": "Candidate"
+     "source": "Next in Leadership"
     },
     {
      "cand": "Sophia Ali",
@@ -3429,7 +3364,7 @@
      "original": 200,
      "discounted": 50,
      "paid": 150,
-     "source": "Candidate"
+     "source": "Next in Leadership"
     },
     {
      "cand": "Jordan Vale",
@@ -3439,7 +3374,7 @@
      "original": 220,
      "discounted": 55,
      "paid": 165,
-     "source": "Candidate"
+     "source": "Next in Leadership"
     }
    ]
   },
@@ -3447,15 +3382,16 @@
    "id": "dc5",
    "code": "FIRST50",
    "name": "Early bird — 50% off first course",
-   "pct": 50,
-   "applies": "course",
-   "application": "checkout",
+   "kind": "pct",
+   "value": 50,
+   "scope": "course",
+   "tracks": [],
+   "courses": [
+    "*"
+   ],
    "start": "2026-08-01",
    "end": "2026-11-30",
-   "limit": 4,
-   "perCand": 1,
    "deactivated": false,
-   "system": false,
    "red": [
     {
      "cand": "Nathan Brooks",
@@ -3465,7 +3401,7 @@
      "original": 100,
      "discounted": 50,
      "paid": 50,
-     "source": "Candidate"
+     "source": "Next in Leadership"
     },
     {
      "cand": "Kai Andersen",
@@ -3475,7 +3411,7 @@
      "original": 100,
      "discounted": 50,
      "paid": 50,
-     "source": "Candidate"
+     "source": "Next in Leadership"
     },
     {
      "cand": "Noor Adib",
@@ -3485,7 +3421,7 @@
      "original": 100,
      "discounted": 50,
      "paid": 50,
-     "source": "Candidate"
+     "source": "Next in Leadership"
     },
     {
      "cand": "Diego Alvarez",
@@ -3495,7 +3431,7 @@
      "original": 100,
      "discounted": 50,
      "paid": 50,
-     "source": "Candidate"
+     "source": "Next in Leadership"
     }
    ]
   },
@@ -3503,15 +3439,16 @@
    "id": "dc6",
    "code": "PROMO10",
    "name": "General 10% promotion",
-   "pct": 10,
-   "applies": "both",
-   "application": "checkout",
+   "kind": "pct",
+   "value": 10,
+   "scope": "track",
+   "tracks": [
+    "*"
+   ],
+   "courses": [],
    "start": "2026-07-01",
    "end": "2026-12-31",
-   "limit": null,
-   "perCand": 2,
    "deactivated": true,
-   "system": false,
    "red": [
     {
      "cand": "Yusuf Demir",
@@ -3521,7 +3458,7 @@
      "original": 100,
      "discounted": 10,
      "paid": 90,
-     "source": "Candidate"
+     "source": "Next in Leadership"
     },
     {
      "cand": "Sophia Ali",
@@ -3531,9 +3468,37 @@
      "original": 150,
      "discounted": 15,
      "paid": 135,
-     "source": "Candidate"
+     "source": "Next in Leadership"
     }
    ]
+  },
+  {
+   "id": "dc7",
+   "code": "REINT10",
+   "name": "$10 off a re-interview",
+   "kind": "amount",
+   "value": 10,
+   "scope": "interview",
+   "tracks": [],
+   "courses": [],
+   "start": "2026-10-01",
+   "end": "2026-12-31",
+   "deactivated": false,
+   "red": []
+  },
+  {
+   "id": "dc8",
+   "code": "",
+   "name": "Black Friday sale",
+   "kind": "pct",
+   "value": 15,
+   "scope": "all",
+   "tracks": [],
+   "courses": [],
+   "start": "2026-11-27",
+   "end": "2026-11-30",
+   "deactivated": false,
+   "red": []
   }
  ],
  "SETTLEMENTS": [
@@ -5459,19 +5424,9 @@
   "delay": "Payout release delay",
   "runday": "Payout run day"
  },
- "DISC_APPLIES": {
-  "course": "Course fees",
-  "interview": "Interviews",
-  "both": "Both"
- },
- "DISC_APPLY": {
-  "checkout": "Entered at checkout",
-  "automatic": "Automatic"
- },
  "DISC_ORDER": {
   "live": 0,
   "scheduled": 1,
-  "exhausted": 2,
   "expired": 3,
   "deactivated": 4
  },

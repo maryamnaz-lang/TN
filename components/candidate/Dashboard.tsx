@@ -16,6 +16,7 @@ import { CourseOffer } from "./CourseOffer";
 import { QuizModal, EnrolledDialog } from "./Level";
 import { courseByKey } from "@/data/level";
 import { BookedDialog, bookHref } from "./Interviews";
+import { Price } from "../ui/Price";
 
 /* ============================================================
    CANDIDATE DASHBOARD — Phase 1's dashboard, stage by stage, minus the
@@ -123,9 +124,8 @@ function StageCard({ card, stage }: { card: Card; stage: string }) {
                 <Text role="compact" as="span" className={s.rating}><Icon name="star" />{A.rating} · {A.interviews} interviews</Text>
                 <Text role="compact" as="p" strong>{A.why}</Text>
                 <Text role="compact" as="p" className={s.meta}>
-                  {card.charged
-                    ? <span><Icon name="wallet" />${A.price} Interview Fee</span>
-                    : <span><Icon name="wallet" /><span className={s.free}>Free</span></span>}
+                  {/* A first interview shows no price, "Free" or "$0" (Maryam 26 Oct 2026). */}
+                  {card.charged && <span><Icon name="wallet" /><Price amount={A.price} /> Interview Fee</span>}
                   <span><Icon name="video" />{A.call}</span>
                   {card.charged && <span><Icon name="calendar" />Next slot: {A.nextSlot}</span>}
                 </Text>

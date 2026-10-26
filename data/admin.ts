@@ -8,6 +8,7 @@
    ============================================================ */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import raw from "./admin.json";
+import { COMMISSION_PCT, priceFor, type TrackKey } from "./fees";
 
 const D = raw as any;
 export type U = any;
@@ -46,14 +47,23 @@ export function face(name: string) {
 }
 
 export const money = (n: number) => "$" + Math.round(n).toLocaleString("en-US");
-/* An interview's price has two fixed parts (Maryam 19 Oct 2026): the talent agent's fee,
-   paid to the agent in full, and the platform fee TalentNext adds on top. Candidates pay
-   the sum. Both are set by a Super Admin per agent. PLATFORM_FEE is the default for an
-   agent with none set (AUTHORED PLACEHOLDER until the client names a figure). */
-export const PLATFORM_FEE = 25;
-export const agentFee = (u: { fee?: number }) => u.fee || 0;
-export const platformFee = (u: { platformFee?: number }) => u.platformFee ?? PLATFORM_FEE;
-export const candidatePrice = (u: { fee?: number; platformFee?: number }) => agentFee(u) + platformFee(u);
+/* THE INTERVIEW PRICE (Maryam 26 Oct 2026, data/fees.ts states the rule): the agent's fee
+   is set PER TRACK, `u.fees` (Explorer / Builder / Trailblazer), each paid to the agent in
+   full; TalentNext's COMMISSION is one percentage per agent, `u.commission` (default 20%),
+   separate from the fees and a share of what the candidate pays. Replaces the 19 Oct fixed
+   $25 platform fee. An agent saved before this carries only `u.fee`, which stands for all
+   three; `u.fee` is still written (the Explorer fee) for the single-fee reads. */
+export { FEE_TRACKS, COMMISSION_PCT, trackOf, priceFor, commissionFor, type TrackKey } from "./fees";
+export const trackFees = (u: { fee?: number; fees?: Partial<Record<TrackKey, number>> }): Record<TrackKey, number> => ({
+  explorer: u.fees?.explorer ?? u.fee ?? 0, builder: u.fees?.builder ?? u.fee ?? 0, trailblazer: u.fees?.trailblazer ?? u.fee ?? 0,
+});
+const span = (xs: number[]) => { const lo = Math.min(...xs), hi = Math.max(...xs); return lo === hi ? money(lo) : `${money(lo)}–${money(hi)}`; };
+export const commissionPct = (u: { commission?: number }) => u.commission ?? COMMISSION_PCT;
+/* "$85" when the three are equal, "$85–$120" when they differ; the price is each fee with the commission in. */
+export const feeRange = (u: U) => span(Object.values(trackFees(u)));
+export const platformFee = (u: { platformFee?: number }) => u.platformFee ?? 0;
+export const priceRange = (u: U) => span(Object.values(trackFees(u)).map((f) => priceFor(f, commissionPct(u), platformFee(u))));
+export const feesSet = (u: U) => Object.values(trackFees(u)).every((f) => f > 0);
 export const AGENTS = () => USERS.filter((u) => u.roles.includes("agent"));
 export const agScore = (a: U) => (a.scoreApproved === false ? a.startingScore : a.approvedScore ?? a.rating) as number;
 export const bkStage = (b: any) => (b.stage || "booked") as string;
@@ -67,8 +77,11 @@ export const bkStageTone = (b: any): [Tone, string] => [toneOf(BK_STAGE_HUE[bkSt
 export const isRe = (kind: string) => /re-?interview/i.test(String(kind || ""));
 export const bkFirst = (b: any) => /first/i.test(String(b.kind || ""));
 export const bkType = (b: any) => (isRe(b.kind) ? "Re-interview" : "First interview");
-export const bkFunding = (b: any) => (bkFirst(b) ? "First-interview discount" : "Candidate");
-export const bkPaid = (b: any) => (bkFirst(b) ? 0 : b.fee || 0);
+/* A first interview is free, not discounted (Maryam 26 Oct 2026): TalentNext pays the agent. */
+export const bkFunding = (b: any) => (bkFirst(b) ? "TalentNext (free first interview)" : "Candidate");
+/* A booking's `fee` is the AGENT's fee for it (their track fee, paid in full); what the
+   candidate paid is that with the 20% commission in (data/fees.ts). */
+export const bkPaid = (b: any) => (bkFirst(b) ? 0 : priceFor(b.fee || 0));
 const BK_ESCROW: Record<string, [string, string]> = D.BK_ESCROW;
 export const bkEscrow = (e: string): [Tone, string] | null => { const m = BK_ESCROW[e]; return m ? [toneOf(m[0]), m[1]] : null; };
 /* Dates: MM-DD-YYYY and a bare 12-hour time (Phase 1 dpFmt / slot12). */
@@ -103,19 +116,29 @@ export { cap };
 /* ---- Roles ---- */
 export const ROLE_BY_K: Record<string, any> = Object.fromEntries(ROLES.map((r) => [r.k, r]));
 export const STAFF_ROLE_KEYS: string[] = D.STAFF_ROLE_KEYS;
-export const staffRole = (u: U) => (u.roles || []).find((r: string) => (ROLE_BY_K[r] || {}).kind === "internal") || (u.roles || [])[0];
-export const staffRoleName = (u: U) => (ROLE_BY_K[staffRole(u)] || {}).name || "—";
+/* A person may hold several internal roles at once (Maryam, 23 Oct 2026: one invite,
+   any combination of roles). `staffRoles` is every one; `staffRole` the first, kept
+   for the places that need a single default. Only a staff account (`internal`)
+   holds internal roles: a seed agent carrying a stray internal key stays an agent. */
+export const staffRoles = (u: U): string[] => (u.internal ? (u.roles || []).filter((r: string) => (ROLE_BY_K[r] || {}).kind === "internal") : []);
+export const staffRole = (u: U) => staffRoles(u)[0] || (u.roles || [])[0];
+const roleNames = (ks: string[]) => ks.map((k) => (ROLE_BY_K[k] || {}).name).filter(Boolean).join(" · ");
+export const staffRoleName = (u: U) => roleNames(staffRoles(u)) || "—";
 const mainRole = (u: U) => ["candidate", "agent", "employer"].find((r) => u.roles.includes(r)) || u.roles[0] || "—";
-export const userTypeName = (u: U) => (u.internal ? staffRoleName(u) : (ROLE_BY_K[mainRole(u)] || {}).name || "—");
+/* The Type column names every role the person holds: "Talent Agent · Reviewer". */
+export const userTypeName = (u: U) => {
+  const ext = ["candidate", "agent", "employer"].filter((r) => u.roles.includes(r));
+  return roleNames([...ext, ...staffRoles(u)]) || (ROLE_BY_K[mainRole(u)] || {}).name || "—";
+};
 /* Role filter (CUT G8: Cohort Leader). Internal roles by their own names. */
 export const ROLE_FILTER: [string, string][] = [["all", "All"], ["candidate", "Candidate"], ["agent", "Talent Agent"],
   ...STAFF_ROLE_KEYS.filter((k) => k !== "admin").map((k) => [k, ROLE_BY_K[k]?.name] as [string, string])];
 export const roleGroup = (rf: string) => (rf === "all" ? "all" : STAFF_ROLE_KEYS.includes(rf) ? "internal" : rf);
 export const roleMatch = (u: U, rf: string) => rf === "all" ? true
-  : STAFF_ROLE_KEYS.includes(rf) ? !!u.internal && staffRole(u) === rf
-  : !u.internal && u.roles.includes(rf);
+  : STAFF_ROLE_KEYS.includes(rf) ? staffRoles(u).includes(rf)
+  : u.roles.includes(rf);
 /* All Users lists every account bar Super Admins and employers (Phase 1 usersBase). */
-export const usersBase = () => USERS.filter((u) => !u.roles.includes("employer") && !(u.internal && staffRole(u) === "admin"));
+export const usersBase = () => USERS.filter((u) => !u.roles.includes("employer") && !u.roles.includes("admin"));
 
 /* ---- Account status: Invited (pending / expired) · Active · Deactivated ---- */
 export function inviteDaysLeft(u: U) {
@@ -157,7 +180,7 @@ export function gateReasons(a: U) {
   if (a.status === "invited" || agDeactivated(a)) r.push("Account is not active");
   if (!(a.payoutMethod || PAYOUTS.some((p) => p.agent === a.name && p.method && p.method !== "—"))) r.push("No payout destination on file");
   if (agTraining(a) === "notcomplete") r.push("LightspeedVT training not complete");
-  if (!(a.profileOK !== false && !!a.fee)) r.push("Public profile or fee not complete");
+  if (!(a.profileOK !== false && feesSet(a))) r.push("Public profile or fee not complete");
   return r;
 }
 export const agState = (a: U) => a.status === "invited" ? "invited"

@@ -7,4 +7,8 @@
 .tick { width: var(--s05); height: var(--s05); color: var(--support-success); }
 .score { display: inline-flex; align-items: center; gap: var(--s01); }
 .star { width: var(--s05); height: var(--s05); color: var(--star); }
+/* "View Receipt" in the Payments table: the same link as the candidate's Payments receipt
+   (candidate/payments.module.css .lnk), so the two portals' receipts open from one look. */
+.lnk { color: var(--link); text-decoration: underline; white-space: nowrap; }
+.lnk:hover { color: var(--link-hover); }
 

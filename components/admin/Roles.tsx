@@ -11,7 +11,7 @@ import { Field, Input, TextArea } from "../ui/Field";
 import { Dropdown } from "../ui/Dropdown";
 import { Icon } from "../Icon";
 import { commit, toast, useStore } from "@/lib/store";
-import { RAW, ROLES, USERS, ROLE_BY_K, staffRole } from "@/data/admin";
+import { RAW, ROLES, USERS, ROLE_BY_K } from "@/data/admin";
 import s from "./roles.module.css";
 
 /* ============================================================
@@ -26,7 +26,7 @@ const ROWS: [string, string, string[]][] = RAW.PERM_ROWS;
 const PERMSET: Record<string, string[]> = RAW.PERMSET;
 const TOTAL = ROWS.reduce((n, r) => n + r[2].length, 0);
 const internal = () => ROLES.filter((r) => r.kind === "internal");
-const holders = (k: string) => USERS.filter((u) => u.internal && staffRole(u) === k && u.status !== "deleted").length;
+const holders = (k: string) => USERS.filter((u) => u.internal && u.roles.includes(k) && u.status !== "deleted").length;
 
 export function AdminRoles() {
   useStore();

@@ -18,6 +18,7 @@ import { commit, toast, useStore } from "@/lib/store";
 import {
   RAW, BOOKINGS, TXNS, BK_STAGE, BK_STAGE_ORDER, bkStage, bkStageTone, bkType, bkFirst, bkFunding, bkPaid, bkEscrow,
   bkWhen, dpFmt, slot12, emailOf, candEmail, scenesConsent, recStatus, face, money, toneOf, type Tone,
+  priceFor, commissionFor, COMMISSION_PCT,
 } from "@/data/admin";
 import s from "./admin.module.css";
 import t from "../candidate/interviews.module.css";
@@ -105,7 +106,9 @@ export function AdminBooking({ id }: { id: string }) {
     );
   }
   const txn = TXNS.find((x) => x.cat === "interview" && x.who === b.cand);
-  const plat = b.fee ? Math.round(b.fee * 0.2) : 0, share = (b.fee || 0) - plat;
+  /* `b.fee` is the agent's fee, paid in full; the candidate paid it with the commission in
+     (data/fees.ts, Maryam 26 Oct 2026). Was: 20% taken out of `b.fee`. */
+  const share = b.fee || 0, com = commissionFor(share), total = priceFor(share);
   const failed = b.transcript === "Failed";
   const tr = b.transcript === "Ready" ? "green" : b.transcript === "Failed" ? "red" : "warn";
   const consent = scenesConsent(b);
@@ -143,9 +146,9 @@ export function AdminBooking({ id }: { id: string }) {
       </Section>
       <Section>
         <SectionHeader title="Payment" />
-        <KV rows={[["Total booking value", b.fee && !bkFirst(b) ? money(b.fee) : "Free"], ["Candidate paid", money(bkPaid(b))], ["Funding source", bkFunding(b)], ["Payout state", <St key="p" v={bkEscrow(b.escrow)} />]]} />
+        <KV rows={[["Total booking value", b.fee && !bkFirst(b) ? money(total) : "Free"], ["Candidate paid", money(bkPaid(b))], ["Funding source", bkFunding(b)], ["Payout state", <St key="p" v={bkEscrow(b.escrow)} />]]} />
         {b.fee && !bkFirst(b)
-          ? <KV rows={[["Transaction", txn ? txn.ref : "No linked transaction"], ["Agent share", money(share)], ["Platform commission", `${money(plat)} · 20%`]]} />
+          ? <KV rows={[["Transaction", txn ? txn.ref : "No linked transaction"], ["Agent fee (paid in full)", money(share)], ["Commission", `${money(com)} · ${COMMISSION_PCT}%`]]} />
           : <Text role="desc" as="p">Complimentary first interview — nothing to settle.</Text>}
         <Text role="body" as="p" className="ink-helper">The transaction, agent share and commission are Finance data, shown here because a Super Admin holds Finance: View.</Text>
       </Section>

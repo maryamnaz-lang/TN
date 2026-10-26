@@ -8,7 +8,7 @@ import { Table, PersonCell, Status, RowMenu, type RowAction } from "../ui/Table"
 import { Tabs } from "../ui/Tabs";
 import { KV } from "../ui/KV";
 import { Button } from "../ui/Button";
-import { Dropdown } from "../ui/Dropdown";
+import { Dropdown, MultiDropdown } from "../ui/Dropdown";
 import { Search, Toolbar, Field, Input, TextArea } from "../ui/Field";
 import { DateFilter, isoOf } from "../ui/DateFilter";
 import { Sheet } from "../ui/Sheet";
@@ -17,6 +17,9 @@ import { Confirm } from "../ui/Confirm";
 import { Icon } from "../Icon";
 import { commit, toast, useStore } from "@/lib/store";
 import { RAW, TXNS, PAYOUTS, FEE_LOG, DISCOUNTS, SETTLEMENTS, face, money, dpFmt, type Tone } from "@/data/admin";
+import { FUNDER, KIND_OPTS, SCOPE_OPTS, discStatus, discUsed, discValue, valueLabel, appliesLabel, tracksLabel, coursesLabel, isPlatform, codeLabel } from "@/data/discounts";
+import { FEE_TRACKS } from "@/data/fees";
+import { COURSE_LIST } from "@/data/level";
 import s from "./admin.module.css";
 import f from "./finance.module.css";
 
@@ -86,7 +89,7 @@ export function AdminTransactions() {
             { key: "t", label: "Type", cell: (t) => TYPE[t.type] || t.type },
             { key: "p", label: "Party", cell: (t) => <PartyCell t={t} /> },
             { key: "a", label: "Amount", cell: (t) => (t.dir === "out" ? "−" : "") + (t.amt ? money(t.amt) : "—") },
-            { key: "s", label: "Split", cell: (t) => (t.sp ? `${money(t.sp.share)} agent · ${money(t.sp.com)} platform` : <Text role="caption" as="span">—</Text>) },
+            { key: "s", label: "Split", cell: (t) => (t.sp ? `${money(t.sp.share)} agent · ${money(t.sp.com)} commission` : <Text role="caption" as="span">—</Text>) },
             { key: "m", label: "Method", cell: (t) => <MethodMark method={t.method} /> },
             { key: "st", label: "Status", cell: (t) => <St m={RAW.TX_STATUS_META} k={t.status} /> },
           ]} />
@@ -104,6 +107,7 @@ export function AdminTransaction({ id }: { id: string }) {
   useStore();
   const t = TXNS.find((x) => x.id === id);
   if (!t) return null;
+  const disc = DISCOUNTS.flatMap((d) => (d.red || []).filter((r: any) => r.txId === t.id).map((r: any) => ({ d, r })))[0];
   const settled = t.status === "succeeded" ? `${dpFmt(t.date)}${t.time ? " · " + t.time : ""}` : t.status === "pending" ? "Not settled yet" : "—";
   return (
     <Page>
@@ -124,8 +128,22 @@ export function AdminTransaction({ id }: { id: string }) {
       {t.sp && (
         <Section>
           <SectionHeader title="Split" />
-          <KV rows={[["Agent fee", money(t.sp.fee)], ["Agent share", money(t.sp.share)], [`Platform commission (${t.sp.pct}%)`, money(t.sp.com)], ["Net", money(t.type === "payout" ? t.sp.share : t.sp.fee)]]} />
+          {/* The stored split already reads the 26 Oct 2026 rule (data/fees.ts): the candidate's
+              price, the agent's fee paid in full, and the commission as a share of the price. */}
+          <KV rows={[["Candidate paid", money(t.sp.fee)], ["Agent fee (paid in full)", money(t.sp.share)], [`Commission (${t.sp.pct}%)`, money(t.sp.com)], ["Net", money(t.type === "payout" ? t.sp.share : t.sp.fee)]]} />
           <Text role="caption" as="p">Read as stored — the share and commission add back to the gross exactly. The split is unchanged by who funded the interview.</Text>
+        </Section>
+      )}
+      {disc && (
+        <Section>
+          <SectionHeader title="Discount" />
+          {/* A code used on this purchase (Maryam 26 Oct 2026): the gap is funded by Next in
+              Leadership, so the agent's fee and TalentNext's share above are untouched. */}
+          <KV rows={[
+            ["Code", <Link key="c" className={f.link} href={`/admin/finance/discounts/${disc.d.id}/`}>{codeLabel(disc.d)}</Link>],
+            ["Price before discount", money(disc.r.original)], ["Discount", `−${money(disc.r.discounted)}`],
+            ["Candidate paid", money(disc.r.paid)], ["Funded by", FUNDER],
+          ]} />
         </Section>
       )}
       <Section>
@@ -222,31 +240,25 @@ export function AdminFeeSettings() {
   );
 }
 
-/* ---------------- 9.5 / 9.6 Discount Codes ---------------- */
-const APPLIES: Record<string, string> = RAW.DISC_APPLIES;
-const APPLY: Record<string, string> = RAW.DISC_APPLY;
+/* ---------------- 9.5 / 9.6 Discount Codes ----------------
+   Rebuilt 26 Oct 2026 (Maryam) on data/discounts.ts: a code is a percentage or a fixed
+   amount off; it applies to courses, interviews or both; it can be held to tracks and
+   (for courses) to chosen courses; on an interview it targets the whole price, the
+   interview commission or the platform fee. Every discount is funded by Next in Leadership. */
 const ORDER: Record<string, number> = RAW.DISC_ORDER;
-const discUsed = (d: any) => (d.red || []).length;
-const discValue = (d: any) => (d.red || []).reduce((n: number, r: any) => n + (Number(r.discounted) || 0), 0);
-function discStatus(d: any) {
-  if (d.deactivated) return "deactivated";
-  const t = todayISO();
-  if (d.end && d.end < t) return "expired";
-  if (d.limit != null && discUsed(d) >= d.limit) return "exhausted";
-  if (d.start && d.start > t) return "scheduled";
-  return "live";
-}
-const DISC_TONE: Record<string, [Tone, string]> = { live: ["green", "Live"], scheduled: ["warn", "Scheduled"], expired: ["red", "Expired"], exhausted: ["plain", "Exhausted"], deactivated: ["plain", "Deactivated"] };
+const DISC_TONE: Record<string, [Tone, string]> = { live: ["green", "Live"], scheduled: ["warn", "Scheduled"], expired: ["red", "Expired"], deactivated: ["plain", "Deactivated"] };
 const DiscSt = ({ d }: { d: any }) => { const [t, l] = DISC_TONE[discStatus(d)]; return <Status tone={t}>{l}</Status>; };
 const valid = (d: any) => `${dpFmt(d.start)} – ${dpFmt(d.end)}`;
-type DSheet = null | { k: "create" } | { k: "edit" | "deact" | "enable" | "disable"; id: string };
+const opts = (xs: [string, string][]) => xs.map(([value, label]) => ({ value, label }));
+const TRACK_OPTS = FEE_TRACKS.map((t) => ({ value: t.key, label: t.label }));
+const COURSE_OPTS = COURSE_LIST.map((c) => ({ value: c.key, label: c.name }));
+type DSheet = null | { k: "create" } | { k: "edit" | "deact"; id: string };
 function discActs(d: any, open: (x: DSheet) => void, go?: (h: string) => void): RowAction[] {
   const st = discStatus(d);
   const a: RowAction[] = go ? [{ icon: "view", label: "View", onClick: () => go(`/admin/finance/discounts/${d.id}/`) }] : [];
-  if (d.system) {
-    if (st === "deactivated") a.push({ icon: "play", label: "Enable", onClick: () => open({ k: "enable", id: d.id }) });
-    else if (st === "live") a.push({ icon: "pause", label: "Disable", onClick: () => open({ k: "disable", id: d.id }) });
-  } else if (st === "scheduled" || st === "live") {
+  /* No system-owned first-interview code: the first interview is simply free, never a
+     discount (Maryam 26 Oct 2026). Every code here is one an admin created. */
+  if (st === "scheduled" || st === "live") {
     a.push({ icon: "edit", label: "Edit", onClick: () => open({ k: "edit", id: d.id }) });
     a.push({ icon: "close", label: "Deactivate", onClick: () => open({ k: "deact", id: d.id }) });
   }
@@ -258,28 +270,31 @@ export function AdminDiscounts() {
   const [q, setQ] = useState(""), [st, setSt] = useState("all"), [ap, setAp] = useState("all");
   const [sheet, setSheet] = useState<DSheet>(null);
   const ql = q.toLowerCase();
-  const rows = DISCOUNTS.filter((d) => st === "all" || discStatus(d) === st).filter((d) => ap === "all" || d.applies === ap)
+  const rows = DISCOUNTS.filter((d) => st === "all" || discStatus(d) === st)
+    .filter((d) => ap === "all" || d.scope === ap)
     .filter((d) => !q || [d.code, d.name].some((x) => String(x).toLowerCase().includes(ql)))
     .sort((a, b) => ORDER[discStatus(a)] - ORDER[discStatus(b)] || String(a.end || "").localeCompare(String(b.end || "")));
   return (
     <Page>
-      <PageHeader title="Discount Codes" desc="Every discount code and how much it has funded — what is live, what has run its course, and what has cost more than it was meant to."
+      <PageHeader title="Discount Codes" desc={`Every discount code and how much it has given away. Discounts are funded by ${FUNDER}.`}
         actions={<Stack row gap={3}><ExportBtn what="Discount Codes" /><Button kind="primary" size="sm" icon="add" onClick={() => setSheet({ k: "create" })}>Create Discount Code</Button></Stack>} />
       <Section kind="tabs">
-        <Tabs value={st} onChange={setSt} items={["all", "scheduled", "live", "expired", "exhausted", "deactivated"].map((k) => ({ key: k, label: k === "all" ? "All" : DISC_TONE[k][1], count: DISCOUNTS.filter((d) => k === "all" || discStatus(d) === k).length }))} />
+        <Tabs value={st} onChange={setSt} items={["all", "scheduled", "live", "expired", "deactivated"].map((k) => ({ key: k, label: k === "all" ? "All" : DISC_TONE[k][1], count: DISCOUNTS.filter((d) => k === "all" || discStatus(d) === k).length }))} />
       </Section>
       <Section kind="block">
         <Toolbar search={<Search value={q} onChange={setQ} placeholder="Search by code or name" />}
-          filters={<Dropdown label="Applies to" value={ap} onChange={setAp} options={[["all", "All"], ["course", "Course fees"], ["interview", "Interviews"], ["both", "Both"]].map(([value, label]) => ({ value, label }))} />} />
+          filters={<>
+            <Dropdown label="Applies to" value={ap} onChange={setAp} options={[{ value: "all", label: "All" }, ...SCOPE_OPTS.map(([value, label]) => ({ value, label: value === "all" ? "Whole platform" : label }))]} />
+          </>} />
         {rows.length ? (
           <Table rows={rows} rowKey={(d) => d.id} href={(d) => `/admin/finance/discounts/${d.id}/`} actions={(d) => discActs(d, setSheet, router.push)} cols={[
-            { key: "c", label: "Code", cell: (d) => <span className={f.code}><span>{d.code.toUpperCase()}</span>{d.system && <Text role="label" as="span" strong ink="secondary" className={f.auto}>Automatic</Text>}</span> },
+            /* A whole-platform discount has no code: it applies on its own (Maryam 26 Oct 2026). */
+            { key: "c", label: "Code", cell: (d) => (isPlatform(d) ? <Text role="compact" as="span" ink="secondary">Automatic, no code</Text> : d.code.toUpperCase()) },
             { key: "n", label: "Name", cell: (d) => d.name },
-            { key: "p", label: "Discount", cell: (d) => `${d.pct}%` },
-            { key: "a", label: "Applies to", cell: (d) => APPLIES[d.applies] || d.applies },
-            { key: "ap", label: "Application", cell: (d) => APPLY[d.application] || d.application },
+            { key: "p", label: "Discount", cell: valueLabel },
+            { key: "a", label: "Applies to", cell: appliesLabel },
             { key: "v", label: "Valid", cell: valid },
-            { key: "u", label: "Used", cell: (d) => (d.limit == null ? `${discUsed(d)} · Unlimited` : `${discUsed(d)} / ${d.limit}`) },
+            { key: "u", label: "Used", cell: (d) => String(discUsed(d)) },
             { key: "g", label: "Value given", cell: (d) => money(discValue(d)) },
             { key: "s", label: "Status", cell: (d) => <DiscSt d={d} /> },
           ]} />
@@ -298,13 +313,19 @@ export function AdminDiscount({ id }: { id: string }) {
   const acts = discActs(d, setSheet);
   return (
     <Page>
-      <PageHeader back="/admin/finance/discounts/" title={d.code.toUpperCase()} desc={`${d.name} · ${d.pct}% off ${APPLIES[d.applies]}`}
+      <PageHeader back="/admin/finance/discounts/" title={codeLabel(d)} desc={`${isPlatform(d) ? "Automatic" : d.name} · ${valueLabel(d)} · ${appliesLabel(d)}`}
         actions={<span className={s.headAct}><DiscSt d={d} />{acts.length > 0 && <RowMenu items={acts} />}</span>} />
       <Section>
         <SectionHeader title="Summary" />
-        <KV rows={[["Code", d.code.toUpperCase()], ["Status", <DiscSt key="s" d={d} />], ["Discount", `${d.pct}% off ${APPLIES[d.applies]}`],
-          ["Application", APPLY[d.application] || d.application], ["Valid", valid(d)], ["Redemption limit", d.limit == null ? "No limit" : String(d.limit)],
-          ["Redemptions", d.limit == null ? `${used} · no limit` : `${used} / ${d.limit}`], ["Value given away", money(discValue(d))]]} />
+        <KV rows={[
+          ["Code", isPlatform(d) ? "None. It applies to every candidate price automatically while live." : d.code.toUpperCase()], ["Status", <DiscSt key="s" d={d} />],
+          ["Discount type", d.kind === "amount" ? "Fixed amount off" : "Percentage off"], ["Discount", valueLabel(d)],
+          ["Applies to", SCOPE_OPTS.find(([k]) => k === d.scope)?.[1] ?? d.scope],
+          /* Only the one follow-up its Applies-to choice has. */
+          ...(d.scope === "track" ? [["Tracks", tracksLabel(d)] as [string, string]] : []),
+          ...(d.scope === "course" ? [["Courses", coursesLabel(d)] as [string, string]] : []),
+          ["Valid", valid(d)], ["Redemptions", String(used)], ["Value given away", money(discValue(d))], ["Funded by", FUNDER],
+        ]} />
       </Section>
       <Section kind="block">
         <SectionHeader title="Redemptions" />
@@ -330,14 +351,10 @@ function DiscSheets({ sheet, close }: { sheet: DSheet; close: () => void }) {
   if (sheet.k === "create") return <DiscForm close={close} />;
   if (sheet.k === "edit") return <DiscForm id={sheet.id} close={close} />;
   const d = DISCOUNTS.find((x) => x.id === sheet.id)!;
-  const code = d.code.toUpperCase();
-  const cfg = {
-    deact: { title: `Deactivate ${code}`, hint: "The code stops working immediately. Discounts already given are unaffected.", ask: `Deactivate ${code}?`, desc: "It stops working immediately. Discounts already given are unaffected.", ok: "Deactivate", danger: true, stepup: false, on: true },
-    enable: { title: "Enable the automatic first-interview discount", hint: "Eligible first interviews will become free to candidates. Existing bookings are unchanged.", ask: "Enable the automatic first-interview discount?", desc: "Eligible first interviews will become free to candidates. Existing bookings are unchanged.", ok: "Enable", danger: false, stepup: true, on: false },
-    disable: { title: "Disable the automatic first-interview discount", hint: "Eligible first interviews will no longer be free to candidates. Existing bookings are unchanged.", ask: "Disable the automatic first-interview discount?", desc: "Eligible first interviews will no longer be free to candidates. Existing bookings are unchanged.", ok: "Disable", danger: true, stepup: true, on: true },
-  }[sheet.k];
-  return <ReasonThenConfirm title={cfg.title} hint={cfg.hint} ask={cfg.ask} desc={cfg.desc} ok={cfg.ok} danger={cfg.danger} stepup={cfg.stepup} close={close}
-    onOk={() => commit(() => { d.deactivated = cfg.on; }, sheet.k === "deact" ? `Discount code ${code} deactivated` : `Automatic first-interview discount ${sheet.k === "enable" ? "enabled" : "disabled"}`)} />;
+  const code = codeLabel(d);
+  return <ReasonThenConfirm title={`Deactivate ${code}`} hint="The code stops working immediately. Discounts already given are unaffected." ask={`Deactivate ${code}?`}
+    desc="It stops working immediately. Discounts already given are unaffected." ok="Deactivate" danger close={close}
+    onOk={() => commit(() => { d.deactivated = true; }, `Discount code ${code} deactivated`)} />;
 }
 function ReasonThenConfirm({ title, hint, ask, desc, ok, danger, stepup, close, onOk }: { title: string; hint: string; ask: string; desc: string; ok: string; danger?: boolean; stepup?: boolean; close: () => void; onOk: () => void }) {
   const [why, setWhy] = useState(""), [asking, setAsking] = useState(false);
@@ -353,46 +370,71 @@ function ReasonThenConfirm({ title, hint, ask, desc, ok, danger, stepup, close, 
 }
 
 /* Create (a plain form) / Edit (a Scheduled code: everything but the code; a
-   Live code: end date + usage limit only, with a reason and a step-up). */
+   Live code: end date only, with a reason and a step-up). Every code is unlimited
+   (Maryam 26 Oct 2026): no usage or per-candidate limit. Its one
+   follow-up (Tracks or Courses) shows only for that Applies-to choice. */
 function DiscForm({ id, close }: { id?: string; close: () => void }) {
   const d = id ? DISCOUNTS.find((x) => x.id === id) : null;
   const live = !!d && discStatus(d) === "live";
-  const [v, setV] = useState({ code: d?.code ?? "", name: d?.name ?? "", pct: d ? String(d.pct) : "", applies: d?.applies ?? "", start: d?.start ?? "", end: d?.end ?? "",
-    limit: d?.limit == null ? "" : String(d.limit), perCand: d?.perCand == null ? "" : String(d.perCand), reason: "" });
+  const [v, setV] = useState({ code: d?.code ?? "", name: d?.name ?? "", kind: d?.kind ?? "", value: d ? String(d.value) : "", scope: d?.scope ?? "",
+    start: d?.start ?? "", end: d?.end ?? "", reason: "" });
+  const [tracks, setTracks] = useState<string[]>(d?.tracks ?? []), [courses, setCourses] = useState<string[]>(d?.courses ?? []);
   const [ask, setAsk] = useState(false);
   const set = (k: string, x: string) => setV((o) => ({ ...o, [k]: x }));
-  const t = todayISO(), used = d ? discUsed(d) : 0;
-  const code = v.code.trim().toUpperCase(), pct = Number(v.pct), limit = v.limit === "" ? null : Number(v.limit), perCand = v.perCand === "" ? null : Number(v.perCand);
+  const t = todayISO();
+  const shape = { scope: v.scope };
+  /* ONE Applies-to choice, at most ONE follow-up (Maryam 26 Oct 2026): Tracks picks tracks,
+     Courses picks courses; the others need nothing more. */
+  const platform = isPlatform(shape), forTrack = v.scope === "track", forCourse = v.scope === "course";
+  const code = v.code.trim().toUpperCase(), value = Number(v.value);
   const err =
-    !d && !code ? "A code is required" : !d && DISCOUNTS.some((x) => x.code.toUpperCase() === code) ? "That code already exists"
-    : !v.name.trim() ? "A name is required" : !(pct >= 1 && pct <= 100) ? "Enter a discount between 1 and 100" : !v.applies ? "Choose what the code applies to"
+    !d && !platform && !code ? "A code is required" : !d && !platform && DISCOUNTS.some((x) => x.code.toUpperCase() === code) ? "That code already exists"
+    : !v.name.trim() ? "A name is required" : !v.kind ? "Choose a discount type"
+    : v.kind === "pct" && !(value >= 1 && value <= 100) ? "Enter a percentage between 1 and 100"
+    : v.kind === "amount" && !(value >= 1) ? "Enter an amount of $1 or more" : !v.scope ? "Choose what the code applies to"
+    : forTrack && !tracks.length ? "Pick at least one track" : forCourse && !courses.length ? "Pick at least one course"
     : !v.start ? "A start date is required" : !live && v.start < t ? "The start date must be today or later" : !v.end ? "An end date is required"
     : v.end < v.start ? "The end date must be on or after the start date" : live && v.end < t ? "The end date must be today or later"
-    : limit != null && !(limit >= 1) ? "The usage limit must be 1 or more" : live && limit != null && limit < used ? `The usage limit can’t be below the ${used} already redeemed`
-    : perCand != null && !(perCand >= 1) ? "The per-candidate limit must be 1 or more" : d && !v.reason.trim() ? "A reason is required" : "";
+    : d && !v.reason.trim() ? "A reason is required" : "";
   const save = () => commit(() => {
-    const ch = live ? { end: v.end, limit } : { name: v.name.trim(), pct, applies: v.applies, start: v.start, end: v.end, limit, perCand };
+    const ch = live ? { end: v.end }
+      : { name: v.name.trim(), kind: v.kind, value, scope: v.scope, tracks: forTrack ? tracks : [], courses: forCourse ? courses : [], start: v.start, end: v.end };
     if (d) Object.assign(d, ch);
-    else DISCOUNTS.unshift({ id: `dc${Date.now()}`, code, ...ch, application: "checkout", deactivated: false, system: false, red: [] });
-  }, d ? `Discount code ${d.code.toUpperCase()} updated` : `Discount code ${code} created`);
-  if (ask && d) return <Confirm icon="warning" stepup title={`Save these changes to ${d.code.toUpperCase()}?`} desc="Discounts already given are unaffected. The new values apply to redemptions made from now on." ok="Save Changes" onCancel={close} onOk={() => { save(); close(); }} />;
+    else DISCOUNTS.unshift({ id: `dc${Date.now()}`, code: platform ? "" : code, ...ch, deactivated: false, red: [] });
+  }, d ? `${codeLabel(d)} updated` : platform ? `${v.name.trim()} created. It applies automatically while live.` : `Discount code ${code} created`);
+  if (ask && d) return <Confirm icon="warning" stepup title={`Save these changes to ${codeLabel(d)}?`} desc="Discounts already given are unaffected. The new values apply to redemptions made from now on." ok="Save Changes" onCancel={close} onOk={() => { save(); close(); }} />;
+  const ro = (x: string) => <Input value={x} readOnly />;
   return (
-    <Slider open title={d ? `Edit discount code — ${d.code.toUpperCase()}` : "Create discount code"} onClose={close}
+    <Slider open title={d ? `Edit discount — ${codeLabel(d)}` : "Create discount code"} onClose={close}
       footer={<><Button kind="secondary" onClick={close}>Cancel</Button><Button kind="primary" disabled={!!err} onClick={() => (d ? setAsk(true) : (save(), close()))}>{d ? "Continue" : "Create Discount Code"}</Button></>}>
       <Stack gap={6}>
-        <Field label="Code" required={!d}><Input value={d ? d.code.toUpperCase() : v.code} readOnly={!!d} maxLength={24} onChange={(e) => set("code", e.target.value.toUpperCase())} placeholder="The string a candidate enters, e.g. WELCOME20" /></Field>
-        <Field label="Name" required={!live}><Input value={v.name} readOnly={live} onChange={(e) => set("name", e.target.value)} placeholder="Internal name for the promotion" /></Field>
-        <Field label="Discount (%)" required={!live}><Input inputMode="numeric" value={v.pct} readOnly={live} onChange={(e) => set("pct", e.target.value.replace(/\D/g, ""))} placeholder="1 to 100" /></Field>
-        <Field label="Applies to" required={!live}>
-          {live ? <Input value={APPLIES[v.applies]} readOnly /> : <Dropdown variant="form" placeholder="Choose what it applies to" value={v.applies || undefined} onChange={(x) => set("applies", x)} options={Object.entries(APPLIES).map(([value, label]) => ({ value, label }))} />}
+        {!platform && <Field label="Code" required={!d}><Input value={d ? d.code.toUpperCase() : v.code} readOnly={!!d} maxLength={24} onChange={(e) => set("code", e.target.value.toUpperCase())} placeholder="The string a candidate enters, e.g. WELCOME20" /></Field>}
+        <Field label="Name" required={!live} help={platform ? "Candidates see this name beside every discounted price." : undefined}><Input value={v.name} readOnly={live} onChange={(e) => set("name", e.target.value)} placeholder={platform ? "e.g. Black Friday sale" : "Internal name for the promotion"} /></Field>
+        <Field label="Discount type" required={!live}>
+          {live ? ro(KIND_OPTS.find(([k]) => k === v.kind)?.[1] ?? "") : <Dropdown variant="form" placeholder="Percentage or fixed amount" value={v.kind || undefined} onChange={(x) => set("kind", x)} options={opts(KIND_OPTS)} />}
         </Field>
-        <Field label="Start date" required={!live}>{live ? <Input value={dpFmt(v.start)} readOnly /> : <DateFilter label="Start" value={v.start} onChange={(x) => set("start", x)} />}</Field>
+        <Field label={v.kind === "amount" ? "Amount off ($)" : "Discount (%)"} required={!live}>
+          <Input inputMode="numeric" value={v.value} readOnly={live} onChange={(e) => set("value", e.target.value.replace(/\D/g, ""))} placeholder={v.kind === "amount" ? "e.g. 25" : "1 to 100"} />
+        </Field>
+        <Field label="Applies to" required={!live}>
+          {live ? ro(SCOPE_OPTS.find(([k]) => k === v.scope)?.[1] ?? "") : <Dropdown variant="form" placeholder="Choose what the discount covers" value={v.scope || undefined} onChange={(x) => set("scope", x)} options={opts(SCOPE_OPTS)} />}
+        </Field>
+        {forTrack && (
+          <Field label="Tracks" required={!live} help="Every course and interview on these tracks.">
+            {live ? ro(tracksLabel({ tracks })) : <MultiDropdown value={tracks} onChange={setTracks} options={TRACK_OPTS} placeholder="Choose tracks" allLabel="All tracks" />}
+          </Field>
+        )}
+        {forCourse && (
+          <Field label="Courses" required={!live}>
+            {live ? ro(coursesLabel({ courses })) : <MultiDropdown value={courses} onChange={setCourses} options={COURSE_OPTS} placeholder="Choose courses" allLabel="All courses" />}
+          </Field>
+        )}
+        <Field label="Start date" required={!live}>{live ? ro(dpFmt(v.start)) : <DateFilter label="Start" value={v.start} onChange={(x) => set("start", x)} />}</Field>
         <Field label="End date" required><DateFilter label="End" value={v.end} onChange={(x) => set("end", x)} /></Field>
-        <Field label="Usage limit"><Input inputMode="numeric" value={v.limit} onChange={(e) => set("limit", e.target.value.replace(/\D/g, ""))} placeholder="Leave blank for no limit" /></Field>
-        <Field label="Limit per candidate"><Input inputMode="numeric" value={live ? (v.perCand || "No limit") : v.perCand} readOnly={live} onChange={(e) => set("perCand", e.target.value.replace(/\D/g, ""))} placeholder="Leave blank for no per-candidate limit" /></Field>
         {d && <Field label="Reason" required><TextArea rows={3} maxLength={500} value={v.reason} onChange={(e) => set("reason", e.target.value)} placeholder="Recorded on the audit log (1–500 characters)." /></Field>}
-        <Text role="desc" as="p">{d ? (live ? "While a code is live, only the end date and the usage limit can be changed. The other fields are shown for reference." : "The code string is fixed for the life of the code.")
-          : "A user-created code is entered by the candidate at checkout. The automatic first-interview discount is system-owned and cannot be created here."}</Text>
+        {/* The create-form footnote (checkout + funding) is removed (Maryam 26 Oct 2026); only the
+            edit rules remain. */}
+        {d && <Text role="desc" as="p">{live ? "While a code is live, only the end date can be changed. The other fields are shown for reference." : "The code string is fixed for the life of the code."}</Text>}
         {err && v.name && <Text role="caption" as="p">{err}</Text>}
       </Stack>
     </Slider>

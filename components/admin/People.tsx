@@ -18,8 +18,8 @@ import { Rich } from "../agent/Interviews";
 import { rowActs, UserSheets, type SheetKey } from "./Users";
 import { commit, useStore } from "@/lib/store";
 import {
-  RAW, USER_BY_ID, BOOKINGS, PAST_IVS, PAYOUTS, TXNS, userCand, userTrack, staffRoleName,
-  userStatus, agRange, rangeLabel, face, money, agScore, toneOf, userByName, candidatePrice, type U,
+  RAW, USER_BY_ID, BOOKINGS, PAST_IVS, PAYOUTS, TXNS, userCand, userTrack, staffRoleName, staffRoles,
+  userStatus, agRange, rangeLabel, face, money, agScore, toneOf, userByName, feeRange, priceRange, type U,
 } from "@/data/admin";
 import p from "../candidate/profile.module.css";
 import iv from "../candidate/interviews.module.css";
@@ -252,7 +252,8 @@ function Agent({ u, menu }: { u: U; menu: React.ReactNode }) {
         <Stats>
           <Stat icon="wallet" label="Total earnings" value={money((u.interviewed || 0) * (u.fee || 0))} desc="Fees paid in full" />
           <Stat icon="video" label="Interviewed" value={String(u.interviewed || 0)} desc="sessions conducted" />
-          <Stat icon="creditCard" label="Talent agent fee" value={u.fee ? money(u.fee) : "—"} desc={u.fee ? `Candidates pay ${money(candidatePrice(u))}` : "Not set"} />
+          {/* Per-track fees (26 Oct 2026): the range across Explorer / Builder / Trailblazer. */}
+          <Stat icon="creditCard" label="Talent agent fee" value={u.fee || u.fees ? feeRange(u) : "—"} desc={u.fee || u.fees ? `Candidates pay ${priceRange(u)}` : "Not set"} />
           <Stat icon="growth" label="Assessment range" value={rangeLabel(agRange(u))} desc={`Agent Score ${agScore(u)?.toFixed(1) ?? "—"}`} />
         </Stats>
       </Section>
@@ -308,12 +309,13 @@ function Staff({ u, menu }: { u: U; menu: React.ReactNode }) {
       <Section>
         <SectionHeader title={u.name} desc={u.email} actions={menu} />
         <KV rows={[
-          ["Role", staffRoleName(u)], ["Status", <Status key="s" tone={t}>{l}</Status>], ["Job title", u.job || "—"], ["Department", u.dept || "—"],
+          [staffRoles(u).length > 1 ? "Roles" : "Role", staffRoleName(u)], ["Status", <Status key="s" tone={t}>{l}</Status>], ["Job title", u.job || "—"], ["Department", u.dept || "—"],
           ["Phone", u.phone || "—"], ["Added", u.joined], ["Invited by", u.invitedBy || "You"], ["Last signed in", u.last || "Never"],
         ]} />
       </Section>
       <Section>
-        <SectionHeader title={`What a ${staffRoleName(u)} can do`} desc="The permissions this role carries. Change them in the Roles module, not here." />
+        <SectionHeader title={staffRoles(u).length > 1 ? "What these roles can do" : `What a ${staffRoleName(u)} can do`}
+          desc={`The permissions ${staffRoles(u).length > 1 ? "these roles carry" : "this role carries"}. Change them in the Roles module, not here.`} />
         <Chips>{perms.map((k) => <Chip key={k}>{k}</Chip>)}</Chips>
       </Section>
       <Section>

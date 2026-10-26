@@ -49,3 +49,8 @@
 .opt.on { background: var(--overlay-selected); }
 .opt img { width: var(--s06); height: var(--s06); border-radius: var(--radius-pill); object-fit: cover; }
 .meta { margin-left: auto; padding-left: var(--s05); color: var(--text-secondary); }
+
+/* MultiDropdown: the trigger, then its picks as chips 12 below it. A picked
+   row carries no grey ground — its ticked box already says it is on. */
+.multi { display: flex; flex-direction: column; gap: var(--s04); width: 100%; min-width: 0; }
+.optMulti { gap: var(--s03); }

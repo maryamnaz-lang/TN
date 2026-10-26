@@ -93,3 +93,15 @@
 
 /* The last row draws no line of its own: the section's divider or air closes the list, so two lines never stack. */
 .ivFound:last-child { border-bottom: 0; }
+
+/* Invite User: each picked role's fields sit in a BLOCK of their own (Maryam 26 Oct
+   2026, replacing the hairline-above-a-heading section, which read as one long
+   jumbled form). A white panel (cards are white, DESIGN §3) inside the hairline,
+   inset 24 on every wall, its heading 16 above the first field. Blocks sit 32 apart,
+   the form's own field rhythm (the Stack gap). */
+.roleBlock { padding: var(--s06); background: var(--layer-01); border: var(--hairline) solid var(--rule); }
+/* Heading left, the red delete icon right (Maryam 26 Oct 2026: removes a role picked by mistake). */
+.roleBlockH { display: flex; align-items: center; justify-content: space-between; gap: var(--s04); margin-bottom: var(--sec-h-gap); }
+.roleBlockX { display: grid; place-items: center; flex: none; padding: var(--s02); color: var(--danger-ink); }
+.roleBlockX svg { width: var(--icon-page); height: var(--icon-page); }
+.roleBlockX:hover { background: var(--overlay-hover); }

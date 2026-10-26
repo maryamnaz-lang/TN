@@ -14,5 +14,8 @@
 .skills { display: flex; flex-wrap: wrap; gap: var(--s02); margin-top: var(--s03); }
 .chip { display: inline-flex; align-items: center; height: var(--s06); padding: 0 var(--s04); border-radius: var(--radius-pill); border: var(--hairline) solid var(--rule); color: var(--text-secondary); }
 
-.col { display: flex; flex-direction: column; gap: var(--s07); max-width: var(--bk-col); }
+/* The course payment column runs the full content width, so "Add a Card" sits at the right
+   end of the "Pay with" row and the card rows span like "Your Cards" in Payments (Maryam
+   26 Oct 2026; was capped at --bk-col, which left the button partway across). */
+.col { display: flex; flex-direction: column; gap: var(--s07); }
 .go { display: flex; }

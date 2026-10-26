@@ -26,9 +26,13 @@ export function CardRow({ c, on, onPick, action }: { c: Card; on?: boolean; onPi
 }
 
 /* <CardPicker> — pay from a saved card, never a re-typed one. The default is
-   selected on open. */
-export function CardPicker({ cards }: { cards: Card[] }) {
-  const [pick, setPick] = useState(Math.max(0, cards.findIndex((c) => c.def)));
+   selected on open. Pass `value`/`onChange` (an index) when the page needs to know the
+   pick, e.g. to name the card on the receipt; without them it keeps its own state. */
+export const defaultCard = (cards: Card[]) => Math.max(0, cards.findIndex((c) => c.def));
+export function CardPicker({ cards, value, onChange }: { cards: Card[]; value?: number; onChange?: (i: number) => void }) {
+  const [own, setOwn] = useState(defaultCard(cards));
+  const pick = value ?? own;
+  const setPick = (i: number) => { setOwn(i); onChange?.(i); };
   return (
     <div className={s.stack} role="radiogroup">
       {cards.map((c, i) => <CardRow key={c.last4} c={c} on={i === pick} onPick={() => setPick(i)} />)}

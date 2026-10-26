@@ -386,10 +386,18 @@ reference.)*
     - Status filter (Invited, Active, Deactivated)
     - search
     - **Invite User**
+    - **Changed (23 Oct 2026): one invite, any combination of roles.** The Roles field is a
+      multi-select (Talent Agent, Reviewer, Supervisor, Manager of Agents, Admin), shown as chips.
+      Name and email are asked once. Each picked role kind then adds its own section: Talent
+      Agent adds the two fees and the initial rating; the internal roles share ONE staff section
+      (phone, job title, department), since those belong to the person. Send Invite waits until
+      every section is complete. A person may now hold several internal roles: the Type column,
+      the Role filter, Roles & Permissions counts and the staff detail all read every role.
     - **Bulk Import**
     - **Export** (toast only)
     - row menu: View, Edit, agent listing controls (Pause/Restore listing, Set assessment range,
-      Override training gate), Change role, Mark as Talent Agent, Resend/Cancel invite,
+      Override training gate), Change roles (a multi-select that replaces the set), Mark as
+      Talent Agent, Resend/Cancel invite,
       Deactivate/Reactivate
     - bulk deactivate
     - no deletes (deactivate only)
@@ -464,7 +472,14 @@ All five pages are as in Phase 1:
 - **Fee Settings:** change log; commission is set on the agent record.
 - **Discount Codes:**
   - create, edit, deactivate
-  - enable / disable the automatic first-interview discount
+  - no first-interview code: the first interview is free, never a discount (Maryam 26 Oct 2026)
+  - a percentage or a fixed amount off; ONE "Applies to" choice with at most one follow-up:
+    Whole platform (automatic, no code, comes off every candidate price while live), Tracks
+    (pick tracks), Courses (pick courses, with an "All courses" row covering future ones too),
+    Interviews (always off the whole price; no "part" to pick). Funded by Next in Leadership,
+    so the agent's fee and TalentNext's share are never reduced (`data/discounts.ts`)
+  - every code is unlimited: no usage limit, no per-candidate limit, no Exhausted status
+  - candidates enter a code on the course payment and the re-interview checkout
   - code detail with redemptions
 - **Reconciliation:** settlement batches, batch detail, Re-check, Mark reviewed.
 

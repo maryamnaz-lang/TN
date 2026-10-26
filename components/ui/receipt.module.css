@@ -1,0 +1,8 @@
+/* THE RECEIPT (ui/Receipt.tsx). The title, then the rows over one hairline (label left,
+   value right, the Payments receipt as it was), then the total on its own hairline so the
+   amount reads as the line that matters. */
+.rec { display: flex; flex-direction: column; gap: var(--s05); }
+.head { display: flex; flex-direction: column; gap: var(--sec-desc-gap); }
+.kv { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--s03) var(--s05); padding-top: var(--s05); border-top: var(--hairline) solid var(--rule); }
+.kv > :nth-child(even) { text-align: right; justify-self: end; }
+.total { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s05); padding-top: var(--s05); border-top: var(--hairline) solid var(--rule); }

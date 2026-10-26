@@ -6,20 +6,23 @@
    Inès were `st:'req'`), so their open slots stay open slots.
    ============================================================ */
 import { PEOPLE } from "./seed";
+import { COMMISSION_PCT, FEE_TRACKS, priceFor, trackOf, type TrackFees } from "./fees";
 
 export const AGENT = {
   name: "Owen Clarke", first: "Owen", email: "owen.clarke@fieldstone.co",
   img: "/images/people/agent.jpg",
   range: "Explorer E2 – Builder B1", rangeShort: "E2 – B1",
-  /* Two fixed fees, both set by a Super Admin (Maryam 19 Oct 2026): the agent's fee, paid
-     to them in full, and the platform fee on top. Candidates pay the sum (price). */
-  fee: 85, share: 85, cut: 25, price: 110,
+  /* Set by a Super Admin (Maryam 26 Oct 2026, data/fees.ts): a fee PER TRACK, paid to the
+     agent in full, and one commission % that is a share of what the candidate pays. So an
+     Explorer interview is $88 to Owen and $110 to the candidate. AUTHORED PLACEHOLDER
+     figures; the Explorer price keeps the $110 the portal showed before. */
+  fees: { explorer: 88, builder: 100, trailblazer: 120 } as TrackFees, commission: COMMISSION_PCT,
   rating: 4.6, ivs: 164, month: 9,
   rank: 12, pool: 38,
   manager: { name: "Nadia Rahman", img: PEOPLE.lena.img },
   approvedScore: 4.5, rubric: 4.5, scoreAt: "1 July", reviewNext: "1 October",
   ivsQ: 47, cancels: 2, lateCancels: 1,
-  escrow: 204, earned: 612, grossHeld: 255,
+  earned: 612,
 };
 
 /* Five portraits across more than five people — Phase 1's own fidelity
@@ -85,6 +88,22 @@ export const IVS: Iv[] = [
   { id: "nina", n: "Nina Haddad", st: "done", day: "Friday 14 August", time: "4:00 PM", kind: "First interview", level: "Explorer – E4", signed: "15 August", money: "Paid 19 August", follow: 4.3, depth: 4.7 },
 ];
 export const ivById = (id: string) => IVS.find((x) => x.id === id);
+export const ivByName = (n: string) => IVS.find((x) => x.n === n);
+
+/* THE FEE FOR ONE INTERVIEW is the agent's fee for the candidate's track (their set level,
+   else the quiz band), paid in full; the candidate paid it with the commission in. */
+const $ = (n: number) => `$${n}`;
+export const ivFee = (x: Pick<Iv, "level" | "band">) => AGENT.fees[trackOf(x.level || x.band)];
+export const ivPrice = (x: Pick<Iv, "level" | "band">) => priceFor(ivFee(x), AGENT.commission);
+/* A payments row names a person: their interview's fee, else the Explorer fee. */
+export const payFee = (name: string) => { const x = IVS.find((i) => i.n === name); return x ? ivFee(x) : AGENT.fees.explorer; };
+/* The three fees as one figure: "$88–$120". */
+export const FEE_SPAN = (() => { const v = FEE_TRACKS.map((t) => AGENT.fees[t.key]); return `${$(Math.min(...v))}–${$(Math.max(...v))}`; })();
+/* What is held: every interview whose recording is still to confirm. Held for the agent is
+   their fees; the candidates paid those with the commission in. */
+const HELD = IVS.filter((x) => x.st === "report");
+export const HELD_FOR_YOU = HELD.reduce((n, x) => n + ivFee(x), 0);
+export const HELD_TOTAL = HELD.reduce((n, x) => n + ivPrice(x), 0);
 export const first = (n: string) => n.split(" ")[0];
 /* "Thursday 20 August" → "20 August" (Phase 1 drops the weekday on a card). */
 export const dayDate = (d: string) => d.replace(/^\w+ /, "");

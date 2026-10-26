@@ -11,7 +11,8 @@ import { Confirm } from "../ui/Confirm";
 import { Icon } from "../Icon";
 import { Availability } from "./Slots";
 import { useDemo } from "@/lib/demo";
-import { AGENT as A, PUB, SPECIALISMS, INDUSTRIES, INTENTS, AGENT_NOTIF_TOGGLES } from "@/data/agent";
+import { AGENT as A, PUB, SPECIALISMS, INDUSTRIES, INTENTS, AGENT_NOTIF_TOGGLES, FEE_SPAN } from "@/data/agent";
+import { FEE_TRACKS } from "@/data/fees";
 import p from "../candidate/profile.module.css";
 import s from "./agent.module.css";
 
@@ -30,13 +31,12 @@ export function AgentProfile() {
   const [ind, setInd] = useState(PUB.industries);
   const [int, setInt] = useState(PUB.intents);
   const [specs, setSpecs] = useState(SPECIALISMS);
-  const [fee, setFee] = useState(A.fee);
   return (
     <Page>
       <PageHeader title="Profile" desc="Your details, the public profile candidates see, and privacy." />
       <Section kind="tabs"><Tabs value={tab} onChange={setTab} items={TABS} /></Section>
-      {tab === "me" && <Mine ind={ind} setInd={setInd} int={int} setInt={setInt} specs={specs} setSpecs={setSpecs} fee={fee} setFee={setFee} />}
-      {tab === "public" && <Public ind={ind} int={int} specs={specs} fee={fee} />}
+      {tab === "me" && <Mine ind={ind} setInd={setInd} int={int} setInt={setInt} specs={specs} setSpecs={setSpecs} />}
+      {tab === "public" && <Public ind={ind} int={int} specs={specs} />}
       {tab === "priv" && <Privacy />}
     </Page>
   );
@@ -63,9 +63,9 @@ function Id({ meta, dot, act }: { meta: ReactNode; dot?: boolean; act?: ReactNod
   );
 }
 
-function Mine({ ind, setInd, int, setInt, specs, setSpecs, fee, setFee }: {
+function Mine({ ind, setInd, int, setInt, specs, setSpecs }: {
   ind: string[]; setInd: (v: string[]) => void; int: string[]; setInt: (v: string[]) => void;
-  specs: string[]; setSpecs: (v: string[]) => void; fee: number; setFee: (v: number) => void;
+  specs: string[]; setSpecs: (v: string[]) => void;
 }) {
   const [edit, setEdit] = useState<null | "details" | "specs" | "ind" | "int">(null);
   const acts = (onSave: () => void) => (
@@ -90,17 +90,20 @@ function Mine({ ind, setInd, int, setInt, specs, setSpecs, fee, setFee }: {
               <Field label="Name"><Input defaultValue={A.name} /></Field>
               <Field label="Email"><Input defaultValue={A.email} readOnly /></Field>
             </FormRow>
-            {/* The fee is set by TalentNext, not the agent (Maryam 19 Oct 2026), so it is read-only here. */}
-            <Field label="Your interview fee" help={`Set by TalentNext and paid to you in full. Candidates pay $${A.price}, which includes the platform fee.`}>
-              <Input value={`$${fee}`} readOnly />
-            </Field>
+            {/* The fees are set by TalentNext, not the agent (Maryam 19 Oct 2026), so they are
+                read-only here: one per level group (26 Oct 2026), each paid to the agent in full. */}
+            {FEE_TRACKS.map((t, i) => (
+              <Field key={t.key} label={`${t.label} fee`} help={i === FEE_TRACKS.length - 1 ? "Set by TalentNext and paid to you in full." : undefined}>
+                <Input value={`$${A.fees[t.key]}`} readOnly />
+              </Field>
+            ))}
             <Field label="About"><TextArea rows={5} defaultValue={PUB.about} /></Field>
           </Form>
         </Section>
       ) : (
         <Section kind="block">
           <Facts>
-            <Fact icon="wallet" label="Your fee" value={`$${fee}`} />
+            <Fact icon="wallet" label="Your fee" value={FEE_SPAN} />
             <Fact icon="growth" label="Assesses" value={A.rangeShort} />
             <Fact icon="video" label="Interviews" value={String(A.ivs)} />
             <Fact icon="starOutline" label="Rating" value={String(A.rating)} />
@@ -167,7 +170,7 @@ function Pick({ opts, sel, onChange }: { opts: string[]; sel: string[]; onChange
   );
 }
 
-function Public({ ind, int, specs, fee }: { ind: string[]; int: string[]; specs: string[]; fee: number }) {
+function Public({ ind, int, specs }: { ind: string[]; int: string[]; specs: string[] }) {
   return (
     <>
       <Section kind="block" noline>
@@ -175,7 +178,7 @@ function Public({ ind, int, specs, fee }: { ind: string[]; int: string[]; specs:
       </Section>
       <Section kind="block" bare>
         <Stats>
-          <Stat icon="wallet" label="Interview Fee" value={`$${fee}`} />
+          <Stat icon="wallet" label="Interview Fee" value={FEE_SPAN} />
           <Stat icon="calendar" label="Availability" value={PUB.hoursFig} />
           <Stat icon="time" label="Evaluation Time" value="24 hrs" />
           <Stat icon="work" label="Experience" value={PUB.yrs} />

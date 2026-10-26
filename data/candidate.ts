@@ -6,6 +6,7 @@
    ============================================================ */
 import type { IconName } from "@/lib/icons";
 import { PEOPLE } from "./seed";
+import { COMMISSION_PCT, priceFor } from "./fees";
 
 export type QA = { icon: IconName; title: string; desc: string; href?: string; ring?: number };
 
@@ -14,7 +15,9 @@ export const AGENT_PRIYA = {
   img: PEOPLE.priya.img,
   rating: 4.8,
   interviews: 210,
-  price: 95,
+  /* What this (Explorer) candidate pays Priya: her Explorer fee, $76, with the 20% commission
+     in (data/fees.ts, 26 Oct 2026). Same fees as her row in data/interviews.ts. */
+  price: priceFor(76, COMMISSION_PCT),
   call: "45 mins call",
   role: "Talent agent",
   expertise: "System Architecture, assesses E1–E3",

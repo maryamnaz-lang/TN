@@ -43,6 +43,10 @@
   .nm > :first-child { white-space: nowrap; }
 }
 .agt { --agt-cols: minmax(min-content, auto) minmax(max-content, auto) minmax(max-content, auto) minmax(max-content, auto) max-content; }
+/* A FIRST interview shows no price at all (Maryam 26 Oct 2026), so the Rate column goes and
+   the table is four columns; the re-interview keeps it. */
+.agt.noRate { --agt-cols: minmax(min-content, auto) minmax(max-content, auto) minmax(max-content, auto) max-content; }
+.noRate .agtH, .noRate .agtR { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1.6fr) minmax(0, .6fr) var(--act-col); }
 @container page (max-width: 819.98px) {
   .agtH { display: none; }
   .agtR { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); padding: var(--s05) 0; }
@@ -77,6 +81,10 @@
 .meta > span { display: inline-flex; align-items: center; gap: var(--s02); }
 .meta svg { width: var(--s05); height: var(--s05); }
 .col { max-width: var(--bk-col); margin: 0 auto; display: flex; flex-direction: column; gap: var(--s07); }
+/* Checkout's "Pay with" runs the full content width, like the course Payment page, so "Add a
+   Card" sits at the right end of its row (Maryam 26 Oct 2026). The booking page keeps the
+   centred column around its Calendly picture. */
+.col.full { max-width: none; margin: 0; }
 .shot { width: 100%; height: auto; border: var(--hairline) solid var(--rule); }
 .go { display: flex; }
 

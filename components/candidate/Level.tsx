@@ -7,7 +7,13 @@ import { Accordion } from "../ui/Accordion";
 import { Button } from "../ui/Button";
 import { Modal } from "../ui/Modal";
 import { Dialog } from "../ui/Dialog";
-import { CardPicker, PayModal } from "../ui/CardPicker";
+import { CardPicker, PayModal, defaultCard } from "../ui/CardPicker";
+import { ReceiptModal } from "../ui/Receipt";
+import { DiscountField, type Applied } from "../ui/DiscountField";
+import { redeem, saleFor } from "@/data/discounts";
+import { Price } from "../ui/Price";
+import { PEOPLE } from "@/data/seed";
+import { purchase, type Payment } from "@/data/payments";
 import { Icon } from "../Icon";
 import { LevelCard } from "./LevelCard";
 import { CourseOffer } from "./CourseOffer";
@@ -94,7 +100,7 @@ export function CoursesPage() {
               </div>
               <div className={`${t.tags} ${t.tagsC}`}>{c.topics.slice(0, 2).map((x) => <Text key={x} role="label" as="span" className={t.tag}>{x}</Text>)}{c.topics.length > 2 && <Text role="label" as="span" className={t.tag}>+{c.topics.length - 2}</Text>}</div>
               <div className={e.len}><Text role="caption" as="span" className={t.cellL}>Length</Text><Text role="compact" as="span">{c.chapters}</Text></div>
-              <div><Text role="caption" as="span" className={t.cellL}>Fee</Text><Text role="compact" as="span" strong>${c.fee}</Text></div>
+              <div><Text role="caption" as="span" className={t.cellL}>Fee</Text><Text role="compact" as="span" strong><Price amount={c.fee} /></Text></div>
               <div className={t.act}><Button kind="primary" size="sm" href={`/candidate/enrollment/course/${c.key}/`}>View Course</Button></div>
             </div>
           ))}
@@ -136,11 +142,27 @@ export function CoursePage({ k }: { k: string }) {
    $690, no interview credit (Phase 1, 8 Oct 2026). Paying enrols: stage →
    Week 1 (the cohort-not-started stage is cut) and "Enrollment Confirmed". */
 export function CoursePayPage({ k }: { k: string }) {
-  const { stage, setStage, setUi } = useDemo();
+  const { stage, setStage, ui, setUi } = useDemo();
   const router = useRouter();
   const c = courseByKey(k);
   const [add, setAdd] = useState(false);
-  const pay = () => { setUi({ enrolled: c.key }); setStage("week1"); router.push("/candidate/"); };
+  const [card, setCard] = useState(defaultCard(SAVED_CARDS));
+  const [review, setReview] = useState(false);
+  const [disc, setDisc] = useState<Applied>(null);
+  /* "Pay" opens the receipt first (Maryam 26 Oct 2026); confirming it records the row the
+     Payments ledger shows and enrols. The item is the COURSE NAME, not its track and level (Maryam 26 Oct 2026).
+     A discount code (data/discounts.ts) lowers what is charged and is recorded on the code. */
+  /* A live whole-platform discount applies on its own; a typed code replaces it only if bigger. */
+  const auto = saleFor(c.fee);
+  const eff: Applied = disc ?? (auto ? { code: auto.name, off: auto.off, d: auto.d } : null);
+  const bill = purchase(c.key.toLowerCase(), c.name, c.fee, SAVED_CARDS[card], eff ?? undefined);
+  const pay = () => {
+    if (eff) redeem(eff.d, PEOPLE.maryam.name, `TXN-${String(Date.now()).slice(-4)}`, c.fee, eff.off);
+    const made = (ui.purchases as Payment[] | undefined) ?? [];
+    setUi({ enrolled: c.key, purchases: [bill, ...made.filter((p) => p.id !== bill.id)] });
+    setStage("week1");
+    router.push("/candidate/");
+  };
   return (
     <Page>
       <PageHeader title="Payment" back={`/candidate/enrollment/course/${c.key}/`} desc="Choose a saved card to pay for the course and start it." />
@@ -149,12 +171,14 @@ export function CoursePayPage({ k }: { k: string }) {
         <div className={s.col}>
           <div>
             <SectionHeader small title="Pay with" actions={<Button kind="ghost" icon="add" asIs onClick={() => setAdd(true)}>Add a Card</Button>} />
-            <CardPicker cards={SAVED_CARDS} />
+            <CardPicker cards={SAVED_CARDS} value={card} onChange={setCard} />
           </div>
-          <div className={s.go}><Button kind="primary" go onClick={pay}>Pay ${c.fee} and start</Button></div>
+          <DiscountField ctx={{ kind: "course", courseKey: c.key, price: c.fee }} cand={PEOPLE.maryam.name} value={disc} onChange={setDisc} auto={auto} />
+          <div className={s.go}><Button kind="primary" go onClick={() => setReview(true)}>Pay ${c.fee - (eff?.off ?? 0)} and start</Button></div>
         </div>
       </Section>
       {add && <PayModal onClose={() => setAdd(false)} />}
+      {review && <ReceiptModal r={bill} review onClose={() => setReview(false)} onConfirm={pay} />}
     </Page>
   );
 }
@@ -165,9 +189,13 @@ export function EnrolledDialog() {
   const k = ui.enrolled as Course["key"] | undefined;
   if (!k) return null;
   const close = () => setUi({ enrolled: undefined });
+  /* The fee is what was actually paid (Maryam 26 Oct 2026): the purchase just recorded for this
+     course, after any discount code or sale, not the catalogue price. */
+  const bought = ((ui.purchases as Payment[] | undefined) ?? []).find((p) => p.id === k.toLowerCase());
+  const paid = bought ? Number(bought.amount.replace(/[^\d.]/g, "")) : undefined;
   return (
     <Dialog icon="checkFilled" title="Enrollment Confirmed" onClose={close}
-      fee={{ label: "Course Fee", value: `$${courseByKey(k).fee}` }}
+      fee={{ label: "Course Fee", value: <Price amount={courseByKey(k).fee} paid={paid} /> }}
       desc="Your payment was successful, and your enrollment is confirmed. You’re ready to begin your learning journey on TALENTnext."
       actions={<Button kind="secondary" onClick={close}>Close</Button>} />
   );

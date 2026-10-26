@@ -1,9 +1,9 @@
 "use client";
 import { useState } from "react";
-import { Page, PageHeader, Section, SectionHeader, Text } from "../primitives";
-import { Status, Table } from "../ui/Table";
+import { Page, PageHeader, Section, SectionHeader } from "../primitives";
+import { Table } from "../ui/Table";
 import { Button } from "../ui/Button";
-import { Modal } from "../ui/Modal";
+import { ReceiptModal } from "../ui/Receipt";
 import { Confirm } from "../ui/Confirm";
 import { PayModal, CardRow } from "../ui/CardPicker";
 import c from "../ui/cards.module.css";
@@ -18,8 +18,9 @@ import s from "./payments.module.css";
    opens as a modal, never a page) and Your Cards (Add a Card = the Stripe
    picture; Remove confirms first). */
 export function PaymentsPage() {
-  const { stage } = useDemo();
-  const rows = payments(stage);
+  const { stage, ui } = useDemo();
+  /* What was bought in this visit (a re-interview, a course) lands here with its receipt. */
+  const rows = payments(stage, (ui.purchases as Payment[] | undefined) ?? []);
   const [receipt, setReceipt] = useState<Payment | null>(null);
   const [cards, setCards] = useState(SAVED_CARDS);
   const [remove, setRemove] = useState<string | null>(null);
@@ -48,20 +49,8 @@ export function PaymentsPage() {
         </div>
       </Section>
 
-      {receipt && (
-        <Modal label="Receipt" onClose={() => setReceipt(null)} footer={<Button kind="secondary" onClick={() => setReceipt(null)}>Close</Button>}>
-          <div className={s.rec}>
-            <Text role="h3">TalentNext Receipt</Text>
-            <div className={s.kv}>
-              <Text role="compact" as="span" ink="secondary">Paid for</Text><Text role="compact" as="span" strong>{receipt.item}</Text>
-              <Text role="compact" as="span" ink="secondary">Date</Text><Text role="compact" as="span" strong>{receipt.date}</Text>
-              <Text role="compact" as="span" ink="secondary">Card</Text><Text role="compact" as="span" strong>{receipt.card ? `${receipt.brand} •••• ${receipt.card}` : "—"}</Text>
-              <Text role="compact" as="span" ink="secondary">Amount</Text><Text role="compact" as="span" strong>{receipt.amount}</Text>
-              <Text role="compact" as="span" ink="secondary">Status</Text><Status tone="green">Paid</Status>
-            </div>
-          </div>
-        </Modal>
-      )}
+      {/* The shared receipt (ui/Receipt.tsx), the same one shown before paying. */}
+      {receipt && <ReceiptModal r={receipt} onClose={() => setReceipt(null)} />}
       {remove && (
         <Confirm icon="delete" title="Remove this card?" danger ok="Remove"
           desc={`The card ending ${remove} will be removed from your account.`}

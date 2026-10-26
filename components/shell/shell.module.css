@@ -174,6 +174,54 @@
 .node { position: relative; }
 .body:not([data-open="true"]) .subs { display: none; }
 
+/* SUPER ADMIN: THE SHUT RAIL'S SUB-MODULE FLYOUT IS BACK (Maryam 26 Oct 2026, "in phase
+   one we show this kind of drop down on hovering a module ... implement the same on the
+   phase zero design for the super admin portal"). Phase 1 §120.1c, value for value: a
+   white panel with the hairline and the menu shadow, floating 8px clear of the rail,
+   sub-modules as plain left-aligned rows, hidden until the module is hovered or focused.
+   The 19 Oct version failed because the rail's own scroll box clipped it (overflow-y:auto
+   forces overflow-x to auto), so only its shadow showed. The fix is Phase 1's: the shut
+   ≥900 rail goes overflow:visible (its icon column fits the frame, nothing needed the
+   scroll) and sits above the content so the panel paints over the page. The open rail and
+   the phone drawer keep the inline subs above. Admin only; the agent portal is unchanged. */
+@container app (min-width: 900px) {
+  .admin .body:not([data-open="true"]) .rail { overflow: visible; position: relative; z-index: 26; }
+  .admin .body:not([data-open="true"]) .subs {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: calc(-1 * var(--s02));
+    left: calc(100% + var(--s03));
+    min-width: var(--rail-flyout-w);
+    padding: var(--s03) 0;
+    background: var(--layer-01);
+    border: var(--hairline) solid var(--rule);
+    box-shadow: var(--shadow-menu);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateX(calc(-1 * var(--s02)));
+    transition: opacity var(--mo-quick) var(--mo-standard), transform var(--mo-quick) var(--mo-standard), visibility var(--mo-quick);
+    z-index: 60;
+  }
+  .admin .body:not([data-open="true"]) .node:hover > .subs,
+  .admin .body:not([data-open="true"]) .node:focus-within > .subs {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: none;
+  }
+  /* an invisible bridge across the 8px gap, so the pointer can travel to the panel */
+  .admin .body:not([data-open="true"]) .subs::before {
+    content: "";
+    position: absolute;
+    top: 0; bottom: 0;
+    left: calc(-1 * var(--s03));
+    width: var(--s03);
+  }
+  .admin .body:not([data-open="true"]) .sub { height: var(--rail-flyout-row-h); padding: 0 var(--s05); }
+}
+
 .main {
   position: relative;
   min-width: 0;

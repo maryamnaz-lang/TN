@@ -15,8 +15,6 @@
 .link { color: var(--link); text-decoration: underline; }
 /* A reference that opens its transaction reads as the platform link (Phase 1 .lnk). */
 .ref { color: var(--link); text-decoration: underline; }
-.code { display: inline-flex; align-items: center; gap: var(--s03); }
-.auto { padding: var(--chip-py) var(--chip-px); border: var(--hairline) solid var(--rule); border-radius: var(--radius-pill); }
 .clamp { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; white-space: normal; max-width: var(--rec-card-w); }
 
 /* A note band: a mark, a heading and its line. */

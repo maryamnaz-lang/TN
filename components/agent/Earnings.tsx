@@ -7,7 +7,9 @@ import { Table, Status } from "../ui/Table";
 import { Button } from "../ui/Button";
 import { PayModal } from "../ui/CardPicker";
 import { Icon } from "../Icon";
-import { AGENT as A, IVS, PAYMENTS, PAYOUT, PHOTO, dayDate } from "@/data/agent";
+import { AGENT as A, IVS, PAYMENTS, PAYOUT, PHOTO, dayDate, ivFee, payFee, FEE_SPAN, HELD_FOR_YOU, HELD_TOTAL, ivByName, type PayRow } from "@/data/agent";
+import { Receipt } from "../ui/Receipt";
+import { priceFor } from "@/data/fees";
 import s from "./money.module.css";
 
 /* ============================================================
@@ -15,8 +17,31 @@ import s from "./money.module.css";
    figures, what's holding up your pay (at most two rows), the payments
    ledger, and the one payout destination (a Stripe reference, 13.1).
    ============================================================ */
+const tone = (r: PayRow): "green" | "warn" | "plain" => (r.st === "green" ? "green" : r.st === "warn" ? "warn" : "plain");
+
+/* An interview's RECEIPT for the agent (Maryam 26 Oct 2026): the shared candidate/agent
+   receipt, read the agent's way — what the candidate paid, TalentNext's commission and the
+   agent's own fee (the same three the interview's fee panel shows), where it is paid, and
+   the row's own status. The agent buys nothing, so there is no review-before-paying step. */
+function EarningReceipt({ r, onClose }: { r: PayRow; onClose: () => void }) {
+  const fee = payFee(r.n), price = priceFor(fee, A.commission), kind = ivByName(r.n)?.kind ?? "Interview";
+  return (
+    <Receipt title="Interview Receipt" onClose={onClose}
+      rows={[
+        ["Interview", `${kind} · ${r.n}`],
+        ["Held on", r.d],
+        ["Candidate paid", `$${price}`],
+        [`Commission (${A.commission}%)`, `$${price - fee}`],
+        ["Paid to", `${PAYOUT.bank} •••• ${PAYOUT.last}`],
+      ]}
+      status={{ tone: tone(r), text: r.s }}
+      total={["Your fee", `$${fee}`]} />
+  );
+}
+
 export function AgentEarnings() {
   const [pay, setPay] = useState(false);
+  const [receipt, setReceipt] = useState<PayRow | null>(null);
   const owed = IVS.filter((x) => x.st === "report").slice(0, 2);
   return (
     <Page>
@@ -27,9 +52,10 @@ export function AgentEarnings() {
         <SectionHeader title="This month" />
         <Stats>
           <Stat icon="wallet" label="Earned" value={`$${A.earned}`} desc="released to your account" />
-          <Stat icon="locked" label="Held for you" value={`$${A.escrow}`} desc={`of $${A.grossHeld} gross held`} />
+          <Stat icon="locked" label="Held for you" value={`$${HELD_FOR_YOU}`} desc={`of $${HELD_TOTAL} gross held`} />
           <Stat icon="video" label="Interviews" value={String(A.month)} desc={`${A.ivs} in total`} />
-          <Stat icon="creditCard" label="Each" value={`$${A.share}`} desc="Your fee, paid in full" />
+          {/* Per-track fees (26 Oct 2026): the range, set by the candidate's level. */}
+          <Stat icon="creditCard" label="Each" value={FEE_SPAN} desc="Your fee by level, paid in full" />
         </Stats>
       </Section>
       <Section>
@@ -37,7 +63,7 @@ export function AgentEarnings() {
         <PersonList>
           {owed.map((x) => (
             <PersonRow key={x.id} img={PHOTO[x.id]} name={x.n}
-              lines={[`Interviewed ${dayDate(x.day)} · $${A.share} waiting on the recording`]}
+              lines={[`Interviewed ${dayDate(x.day)} · $${ivFee(x)} waiting on the recording`]}
               action={<Button kind="link" go href={`/agent/interviews/${x.id}/`}>Send Recommendation</Button>} />
           ))}
         </PersonList>
@@ -49,9 +75,11 @@ export function AgentEarnings() {
         <Table rows={PAYMENTS} rowKey={(r) => r.n + r.d} cols={[
           { key: "n", label: "Interview", cell: (r) => r.n },
           { key: "d", label: "When", cell: (r) => r.d },
-          { key: "f", label: "Fee", cell: () => `$${A.fee}` },
-          { key: "y", label: "Yours", cell: () => `$${A.share}` },
-          { key: "s", label: "Status", cell: (r) => <Status tone={r.st === "green" ? "green" : r.st === "warn" ? "warn" : "plain"}>{r.s}</Status> },
+          /* "Fee" is what the candidate paid; "Yours" is your fee for their level, paid in full. */
+          { key: "f", label: "Fee", cell: (r) => `$${priceFor(payFee(r.n), A.commission)}` },
+          { key: "y", label: "Yours", cell: (r) => `$${payFee(r.n)}` },
+          { key: "s", label: "Status", cell: (r) => <Status tone={tone(r)}>{r.s}</Status> },
+          { key: "r", label: "Receipt", cell: (r) => <button type="button" className={s.lnk} onClick={() => setReceipt(r)}>View Receipt</button> },
         ]} />
       </Section>
       <Section>
@@ -66,6 +94,7 @@ export function AgentEarnings() {
         </div>
       </Section>
       {pay && <PayModal onClose={() => setPay(false)} />}
+      {receipt && <EarningReceipt r={receipt} onClose={() => setReceipt(null)} />}
     </Page>
   );
 }

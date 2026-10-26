@@ -31,7 +31,10 @@ export function Onboarding() {
       return () => clearTimeout(t);
     }
   }, []);
-  const load = (then: () => void) => { setLoading(true); setTimeout(() => { setLoading(false); then(); }, 2000); };
+  /* `leave` keeps the loader on through a route change: clearing it first repainted "You're all
+     set" while /candidate/ was still loading, so the screen jumped back before the dashboard. */
+  const load = (then: () => void, leave = false) => { setLoading(true); setTimeout(() => { if (!leave) setLoading(false); then(); }, 2000); };
+  useEffect(() => { router.prefetch("/candidate/"); }, [router]);
   const q = step >= 1 && step <= N ? OB_Q[step - 1] : null;
   const ready = !q ? true : q.t === "dd" ? !!ans[q.k] && (ans[q.k] !== "other" || !!ans[`${q.k}-other`]) : !!ans[q.k]?.trim();
   const pct = step === 0 ? 0 : step > N ? 100 : ((step - 1) / N) * 100;
@@ -102,7 +105,7 @@ export function Onboarding() {
                       ))}
                     </div>
                     <div className={s.foot}>
-                      <Button kind="primary" go onClick={() => load(() => { setStage("new"); router.push("/candidate/"); })}>Find an Agent</Button>
+                      <Button kind="primary" go onClick={() => load(() => { setStage("new"); router.push("/candidate/"); }, true)}>Find an Agent</Button>
                     </div>
                   </>
                 )}

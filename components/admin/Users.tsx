@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { Page, PageHeader, Section, Stack, Text } from "../primitives";
 import { Table, PersonCell, Status, BulkBar, type RowAction } from "../ui/Table";
 import { Button } from "../ui/Button";
-import { Dropdown } from "../ui/Dropdown";
+import { Dropdown, MultiDropdown } from "../ui/Dropdown";
 import { Field, Input, TextArea, Search, Toolbar } from "../ui/Field";
 import { Slider } from "../ui/Slider";
 import { Sheet } from "../ui/Sheet";
@@ -13,9 +13,9 @@ import { Icon } from "../Icon";
 import { commit, toast, useStore } from "@/lib/store";
 import {
   RAW, USERS, USER_BY_ID, ROLE_FILTER, ROLE_BY_K, STAFF_ROLE_KEYS, USER_STATUS_OPTS, LVL_CODES,
-  usersBase, roleGroup, roleMatch, userStatusKey, userStatus, userTypeName, staffRole, staffRoleName,
+  usersBase, roleGroup, roleMatch, userStatusKey, userStatus, userTypeName, staffRoles, staffRoleName,
   userCand, candLevel, userTrack, agState, agStateTone, agTraining, agTrainTone, agRange, rangeLabel, rangeCovers,
-  agScore, face, money, personHref, PLATFORM_FEE, type U,
+  agScore, face, money, personHref, COMMISSION_PCT, FEE_TRACKS, trackFees, feeRange, priceFor, commissionPct, platformFee, type TrackKey, type U,
 } from "@/data/admin";
 import s from "./admin.module.css";
 
@@ -81,7 +81,7 @@ export function AdminUsers() {
       { key: "i", label: "Interviews", cell: (u: U) => String(u.interviewed || 0) },
       { key: "tr", label: "Training", cell: (u: U) => { if (u.status === "invited") return "—"; const [t, l] = agTrainTone(u); return <Status tone={t}>{l}</Status>; } },
       { key: "as", label: "Assesses", cell: (u: U) => rangeLabel(agRange(u)) },
-      { key: "fe", label: "Fee", cell: (u: U) => (u.fee ? money(u.fee) : "—") },
+      { key: "fe", label: "Fee", cell: (u: U) => (u.fee || u.fees ? feeRange(u) : "—") },
       { key: "sa", label: "State", cell: (u: U) => { if (u.status === "invited") return st(u); const [t, l] = agStateTone(u); return <Status tone={t}>{l}</Status>; } }]
     : g === "internal" ? [name,
       { key: "j", label: "Job title", cell: (u: U) => u.job || "—" }, { key: "d", label: "Department", cell: (u: U) => u.dept || "—" },
@@ -132,25 +132,28 @@ export function rowActs(u: U, open: (s: SheetKey) => void, go?: (href: string) =
   const off: RowAction = active
     ? { icon: "deactivate", label: "Deactivate", onClick: () => open({ k: u.internal ? "deactivate" : "deactext", id: u.id }) }
     : { icon: "play", label: "Reactivate", onClick: () => open({ k: u.internal ? "reactivate" : "reactext", id: u.id }) };
-  if (u.internal) {
-    if (!active) return [...view, off];
-    const prot = u.orig ? "The original Super Admin account is protected" : null;
-    return [...view,
-      ...(prot ? [] : [{ icon: "edit", label: "Edit", onClick: () => open({ k: "editstaff", id: u.id }) } as RowAction,
-        { icon: "group", label: "Change Role", onClick: () => open({ k: "changerole", id: u.id }) } as RowAction]),
-      ...(u.roles.includes("agent") ? [] : [{ icon: "verified", label: "Mark as Talent Agent", onClick: () => open({ k: "markagent", id: u.id }) } as RowAction]),
-      ...(prot ? [] : [off])];
-  }
-  if (u.roles.includes("agent") && !u.roles.includes("candidate")) {
+  /* The agent's own steps, shared by an agent and by a staff member who is also one. */
+  const agentActs = (editLabel: string): RowAction[] => {
     const stt = agState(u);
-    return [...view,
-      { icon: "edit", label: "Edit", onClick: () => open({ k: "editagent", id: u.id }) },
+    return [
+      { icon: "edit", label: editLabel, onClick: () => open({ k: "editagent", id: u.id }) },
       ...(stt === "listed" ? [{ icon: "pause", label: "Pause Listing", onClick: () => open({ k: "agpause", id: u.id }) } as RowAction] : []),
       ...(stt === "paused" ? [{ icon: "play", label: "Restore Listing", onClick: () => open({ k: "agrestore", id: u.id }) } as RowAction] : []),
       { icon: "flag", label: "Set Assessment Range", onClick: () => open({ k: "agrange", id: u.id }) },
       ...(agTraining(u) === "notcomplete" ? [{ icon: "check", label: "Override Training Gate", onClick: () => open({ k: "agoverride", id: u.id }) } as RowAction] : []),
-      off];
+    ];
+  };
+  if (u.internal) {
+    if (!active) return [...view, off];
+    const prot = u.orig ? "The original Super Admin account is protected" : null;
+    const both = u.roles.includes("agent");
+    return [...view,
+      ...(prot ? [] : [{ icon: "edit", label: both ? "Edit Staff Details" : "Edit", onClick: () => open({ k: "editstaff", id: u.id }) } as RowAction,
+        { icon: "group", label: "Change Roles", onClick: () => open({ k: "changerole", id: u.id }) } as RowAction]),
+      ...(both ? agentActs("Edit Agent Details") : [{ icon: "verified", label: "Mark as Talent Agent", onClick: () => open({ k: "markagent", id: u.id }) } as RowAction]),
+      ...(prot ? [] : [off])];
   }
+  if (u.roles.includes("agent") && !u.roles.includes("candidate")) return [...view, ...agentActs("Edit"), off];
   return [...view, ...(userCand(u) ? [{ icon: "edit", label: "Edit", onClick: () => open({ k: "editcand", id: u.id }) } as RowAction] : []), off];
 }
 const mdy = (d: Date) => `${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}-${d.getFullYear()}`;
@@ -233,15 +236,18 @@ function AgRange({ u, close }: { u: U; close: () => void }) {
   );
 }
 
+/* Change roles: the internal roles a person holds, as a set. A person may hold
+   several (23 Oct 2026); the sheet replaces the whole set and needs at least one. */
 function ChangeRole({ u, close }: { u: U; close: () => void }) {
-  const [role, setRole] = useState(staffRole(u));
+  const [roles, setRoles] = useState<string[]>(staffRoles(u).filter((k) => k !== "admin"));
+  const names = andList(roles.map((k) => ROLE_BY_K[k].name));
   return (
-    <Sheet title={`Change ${u.name}’s role`} onClose={close}
-      footer={<Foot ok="Confirm" close={close} onOk={() => { commit(() => { u.roles = [role, ...u.roles.filter((r: string) => !STAFF_ROLE_KEYS.includes(r))]; }, `${u.name} is now ${ROLE_BY_K[role].name}`); close(); }} />}>
+    <Sheet title={`Change ${u.name}’s roles`} onClose={close}
+      footer={<Foot ok="Confirm" disabled={!roles.length} close={close} onOk={() => { commit(() => { u.roles = [...u.roles.filter((r: string) => !STAFF_ROLE_KEYS.includes(r) || r === "admin"), ...roles]; }, `${u.name} is now ${names}`); close(); }} />}>
       <Field label="User"><Input value={`${u.name} · ${u.email}`} readOnly /></Field>
-      <Field label="Current role"><Input value={staffRoleName(u)} readOnly /></Field>
-      <Field label="New role" required><Dropdown variant="form" value={role} onChange={setRole} options={INTERNAL_ROLES.map(opt)} /></Field>
-      <Text role="desc" as="p">The role replaces the current one, never adds to it. They are notified and their access changes immediately.</Text>
+      <Field label="Current roles"><Input value={staffRoleName(u)} readOnly /></Field>
+      <Field label="Roles" required><MultiDropdown value={roles} onChange={setRoles} options={INTERNAL_ROLES.map(opt)} placeholder="Select roles" /></Field>
+      <Text role="desc" as="p">These replace the roles they hold now. They are notified and their access changes immediately.</Text>
     </Sheet>
   );
 }
@@ -259,79 +265,144 @@ function StarPick({ value, onChange }: { value: number; onChange: (n: number) =>
   );
 }
 const RatingField = ({ value, onChange }: { value: number; onChange: (n: number) => void }) => (
-  <Field label="Initial rating" required help="Their starting Agent Score out of 5, shown to candidates until the first quarterly review replaces it.">
+  <Field label="Initial rating" required>
     <StarPick value={value} onChange={onChange} />
   </Field>
 );
 
-/* The two fixed fees that make up an interview's price, with the candidate's price
-   worked out live underneath. Used by every form that creates or edits an agent. */
+/* The fees that make up an interview's price, with the candidate's price worked out live
+   underneath. Used by every form that creates or edits an agent. THE AGENT'S FEE IS SET
+   PER TRACK (Maryam 26 Oct 2026): an Explorer, a Builder and a Trailblazer fee, each paid
+   to the agent in full. Then ONE Commission (%), separate from all three, prefilled at 20
+   (was a $25 "Platform fee"); it is a share of the candidate's price (data/fees.ts). The
+   labels name the level group, not the word "track". */
 const num = (x: string) => Number(String(x).replace(/[^\d.]/g, "")) || 0;
-function FeeFields({ fee, plat, onFee, onPlat }: { fee: string; plat: string; onFee: (x: string) => void; onPlat: (x: string) => void }) {
-  const total = num(fee) + num(plat);
+type FeeStr = Record<TrackKey, string>;
+const NO_FEES: FeeStr = { explorer: "", builder: "", trailblazer: "" };
+const COM_DEFAULT = String(COMMISSION_PCT);
+const feeStr = (u: U): FeeStr => { const f = trackFees(u); return { explorer: f.explorer ? String(f.explorer) : "", builder: f.builder ? String(f.builder) : "", trailblazer: f.trailblazer ? String(f.trailblazer) : "" }; };
+const feeNum = (f: FeeStr) => ({ explorer: num(f.explorer), builder: num(f.builder), trailblazer: num(f.trailblazer) });
+/* A commission is required and 0–99 (100 would leave no price to divide). */
+const comOk = (com: string) => com.trim() !== "" && num(com) < 100;
+/* The platform fee is a required flat dollar amount ($0 allowed). */
+const platOk = (pf: string) => pf.trim() !== "";
+const feesReady = (f: FeeStr, com: string, pf: string) => FEE_TRACKS.every((t) => num(f[t.key]) > 0) && comOk(com) && platOk(pf);
+/* What a save writes: the three fees, `fee` (the Explorer fee) for the single-fee reads, the commission and the platform fee. */
+const feeSave = (f: FeeStr, com: string, pf: string) => ({ fees: feeNum(f), fee: num(f.explorer), commission: num(com), platformFee: num(pf) });
+function FeeFields({ fees, com, pf, onFee, onCom, onPf }: { fees: FeeStr; com: string; pf: string; onFee: (k: TrackKey, x: string) => void; onCom: (x: string) => void; onPf: (x: string) => void }) {
+  const set = FEE_TRACKS.filter((t) => num(fees[t.key]) > 0);
   return (
     <>
-      <Field label="Talent agent fee (USD)" required help="Paid to the talent agent in full for each interview.">
-        <Input value={fee} onChange={(e) => onFee(e.target.value)} inputMode="decimal" placeholder="e.g. 100" />
+      <Stack gap={6}>
+        {FEE_TRACKS.map((t) => (
+          <Field key={t.key} label={`${t.label} fee`} required>
+            <Input value={fees[t.key]} onChange={(e) => onFee(t.key, e.target.value)} inputMode="decimal" placeholder="$100" />
+          </Field>
+        ))}
+      </Stack>
+      <Field label="Interview commission (%)" required>
+        <Input value={com} onChange={(e) => onCom(e.target.value)} inputMode="decimal" placeholder={COM_DEFAULT} />
       </Field>
-      <Field label="Platform fee (USD)" required help="Added to the talent agent fee and retained by TalentNext.">
-        <Input value={plat} onChange={(e) => onPlat(e.target.value)} inputMode="decimal" placeholder={`e.g. ${PLATFORM_FEE}`} />
+      {/* Platform fee: a flat $ amount after the commission (Maryam 26 Oct 2026). */}
+      <Field label="Platform fee" required>
+        <Input value={pf} onChange={(e) => onPf(e.target.value)} inputMode="decimal" placeholder="$25" />
       </Field>
-      <Text role="body" as="p">{num(fee) ? <>Candidates pay <b>{money(total)}</b> per interview.</> : "Candidates’ price per interview appears once both fees are set."}</Text>
+      {/* The price line shows only once a fee is set; no placeholder line before that (Maryam 26 Oct 2026). */}
+      {set.length > 0 && comOk(com) && platOk(pf) && (
+        <Text role="body" as="p">
+          Candidates pay {set.map((t, i) => <span key={t.key}>{i ? (i === set.length - 1 ? " and " : ", ") : ""}<b>{money(priceFor(num(fees[t.key]), num(com), num(pf)))}</b> ({t.label})</span>)} per interview.
+        </Text>
+      )}
     </>
   );
 }
 
 function MarkAgent({ u, close }: { u: U; close: () => void }) {
-  const [rating, setRating] = useState(0), [fee, setFee] = useState(""), [plat, setPlat] = useState(String(PLATFORM_FEE));
+  const [rating, setRating] = useState(0), [fees, setFees] = useState<FeeStr>(NO_FEES), [com, setCom] = useState(COM_DEFAULT), [pf, setPf] = useState("");
   return (
     <Sheet title={`Invite ${u.name} to be a talent agent`} onClose={close}
-      footer={<Foot ok="Send Invite" disabled={!rating || !num(fee) || !num(plat)} close={close} onOk={() => { commit(() => { u.roles = [...u.roles, "agent"]; u.fee = num(fee); u.platformFee = num(plat); u.startingScore = rating; u.scoreApproved = false; u.onboarded = false; }, `Agent invite sent to ${u.email}`); close(); }} />}>
+      footer={<Foot ok="Send Invite" disabled={!rating || !feesReady(fees, com, pf)} close={close} onOk={() => { commit(() => { u.roles = [...u.roles, "agent"]; Object.assign(u, feeSave(fees, com, pf)); u.startingScore = rating; u.scoreApproved = false; u.onboarded = false; }, `Agent invite sent to ${u.email}`); close(); }} />}>
       <Text role="desc" as="p">{u.name} keeps their current account and role. Set their interview fees and starting Agent Score; an invitation to the agent workspace is sent.</Text>
-      <FeeFields fee={fee} plat={plat} onFee={setFee} onPlat={setPlat} />
+      <FeeFields fees={fees} com={com} pf={pf} onFee={(k, x) => setFees((f) => ({ ...f, [k]: x }))} onCom={setCom} onPf={setPf} />
       <RatingField value={rating} onChange={setRating} />
     </Sheet>
   );
 }
 
-/* Invite User: one slider, the role a dropdown of every role an admin may add
-   (Phase 1 ADDUSER_ROLES; CUT G8: Cohort Leader). The role reveals its fields. */
+/* Invite User: one slider, one invite, ANY combination of roles (Maryam, 23 Oct
+   2026). The Roles field is a multi-select of every role an admin may add (Phase 1
+   ADDUSER_ROLES; CUT G8: Cohort Leader). Name and email are asked once; each picked
+   role kind then adds its own headed section. Phone, job title and department
+   belong to the PERSON, so every picked internal role shares ONE staff section,
+   headed with their names. Values typed into a section survive removing and
+   re-adding its role. */
+const ROLE_OPTS = [{ value: "agent", label: "Talent Agent" }, ...INTERNAL_ROLES.map(opt)];
+/* One picked role's fields, in a block of their own: a white panel inside a hairline,
+   its heading at the top (Maryam 26 Oct 2026: a divider alone "is looking very confusing"). */
+/* Its top-right carries a red delete icon that takes the role(s) back out of the pick, for a
+   role added by mistake (Maryam 26 Oct 2026). */
+function RoleBlock({ title, onRemove, children }: { title: string; onRemove: () => void; children: ReactNode }) {
+  return (
+    <section className={s.roleBlock}>
+      <div className={s.roleBlockH}>
+        <Text role="sec" as="h3">{title}</Text>
+        <button type="button" className={s.roleBlockX} onClick={onRemove} aria-label={`Remove ${title}`} title={`Remove ${title}`}>
+          <Icon name="delete" />
+        </button>
+      </div>
+      <Stack gap={6}>{children}</Stack>
+    </section>
+  );
+}
+const andList = (xs: string[]) => (xs.length < 2 ? xs.join("") : `${xs.slice(0, -1).join(", ")} and ${xs[xs.length - 1]}`);
 function AddUser({ close }: { close: () => void }) {
-  const roles: [string, string][] = [["agent", "Talent Agent"], ...INTERNAL_ROLES];
-  const [role, setRole] = useState("agent");
-  const [v, setV] = useState({ first: "", last: "", email: "", phone: "", job: "", dept: "", fee: "", plat: String(PLATFORM_FEE) });
+  const [roles, setRoles] = useState<string[]>([]);
+  const [v, setV] = useState({ first: "", last: "", email: "", phone: "", job: "", dept: "", com: COM_DEFAULT, pf: "" });
+  const [fees, setFees] = useState<FeeStr>(NO_FEES);
   const [rating, setRating] = useState(0);
   const set = (k: keyof typeof v) => (e: { target: { value: string } }) => setV((x) => ({ ...x, [k]: e.target.value }));
-  const internal = role !== "agent";
-  const ready = v.first.trim() && v.last.trim() && v.email.trim() && (internal ? v.job.trim() && v.dept : rating > 0 && num(v.fee) > 0 && num(v.plat) > 0);
+  const agent = roles.includes("agent");
+  const staff = roles.filter((r) => r !== "agent");
+  const staffNames = staff.map((k) => ROLE_BY_K[k].name);
+  const ready = roles.length > 0 && v.first.trim() && v.last.trim() && v.email.trim()
+    && (!agent || (rating > 0 && feesReady(fees, v.com, v.pf)))
+    && (!staff.length || (v.job.trim() && v.dept && v.phone.trim()));
   const send = () => {
     commit(() => {
       USERS.push({
-        id: `u${Date.now()}`, name: `${v.first.trim()} ${v.last.trim()}`, email: v.email.trim(), roles: [role], status: "invited", invitedOn: mdy(new Date()),
-        joined: mdy(new Date()), last: "Never", level: "—", ...(internal ? { internal: true, job: v.job, dept: v.dept, phone: v.phone }
-          : { fee: num(v.fee), platformFee: num(v.plat), startingScore: rating, scoreApproved: false, interviewed: 0, onboarded: false, training: "notcomplete" }),
+        id: `u${Date.now()}`, name: `${v.first.trim()} ${v.last.trim()}`, email: v.email.trim(), roles: [...roles], status: "invited", invitedOn: mdy(new Date()),
+        joined: mdy(new Date()), last: "Never", level: "—",
+        ...(staff.length ? { internal: true, job: v.job, dept: v.dept, phone: v.phone } : {}),
+        ...(agent ? { ...feeSave(fees, v.com, v.pf), startingScore: rating, scoreApproved: false, interviewed: 0, onboarded: false, training: "notcomplete" } : {}),
       });
-    }, `Invite sent to ${v.email.trim()}`);
+    }, `Invite sent to ${v.email.trim()} as ${andList(roles.map((r) => ROLE_OPTS.find((o) => o.value === r)!.label))}`);
     close();
   };
   return (
     <Slider title="Add a user" open onClose={close} footer={<Foot ok="Send Invite" disabled={!ready} close={close} onOk={send} />}>
+      {/* The person first, then their roles (Maryam 26 Oct 2026): name and email, the Roles
+          pick under them, and each picked role's fields in a block of their own. */}
       <Stack gap={6}>
-        <Field label="Role" required><Dropdown variant="form" value={role} onChange={setRole} options={roles.map(opt)} /></Field>
         <Field label="First name" required><Input value={v.first} onChange={set("first")} placeholder="First name" /></Field>
         <Field label="Last name" required><Input value={v.last} onChange={set("last")} placeholder="Last name" /></Field>
         <Field label="Email address" required><Input value={v.email} onChange={set("email")} type="email" placeholder="name@company.com" /></Field>
-        {internal ? (
-          <>
-            <Field label="Phone number"><Input value={v.phone} onChange={set("phone")} placeholder="+1 (415) 555-0100" /></Field>
+        <Field label="Roles" required>
+          <MultiDropdown value={roles} onChange={setRoles} options={ROLE_OPTS} placeholder="Select roles" />
+        </Field>
+        {agent && (
+          <RoleBlock title="Talent Agent" onRemove={() => setRoles((r) => r.filter((k) => k !== "agent"))}>
+            <FeeFields fees={fees} com={v.com} pf={v.pf} onFee={(k, x) => setFees((f) => ({ ...f, [k]: x }))} onCom={(x) => setV((y) => ({ ...y, com: x }))} onPf={(x) => setV((y) => ({ ...y, pf: x }))} />
+            <RatingField value={rating} onChange={setRating} />
+          </RoleBlock>
+        )}
+        {staff.length > 0 && (
+          /* The internal roles share one block (phone, job title, department are the person's), so its delete removes all of them. */
+          <RoleBlock title={andList(staffNames)} onRemove={() => setRoles((r) => r.filter((k) => k === "agent"))}>
             <Field label="Job title" required><Input value={v.job} onChange={set("job")} placeholder="e.g. Level Reviewer" /></Field>
             <Field label="Department" required help={depts().length ? undefined : NO_DEPTS}><Dropdown variant="form" disabled={!depts().length} placeholder="Select a department" value={v.dept || undefined} onChange={(d) => setV((x) => ({ ...x, dept: d }))} options={depts().map((d) => ({ value: d, label: d }))} /></Field>
-          </>
-        ) : (
-          <>
-            <FeeFields fee={v.fee} plat={v.plat} onFee={(x) => setV((y) => ({ ...y, fee: x }))} onPlat={(x) => setV((y) => ({ ...y, plat: x }))} />
-            <RatingField value={rating} onChange={setRating} />
-          </>
+            {/* Last in the block and required (Maryam 26 Oct 2026). */}
+            <Field label="Phone number" required><Input value={v.phone} onChange={set("phone")} inputMode="tel" placeholder="+1 (415) 555-0100" /></Field>
+          </RoleBlock>
         )}
       </Stack>
     </Slider>
@@ -342,16 +413,17 @@ const split = (n: string) => { const [first, ...rest] = String(n).split(" "); re
 
 function EditAgent({ u, close }: { u: U; close: () => void }) {
   const r = agRange(u);
-  const [v, setV] = useState({ ...split(u.name), fee: String(u.fee ?? ""), plat: String(u.platformFee ?? PLATFORM_FEE), from: r[0], to: r[1] });
+  const [v, setV] = useState({ ...split(u.name), com: String(commissionPct(u)), pf: String(platformFee(u)), from: r[0], to: r[1] });
+  const [fees, setFees] = useState<FeeStr>(() => feeStr(u));
   const lv = LVL_CODES.map((l) => ({ value: l, label: l }));
   return (
     <Slider title={`Edit talent agent — ${u.name}`} open onClose={close}
-      footer={<Foot ok="Save Changes" disabled={!v.first.trim() || !v.last.trim() || !num(v.fee) || !num(v.plat)} close={close} onOk={() => { commit(() => { u.name = `${v.first.trim()} ${v.last.trim()}`; u.fee = num(v.fee); u.platformFee = num(v.plat); u.range = [v.from, v.to]; }, `${u.name} updated`); close(); }} />}>
+      footer={<Foot ok="Save Changes" disabled={!v.first.trim() || !v.last.trim() || !feesReady(fees, v.com, v.pf)} close={close} onOk={() => { commit(() => { u.name = `${v.first.trim()} ${v.last.trim()}`; Object.assign(u, feeSave(fees, v.com, v.pf)); u.range = [v.from, v.to]; }, `${u.name} updated`); close(); }} />}>
       <Stack gap={6}>
         <Field label="First name" required><Input value={v.first} onChange={(e) => setV({ ...v, first: e.target.value })} /></Field>
         <Field label="Last name" required><Input value={v.last} onChange={(e) => setV({ ...v, last: e.target.value })} /></Field>
         <Field label="Email address"><Input value={u.email} readOnly /></Field>
-        <FeeFields fee={v.fee} plat={v.plat} onFee={(x) => setV({ ...v, fee: x })} onPlat={(x) => setV({ ...v, plat: x })} />
+        <FeeFields fees={fees} com={v.com} pf={v.pf} onFee={(k, x) => setFees((f) => ({ ...f, [k]: x }))} onCom={(x) => setV({ ...v, com: x })} onPf={(x) => setV({ ...v, pf: x })} />
         <Field label="Assessment range (from)"><Dropdown variant="form" value={v.from} onChange={(x) => setV({ ...v, from: x })} options={lv} /></Field>
         <Field label="Assessment range (to)"><Dropdown variant="form" value={v.to} onChange={(x) => setV({ ...v, to: x })} options={lv} /></Field>
       </Stack>
@@ -381,14 +453,15 @@ function EditStaff({ u, close }: { u: U; close: () => void }) {
   const [v, setV] = useState({ ...split(u.name), phone: u.phone || "", job: u.job || "", dept: u.dept || "" });
   return (
     <Slider title={`Edit ${u.name}`} open onClose={close}
-      footer={<Foot ok="Save Changes" disabled={!v.first.trim() || !v.last.trim() || !v.job.trim() || !v.dept} close={close} onOk={() => { commit(() => { u.name = `${v.first.trim()} ${v.last.trim()}`; u.phone = v.phone; u.job = v.job; u.dept = v.dept; }, `${u.name} updated`); close(); }} />}>
+      footer={<Foot ok="Save Changes" disabled={!v.first.trim() || !v.last.trim() || !v.job.trim() || !v.dept || !v.phone.trim()} close={close} onOk={() => { commit(() => { u.name = `${v.first.trim()} ${v.last.trim()}`; u.phone = v.phone; u.job = v.job; u.dept = v.dept; }, `${u.name} updated`); close(); }} />}>
       <Stack gap={6}>
         <Field label="First name" required><Input value={v.first} onChange={(e) => setV({ ...v, first: e.target.value })} /></Field>
         <Field label="Last name" required><Input value={v.last} onChange={(e) => setV({ ...v, last: e.target.value })} /></Field>
         <Field label="Email address"><Input value={u.email} readOnly /></Field>
-        <Field label="Phone number"><Input value={v.phone} onChange={(e) => setV({ ...v, phone: e.target.value })} placeholder="+1 (415) 555-0100" /></Field>
         <Field label="Job title" required><Input value={v.job} onChange={(e) => setV({ ...v, job: e.target.value })} /></Field>
         <Field label="Department" required><Dropdown variant="form" value={v.dept} onChange={(x) => setV({ ...v, dept: x })} options={depts().map((d) => ({ value: d, label: d }))} /></Field>
+        {/* Below Department and required, as on the invite (Maryam 26 Oct 2026). */}
+        <Field label="Phone number" required><Input value={v.phone} onChange={(e) => setV({ ...v, phone: e.target.value })} inputMode="tel" placeholder="+1 (415) 555-0100" /></Field>
       </Stack>
     </Slider>
   );

@@ -4,6 +4,7 @@ import { TalLabel } from "../ui/DarkCard";
 import d from "../ui/darkcard.module.css";
 import { Text } from "../primitives";
 import { Icon } from "../Icon";
+import { Price } from "../ui/Price";
 import type { Course } from "@/data/level";
 import s from "./dashboard.module.css";
 
@@ -32,7 +33,7 @@ export function CourseOffer({ course, recommended, slot, cta, opens }: {
         <Text role="body" as="p" ink="secondary" className={s.eoDesc}>{course.desc}</Text>
       </div>
       <div className={`${s.eoFacts} ${cta ? s.eoHasCta : ""}`}>
-        <EoFact icon="wallet" l="Course Fee" v={<span className={s.acc}>${course.fee}</span>} />
+        <EoFact icon="wallet" l="Course Fee" v={<span className={s.acc}><Price amount={course.fee} /></span>} />
         <EoFact icon="book" l="Chapters" v="13" />
         <EoFact icon="starOutline" star l="Rating" v={`${course.rating} · ${course.reviews} reviews`} />
         {cta && <div className={s.cta}>{cta}</div>}

@@ -1,0 +1,4 @@
+/* THE PRICE (ui/Price.tsx): during an automatic whole-platform discount the old price is
+   struck through just before the new one, in the same ink so it reads on any ground. */
+.p { display: inline-flex; align-items: baseline; gap: var(--s02); }
+.was { text-decoration: line-through; opacity: 0.6; }

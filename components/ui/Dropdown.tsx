@@ -1,25 +1,20 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import s from "./dropdown.module.css";
+import t from "./table.module.css";
 import { Icon } from "../Icon";
+import { Chip, Chips } from "./Chip";
 
 export type Option = { value: string; label: string; img?: string; meta?: string };
 
-/* <Dropdown> — our dropdown. `variant="filter"` for a toolbar (shows
-   "Label: Value"), `variant="form"` inside a <Field>. `placeholder` leaves
-   a form dropdown unselected until the user picks. Click-away closes. */
-export function Dropdown({
-  options, value, onChange, variant = "filter", label, placeholder, disabled,
-}: {
-  options: Option[]; value?: string; onChange: (v: string) => void;
-  variant?: "filter" | "form"; label?: string; placeholder?: string; disabled?: boolean;
-}) {
+/* Open state, click-away and the room left below the trigger, shared by both
+   dropdowns. The menu always opens DOWNWARD (Phase 1 §127) and is never cut off
+   by the screen edge: on open it measures the room below the trigger and caps
+   its height to it, so a long list scrolls inside the menu instead. */
+function useMenu() {
   const [open, setOpen] = useState(false);
   const [room, setRoom] = useState<number | null>(null);
   const ref = useRef<HTMLDivElement>(null);
-  /* The menu always opens DOWNWARD (Phase 1 §127) and is never cut off by the screen
-     edge: on open it measures the room left below the trigger and caps its height to
-     it, so a long list scrolls inside the menu instead of running off-screen. */
   const toggle = () => {
     if (!open && ref.current) setRoom(Math.max(120, Math.floor(window.innerHeight - ref.current.getBoundingClientRect().bottom - 16)));
     setOpen((o) => !o);
@@ -30,7 +25,20 @@ export function Dropdown({
     document.addEventListener("mousedown", close);
     return () => document.removeEventListener("mousedown", close);
   }, [open]);
+  const menuStyle = room ? ({ "--menu-room": `${room}px` } as React.CSSProperties) : undefined;
+  return { open, setOpen, toggle, ref, menuStyle };
+}
 
+/* <Dropdown> — our dropdown. `variant="filter"` for a toolbar (shows
+   "Label: Value"), `variant="form"` inside a <Field>. `placeholder` leaves
+   a form dropdown unselected until the user picks. Click-away closes. */
+export function Dropdown({
+  options, value, onChange, variant = "filter", label, placeholder, disabled,
+}: {
+  options: Option[]; value?: string; onChange: (v: string) => void;
+  variant?: "filter" | "form"; label?: string; placeholder?: string; disabled?: boolean;
+}) {
+  const { open, setOpen, toggle, ref, menuStyle } = useMenu();
   const cur = options.find((o) => o.value === value);
   return (
     <div ref={ref} className={`${s.dd} ${s[variant]}`}>
@@ -42,7 +50,7 @@ export function Dropdown({
         <Icon name="chevDown" />
       </button>
       {open && (
-        <div className={s.menu} role="listbox" style={room ? ({ "--menu-room": `${room}px` } as React.CSSProperties) : undefined}>
+        <div className={s.menu} role="listbox" style={menuStyle}>
           {options.map((o) => (
             <button key={o.value} type="button" role="option" aria-selected={o.value === value}
               className={`${s.opt} ${o.value === value ? s.on : ""} t-compact`}
@@ -54,6 +62,72 @@ export function Dropdown({
             </button>
           ))}
         </div>
+      )}
+    </div>
+  );
+}
+
+/* <MultiDropdown> — the form dropdown that takes several picks (Phase 1
+   formDdMulti). Each option leads with the table's own row-select box, the
+   menu stays open while picking, the trigger reads "N selected", and the picks
+   show under it as round chips, each with its own remove cross. `value` keeps
+   the order things were picked in. */
+/* `allLabel` adds an "All …" row on top (Maryam 26 Oct 2026). Ticked, the value is ["*"]:
+   EVERY option, including ones added later, so it is saved as "all", not as today's list.
+   It shows as one chip. Unticking one option while "all" is on keeps the others. */
+export const ALL = "*";
+export function MultiDropdown({
+  options, value, onChange, placeholder, disabled, allLabel,
+}: {
+  options: Option[]; value: string[]; onChange: (v: string[]) => void; placeholder?: string; disabled?: boolean; allLabel?: string;
+}) {
+  const { open, toggle, ref, menuStyle } = useMenu();
+  const isAll = !!allLabel && value.includes(ALL);
+  const flip = (v: string) => {
+    if (isAll) return onChange(options.map((o) => o.value).filter((x) => x !== v));
+    const next = value.includes(v) ? value.filter((x) => x !== v) : [...value, v];
+    onChange(allLabel && next.length === options.length ? [ALL] : next);
+  };
+  const picked = isAll ? [{ value: ALL, label: allLabel! }] : (value.map((v) => options.find((o) => o.value === v)).filter(Boolean) as Option[]);
+  return (
+    <div className={s.multi}>
+      <div ref={ref} className={`${s.dd} ${s.form}`}>
+        <button type="button" className={`${s.t} t-compact`} aria-haspopup="listbox" aria-expanded={open} disabled={disabled} onClick={toggle}>
+          <span>{isAll ? allLabel : picked.length ? `${picked.length} selected` : <span className={s.ph}>{placeholder ?? "Select"}</span>}</span>
+          <Icon name="chevDown" />
+        </button>
+        {open && (
+          <div className={s.menu} role="listbox" aria-multiselectable="true" style={menuStyle}>
+            {allLabel && (
+              <button type="button" role="option" aria-selected={isAll}
+                className={`${s.opt} ${s.optMulti} t-compact`} onClick={() => onChange(isAll ? [] : [ALL])}>
+                <span className={`${t.cb} ${isAll ? t.cbOn : ""}`} aria-hidden="true">{isAll && <Icon name="check" />}</span>
+                <span>{allLabel}</span>
+              </button>
+            )}
+            {options.map((o) => {
+              const on = isAll || value.includes(o.value);
+              return (
+                <button key={o.value} type="button" role="option" aria-selected={on}
+                  className={`${s.opt} ${s.optMulti} t-compact`} onClick={() => flip(o.value)}>
+                  <span className={`${t.cb} ${on ? t.cbOn : ""}`} aria-hidden="true">{on && <Icon name="check" />}</span>
+                  <span>{o.label}</span>
+                  {o.meta && <span className={`${s.meta} t-label`}>{o.meta}</span>}
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+      {picked.length > 0 && (
+        <Chips>
+          {picked.map((o) => (
+            <Chip key={o.value}>
+              {o.label}
+              <button type="button" aria-label={`Remove ${o.label}`} onClick={() => (o.value === ALL ? onChange([]) : flip(o.value))}><Icon name="close" /></button>
+            </Chip>
+          ))}
+        </Chips>
       )}
     </div>
   );
