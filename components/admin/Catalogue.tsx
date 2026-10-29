@@ -9,7 +9,7 @@ import { Facts, Fact } from "../ui/Figures";
 import { Tabs } from "../ui/Tabs";
 import { Accordion } from "../ui/Accordion";
 import { Button } from "../ui/Button";
-import { Dropdown } from "../ui/Dropdown";
+import { Dropdown, MultiDropdown } from "../ui/Dropdown";
 import { Search, Toolbar, Field, Input, TextArea } from "../ui/Field";
 import { Slider } from "../ui/Slider";
 import { Sheet } from "../ui/Sheet";
@@ -71,7 +71,7 @@ export function AdminCatalogue() {
             { key: "l", label: "Levels", cell: (x) => (x.levels || []).join(", ") },
             { key: "i", label: "Intent", cell: (x) => intentName(x.intent) },
             { key: "s", label: "Status", cell: (x) => <Status tone={STATUS[x.status][0]}>{STATUS[x.status][1]}</Status> },
-            { key: "c", label: "Chapters", cell: (x) => String(x.chapters) },
+            { key: "c", label: "Chapters", cell: (x) => (x.chapters ? String(x.chapters) : "—") },
             { key: "p", label: "Price", cell: (x) => money(x.price) },
           ]} />
         ) : <div className={s.empty}><Icon name="book" /><Text role="h4" as="span">No courses match</Text><Text role="desc" as="span">Nothing in this filter yet.</Text></div>}
@@ -119,7 +119,7 @@ export function AdminCourse({ id }: { id: string }) {
           <Fact icon="flag" label="Track" value={x.track} />
           <Fact icon="growth" label="Levels" value={(x.levels || []).join(", ")} />
           <Fact icon="idea" label="Intent" value={intentName(x.intent)} />
-          <Fact icon="book" label="Chapters" value={String(x.chapters)} />
+          <Fact icon="book" label="Chapters" value={x.chapters ? `${x.chapters} · from LightSpeedVT` : "From LightSpeedVT"} />
           <Fact icon="launch" label="Learning platform" value={x.lsvt || "—"} />
           <Fact icon="wallet" label="Price" value={money(x.price)} />
           <Fact icon="checkOutline" label="Status" value={<Status tone={STATUS[x.status][0]}>{STATUS[x.status][1]}</Status>} />
@@ -168,19 +168,19 @@ function CourseSheets({ sheet, close, after }: { sheet: CSheet; close: () => voi
     onCancel={close} onOk={() => { commit(() => sheet.ids.forEach((i) => { const k = COURSES.findIndex((v) => v.id === i); if (k >= 0) COURSES.splice(k, 1); }), n === 1 ? `${one?.name} deleted` : `${n} courses deleted`); close(); after?.(true); }} />;
 }
 
-/* Add / edit a course (Phase 1 KINDS.course). Price is set on create; on
+/* Add / edit a course (Phase 1 KINDS.course). Chapter count is not asked; it comes from
+   LightSpeedVT. Price is set on create; on
    edit it is read-only and changes through "Change price" (step-up). */
 function CourseForm({ id, close }: { id?: string; close: () => void }) {
   const x = id ? COURSES.find((v) => v.id === id) : null;
   const [f, setF] = useState({ name: x?.name ?? "", desc: x?.desc ?? "", track: x?.track ?? "", levels: (x?.levels ?? []) as string[], intent: x?.intent ?? "",
-    chapters: String(x?.chapters ?? ""), lsvt: x?.lsvt ?? "", price: String(x?.price ?? ""), status: x?.status === "live" ? "live" : "draft" });
+    lsvt: x?.lsvt ?? "", price: String(x?.price ?? ""), status: x?.status === "live" ? "live" : "draft" });
   const set = (k: string, v: any) => setF((o) => ({ ...o, [k]: v }));
-  const ch = Number(f.chapters);
   const taken = COURSES.some((v) => v.name.toLowerCase() === f.name.trim().toLowerCase() && v.id !== id);
-  const ok = f.name.trim() && !taken && f.desc.trim() && f.track && f.levels.length && f.intent && ch >= 1 && ch <= 90 && f.lsvt && (x || f.price !== "");
+  const ok = f.name.trim() && !taken && f.desc.trim() && f.track && f.levels.length && f.intent && f.lsvt && (x || f.price !== "");
   const save = () => {
     commit(() => {
-      const rec = { name: f.name.trim(), desc: f.desc.trim(), track: f.track, levels: f.levels, intent: f.intent, chapters: ch, lsvt: f.lsvt, status: f.status };
+      const rec = { name: f.name.trim(), desc: f.desc.trim(), track: f.track, levels: f.levels, intent: f.intent, lsvt: f.lsvt, status: f.status };
       if (x) Object.assign(x, rec);
       else COURSES.unshift({ id: `co${Date.now()}`, ...rec, price: Number(f.price) });
     }, x ? `${f.name.trim()} updated` : `${f.name.trim()} added`);
@@ -195,21 +195,17 @@ function CourseForm({ id, close }: { id?: string; close: () => void }) {
         <Field label="Track" required>
           <Dropdown variant="form" placeholder="Choose a track" value={f.track || undefined} onChange={(v) => setF((o) => ({ ...o, track: v, levels: [] }))} options={["Explorer", "Builder"].map((v) => ({ value: v, label: v }))} />
         </Field>
-        <Field group label="Levels" required help={f.track ? "Pick the levels this course suits. They need not be next to each other." : "Choose a track first."}>
-          <div className={l.pick}>
-            {(TRACK_LEVELS[f.track] || []).map((k) => {
-              const on = f.levels.includes(k);
-              return <button key={k} type="button" aria-pressed={on} className={`${l.chip} ${on ? l.on : ""} t-label`} onClick={() => set("levels", on ? f.levels.filter((v) => v !== k) : [...f.levels, k])}><b>{k}</b></button>;
-            })}
-          </div>
+        {/* A dropdown like every other field (Maryam 29 Oct 2026): before a track is picked it
+            showed only a caption and looked empty. Now it is always there, disabled until then. */}
+        <Field group label="Levels" required help={f.track ? "Pick the levels this course suits. They need not be next to each other." : undefined}>
+          <MultiDropdown value={f.levels} onChange={(v) => set("levels", v)} disabled={!f.track}
+            placeholder={f.track ? "Choose levels" : "Choose a track first"} options={(TRACK_LEVELS[f.track] || []).map((k) => ({ value: k, label: k }))} />
         </Field>
         <Field label="Intent" required>
           <Dropdown variant="form" placeholder="Choose an intent" value={f.intent || undefined} onChange={(v) => set("intent", v)} options={INTENTS.map(([value, label]) => ({ value, label }))} />
         </Field>
-        <Field label="Chapter count" required help={ch >= 1 && ch <= 90 ? "Candidates take the chapters at their own pace." : "Between 1 and 90."}>
-          <Input inputMode="numeric" value={f.chapters} onChange={(e) => set("chapters", e.target.value.replace(/\D/g, ""))} placeholder="e.g. 12" />
-        </Field>
-        <Field label="LightSpeedVT Courses" required>
+        {/* No chapter count here (Maryam 29 Oct 2026): it comes from the LightSpeedVT course. */}
+        <Field label="LightSpeedVT Courses" required help="The chapter count comes from this LightSpeedVT course.">
           <Dropdown variant="form" placeholder="Choose a LightSpeedVT course" value={f.lsvt || undefined} onChange={(v) => set("lsvt", v)} options={(RAW.LS_COURSES as string[]).map((n) => ({ value: `${n} (LSVT)`, label: n }))} />
         </Field>
         <Field label="Price ($)" required={!x} help={x ? "Change the price from the course’s menu. It needs a security code." : undefined}>
