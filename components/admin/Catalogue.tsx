@@ -192,7 +192,7 @@ function CourseForm({ id, close }: { id?: string; close: () => void }) {
       footer={<><Button kind="secondary" onClick={close}>Cancel</Button><Button kind="primary" disabled={!ok} onClick={save}>{x ? "Save Changes" : "Add Course"}</Button></>}>
       <Stack gap={6}>
         {/* First, and the only source of the course's name, description and chapter count (Maryam 29 Oct 2026). */}
-        <Field label="LightSpeedVT Courses" required help="The course name, description and chapter count come from this LightSpeedVT course.">
+        <Field label="LightSpeedVT Courses" required>
           <Dropdown variant="form" placeholder="Choose a LightSpeedVT course" value={f.lsvt || undefined} onChange={(v) => set("lsvt", v)} options={(RAW.LS_COURSES as string[]).map((n) => ({ value: `${n} (LSVT)`, label: n }))} />
         </Field>
         <Field label="Track" required>
