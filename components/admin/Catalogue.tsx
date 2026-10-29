@@ -53,7 +53,7 @@ export function AdminCatalogue() {
     : [{ icon: "locked" as const, label: "Archive All", onClick: () => setSheet({ k: "bulkarch", ids: sel }) }, { icon: "delete" as const, label: "Delete All", onClick: () => setSheet({ k: "del", ids: sel }) }];
   return (
     <Page>
-      <PageHeader title="Course catalogue" desc="The courses candidates can enrol on, the chapter count each runs over, and the track, levels and intents Tal recommends them for."
+      <PageHeader title="Course catalogue" desc="The courses candidates can enrol on, and the track, levels and intents Tal recommends them for."
         actions={<Button kind="primary" size="sm" icon="add" onClick={() => setSheet({ k: "new" })}>Add Course</Button>} />
       <Section kind="tabs">
         <Tabs value={st} onChange={setSt} items={[["all", "All"], ["live", "Live"], ["draft", "Draft"], ["archived", "Archived"]].map(([k, label]) => ({ key: k, label, count: base.filter((x) => k === "all" || x.status === k).length }))} />
@@ -71,7 +71,6 @@ export function AdminCatalogue() {
             { key: "l", label: "Levels", cell: (x) => (x.levels || []).join(", ") },
             { key: "i", label: "Intent", cell: (x) => intentName(x.intent) },
             { key: "s", label: "Status", cell: (x) => <Status tone={STATUS[x.status][0]}>{STATUS[x.status][1]}</Status> },
-            { key: "c", label: "Chapters", cell: (x) => (x.chapters ? String(x.chapters) : "—") },
             { key: "p", label: "Price", cell: (x) => money(x.price) },
           ]} />
         ) : <div className={s.empty}><Icon name="book" /><Text role="h4" as="span">No courses match</Text><Text role="desc" as="span">Nothing in this filter yet.</Text></div>}
@@ -168,30 +167,34 @@ function CourseSheets({ sheet, close, after }: { sheet: CSheet; close: () => voi
     onCancel={close} onOk={() => { commit(() => sheet.ids.forEach((i) => { const k = COURSES.findIndex((v) => v.id === i); if (k >= 0) COURSES.splice(k, 1); }), n === 1 ? `${one?.name} deleted` : `${n} courses deleted`); close(); after?.(true); }} />;
 }
 
-/* Add / edit a course (Phase 1 KINDS.course). Chapter count is not asked; it comes from
-   LightSpeedVT. Price is set on create; on
+/* Add / edit a course (Phase 1 KINDS.course). The course's name, description and chapter
+   count all come from LightSpeedVT (Maryam 29 Oct 2026), so the form opens on the LightSpeedVT
+   course and asks for none of them: a new course is named after it, an edit keeps the record's
+   own name and description. Price is set on create; on
    edit it is read-only and changes through "Change price" (step-up). */
 function CourseForm({ id, close }: { id?: string; close: () => void }) {
   const x = id ? COURSES.find((v) => v.id === id) : null;
   const [f, setF] = useState({ name: x?.name ?? "", desc: x?.desc ?? "", track: x?.track ?? "", levels: (x?.levels ?? []) as string[], intent: x?.intent ?? "",
     lsvt: x?.lsvt ?? "", price: String(x?.price ?? ""), status: x?.status === "live" ? "live" : "draft" });
   const set = (k: string, v: any) => setF((o) => ({ ...o, [k]: v }));
-  const taken = COURSES.some((v) => v.name.toLowerCase() === f.name.trim().toLowerCase() && v.id !== id);
-  const ok = f.name.trim() && !taken && f.desc.trim() && f.track && f.levels.length && f.intent && f.lsvt && (x || f.price !== "");
+  const ok = f.track && f.levels.length && f.intent && f.lsvt && (x || f.price !== "");
   const save = () => {
     commit(() => {
-      const rec = { name: f.name.trim(), desc: f.desc.trim(), track: f.track, levels: f.levels, intent: f.intent, lsvt: f.lsvt, status: f.status };
+      const name = x ? x.name : f.lsvt.replace(/ \(LSVT\)$/, "");
+      const rec = { name, desc: x?.desc ?? "", track: f.track, levels: f.levels, intent: f.intent, lsvt: f.lsvt, status: f.status };
       if (x) Object.assign(x, rec);
       else COURSES.unshift({ id: `co${Date.now()}`, ...rec, price: Number(f.price) });
-    }, x ? `${f.name.trim()} updated` : `${f.name.trim()} added`);
+    }, x ? `${x.name} updated` : `${f.lsvt.replace(/ \(LSVT\)$/, "")} added`);
     close();
   };
   return (
     <Slider open title={x ? `Edit ${x.name}` : "Add a course"} onClose={close}
       footer={<><Button kind="secondary" onClick={close}>Cancel</Button><Button kind="primary" disabled={!ok} onClick={save}>{x ? "Save Changes" : "Add Course"}</Button></>}>
       <Stack gap={6}>
-        <Field label="Course name" required error={taken ? "A course with this name already exists." : undefined}><Input value={f.name} onChange={(e) => set("name", e.target.value)} placeholder="e.g. Foundations of Leadership" /></Field>
-        <Field label="Description" required help="Tal reads this description when it chooses which course to recommend."><TextArea rows={4} value={f.desc} onChange={(e) => set("desc", e.target.value)} placeholder="What the course teaches and what it is for" /></Field>
+        {/* First, and the only source of the course's name, description and chapter count (Maryam 29 Oct 2026). */}
+        <Field label="LightSpeedVT Courses" required help="The course name, description and chapter count come from this LightSpeedVT course.">
+          <Dropdown variant="form" placeholder="Choose a LightSpeedVT course" value={f.lsvt || undefined} onChange={(v) => set("lsvt", v)} options={(RAW.LS_COURSES as string[]).map((n) => ({ value: `${n} (LSVT)`, label: n }))} />
+        </Field>
         <Field label="Track" required>
           <Dropdown variant="form" placeholder="Choose a track" value={f.track || undefined} onChange={(v) => setF((o) => ({ ...o, track: v, levels: [] }))} options={["Explorer", "Builder"].map((v) => ({ value: v, label: v }))} />
         </Field>
@@ -203,10 +206,6 @@ function CourseForm({ id, close }: { id?: string; close: () => void }) {
         </Field>
         <Field label="Intent" required>
           <Dropdown variant="form" placeholder="Choose an intent" value={f.intent || undefined} onChange={(v) => set("intent", v)} options={INTENTS.map(([value, label]) => ({ value, label }))} />
-        </Field>
-        {/* No chapter count here (Maryam 29 Oct 2026): it comes from the LightSpeedVT course. */}
-        <Field label="LightSpeedVT Courses" required help="The chapter count comes from this LightSpeedVT course.">
-          <Dropdown variant="form" placeholder="Choose a LightSpeedVT course" value={f.lsvt || undefined} onChange={(v) => set("lsvt", v)} options={(RAW.LS_COURSES as string[]).map((n) => ({ value: `${n} (LSVT)`, label: n }))} />
         </Field>
         <Field label="Price ($)" required={!x} help={x ? "Change the price from the course’s menu. It needs a security code." : undefined}>
           <Input inputMode="numeric" value={x ? money(x.price) : f.price} readOnly={!!x} onChange={(e) => set("price", e.target.value.replace(/\D/g, ""))} placeholder="e.g. 690" />
