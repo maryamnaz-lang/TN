@@ -84,7 +84,7 @@ export const IVS: Iv[] = [
     seedStrength: "Builds a deliberate routine early rather than winging it, and follows through on what it surfaces.",
     seedGrowth: "The harder conversations a one-to-one eventually raises: naming an issue with someone she has only just started managing." },
 
-  { id: "tom", n: "Tom Whelan", st: "done", day: "Monday 17 August", time: "6:30 PM", kind: "Re-interview", level: "Builder – B1", signed: "17 August", money: "Releases Thursday 20 August", follow: 4.6, depth: 4.8 },
+  { id: "tom", n: "Tom Whelan", st: "done", day: "Monday 17 August", time: "6:30 PM", kind: "Re-interview", level: "Builder – B1", signed: "17 August", money: "Paid 20 August", follow: 4.6, depth: 4.8 },
   { id: "nina", n: "Nina Haddad", st: "done", day: "Friday 14 August", time: "4:00 PM", kind: "First interview", level: "Explorer – E4", signed: "15 August", money: "Paid 19 August", follow: 4.3, depth: 4.7 },
 ];
 export const ivById = (id: string) => IVS.find((x) => x.id === id);
@@ -99,11 +99,6 @@ export const ivPrice = (x: Pick<Iv, "level" | "band">) => priceFor(ivFee(x), AGE
 export const payFee = (name: string) => { const x = IVS.find((i) => i.n === name); return x ? ivFee(x) : AGENT.fees.explorer; };
 /* The three fees as one figure: "$88–$120". */
 export const FEE_SPAN = (() => { const v = FEE_TRACKS.map((t) => AGENT.fees[t.key]); return `${$(Math.min(...v))}–${$(Math.max(...v))}`; })();
-/* What is held: every interview whose recording is still to confirm. Held for the agent is
-   their fees; the candidates paid those with the commission in. */
-const HELD = IVS.filter((x) => x.st === "report");
-export const HELD_FOR_YOU = HELD.reduce((n, x) => n + ivFee(x), 0);
-export const HELD_TOTAL = HELD.reduce((n, x) => n + ivPrice(x), 0);
 export const first = (n: string) => n.split(" ")[0];
 /* "Thursday 20 August" → "20 August" (Phase 1 drops the weekday on a card). */
 export const dayDate = (d: string) => d.replace(/^\w+ /, "");
@@ -113,10 +108,11 @@ export const PAST_COUNT = AGENT.ivs;
 
 export type PayRow = { n: string; d: string; s: string; st: "quiet" | "warn" | "green" };
 export const PAYMENTS: PayRow[] = [
-  { n: "Rafael Ortiz", d: "19 Aug", s: "Funds held", st: "quiet" },
-  { n: "Sofia Marek", d: "18 Aug", s: "Recording to confirm", st: "warn" },
-  { n: "Tom Whelan", d: "17 Aug", s: "Releases 20 Aug", st: "quiet" },
-  { n: "Leah Carr", d: "15 Aug", s: "On hold", st: "warn" },
+  /* No held funds or awaiting payments for now (Maryam 10 Nov 2026): every row is paid. */
+  { n: "Rafael Ortiz", d: "19 Aug", s: "Paid 19 Aug", st: "green" },
+  { n: "Sofia Marek", d: "18 Aug", s: "Paid 18 Aug", st: "green" },
+  { n: "Tom Whelan", d: "17 Aug", s: "Paid 20 Aug", st: "green" },
+  { n: "Leah Carr", d: "15 Aug", s: "Paid 18 Aug", st: "green" },
   { n: "Nina Haddad", d: "14 Aug", s: "Paid 19 Aug", st: "green" },
   { n: "Owen Pryce", d: "13 Aug", s: "Returned", st: "quiet" },
   { n: "Marcus Bell", d: "12 Aug", s: "Paid 17 Aug", st: "green" },
@@ -138,7 +134,7 @@ export const INTENTS = ["Develop in my current role", "Develop for another role"
 export const AGENT_NOTIF_TOGGLES: [string, string, boolean][] = [
   ["New Interview Booking", "Get notified when a candidate books a slot, with their brief attached.", true],
   ["Recommendation Needed", "Get notified after a call when a recommendation is ready to submit.", true],
-  ["Payout Updates", "Get notified when held funds are released and payouts arrive.", true],
+  ["Payout Updates", "Get notified when a payout arrives in your account.", true],
   ["Product Updates", "Receive portal updates no more than once a month.", false],
 ];
 
@@ -182,12 +178,19 @@ export const WEEK_SLOTS: WeekSlot[] = (() => {
   });
   return out;
 })();
-/* The agent's weekly SHIFTS (Maryam 19 Oct 2026): a day carries one or two shifts, each a
+/* The agent's weekly SHIFTS (Maryam 19 Oct 2026): a day carries any number of shifts (the
+   two-a-day cap was lifted 10 Nov 2026), each a
    start-to-end window; candidates book 45-minute interviews inside them. A single start time
    per interview read wrongly (10:00 and 10:30 on one day overlap a 45-minute call). Authored
    placeholder (§74), set around the diary's existing booked times. */
 export type Shift = { id: string; day: string; start: string; end: string };
-export const SHIFT_MAX = 2;
+/* The agent's TIME ZONE (Maryam 10 Nov 2026): the zone their shifts are set in. The US zones,
+   named as US zones rather than by city, with the offset in August (summer time). */
+export const TIME_ZONES = [
+  "US Eastern (UTC-04:00)", "US Central (UTC-05:00)", "US Mountain (UTC-06:00)", "US Arizona (UTC-07:00)",
+  "US Pacific (UTC-07:00)", "US Alaska (UTC-08:00)", "US Hawaii (UTC-10:00)",
+];
+export const AGENT_TZ = TIME_ZONES[0];
 export const WEEK_SHIFTS: Shift[] = [
   { id: "mon1", day: "Monday", start: "9:00 AM", end: "12:00 PM" },
   { id: "mon2", day: "Monday", start: "2:00 PM", end: "7:00 PM" },

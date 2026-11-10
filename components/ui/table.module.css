@@ -36,6 +36,13 @@
 .tbl tbody tr:first-child td { padding-top: var(--s06); }
 .tbl td:first-child { color: var(--text-primary); }
 .tbl th:last-child, .tbl td:last-child { padding-right: 0; }
+/* A sortable header: the label is a button followed by the two-chevron sort mark. No
+   focus ring on a mouse click; the keyboard still gets one. */
+.sortB { display: inline-flex; align-items: center; gap: var(--s02); font: inherit; color: inherit; cursor: pointer; }
+.sortB:focus:not(:focus-visible) { outline: none; }
+.sortMk { width: 16px; height: 16px; flex: none; fill: none; stroke: var(--border-subtle-02); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.sortB:hover .sortMk { stroke: var(--text-secondary); }
+.sortMk .sortMkOn { stroke: var(--text-primary); }
 .clk { cursor: pointer; }
 .clk:hover td:first-child { color: var(--accent-text); }
 .act { width: var(--s09); text-align: left; padding-right: 0; }
@@ -44,6 +51,19 @@
 .pcell { display: flex; align-items: center; gap: var(--s03); min-width: 0; }
 .pcell img { width: var(--avatar-row); height: var(--avatar-row); border-radius: var(--radius-pill); object-fit: cover; flex: none; }
 .pcellB { display: flex; flex-direction: column; min-width: 0; }
+
+/* Skeleton (loading preview): very light grey blocks, square except the face, with a
+   lighter band sweeping left to right. Reduced motion keeps the blocks, drops the sweep. */
+.sk {
+  display: block; height: 12px; flex: none;
+  background: linear-gradient(90deg, var(--layer-02) 0%, var(--rule) 40%, var(--layer-02) 80%) 0 0 / 300% 100%;
+  animation: skShimmer 1.4s ease-in-out infinite;
+}
+.skFace { width: var(--avatar-row); height: var(--avatar-row); border-radius: var(--radius-pill); }
+.skBox { width: 16px; height: 16px; }
+.skLines { display: flex; flex-direction: column; gap: var(--s03); }
+@keyframes skShimmer { from { background-position: 100% 0; } to { background-position: 0 0; } }
+@media (prefers-reduced-motion: reduce) { .sk { animation: none; background: var(--rule); } }
 
 /* Status is plain coloured text, never a chip (Phase 1 §126). */
 .st-green { color: var(--support-success-ink); }

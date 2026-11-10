@@ -10,6 +10,8 @@
 .opt { display: flex; align-items: center; gap: var(--s03); }
 .opt > :first-child { flex: 1; }
 .score { width: var(--s10); flex: none; }
+/* An Intent question's option carries its intent beside the label. */
+.intent { width: 220px; flex: none; }
 .x { width: var(--s07); height: var(--s07); display: grid; place-items: center; color: var(--text-secondary); flex: none; }
 .x svg { width: var(--icon-page); height: var(--icon-page); }
 .x:hover { color: var(--accent-text); }

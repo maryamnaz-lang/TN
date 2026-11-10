@@ -1,18 +1,55 @@
-/* ONBOARDING — Phase 1 ob.js OB_Q (the client's five questions, 21 Sep 2026)
-   and obDoneScreen, read 15 Oct 2026. These are the questions Super Admin
-   edits under Onboarding Questions. */
-export type ObQ =
-  | { k: string; q: string; t: "radio"; o: [string, string][] }
-  | { k: string; q: string; t: "text"; ph: string }
-  | { k: string; q: string; t: "dd"; o: [string, string][]; ph: string };
+/* ONBOARDING QUESTIONS ARE DYNAMIC (Maryam, 4 Nov 2026). Super Admin adds, edits, deletes,
+   reorders and switches questions on or off under Onboarding Questions, and the candidate's
+   onboarding reads this SAME list (active ones, in order) — there is no second copy.
+   Each question names what its answer FEEDS on the candidate's profile. A question that feeds
+   Intent maps EACH OPTION to one of the course intents, so whatever the wording, an answer still
+   lands on an intent and Tal can match a course. One question per field; Intent is the one field
+   that must always be fed. Seeded from Phase 1's ONBOARDING_Q (the client's five, 21 Sep 2026):
+   the option scores are dropped (Feeds replaced Weight, 2 Nov 2026) and Phase 1's candidate
+   placeholders kept. A reload resets the list, like every prototype record. */
+import { ONBOARDING_Q, RAW } from "./admin";
 
-export const OB_Q: ObQ[] = [
-  { k: "where", q: "Where are you right now?", t: "radio", o: [["moveup", "In a job I want to move up in"], ["leaving", "In a job I don't plan to stay in"], ["own", "Running something of my own, or trying to start it"], ["between", "Between things"]] },
-  { k: "persona", q: "Which of these sounds most like you? Pick one.", t: "radio", o: [["top", "Top Performer"], ["athlete", "Athlete"], ["leader", "Leader"], ["entrepreneur", "Entrepreneur"], ["notsure", "Not Sure"], ["team", "Team Player"]] },
-  { k: "role", q: "What do you do now?", t: "text", ph: "Operations coordinator, student, own a detailing business" },
-  { k: "industry", q: "What industry is that in?", t: "dd", ph: "Tell me your industry", o: [["security", "Security"], ["franchise", "Franchise ownership"], ["retail", "Retail"], ["food", "Food and hospitality"], ["trades", "Trades and construction"], ["healthcare", "Healthcare"], ["logistics", "Transportation and logistics"], ["sales", "Sales"], ["education", "Education"], ["technology", "Technology"], ["student", "Student"], ["other", "Other"]] },
-  { k: "years", q: "How many years have you been working?", t: "radio", o: [["0", "Under 1"], ["1", "1 to 3"], ["3", "3 to 7"], ["7", "7 to 15"], ["15", "15 or more"]] },
+export type ObType = "single" | "text" | "dropdown";
+export type ObFeed = "intent" | "persona" | "role" | "industry" | "years" | "none";
+export type ObOpt = { label: string; intent?: string };
+export type ObQuestion = {
+  id: string; text: string; type: ObType; feeds: ObFeed; active: boolean;
+  options: ObOpt[]; placeholder?: string; other?: boolean;
+};
+
+export const OB_TYPES: [ObType, string][] = [["single", "Single choice"], ["dropdown", "Dropdown"], ["text", "Free text"]];
+export const OB_FEEDS: [ObFeed, string][] = [
+  ["intent", "Intent"], ["persona", "Persona"], ["role", "Current role"], ["industry", "Industry"], ["years", "Years working"], ["none", "Nothing, answer is saved only"],
 ];
+/* Only Intent must have a question feeding it: without it Tal cannot recommend a course. */
+export const OB_REQUIRED: ObFeed[] = ["intent"];
+/* An intent comes from a pick, so a free-text question cannot feed it. */
+export const feedFits = (f: ObFeed, t: ObType) => !(f === "intent" && t === "text");
+export const OB_INTENTS: [string, string][] = RAW.INTENTS;
+export const feedName = (f: ObFeed) => OB_FEEDS.find(([k]) => k === f)?.[1] ?? "—";
+
+const SEED: Record<string, { feeds: ObFeed; placeholder?: string; intents?: string[] }> = {
+  obq1: { feeds: "intent", intents: ["role", "another", "ownership", "another"] },
+  obq2: { feeds: "persona" },
+  obq3: { feeds: "role", placeholder: "Operations coordinator, student, own a detailing business" },
+  obq4: { feeds: "industry", placeholder: "Select your industry" },
+  obq5: { feeds: "years" },
+};
+export const OB_QUESTIONS: ObQuestion[] = ONBOARDING_Q as ObQuestion[];
+for (const q of OB_QUESTIONS as any[]) {
+  if (q.feeds) continue;
+  const seed = SEED[q.id] ?? { feeds: "none" };
+  q.feeds = seed.feeds; q.active = true;
+  if (seed.placeholder) q.placeholder = seed.placeholder;
+  q.options = (q.options || []).map((o: any, i: number) => ({ label: o.label, ...(seed.intents ? { intent: seed.intents[i] } : {}) }));
+  delete q.weight;
+}
+/* Which question feeds a field, other than `except`. */
+export const feederOf = (f: ObFeed, except?: string) => OB_QUESTIONS.find((q) => q.active && q.feeds === f && q.id !== except);
+/* The one question feeding a required field cannot be deleted, switched off or re-pointed. */
+export const lockedFeeder = (q: ObQuestion) => q.active && OB_REQUIRED.includes(q.feeds) && !feederOf(q.feeds, q.id);
+/* What the candidate is asked: the active questions, in order. */
+export const obLive = () => OB_QUESTIONS.filter((q) => q.active);
 
 export const OB_WELCOME = {
   title: "Welcome to TALENTnext, Maryam!",

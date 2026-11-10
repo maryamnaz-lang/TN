@@ -8,3 +8,16 @@
 
 /* The last row draws no line of its own: the section's divider or air closes the list, so two lines never stack. */
 .row:last-child { border-bottom: 0; }
+
+/* A disabled switch (Maryam 10 Nov 2026): held off, faded, not pressable; its tip is a
+   white chip on the rail flyout's recipe (hairline + menu shadow), opening above the switch. */
+.tipWrap { position: relative; flex: none; display: flex; }
+.sw[aria-disabled="true"] { opacity: .45; cursor: not-allowed; }
+.tip {
+  position: absolute; bottom: calc(100% + var(--s03)); right: 0; z-index: 20;
+  width: max-content; max-width: 240px; padding: var(--s03) var(--s04);
+  background: var(--layer-01); border: var(--hairline) solid var(--rule); box-shadow: var(--shadow-menu);
+  opacity: 0; visibility: hidden; pointer-events: none;
+  transition: opacity var(--mo-quick) var(--mo-standard), visibility var(--mo-quick);
+}
+.tipWrap:hover .tip, .tipWrap:focus-within .tip { opacity: 1; visibility: visible; }

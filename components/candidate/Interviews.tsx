@@ -19,14 +19,20 @@ import { Field, TextArea } from "../ui/Field";
 import { Icon } from "../Icon";
 import { useDemo } from "@/lib/demo";
 import { atLeast } from "@/lib/demo";
-import { AGENTS, HOW_IT_WORKS, PAST, REPORT, SAVED_CARDS, SCENES, SCENES_PRICE, SCENE_STILL, SHARE_NETS, CAND_TRACK, agentByKey, isReinterview, type Agent } from "@/data/interviews";
+import { AGENTS, agentPublic, HOW_IT_WORKS, PAST, REPORT, SAVED_CARDS, SCENES, SCENES_PRICE, SCENE_STILL, SHARE_NETS, CAND_TRACK, agentByKey, isReinterview, type Agent } from "@/data/interviews";
 import { CallRow, When } from "./CallRow";
 import s from "./interviews.module.css";
+import pf from "./profile.module.css";
+import Link from "next/link";
+import { Stats, Stat } from "../ui/Figures";
+import { Chips, Chip } from "../ui/Chip";
 
 const BASE = "/candidate/interviews";
 /* Where "Book" goes: a re-interview pays first (checkout); a first interview goes straight
    to the calendar and is booked there, with no price, "Free" or "$0" anywhere on the way
    (Maryam 26 Oct 2026; Phase 1 13 Oct 2026 for the skipped payment step). */
+/* The agent's public profile (Maryam 10 Nov 2026). */
+export const profHref = (key: string) => `${BASE}/agents/${key}/`;
 export const bookHref = (stage: string, key = "priya") =>
   `${BASE}/${isReinterview(stage) ? "checkout" : "book"}/${key}/`;
 
@@ -102,11 +108,14 @@ function AgentsTable() {
       {AGENTS.map((a) => (
         <div key={a.key} className={s.agtR}>
           <div className={s.who}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={a.img} alt="" />
+            {/* The photo and the name open the agent's profile (Maryam 10 Nov 2026). */}
+            <Link href={profHref(a.key)} aria-label={`${a.name} profile`}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={a.img} alt="" />
+            </Link>
             <span className={s.wb}>
               <span className={s.nm}>
-                <Text role="h4" as="span">{a.name}</Text>
+                <Link href={profHref(a.key)} className={s.profLink}><Text role="h4" as="span">{a.name}</Text></Link>
                 {a.recommended && <Text role="caption" as="span" className={s.recTag}>Recommended</Text>}
               </span>
               <span className={s.rate}><Stars n={a.rating} /><Text role="label" as="span">{a.rating}</Text></span>
@@ -157,10 +166,12 @@ function PastList({ items }: { items: (typeof PAST)[string] }) {
 function AgentHead({ a, charged }: { a: Agent; charged: boolean }) {
   return (
     <div className={s.bkp}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={a.img} alt="" />
+      <Link href={profHref(a.key)} aria-label={`${a.name} profile`}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={a.img} alt="" />
+      </Link>
       <div className={s.bkpB}>
-        <span className={s.nameRow}><Text role="h3" as="span">{a.name}</Text><Icon name="verified" className={s.verified} /></span>
+        <span className={s.nameRow}><Link href={profHref(a.key)} className={s.profLink}><Text role="h3" as="span">{a.name}</Text></Link><Icon name="verified" className={s.verified} /></span>
         <Text role="compact" as="span" className={s.rating}><Icon name="star" />{a.rating} · {a.ivs} interviews</Text>
         <Text role="compact" as="span" className={s.meta}>
           {/* A first interview shows no fee line at all (Maryam 26 Oct 2026). */}
@@ -408,5 +419,68 @@ export function ShareMenu() {
         </div>
       )}
     </div>
+  );
+}
+
+/* ============================================================
+   /candidate/interviews/agents/<agent>/ — THE AGENT'S PROFILE, as a candidate
+   reads it before booking (Maryam 10 Nov 2026). Opened from the agent's photo or
+   name on the dashboard's recommendation card, the All Agents list, and the
+   booking and checkout heads. Only the public side (data/interviews.ts
+   AGENT_PUBLIC): no earnings, payouts, commission, Agent Score or other
+   candidates. A first interview shows no price anywhere (26 Oct 2026), so the
+   fee figure is swapped for the interview count until the re-interview.
+   ============================================================ */
+export function AgentProfilePage({ agent }: { agent: string }) {
+  const a = agentByKey(agent);
+  const pub = agentPublic(a.key);
+  const { stage } = useDemo();
+  const charged = isReinterview(stage);
+  return (
+    <Page>
+      <PageHeader title={a.name} back={`${BASE}/agents/`} />
+      <Section kind="block" noline>
+        <div className={pf.idhead}>
+          <span className={pf.photo}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={a.img} alt="" />
+          </span>
+          <span className={pf.idB}>
+            <span className={s.nameRow}><Text role="h3" as="span">{a.name}</Text><Icon name="verified" className={s.verified} /></span>
+            <Text role="compact" as="span" className={s.rating}><Icon name="star" />{a.rating} · Assesses {a.range}</Text>
+          </span>
+          <span className={pf.idAct}><Button kind="primary" go href={bookHref(stage, a.key)}>Book {a.name.split(" ")[0]}</Button></span>
+        </div>
+      </Section>
+      <Section kind="block" bare>
+        <Stats>
+          {charged
+            ? <Stat icon="wallet" label="Interview Fee" value={<Price amount={a.price} />} desc="For your re-interview" />
+            : <Stat icon="video" label="Interviews" value={String(a.ivs)} desc="Conducted" />}
+          <Stat icon="work" label="Experience" value={`${a.yrs} yrs`} desc="Interviewing" />
+          <Stat icon="calendar" label="Next Slot" value={a.slot.split(" · ")[0]} desc={a.slot.split(" · ")[1]} />
+          <Stat icon="time" label="Your Report" value="24 hrs" desc="After your call" />
+        </Stats>
+      </Section>
+      <Section>
+        <SectionHeader title="About" />
+        <Text role="body" ink="secondary">{pub.about}</Text>
+      </Section>
+      <Section noline><SectionHeader title="Expertise" /><Chips>{a.tags.map((t) => <Chip key={t}>{t}</Chip>)}</Chips></Section>
+      <Section noline><SectionHeader title="Industries" /><Chips>{pub.industries.map((t) => <Chip key={t}>{t}</Chip>)}</Chips></Section>
+      <Section><SectionHeader title="Goals They Work With" /><Chips>{pub.goals.map((t) => <Chip key={t}>{t}</Chip>)}</Chips></Section>
+      <Section>
+        <SectionHeader title="What Candidates Say" />
+        <div className={s.revs}>
+          {pub.reviews.map((r, i) => (
+            <div key={i} className={s.rev}>
+              <Stars n={r.stars} />
+              <Text role="body" as="p">{r.text}</Text>
+              <Text role="caption" as="span">{r.who}</Text>
+            </div>
+          ))}
+        </div>
+      </Section>
+    </Page>
   );
 }

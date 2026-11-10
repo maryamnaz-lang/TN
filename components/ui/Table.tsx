@@ -1,7 +1,7 @@
 "use client";
-import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { isValidElement, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import s from "./table.module.css";
 import { Icon } from "../Icon";
 import { Dropdown } from "./Dropdown";
@@ -10,26 +10,71 @@ import type { IconName } from "@/lib/icons";
 
 /* Every column is the same width and every cell is left-aligned, on every table (Maryam
    19 Oct 2026: one format for all tables, never opt-in). */
-export type Col<R> = { key: string; label: string; cell: (r: R) => ReactNode };
+/* `sort` is optional: without it a column sorts by the text its cell shows. `sort: false`
+   turns sorting off for that column. */
+export type Col<R> = { key: string; label: string; cell: (r: R) => ReactNode; sort?: ((r: R) => string | number) | false };
+
+/* COLUMN SORTING, EVERY TABLE (Maryam 4 Nov 2026). Click a header: ascending, again:
+   descending, a third time: back to the table's own order. The sort value is the text
+   the cell shows, so no table has to declare anything: a person cell sorts by name,
+   status by its word, dates (MM-DD-YYYY) by date, money and counts by number. */
+function nodeText(n: ReactNode): string {
+  if (n == null || typeof n === "boolean") return "";
+  if (typeof n === "string" || typeof n === "number") return String(n);
+  if (Array.isArray(n)) return n.map(nodeText).join(" ");
+  if (isValidElement(n)) {
+    const p = n.props as Record<string, unknown>;
+    if (p.children != null) return nodeText(p.children as ReactNode);
+    for (const k of ["name", "label", "value", "title"]) if (typeof p[k] === "string" || typeof p[k] === "number") return String(p[k]);
+  }
+  return "";
+}
+function sortKey(v: string | number): string | number {
+  if (typeof v === "number") return v;
+  const s = v.trim();
+  const d = s.match(/^(\d{2})-(\d{2})-(\d{4})/);
+  if (d) return Number(d[3] + d[1] + d[2]);
+  const n = s.replace(/[$,%\s]/g, "");
+  if (/^-?\d+(\.\d+)?$/.test(n)) return Number(n);
+  return s === "—" || s === "-" ? "" : s.toLowerCase();
+}
+const COLLATE = new Intl.Collator(undefined, { numeric: true, sensitivity: "base" });
+function cmp(a: string | number, b: string | number) {
+  const ea = a === "", eb = b === "";
+  if (ea || eb) return ea === eb ? 0 : ea ? 1 : -1;
+  if (typeof a === "number" && typeof b === "number") return a - b;
+  return COLLATE.compare(String(a), String(b));
+}
 export type RowAction = { icon: IconName; label: string; onClick: () => void; danger?: boolean };
 
-/* <Table> — one page at a time (5 rows by default; 5/10/25/50). A row with
+/* <Table> — one page at a time (5 rows by default, 10 on the Super Admin portal —
+   Maryam 3 Nov 2026; 5/10/25/50). A row with
    `href` opens it; `actions` adds the one kebab per row. */
 export function Table<R>({
-  cols, rows, rowKey, href, actions, pageSize = 5, selected, onSelect,
+  cols, rows, rowKey, href, actions, pageSize, selected, onSelect, loading,
 }: {
   cols: Col<R>[]; rows: R[]; rowKey: (r: R) => string;
   href?: (r: R) => string | undefined; actions?: (r: R) => RowAction[]; pageSize?: number;
   /* Row selection (Phase 1 admin tables with a kebab): a box per row and a
      select-all that takes the whole list, every page. */
   selected?: string[]; onSelect?: (ids: string[]) => void;
+  /* While true the header stays and the body is a shimmering skeleton of
+     `pageSize` rows; pagination waits for the data. */
+  loading?: boolean;
 }) {
   const router = useRouter();
-  const [size, setSize] = useState(pageSize);
+  const admin = usePathname()?.startsWith("/admin") ?? false;
+  const [size, setSize] = useState(pageSize ?? (admin ? 10 : 5));
   const [page, setPage] = useState(1);
+  const [sort, setSort] = useState<{ key: string; dir: 1 | -1 } | null>(null);
+  const sortCol = sort && cols.find((c) => c.key === sort.key);
+  /* Blanks ("—") always sink to the bottom, whichever way the column runs. */
+  const ordered = sortCol && sortCol.sort !== false ? rows.map((r) => ({ r, k: sortKey(sortCol.sort ? sortCol.sort(r) : nodeText(sortCol.cell(r))) }))
+    .sort((a, b) => (a.k === "" || b.k === "" ? cmp(a.k, b.k) : cmp(a.k, b.k) * sort!.dir)).map((x) => x.r) : rows;
+  const flip = (k: string) => { setSort((x) => (!x || x.key !== k ? { key: k, dir: 1 } : x.dir === 1 ? { key: k, dir: -1 } : null)); setPage(1); };
   const pages = Math.max(1, Math.ceil(rows.length / size));
   const cur = Math.min(page, pages);
-  const slice = rows.slice((cur - 1) * size, cur * size);
+  const slice = ordered.slice((cur - 1) * size, cur * size);
 
   return (
     <div>
@@ -43,12 +88,22 @@ export function Table<R>({
                     label="Select all" onClick={() => onSelect(rows.every((r) => selected?.includes(rowKey(r))) ? [] : rows.map(rowKey))} />
                 </th>
               )}
-              {cols.map((c) => <th key={c.key} className="t-compact w-strong">{c.label}</th>)}
+              {cols.map((c) => {
+                if (c.sort === false) return <th key={c.key} className="t-compact w-strong">{c.label}</th>;
+                const on = sort?.key === c.key ? sort.dir : 0;
+                return (
+                  <th key={c.key} className="t-compact w-strong" aria-sort={on === 1 ? "ascending" : on === -1 ? "descending" : "none"}>
+                    <button type="button" className={`${s.sortB} ${on ? s.sortOn : ""}`} onClick={() => flip(c.key)}>
+                      {c.label}<SortMark dir={on} />
+                    </button>
+                  </th>
+                );
+              })}
               {actions && <th className={`${s.act} t-compact w-strong`}>Actions</th>}
             </tr>
           </thead>
           <tbody>
-            {slice.map((r) => {
+            {loading ? <SkeletonRows n={size} cols={cols.length} sel={!!onSelect} act={!!actions} /> : slice.map((r) => {
               const to = href?.(r);
               return (
                 <tr key={rowKey(r)} className={to ? s.clk : undefined} onClick={to ? () => router.push(to) : undefined}>
@@ -68,7 +123,7 @@ export function Table<R>({
           </tbody>
         </table>
       </div>
-      {rows.length > 5 && (
+      {!loading && rows.length > 5 && (
         <div className={s.pgn}>
           <div className={`${s.pgnSize} t-body`}>
             Rows per page
@@ -86,6 +141,46 @@ export function Table<R>({
         </div>
       )}
     </div>
+  );
+}
+
+/* Skeleton rows (Maryam 3 Nov 2026, the YouTube loading preview): every cell is a
+   very light grey block with a shimmer sweeping through it, laid out as the real row
+   (a round face + two lines in the first column, one bar in the rest) so nothing
+   jumps when the data lands. Widths vary per column so it does not read as a grid. */
+const SK_W = [72, 96, 64, 84, 56, 90];
+function SkeletonRows({ n, cols, sel, act }: { n: number; cols: number; sel: boolean; act: boolean }) {
+  return (
+    <>
+      {Array.from({ length: n }, (_, r) => (
+        <tr key={r} aria-hidden="true">
+          {sel && <td className={s.sel}><span className={`${s.sk} ${s.skBox}`} /></td>}
+          {Array.from({ length: cols }, (_, c) => (
+            <td key={c}>
+              {c === 0 ? (
+                <span className={s.pcell}>
+                  <span className={`${s.sk} ${s.skFace}`} />
+                  <span className={s.skLines}><span className={s.sk} style={{ width: 120 }} /><span className={s.sk} style={{ width: 150, height: 10 }} /></span>
+                </span>
+              ) : <span className={s.sk} style={{ width: SK_W[(c + r) % SK_W.length] }} />}
+            </td>
+          ))}
+          {act && <td className={s.act}><span className={`${s.sk} ${s.skBox}`} /></td>}
+        </tr>
+      ))}
+    </>
+  );
+}
+
+/* The sort mark: an up and a down chevron stacked, always shown, light grey at rest. The
+   sorted column darkens the half that names its direction (Maryam 4 Nov 2026, replacing a
+   single chevron that only appeared on hover). */
+function SortMark({ dir }: { dir: 0 | 1 | -1 }) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className={s.sortMk}>
+      <path d="M8 9.5L12 5.5L16 9.5" className={dir === 1 ? s.sortMkOn : undefined} />
+      <path d="M8 14.5L12 18.5L16 14.5" className={dir === -1 ? s.sortMkOn : undefined} />
+    </svg>
   );
 }
 

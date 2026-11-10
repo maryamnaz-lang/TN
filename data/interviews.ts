@@ -30,6 +30,70 @@ const ROWS: Omit<Agent, "price">[] = [
 export const AGENTS: Agent[] = ROWS.map((a) => ({ ...a, price: candPrice(a.fees) }));
 export const agentByKey = (k: string) => AGENTS.find((a) => a.key === k) ?? AGENTS[0];
 
+/* ============================================================
+   THE AGENT'S PUBLIC PROFILE, as a candidate reads it before booking (Maryam 10 Nov 2026).
+   It is what the agent's own Public Profile tab says candidates see: About, specialities,
+   industries, the goals they work with, plus candidates' reviews. NEVER here: earnings,
+   payouts, commission, the agent's own fee split, the Agent Score, email, other candidates'
+   names, recommendations or interview records (the Super Admin's detail page only).
+   Owen's About, industries and goals are his own (data/agent.ts PUB); the other five and
+   every review are AUTHORED PLACEHOLDER (Phase 1 §74), reviews anonymised to track + month.
+   ============================================================ */
+export type AgentReview = { stars: number; text: string; who: string };
+export type AgentPublic = { about: string; industries: string[]; goals: string[]; reviews: AgentReview[] };
+export const AGENT_PUBLIC: Record<string, AgentPublic> = {
+  priya: {
+    about: "I spent nine years leading platform teams before I started interviewing. I ask about the decisions you made under real constraints: who you brought in, what you gave up and what you would change. Expect plain questions and a report that names one thing to work on next.",
+    industries: ["Technology", "Healthcare"], goals: ["Develop in my current role", "Develop for another role"],
+    reviews: [
+      { stars: 5, text: "She made it easy to talk about a project that went badly. The report was specific and fair.", who: "Explorer candidate · August 2026" },
+      { stars: 5, text: "Clear questions, no trick ones. I knew exactly what to work on afterwards.", who: "Explorer candidate · July 2026" },
+      { stars: 4, text: "Calm and well prepared. I would have liked a little more time on my second example.", who: "Builder candidate · July 2026" },
+    ],
+  },
+  owen: {
+    about: "I came to interviewing from running delivery teams, which is where I learned that what somebody says about a week and what they did in it are two different accounts. I ask for the second one. Eleven years in delivery, six of them managing managers. You will leave with one thing to work on, named plainly.",
+    industries: ["Technology", "Sales"], goals: ["Develop in my current role", "Develop for ownership"],
+    reviews: [
+      { stars: 5, text: "Direct but kind. He pushed for detail in a way that helped me think.", who: "Explorer candidate · August 2026" },
+      { stars: 4, text: "Good questions about handing work over. The feedback matched what my manager says.", who: "Builder candidate · June 2026" },
+    ],
+  },
+  lena: {
+    about: "I have managed product and engineering teams for twelve years. I listen for how you bring people with you, not just what shipped. The conversation is relaxed and you can use any example from work or outside it.",
+    industries: ["Technology", "Education"], goals: ["Develop for another role"],
+    reviews: [
+      { stars: 5, text: "Felt like a conversation, not a test. Very encouraging.", who: "Explorer candidate · August 2026" },
+      { stars: 4, text: "Helpful feedback on how I run team meetings.", who: "Explorer candidate · June 2026" },
+    ],
+  },
+  samuel: {
+    about: "Analytics and operations lead for ten years. I like examples with numbers in them: what you measured, what changed and how you knew. I will help you find the evidence in your own story.",
+    industries: ["Transportation and logistics", "Retail"], goals: ["Develop in my current role", "Develop for ownership"],
+    reviews: [
+      { stars: 4, text: "Practical and structured. He asked how I would know my plan was working.", who: "Builder candidate · July 2026" },
+      { stars: 5, text: "Best preparation I have had for a promotion conversation.", who: "Explorer candidate · May 2026" },
+    ],
+  },
+  hana: {
+    about: "I lead research and design teams and interview mostly Builder candidates. I ask about moments when you had to change someone's mind with evidence rather than authority.",
+    industries: ["Technology", "Food and hospitality"], goals: ["Develop for another role", "Develop in my current role"],
+    reviews: [
+      { stars: 4, text: "Thoughtful questions. The written report was detailed.", who: "Builder candidate · August 2026" },
+      { stars: 4, text: "She took time to understand my role before asking anything.", who: "Builder candidate · June 2026" },
+    ],
+  },
+  camila: {
+    about: "Growth and go-to-market leader who has built two teams from scratch. I focus on how you set direction when the plan is unclear and how you look after your people while doing it.",
+    industries: ["Sales", "Franchise ownership"], goals: ["Develop for ownership", "Develop in my current role"],
+    reviews: [
+      { stars: 5, text: "Energetic and generous with examples of her own. I left with a clear next step.", who: "Explorer candidate · August 2026" },
+      { stars: 5, text: "Asked about the hard parts of running my own shop without making it awkward.", who: "Builder candidate · July 2026" },
+    ],
+  },
+};
+export const agentPublic = (k: string) => AGENT_PUBLIC[k] ?? AGENT_PUBLIC.priya;
+
 /* The first interview is booked straight away with no payment step and no price shown
    anywhere, never "Free", "$0" or "Complimentary" (Maryam 26 Oct 2026); the re-interview
    (day 90) is charged at the agent's price (Phase 1 ivCharged). */

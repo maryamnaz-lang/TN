@@ -5,7 +5,8 @@ import { Page, PageHeader, Section, Stack, Text } from "../primitives";
 import { Table, PersonCell, Status, BulkBar, type RowAction } from "../ui/Table";
 import { Button } from "../ui/Button";
 import { Dropdown, MultiDropdown } from "../ui/Dropdown";
-import { Field, Input, TextArea, Search, Toolbar } from "../ui/Field";
+import { Field, Input, PhoneInput, TextArea, Search, Toolbar } from "../ui/Field";
+import { TALENT } from "@/data/agent";
 import { Slider } from "../ui/Slider";
 import { Sheet } from "../ui/Sheet";
 import { KV } from "../ui/KV";
@@ -40,6 +41,11 @@ export function AdminUsers() {
   const [f, setF] = useState<Record<string, string>>({ role: "all", status: "all" });
   const [sel, setSel] = useState<string[]>([]);
   const [sheet, setSheet] = useState<SheetKey>(null);
+  /* DEMO ONLY (Maryam 3 Nov 2026): the table body shows its skeleton for 3 seconds on
+     arrival, then the rows. Seed data is instant, so the wait is simulated; the header,
+     toolbar and page around it are live from the start. This is the one table that does it. */
+  const [loading, setLoading] = useState(true);
+  useEffect(() => { const t = setTimeout(() => setLoading(false), 3000); return () => clearTimeout(t); }, []);
   useEffect(() => { const r = new URLSearchParams(location.search).get("role"); if (r) setF((x) => ({ ...x, role: r })); }, []);
   const g = roleGroup(f.role);
   const fv = (k: string) => f[k] ?? "all";
@@ -77,7 +83,7 @@ export function AdminUsers() {
       { key: "s", label: "Status", cell: st }, { key: "a", label: "Last active", cell: (u: U) => u.last }]
     : g === "agent" ? [name,
       { key: "r", label: "Rank", cell: (u: U) => (u.rank ? String(u.rank) : "—") },
-      { key: "sc", label: "Agent Score", cell: (u: U) => (u.status === "invited" ? "—" : <span className={s.score}><Icon name="star" />{agScore(u)?.toFixed(1)}</span>) },
+      { key: "sc", label: "Agent Score", cell: (u: U) => (u.status === "invited" ? "—" : <span className={s.score}><Icon name="star" />{agScore(u)?.toFixed(1) ?? "—"}</span>) },
       { key: "i", label: "Interviews", cell: (u: U) => String(u.interviewed || 0) },
       { key: "tr", label: "Training", cell: (u: U) => { if (u.status === "invited") return "—"; const [t, l] = agTrainTone(u); return <Status tone={t}>{l}</Status>; } },
       { key: "as", label: "Assesses", cell: (u: U) => rangeLabel(agRange(u)) },
@@ -110,8 +116,8 @@ export function AdminUsers() {
         } />
       <Section kind="block">
         <Toolbar search={<Search value={q} onChange={setQ} placeholder={g === "candidate" ? "Search by name, email or level" : "Search by name or email"} />} filters={<>{filters}</>} />
-        {rows.length ? (
-          <Table rows={rows} rowKey={(u) => u.id} href={personHref} cols={cols} actions={(u) => rowActs(u, setSheet, router.push)} selected={sel} onSelect={setSel} />
+        {loading || rows.length ? (
+          <Table loading={loading} rows={rows} rowKey={(u) => u.id} href={personHref} cols={cols} actions={(u) => rowActs(u, setSheet, router.push)} selected={sel} onSelect={setSel} />
         ) : (
           <div className={s.empty}><Icon name="group" /><Text role="h4" as="span">No accounts match</Text><Text role="desc" as="span">{q ? `Nothing matches “${q}” in this filter.` : "Nothing in this filter yet."}</Text></div>
         )}
@@ -168,8 +174,8 @@ export function UserSheets({ sheet, close, sel = [], clearSel }: { sheet: SheetK
     case "editcand": return u ? <EditCand u={u} close={close} /> : null;
     case "editstaff": return u ? <EditStaff u={u} close={close} /> : null;
     case "deactext": case "deactivate":
-      return u ? <Reason title={`Deactivate ${u.name}`} ok="Deactivate" danger close={close}
-        ph={sheet.k === "deactext" ? "Why this account is being removed. Internal only." : "Why this account is being switched off. Internal only — they never see it."}
+      return u ? <Reason title={`Deactivate ${u.name}`} ok="Deactivate" danger close={close} reasons={DEACT_REASONS}
+        ph={sheet.k === "deactext" ? "Type the reason. Internal only." : "Type the reason. Internal only, they never see it."}
         help={sheet.k === "deactivate" ? "They are signed out immediately and can’t sign in again. The record, role and history stay intact so the account can be reactivated later." : undefined}
         onOk={() => commit(() => { u.status = "inactive"; u.deactivatedOn = mdy(new Date()); }, `${u.name} deactivated`)} /> : null;
     case "reactext": case "reactivate":
@@ -178,8 +184,8 @@ export function UserSheets({ sheet, close, sel = [], clearSel }: { sheet: SheetK
         help={sheet.k === "reactivate" ? "Their password is unchanged, so they sign in exactly as before — a one-time code to their email at each sign-in, as always." : undefined}
         onOk={() => commit(() => { u.status = "active"; delete u.deactivatedOn; }, `${u.name} reactivated`)} /> : null;
     case "bulkdeact":
-      return <Reason title={`Deactivate ${sel.length} account${sel.length === 1 ? "" : "s"}`} ok={sel.length > 1 ? "Deactivate All" : "Deactivate"} danger close={close}
-        ph="Why these accounts are being removed. Internal only."
+      return <Reason title={`Deactivate ${sel.length} account${sel.length === 1 ? "" : "s"}`} ok={sel.length > 1 ? "Deactivate All" : "Deactivate"} danger close={close} reasons={DEACT_REASONS}
+        ph="Type the reason. Internal only."
         onOk={() => commit(() => { sel.forEach((x) => { x.status = "inactive"; x.deactivatedOn = mdy(new Date()); }); clearSel?.(); }, `${sel.length} account${sel.length === 1 ? "" : "s"} deactivated`)} />;
     case "agpause":
       return u ? <Reason title={`Pause ${u.name}’s listing`} ok="Pause Listing" close={close} ph="Required — written to the audit log; never shown to the agent"
@@ -206,15 +212,25 @@ const Foot = ({ ok, onOk, disabled, danger, close }: { ok: string; onOk: () => v
   <><Button kind="secondary" onClick={close}>Cancel</Button><Button kind={danger ? "danger" : "primary"} disabled={disabled} onClick={onOk}>{ok}</Button></>
 );
 
-/* A centred sheet whose one required field is a reason. */
-function Reason({ title, ok, ph, onOk, close, danger, top, help, extra }: {
-  title: string; ok: string; ph: string; onOk: () => void; close: () => void; danger?: boolean; top?: ReactNode; help?: ReactNode; extra?: ReactNode;
+/* A centred sheet whose one required field is a reason. With `reasons`, the reason is a
+   DROPDOWN of set reasons, and only "Other reason" opens a text field to type one
+   (Maryam 3 Nov 2026, on Deactivate). The list is authored placeholder (§74). */
+const OTHER = "Other reason";
+const DEACT_REASONS = ["No longer with the organisation", "Requested by the account holder", "Policy or conduct violation", "Inactive for a long period", "Duplicate account", OTHER];
+function Reason({ title, ok, ph, onOk, close, danger, top, help, extra, reasons }: {
+  title: string; ok: string; ph: string; onOk: () => void; close: () => void; danger?: boolean; top?: ReactNode; help?: ReactNode; extra?: ReactNode; reasons?: string[];
 }) {
-  const [why, setWhy] = useState("");
+  const [why, setWhy] = useState(""), [pick, setPick] = useState("");
+  const ready = reasons ? !!pick && (pick !== OTHER || !!why.trim()) : !!why.trim();
   return (
-    <Sheet title={title} onClose={close} footer={<Foot ok={ok} danger={danger} disabled={!why.trim()} close={close} onOk={() => { onOk(); close(); }} />}>
+    <Sheet title={title} onClose={close} footer={<Foot ok={ok} danger={danger} disabled={!ready} close={close} onOk={() => { onOk(); close(); }} />}>
       {top}
-      <Field label="Reason" required><TextArea rows={3} value={why} onChange={(e) => setWhy(e.target.value)} placeholder={ph} /></Field>
+      {reasons ? (
+        <>
+          <Field label="Reason" required><Dropdown variant="form" placeholder="Select a reason" value={pick || undefined} onChange={setPick} options={reasons.map((r) => ({ value: r, label: r }))} /></Field>
+          {pick === OTHER && <Field label="Other reason" required><TextArea rows={3} value={why} onChange={(e) => setWhy(e.target.value)} placeholder={ph} /></Field>}
+        </>
+      ) : <Field label="Reason" required><TextArea rows={3} value={why} onChange={(e) => setWhy(e.target.value)} placeholder={ph} /></Field>}
       {extra}
       {help && <Text role="desc" as="p">{help}</Text>}
     </Sheet>
@@ -252,23 +268,9 @@ function ChangeRole({ u, close }: { u: U; close: () => void }) {
   );
 }
 
-/* The 5-star starting Agent Score (Phase 1 starPick). */
-function StarPick({ value, onChange }: { value: number; onChange: (n: number) => void }) {
-  return (
-    <span className={s.stars} role="radiogroup" aria-label="Initial rating">
-      {[1, 2, 3, 4, 5].map((n) => (
-        <button key={n} type="button" role="radio" aria-checked={value === n} aria-label={`${n} star${n > 1 ? "s" : ""}`} className={n <= value ? s.on : ""} onClick={() => onChange(n)}>
-          <Icon name={n <= value ? "star" : "starOutline"} />
-        </button>
-      ))}
-    </span>
-  );
-}
-const RatingField = ({ value, onChange }: { value: number; onChange: (n: number) => void }) => (
-  <Field label="Initial rating" required>
-    <StarPick value={value} onChange={onChange} />
-  </Field>
-);
+/* NO INITIAL RATING ON AN AGENT INVITE (Maryam 3 Nov 2026): the 5-star starting Agent
+   Score picker is gone from Add a user and Mark as Talent Agent. A new agent has no score
+   until their first review, so every score cell reads "—" for them. */
 
 /* The fees that make up an interview's price, with the candidate's price worked out live
    underneath. Used by every form that creates or edits an agent. THE AGENT'S FEE IS SET
@@ -332,14 +334,34 @@ function FeeFields({ fees, com, pf, setFees, onCom, onPf }: { fees: FeeStr; com:
   );
 }
 
+/* An agent's CANDIDATE TYPES (the six TALENT types, any number) and YEARS OF EXPERIENCE,
+   asked on every talent-agent invite, after the tracks and fees (Maryam 6 Nov 2026, off the
+   build the developers shipped). They replace the 3 Nov Industry + Skills pair. Both are
+   REQUIRED (Maryam 6 Nov 2026): at least one type, and a whole number of years. */
+const TYPE_OPTS = TALENT.map((x) => ({ value: x.k, label: x.n }));
+type Prof = { types: string[]; years: string };
+const NO_PROF: Prof = { types: [], years: "" };
+const yearsOk = (y: string) => /^\d{1,2}$/.test(y.trim()) && +y <= 60;
+const profOk = (p: Prof) => p.types.length > 0 && yearsOk(p.years);
+const profSave = (p: Prof) => ({ types: p.types, years: +p.years });
+function AgentProfileFields({ p, onChange }: { p: Prof; onChange: (p: Prof) => void }) {
+  return (
+    <>
+      <Field label="Candidate types they interview" required><MultiDropdown value={p.types} onChange={(types) => onChange({ ...p, types })} options={TYPE_OPTS} placeholder="Select candidate types" /></Field>
+      <Field label="Years of experience" required help={!p.years.trim() || yearsOk(p.years) ? undefined : "Enter a whole number between 0 and 60."}><Input value={p.years} inputMode="numeric" onChange={(e) => onChange({ ...p, years: e.target.value })} placeholder="e.g. 8" /></Field>
+    </>
+  );
+}
+
 function MarkAgent({ u, close }: { u: U; close: () => void }) {
-  const [rating, setRating] = useState(0), [fees, setFees] = useState<FeeStr>(NO_FEES), [com, setCom] = useState(COM_DEFAULT), [pf, setPf] = useState("");
+  const [fees, setFees] = useState<FeeStr>(NO_FEES), [com, setCom] = useState(COM_DEFAULT), [pf, setPf] = useState("");
+  const [prof, setProf] = useState<Prof>(NO_PROF);
   return (
     <Sheet title={`Invite ${u.name} to be a talent agent`} onClose={close}
-      footer={<Foot ok="Send Invite" disabled={!rating || !feesReady(fees, com, pf)} close={close} onOk={() => { commit(() => { u.roles = [...u.roles, "agent"]; Object.assign(u, feeSave(fees, com, pf)); u.startingScore = rating; u.scoreApproved = false; u.onboarded = false; }, `Agent invite sent to ${u.email}`); close(); }} />}>
-      <Text role="desc" as="p">{u.name} keeps their current account and role. Set their interview fees and starting Agent Score; an invitation to the agent workspace is sent.</Text>
+      footer={<Foot ok="Send Invite" disabled={!profOk(prof) || !feesReady(fees, com, pf)} close={close} onOk={() => { commit(() => { u.roles = [...u.roles, "agent"]; Object.assign(u, feeSave(fees, com, pf)); Object.assign(u, profSave(prof)); u.onboarded = false; }, `Agent invite sent to ${u.email}`); close(); }} />}>
+      <Text role="desc" as="p">{u.name} keeps their current account and role. Set their interview fees; an invitation to the agent workspace is sent.</Text>
       <FeeFields fees={fees} com={com} pf={pf} setFees={setFees} onCom={setCom} onPf={setPf} />
-      <RatingField value={rating} onChange={setRating} />
+      <AgentProfileFields p={prof} onChange={setProf} />
     </Sheet>
   );
 }
@@ -351,7 +373,11 @@ function MarkAgent({ u, close }: { u: U; close: () => void }) {
    belong to the PERSON, so every picked internal role shares ONE staff section,
    headed with their names. Values typed into a section survive removing and
    re-adding its role. */
-const ROLE_OPTS = [{ value: "agent", label: "Talent Agent" }, ...INTERNAL_ROLES.map(opt)];
+/* Candidate joins the invitable roles (Maryam, 4 Nov 2026). The invite emails a link to the
+   preliminary quiz; the candidate takes it and signs up from there, so nothing more is asked here.
+   Picking it draws no block of its own; the confirmation toast names the quiz link (Maryam, 4 Nov 2026). */
+const ROLE_OPTS = [{ value: "candidate", label: "Candidate" }, { value: "agent", label: "Talent Agent" }, ...INTERNAL_ROLES.map(opt)];
+const NOT_STAFF = ["agent", "candidate"];
 /* One picked role's fields, in a block of their own: a white panel inside a hairline,
    its heading at the top (Maryam 26 Oct 2026: a divider alone "is looking very confusing"). */
 /* Its top-right carries a red delete icon that takes the role(s) back out of the pick, for a
@@ -374,13 +400,14 @@ function AddUser({ close }: { close: () => void }) {
   const [roles, setRoles] = useState<string[]>([]);
   const [v, setV] = useState({ first: "", last: "", email: "", phone: "", job: "", dept: "", com: COM_DEFAULT, pf: "" });
   const [fees, setFees] = useState<FeeStr>(NO_FEES);
-  const [rating, setRating] = useState(0);
+  const [prof, setProf] = useState<Prof>(NO_PROF);
   const set = (k: keyof typeof v) => (e: { target: { value: string } }) => setV((x) => ({ ...x, [k]: e.target.value }));
   const agent = roles.includes("agent");
-  const staff = roles.filter((r) => r !== "agent");
+  const cand = roles.includes("candidate");
+  const staff = roles.filter((r) => !NOT_STAFF.includes(r));
   const staffNames = staff.map((k) => ROLE_BY_K[k].name);
   const ready = roles.length > 0 && v.first.trim() && v.last.trim() && v.email.trim()
-    && (!agent || (rating > 0 && feesReady(fees, v.com, v.pf)))
+    && (!agent || (profOk(prof) && feesReady(fees, v.com, v.pf)))
     && (!staff.length || (v.job.trim() && v.dept && v.phone.trim()));
   const send = () => {
     commit(() => {
@@ -388,9 +415,10 @@ function AddUser({ close }: { close: () => void }) {
         id: `u${Date.now()}`, name: `${v.first.trim()} ${v.last.trim()}`, email: v.email.trim(), roles: [...roles], status: "invited", invitedOn: mdy(new Date()),
         joined: mdy(new Date()), last: "Never", level: "—",
         ...(staff.length ? { internal: true, job: v.job, dept: v.dept, phone: v.phone } : {}),
-        ...(agent ? { ...feeSave(fees, v.com, v.pf), startingScore: rating, scoreApproved: false, interviewed: 0, onboarded: false, training: "notcomplete" } : {}),
+        ...(agent ? { ...feeSave(fees, v.com, v.pf), ...profSave(prof), interviewed: 0, onboarded: false, training: "notcomplete" } : {}),
       });
-    }, `Invite sent to ${v.email.trim()} as ${andList(roles.map((r) => ROLE_OPTS.find((o) => o.value === r)!.label))}`);
+    }, cand && roles.length === 1 ? `Quiz link sent to ${v.email.trim()}`
+      : `Invite sent to ${v.email.trim()} as ${andList(roles.map((r) => ROLE_OPTS.find((o) => o.value === r)!.label))}`);
     close();
   };
   return (
@@ -407,16 +435,16 @@ function AddUser({ close }: { close: () => void }) {
         {agent && (
           <RoleBlock title="Talent Agent" onRemove={() => setRoles((r) => r.filter((k) => k !== "agent"))}>
             <FeeFields fees={fees} com={v.com} pf={v.pf} setFees={setFees} onCom={(x) => setV((y) => ({ ...y, com: x }))} onPf={(x) => setV((y) => ({ ...y, pf: x }))} />
-            <RatingField value={rating} onChange={setRating} />
+            <AgentProfileFields p={prof} onChange={setProf} />
           </RoleBlock>
         )}
         {staff.length > 0 && (
           /* The internal roles share one block (phone, job title, department are the person's), so its delete removes all of them. */
-          <RoleBlock title={andList(staffNames)} onRemove={() => setRoles((r) => r.filter((k) => k === "agent"))}>
+          <RoleBlock title={andList(staffNames)} onRemove={() => setRoles((r) => r.filter((k) => NOT_STAFF.includes(k)))}>
             <Field label="Job title" required><Input value={v.job} onChange={set("job")} placeholder="e.g. Level Reviewer" /></Field>
             <Field label="Department" required help={depts().length ? undefined : NO_DEPTS}><Dropdown variant="form" disabled={!depts().length} placeholder="Select a department" value={v.dept || undefined} onChange={(d) => setV((x) => ({ ...x, dept: d }))} options={depts().map((d) => ({ value: d, label: d }))} /></Field>
             {/* Last in the block and required (Maryam 26 Oct 2026). */}
-            <Field label="Phone number" required><Input value={v.phone} onChange={set("phone")} inputMode="tel" placeholder="+1 (415) 555-0100" /></Field>
+            <Field label="Phone number" required><PhoneInput value={v.phone} onChange={set("phone")} placeholder="+1 (415) 555-0100" /></Field>
           </RoleBlock>
         )}
       </Stack>
@@ -476,7 +504,7 @@ function EditStaff({ u, close }: { u: U; close: () => void }) {
         <Field label="Job title" required><Input value={v.job} onChange={(e) => setV({ ...v, job: e.target.value })} /></Field>
         <Field label="Department" required><Dropdown variant="form" value={v.dept} onChange={(x) => setV({ ...v, dept: x })} options={depts().map((d) => ({ value: d, label: d }))} /></Field>
         {/* Below Department and required, as on the invite (Maryam 26 Oct 2026). */}
-        <Field label="Phone number" required><Input value={v.phone} onChange={(e) => setV({ ...v, phone: e.target.value })} inputMode="tel" placeholder="+1 (415) 555-0100" /></Field>
+        <Field label="Phone number" required><PhoneInput value={v.phone} onChange={(e) => setV({ ...v, phone: e.target.value })} placeholder="+1 (415) 555-0100" /></Field>
       </Stack>
     </Slider>
   );

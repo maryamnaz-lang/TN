@@ -15,7 +15,9 @@ import { CallRow, When } from "./CallRow";
 import { CourseOffer } from "./CourseOffer";
 import { QuizModal, EnrolledDialog } from "./Level";
 import { courseByKey } from "@/data/level";
-import { BookedDialog, bookHref } from "./Interviews";
+import { BookedDialog, bookHref, profHref } from "./Interviews";
+import iv from "./interviews.module.css";
+import Link from "next/link";
 import { Price } from "../ui/Price";
 
 /* ============================================================
@@ -117,10 +119,13 @@ function StageCard({ card, stage }: { card: Card; stage: string }) {
         <DarkCard title={card.title} tal slot={<Button kind="onDark" go href="/candidate/interviews/agents/">View All Agents</Button>}>
           <div className={s.rec}>
             <div className={s.recL}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img className={s.face} src={A.img} alt="" />
+              {/* The photo and the name open Priya's profile (Maryam 10 Nov 2026). */}
+              <Link href={profHref("priya")} aria-label={`${A.name} profile`}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img className={s.face} src={A.img} alt="" />
+              </Link>
               <div className={s.recB}>
-                <span className={s.nameRow}><Text role="h3" as="span">{A.name}</Text><Icon name="verified" className={s.verified} /></span>
+                <span className={s.nameRow}><Link href={profHref("priya")} className={iv.profLink}><Text role="h3" as="span">{A.name}</Text></Link><Icon name="verified" className={s.verified} /></span>
                 <Text role="compact" as="span" className={s.rating}><Icon name="star" />{A.rating} · {A.interviews} interviews</Text>
                 <Text role="compact" as="p" strong>{A.why}</Text>
                 <Text role="compact" as="p" className={s.meta}>

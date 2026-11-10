@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { allRoutes, resolve, PORTALS, type PortalKey } from "@/lib/portals";
+import { ErrorStatesPage } from "@/components/ErrorStatesPage";
 import { ModulePage } from "@/components/ModulePage";
 import { Gallery } from "@/components/Gallery";
 import { CandidateDashboard } from "@/components/candidate/Dashboard";
@@ -8,7 +9,7 @@ import { PaymentsPage } from "@/components/candidate/Payments";
 import { ProgressPage } from "@/components/candidate/Progress";
 import { CourseworkPage } from "@/components/candidate/Coursework";
 import { LevelPage, ResultPage, CoursesPage, CoursePage, CoursePayPage } from "@/components/candidate/Level";
-import { InterviewsHome, AgentsPage, BookPage, CheckoutPage, ReportPage } from "@/components/candidate/Interviews";
+import { InterviewsHome, AgentsPage, AgentProfilePage, BookPage, CheckoutPage, ReportPage } from "@/components/candidate/Interviews";
 import { AgentDashboard } from "@/components/agent/Dashboard";
 import { AgentEarnings, AgentStanding } from "@/components/agent/Earnings";
 import { AgentProfile } from "@/components/agent/Profile";
@@ -35,6 +36,7 @@ export default async function Route({ params }: { params: Promise<{ portal: stri
   const p = portal as PortalKey;
   const { title } = resolve(p, slug);
   if (slug[0] === "gallery") return <Gallery />;
+  if (slug[0] === "states") return <ErrorStatesPage portal={p} />;
   if (p === "candidate" && slug.length === 0) return <CandidateDashboard />;
   if (p === "candidate" && slug[0] === "profile") return <ProfilePage />;
   if (p === "candidate" && slug[0] === "payments") return <PaymentsPage />;
@@ -48,7 +50,7 @@ export default async function Route({ params }: { params: Promise<{ portal: stri
   }
   if (p === "candidate" && slug[0] === "interviews") {
     const [, sub, arg] = slug;
-    if (sub === "agents") return <AgentsPage />;
+    if (sub === "agents") return arg ? <AgentProfilePage agent={arg} /> : <AgentsPage />;
     if (sub === "book") return <BookPage agent={arg} />;
     if (sub === "checkout") return <CheckoutPage agent={arg} />;
     if (sub === "report") return <ReportPage kind={arg === "re" ? "re" : "level"} />;

@@ -138,8 +138,12 @@ export const href = (p: PortalKey, ...seg: string[]) =>
 const AGENT_IV_IDS = ["rafael", "amara", "marcus", "yuki", "diego", "sofia", "grace", "omar", "farah", "daniel", "petra", "tom", "nina"];
 const AGENT_KEYS = ["priya", "owen", "lena", "samuel", "hana", "camila"];
 export const EXTRA_ROUTES: { portal: PortalKey; slug: string[] }[] = [
+  /* The developers' error-states page, one per portal shell (Maryam 5 Nov 2026). Off the
+     rail and the account menu; reached from the ⋮ prototype menu. */
+  { portal: "candidate", slug: ["states"] }, { portal: "agent", slug: ["states"] }, { portal: "admin", slug: ["states"] },
   { portal: "candidate", slug: ["interviews", "agents"] },
   ...AGENT_KEYS.flatMap((k) => [
+    { portal: "candidate" as PortalKey, slug: ["interviews", "agents", k] },
     { portal: "candidate" as PortalKey, slug: ["interviews", "book", k] },
     { portal: "candidate" as PortalKey, slug: ["interviews", "checkout", k] },
   ]),
@@ -194,6 +198,6 @@ export function resolve(p: PortalKey, slug: string[]) {
   const item = PORTALS[p].nav.find((n) => n.key === a);
   const sub = item?.subs?.find((s) => s.key === b) ?? (item?.subs ? item.subs[0] : undefined);
   const acct = ACCOUNT_PAGES[p].find((x) => x.key === a);
-  const title = acct?.title ?? sub?.title ?? item?.title ?? "Not found";
+  const title = a === "states" ? "Error States" : acct?.title ?? sub?.title ?? item?.title ?? "Page not found";
   return { item, sub, acct, title };
 }

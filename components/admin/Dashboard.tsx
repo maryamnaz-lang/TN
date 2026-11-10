@@ -53,7 +53,7 @@ export function AdminDashboard() {
   const escrow = PAYOUTS.filter((p) => p.status === "held").reduce((n, p) => n + p.net, 0);
   const returned = PAYOUTS.filter((p) => p.status === "returned").reduce((n, p) => n + p.net, 0);
   const byTrack = ["Explorer", "Builder", "Trailblazer"].map((b) => [b, CANDS.filter((c) => c.bucket === b).length] as const);
-  const top = AGENTS().filter((a) => a.status !== "invited").sort((a, b) => agScore(b) - agScore(a) || b.interviewed - a.interviewed).slice(0, 3);
+  const top = AGENTS().filter((a) => a.status !== "invited").sort((a, b) => (agScore(b) ?? 0) - (agScore(a) ?? 0) || b.interviewed - a.interviewed).slice(0, 3);
   const link = (label: string, href: string) => <Button kind="link" go href={href}>{label}</Button>;
 
   return (
@@ -194,7 +194,7 @@ export function AdminDashboard() {
         <Table rows={top} rowKey={(a) => a.id} href={(a) => `/admin/users/all/${a.id}/`} pageSize={10} cols={[
           { key: "a", label: "Agent", cell: (a) => <PersonCell name={a.name} img={face(a.name)} /> },
           { key: "r", label: "Rank", cell: (a) => `#${top.indexOf(a) + 1}` },
-          { key: "s", label: "Agent Score", cell: (a) => <span className={s.score}><Icon name="star" />{agScore(a).toFixed(1)}{a.scoreApproved === false && <Text role="caption" as="span"> · Starting</Text>}</span> },
+          { key: "s", label: "Agent Score", cell: (a) => <span className={s.score}><Icon name="star" />{agScore(a)?.toFixed(1) ?? "—"}{a.scoreApproved === false && <Text role="caption" as="span"> · Starting</Text>}</span> },
           { key: "i", label: "Interviews conducted", cell: (a) => <>{a.interviewed} <Text role="caption" as="span">interviews</Text></> },
         ]} />
       </Section>

@@ -63,7 +63,7 @@ export function AgentInterviews() {
                   day={schedDay(x.day)} time={x.time}
                   lines={x.kind === "Re-interview"
                     ? ["Re-interview · 45 minutes · Recorded"]
-                    : [`First Interview · 45 minutes · Recorded · $${ivFee(x)} already paid and held`]} />
+                    : [`First Interview · 45 minutes · Recorded · $${ivFee(x)} your fee`]} />
               ))}
             </PersonList>
           </Section>
@@ -93,7 +93,7 @@ function PastTable({ rows }: { rows: Iv[] }) {
       <Table rows={rows} rowKey={(x) => x.id} cols={[
         { key: "n", label: "Candidate", cell: (x) => x.n },
         { key: "d", label: "Interviewed", cell: (x) => dayDate(x.day) },
-        { key: "l", label: "Level", cell: (x) => (x.st === "report" ? "Recording to confirm" : x.level) },
+        { key: "l", label: "Level", cell: (x) => (x.st === "report" ? "Recommendation pending" : x.level) },
         { key: "f", label: "Follow-up", cell: (x) => (x.follow ?? "—") },
         { key: "p", label: "Depth", cell: (x) => (x.depth ?? "—") },
       ]} />
@@ -148,7 +148,7 @@ function Upcoming({ x }: { x: Iv }) {
       </Section>
       <Section tint>
         <Disclosure title="Before the Interview">
-          <Text role="desc">Three steps to prepare. Sending your recommendation after the call releases your payout.</Text>
+          <Text role="desc">Three steps to prepare, then send your recommendation after the call.</Text>
           <HowItWorks steps={STEPS} />
         </Disclosure>
       </Section>
@@ -288,12 +288,12 @@ function Recommend({ x }: { x: Iv }) {
       </Section>
       {confirm === "send" && (
         <Confirm icon="send" title="Send this recommendation?" ok="Send Recommendation"
-          desc="Your proposed level and TALENT letters go to a reviewer, who has 24 hours to approve them. You cannot change them after sending. This files your report and releases your payout three working days after the call."
+          desc="Your proposed level and TALENT letters go to a reviewer, who has 24 hours to approve them. You cannot change them after sending."
           onCancel={() => setConfirm(null)} onOk={() => { setConfirm(null); router.push(`${BASE}/`); }} />
       )}
       {confirm === "draft" && (
         <Confirm icon="checkOutline" title="Draft saved" ok="Done"
-          desc="Your evaluation is saved and visible only to you. The interview stays in Evaluations and your payout stays blocked until you send it."
+          desc="Your evaluation is saved and visible only to you. The interview stays in Pending Recommendations until you send it."
           onCancel={() => setConfirm(null)} onOk={() => setConfirm(null)} />
       )}
     </Page>

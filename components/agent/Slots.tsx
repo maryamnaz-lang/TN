@@ -5,12 +5,13 @@ import { Button } from "../ui/Button";
 import { Modal } from "../ui/Modal";
 import { Dropdown } from "../ui/Dropdown";
 import { Icon } from "../Icon";
-import { WEEK_SHIFTS, SHIFT_MAX, SLOT_DAYS, SLOT_TIMES, slotMin, type Shift } from "@/data/agent";
+import { WEEK_SHIFTS, SLOT_DAYS, SLOT_TIMES, slotMin, type Shift } from "@/data/agent";
 import s from "./slots.module.css";
 
 /* ============================================================
    AVAILABILITY — on the agent's My Profile, after About (Maryam 19 Oct 2026).
-   The agent sets SHIFTS, not single times: a day carries one or two shifts,
+   The agent sets SHIFTS, not single times: a day carries any number of shifts
+   (no two-a-day cap since Maryam 10 Nov 2026),
    each a start-to-end window ("9:00 AM – 5:00 PM"), and candidates book
    45-minute interviews inside them. Single start times read wrongly, since
    10:00 and 10:30 on one day overlap a 45-minute call.
@@ -19,14 +20,17 @@ import s from "./slots.module.css";
    as a grey removable block. The heading's "Add Shift" is the one way to add.
    Removing a shift leaves booked interviews alone.
    ============================================================ */
-export function Availability() {
-  const [shifts, setShifts] = useState<Shift[]>(WEEK_SHIFTS);
+/* The profile may hold the shifts itself (its Visibility toggle needs to know whether any
+   exist, Maryam 10 Nov 2026); without them the section keeps its own. */
+export function Availability({ shifts: held, setShifts: setHeld }: { shifts?: Shift[]; setShifts?: (v: Shift[] | ((x: Shift[]) => Shift[])) => void } = {}) {
+  const [own, setOwn] = useState<Shift[]>(WEEK_SHIFTS);
+  const shifts = held ?? own, setShifts = setHeld ?? setOwn;
   const [adding, setAdding] = useState(false);
   const byDay = SLOT_DAYS.map((day) => [day, shifts.filter((x) => x.day === day).sort((a, b) => slotMin(a.start) - slotMin(b.start))] as const);
   const rows = byDay.filter(([, list]) => list.length);
   return (
     <Section>
-      <SectionHeader title="Availability" desc="The hours candidates can book a 45-minute interview with you, up to two shifts a day. Removing a shift does not affect interviews already booked."
+      <SectionHeader title="Availability" desc="Shifts repeat every week. Removing one keeps interviews already booked."
         actions={<Button kind="link" icon="add" onClick={() => setAdding(true)}>Add Shift</Button>} />
       {rows.length ? (
         <div className={s.grid}>
@@ -60,17 +64,16 @@ export function Availability() {
 
 /* The add-shift dialog: a weekday, then start "to" end. Save stays off, with the reason
    underneath, until the end is after the start, the shift does not overlap one already
-   on that day, and the day has fewer than two shifts. It opens on the first day with room. */
+   on that day. A day takes any number of shifts (Maryam 10 Nov 2026). */
 function AddShift({ shifts, onClose, onSave }: { shifts: Shift[]; onClose: () => void; onSave: (day: string, start: string, end: string) => void }) {
   const onDay = (d: string) => shifts.filter((x) => x.day === d);
-  const [day, setDay] = useState(SLOT_DAYS.find((d) => onDay(d).length < SHIFT_MAX) ?? SLOT_DAYS[0]);
+  const [day, setDay] = useState(SLOT_DAYS[0]);
   const [start, setStart] = useState("9:00 AM");
   const [end, setEnd] = useState("5:00 PM");
   const opt = (v: string) => ({ value: v, label: v });
   const a = slotMin(start), b = slotMin(end);
   const clash = onDay(day).find((x) => a < slotMin(x.end) && slotMin(x.start) < b);
-  const err = onDay(day).length >= SHIFT_MAX ? `${day} already has two shifts. Remove one to add another.`
-    : b <= a ? "The shift must end after it starts."
+  const err = b <= a ? "The shift must end after it starts."
     : b - a < 45 ? "A shift must be at least 45 minutes, the length of one interview."
     : clash ? `This overlaps the ${clash.start} – ${clash.end} shift on ${day}.`
     : "";

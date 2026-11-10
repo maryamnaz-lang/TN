@@ -6,7 +6,7 @@ import { QuickActions } from "../ui/QuickActions";
 import { ProgressWing } from "../ui/ProgressWing";
 import { Stats, Stat } from "../ui/Figures";
 import { Button } from "../ui/Button";
-import { AGENT as A, IVS, PHOTO, dayDate, kindLabel, levelLine, ivFee, FEE_SPAN, HELD_FOR_YOU, HELD_TOTAL } from "@/data/agent";
+import { AGENT as A, IVS, PHOTO, dayDate, kindLabel, levelLine, ivFee } from "@/data/agent";
 
 /* ============================================================
    AGENT HOME — Phase 1 V.dashboard on the working week, minus the Tal
@@ -25,17 +25,18 @@ export function AgentDashboard() {
       <Section>
         <ProgressWing full title="Your earnings"
           big={`$${A.earned}`} bigLabel="Earned This Month"
-          right={`$${HELD_FOR_YOU}`} rightLabel="Awaiting Release"
-          segs={["done", "done", "done", "done", "now", "now", "now"]} />
+          right={String(A.month)} rightLabel="Interviews This Month"
+          segs={["done", "done", "done", "done", "done", "done", "done"]} />
       </Section>
       {/* The three figures: their own block section of three joint cards inside the band,
           one section gap under the bar, as on the candidate's Week 1 dashboard (Maryam 16 Oct 2026). */}
       <Section kind="block" bare>
         <Stats cols={3}>
-          <Stat icon="video" label="Interviews Completed" value={String(A.month)} desc="This month" />
-          {/* Per-track fees (26 Oct 2026): the range, set by the candidate's level. */}
-          <Stat icon="wallet" label="Fee per Interview" value={FEE_SPAN} desc="By level, paid to you in full" />
-          <Stat icon="creditCard" label="Gross Held" value={`$${HELD_TOTAL}`} desc="Released once you send the evaluation" />
+          <Stat icon="video" label="Interviews Completed" value={String(A.ivs)} desc="Since you joined" />
+          {/* Maryam 10 Nov 2026: the fee range gave way to the upcoming count, and the third
+              cell is the candidates' rating (there is no Agent Score; held funds are gone too). */}
+          <Stat icon="calendar" label="Upcoming Interviews" value={String(IVS.filter((x) => x.st === "next").length)} desc="Booked with you" />
+          <Stat icon="starOutline" label="Rating" value={String(A.rating)} desc="From your candidates" />
         </Stats>
       </Section>
       </HeadBand>
@@ -45,7 +46,7 @@ export function AgentDashboard() {
       <Section kind="block">
         <SectionHeader title="Quick Actions" />
         <QuickActions items={[
-          { icon: "video", title: "Recordings to Confirm", desc: "For pending payment release.", href: "/agent/interviews/?tab=eval" },
+          { icon: "video", title: "Pending Recommendations", desc: "Send your evaluations.", href: "/agent/interviews/?tab=eval" },
           { icon: "calendar", title: "Upcoming Interviews", desc: "View your scheduled interviews.", href: "/agent/interviews/?tab=next" },
         ]} />
       </Section>
@@ -59,7 +60,7 @@ export function NextCall({ id, actions }: { id: string; actions?: React.ReactNod
   const x = IVS.find((i) => i.id === id)!;
   return (
     <CallRow img={PHOTO[x.id]} name={x.n}
-      lines={[`${kindLabel(x)} · ${levelLine(x)}`, `45 minutes · Recorded · $${ivFee(x)} already paid and held`]}
+      lines={[`${kindLabel(x)} · ${levelLine(x)}`, `45 minutes · Recorded · $${ivFee(x)} your fee`]}
       action={actions ?? <Button kind="accent" iconEnd="video" disabled>Join Call</Button>} />
   );
 }

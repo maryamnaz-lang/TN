@@ -10,7 +10,7 @@ import { Tabs } from "../ui/Tabs";
 import { KV } from "../ui/KV";
 import { Button } from "../ui/Button";
 import { Dropdown } from "../ui/Dropdown";
-import { Search, Toolbar, Field, Input, TextArea } from "../ui/Field";
+import { Search, Toolbar, Field, Input, PhoneInput, TextArea } from "../ui/Field";
 import { DateFilter } from "../ui/DateFilter";
 import { Slider } from "../ui/Slider";
 import { Sheet } from "../ui/Sheet";
@@ -18,10 +18,11 @@ import { Confirm } from "../ui/Confirm";
 import { ToggleRow } from "../ui/Toggle";
 import { Icon } from "../Icon";
 import { commit, toast, useStore } from "@/lib/store";
-import { RAW, ONBOARDING_Q, INTEGRATIONS, USERS, ME, FEE_LOG, face, dpFmt, staffRoleName } from "@/data/admin";
+import { RAW, INTEGRATIONS, USERS, ME, FEE_LOG, face, dpFmt, staffRoleName } from "@/data/admin";
 import s from "./admin.module.css";
 import p from "../candidate/profile.module.css";
 import y from "./system.module.css";
+import { OB_QUESTIONS, OB_TYPES, OB_FEEDS, OB_INTENTS, feedFits, feedName, feederOf, lockedFeeder, type ObQuestion, type ObOpt, type ObType, type ObFeed } from "@/data/onboarding";
 import tg from "../ui/toggle.module.css";
 
 /* ============================================================
@@ -29,71 +30,113 @@ import tg from "../ui/toggle.module.css";
    Phase 1 onboardingQuestions / systemIntegrations / V.settings /
    settingsProfile / settingsGeneral.
    ============================================================ */
-const OB_TYPE: Record<string, string> = Object.fromEntries(RAW.OB_TYPES);
-
 /* ---------------- Onboarding Questions ---------------- */
-/* The Feeds column replaces Weight, as on the UAT build (Maryam 2 Nov 2026): it names the
-   profile field each answer writes. Read off the UAT page, keyed by question id; a question
-   added here feeds nothing yet, so it reads "—". */
-const OB_FEEDS: Record<string, string> = {
-  obq1: "cohort_intent", obq2: "door_selected", obq3: "current_role", obq4: "industry", obq5: "years_working",
-};
+/* DYNAMIC (Maryam, 4 Nov 2026; data/onboarding.ts states the model): add, edit, delete, reorder
+   and switch questions on or off; each names what it Feeds, and an Intent question maps every
+   option to an intent. The candidate's onboarding reads this list. The question feeding Intent
+   cannot be deleted, switched off or re-pointed until another question feeds Intent. */
+const OB_TYPE: Record<string, string> = Object.fromEntries(OB_TYPES);
+const OB_LOCK = "Another question must feed Intent first. Without it, Tal cannot recommend a course.";
 export function AdminOnboarding() {
   useStore();
   const [q, setQ] = useState("");
   const [edit, setEdit] = useState<string | null>(null);
-  const rows = ONBOARDING_Q.filter((x) => !q || x.text.toLowerCase().includes(q.toLowerCase()));
+  const [ask, setAsk] = useState<null | { k: "del" | "lock"; id: string }>(null);
+  const rows = OB_QUESTIONS.filter((x) => !q || x.text.toLowerCase().includes(q.toLowerCase()));
+  const move = (x: ObQuestion, d: -1 | 1) => commit(() => {
+    const i = OB_QUESTIONS.indexOf(x), j = i + d;
+    [OB_QUESTIONS[i], OB_QUESTIONS[j]] = [OB_QUESTIONS[j], OB_QUESTIONS[i]];
+  }, "Question moved");
+  const target = ask && OB_QUESTIONS.find((x) => x.id === ask.id);
   return (
     <Page>
-      <PageHeader title="Onboarding Questions" desc="The questions a candidate answers when they create an account. Reword them here; what each answer feeds stays fixed." />
+      <PageHeader title="Onboarding Questions" desc="The questions a candidate answers when they create an account, in the order they are asked, and what each answer feeds."
+        actions={<Button kind="primary" size="sm" icon="add" onClick={() => setEdit("new")}>Add Question</Button>} />
       <Section kind="block">
         <Toolbar search={<Search value={q} onChange={setQ} placeholder="Search questions" />} />
         {rows.length ? (
-          <Table rows={rows} rowKey={(x) => x.id} actions={(x) => [{ icon: "edit", label: "Edit", onClick: () => setEdit(x.id) }]} cols={[
-            { key: "n", label: "#", cell: (x) => String(ONBOARDING_Q.indexOf(x) + 1) },
+          <Table rows={rows} rowKey={(x) => x.id} actions={(x) => {
+            const i = OB_QUESTIONS.indexOf(x), locked = lockedFeeder(x);
+            return [
+              { icon: "edit", label: "Edit", onClick: () => setEdit(x.id) },
+              ...(i > 0 ? [{ icon: "chevUp" as const, label: "Move up", onClick: () => move(x, -1) }] : []),
+              ...(i < OB_QUESTIONS.length - 1 ? [{ icon: "chevDown" as const, label: "Move down", onClick: () => move(x, 1) }] : []),
+              x.active
+                ? { icon: "viewOff" as const, label: "Turn off", onClick: () => (locked ? setAsk({ k: "lock", id: x.id }) : commit(() => { x.active = false; }, "Question turned off")) }
+                : { icon: "view" as const, label: "Turn on", onClick: () => commit(() => { x.active = true; if (x.feeds !== "none" && feederOf(x.feeds, x.id)) x.feeds = "none"; }, "Question turned on") },
+              { icon: "delete", label: "Delete", danger: true, onClick: () => setAsk({ k: locked ? "lock" : "del", id: x.id }) },
+            ];
+          }} cols={[
+            { key: "n", label: "#", cell: (x) => String(OB_QUESTIONS.indexOf(x) + 1), sort: false },
             { key: "q", label: "Question", cell: (x) => <button type="button" className={y.rowBtn} onClick={() => setEdit(x.id)}>{x.text}</button> },
             { key: "t", label: "Answer type", cell: (x) => OB_TYPE[x.type] },
-            { key: "o", label: "Options", cell: (x) => (x.type === "text" ? "—" : String((x.options || []).length)) },
-            { key: "f", label: "Feeds", cell: (x) => OB_FEEDS[x.id] ?? "—" },
+            { key: "o", label: "Options", cell: (x) => (x.type === "text" ? "—" : String(x.options.length + (x.other ? 1 : 0))) },
+            { key: "f", label: "Feeds", cell: (x) => (x.feeds === "none" ? "—" : feedName(x.feeds)) },
+            { key: "s", label: "Status", cell: (x) => <Status tone={x.active ? "green" : "plain"}>{x.active ? "Active" : "Off"}</Status> },
           ]} />
         ) : <div className={s.empty}><Icon name="document" /><Text role="h4" as="span">No questions yet</Text><Text role="desc" as="span">Nothing matches your search.</Text></div>}
       </Section>
       {edit && <QuestionEditor id={edit} close={() => setEdit(null)} />}
+      {ask?.k === "lock" && target && (
+        <Confirm icon="info" title="This question feeds Intent" desc={OB_LOCK} ok="Got It" onOk={() => setAsk(null)} onCancel={() => setAsk(null)} />
+      )}
+      {ask?.k === "del" && target && (
+        <Confirm icon="delete" danger title="Delete this question?" desc={`“${target.text}” is no longer asked. Candidates who already answered keep their answer.`} ok="Delete"
+          onCancel={() => setAsk(null)} onOk={() => { commit(() => { OB_QUESTIONS.splice(OB_QUESTIONS.indexOf(target), 1); }, "Question deleted"); setAsk(null); }} />
+      )}
     </Page>
   );
 }
-/* The editor is the right slider. Answer type and weightage are hidden
-   (Phase 1, 23 Sep 2026): only the wording and the options are edited. */
+/* The editor is the right slider, for a new question and an existing one. Answer type is
+   shown again (a new question needs one). Feeds lists every field; one already fed by another
+   active question is left out, and Intent is left out for free text. */
 function QuestionEditor({ id, close }: { id: string; close: () => void }) {
-  const src = ONBOARDING_Q.find((x) => x.id === id)!;
-  const [q, setQ] = useState<any>(() => JSON.parse(JSON.stringify(src)));
-  const single = q.type === "single", text = q.type === "text";
-  const setOpt = (i: number, k: string, v: any) => setQ((o: any) => ({ ...o, options: o.options.map((x: any, j: number) => (j === i ? { ...x, [k]: v } : x)) }));
+  const src = id === "new" ? null : OB_QUESTIONS.find((x) => x.id === id)!;
+  const [q, setQ] = useState<ObQuestion>(() => (src ? JSON.parse(JSON.stringify(src))
+    : { id: `obq${Date.now()}`, text: "", type: "single", feeds: "none", active: true, options: [{ label: "" }, { label: "" }] }));
+  const text = q.type === "text", intent = q.feeds === "intent";
+  const locked = !!src && lockedFeeder(src);
+  const feeds = OB_FEEDS.filter(([f]) => f === "none" || f === q.feeds || (feedFits(f, q.type) && !feederOf(f, q.id)));
+  const setOpt = (i: number, k: keyof ObOpt, v: string) => setQ((o) => ({ ...o, options: o.options.map((x, j) => (j === i ? { ...x, [k]: v } : x)) }));
+  const setType = (t: string) => setQ((o) => ({ ...o, type: t as ObType, feeds: feedFits(o.feeds, t as ObType) ? o.feeds : "none",
+    options: t === "text" ? o.options : o.options.length ? o.options : [{ label: "" }, { label: "" }] }));
+  const opts = q.options.filter((o) => o.label.trim());
+  const ok = q.text.trim() && (text || (opts.length >= 2 && (!intent || opts.every((o) => o.intent))));
   const save = () => {
     commit(() => {
-      Object.assign(src, { text: q.text.trim(), options: text ? [] : q.options.filter((o: any) => (o.label || "").trim()).map((o: any) => (single ? { label: o.label.trim(), score: +o.score || 0 } : { label: o.label.trim() })),
-        ...(text ? { placeholder: q.placeholder || "" } : {}), ...(q.type === "dropdown" ? { other: !!q.other } : {}) });
-    }, "Question saved");
+      const rec: ObQuestion = { ...q, text: q.text.trim(),
+        options: text ? [] : opts.map((o) => ({ label: o.label.trim(), ...(intent ? { intent: o.intent } : {}) })),
+        placeholder: q.placeholder?.trim() || undefined, other: q.type === "dropdown" && !intent ? !!q.other : undefined };
+      if (src) Object.assign(src, rec); else OB_QUESTIONS.push(rec);
+    }, src ? "Question saved" : "Question added");
     close();
   };
   return (
-    <Slider open title="Edit question" onClose={close}
-      footer={<><Button kind="secondary" onClick={close}>Cancel</Button><Button kind="primary" disabled={!q.text.trim()} onClick={save}>Save Question</Button></>}>
+    <Slider open title={src ? "Edit question" : "Add a question"} onClose={close}
+      footer={<><Button kind="secondary" onClick={close}>Cancel</Button><Button kind="primary" disabled={!ok} onClick={save}>{src ? "Save Question" : "Add Question"}</Button></>}>
       <Stack gap={6}>
-        <Field label="Question"><Input value={q.text} onChange={(e) => setQ({ ...q, text: e.target.value })} placeholder="Type the question" /></Field>
-        {text && <Field label="Placeholder"><Input value={q.placeholder || ""} onChange={(e) => setQ({ ...q, placeholder: e.target.value })} placeholder="Example answer shown in the field" /></Field>}
+        <Field label="Question" required><Input value={q.text} onChange={(e) => setQ({ ...q, text: e.target.value })} placeholder="Type the question" /></Field>
+        <Field label="Answer type" required help={locked ? OB_LOCK : undefined}>
+          <Dropdown variant="form" value={q.type} onChange={setType} disabled={locked} options={OB_TYPES.map(([value, label]) => ({ value, label }))} />
+        </Field>
+        <Field label="Feeds" required help={locked ? undefined : intent ? "Map every option to the intent it stands for." : "The profile field this answer fills. A field another question already feeds is not listed."}>
+          <Dropdown variant="form" value={q.feeds} disabled={locked} onChange={(f) => setQ({ ...q, feeds: f as ObFeed })} options={feeds.map(([value, label]) => ({ value, label }))} />
+        </Field>
+        {q.type !== "single" && (
+          <Field label="Placeholder"><Input value={q.placeholder || ""} onChange={(e) => setQ({ ...q, placeholder: e.target.value })} placeholder={text ? "Example answer shown in the field" : "Text shown before a pick"} /></Field>
+        )}
         {!text && (
-          <Field group label={single ? "Options and their score" : "Options"}>
+          <Field group required label={intent ? "Options and their intent" : "Options"}>
             <Stack gap={3}>
-              {q.options.map((o: any, i: number) => (
+              {q.options.map((o, i) => (
                 <div key={i} className={y.opt}>
                   <Input value={o.label} onChange={(e) => setOpt(i, "label", e.target.value)} placeholder="Option label" aria-label={`Option ${i + 1}`} />
-                  {single && <span className={y.score}><Input inputMode="numeric" value={String(o.score ?? 0)} onChange={(e) => setOpt(i, "score", e.target.value.replace(/\D/g, ""))} aria-label="Score" /></span>}
-                  <button type="button" className={y.x} aria-label="Remove option" onClick={() => setQ({ ...q, options: q.options.filter((_: any, j: number) => j !== i) })}><Icon name="close" /></button>
+                  {intent && <span className={y.intent}><Dropdown variant="form" placeholder="Intent" value={o.intent} onChange={(v) => setOpt(i, "intent", v)} options={OB_INTENTS.map(([value, label]) => ({ value, label }))} /></span>}
+                  <button type="button" className={y.x} aria-label="Remove option" onClick={() => setQ({ ...q, options: q.options.filter((_, j) => j !== i) })}><Icon name="close" /></button>
                 </div>
               ))}
-              <span><Button kind="link" size="sm" icon="add" onClick={() => setQ({ ...q, options: [...q.options, { label: "", score: 0 }] })}>Add option</Button></span>
-              {q.type === "dropdown" && (
+              <span><Button kind="link" size="sm" icon="add" onClick={() => setQ({ ...q, options: [...q.options, { label: "" }] })}>Add option</Button></span>
+              {q.type === "dropdown" && !intent && (
                 <label className={y.check}><input type="checkbox" checked={!!q.other} onChange={() => setQ({ ...q, other: !q.other })} />Allow “Other” with a text field</label>
               )}
             </Stack>
@@ -535,7 +578,7 @@ function PhoneSheet({ close }: { close: () => void }) {
   return step === "num" ? (
     <Sheet title="Change phone number" onClose={close} footer={<><Button kind="secondary" onClick={close}>Cancel</Button><Button kind="primary" disabled={num.replace(/\D/g, "").length < 7 || !pw} onClick={() => { setStep("code"); toast("A code was sent to the new number"); }}>Send Code</Button></>}>
       <Stack gap={5}>
-        <Field label="New number" required><Input type="tel" value={num} onChange={(e) => setNum(e.target.value)} placeholder="+1 (415) 555-0100" /></Field>
+        <Field label="New number" required><PhoneInput value={num} onChange={(e) => setNum(e.target.value)} placeholder="+1 (415) 555-0100" /></Field>
         <Field label="Current password" required><Input type="password" value={pw} onChange={(e) => setPwd(e.target.value)} placeholder="Your current password" autoComplete="current-password" /></Field>
         <Text role="desc" as="p">We send a code to the new number; it takes over once the code is entered.</Text>
       </Stack>

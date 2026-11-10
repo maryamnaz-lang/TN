@@ -27,7 +27,8 @@ export function AppShell({ portal, children }: { portal: PortalKey; children: Re
   /* The collapsed rail's flyout CLOSES once a sub-module is picked (Maryam 2 Nov 2026). It
      shows on hover and on focus-within, and after a click the pointer is still over it and
      the link still has focus, so it stayed. Picking blurs the link and marks the module
-     shut; the flyout comes back only after the pointer leaves the module and returns. */
+     shut; the flyout comes back only after the pointer leaves the module and returns.
+     Clicking the MODULE itself shuts it the same way (Maryam 10 Nov 2026). */
   const [shut, setShut] = useState<string | null>(null);
   const [logoutS, setLogoutS] = useState(false);
   const logout = logoutS || !!ui.logout;
@@ -67,7 +68,7 @@ export function AppShell({ portal, children }: { portal: PortalKey; children: Re
     // An admin parent answers hover with its sub-module flyout, so it carries no tooltip (Phase 1).
     const flyout = portal === "admin" && !!n.subs;
     const link = (
-      <Link href={href(portal, n.key, n.subs?.[0].key ?? "")} className={`${s.item} ${on ? s.on : ""}`} title={flyout ? undefined : n.title}>
+      <Link href={href(portal, n.key, n.subs?.[0].key ?? "")} onClick={n.subs ? (e) => { e.currentTarget.blur(); setShut(n.key); } : undefined} className={`${s.item} ${on ? s.on : ""}`} title={flyout ? undefined : n.title}>
         <Icon name={n.icon} />
         <span className={`${s.label} t-compact w-strong`}>{n.title}</span>
         {n.subs && <span className={`${s.chev} ${on ? s.up : ""}`}><Icon name="chevDown" /></span>}
@@ -260,6 +261,8 @@ export function DemoMenu({ portal }: { portal: PortalKey }) {
             {(Object.keys(PORTALS) as PortalKey[]).map((k) => (
               <Link key={k} href={href(k)} className="t-label" onClick={() => setShow(false)}>{PORTALS[k].name} portal</Link>
             ))}
+            {/* The developers' error-states page (Maryam 5 Nov 2026). */}
+            <Link href={href(portal, "states")} className="t-label" onClick={() => setShow(false)}>Error states</Link>
           </div>
         </div>
       )}

@@ -154,3 +154,14 @@
 
 /* The last row draws no line of its own: the section's divider or air closes the list, so two lines never stack. */
 .ivrow:last-child { border-bottom: 0; }
+
+/* The agent profile's reviews (Maryam 10 Nov 2026): one quote per row, stars over the words
+   over the anonymised "track · month" line, a hairline between rows. */
+.revs { display: flex; flex-direction: column; }
+.rev { display: flex; flex-direction: column; gap: var(--s03); padding: var(--s05) 0; border-bottom: var(--hairline) solid var(--rule); }
+.rev:first-child { padding-top: 0; }
+.rev:last-child { border-bottom: 0; padding-bottom: 0; }
+/* The agent's photo and name open their profile (Maryam 10 Nov 2026): plain links, the name
+   underlined on hover so it reads as one. */
+.profLink { color: inherit; text-decoration: none; }
+.profLink:hover { text-decoration: underline; text-underline-offset: 3px; }

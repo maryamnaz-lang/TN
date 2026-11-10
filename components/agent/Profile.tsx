@@ -7,11 +7,12 @@ import { Button } from "../ui/Button";
 import { Facts, Fact, Stats, Stat } from "../ui/Figures";
 import { Field, Input, TextArea, Form, FormRow } from "../ui/Field";
 import { ToggleRow } from "../ui/Toggle";
+import { Dropdown } from "../ui/Dropdown";
 import { Confirm } from "../ui/Confirm";
 import { Icon } from "../Icon";
 import { Availability } from "./Slots";
 import { useDemo } from "@/lib/demo";
-import { AGENT as A, PUB, SPECIALISMS, INDUSTRIES, INTENTS, AGENT_NOTIF_TOGGLES, FEE_SPAN } from "@/data/agent";
+import { AGENT as A, PUB, SPECIALISMS, INDUSTRIES, INTENTS, AGENT_NOTIF_TOGGLES, FEE_SPAN, WEEK_SHIFTS, TIME_ZONES, AGENT_TZ, type Shift } from "@/data/agent";
 import { FEE_TRACKS } from "@/data/fees";
 import p from "../candidate/profile.module.css";
 import s from "./agent.module.css";
@@ -46,7 +47,9 @@ const Chips = ({ items }: { items: string[] }) => (
   <ChipRow>{items.map((k) => <Chip key={k}>{k}</Chip>)}</ChipRow>
 );
 
-function Id({ meta, dot, act }: { meta: ReactNode; dot?: boolean; act?: ReactNode }) {
+/* `meta2` is an optional second line under the meta, the agent's time zone under their
+   email (Maryam 10 Nov 2026). */
+function Id({ meta, meta2, dot, act, name = A.name }: { meta: ReactNode; meta2?: ReactNode; dot?: boolean; act?: ReactNode; name?: string }) {
   return (
     <div className={p.idhead}>
       <span className={p.photo}>
@@ -55,8 +58,9 @@ function Id({ meta, dot, act }: { meta: ReactNode; dot?: boolean; act?: ReactNod
         {dot && <i className={s.avOn} aria-label="Active" />}
       </span>
       <span className={p.idB}>
-        <Text role="h3" as="span">{A.name}</Text>
+        <Text role="h3" as="span">{name}</Text>
         <Text role="desc" as="span">{meta}</Text>
+        {meta2 && <Text role="desc" as="span">{meta2}</Text>}
       </span>
       {act && <span className={p.idAct}>{act}</span>}
     </div>
@@ -77,44 +81,58 @@ function Mine({ ind, setInd, int, setInt, specs, setSpecs }: {
   const pen = (k: typeof edit, label?: string) => label
     ? <Button kind="link" icon="add" onClick={() => setEdit(k)}>{label}</Button>
     : <Button kind="ghost" size="sm" icon="edit" label="Edit Specialities" onClick={() => setEdit(k)} />;
-  const saveDetails = () => setEdit(null);
+  /* The saved name and the form's draft, so Visibility reads what was saved (Maryam 10 Nov 2026). */
+  const split = () => ({ first: A.name.split(" ")[0], last: A.name.split(" ").slice(1).join(" "), tz: AGENT_TZ });
+  const [name, setName] = useState(split), [draft, setDraft] = useState(split);
+  const [shifts, setShifts] = useState<Shift[]>(WEEK_SHIFTS);
+  const saveDetails = () => { setName(draft); setEdit(null); };
+  /* VISIBILITY GATE (Maryam 10 Nov 2026, narrowed the same day): the agent can list themselves
+     only once they have at least one shift. Name and fee no longer gate it. */
+  const tip = shifts.length ? "" : "Add your availability to get listed.";
   return (
     <>
       <Section kind="block">
-        <Id meta={A.email} dot act={edit === "details" ? acts(saveDetails) : <Button kind="ghost" iconEnd="edit" onClick={() => setEdit("details")}>Edit Details</Button>} />
+        <Id meta={A.email} meta2={name.tz} name={`${name.first} ${name.last}`.trim()} dot act={edit === "details" ? acts(saveDetails) : <Button kind="ghost" iconEnd="edit" onClick={() => { setDraft(name); setEdit("details"); }}>Edit Details</Button>} />
       </Section>
       {edit === "details" ? (
         <Section kind="block">
           <Form>
-            <FormRow>
-              <Field label="Name"><Input defaultValue={A.name} /></Field>
+            {/* First name, last name and email on one row (Maryam 10 Nov 2026): the candidate
+                profile's three-up grid, stacking below 700px. */}
+            <div className={p.g3}>
+              <Field label="First name"><Input value={draft.first} onChange={(e) => setDraft({ ...draft, first: e.target.value })} /></Field>
+              <Field label="Last name"><Input value={draft.last} onChange={(e) => setDraft({ ...draft, last: e.target.value })} /></Field>
               <Field label="Email"><Input defaultValue={A.email} readOnly /></Field>
-            </FormRow>
-            {/* The fees are set by TalentNext, not the agent (Maryam 19 Oct 2026), so they are
-                read-only here: one per level group (26 Oct 2026), each paid to the agent in full. */}
-            {FEE_TRACKS.map((t, i) => (
-              <Field key={t.key} label={`${t.label} fee`} help={i === FEE_TRACKS.length - 1 ? "Set by TalentNext and paid to you in full." : undefined}>
-                <Input value={`$${A.fees[t.key]}`} readOnly />
-              </Field>
-            ))}
+            </div>
+            {/* TIME ZONE (Maryam 10 Nov 2026): edited here; the read view shows it under the email
+                in the header, not in a figure block or the Availability description. */}
+            <div className={p.g3}>
+              <Field label="Time zone"><Dropdown variant="form" value={draft.tz} onChange={(v) => setDraft({ ...draft, tz: v })} options={TIME_ZONES.map((z) => ({ value: z, label: z }))} /></Field>
+            </div>
+            {/* The three fees are set by TalentNext and cannot be edited, so the edit view
+                leaves them out; they read on the facts band (Maryam 10 Nov 2026). */}
             <Field label="About"><TextArea rows={5} defaultValue={PUB.about} /></Field>
           </Form>
         </Section>
       ) : (
         <Section kind="block">
-          <Facts>
-            <Fact icon="wallet" label="Your fee" value={FEE_SPAN} />
+          {/* One cell per track fee instead of a single span (Maryam 10 Nov 2026): six cells, two rows of three. */}
+          <Facts cols={3}>
+            {FEE_TRACKS.map((t) => <Fact key={t.key} icon="wallet" label={`${t.label} fee`} value={`$${A.fees[t.key]}`} />)}
             <Fact icon="growth" label="Assesses" value={A.rangeShort} />
             <Fact icon="video" label="Interviews" value={String(A.ivs)} />
             <Fact icon="starOutline" label="Rating" value={String(A.rating)} />
           </Facts>
         </Section>
       )}
-      <Section>
-        <SectionHeader title="About" />
-        <Text role="body" ink="secondary">{PUB.about}</Text>
-      </Section>
-      <Availability />
+      {/* The edit form carries its own About field, so the read-only section hides while it is open (Maryam 10 Nov 2026). */}
+      {edit !== "details" && (
+        <Section>
+          <SectionHeader title="About" />
+          <Text role="body" ink="secondary">{PUB.about}</Text>
+        </Section>
+      )}
+      <Availability shifts={shifts} setShifts={setShifts} />
       <Section>
         <SectionHeader title="Specialities" actions={edit === "specs" ? acts(() => setEdit(null)) : pen("specs")} />
         {edit === "specs" ? <Editable list={specs} onChange={setSpecs} placeholder="Add a speciality" /> : <Chips items={specs} />}
@@ -129,7 +147,7 @@ function Mine({ ind, setInd, int, setInt, specs, setSpecs }: {
       </Section>
       <Section>
         <SectionHeader title="Visibility" />
-        <ToggleRow title="Listed in the marketplace" desc="Candidates on your track can find and book you" />
+        <ToggleRow title="Listed in the marketplace" desc="Candidates on your track can find and book you" disabled={!!tip} tip={tip} />
       </Section>
     </>
   );

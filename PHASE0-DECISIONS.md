@@ -459,9 +459,18 @@ reference.)*
 - **Removed:** the "Tracks, Levels & Acronyms" page.
 
 ### 5.6 Onboarding Questions
-- The question list and the edit slider (single choice with scores and weight, free text,
-  dropdown).
-- These feed the candidate onboarding questions (3.1).
+- **Dynamic (Maryam, 4 Nov 2026).** Super Admin adds, edits, deletes, reorders (Move up /
+  Move down) and turns questions on or off. Answer types: single choice, dropdown (optional
+  "Other" with text), free text. Option scores and weight are gone.
+- **Each question names what it Feeds:** Intent, Persona, Current role, Industry, Years working,
+  or Nothing (answer saved only). One question per field.
+- **Intent is mapped per option:** a question feeding Intent maps every option to one of the
+  three course intents, so Tal can match a course whatever the wording. Free text cannot feed
+  Intent.
+- **Intent must always be fed:** the question feeding it cannot be deleted, turned off, or have
+  its type or Feeds changed until another question feeds Intent.
+- **The candidate onboarding (3.1) reads this same list** (active questions, in order); the
+  question count and progress bar follow it. Model: `data/onboarding.ts`.
 
 ### 5.7 Finance & Settlement
 All five pages are as in Phase 1:
@@ -501,6 +510,20 @@ All five pages are as in Phase 1:
 
 ### 5.10 My Profile, General Settings
 - As Phase 1.
+
+### 5.12 Error states (all portals, 5 Nov 2026)
+One `<ErrorState>` (`components/ui/ErrorState.tsx`) draws every error screen, in the CONTENT area so the header and side nav stay. Each case is a mark, a title, one line and its way out; the cases are listed once in `ERROR_CASES`:
+- **Something went wrong** (5xx / unhandled): Try Again + Go To Dashboard, optional error reference. Real: `app/[portal]/error.tsx`.
+- **Page not found** (404): Go To Dashboard + Go Back. Real: `app/not-found.tsx`; any wrong URL lands here, inside the shell of the portal named in the path.
+- **No access** (403): Go To Dashboard + Go Back.
+- **You're offline**: Try Again.
+The developers' page `/<portal>/states/` previews every case inside the real shell; it is off the rail and the account menu, linked from the ⋮ prototype menu ("Error states").
+
+### 5.13 Talent agent invite fields (Super Admin, 6 Nov 2026)
+- Add a user (Talent Agent block) and Mark as Talent Agent drop Industry and Skills.
+- After the tracks and fees they ask **Candidate types they interview**: a multi-select of the six TALENT types (Top Performer, Athlete, Leader, Entrepreneur, Not Sure, Team Player). Required, at least one.
+- Then **Years of experience**: a required whole number from 0 to 60.
+- Follows the field set the developers shipped, built in our components.
 
 ### 5.11 Not in Phase 0
 - Rulings Register

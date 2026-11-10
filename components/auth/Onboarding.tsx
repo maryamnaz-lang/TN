@@ -10,19 +10,26 @@ import { Scene } from "../shell/Scene";
 import { TalOrb, TnLoader } from "../ui/TalOrb";
 import { LOGO_SVG } from "@/lib/icons";
 import { useDemo } from "@/lib/demo";
-import { OB_Q, OB_WELCOME, OB_DONE } from "@/data/onboarding";
+import { obLive, OB_WELCOME, OB_DONE } from "@/data/onboarding";
+import { useStore } from "@/lib/store";
 import s from "./onboarding.module.css";
 
-/* /onboarding/ — Phase 1 ob.js: welcome → 2s loader → five questions →
+/* /onboarding/ — Phase 1 ob.js: welcome → 2s loader → the questions →
    "You're all set" → "Find an Agent" → 2s loader → the dashboard. Tal's
-   mark is the LIVE orb on every onboarding screen, as in Phase 1. */
+   mark is the LIVE orb on every onboarding screen, as in Phase 1. The questions are the
+   ones Super Admin keeps under Onboarding Questions (active, in order), so the count and the
+   progress bar follow that list. An answer is keyed by question id; "Other" on a dropdown
+   carries its own text. */
+const OTHER = "__other";
 export function Onboarding() {
   const router = useRouter();
   const { setStage } = useDemo();
-  const [step, setStep] = useState(0);           // 0 welcome, 1..5 questions, 6 done
+  useStore();
+  const QS = obLive();
+  const [step, setStep] = useState(0);           // 0 welcome, 1..N questions, N+1 done
   const [loading, setLoading] = useState(false);
   const [ans, setAns] = useState<Record<string, string>>({});
-  const N = OB_Q.length;
+  const N = QS.length;
 
   useEffect(() => {
     if (new URLSearchParams(location.search).get("load")) {
@@ -35,8 +42,9 @@ export function Onboarding() {
      set" while /candidate/ was still loading, so the screen jumped back before the dashboard. */
   const load = (then: () => void, leave = false) => { setLoading(true); setTimeout(() => { if (!leave) setLoading(false); then(); }, 2000); };
   useEffect(() => { router.prefetch("/candidate/"); }, [router]);
-  const q = step >= 1 && step <= N ? OB_Q[step - 1] : null;
-  const ready = !q ? true : q.t === "dd" ? !!ans[q.k] && (ans[q.k] !== "other" || !!ans[`${q.k}-other`]) : !!ans[q.k]?.trim();
+  const q = step >= 1 && step <= N ? QS[step - 1] : null;
+  const k = q?.id ?? "";
+  const ready = !q ? true : q.type === "dropdown" ? !!ans[k] && (ans[k] !== OTHER || !!ans[`${k}-other`]?.trim()) : !!ans[k]?.trim();
   const pct = step === 0 ? 0 : step > N ? 100 : ((step - 1) / N) * 100;
 
   return (
@@ -68,22 +76,22 @@ export function Onboarding() {
                 <TalOrb size={52} live className={s.orb} />
                 {q ? (
                   <>
-                    <h1 className={s.title}>{q.q}</h1>
-                    {q.t === "radio" && (
+                    <h1 className={s.title}>{q.text}</h1>
+                    {q.type === "single" && (
                       <div className={s.opts} role="radiogroup">
-                        {q.o.map(([k, l]) => (
-                          <button key={k} role="radio" aria-checked={ans[q.k] === k} className={`${s.opt} ${ans[q.k] === k ? s.on : ""}`} onClick={() => setAns((a) => ({ ...a, [q.k]: k }))}>
-                            <span className={s.radio} /><Text role="body" as="span">{l}</Text>
+                        {q.options.map((o, i) => (
+                          <button key={i} role="radio" aria-checked={ans[k] === String(i)} className={`${s.opt} ${ans[k] === String(i) ? s.on : ""}`} onClick={() => setAns((a) => ({ ...a, [k]: String(i) }))}>
+                            <span className={s.radio} /><Text role="body" as="span">{o.label}</Text>
                           </button>
                         ))}
                       </div>
                     )}
-                    {q.t === "text" && <div className={s.field}><Input value={ans[q.k] ?? ""} placeholder={q.ph} onChange={(e) => setAns((a) => ({ ...a, [q.k]: e.target.value }))} /></div>}
-                    {q.t === "dd" && (
+                    {q.type === "text" && <div className={s.field}><Input value={ans[k] ?? ""} placeholder={q.placeholder} onChange={(e) => setAns((a) => ({ ...a, [k]: e.target.value }))} /></div>}
+                    {q.type === "dropdown" && (
                       <div className={s.field}>
-                        <Dropdown variant="form" placeholder="Select your industry" value={ans[q.k]} onChange={(v) => setAns((a) => ({ ...a, [q.k]: v }))}
-                          options={q.o.map(([value, label]) => ({ value, label }))} />
-                        {ans[q.k] === "other" && <Input value={ans[`${q.k}-other`] ?? ""} placeholder={q.ph} onChange={(e) => setAns((a) => ({ ...a, [`${q.k}-other`]: e.target.value }))} />}
+                        <Dropdown variant="form" placeholder={q.placeholder || "Select an option"} value={ans[k]} onChange={(v) => setAns((a) => ({ ...a, [k]: v }))}
+                          options={[...q.options.map((o, i) => ({ value: String(i), label: o.label })), ...(q.other ? [{ value: OTHER, label: "Other" }] : [])]} />
+                        {ans[k] === OTHER && <Input value={ans[`${k}-other`] ?? ""} placeholder="Tell us more" onChange={(e) => setAns((a) => ({ ...a, [`${k}-other`]: e.target.value }))} />}
                       </div>
                     )}
                     <div className={s.foot}>
