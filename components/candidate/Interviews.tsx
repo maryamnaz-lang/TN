@@ -9,6 +9,7 @@ import { Disclosure, HowItWorks } from "../ui/Disclosure";
 import { CardPicker, PayModal, defaultCard } from "../ui/CardPicker";
 import { ReceiptModal } from "../ui/Receipt";
 import { DiscountField, type Applied } from "../ui/DiscountField";
+import { PayBar } from "../ui/PayBar";
 import { redeem, saleFor } from "@/data/discounts";
 import { Price } from "../ui/Price";
 import { COMMISSION_PCT } from "@/data/fees";
@@ -259,9 +260,10 @@ export function CheckoutPage({ agent }: { agent: string }) {
             <CardPicker cards={SAVED_CARDS} value={card} onChange={setCard} />
           </div>
           <DiscountField ctx={{ kind: "interview", track: CAND_TRACK, fee: a.fees[CAND_TRACK], pct: COMMISSION_PCT, platform: 0 }} cand={PEOPLE.maryam.name} value={disc} onChange={setDisc} auto={auto} />
-          <div className={s.go}><Button kind="primary" go onClick={() => setReview(true)}>Pay ${a.price - (eff?.off ?? 0)}</Button></div>
         </div>
       </Section>
+      {/* The pay action is a sticky bar at the foot (Maryam 10 Nov 2026), ui/PayBar. */}
+      <PayBar amount={a.price - (eff?.off ?? 0)} was={a.price} label={`Pay $${a.price - (eff?.off ?? 0)}`} onPay={() => setReview(true)} />
       {add && <PayModal onClose={() => setAdd(false)} />}
       {review && <ReceiptModal r={bill} review onClose={() => setReview(false)} onConfirm={confirm} />}
       {paid && (

@@ -16,7 +16,7 @@ import {
   RAW, USERS, USER_BY_ID, ROLE_FILTER, ROLE_BY_K, STAFF_ROLE_KEYS, USER_STATUS_OPTS, LVL_CODES,
   usersBase, roleGroup, roleMatch, userStatusKey, userStatus, userTypeName, staffRoles, staffRoleName,
   userCand, candLevel, userTrack, agState, agStateTone, agTraining, agTrainTone, agRange, rangeLabel, rangeCovers,
-  agScore, face, money, personHref, COMMISSION_PCT, FEE_TRACKS, trackFees, feeRange, priceFor, commissionPct, platformFee, type TrackKey, type U,
+  agScore, face, money, personHref, COMMISSION_PCT, FEE_TRACKS, trackFees, feeRange, priceFor, commissionPct, type TrackKey, type U,
 } from "@/data/admin";
 import s from "./admin.module.css";
 
@@ -162,7 +162,7 @@ export function rowActs(u: U, open: (s: SheetKey) => void, go?: (href: string) =
   if (u.roles.includes("agent") && !u.roles.includes("candidate")) return [...view, ...agentActs("Edit"), off];
   return [...view, ...(userCand(u) ? [{ icon: "edit", label: "Edit", onClick: () => open({ k: "editcand", id: u.id }) } as RowAction] : []), off];
 }
-const mdy = (d: Date) => `${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}-${d.getFullYear()}`;
+const mdy = (d: Date) => `${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")}/${d.getFullYear()}`;
 
 /* Every sheet a user row (or the detail page) opens. */
 export function UserSheets({ sheet, close, sel = [], clearSel }: { sheet: SheetKey; close: () => void; sel?: U[]; clearSel?: () => void }) {
@@ -291,21 +291,20 @@ const feeStr = (u: U): FeeStr => { const f = trackFees(u), o: FeeStr = {}; FEE_T
 const feeNum = (f: FeeStr) => ({ explorer: num(f.explorer ?? ""), builder: num(f.builder ?? ""), trailblazer: num(f.trailblazer ?? "") });
 /* A commission is required and 0–99 (100 would leave no price to divide). */
 const comOk = (com: string) => com.trim() !== "" && num(com) < 100;
-/* The platform fee is a required flat dollar amount ($0 allowed). */
-const platOk = (pf: string) => pf.trim() !== "";
 /* At least one track, and a fee on every track picked. */
-const feesReady = (f: FeeStr, com: string, pf: string) => { const p = picked(f); return p.length > 0 && p.every((t) => num(f[t.key] ?? "") > 0) && comOk(com) && platOk(pf); };
-/* What a save writes: the three fees (0 = not interviewed), `fee` (the first picked track's fee) for the single-fee reads, the commission and the platform fee. */
-const feeSave = (f: FeeStr, com: string, pf: string) => { const n = feeNum(f); return { fees: n, fee: picked(f).map((t) => n[t.key])[0] ?? 0, commission: num(com), platformFee: num(pf) }; };
+const feesReady = (f: FeeStr, com: string) => { const p = picked(f); return p.length > 0 && p.every((t) => num(f[t.key] ?? "") > 0) && comOk(com); };
+/* What a save writes: the three fees (0 = not interviewed), `fee` (the first picked track's fee) for the single-fee reads, and the commission.
+   NO PLATFORM FEE HERE (Maryam 11 Nov 2026): it is one value set in Settings → Platform → Money, and priceFor adds it. */
+const feeSave = (f: FeeStr, com: string) => { const n = feeNum(f); return { fees: n, fee: picked(f).map((t) => n[t.key])[0] ?? 0, commission: num(com) }; };
 const TRACK_OPTS = FEE_TRACKS.map((t) => ({ value: t.key, label: t.label }));
-function FeeFields({ fees, com, pf, setFees, onCom, onPf }: { fees: FeeStr; com: string; pf: string; setFees: (f: FeeStr) => void; onCom: (x: string) => void; onPf: (x: string) => void }) {
+function FeeFields({ fees, com, setFees, onCom }: { fees: FeeStr; com: string; setFees: (f: FeeStr) => void; onCom: (x: string) => void }) {
   const on = picked(fees);
   const set = on.filter((t) => num(fees[t.key] ?? "") > 0);
   /* Picking keeps any fee already typed; unpicking drops that track's field and value. */
   const pick = (keys: string[]) => { const o: FeeStr = {}; FEE_TRACKS.forEach((t) => { if (keys.includes(t.key)) o[t.key] = fees[t.key] ?? ""; }); setFees(o); };
   return (
     <>
-      <Field label="Tracks they interview" required>
+      <Field label="Interview tracks" required>
         <MultiDropdown value={on.map((t) => t.key)} onChange={pick} options={TRACK_OPTS} placeholder="Select tracks" />
       </Field>
       {on.length > 0 && (
@@ -320,14 +319,10 @@ function FeeFields({ fees, com, pf, setFees, onCom, onPf }: { fees: FeeStr; com:
       <Field label="Interview commission (%)" required>
         <Input value={com} onChange={(e) => onCom(e.target.value)} inputMode="decimal" placeholder={COM_DEFAULT} />
       </Field>
-      {/* Platform fee: a flat $ amount after the commission (Maryam 26 Oct 2026). */}
-      <Field label="Platform fee" required>
-        <Input value={pf} onChange={(e) => onPf(e.target.value)} inputMode="decimal" placeholder="$25" />
-      </Field>
       {/* The price line shows only once a fee is set; no placeholder line before that (Maryam 26 Oct 2026). */}
-      {set.length > 0 && comOk(com) && platOk(pf) && (
+      {set.length > 0 && comOk(com) && (
         <Text role="body" as="p">
-          Candidates pay {set.map((t, i) => <span key={t.key}>{i ? (i === set.length - 1 ? " and " : ", ") : ""}<b>{money(priceFor(num(fees[t.key] ?? ""), num(com), num(pf)))}</b> ({t.label})</span>)} per interview.
+          Candidates pay {set.map((t, i) => <span key={t.key}>{i ? (i === set.length - 1 ? " and " : ", ") : ""}<b>{money(priceFor(num(fees[t.key] ?? ""), num(com)))}</b> ({t.label})</span>)} per interview.
         </Text>
       )}
     </>
@@ -354,13 +349,13 @@ function AgentProfileFields({ p, onChange }: { p: Prof; onChange: (p: Prof) => v
 }
 
 function MarkAgent({ u, close }: { u: U; close: () => void }) {
-  const [fees, setFees] = useState<FeeStr>(NO_FEES), [com, setCom] = useState(COM_DEFAULT), [pf, setPf] = useState("");
+  const [fees, setFees] = useState<FeeStr>(NO_FEES), [com, setCom] = useState(COM_DEFAULT);
   const [prof, setProf] = useState<Prof>(NO_PROF);
   return (
     <Sheet title={`Invite ${u.name} to be a talent agent`} onClose={close}
-      footer={<Foot ok="Send Invite" disabled={!profOk(prof) || !feesReady(fees, com, pf)} close={close} onOk={() => { commit(() => { u.roles = [...u.roles, "agent"]; Object.assign(u, feeSave(fees, com, pf)); Object.assign(u, profSave(prof)); u.onboarded = false; }, `Agent invite sent to ${u.email}`); close(); }} />}>
+      footer={<Foot ok="Send Invite" disabled={!profOk(prof) || !feesReady(fees, com)} close={close} onOk={() => { commit(() => { u.roles = [...u.roles, "agent"]; Object.assign(u, feeSave(fees, com)); Object.assign(u, profSave(prof)); u.onboarded = false; }, `Agent invite sent to ${u.email}`); close(); }} />}>
       <Text role="desc" as="p">{u.name} keeps their current account and role. Set their interview fees; an invitation to the agent workspace is sent.</Text>
-      <FeeFields fees={fees} com={com} pf={pf} setFees={setFees} onCom={setCom} onPf={setPf} />
+      <FeeFields fees={fees} com={com} setFees={setFees} onCom={setCom} />
       <AgentProfileFields p={prof} onChange={setProf} />
     </Sheet>
   );
@@ -398,7 +393,7 @@ function RoleBlock({ title, onRemove, children }: { title: string; onRemove: () 
 const andList = (xs: string[]) => (xs.length < 2 ? xs.join("") : `${xs.slice(0, -1).join(", ")} and ${xs[xs.length - 1]}`);
 function AddUser({ close }: { close: () => void }) {
   const [roles, setRoles] = useState<string[]>([]);
-  const [v, setV] = useState({ first: "", last: "", email: "", phone: "", job: "", dept: "", com: COM_DEFAULT, pf: "" });
+  const [v, setV] = useState({ first: "", last: "", email: "", phone: "", job: "", dept: "", com: COM_DEFAULT });
   const [fees, setFees] = useState<FeeStr>(NO_FEES);
   const [prof, setProf] = useState<Prof>(NO_PROF);
   const set = (k: keyof typeof v) => (e: { target: { value: string } }) => setV((x) => ({ ...x, [k]: e.target.value }));
@@ -407,7 +402,7 @@ function AddUser({ close }: { close: () => void }) {
   const staff = roles.filter((r) => !NOT_STAFF.includes(r));
   const staffNames = staff.map((k) => ROLE_BY_K[k].name);
   const ready = roles.length > 0 && v.first.trim() && v.last.trim() && v.email.trim()
-    && (!agent || (profOk(prof) && feesReady(fees, v.com, v.pf)))
+    && (!agent || (profOk(prof) && feesReady(fees, v.com)))
     && (!staff.length || (v.job.trim() && v.dept && v.phone.trim()));
   const send = () => {
     commit(() => {
@@ -415,7 +410,7 @@ function AddUser({ close }: { close: () => void }) {
         id: `u${Date.now()}`, name: `${v.first.trim()} ${v.last.trim()}`, email: v.email.trim(), roles: [...roles], status: "invited", invitedOn: mdy(new Date()),
         joined: mdy(new Date()), last: "Never", level: "—",
         ...(staff.length ? { internal: true, job: v.job, dept: v.dept, phone: v.phone } : {}),
-        ...(agent ? { ...feeSave(fees, v.com, v.pf), ...profSave(prof), interviewed: 0, onboarded: false, training: "notcomplete" } : {}),
+        ...(agent ? { ...feeSave(fees, v.com), ...profSave(prof), interviewed: 0, onboarded: false, training: "notcomplete" } : {}),
       });
     }, cand && roles.length === 1 ? `Quiz link sent to ${v.email.trim()}`
       : `Invite sent to ${v.email.trim()} as ${andList(roles.map((r) => ROLE_OPTS.find((o) => o.value === r)!.label))}`);
@@ -434,7 +429,7 @@ function AddUser({ close }: { close: () => void }) {
         </Field>
         {agent && (
           <RoleBlock title="Talent Agent" onRemove={() => setRoles((r) => r.filter((k) => k !== "agent"))}>
-            <FeeFields fees={fees} com={v.com} pf={v.pf} setFees={setFees} onCom={(x) => setV((y) => ({ ...y, com: x }))} onPf={(x) => setV((y) => ({ ...y, pf: x }))} />
+            <FeeFields fees={fees} com={v.com} setFees={setFees} onCom={(x) => setV((y) => ({ ...y, com: x }))} />
             <AgentProfileFields p={prof} onChange={setProf} />
           </RoleBlock>
         )}
@@ -444,7 +439,7 @@ function AddUser({ close }: { close: () => void }) {
             <Field label="Job title" required><Input value={v.job} onChange={set("job")} placeholder="e.g. Level Reviewer" /></Field>
             <Field label="Department" required help={depts().length ? undefined : NO_DEPTS}><Dropdown variant="form" disabled={!depts().length} placeholder="Select a department" value={v.dept || undefined} onChange={(d) => setV((x) => ({ ...x, dept: d }))} options={depts().map((d) => ({ value: d, label: d }))} /></Field>
             {/* Last in the block and required (Maryam 26 Oct 2026). */}
-            <Field label="Phone number" required><PhoneInput value={v.phone} onChange={set("phone")} placeholder="+1 (415) 555-0100" /></Field>
+            <Field label="Phone number" required group><PhoneInput value={v.phone} onChange={set("phone")} /></Field>
           </RoleBlock>
         )}
       </Stack>
@@ -456,17 +451,17 @@ const split = (n: string) => { const [first, ...rest] = String(n).split(" "); re
 
 function EditAgent({ u, close }: { u: U; close: () => void }) {
   const r = agRange(u);
-  const [v, setV] = useState({ ...split(u.name), com: String(commissionPct(u)), pf: String(platformFee(u)), from: r[0], to: r[1] });
+  const [v, setV] = useState({ ...split(u.name), com: String(commissionPct(u)), from: r[0], to: r[1] });
   const [fees, setFees] = useState<FeeStr>(() => feeStr(u));
   const lv = LVL_CODES.map((l) => ({ value: l, label: l }));
   return (
     <Slider title={`Edit talent agent — ${u.name}`} open onClose={close}
-      footer={<Foot ok="Save Changes" disabled={!v.first.trim() || !v.last.trim() || !feesReady(fees, v.com, v.pf)} close={close} onOk={() => { commit(() => { u.name = `${v.first.trim()} ${v.last.trim()}`; Object.assign(u, feeSave(fees, v.com, v.pf)); u.range = [v.from, v.to]; }, `${u.name} updated`); close(); }} />}>
+      footer={<Foot ok="Save Changes" disabled={!v.first.trim() || !v.last.trim() || !feesReady(fees, v.com)} close={close} onOk={() => { commit(() => { u.name = `${v.first.trim()} ${v.last.trim()}`; Object.assign(u, feeSave(fees, v.com)); u.range = [v.from, v.to]; }, `${u.name} updated`); close(); }} />}>
       <Stack gap={6}>
         <Field label="First name" required><Input value={v.first} onChange={(e) => setV({ ...v, first: e.target.value })} /></Field>
         <Field label="Last name" required><Input value={v.last} onChange={(e) => setV({ ...v, last: e.target.value })} /></Field>
         <Field label="Email address"><Input value={u.email} readOnly /></Field>
-        <FeeFields fees={fees} com={v.com} pf={v.pf} setFees={setFees} onCom={(x) => setV({ ...v, com: x })} onPf={(x) => setV({ ...v, pf: x })} />
+        <FeeFields fees={fees} com={v.com} setFees={setFees} onCom={(x) => setV({ ...v, com: x })} />
         <Field label="Assessment range (from)"><Dropdown variant="form" value={v.from} onChange={(x) => setV({ ...v, from: x })} options={lv} /></Field>
         <Field label="Assessment range (to)"><Dropdown variant="form" value={v.to} onChange={(x) => setV({ ...v, to: x })} options={lv} /></Field>
       </Stack>
@@ -504,7 +499,7 @@ function EditStaff({ u, close }: { u: U; close: () => void }) {
         <Field label="Job title" required><Input value={v.job} onChange={(e) => setV({ ...v, job: e.target.value })} /></Field>
         <Field label="Department" required><Dropdown variant="form" value={v.dept} onChange={(x) => setV({ ...v, dept: x })} options={depts().map((d) => ({ value: d, label: d }))} /></Field>
         {/* Below Department and required, as on the invite (Maryam 26 Oct 2026). */}
-        <Field label="Phone number" required><PhoneInput value={v.phone} onChange={(e) => setV({ ...v, phone: e.target.value })} placeholder="+1 (415) 555-0100" /></Field>
+        <Field label="Phone number" required group><PhoneInput value={v.phone} onChange={(e) => setV({ ...v, phone: e.target.value })} /></Field>
       </Stack>
     </Slider>
   );

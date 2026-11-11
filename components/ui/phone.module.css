@@ -1,0 +1,37 @@
+/* THE PHONE FIELD (ui/PhoneInput.tsx, Maryam 11 Nov 2026): one underlined control like every
+   field (field.module.css .inp), the country picker on the left and the number to its right.
+   The underline turns to the focus line while either half is in use. The country list is our
+   dropdown menu (dropdown.module.css .menu), opening downward over what is below. */
+.ph {
+  position: relative; display: flex; align-items: center; gap: var(--s04); width: 100%;
+  height: var(--ctrl-h);
+  border-bottom: var(--hairline) solid var(--rule);
+}
+.ph:focus-within { border-bottom-color: var(--focus); box-shadow: inset 0 calc(var(--hairline) * -1) 0 var(--focus); }
+.cc { display: inline-flex; align-items: center; gap: var(--s02); flex: none; height: 100%; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+.cc svg { width: var(--s05); height: var(--s05); color: var(--text-secondary); transition: transform var(--mo-quick) var(--mo-standard); }
+.cc[aria-expanded="true"] svg { transform: rotate(180deg); }
+.flag { font-size: 18px; line-height: 1; }
+.num {
+  flex: 1 1 auto; min-width: 0; height: 100%; padding: 0;
+  border: 0; background: transparent; outline: none; color: var(--text-primary);
+  font-family: var(--font-sans); font-size: var(--t-compact-size); line-height: var(--t-compact-lh);
+  font-variant-numeric: tabular-nums;
+}
+.num::placeholder { color: var(--text-placeholder); }
+
+.menu {
+  position: absolute; top: calc(100% + var(--s02)); left: 0; z-index: 40;
+  width: min(100%, 320px);
+  display: flex; flex-direction: column;
+  background: var(--layer-01); border: var(--hairline) solid var(--rule); box-shadow: var(--shadow-menu);
+}
+.q { height: var(--ctrl-h); padding: 0 var(--s04); border: 0; border-bottom: var(--hairline) solid var(--rule); background: transparent; outline: none; color: var(--text-primary); font-family: var(--font-sans); }
+.q::placeholder { color: var(--text-placeholder); }
+.opts { max-height: calc(var(--s12) * 3); overflow-y: auto; display: flex; flex-direction: column; }
+.opt { display: flex; align-items: center; gap: var(--s03); padding: var(--s03) var(--s04); text-align: left; color: var(--text-primary); }
+.opt:hover { background: var(--overlay-hover); }
+.opt.on { background: var(--overlay-selected); }
+.name { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dial { color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+.none { padding: var(--s04); color: var(--text-secondary); }

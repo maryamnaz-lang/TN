@@ -17,7 +17,7 @@ export type Col<R> = { key: string; label: string; cell: (r: R) => ReactNode; so
 /* COLUMN SORTING, EVERY TABLE (Maryam 4 Nov 2026). Click a header: ascending, again:
    descending, a third time: back to the table's own order. The sort value is the text
    the cell shows, so no table has to declare anything: a person cell sorts by name,
-   status by its word, dates (MM-DD-YYYY) by date, money and counts by number. */
+   status by its word, dates (MM/DD/YYYY) by date, money and counts by number. */
 function nodeText(n: ReactNode): string {
   if (n == null || typeof n === "boolean") return "";
   if (typeof n === "string" || typeof n === "number") return String(n);
@@ -32,7 +32,7 @@ function nodeText(n: ReactNode): string {
 function sortKey(v: string | number): string | number {
   if (typeof v === "number") return v;
   const s = v.trim();
-  const d = s.match(/^(\d{2})-(\d{2})-(\d{4})/);
+  const d = s.match(/^(\d{2})[-/](\d{2})[-/](\d{4})/);
   if (d) return Number(d[3] + d[1] + d[2]);
   const n = s.replace(/[$,%\s]/g, "");
   if (/^-?\d+(\.\d+)?$/.test(n)) return Number(n);

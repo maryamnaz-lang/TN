@@ -409,7 +409,7 @@ function Privacy() {
           <span className={s.srowB}><Text role="h4" as="span">Email Address</Text><Text role="body" as="span">{PF.general.email}</Text><Text role="desc" as="span">Your sign-in email. Manage your account details under My Profile.</Text></span>
         </div>
         <div className={s.srow}>
-          <span className={s.srowB}><Text role="h4" as="span">Password</Text><Text role="desc" as="span">Last changed August 14, 2026</Text></span>
+          <span className={s.srowB}><Text role="h4" as="span">Password</Text><Text role="desc" as="span">Last changed 08/14/2026</Text></span>
           {!pw && <Button kind="ghost" size="sm" onClick={() => setPw(true)}>Reset Password</Button>}
         </div>
         {pw && (

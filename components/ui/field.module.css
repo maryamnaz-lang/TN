@@ -47,7 +47,3 @@ textarea.inp { height: auto; min-height: calc(var(--s12) + var(--s06)); padding-
 /* Super Admin forms: the label is book weight in black (Maryam 19 Oct 2026, was the grey). */
 :global([data-portal="admin"]) .f > span:first-child { font-weight: var(--t-w-book); color: var(--text-primary); }
 
-/* <PhoneInput>: the dial code's flag sits at the field's right end; the text never runs under it. */
-.phone { position: relative; display: block; }
-.phone .inp { padding-right: var(--s08); }
-.flag { position: absolute; right: 0; top: 50%; transform: translateY(-50%); font-size: 18px; line-height: 1; pointer-events: none; }

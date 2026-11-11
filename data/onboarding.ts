@@ -10,7 +10,12 @@
 import { ONBOARDING_Q, RAW } from "./admin";
 
 export type ObType = "single" | "text" | "dropdown";
-export type ObFeed = "intent" | "persona" | "role" | "industry" | "years" | "none";
+/* FEEDS IS TWO OPTIONS, INTENT OR QUIZ (Maryam 11 Nov 2026; was Intent / Persona / Current role /
+   Industry / Years working / Nothing).    Every question maps to one of the two, and ANY NUMBER of questions may feed either
+   (Maryam 11 Nov 2026: "we can have intent from different questions"). An Intent question maps
+   each of its options to a course intent; a Quiz question counts towards the leadership quiz.
+   At least one active question must still feed Intent, or Tal cannot recommend a course. */
+export type ObFeed = "intent" | "quiz";
 export type ObOpt = { label: string; intent?: string };
 export type ObQuestion = {
   id: string; text: string; type: ObType; feeds: ObFeed; active: boolean;
@@ -18,9 +23,7 @@ export type ObQuestion = {
 };
 
 export const OB_TYPES: [ObType, string][] = [["single", "Single choice"], ["dropdown", "Dropdown"], ["text", "Free text"]];
-export const OB_FEEDS: [ObFeed, string][] = [
-  ["intent", "Intent"], ["persona", "Persona"], ["role", "Current role"], ["industry", "Industry"], ["years", "Years working"], ["none", "Nothing, answer is saved only"],
-];
+export const OB_FEEDS: [ObFeed, string][] = [["intent", "Intent"], ["quiz", "Quiz"]];
 /* Only Intent must have a question feeding it: without it Tal cannot recommend a course. */
 export const OB_REQUIRED: ObFeed[] = ["intent"];
 /* An intent comes from a pick, so a free-text question cannot feed it. */
@@ -30,21 +33,21 @@ export const feedName = (f: ObFeed) => OB_FEEDS.find(([k]) => k === f)?.[1] ?? "
 
 const SEED: Record<string, { feeds: ObFeed; placeholder?: string; intents?: string[] }> = {
   obq1: { feeds: "intent", intents: ["role", "another", "ownership", "another"] },
-  obq2: { feeds: "persona" },
-  obq3: { feeds: "role", placeholder: "Operations coordinator, student, own a detailing business" },
-  obq4: { feeds: "industry", placeholder: "Select your industry" },
-  obq5: { feeds: "years" },
+  obq2: { feeds: "quiz" },
+  obq3: { feeds: "quiz", placeholder: "Operations coordinator, student, own a detailing business" },
+  obq4: { feeds: "quiz", placeholder: "Select your industry" },
+  obq5: { feeds: "quiz" },
 };
 export const OB_QUESTIONS: ObQuestion[] = ONBOARDING_Q as ObQuestion[];
 for (const q of OB_QUESTIONS as any[]) {
-  if (q.feeds) continue;
-  const seed = SEED[q.id] ?? { feeds: "none" };
+  if (q.feeds === "intent" || q.feeds === "quiz") continue;
+  const seed = SEED[q.id] ?? { feeds: "quiz" };
   q.feeds = seed.feeds; q.active = true;
   if (seed.placeholder) q.placeholder = seed.placeholder;
   q.options = (q.options || []).map((o: any, i: number) => ({ label: o.label, ...(seed.intents ? { intent: seed.intents[i] } : {}) }));
   delete q.weight;
 }
-/* Which question feeds a field, other than `except`. */
+/* Another active question feeding a field, other than `except`. */
 export const feederOf = (f: ObFeed, except?: string) => OB_QUESTIONS.find((q) => q.active && q.feeds === f && q.id !== except);
 /* The one question feeding a required field cannot be deleted, switched off or re-pointed. */
 export const lockedFeeder = (q: ObQuestion) => q.active && OB_REQUIRED.includes(q.feeds) && !feederOf(q.feeds, q.id);

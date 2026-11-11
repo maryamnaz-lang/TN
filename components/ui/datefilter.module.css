@@ -4,6 +4,22 @@
 .t svg { width: var(--icon-sm); height: var(--icon-sm); color: var(--text-secondary); }
 .x { display: grid; place-items: center; width: var(--s06); align-self: stretch; margin-right: var(--s02); color: var(--text-secondary); }
 .x svg { width: var(--s04); height: var(--s04); }
+/* <DateInput>, the form date field (Maryam 11 Nov 2026): the same underline control as every
+   other field (field.module.css .inp, restated here), the typed date on the left, the calendar
+   button at the right end. */
+.di { position: relative; display: block; width: 100%; }
+.diInp {
+  width: 100%; height: var(--ctrl-h); padding: 0 var(--s08) 0 0;
+  border: 0; border-bottom: var(--hairline) solid var(--rule); border-radius: var(--radius);
+  background: transparent; color: var(--text-primary);
+  font-family: var(--font-sans); font-size: var(--t-compact-size); line-height: var(--t-compact-lh);
+  font-variant-numeric: tabular-nums; outline: none;
+}
+.diInp::placeholder { color: var(--text-placeholder); }
+.diInp:focus { border-bottom-color: var(--focus); box-shadow: inset 0 calc(var(--hairline) * -1) 0 var(--focus); }
+.diBtn { position: absolute; right: 0; top: 50%; transform: translateY(-50%); display: grid; place-items: center; width: var(--s07); height: var(--s07); color: var(--text-secondary); }
+.diBtn svg { width: var(--icon-rail); height: var(--icon-rail); }
+.diBtn:hover, .diBtn[aria-expanded="true"] { color: var(--text-primary); }
 .pop { position: absolute; top: calc(100% + var(--s02)); right: 0; z-index: 60; width: var(--dcal-w); padding: var(--s04); background: var(--layer-01); border: var(--hairline) solid var(--rule); box-shadow: var(--shadow-menu); }
 .h { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--s03); }
 .nav { display: grid; place-items: center; width: var(--s07); height: var(--s07); color: var(--text-primary); }
@@ -15,3 +31,4 @@
 .d:hover { background: var(--overlay-hover); }
 .d.today { border: var(--hairline) solid var(--rule); }
 .d.on { background: var(--accent); color: var(--on-accent); }
+.popL { right: auto; left: 0; }

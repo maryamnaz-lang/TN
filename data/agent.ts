@@ -100,8 +100,13 @@ export const payFee = (name: string) => { const x = IVS.find((i) => i.n === name
 /* The three fees as one figure: "$88–$120". */
 export const FEE_SPAN = (() => { const v = FEE_TRACKS.map((t) => AGENT.fees[t.key]); return `${$(Math.min(...v))}–${$(Math.max(...v))}`; })();
 export const first = (n: string) => n.split(" ")[0];
-/* "Thursday 20 August" → "20 August" (Phase 1 drops the weekday on a card). */
-export const dayDate = (d: string) => d.replace(/^\w+ /, "");
+/* "Thursday 20 August" → "08/20/2026": the platform's US date, MM/DD/YYYY (Maryam 11 Nov 2026,
+   was "20 August"). A bare weekday ("Monday", an open slot) has no date and stays as it is. */
+export const dayDate = (d: string) => {
+  if (!/\d/.test(d)) return d;
+  const x = ivDate(d), p = (n: number) => String(n).padStart(2, "0");
+  return `${p(x.getMonth() + 1)}/${p(x.getDate())}/${x.getFullYear()}`;
+};
 
 /* Phase 1 counts Past Interviews as the agent's lifetime total. */
 export const PAST_COUNT = AGENT.ivs;
@@ -109,17 +114,17 @@ export const PAST_COUNT = AGENT.ivs;
 export type PayRow = { n: string; d: string; s: string; st: "quiet" | "warn" | "green" };
 export const PAYMENTS: PayRow[] = [
   /* No held funds or awaiting payments for now (Maryam 10 Nov 2026): every row is paid. */
-  { n: "Rafael Ortiz", d: "19 Aug", s: "Paid 19 Aug", st: "green" },
-  { n: "Sofia Marek", d: "18 Aug", s: "Paid 18 Aug", st: "green" },
-  { n: "Tom Whelan", d: "17 Aug", s: "Paid 20 Aug", st: "green" },
-  { n: "Leah Carr", d: "15 Aug", s: "Paid 18 Aug", st: "green" },
-  { n: "Nina Haddad", d: "14 Aug", s: "Paid 19 Aug", st: "green" },
-  { n: "Owen Pryce", d: "13 Aug", s: "Returned", st: "quiet" },
-  { n: "Marcus Bell", d: "12 Aug", s: "Paid 17 Aug", st: "green" },
+  { n: "Rafael Ortiz", d: "08/19/2026", s: "Paid 08/19/2026", st: "green" },
+  { n: "Sofia Marek", d: "08/18/2026", s: "Paid 08/18/2026", st: "green" },
+  { n: "Tom Whelan", d: "08/17/2026", s: "Paid 08/20/2026", st: "green" },
+  { n: "Leah Carr", d: "08/15/2026", s: "Paid 08/18/2026", st: "green" },
+  { n: "Nina Haddad", d: "08/14/2026", s: "Paid 08/19/2026", st: "green" },
+  { n: "Owen Pryce", d: "08/13/2026", s: "Returned", st: "quiet" },
+  { n: "Marcus Bell", d: "08/12/2026", s: "Paid 08/17/2026", st: "green" },
 ];
 
 /* The payout destination: ONE Stripe reference, not a card wallet (13.1). */
-export const PAYOUT = { bank: "Wells Fargo", last: "4417", verified: "12 Jun 2026" };
+export const PAYOUT = { bank: "Wells Fargo", last: "4417", verified: "06/12/2026" };
 
 export const PUB = {
   about: "I came to interviewing from running delivery teams, which is where I learned that what somebody says about a week and what they did in it are two different accounts. I ask for the second one. Eleven years in delivery, six of them managing managers, means most of what I probe for I have had to do myself under a deadline. In the room I am listening for how a decision actually got made — who was there, what was traded off, what you would do differently — not for the version that sounds best in an interview. You will leave with one thing to work on, named plainly, and a report you can point at the evidence for.",

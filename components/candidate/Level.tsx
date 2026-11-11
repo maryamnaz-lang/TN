@@ -10,6 +10,7 @@ import { Dialog } from "../ui/Dialog";
 import { CardPicker, PayModal, defaultCard } from "../ui/CardPicker";
 import { ReceiptModal } from "../ui/Receipt";
 import { DiscountField, type Applied } from "../ui/DiscountField";
+import { PayBar } from "../ui/PayBar";
 import { redeem, saleFor } from "@/data/discounts";
 import { Price } from "../ui/Price";
 import { PEOPLE } from "@/data/seed";
@@ -174,9 +175,10 @@ export function CoursePayPage({ k }: { k: string }) {
             <CardPicker cards={SAVED_CARDS} value={card} onChange={setCard} />
           </div>
           <DiscountField ctx={{ kind: "course", courseKey: c.key, price: c.fee }} cand={PEOPLE.maryam.name} value={disc} onChange={setDisc} auto={auto} />
-          <div className={s.go}><Button kind="primary" go onClick={() => setReview(true)}>Pay ${c.fee - (eff?.off ?? 0)} and start</Button></div>
         </div>
       </Section>
+      {/* The pay action is a sticky bar at the foot (Maryam 10 Nov 2026), ui/PayBar. */}
+      <PayBar amount={c.fee - (eff?.off ?? 0)} was={c.fee} label={`Pay $${c.fee - (eff?.off ?? 0)}`} onPay={() => setReview(true)} />
       {add && <PayModal onClose={() => setAdd(false)} />}
       {review && <ReceiptModal r={bill} review onClose={() => setReview(false)} onConfirm={pay} />}
     </Page>

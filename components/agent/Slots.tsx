@@ -97,3 +97,35 @@ function AddShift({ shifts, onClose, onSave }: { shifts: Shift[]; onClose: () =>
     </Modal>
   );
 }
+
+/* ============================================================
+   CALENDAR CONNECTION — replaces the shift editor on My Profile (Maryam 10 Nov 2026,
+   off a Circleback reference, built in our components). The agent connects their
+   Outlook calendar and candidates book inside its free hours, so there are no shifts
+   to keep by hand. One white card: the Outlook logo (Maryam's supplied file),
+   the calendar's name and state, and the action. Connecting opens Microsoft's own
+   sign-in, so the button carries the open-in-new mark; the prototype marks it connected.
+   `Availability` above stays defined, no longer drawn.
+   ============================================================ */
+/* Maryam's supplied Outlook calendar logo, cropped to its edges (public/images/logos/outlook.png). */
+const OUTLOOK_MARK = <img src="/images/logos/outlook.png" alt="" className={s.olMark} />;
+export function CalendarConnect({ connected, setConnected, email }: { connected: boolean; setConnected: (v: boolean) => void; email: string }) {
+  return (
+    <Section>
+      <SectionHeader title="Availability" desc="Connect your calendar so candidates can book you in your free hours." />
+      <div className={s.ol}>
+        {OUTLOOK_MARK}
+        <span className={s.olB}>
+          <Text role="h4" as="span">Microsoft Outlook Calendar</Text>
+          {connected && <Text role="desc" as="span" className={s.olOn}><Icon name="checkFilled" />Connected as {email}</Text>}
+        </span>
+        {/* Two separate buttons (keys), never one element switching class: a reused button
+            faded black to grey while its ink flipped at once, a blank black box mid-hover. */}
+        {connected
+          ? <Button key="off" kind="secondary" onClick={() => setConnected(false)}>Disconnect</Button>
+          /* Connect does nothing for now (Maryam 10 Nov 2026); its hover is the accent red. */
+          : <span key="on" className={s.olAct}><Button kind="primary" iconEnd="openNew">Connect Outlook</Button></span>}
+      </div>
+    </Section>
+  );
+}

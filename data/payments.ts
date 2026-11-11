@@ -8,12 +8,12 @@ import { courseByKey } from "./level";
 export type Payment = { id: string; item: string; date: string; card?: string; brand?: string; amount: string; original?: string; discount?: { code: string; off: string } };
 
 /* A course row names the COURSE, read off the catalogue (Maryam 26 Oct 2026). */
-const E2: Payment = { id: "e2", item: courseByKey("E2").name, date: "Feb 4, 2026", card: "8210", brand: "Mastercard", amount: "$490" };
+const E2: Payment = { id: "e2", item: courseByKey("E2").name, date: "02/04/2026", card: "8210", brand: "Mastercard", amount: "$490" };
 /* No row for the first interview: nothing was paid, and its booking carries no price or
    "Complimentary" wording anywhere (Maryam 26 Oct 2026). */
-const E3: Payment = { id: "e3", item: courseByKey("E3").name, date: "Aug 14, 2026", card: "4242", brand: "Visa", amount: "$690" };
+const E3: Payment = { id: "e3", item: courseByKey("E3").name, date: "08/14/2026", card: "4242", brand: "Visa", amount: "$690" };
 /* The re-interview is charged at Priya's price for this candidate's track (data/candidate.ts), not typed twice. */
-const RE: Payment = { id: "re", item: "Re-interview · Priya Nair", date: "Nov 20, 2026", card: "4242", brand: "Visa", amount: `$${AGENT_PRIYA.price}` };
+const RE: Payment = { id: "re", item: "Re-interview · Priya Nair", date: "11/20/2026", card: "4242", brand: "Visa", amount: `$${AGENT_PRIYA.price}` };
 
 /* Newest first; what has been paid by the stage the candidate is at, with anything bought
    during this visit (`made`, the demo's `ui.purchases`) on top. A purchase replaces the
@@ -29,8 +29,8 @@ export function payments(stage: string, made: Payment[] = []): Payment[] {
   return [...made, ...rows.filter((p) => !ids.has(p.id))];
 }
 
-/* A purchase's date in the ledger's own format ("Oct 26, 2026"). */
-export const ledgerDate = (d = new Date()) => d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+/* A purchase's date in the platform's US format, MM/DD/YYYY (Maryam 11 Nov 2026, was "Oct 26, 2026"). */
+export const ledgerDate = (d = new Date()) => `${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")}/${d.getFullYear()}`;
 
 /* What a purchase records: the row the Payments ledger and its receipt read. */
 export const purchase = (id: string, item: string, price: number, card: { brand: string; last4: string }, disc?: { code: string; off: number }): Payment =>

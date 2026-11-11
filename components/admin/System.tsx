@@ -11,14 +11,14 @@ import { KV } from "../ui/KV";
 import { Button } from "../ui/Button";
 import { Dropdown } from "../ui/Dropdown";
 import { Search, Toolbar, Field, Input, PhoneInput, TextArea } from "../ui/Field";
-import { DateFilter } from "../ui/DateFilter";
+import { DateInput } from "../ui/DateFilter";
 import { Slider } from "../ui/Slider";
 import { Sheet } from "../ui/Sheet";
 import { Confirm } from "../ui/Confirm";
 import { ToggleRow } from "../ui/Toggle";
 import { Icon } from "../Icon";
 import { commit, toast, useStore } from "@/lib/store";
-import { RAW, INTEGRATIONS, USERS, ME, FEE_LOG, face, dpFmt, staffRoleName } from "@/data/admin";
+import { RAW, INTEGRATIONS, USERS, ME, FEE_LOG, PLATFORM, face, dpFmt, staffRoleName } from "@/data/admin";
 import s from "./admin.module.css";
 import p from "../candidate/profile.module.css";
 import y from "./system.module.css";
@@ -63,7 +63,7 @@ export function AdminOnboarding() {
               ...(i < OB_QUESTIONS.length - 1 ? [{ icon: "chevDown" as const, label: "Move down", onClick: () => move(x, 1) }] : []),
               x.active
                 ? { icon: "viewOff" as const, label: "Turn off", onClick: () => (locked ? setAsk({ k: "lock", id: x.id }) : commit(() => { x.active = false; }, "Question turned off")) }
-                : { icon: "view" as const, label: "Turn on", onClick: () => commit(() => { x.active = true; if (x.feeds !== "none" && feederOf(x.feeds, x.id)) x.feeds = "none"; }, "Question turned on") },
+                : { icon: "view" as const, label: "Turn on", onClick: () => commit(() => { x.active = true; }, "Question turned on") },
               { icon: "delete", label: "Delete", danger: true, onClick: () => setAsk({ k: locked ? "lock" : "del", id: x.id }) },
             ];
           }} cols={[
@@ -71,7 +71,7 @@ export function AdminOnboarding() {
             { key: "q", label: "Question", cell: (x) => <button type="button" className={y.rowBtn} onClick={() => setEdit(x.id)}>{x.text}</button> },
             { key: "t", label: "Answer type", cell: (x) => OB_TYPE[x.type] },
             { key: "o", label: "Options", cell: (x) => (x.type === "text" ? "—" : String(x.options.length + (x.other ? 1 : 0))) },
-            { key: "f", label: "Feeds", cell: (x) => (x.feeds === "none" ? "—" : feedName(x.feeds)) },
+            { key: "f", label: "Feeds", cell: (x) => feedName(x.feeds) },
             { key: "s", label: "Status", cell: (x) => <Status tone={x.active ? "green" : "plain"}>{x.active ? "Active" : "Off"}</Status> },
           ]} />
         ) : <div className={s.empty}><Icon name="document" /><Text role="h4" as="span">No questions yet</Text><Text role="desc" as="span">Nothing matches your search.</Text></div>}
@@ -93,12 +93,13 @@ export function AdminOnboarding() {
 function QuestionEditor({ id, close }: { id: string; close: () => void }) {
   const src = id === "new" ? null : OB_QUESTIONS.find((x) => x.id === id)!;
   const [q, setQ] = useState<ObQuestion>(() => (src ? JSON.parse(JSON.stringify(src))
-    : { id: `obq${Date.now()}`, text: "", type: "single", feeds: "none", active: true, options: [{ label: "" }, { label: "" }] }));
+    : { id: `obq${Date.now()}`, text: "", type: "single", feeds: "quiz", active: true, options: [{ label: "" }, { label: "" }] }));
   const text = q.type === "text", intent = q.feeds === "intent";
   const locked = !!src && lockedFeeder(src);
-  const feeds = OB_FEEDS.filter(([f]) => f === "none" || f === q.feeds || (feedFits(f, q.type) && !feederOf(f, q.id)));
+  /* Both are always offered (several questions may feed Intent); Intent needs a pick, so free text offers Quiz only. */
+  const feeds = OB_FEEDS.filter(([f]) => f === q.feeds || feedFits(f, q.type));
   const setOpt = (i: number, k: keyof ObOpt, v: string) => setQ((o) => ({ ...o, options: o.options.map((x, j) => (j === i ? { ...x, [k]: v } : x)) }));
-  const setType = (t: string) => setQ((o) => ({ ...o, type: t as ObType, feeds: feedFits(o.feeds, t as ObType) ? o.feeds : "none",
+  const setType = (t: string) => setQ((o) => ({ ...o, type: t as ObType, feeds: feedFits(o.feeds, t as ObType) ? o.feeds : "quiz",
     options: t === "text" ? o.options : o.options.length ? o.options : [{ label: "" }, { label: "" }] }));
   const opts = q.options.filter((o) => o.label.trim());
   const ok = q.text.trim() && (text || (opts.length >= 2 && (!intent || opts.every((o) => o.intent))));
@@ -119,7 +120,7 @@ function QuestionEditor({ id, close }: { id: string; close: () => void }) {
         <Field label="Answer type" required help={locked ? OB_LOCK : undefined}>
           <Dropdown variant="form" value={q.type} onChange={setType} disabled={locked} options={OB_TYPES.map(([value, label]) => ({ value, label }))} />
         </Field>
-        <Field label="Feeds" required help={locked ? undefined : intent ? "Map every option to the intent it stands for." : "The profile field this answer fills. A field another question already feeds is not listed."}>
+        <Field label="Feeds" required help={locked ? undefined : intent ? "Map every option to the intent it stands for." : undefined}>
           <Dropdown variant="form" value={q.feeds} disabled={locked} onChange={(f) => setQ({ ...q, feeds: f as ObFeed })} options={feeds.map(([value, label]) => ({ value, label }))} />
         </Field>
         {q.type !== "single" && (
@@ -280,29 +281,38 @@ const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
 function Money() {
   const [edit, setEdit] = useState(false);
   const [delay, setDelay] = useState(String(SET.payoutDelay)), [day, setDay] = useState(SET.payoutRunDay);
+  /* THE PLATFORM FEE lives here, set once for every interview (Maryam 11 Nov 2026); it was a
+     field on each talent agent form. A flat $ amount added on top of the commission. */
+  const [pf, setPf] = useState(String(PLATFORM.fee));
   const [step, setStep] = useState<null | "reason" | "stepup">(null);
   const [why, setWhy] = useState("");
-  const ok = /^\d+$/.test(delay) && +delay >= 0 && +delay <= 30;
+  const delayOk = /^\d+$/.test(delay) && +delay >= 0 && +delay <= 30;
+  const pfOk = /^\d+$/.test(pf) && +pf >= 0 && +pf <= 500;
+  const ok = delayOk && pfOk;
   const changes: [string, string, string, string][] = [];
-  if (ok && +delay !== SET.payoutDelay) changes.push(["Payout release delay", String(SET.payoutDelay), delay, "working days"]);
+  if (pfOk && +pf !== PLATFORM.fee) changes.push(["Platform fee", `$${PLATFORM.fee}`, `$${+pf}`, "per interview"]);
+  if (delayOk && +delay !== SET.payoutDelay) changes.push(["Payout release delay", String(SET.payoutDelay), delay, "working days"]);
   if (day !== SET.payoutRunDay) changes.push(["Payout run day", SET.payoutRunDay, day, ""]);
-  const reset = () => { setEdit(false); setStep(null); setWhy(""); setDelay(String(SET.payoutDelay)); setDay(SET.payoutRunDay); };
+  const reset = () => { setEdit(false); setStep(null); setWhy(""); setDelay(String(SET.payoutDelay)); setDay(SET.payoutRunDay); setPf(String(PLATFORM.fee)); };
   return (
     <Section>
-      <SectionHeader title="Money" desc="When held funds are released and the weekly payout run. These carry the Change fee permission — a reason and a re-authentication step. A change applies to recommendations sent after it; held funds already releasable are unaffected."
+      <SectionHeader title="Money" desc="The platform fee on every interview, when held funds are released and the weekly payout run. These carry the Change fee permission — a reason and a re-authentication step. A change applies to bookings and recommendations made after it; held funds already releasable are unaffected."
         actions={edit
           ? <Stack row gap={3}><Button kind="secondary" size="sm" onClick={reset}>Cancel</Button><Button kind="primary" size="sm" disabled={!ok || !changes.length} onClick={() => setStep("reason")}>Save</Button></Stack>
           : <Button kind="ghost" size="sm" icon="edit" onClick={() => setEdit(true)}>Edit</Button>} />
       {edit ? (
         <Stack gap={5}>
-          <Field label="Payout release delay (working days)" help="How long after a recommendation is sent before held funds become releasable. Counted against the working-days calendar below." error={ok ? undefined : "Enter a whole number between 0 and 30 working days."}>
+          <Field label="Platform fee ($ per interview)" help="A flat amount added to every paid interview, on top of the agent's fee and the commission. It applies to every talent agent." error={pfOk ? undefined : "Enter a whole number between 0 and 500 dollars."}>
+            <Input inputMode="numeric" value={pf} onChange={(e) => setPf(e.target.value.replace(/[^\d]/g, ""))} placeholder="e.g. 25" />
+          </Field>
+          <Field label="Payout release delay (working days)" help="How long after a recommendation is sent before held funds become releasable. Counted against the working-days calendar below." error={delayOk ? undefined : "Enter a whole number between 0 and 30 working days."}>
             <Input inputMode="numeric" value={delay} onChange={(e) => setDelay(e.target.value.replace(/[^\d]/g, ""))} />
           </Field>
           <Field label="Payout run day" help="The payout run executes at 12:00 AM on this day, in your time zone.">
             <Dropdown variant="form" value={day} onChange={setDay} options={DAYS.map((d) => ({ value: d, label: d }))} />
           </Field>
         </Stack>
-      ) : <KV ends rows={[["Payout release delay", `${SET.payoutDelay} working days`], ["Payout run day", `${SET.payoutRunDay}, 12:00 AM`]]} />}
+      ) : <KV ends rows={[["Platform fee", `$${PLATFORM.fee} per interview`], ["Payout release delay", `${SET.payoutDelay} working days`], ["Payout run day", `${SET.payoutRunDay}, 12:00 AM`]]} />}
       {step === "reason" && (
         <Sheet title="Confirm the money change" onClose={() => setStep(null)} footer={<><Button kind="secondary" onClick={() => setStep(null)}>Cancel</Button><Button kind="primary" disabled={!why.trim()} onClick={() => setStep("stepup")}>Continue</Button></>}>
           <Stack gap={5}>
@@ -313,8 +323,8 @@ function Money() {
       )}
       {step === "stepup" && <Confirm icon="check" stepup title="Confirm your identity" desc="Enter the security code to save this money change." ok="Save Changes" onCancel={() => setStep(null)}
         onOk={() => { commit(() => {
-          changes.forEach(([l, a, b, u]) => FEE_LOG.unshift({ id: `fl${Date.now()}${l}`, valueType: /delay/i.test(l) ? "delay" : "runday", agent: "", agentEmail: "", from: `${a}${u ? " " + u : ""}`, to: `${b}${u ? " " + u : ""}`, changedBy: ME.name, role: "Super Admin", on: `${new Date().toISOString().slice(0, 10)}, just now`, reason: why.trim() }));
-          SET.payoutDelay = +delay; SET.payoutRunDay = day;
+          changes.forEach(([l, a, b, u]) => FEE_LOG.unshift({ id: `fl${Date.now()}${l}`, valueType: /platform/i.test(l) ? "platform" : /delay/i.test(l) ? "delay" : "runday", agent: "", agentEmail: "", from: `${a}${u ? " " + u : ""}`, to: `${b}${u ? " " + u : ""}`, changedBy: ME.name, role: "Super Admin", on: `${new Date().toISOString().slice(0, 10)}, just now`, reason: why.trim() }));
+          SET.payoutDelay = +delay; SET.payoutRunDay = day; PLATFORM.fee = +pf;
         }, "Money settings saved"); reset(); }} />}
     </Section>
   );
@@ -414,7 +424,7 @@ function HolidaySheet({ H, date, close }: { H: { date: string; name: string }[];
         commit(() => { if (cur) { cur.date = d; cur.name = n.trim(); } else H.push({ date: d, name: n.trim() }); }, `${cur ? "Updated" : "Added"} ${n.trim()}, ${dpFmt(d)}`); close();
       }}>{cur ? "Save Changes" : "Add Holiday"}</Button></>}>
       <Stack gap={6}>
-        <Field label="Date" required error={err || undefined}><DateFilter label="Date" value={d} onChange={setD} /></Field>
+        <Field label="Date" required error={err || undefined}><DateInput label="Date" value={d} onChange={setD} /></Field>
         <Field label="Name" required><Input value={n} maxLength={100} onChange={(e) => setN(e.target.value)} placeholder="e.g. Spring Bank Holiday" /></Field>
       </Stack>
     </Sheet>
@@ -578,7 +588,7 @@ function PhoneSheet({ close }: { close: () => void }) {
   return step === "num" ? (
     <Sheet title="Change phone number" onClose={close} footer={<><Button kind="secondary" onClick={close}>Cancel</Button><Button kind="primary" disabled={num.replace(/\D/g, "").length < 7 || !pw} onClick={() => { setStep("code"); toast("A code was sent to the new number"); }}>Send Code</Button></>}>
       <Stack gap={5}>
-        <Field label="New number" required><PhoneInput value={num} onChange={(e) => setNum(e.target.value)} placeholder="+1 (415) 555-0100" /></Field>
+        <Field label="New number" required group><PhoneInput value={num} onChange={(e) => setNum(e.target.value)} label="New number" /></Field>
         <Field label="Current password" required><Input type="password" value={pw} onChange={(e) => setPwd(e.target.value)} placeholder="Your current password" autoComplete="current-password" /></Field>
         <Text role="desc" as="p">We send a code to the new number; it takes over once the code is entered.</Text>
       </Stack>
@@ -670,7 +680,7 @@ export function AdminGeneral() {
           <Field label="Support phone"><Input value={v.phone} onChange={(e) => setV({ ...v, phone: e.target.value })} /></Field>
           <Field label="Timezone"><Dropdown variant="form" value={v.tz} onChange={(x) => setV({ ...v, tz: x })} options={opts(["Europe/London (GMT+1)", "UTC", "America/New_York (GMT-4)", "Asia/Karachi (GMT+5)"])} /></Field>
           <Field label="Language"><Dropdown variant="form" value={v.lang} onChange={(x) => setV({ ...v, lang: x })} options={opts(["English (United Kingdom)", "English (United States)"])} /></Field>
-          <Field label="Date format"><Dropdown variant="form" value={v.dates} onChange={(x) => setV({ ...v, dates: x })} options={opts(["MM-DD-YYYY", "DD-MM-YYYY", "YYYY-MM-DD"])} /></Field>
+          <Field label="Date format"><Dropdown variant="form" value={v.dates} onChange={(x) => setV({ ...v, dates: x })} options={opts(["MM/DD/YYYY", "DD/MM/YYYY", "YYYY-MM-DD"])} /></Field>
           <Field label="Display currency"><Dropdown variant="form" value={v.ccy} onChange={(x) => setV({ ...v, ccy: x })} options={opts(["USD ($)", "GBP (£)", "EUR (€)"])} /></Field>
         </div>
       </Section>

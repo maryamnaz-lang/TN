@@ -10,13 +10,13 @@ import { KV } from "../ui/KV";
 import { Button } from "../ui/Button";
 import { Dropdown, MultiDropdown } from "../ui/Dropdown";
 import { Search, Toolbar, Field, Input, TextArea } from "../ui/Field";
-import { DateFilter, isoOf } from "../ui/DateFilter";
+import { DateFilter, DateInput, isoOf } from "../ui/DateFilter";
 import { Sheet } from "../ui/Sheet";
 import { Slider } from "../ui/Slider";
 import { Confirm } from "../ui/Confirm";
 import { Icon } from "../Icon";
 import { commit, toast, useStore } from "@/lib/store";
-import { RAW, TXNS, PAYOUTS, FEE_LOG, DISCOUNTS, SETTLEMENTS, face, money, dpFmt, type Tone } from "@/data/admin";
+import { RAW, TXNS, PAYOUTS, FEE_LOG, DISCOUNTS, SETTLEMENTS, face, money, dpFmt, candEmail, type Tone } from "@/data/admin";
 import { FUNDER, KIND_OPTS, SCOPE_OPTS, discStatus, discUsed, discValue, valueLabel, appliesLabel, tracksLabel, coursesLabel, isPlatform, codeLabel } from "@/data/discounts";
 import { FEE_TRACKS } from "@/data/fees";
 import { COURSE_LIST } from "@/data/level";
@@ -219,7 +219,7 @@ export function AdminFeeSettings() {
     <Page>
       <PageHeader title="Fee Settings" desc="The record of every fee value ever set or changed. It is read-only and cannot be edited or cleared by anyone." actions={<ExportBtn what="Fee Settings" />} />
       <Section kind="tabs">
-        <Tabs value={vt} onChange={setVt} items={[["all", "All"], ["commission", "Agent commission"], ["delay", "Payout release delay"], ["runday", "Payout run day"]].map(([k, label]) => ({ key: k, label, count: FEE_LOG.filter((e) => k === "all" || e.valueType === k).length }))} />
+        <Tabs value={vt} onChange={setVt} items={[["all", "All"], ["commission", "Agent commission"], ["platform", "Platform fee"], ["delay", "Payout release delay"], ["runday", "Payout run day"]].map(([k, label]) => ({ key: k, label, count: FEE_LOG.filter((e) => k === "all" || e.valueType === k).length }))} />
       </Section>
       <Section kind="block">
         <Toolbar search={<Search value={q} onChange={setQ} placeholder="Search by agent, email or who changed it" />}
@@ -284,7 +284,7 @@ export function AdminDiscounts() {
       <Section kind="block">
         <Toolbar search={<Search value={q} onChange={setQ} placeholder="Search by code or name" />}
           filters={<>
-            <Dropdown label="Applies to" value={ap} onChange={setAp} options={[{ value: "all", label: "All" }, ...SCOPE_OPTS.map(([value, label]) => ({ value, label: value === "all" ? "Whole platform" : label }))]} />
+            <Dropdown label="Applies to" value={ap} onChange={setAp} options={[{ value: "all", label: "All" }, ...SCOPE_OPTS.map(([value, label]) => ({ value, label }))]} />
           </>} />
         {rows.length ? (
           <Table rows={rows} rowKey={(d) => d.id} href={(d) => `/admin/finance/discounts/${d.id}/`} actions={(d) => discActs(d, setSheet, router.push)} cols={[
@@ -319,7 +319,7 @@ export function AdminDiscount({ id }: { id: string }) {
         <SectionHeader title="Summary" />
         <KV rows={[
           ["Code", isPlatform(d) ? "None. It applies to every candidate price automatically while live." : d.code.toUpperCase()], ["Status", <DiscSt key="s" d={d} />],
-          ["Discount type", d.kind === "amount" ? "Fixed amount off" : "Percentage off"], ["Discount", valueLabel(d)],
+          ["Discount type", d.kind === "amount" ? "Fixed amount" : "Percentage"], ["Discount", valueLabel(d)],
           ["Applies to", SCOPE_OPTS.find(([k]) => k === d.scope)?.[1] ?? d.scope],
           /* Only the one follow-up its Applies-to choice has. */
           ...(d.scope === "track" ? [["Tracks", tracksLabel(d)] as [string, string]] : []),
@@ -331,13 +331,12 @@ export function AdminDiscount({ id }: { id: string }) {
         <SectionHeader title="Redemptions" />
         {d.red?.length ? (
           <Table rows={d.red as any[]} rowKey={(r) => r.ref} href={(r) => (r.txId && TXNS.some((t) => t.id === r.txId) ? `/admin/finance/transactions/${r.txId}/` : undefined)} cols={[
-            { key: "c", label: "Candidate", cell: (r) => <PersonCell name={r.cand} img={face(r.cand)} /> },
-            { key: "r", label: "Reference", cell: (r) => (r.txId && TXNS.some((t) => t.id === r.txId) ? <span className={f.ref}>{r.ref}</span> : r.ref) },
+            { key: "c", label: "Candidate", cell: (r) => <PersonCell name={r.cand} img={face(r.cand)} sub={candEmail(r.cand)} /> },
+            // No Reference or Funding source columns (Maryam 11 Nov 2026); a row still opens its transaction.
             { key: "d", label: "Date", cell: (r) => dpFmt(r.date) },
             { key: "o", label: "Original", cell: (r) => money(r.original) },
             { key: "x", label: "Discounted", cell: (r) => money(r.discounted) },
             { key: "p", label: "Paid", cell: (r) => money(r.paid) },
-            { key: "s", label: "Funding source", cell: (r) => r.source },
           ]} />
         ) : <Empty icon="ticket" title="No redemptions yet" desc="No one has used this code." />}
       </Section>
@@ -429,8 +428,8 @@ function DiscForm({ id, close }: { id?: string; close: () => void }) {
             {live ? ro(coursesLabel({ courses })) : <MultiDropdown value={courses} onChange={setCourses} options={COURSE_OPTS} placeholder="Choose courses" allLabel="All courses" />}
           </Field>
         )}
-        <Field label="Start date" required={!live}>{live ? ro(dpFmt(v.start)) : <DateFilter label="Start" value={v.start} onChange={(x) => set("start", x)} />}</Field>
-        <Field label="End date" required><DateFilter label="End" value={v.end} onChange={(x) => set("end", x)} /></Field>
+        <Field label="Start date" required={!live}>{live ? ro(dpFmt(v.start)) : <DateInput label="Start date" value={v.start} onChange={(x) => set("start", x)} />}</Field>
+        <Field label="End date" required><DateInput label="End date" value={v.end} onChange={(x) => set("end", x)} /></Field>
         {d && <Field label="Reason" required><TextArea rows={3} maxLength={500} value={v.reason} onChange={(e) => set("reason", e.target.value)} placeholder="Recorded on the audit log (1–500 characters)." /></Field>}
         {/* The create-form footnote (checkout + funding) is removed (Maryam 26 Oct 2026); only the
             edit rules remain. */}

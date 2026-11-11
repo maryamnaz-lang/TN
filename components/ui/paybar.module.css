@@ -1,0 +1,28 @@
+/* THE STICKY PAY BAR (ui/PayBar.tsx): pinned to the bottom of the scrolling page, white on the
+   one hairline above it, padded to the page gutter so its edges line up with the sections.
+   It pulls down over the page's foot padding so it sits flush with the frame. */
+/* ALWAYS AT THE FOOT (Maryam 10 Nov 2026): on a screen taller than the page, a sticky bar
+   ended right after the content and moved down when the discount field opened. So the page
+   column and the page fill the scroller's height as flex columns, and the bar takes the
+   leftover space above it (margin-top:auto): it sits on the bottom edge whatever the content
+   length, and once the content is longer it sticks there while scrolling. */
+:global(*):has(> * > .bar) { display: flex; flex-direction: column; min-height: 100%; }
+:global(*):has(> .bar) { display: flex; flex-direction: column; flex: 1 0 auto; }
+:global(*):has(> .bar) > * { flex-shrink: 0; }
+.gap { height: var(--sec-gap); }
+.bar {
+  position: sticky; bottom: 0; z-index: 5;
+  margin-top: auto;
+  margin-bottom: calc(-1 * var(--page-pad-bottom));
+  background: var(--layer-01);
+  border-top: var(--hairline) solid var(--rule);
+}
+.in { display: flex; align-items: center; gap: var(--s05); padding: var(--s05) var(--pad-x); }
+.total { display: flex; flex-direction: column; gap: var(--s01); margin-right: auto; }
+.amt { display: inline-flex; align-items: baseline; gap: var(--s03); font-variant-numeric: tabular-nums; }
+.was { color: var(--text-secondary); font-size: var(--t-desc-size); }
+@container app (max-width: 599.98px) {
+  .in { flex-wrap: wrap; row-gap: var(--s04); }
+  .act { flex: 1 0 100%; display: flex; }
+  .act > * { flex: 1 1 auto; }
+}

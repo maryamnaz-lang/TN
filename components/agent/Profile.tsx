@@ -7,12 +7,11 @@ import { Button } from "../ui/Button";
 import { Facts, Fact, Stats, Stat } from "../ui/Figures";
 import { Field, Input, TextArea, Form, FormRow } from "../ui/Field";
 import { ToggleRow } from "../ui/Toggle";
-import { Dropdown } from "../ui/Dropdown";
 import { Confirm } from "../ui/Confirm";
 import { Icon } from "../Icon";
-import { Availability } from "./Slots";
+import { CalendarConnect } from "./Slots";
 import { useDemo } from "@/lib/demo";
-import { AGENT as A, PUB, SPECIALISMS, INDUSTRIES, INTENTS, AGENT_NOTIF_TOGGLES, FEE_SPAN, WEEK_SHIFTS, TIME_ZONES, AGENT_TZ, type Shift } from "@/data/agent";
+import { AGENT as A, PUB, SPECIALISMS, INDUSTRIES, INTENTS, AGENT_NOTIF_TOGGLES, FEE_SPAN, } from "@/data/agent";
 import { FEE_TRACKS } from "@/data/fees";
 import p from "../candidate/profile.module.css";
 import s from "./agent.module.css";
@@ -82,17 +81,17 @@ function Mine({ ind, setInd, int, setInt, specs, setSpecs }: {
     ? <Button kind="link" icon="add" onClick={() => setEdit(k)}>{label}</Button>
     : <Button kind="ghost" size="sm" icon="edit" label="Edit Specialities" onClick={() => setEdit(k)} />;
   /* The saved name and the form's draft, so Visibility reads what was saved (Maryam 10 Nov 2026). */
-  const split = () => ({ first: A.name.split(" ")[0], last: A.name.split(" ").slice(1).join(" "), tz: AGENT_TZ });
+  const split = () => ({ first: A.name.split(" ")[0], last: A.name.split(" ").slice(1).join(" ") });
   const [name, setName] = useState(split), [draft, setDraft] = useState(split);
-  const [shifts, setShifts] = useState<Shift[]>(WEEK_SHIFTS);
+  const [calOn, setCalOn] = useState(false);
   const saveDetails = () => { setName(draft); setEdit(null); };
-  /* VISIBILITY GATE (Maryam 10 Nov 2026, narrowed the same day): the agent can list themselves
-     only once they have at least one shift. Name and fee no longer gate it. */
-  const tip = shifts.length ? "" : "Add your availability to get listed.";
+  /* VISIBILITY GATE (Maryam 10 Nov 2026): the agent can list themselves only once their
+     Outlook calendar is connected (it replaced the shift editor the same day). */
+  const tip = calOn ? "" : "Connect your calendar to get listed.";
   return (
     <>
       <Section kind="block">
-        <Id meta={A.email} meta2={name.tz} name={`${name.first} ${name.last}`.trim()} dot act={edit === "details" ? acts(saveDetails) : <Button kind="ghost" iconEnd="edit" onClick={() => { setDraft(name); setEdit("details"); }}>Edit Details</Button>} />
+        <Id meta={A.email} name={`${name.first} ${name.last}`.trim()} dot act={edit === "details" ? acts(saveDetails) : <Button kind="ghost" iconEnd="edit" onClick={() => { setDraft(name); setEdit("details"); }}>Edit Details</Button>} />
       </Section>
       {edit === "details" ? (
         <Section kind="block">
@@ -104,11 +103,7 @@ function Mine({ ind, setInd, int, setInt, specs, setSpecs }: {
               <Field label="Last name"><Input value={draft.last} onChange={(e) => setDraft({ ...draft, last: e.target.value })} /></Field>
               <Field label="Email"><Input defaultValue={A.email} readOnly /></Field>
             </div>
-            {/* TIME ZONE (Maryam 10 Nov 2026): edited here; the read view shows it under the email
-                in the header, not in a figure block or the Availability description. */}
-            <div className={p.g3}>
-              <Field label="Time zone"><Dropdown variant="form" value={draft.tz} onChange={(v) => setDraft({ ...draft, tz: v })} options={TIME_ZONES.map((z) => ({ value: z, label: z }))} /></Field>
-            </div>
+            {/* No time zone field (Maryam 10 Nov 2026, removed from the read and edit views). */}
             {/* The three fees are set by TalentNext and cannot be edited, so the edit view
                 leaves them out; they read on the facts band (Maryam 10 Nov 2026). */}
             <Field label="About"><TextArea rows={5} defaultValue={PUB.about} /></Field>
@@ -132,7 +127,7 @@ function Mine({ ind, setInd, int, setInt, specs, setSpecs }: {
           <Text role="body" ink="secondary">{PUB.about}</Text>
         </Section>
       )}
-      <Availability shifts={shifts} setShifts={setShifts} />
+      <CalendarConnect connected={calOn} setConnected={setCalOn} email={A.email} />
       <Section>
         <SectionHeader title="Specialities" actions={edit === "specs" ? acts(() => setEdit(null)) : pen("specs")} />
         {edit === "specs" ? <Editable list={specs} onChange={setSpecs} placeholder="Add a speciality" /> : <Chips items={specs} />}

@@ -27,10 +27,10 @@ export const FUNDER = "Next in Leadership";
 export type DiscKind = "pct" | "amount";
 export type DiscScope = "all" | "track" | "course" | "interview";
 
-export const KIND_OPTS: [DiscKind, string][] = [["pct", "Percentage off"], ["amount", "Fixed amount off"]];
+export const KIND_OPTS: [DiscKind, string][] = [["pct", "Percentage"], ["amount", "Fixed amount"]]; // no "off" (Maryam 11 Nov 2026)
 /* "Whole platform" (Maryam 26 Oct 2026): every course and every interview, on every track,
    on the whole price. It carries no track or course of its own. */
-export const SCOPE_OPTS: [DiscScope, string][] = [["all", "Whole platform (automatic)"], ["track", "Tracks"], ["course", "Courses"], ["interview", "Interviews"]];
+export const SCOPE_OPTS: [DiscScope, string][] = [["all", "Platformwide"], ["track", "Tracks"], ["course", "Courses"], ["interview", "Interviews"]];
 
 /* ---- status (moved here from Finance.tsx so both portals read one copy) ----
    Every code is UNLIMITED (Maryam 26 Oct 2026): no usage limit and no per-candidate limit,
@@ -62,7 +62,7 @@ export const hasInterview = (d: any) => ["all", "track", "interview"].includes(d
 /* What it covers, in one line: "Whole platform", "Tracks · Explorer, Builder", "Courses · All courses",
    "Courses · Business Fundamentals", "Interviews". */
 export function appliesLabel(d: any) {
-  if (d.scope === "all") return "Whole platform";
+  if (d.scope === "all") return "Platformwide"; // was "Whole platform" (Maryam 11 Nov 2026)
   if (d.scope === "track") return `Tracks · ${tracksLabel(d)}`;
   if (d.scope === "course") return `Courses · ${coursesLabel(d)}`;
   return "Interviews";

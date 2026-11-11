@@ -75,7 +75,7 @@ export function AgentInterviews() {
           <PersonList>
             {report.map((x) => (
               <PersonRow key={x.id} roomy href={`${BASE}/${x.id}/`} img={PHOTO[x.id]} name={x.n}
-                lines={[`${kindLabel(x)} · ${dayDate(x.day).replace("August", "Aug")}`]} />
+                lines={[`${kindLabel(x)} · ${dayDate(x.day)}`]} />
             ))}
           </PersonList>
         </Section>
@@ -217,7 +217,7 @@ function Recommend({ x }: { x: Iv }) {
       <Section kind="block" noline>
         <SectionHeader title="The Interview" />
         <Stats>
-          <Stat icon="calendar" label="Held" desc={`${dayDate(x.day).replace("August", "Aug")} · ${x.time}`} />
+          <Stat icon="calendar" label="Held" desc={`${dayDate(x.day)} · ${x.time}`} />
           <Stat icon="time" label="Total Duration" desc="48 min" />
           <Stat icon="document" label="Transcript" desc={<Link className={s.statLink} href={`${BASE}/${x.id}/transcript/`}>Ready<Icon name="arrowRight" /></Link>} />
           <Stat icon="video" label="Recording" desc="Ready for recommendation" />

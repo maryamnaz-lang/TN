@@ -39,10 +39,10 @@ const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "
 const logISO = (d: string) => {
   const m = String(d || "").match(/(\d{1,2})\s+([A-Za-z]{3})\w*\s+(\d{4})/);
   if (m) return `${m[3]}-${String(MONTHS.indexOf(m[2]) + 1).padStart(2, "0")}-${m[1].padStart(2, "0")}`;
-  const n = String(d || "").match(/^(\d{2})-(\d{2})-(\d{4})$/);
+  const n = String(d || "").match(/^(\d{2})[-/](\d{2})[-/](\d{4})/);
   return n ? `${n[3]}-${n[1]}-${n[2]}` : "";
 };
-const todayStr = () => { const d = new Date(); return `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`; };
+const todayStr = () => { const d = new Date(); return `${String(d.getMonth() + 1).padStart(2, "0")}/${String(d.getDate()).padStart(2, "0")}/${d.getFullYear()}`; };
 const pending = () => PAST_IVS.filter((x) => !x.decision).sort((a, b) => (a.dueInMin ?? 1e9) - (b.dueInMin ?? 1e9));
 const dueLabel = (m: number) => m <= 0 ? "Overdue" : m < 60 ? `${Math.round(m)} min left` : m < 1440 ? `${Math.round(m / 60)} hr left` : `${Math.round(m / 1440)} day${Math.round(m / 1440) === 1 ? "" : "s"} left`;
 const Due = ({ iv }: { iv: any }) => iv.dueInMin == null ? <>{iv.deadline || "—"}</> : <span className={iv.dueInMin < 60 ? l.urgent : l.soon}>{dueLabel(iv.dueInMin)}</span>;

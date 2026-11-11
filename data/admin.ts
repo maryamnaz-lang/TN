@@ -8,7 +8,7 @@
    ============================================================ */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import raw from "./admin.json";
-import { COMMISSION_PCT, priceFor, type TrackKey } from "./fees";
+import { COMMISSION_PCT, PLATFORM, priceFor, type TrackKey } from "./fees";
 
 const D = raw as any;
 export type U = any;
@@ -53,7 +53,7 @@ export const money = (n: number) => "$" + Math.round(n).toLocaleString("en-US");
    separate from the fees and a share of what the candidate pays. Replaces the 19 Oct fixed
    $25 platform fee. An agent saved before this carries only `u.fee`, which stands for all
    three; `u.fee` is still written (the Explorer fee) for the single-fee reads. */
-export { FEE_TRACKS, COMMISSION_PCT, trackOf, priceFor, commissionFor, type TrackKey } from "./fees";
+export { FEE_TRACKS, COMMISSION_PCT, PLATFORM, trackOf, priceFor, commissionFor, type TrackKey } from "./fees";
 export const trackFees = (u: { fee?: number; fees?: Partial<Record<TrackKey, number>> }): Record<TrackKey, number> => ({
   explorer: u.fees?.explorer ?? u.fee ?? 0, builder: u.fees?.builder ?? u.fee ?? 0, trailblazer: u.fees?.trailblazer ?? u.fee ?? 0,
 });
@@ -63,7 +63,8 @@ export const commissionPct = (u: { commission?: number }) => u.commission ?? COM
 /* Only the tracks the agent interviews (fee > 0) count, so an Explorers-only agent reads "$80", not "$0–$80". */
 const offered = (u: U) => { const v = Object.values(trackFees(u)).filter((f) => f > 0); return v.length ? v : [0]; };
 export const feeRange = (u: U) => span(offered(u));
-export const platformFee = (u: { platformFee?: number }) => u.platformFee ?? 0;
+/* The one platform fee, set in Settings (Maryam 11 Nov 2026); no longer per agent. */
+export const platformFee = (_u?: unknown) => PLATFORM.fee;
 export const priceRange = (u: U) => span(offered(u).map((f) => priceFor(f, commissionPct(u), platformFee(u))));
 /* Listable once at least one track has a fee (an agent need not interview all three). */
 export const feesSet = (u: U) => Object.values(trackFees(u)).some((f) => f > 0);
@@ -87,8 +88,8 @@ export const bkFunding = (b: any) => (bkFirst(b) ? "TalentNext (free first inter
 export const bkPaid = (b: any) => (bkFirst(b) ? 0 : priceFor(b.fee || 0));
 const BK_ESCROW: Record<string, [string, string]> = D.BK_ESCROW;
 export const bkEscrow = (e: string): [Tone, string] | null => { const m = BK_ESCROW[e]; return m ? [toneOf(m[0]), m[1]] : null; };
-/* Dates: MM-DD-YYYY and a bare 12-hour time (Phase 1 dpFmt / slot12). */
-export const dpFmt = (iso: string) => { const m = String(iso || "").match(/^(\d{4})-(\d{2})-(\d{2})/); return m ? `${m[2]}-${m[3]}-${m[1]}` : String(iso || ""); };
+/* Dates: MM/DD/YYYY, the US format with slashes (Maryam 11 Nov 2026), and a bare 12-hour time (Phase 1 dpFmt / slot12). */
+export const dpFmt = (iso: string) => { const m = String(iso || "").match(/^(\d{4})-(\d{2})-(\d{2})/); return m ? `${m[2]}/${m[3]}/${m[1]}` : String(iso || ""); };
 export function slot12(slot: string) {
   const m = String(slot || "").match(/(\d{1,2}):(\d{2})/);
   if (!m) return String(slot || "");
@@ -146,7 +147,7 @@ export const usersBase = () => USERS.filter((u) => !u.roles.includes("employer")
 /* ---- Account status: Invited (pending / expired) · Active · Deactivated ---- */
 export function inviteDaysLeft(u: U) {
   if (!u.invitedOn) return null;
-  const [mm, dd, yy] = String(u.invitedOn).split("-").map(Number);
+  const [mm, dd, yy] = String(u.invitedOn).split(/[-/]/).map(Number);
   return Math.ceil((new Date(yy, mm - 1, dd).getTime() + 7 * 864e5 - Date.now()) / 864e5);
 }
 export const userStatusKey = (u: U) => u.status === "invited"

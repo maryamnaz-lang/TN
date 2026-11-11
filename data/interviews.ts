@@ -119,13 +119,13 @@ export const SAVED_CARDS = [
 
 /* Past interviews, by stage. */
 export const PAST: Record<string, { kind: "level" | "re"; outcome: string; date: string }[]> = {
-  assessed: [{ kind: "level", outcome: "Confirmed Explorer – E3", date: "August 20, 2026" }],
-  week1: [{ kind: "level", outcome: "Confirmed Explorer – E3", date: "August 20, 2026" }],
-  day34: [{ kind: "level", outcome: "Confirmed Explorer – E3", date: "August 20, 2026" }],
-  day90: [{ kind: "level", outcome: "Confirmed Explorer – E3", date: "August 20, 2026" }],
+  assessed: [{ kind: "level", outcome: "Confirmed Explorer – E3", date: "08/20/2026" }],
+  week1: [{ kind: "level", outcome: "Confirmed Explorer – E3", date: "08/20/2026" }],
+  day34: [{ kind: "level", outcome: "Confirmed Explorer – E3", date: "08/20/2026" }],
+  day90: [{ kind: "level", outcome: "Confirmed Explorer – E3", date: "08/20/2026" }],
   promoted: [
-    { kind: "re", outcome: "Promoted to Explorer – E4", date: "November 21, 2026" },
-    { kind: "level", outcome: "Confirmed Explorer – E3", date: "August 20, 2026" },
+    { kind: "re", outcome: "Promoted to Explorer – E4", date: "11/21/2026" },
+    { kind: "level", outcome: "Confirmed Explorer – E3", date: "08/20/2026" },
   ],
 };
 
@@ -144,7 +144,7 @@ export const REPORT = {
   re: { level: "Explorer – E4", rung: 4, when: "Promoted November 21 · Assigned by TALENTnext" },
   details: {
     agent: "Priya Nair · Talent Agent",
-    date: "August 20, 2026",
+    date: "08/20/2026",
     strengths: "You consider both outcomes and people when making decisions, supported by specific examples from your interview.",
     growth: "Delegation and coaching instead of taking over. Chapters 4 and 12 address these skills.",
     note: "“She talks cautiously, but she has already run a reorganization and can explain every call she made in it. That is an E3, not an E2.”",

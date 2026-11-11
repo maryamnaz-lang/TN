@@ -23,8 +23,11 @@ export const COMMISSION_PCT = 20;
 export const trackOf = (s?: string): TrackKey =>
   /trailblazer|\bT\d/i.test(s || "") ? "trailblazer" : /builder|\bB\d/i.test(s || "") ? "builder" : "explorer";
 
-/* What the candidate pays for an agent fee, and the commission inside it. A PLATFORM FEE
-   (a flat dollar amount, set per agent after the commission, Maryam 26 Oct 2026) is added
-   on top; agents with none set it to 0, so every existing price is unchanged. */
-export const priceFor = (fee: number, pct: number = COMMISSION_PCT, platform = 0) => (fee > 0 ? Math.round(fee / (1 - pct / 100)) + platform : 0);
+/* THE PLATFORM FEE is ONE flat dollar amount per interview, set once by the Super Admin in
+   Settings → Platform → Money (Maryam 11 Nov 2026; it was a field on every agent form). It is
+   added on top of the commission. It starts at $0, so no price moved when it became a setting. */
+export const PLATFORM = { fee: 0 };
+
+/* What the candidate pays for an agent fee, and the commission inside it, plus the platform fee. */
+export const priceFor = (fee: number, pct: number = COMMISSION_PCT, platform = PLATFORM.fee) => (fee > 0 ? Math.round(fee / (1 - pct / 100)) + platform : 0);
 export const commissionFor = (fee: number, pct: number = COMMISSION_PCT) => priceFor(fee, pct) - fee;

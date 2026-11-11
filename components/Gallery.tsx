@@ -17,12 +17,12 @@ import { PEOPLE } from "@/data/seed";
    portal. /candidate/gallery/ */
 type Row = { id: string; name: string; img: string; email: string; type: string; when: string; status: "green" | "warn" | "red" };
 const ROWS: Row[] = [
-  ["Maryam Naz", PEOPLE.maryam.img, "First interview", "10-21-2026", "green"],
-  ["Priya Nair", PEOPLE.priya.img, "Re-interview", "10-22-2026", "warn"],
-  ["Owen Clarke", PEOPLE.owen.img, "First interview", "10-23-2026", "green"],
-  ["Lena Fischer", PEOPLE.lena.img, "Re-interview", "10-24-2026", "red"],
-  ["Samuel Adeyemi", PEOPLE.samuel.img, "First interview", "10-25-2026", "green"],
-  ["Derek Sole", PEOPLE.derek.img, "Re-interview", "10-26-2026", "warn"],
+  ["Maryam Naz", PEOPLE.maryam.img, "First interview", "10/21/2026", "green"],
+  ["Priya Nair", PEOPLE.priya.img, "Re-interview", "10/22/2026", "warn"],
+  ["Owen Clarke", PEOPLE.owen.img, "First interview", "10/23/2026", "green"],
+  ["Lena Fischer", PEOPLE.lena.img, "Re-interview", "10/24/2026", "red"],
+  ["Samuel Adeyemi", PEOPLE.samuel.img, "First interview", "10/25/2026", "green"],
+  ["Derek Sole", PEOPLE.derek.img, "Re-interview", "10/26/2026", "warn"],
 ].map(([name, img, type, when, status], i) => ({
   id: String(i), name, img, email: `${name.split(" ")[0].toLowerCase()}@example.com`, type, when, status,
 } as Row));
