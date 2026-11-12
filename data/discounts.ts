@@ -16,7 +16,7 @@
 
    Every discount is FUNDED BY NEXT IN LEADERSHIP (NIL), TalentNext's parent account:
    the talent agent still gets their full fee and TalentNext still books its full
-   commission and platform fee. The amount off is capped at the price, never below $0. Amounts are whole dollars, like every price here.
+   commission. The amount off is capped at the price, never below $0. Amounts are whole dollars, like every price here.
    ============================================================ */
 import { DISCOUNTS } from "./admin";
 import { FEE_TRACKS, priceFor, trackOf, type TrackKey } from "./fees";
@@ -74,7 +74,7 @@ export type DiscCtx =
   | { kind: "interview"; track: TrackKey; fee: number; pct: number; platform: number };
 export type DiscResult = { ok: true; d: any; base: number; off: number; total: number } | { ok: false; reason: string };
 
-const priceOf = (c: DiscCtx) => (c.kind === "course" ? c.price : priceFor(c.fee, c.pct, c.platform));
+const priceOf = (c: DiscCtx) => (c.kind === "course" ? c.price : priceFor(c.fee, c.pct));
 export function discountFor(d: any, c: DiscCtx) {
   const price = priceOf(c), base = price;
   const raw = d.kind === "amount" ? d.value : (base * d.value) / 100;

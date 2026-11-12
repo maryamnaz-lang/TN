@@ -428,8 +428,16 @@ function DiscForm({ id, close }: { id?: string; close: () => void }) {
             {live ? ro(coursesLabel({ courses })) : <MultiDropdown value={courses} onChange={setCourses} options={COURSE_OPTS} placeholder="Choose courses" allLabel="All courses" />}
           </Field>
         )}
-        <Field label="Start date" required={!live}>{live ? ro(dpFmt(v.start)) : <DateInput label="Start date" value={v.start} onChange={(x) => set("start", x)} />}</Field>
-        <Field label="End date" required><DateInput label="End date" value={v.end} onChange={(x) => set("end", x)} /></Field>
+        {/* Past dates are not allowed (Maryam 11 Nov 2026): the calendar disables every day before
+            today (the end date, before the start date), and a typed past date is named under its field. */}
+        <Field label="Start date" required={!live} help={live ? undefined : "Today or later."}
+          error={!live && v.start && v.start < t ? "The start date can't be in the past. Choose today or a later date." : undefined}>
+          {live ? ro(dpFmt(v.start)) : <DateInput label="Start date" value={v.start} min={t} onChange={(x) => set("start", x)} />}
+        </Field>
+        <Field label="End date" required help="On or after the start date."
+          error={v.end && v.end < t ? "The end date can't be in the past." : v.end && v.start && v.end < v.start ? "The end date must be on or after the start date." : undefined}>
+          <DateInput label="End date" value={v.end} min={live ? t : v.start && v.start > t ? v.start : t} onChange={(x) => set("end", x)} />
+        </Field>
         {d && <Field label="Reason" required><TextArea rows={3} maxLength={500} value={v.reason} onChange={(e) => set("reason", e.target.value)} placeholder="Recorded on the audit log (1–500 characters)." /></Field>}
         {/* The create-form footnote (checkout + funding) is removed (Maryam 26 Oct 2026); only the
             edit rules remain. */}

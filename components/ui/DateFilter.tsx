@@ -18,8 +18,10 @@ const isoFromUs = (t: string) => {
 };
 
 /* The month grid both controls open (Phase 1 .dcal): Sunday first, today ringed, the pick in accent. */
-function Calendar({ value, label, onPick, align = "right" }: { value: string; label: string; onPick: (iso: string) => void; align?: "left" | "right" }) {
-  const base = value ? new Date(value + "T00:00:00") : new Date();
+/* `min` (ISO) greys out and disables every day before it, and stops the month arrow going back
+   past it, so a date that is not allowed cannot be picked (Maryam 11 Nov 2026). */
+function Calendar({ value, label, onPick, align = "right", min }: { value: string; label: string; onPick: (iso: string) => void; align?: "left" | "right"; min?: string }) {
+  const base = value ? new Date(value + "T00:00:00") : min ? new Date(min + "T00:00:00") : new Date();
   const [ym, setYm] = useState({ y: base.getFullYear(), m: base.getMonth() });
   const first = new Date(ym.y, ym.m, 1).getDay(), days = new Date(ym.y, ym.m + 1, 0).getDate();
   const today = isoOf(new Date());
@@ -30,7 +32,7 @@ function Calendar({ value, label, onPick, align = "right" }: { value: string; la
   return (
     <div ref={pop} className={`${s.pop} ${align === "left" ? s.popL : ""}`} role="dialog" aria-label={`${label} date`}>
       <div className={s.h}>
-        <button type="button" className={s.nav} aria-label="Previous month" onClick={() => step(-1)}><Icon name="chevLeft" /></button>
+        <button type="button" className={s.nav} aria-label="Previous month" disabled={!!min && `${ym.y}-${pad(ym.m + 1)}` <= min.slice(0, 7)} onClick={() => step(-1)}><Icon name="chevLeft" /></button>
         <span className={`${s.m} t-compact w-strong`}>{MONTHS[ym.m]} {ym.y}</span>
         <button type="button" className={s.nav} aria-label="Next month" onClick={() => step(1)}><Icon name="chevRight" /></button>
       </div>
@@ -39,8 +41,9 @@ function Calendar({ value, label, onPick, align = "right" }: { value: string; la
         {Array.from({ length: first }, (_, i) => <span key={`x${i}`} />)}
         {Array.from({ length: days }, (_, i) => {
           const iso = `${ym.y}-${pad(ym.m + 1)}-${pad(i + 1)}`;
+          const off = !!min && iso < min;
           return (
-            <button key={iso} type="button" className={`${s.d} ${iso === value ? s.on : ""} ${iso === today ? s.today : ""} t-compact`}
+            <button key={iso} type="button" disabled={off} aria-disabled={off} className={`${s.d} ${iso === value ? s.on : ""} ${iso === today ? s.today : ""} ${off ? s.off : ""} t-compact`}
               onClick={() => onPick(iso)}>{i + 1}</button>
           );
         })}
@@ -81,7 +84,7 @@ export function DateFilter({ label: l, value, onChange }: { label: string; value
    placeholder "e.g. 11/30/2026" showing the format, and the calendar mark at the right end is a
    button that opens the month grid. A typed date that is complete and real is taken at once;
    anything else waits, and leaving the field puts back the last good date. */
-export function DateInput({ value, onChange, label = "Date", example = "11/30/2026" }: { value: string; onChange: (v: string) => void; label?: string; example?: string }) {
+export function DateInput({ value, onChange, label = "Date", example = "11/30/2026", min }: { value: string; onChange: (v: string) => void; label?: string; example?: string; min?: string }) {
   const [open, setOpen] = useState(false);
   const [text, setText] = useState(value ? usOf(value) : "");
   useEffect(() => { setText(value ? usOf(value) : ""); }, [value]);
@@ -99,7 +102,7 @@ export function DateInput({ value, onChange, label = "Date", example = "11/30/20
       <button type="button" className={s.diBtn} aria-label={`Choose ${label.toLowerCase()} from a calendar`} aria-haspopup="dialog" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
         <Icon name="calendar" />
       </button>
-      {open && <Calendar value={value} label={label} onPick={(iso) => { onChange(iso); setOpen(false); }} />}
+      {open && <Calendar value={value} label={label} min={min} onPick={(iso) => { onChange(iso); setOpen(false); }} />}
     </div>
   );
 }

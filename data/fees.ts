@@ -23,11 +23,12 @@ export const COMMISSION_PCT = 20;
 export const trackOf = (s?: string): TrackKey =>
   /trailblazer|\bT\d/i.test(s || "") ? "trailblazer" : /builder|\bB\d/i.test(s || "") ? "builder" : "explorer";
 
-/* THE PLATFORM FEE is ONE flat dollar amount per interview, set once by the Super Admin in
-   Settings → Platform → Money (Maryam 11 Nov 2026; it was a field on every agent form). It is
-   added on top of the commission. It starts at $0, so no price moved when it became a setting. */
+/* THE PLATFORM FEE is ONE flat MONTHLY dollar amount, set once by the Super Admin in
+   Settings → Platform → Money (Maryam 11 Nov 2026; it was a field on every agent form). It is a
+   monthly fee each TALENT AGENT pays, NOT a per-interview charge (Maryam 11 Nov 2026), so it is never added to an
+   interview price: priceFor is the agent fee plus the commission only. */
 export const PLATFORM = { fee: 0 };
 
-/* What the candidate pays for an agent fee, and the commission inside it, plus the platform fee. */
-export const priceFor = (fee: number, pct: number = COMMISSION_PCT, platform = PLATFORM.fee) => (fee > 0 ? Math.round(fee / (1 - pct / 100)) + platform : 0);
+/* What the candidate pays for an agent fee, with the commission inside it (the monthly platform fee is not part of it). */
+export const priceFor = (fee: number, pct: number = COMMISSION_PCT) => (fee > 0 ? Math.round(fee / (1 - pct / 100)) : 0);
 export const commissionFor = (fee: number, pct: number = COMMISSION_PCT) => priceFor(fee, pct) - fee;

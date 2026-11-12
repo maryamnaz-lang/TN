@@ -294,7 +294,7 @@ const comOk = (com: string) => com.trim() !== "" && num(com) < 100;
 /* At least one track, and a fee on every track picked. */
 const feesReady = (f: FeeStr, com: string) => { const p = picked(f); return p.length > 0 && p.every((t) => num(f[t.key] ?? "") > 0) && comOk(com); };
 /* What a save writes: the three fees (0 = not interviewed), `fee` (the first picked track's fee) for the single-fee reads, and the commission.
-   NO PLATFORM FEE HERE (Maryam 11 Nov 2026): it is one value set in Settings → Platform → Money, and priceFor adds it. */
+   NO PLATFORM FEE HERE (Maryam 11 Nov 2026): it is one monthly value set in Settings → Platform → Money, never part of an interview price. */
 const feeSave = (f: FeeStr, com: string) => { const n = feeNum(f); return { fees: n, fee: picked(f).map((t) => n[t.key])[0] ?? 0, commission: num(com) }; };
 const TRACK_OPTS = FEE_TRACKS.map((t) => ({ value: t.key, label: t.label }));
 function FeeFields({ fees, com, setFees, onCom }: { fees: FeeStr; com: string; setFees: (f: FeeStr) => void; onCom: (x: string) => void }) {

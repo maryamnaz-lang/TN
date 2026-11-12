@@ -32,3 +32,6 @@
 .d.today { border: var(--hairline) solid var(--rule); }
 .d.on { background: var(--accent); color: var(--on-accent); }
 .popL { right: auto; left: 0; }
+/* A day before the field's earliest allowed date: greyed and not pickable (Maryam 11 Nov 2026). */
+.d.off, .d.off:hover { color: var(--text-disabled); background: transparent; cursor: not-allowed; }
+.nav:disabled, .nav:disabled:hover { color: var(--text-disabled); background: transparent; cursor: not-allowed; }

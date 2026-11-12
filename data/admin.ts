@@ -63,9 +63,9 @@ export const commissionPct = (u: { commission?: number }) => u.commission ?? COM
 /* Only the tracks the agent interviews (fee > 0) count, so an Explorers-only agent reads "$80", not "$0–$80". */
 const offered = (u: U) => { const v = Object.values(trackFees(u)).filter((f) => f > 0); return v.length ? v : [0]; };
 export const feeRange = (u: U) => span(offered(u));
-/* The one platform fee, set in Settings (Maryam 11 Nov 2026); no longer per agent. */
+/* The one monthly platform fee, set in Settings (Maryam 11 Nov 2026); not part of an interview price. */
 export const platformFee = (_u?: unknown) => PLATFORM.fee;
-export const priceRange = (u: U) => span(offered(u).map((f) => priceFor(f, commissionPct(u), platformFee(u))));
+export const priceRange = (u: U) => span(offered(u).map((f) => priceFor(f, commissionPct(u))));
 /* Listable once at least one track has a fee (an agent need not interview all three). */
 export const feesSet = (u: U) => Object.values(trackFees(u)).some((f) => f > 0);
 export const AGENTS = () => USERS.filter((u) => u.roles.includes("agent"));

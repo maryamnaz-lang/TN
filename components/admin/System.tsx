@@ -281,8 +281,9 @@ const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
 function Money() {
   const [edit, setEdit] = useState(false);
   const [delay, setDelay] = useState(String(SET.payoutDelay)), [day, setDay] = useState(SET.payoutRunDay);
-  /* THE PLATFORM FEE lives here, set once for every interview (Maryam 11 Nov 2026); it was a
-     field on each talent agent form. A flat $ amount added on top of the commission. */
+  /* THE PLATFORM FEE lives here (Maryam 11 Nov 2026); it was a field on each talent agent form.
+     It is a flat MONTHLY $ amount each TALENT AGENT pays (Maryam 11 Nov 2026), not a per-interview
+     charge, so no interview price includes it. */
   const [pf, setPf] = useState(String(PLATFORM.fee));
   const [step, setStep] = useState<null | "reason" | "stepup">(null);
   const [why, setWhy] = useState("");
@@ -290,19 +291,19 @@ function Money() {
   const pfOk = /^\d+$/.test(pf) && +pf >= 0 && +pf <= 500;
   const ok = delayOk && pfOk;
   const changes: [string, string, string, string][] = [];
-  if (pfOk && +pf !== PLATFORM.fee) changes.push(["Platform fee", `$${PLATFORM.fee}`, `$${+pf}`, "per interview"]);
+  if (pfOk && +pf !== PLATFORM.fee) changes.push(["Platform fee", `$${PLATFORM.fee}`, `$${+pf}`, "per month"]);
   if (delayOk && +delay !== SET.payoutDelay) changes.push(["Payout release delay", String(SET.payoutDelay), delay, "working days"]);
   if (day !== SET.payoutRunDay) changes.push(["Payout run day", SET.payoutRunDay, day, ""]);
   const reset = () => { setEdit(false); setStep(null); setWhy(""); setDelay(String(SET.payoutDelay)); setDay(SET.payoutRunDay); setPf(String(PLATFORM.fee)); };
   return (
     <Section>
-      <SectionHeader title="Money" desc="The platform fee on every interview, when held funds are released and the weekly payout run. These carry the Change fee permission — a reason and a re-authentication step. A change applies to bookings and recommendations made after it; held funds already releasable are unaffected."
+      <SectionHeader title="Money" desc="The monthly platform fee talent agents pay, when held funds are released and the weekly payout run. These carry the Change fee permission — a reason and a re-authentication step. A fee change applies from the next monthly charge; a payout change applies to recommendations made after it, and held funds already releasable are unaffected."
         actions={edit
           ? <Stack row gap={3}><Button kind="secondary" size="sm" onClick={reset}>Cancel</Button><Button kind="primary" size="sm" disabled={!ok || !changes.length} onClick={() => setStep("reason")}>Save</Button></Stack>
           : <Button kind="ghost" size="sm" icon="edit" onClick={() => setEdit(true)}>Edit</Button>} />
       {edit ? (
         <Stack gap={5}>
-          <Field label="Platform fee ($ per interview)" help="A flat amount added to every paid interview, on top of the agent's fee and the commission. It applies to every talent agent." error={pfOk ? undefined : "Enter a whole number between 0 and 500 dollars."}>
+          <Field label="Platform fee ($ per month)" help="A flat fee every talent agent pays each month. It is not added to any interview price." error={pfOk ? undefined : "Enter a whole number between 0 and 500 dollars."}>
             <Input inputMode="numeric" value={pf} onChange={(e) => setPf(e.target.value.replace(/[^\d]/g, ""))} placeholder="e.g. 25" />
           </Field>
           <Field label="Payout release delay (working days)" help="How long after a recommendation is sent before held funds become releasable. Counted against the working-days calendar below." error={delayOk ? undefined : "Enter a whole number between 0 and 30 working days."}>
@@ -312,7 +313,7 @@ function Money() {
             <Dropdown variant="form" value={day} onChange={setDay} options={DAYS.map((d) => ({ value: d, label: d }))} />
           </Field>
         </Stack>
-      ) : <KV ends rows={[["Platform fee", `$${PLATFORM.fee} per interview`], ["Payout release delay", `${SET.payoutDelay} working days`], ["Payout run day", `${SET.payoutRunDay}, 12:00 AM`]]} />}
+      ) : <KV ends rows={[["Platform fee", `$${PLATFORM.fee} per month`], ["Payout release delay", `${SET.payoutDelay} working days`], ["Payout run day", `${SET.payoutRunDay}, 12:00 AM`]]} />}
       {step === "reason" && (
         <Sheet title="Confirm the money change" onClose={() => setStep(null)} footer={<><Button kind="secondary" onClick={() => setStep(null)}>Cancel</Button><Button kind="primary" disabled={!why.trim()} onClick={() => setStep("stepup")}>Continue</Button></>}>
           <Stack gap={5}>
