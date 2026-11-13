@@ -55,12 +55,13 @@
 /* Skeleton (loading preview): very light grey blocks, square except the face, with a
    lighter band sweeping left to right. Reduced motion keeps the blocks, drops the sweep. */
 .sk {
-  display: block; height: 12px; flex: none;
+  display: block; width: var(--sk-w, auto); height: 12px; flex: none;
   background: linear-gradient(90deg, var(--layer-02) 0%, var(--rule) 40%, var(--layer-02) 80%) 0 0 / 300% 100%;
   animation: skShimmer 1.4s ease-in-out infinite;
 }
 .skFace { width: var(--avatar-row); height: var(--avatar-row); border-radius: var(--radius-pill); }
 .skBox { width: 16px; height: 16px; }
+.skSub { height: 10px; }
 .skLines { display: flex; flex-direction: column; gap: var(--s03); }
 @keyframes skShimmer { from { background-position: 100% 0; } to { background-position: 0 0; } }
 @media (prefers-reduced-motion: reduce) { .sk { animation: none; background: var(--rule); } }

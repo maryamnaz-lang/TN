@@ -160,9 +160,9 @@ function SkeletonRows({ n, cols, sel, act }: { n: number; cols: number; sel: boo
               {c === 0 ? (
                 <span className={s.pcell}>
                   <span className={`${s.sk} ${s.skFace}`} />
-                  <span className={s.skLines}><span className={s.sk} style={{ width: 120 }} /><span className={s.sk} style={{ width: 150, height: 10 }} /></span>
+                  <span className={s.skLines}><span className={s.sk} style={{ "--sk-w": "120px" } as CSSProperties} /><span className={`${s.sk} ${s.skSub}`} style={{ "--sk-w": "150px" } as CSSProperties} /></span>
                 </span>
-              ) : <span className={s.sk} style={{ width: SK_W[(c + r) % SK_W.length] }} />}
+              ) : <span className={s.sk} style={{ "--sk-w": `${SK_W[(c + r) % SK_W.length]}px` } as CSSProperties} />}
             </td>
           ))}
           {act && <td className={s.act}><span className={`${s.sk} ${s.skBox}`} /></td>}

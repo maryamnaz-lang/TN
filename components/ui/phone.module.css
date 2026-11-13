@@ -11,7 +11,7 @@
 .cc { display: inline-flex; align-items: center; gap: var(--s02); flex: none; height: 100%; color: var(--text-primary); font-variant-numeric: tabular-nums; }
 .cc svg { width: var(--s05); height: var(--s05); color: var(--text-secondary); transition: transform var(--mo-quick) var(--mo-standard); }
 .cc[aria-expanded="true"] svg { transform: rotate(180deg); }
-.flag { font-size: 18px; line-height: 1; }
+.flag { font-size: var(--t-sec-lg-size); line-height: 1; }
 .num {
   flex: 1 1 auto; min-width: 0; height: 100%; padding: 0;
   border: 0; background: transparent; outline: none; color: var(--text-primary);
