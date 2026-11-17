@@ -23,6 +23,11 @@ export const AGENT = {
   approvedScore: 4.5, rubric: 4.5, scoreAt: "1 July", reviewNext: "1 October",
   ivsQ: 47, cancels: 2, lateCancels: 1,
   earned: 612,
+  /* Set by the Super Admin on the invite (Users.tsx AgentProfileFields, Maryam 6 Nov 2026) and
+     shown read-only on the agent's own profile (Maryam 17 Nov 2026): the years of experience and
+     the TALENT candidate types (keys of TALENT below) the agent interviews. AUTHORED PLACEHOLDER;
+     the eleven years match PUB.yrs and the About copy. */
+  years: 11, types: ["t1", "l", "t2"],
 };
 
 /* Five portraits across more than five people — Phase 1's own fidelity
@@ -241,6 +246,11 @@ export const TALENT = [
   { k: "t1", c: "T", n: "Top Performer" }, { k: "a", c: "A", n: "Athlete" }, { k: "l", c: "L", n: "Leader" },
   { k: "e", c: "E", n: "Entrepreneur" }, { k: "n", c: "N", n: "Not Sure" }, { k: "t2", c: "T", n: "Team Player" },
 ];
+
+/* The candidate types an agent interviews, as their TALENT acronyms in TALENT order ("T, L, T"),
+   and as full names for the tooltip, since the word TALENT repeats T. */
+export const typeLetters = (keys: string[]) => TALENT.filter((x) => keys.includes(x.k)).map((x) => x.c).join(", ");
+export const typeNames = (keys: string[]) => TALENT.filter((x) => keys.includes(x.k)).map((x) => x.n).join(", ");
 
 /* ---- Dates against Phase 1's fixed "today" (Wed 19 Aug 2026) ---- */
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];

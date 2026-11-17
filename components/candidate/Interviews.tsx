@@ -460,7 +460,10 @@ export function AgentProfilePage({ agent }: { agent: string }) {
             ? <Stat icon="wallet" label="Interview Fee" value={<Price amount={a.price} />} desc="For your re-interview" />
             : <Stat icon="video" label="Interviews" value={String(a.ivs)} desc="Conducted" />}
           <Stat icon="work" label="Experience" value={`${a.yrs} yrs`} desc="Interviewing" />
-          <Stat icon="calendar" label="Next Slot" value={a.slot.split(" · ")[0]} desc={a.slot.split(" · ")[1]} />
+          {/* Was "Next Slot" (Maryam 17 Nov 2026: a next slot is shown nowhere else in the
+              system, so it went). The interview's length takes the cell, the same 45 minutes
+              the booking flow states (data/interviews.ts facts), so the band keeps four. */}
+          <Stat icon="hourglass" label="Length" value="45 mins" desc="Recorded call" />
           <Stat icon="time" label="Your Report" value="24 hrs" desc="After your call" />
         </Stats>
       </Section>
@@ -471,18 +474,8 @@ export function AgentProfilePage({ agent }: { agent: string }) {
       <Section noline><SectionHeader title="Expertise" /><Chips>{a.tags.map((t) => <Chip key={t}>{t}</Chip>)}</Chips></Section>
       <Section noline><SectionHeader title="Industries" /><Chips>{pub.industries.map((t) => <Chip key={t}>{t}</Chip>)}</Chips></Section>
       <Section><SectionHeader title="Goals They Work With" /><Chips>{pub.goals.map((t) => <Chip key={t}>{t}</Chip>)}</Chips></Section>
-      <Section>
-        <SectionHeader title="What Candidates Say" />
-        <div className={s.revs}>
-          {pub.reviews.map((r, i) => (
-            <div key={i} className={s.rev}>
-              <Stars n={r.stars} />
-              <Text role="body" as="p">{r.text}</Text>
-              <Text role="caption" as="span">{r.who}</Text>
-            </div>
-          ))}
-        </div>
-      </Section>
+      {/* "What Candidates Say" is HIDDEN (Maryam 17 Nov 2026). The reviews stay in
+          AGENT_PUBLIC; the .revs / .rev markup is one revert away in git. */}
     </Page>
   );
 }

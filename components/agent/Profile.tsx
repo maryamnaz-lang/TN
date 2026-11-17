@@ -11,7 +11,7 @@ import { Confirm } from "../ui/Confirm";
 import { Icon } from "../Icon";
 import { CalendarConnect } from "./Slots";
 import { useDemo } from "@/lib/demo";
-import { AGENT as A, PUB, SPECIALISMS, INDUSTRIES, INTENTS, AGENT_NOTIF_TOGGLES, FEE_SPAN, } from "@/data/agent";
+import { AGENT as A, PUB, SPECIALISMS, INDUSTRIES, INTENTS, AGENT_NOTIF_TOGGLES, FEE_SPAN, typeNames } from "@/data/agent";
 import { FEE_TRACKS } from "@/data/fees";
 import p from "../candidate/profile.module.css";
 import s from "./agent.module.css";
@@ -111,9 +111,13 @@ function Mine({ ind, setInd, int, setInt, specs, setSpecs }: {
         </Section>
       ) : (
         <Section kind="block">
-          {/* One cell per track fee instead of a single span (Maryam 10 Nov 2026): six cells, two rows of three. */}
-          <Facts cols={3}>
+          {/* One cell per track fee (Maryam 10 Nov 2026). The years of experience and the candidate
+              types the Super Admin set on the invite join the band (Maryam 17 Nov 2026), so it is
+              eight cells, two rows of four. Both are set by TalentNext, so neither is editable here. */}
+          <Facts cols={4}>
             {FEE_TRACKS.map((t) => <Fact key={t.key} icon="wallet" label={`${t.label} fee`} value={`$${A.fees[t.key]}`} />)}
+            <Fact icon="time" label="Experience" value={`${A.years} years`} />
+            <Fact icon="user" label="Who you can interview" value={typeNames(A.types)} />
             <Fact icon="growth" label="Assesses" value={A.rangeShort} />
             <Fact icon="video" label="Interviews" value={String(A.ivs)} />
             <Fact icon="starOutline" label="Rating" value={String(A.rating)} />

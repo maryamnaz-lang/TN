@@ -24,7 +24,25 @@
 }
 .inp::placeholder { color: var(--text-placeholder); }
 .inp:focus { border-bottom-color: var(--focus); box-shadow: inset 0 calc(var(--hairline) * -1) 0 var(--focus); }
-.inp[readonly] { border-bottom-style: dashed; }
+/* THE LOCKED FIELD (Maryam 17 Nov 2026, replacing the dashed underline): the field's own plain
+   underline, NO grey ground ("we don't need to add a background on the field", same day, which
+   reverses the first pass's --layer-02 box), the value in --text-secondary, a lock mark at the
+   right and a not-allowed cursor. It never takes the focus line. Field.tsx wraps a read-only or
+   disabled <Input> in .lock for the mark. */
+.inp[readonly], .inp:disabled, .inp[readonly]:focus, .inp:disabled:focus {
+  padding-right: var(--s07);
+  border-bottom-color: var(--rule); box-shadow: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: not-allowed;
+}
+/* A locked field takes no click, no caret and no focus (Maryam 17 Nov 2026: "stop the click"). It
+   is rendered DISABLED, so a click on its label does nothing too; the input ignores the pointer, and
+   the wrapper shows the not-allowed cursor. Safari fades a disabled value, so the fill and opacity
+   are restated. */
+.lock { position: relative; display: block; width: 100%; min-width: 0; cursor: not-allowed; }
+.lock .inp { pointer-events: none; user-select: none; opacity: 1; -webkit-text-fill-color: var(--text-secondary); }
+.lockIc { position: absolute; right: 0; top: 50%; transform: translateY(-50%); width: var(--s05); height: var(--s05); color: var(--text-secondary); pointer-events: none; }
 textarea.inp { height: auto; min-height: calc(var(--s12) + var(--s06)); padding-top: var(--s03); resize: vertical; }
 
 /* A form: fields sit 32 apart. */

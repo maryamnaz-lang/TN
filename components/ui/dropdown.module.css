@@ -16,11 +16,13 @@
   color: var(--text-primary);
 }
 .t svg { width: var(--s05); height: var(--s05); color: var(--text-secondary); transition: transform var(--mo-quick) var(--mo-standard); }
-.t:disabled { cursor: not-allowed; border-bottom-style: dashed; }
+.t:disabled { cursor: not-allowed; color: var(--text-secondary); }
 .t:disabled svg { opacity: .4; }
 .t[aria-expanded="true"] svg { transform: rotate(180deg); }
 .filter .t { height: var(--filter-h); padding: 0 var(--s04); background: transparent; border: var(--hairline) solid var(--rule); }
 .form .t { height: var(--ctrl-h); padding: 0 var(--s05) 0 0; border-bottom: var(--hairline) solid var(--rule); }
+/* A disabled form dropdown is the same LOCKED field as a read-only input (field.module.css):
+   its plain underline, no grey ground, the value muted, the chevron faded (Maryam 17 Nov 2026). */
 .form .t[aria-expanded="true"] { border-bottom-color: var(--focus); box-shadow: inset 0 calc(var(--hairline) * -1) 0 var(--focus); }
 .ph { color: var(--text-placeholder); }
 .lbl { color: var(--text-secondary); }
@@ -58,7 +60,7 @@
 .multi { display: flex; flex-direction: column; width: 100%; min-width: 0; }
 .form .tMulti { height: auto; min-height: var(--ctrl-h); padding-top: var(--s02); padding-bottom: var(--s02); white-space: normal; cursor: pointer; }
 .tMulti:focus-visible { outline: none; border-bottom-color: var(--focus); }
-.tMulti[aria-disabled="true"] { cursor: not-allowed; border-bottom-style: dashed; }
+.tMulti[aria-disabled="true"] { cursor: not-allowed; }
 .tMulti[aria-disabled="true"] > svg { opacity: .4; }
 .tMulti > svg { flex: none; }
 .picks { display: flex; flex-wrap: wrap; gap: var(--s02); min-width: 0; }

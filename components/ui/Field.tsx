@@ -22,7 +22,14 @@ export function Field({ label, required, help, error, children, group }: {
   );
 }
 
-export const Input = (p: InputHTMLAttributes<HTMLInputElement>) => <input {...p} className={s.inp} />;
+/* A read-only or disabled field is a LOCKED field (Maryam 17 Nov 2026: "use proper disable mode,
+   that is being used in professional or premium systems"; was a dashed underline): a plain
+   underline with no grey ground, the value in the secondary grey, a lock mark at the right end and a
+   not-allowed cursor. It is rendered disabled, so it takes no click, caret or focus (Maryam 17 Nov 2026). */
+export const Input = (p: InputHTMLAttributes<HTMLInputElement>) =>
+  p.readOnly || p.disabled
+    ? <span className={s.lock} aria-disabled="true"><input {...p} readOnly={undefined} disabled className={s.inp} /><Icon name="locked" className={s.lockIc} /></span>
+    : <input {...p} className={s.inp} />;
 export const TextArea = (p: TextareaHTMLAttributes<HTMLTextAreaElement>) => <textarea {...p} className={s.inp} />;
 
 /* <PhoneInput> moved to its own client file with the country picker (Maryam 11 Nov 2026). */
