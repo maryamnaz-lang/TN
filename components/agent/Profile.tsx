@@ -10,8 +10,9 @@ import { ToggleRow } from "../ui/Toggle";
 import { Confirm } from "../ui/Confirm";
 import { Icon } from "../Icon";
 import { CalendarConnect } from "./Slots";
+import { WorkWeekSection } from "./WorkWeek";
 import { useDemo } from "@/lib/demo";
-import { AGENT as A, PUB, SPECIALISMS, INDUSTRIES, INTENTS, AGENT_NOTIF_TOGGLES, FEE_SPAN, typeNames } from "@/data/agent";
+import { AGENT as A, PUB, SPECIALISMS, INDUSTRIES, INTENTS, AGENT_NOTIF_TOGGLES, FEE_SPAN, typeNames, AGENT_WORK, type WorkWeek } from "@/data/agent";
 import { FEE_TRACKS } from "@/data/fees";
 import p from "../candidate/profile.module.css";
 import s from "./agent.module.css";
@@ -31,11 +32,13 @@ export function AgentProfile() {
   const [ind, setInd] = useState(PUB.industries);
   const [int, setInt] = useState(PUB.intents);
   const [specs, setSpecs] = useState(SPECIALISMS);
+  /* Held here so it survives a tab switch (Maryam 20 Nov 2026). */
+  const [week, setWeek] = useState<WorkWeek>(AGENT_WORK);
   return (
     <Page>
       <PageHeader title="Profile" desc="Your details, the public profile candidates see, and privacy." />
       <Section kind="tabs"><Tabs value={tab} onChange={setTab} items={TABS} /></Section>
-      {tab === "me" && <Mine ind={ind} setInd={setInd} int={int} setInt={setInt} specs={specs} setSpecs={setSpecs} />}
+      {tab === "me" && <Mine ind={ind} setInd={setInd} int={int} setInt={setInt} specs={specs} setSpecs={setSpecs} week={week} setWeek={setWeek} />}
       {tab === "public" && <Public ind={ind} int={int} specs={specs} />}
       {tab === "priv" && <Privacy />}
     </Page>
@@ -66,9 +69,9 @@ function Id({ meta, meta2, dot, act, name = A.name }: { meta: ReactNode; meta2?:
   );
 }
 
-function Mine({ ind, setInd, int, setInt, specs, setSpecs }: {
+function Mine({ ind, setInd, int, setInt, specs, setSpecs, week, setWeek }: {
   ind: string[]; setInd: (v: string[]) => void; int: string[]; setInt: (v: string[]) => void;
-  specs: string[]; setSpecs: (v: string[]) => void;
+  specs: string[]; setSpecs: (v: string[]) => void; week: WorkWeek; setWeek: (w: WorkWeek) => void;
 }) {
   const [edit, setEdit] = useState<null | "details" | "specs" | "ind" | "int">(null);
   const acts = (onSave: () => void) => (
@@ -131,6 +134,8 @@ function Mine({ ind, setInd, int, setInt, specs, setSpecs }: {
           <Text role="body" ink="secondary">{PUB.about}</Text>
         </Section>
       )}
+      {/* The zone and the working week come before the calendar they shape (Maryam 20 Nov 2026). */}
+      <WorkWeekSection week={week} onChange={setWeek} />
       <CalendarConnect connected={calOn} setConnected={setCalOn} email={A.email} />
       <Section>
         <SectionHeader title="Specialities" actions={edit === "specs" ? acts(() => setEdit(null)) : pen("specs")} />

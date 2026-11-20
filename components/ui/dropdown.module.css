@@ -76,3 +76,16 @@
 .pick button { display: inline-grid; place-items: center; color: var(--text-secondary); }
 .t .pick svg { width: var(--s04); height: var(--s04); transform: none; }
 .optMulti { gap: var(--s03); }
+
+/* SEARCHABLE FORM DROPDOWN (SearchDropdown, Maryam 20 Nov 2026): the trigger is a text field on
+   the same underline as .form .t; the chevron turns to a search mark while it is open. .hi is the
+   row the arrow keys are on. */
+.tSearch { cursor: text; }
+.q {
+  flex: 1 1 auto; min-width: 0; height: 100%; padding: 0;
+  border: 0; background: transparent; outline: none; color: var(--text-primary);
+  font-family: var(--font-sans);
+}
+.q::placeholder { color: var(--text-placeholder); }
+.opt.hi { background: var(--overlay-hover); }
+.none { padding: var(--s03) var(--s04); color: var(--text-secondary); }

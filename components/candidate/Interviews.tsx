@@ -36,6 +36,15 @@ const BASE = "/candidate/interviews";
 export const profHref = (key: string) => `${BASE}/agents/${key}/`;
 export const bookHref = (stage: string, key = "priya") =>
   `${BASE}/${isReinterview(stage) ? "checkout" : "book"}/${key}/`;
+/* RESCHEDULE IS WITH THE SAME AGENT, AND A CANDIDATE CANNOT CANCEL (Maryam 20 Nov 2026, Phase 0).
+   Once an interview is booked the candidate has paid for THAT agent, so a reschedule only moves
+   the time: the calendar is always the booked agent's, nothing is charged again, and no other
+   agent can be booked while the booking stands. There is no candidate "Cancel interview" in
+   Phase 0 (Phase 1's cancel-with-a-reason flow is not carried over). The booked agent is Priya
+   in this build (AUTHORED PLACEHOLDER: the seed books every candidate with her). */
+export const BOOKED_AGENT = "priya";
+export const hasBooking = (stage: string) => stage === "booked" || stage === "resched";
+export const reschedHref = `${BASE}/book/${BOOKED_AGENT}/`;
 
 /* ============================================================
    /candidate/interviews/ — the module page. Phase 1 V.interviews, stage
@@ -54,7 +63,7 @@ export function InterviewsHome() {
       {booked && (
         <DarkCard title="Scheduled" slot={<When>{stage === "resched" ? "In 2 days" : "In 5 minutes"}</When>}>
           <CallRow action={<Stack row gap={3}>
-            <Button kind="secondary" icon="calendar" href={`${BASE}/book/priya/`}>Reschedule</Button>
+            <Button kind="secondary" icon="calendar" href={reschedHref}>Reschedule</Button>
             <Button kind="accent" go disabled>Join call</Button>
           </Stack>} />
         </DarkCard>
@@ -130,7 +139,11 @@ function AgentsTable() {
           </div>
           <div><Text role="caption" as="span" className={s.cellL}>Experience</Text><Text role="compact" as="span">{a.yrs} yrs</Text></div>
           {charged && <div><Text role="caption" as="span" className={s.cellL}>Rate</Text><Text role="h4" as="span"><Price amount={a.price} /></Text></div>}
-          <div className={s.act}><Button kind="primary" size="sm" href={bookHref(stage, a.key)}>Book</Button></div>
+          {/* With a booking standing, only its agent has a button, and it reschedules (20 Nov 2026). */}
+          <div className={s.act}>
+            {!hasBooking(stage) ? <Button kind="primary" size="sm" href={bookHref(stage, a.key)}>Book</Button>
+              : a.key === BOOKED_AGENT ? <Button kind="secondary" size="sm" href={reschedHref}>Reschedule</Button> : null}
+          </div>
         </div>
       ))}
     </div>
@@ -164,15 +177,20 @@ function PastList({ items }: { items: (typeof PAST)[string] }) {
 }
 
 /* The agent's head on the booking and checkout pages (Phase 1 .bkp). */
-function AgentHead({ a, charged }: { a: Agent; charged: boolean }) {
+/* `fixed`: a reschedule, where the agent is not a choice, so the head does not link out to the
+   profile (and from there to the other agents). */
+function AgentHead({ a, charged, fixed }: { a: Agent; charged: boolean; fixed?: boolean }) {
   return (
     <div className={s.bkp}>
-      <Link href={profHref(a.key)} aria-label={`${a.name} profile`}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={a.img} alt="" />
-      </Link>
+      {fixed
+        /* eslint-disable-next-line @next/next/no-img-element */
+        ? <img src={a.img} alt="" />
+        : <Link href={profHref(a.key)} aria-label={`${a.name} profile`}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={a.img} alt="" />
+        </Link>}
       <div className={s.bkpB}>
-        <span className={s.nameRow}><Link href={profHref(a.key)} className={s.profLink}><Text role="h3" as="span">{a.name}</Text></Link><Icon name="verified" className={s.verified} /></span>
+        <span className={s.nameRow}>{fixed ? <Text role="h3" as="span">{a.name}</Text> : <Link href={profHref(a.key)} className={s.profLink}><Text role="h3" as="span">{a.name}</Text></Link>}<Icon name="verified" className={s.verified} /></span>
         <Text role="compact" as="span" className={s.rating}><Icon name="star" />{a.rating} · {a.ivs} interviews</Text>
         <Text role="compact" as="span" className={s.meta}>
           {/* A first interview shows no fee line at all (Maryam 26 Oct 2026). */}
@@ -191,12 +209,16 @@ function AgentHead({ a, charged }: { a: Agent; charged: boolean }) {
    its stage), then the dashboard opens on "Interview Booked!".
    ============================================================ */
 export function BookPage({ agent }: { agent: string }) {
-  const a = agentByKey(agent);
   const { stage, setStage, setUi } = useDemo();
+  /* With a booking standing this page is a RESCHEDULE, always with the booked agent, whatever
+     agent the address names (20 Nov 2026). */
+  const resched = hasBooking(stage);
+  const a = agentByKey(resched ? BOOKED_AGENT : agent);
   const router = useRouter();
   const charged = isReinterview(stage);
+  const first = a.name.split(" ")[0];
   const confirm = () => {
-    setUi({ ivBooked: { agent: a.key, charged } });
+    setUi({ ivBooked: { agent: a.key, charged, resched } });
     /* A first booking moves to the "booked" stage; a paid RE-interview stays on its own
        stage (day 90), or the candidate would drop back to the first-interview journey and
        lose the course from Payments (26 Oct 2026). */
@@ -205,8 +227,10 @@ export function BookPage({ agent }: { agent: string }) {
   };
   return (
     <Page>
-      <PageHeader title={`Book ${a.name}`} back={`${BASE}/`} desc="Pick a time that suits you for your 45-minute recorded interview." />
-      <Section><AgentHead a={a} charged={charged} /></Section>
+      {resched
+        ? <PageHeader title={`Reschedule with ${first}`} back={`${BASE}/`} desc={`Pick a new time for your interview with ${first}. Your interview stays with ${first} and nothing is charged again.`} />
+        : <PageHeader title={`Book ${a.name}`} back={`${BASE}/`} desc="Pick a time that suits you for your 45-minute recorded interview." />}
+      <Section><AgentHead a={a} charged={charged} fixed={resched} /></Section>
       <Section kind="block">
         <div className={s.col}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -214,7 +238,7 @@ export function BookPage({ agent }: { agent: string }) {
           <Field label="What do you want to talk about?">
             <TextArea rows={3} maxLength={300} placeholder="A real leadership situation from the last few months works best." />
           </Field>
-          <div className={s.go}><Button kind="primary" go onClick={confirm}>Confirm booking</Button></div>
+          <div className={s.go}><Button kind="primary" go onClick={confirm}>{resched ? "Confirm New Time" : "Confirm booking"}</Button></div>
         </div>
       </Section>
     </Page>
@@ -279,13 +303,18 @@ export function CheckoutPage({ agent }: { agent: string }) {
 /* The "Interview Booked!" dialog, raised on the dashboard after booking. */
 export function BookedDialog() {
   const { ui, setUi } = useDemo();
-  const b = ui.ivBooked as { agent: string; charged: boolean } | undefined;
+  const b = ui.ivBooked as { agent: string; charged: boolean; resched?: boolean } | undefined;
   if (!b) return null;
   const a = agentByKey(b.agent);
   const close = () => setUi({ ivBooked: undefined });
   /* What was actually paid for the re-interview (Maryam 26 Oct 2026), after any code or sale. */
   const bought = ((ui.purchases as Payment[] | undefined) ?? []).find((p) => p.id === "re");
   const paid = bought ? Number(bought.amount.replace(/[^\d.]/g, "")) : undefined;
+  if (b.resched) return (
+    <Dialog icon="checkFilled" title="Interview Rescheduled" onClose={close}
+      desc={<>Your interview with {a.name} has moved to your new time. Nothing was charged again.</>}
+      actions={<Button kind="primary" onClick={close}>View My Dashboard</Button>} />
+  );
   return (
     <Dialog icon="checkFilled" title="Interview Booked!" onClose={close}
       desc={<>{b.charged ? <>You have booked an interview with {a.name} for <Price amount={a.price} paid={paid} />.</> : <>You have booked an interview with {a.name}.</>} Join the interview on your selected slot and get to know of your level.</>}
@@ -451,7 +480,11 @@ export function AgentProfilePage({ agent }: { agent: string }) {
             <span className={s.nameRow}><Text role="h3" as="span">{a.name}</Text><Icon name="verified" className={s.verified} /></span>
             <Text role="compact" as="span" className={s.rating}><Icon name="star" />{a.rating} · Assesses {a.range}</Text>
           </span>
-          <span className={pf.idAct}><Button kind="primary" go href={bookHref(stage, a.key)}>Book {a.name.split(" ")[0]}</Button></span>
+          {/* With a booking standing, the booked agent's profile offers Reschedule and every
+              other agent's offers nothing (20 Nov 2026). */}
+          {!hasBooking(stage)
+            ? <span className={pf.idAct}><Button kind="primary" go href={bookHref(stage, a.key)}>Book {a.name.split(" ")[0]}</Button></span>
+            : a.key === BOOKED_AGENT && <span className={pf.idAct}><Button kind="secondary" icon="calendar" href={reschedHref}>Reschedule</Button></span>}
         </div>
       </Section>
       <Section kind="block" bare>

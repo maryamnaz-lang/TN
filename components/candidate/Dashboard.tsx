@@ -15,7 +15,7 @@ import { CallRow, When } from "./CallRow";
 import { CourseOffer } from "./CourseOffer";
 import { QuizModal, EnrolledDialog } from "./Level";
 import { courseByKey } from "@/data/level";
-import { BookedDialog, bookHref, profHref } from "./Interviews";
+import { BookedDialog, bookHref, profHref, reschedHref } from "./Interviews";
 import iv from "./interviews.module.css";
 import Link from "next/link";
 import { Price } from "../ui/Price";
@@ -144,7 +144,7 @@ function StageCard({ card, stage }: { card: Card; stage: string }) {
       return (
         <DarkCard title="Your Next Step: Interview" slot={<When>{card.when}</When>}>
           <CallRow action={card.resched
-            ? <Button kind="secondary" go href="/candidate/interviews/book/priya/">Reschedule</Button>
+            ? <Button kind="secondary" go href={reschedHref}>Reschedule</Button>
             : <Button kind="accent" go disabled>Join call</Button>} />
         </DarkCard>
       );

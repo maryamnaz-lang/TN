@@ -194,13 +194,72 @@ export const WEEK_SLOTS: WeekSlot[] = (() => {
    per interview read wrongly (10:00 and 10:30 on one day overlap a 45-minute call). Authored
    placeholder (§74), set around the diary's existing booked times. */
 export type Shift = { id: string; day: string; start: string; end: string };
-/* The agent's TIME ZONE (Maryam 10 Nov 2026): the zone their shifts are set in. The US zones,
-   named as US zones rather than by city, with the offset in August (summer time). */
-export const TIME_ZONES = [
-  "US Eastern (UTC-04:00)", "US Central (UTC-05:00)", "US Mountain (UTC-06:00)", "US Arizona (UTC-07:00)",
-  "US Pacific (UTC-07:00)", "US Alaska (UTC-08:00)", "US Hawaii (UTC-10:00)",
+/* THE AGENT'S TIME ZONE, WORKING DAYS AND WORKING HOURS (Maryam 20 Nov 2026), set on My Profile.
+   Each agent's own; when the Outlook calendar is connected, their availability is read inside
+   these days and hours, in this zone. A zone is a real IANA id so its offset is worked out live
+   (summer time included) rather than typed, and so it can be compared with the zone the
+   agent's device reports. The list is the US first, then Canada, then the countries the team
+   works from; AUTHORED PLACEHOLDER until the client names the full set. */
+export const TIME_ZONES: { id: string; name: string }[] = [
+  { id: "America/New_York", name: "US Eastern" }, { id: "America/Chicago", name: "US Central" },
+  { id: "America/Denver", name: "US Mountain" }, { id: "America/Phoenix", name: "US Arizona" },
+  { id: "America/Los_Angeles", name: "US Pacific" }, { id: "America/Anchorage", name: "US Alaska" },
+  { id: "Pacific/Honolulu", name: "US Hawaii" },
+  { id: "America/Halifax", name: "Canada Atlantic" }, { id: "America/Toronto", name: "Canada Eastern" },
+  { id: "America/Winnipeg", name: "Canada Central" }, { id: "America/Edmonton", name: "Canada Mountain" },
+  { id: "America/Vancouver", name: "Canada Pacific" },
+  { id: "Europe/London", name: "United Kingdom" }, { id: "Asia/Dubai", name: "United Arab Emirates" },
+  { id: "Asia/Karachi", name: "Pakistan" }, { id: "Asia/Kolkata", name: "India" },
 ];
-export const AGENT_TZ = TIME_ZONES[0];
+/* A zone's offset right now, in minutes east of UTC, and as "UTC−08:00". */
+export function tzOffsetMin(id: string, at = new Date()) {
+  try {
+    const p = new Intl.DateTimeFormat("en-US", { timeZone: id, timeZoneName: "longOffset" }).formatToParts(at);
+    const m = (p.find((x) => x.type === "timeZoneName")?.value ?? "").match(/([+-])(\d{2}):?(\d{2})?/);
+    return m ? (m[1] === "-" ? -1 : 1) * (+m[2] * 60 + +(m[3] ?? 0)) : 0;
+  } catch { return 0; }
+}
+export function tzOffsetLabel(id: string) {
+  const o = tzOffsetMin(id), a = Math.abs(o);
+  return `UTC${o < 0 ? "−" : "+"}${String(Math.floor(a / 60)).padStart(2, "0")}:${String(a % 60).padStart(2, "0")}`;
+}
+/* "US Pacific (UTC−08:00)" for a listed zone; "Lagos, Africa (UTC+01:00)" for any other, the same
+   words the searchable field lists it under. */
+export function tzLabel(id: string) {
+  const parts = id.split("/");
+  const name = TIME_ZONES.find((z) => z.id === id)?.name
+    ?? (parts.length > 1 ? `${parts[parts.length - 1].replace(/_/g, " ")}, ${parts[0].replace(/_/g, " ")}` : id);
+  return `${name} (${tzOffsetLabel(id)})`;
+}
+/* EVERY zone, for the type-to-search field (Maryam 20 Nov 2026): the named ones above first,
+   then every other zone the browser knows, as "Karachi, Asia (UTC+05:00)". A row matches on its
+   label and on its city, region and offset, so "toronto", "pacific" or "+05" all find it. */
+export function zoneOptions() {
+  const off = (id: string) => { const l = tzOffsetLabel(id); return `${l} ${l.replace("UTC", "").replace("−", "-")} gmt`; };
+  const city = (id: string) => id.split("/").reverse().join(" ").replace(/_/g, " ");
+  const named = TIME_ZONES.map((z) => ({ value: z.id, label: tzLabel(z.id), kw: `${city(z.id)} ${off(z.id)}` }));
+  let all: string[] = [];
+  try { all = (Intl as unknown as { supportedValuesOf: (k: string) => string[] }).supportedValuesOf("timeZone"); } catch { all = []; }
+  const rest = all.filter((id) => id.includes("/") && !TIME_ZONES.some((z) => z.id === id)).map((id) => {
+    return { value: id, label: tzLabel(id), kw: `${city(id)} ${off(id)}` };
+  });
+  return [...named, ...rest];
+}
+/* The zone this device reports, or "" where the browser cannot say. */
+export function deviceTz() { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || ""; } catch { return ""; } }
+export const WORK_DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+/* Working hours on the half hour, 6:00 AM to 10:00 PM. */
+export const WORK_TIMES = (() => {
+  const out: string[] = [];
+  for (let m = 6 * 60; m <= 22 * 60; m += 30) {
+    const h = Math.floor(m / 60), mm = m % 60;
+    out.push(`${((h + 11) % 12) + 1}:${mm === 0 ? "00" : mm} ${h < 12 ? "AM" : "PM"}`);
+  }
+  return out;
+})();
+export type WorkWeek = { tz: string; days: string[]; start: string; end: string };
+/* Owen's starting week: AUTHORED PLACEHOLDER, a US Eastern weekday 9 to 5. */
+export const AGENT_WORK: WorkWeek = { tz: "America/New_York", days: WORK_DAYS.slice(0, 5), start: "9:00 AM", end: "5:00 PM" };
 export const WEEK_SHIFTS: Shift[] = [
   { id: "mon1", day: "Monday", start: "9:00 AM", end: "12:00 PM" },
   { id: "mon2", day: "Monday", start: "2:00 PM", end: "7:00 PM" },

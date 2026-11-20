@@ -107,7 +107,9 @@
   margin-bottom: var(--sec-h-gap);
 }
 .shText { display: flex; flex-direction: column; gap: var(--sec-desc-gap); min-width: 0; flex: 1 1 calc(var(--s12) * 2); }
-.shActs { display: flex; align-items: center; gap: var(--s04); flex: none; margin-left: auto; }
+/* Capped at the column (Maryam 20 Nov 2026): a Discard + Save pair is wider than a phone column,
+   and with no cap it ran past the right margin instead of wrapping. */
+.shActs { display: flex; align-items: center; flex-wrap: wrap; gap: var(--s04); flex: none; max-width: 100%; margin-left: auto; }
 /* Super Admin heading actions are all 40 tall, an accent link included (Phase 1 §120). */
 :global([data-portal="admin"]) .shActs > * { height: var(--s08); }
 /* SUPER ADMIN HEADING ACTIONS SIT 24 APART (Maryam 26 Oct 2026: "Bulk Import, Export and

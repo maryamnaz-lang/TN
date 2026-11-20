@@ -4,7 +4,8 @@ import s from "./dropdown.module.css";
 import t from "./table.module.css";
 import { Icon } from "../Icon";
 
-export type Option = { value: string; label: string; img?: string; meta?: string };
+/* `kw` is extra text a SEARCHABLE dropdown matches on, never shown (a city, an offset). */
+export type Option = { value: string; label: string; img?: string; meta?: string; kw?: string };
 
 /* Open state, click-away and the room left below the trigger, shared by both
    dropdowns. The menu always opens DOWNWARD (Phase 1 §127) and is never cut off
@@ -60,6 +61,65 @@ export function Dropdown({
               {o.meta && <span className={`${s.meta} t-label`}>{o.meta}</span>}
             </button>
           ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* <SearchDropdown> — a form dropdown you can TYPE into (Maryam 20 Nov 2026: "do not only let them
+   select, let them type as well", first for the agent's time zone). The trigger is a text field
+   that always reads the picked option. Clicking it KEEPS that text (Maryam 20 Nov 2026: "the
+   previous time zone text will stay"): the menu opens on the whole list, scrolled to the current
+   pick, and the user can type over it, or put the caret in and edit it. Only once the text is
+   CHANGED does the menu narrow to the options whose label or `kw` hold every typed word. Arrow
+   keys move the highlight, Enter picks it, Escape or a click away closes and puts the picked
+   label back. Same underline, menu and option rows as <Dropdown variant="form">. */
+export function SearchDropdown({
+  options, value, onChange, placeholder = "Type to search", empty = "No match. Try another word.", label,
+}: {
+  options: Option[]; value?: string; onChange: (v: string) => void; placeholder?: string; empty?: string; label?: string;
+}) {
+  const { open, setOpen, toggle, ref, menuStyle } = useMenu();
+  /* null = not typed yet: the field shows the pick and the menu lists everything. */
+  const [q, setQ] = useState<string | null>(null);
+  const [hi, setHi] = useState(0);
+  const listRef = useRef<HTMLDivElement>(null);
+  const cur = options.find((o) => o.value === value);
+  const words = (q ?? "").toLowerCase().split(/\s+/).filter(Boolean);
+  const list = q !== null && words.length
+    ? options.filter((o) => { const hay = `${o.label} ${o.kw ?? ""} ${o.meta ?? ""}`.toLowerCase(); return words.every((w) => hay.includes(w)); })
+    : options;
+  useEffect(() => { if (!open) setQ(null); else if (q === null) setHi(Math.max(0, options.findIndex((o) => o.value === value))); }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (q !== null) setHi(0); }, [q]);
+  useEffect(() => { listRef.current?.children[hi]?.scrollIntoView({ block: "nearest" }); }, [hi, open]);
+  const pick = (o: Option) => { onChange(o.value); setOpen(false); (document.activeElement as HTMLElement | null)?.blur(); };
+  const key = (e: React.KeyboardEvent) => {
+    if (e.key === "ArrowDown") { e.preventDefault(); if (!open) toggle(); else setHi((h) => Math.min(h + 1, list.length - 1)); }
+    else if (e.key === "ArrowUp") { e.preventDefault(); setHi((h) => Math.max(h - 1, 0)); }
+    else if (e.key === "Enter") { e.preventDefault(); if (open && list[hi]) pick(list[hi]); }
+    else if (e.key === "Escape") { if (open) { e.stopPropagation(); setOpen(false); } }
+  };
+  return (
+    <div ref={ref} className={`${s.dd} ${s.form}`}>
+      <div className={`${s.t} ${s.tSearch}`} aria-expanded={open}>
+        <input className={`${s.q} t-compact`} role="combobox" aria-expanded={open} aria-autocomplete="list" aria-label={label}
+          value={q ?? cur?.label ?? ""} placeholder={placeholder}
+          onFocus={() => { if (!open) toggle(); }} onClick={() => { if (!open) toggle(); }}
+          onChange={(e) => { setQ(e.target.value); if (!open) toggle(); }} onKeyDown={key} />
+        <Icon name={open ? "search" : "chevDown"} />
+      </div>
+      {open && (
+        <div ref={listRef} className={s.menu} role="listbox" style={menuStyle}>
+          {list.map((o, i) => (
+            <button key={o.value} type="button" role="option" aria-selected={o.value === value} tabIndex={-1}
+              className={`${s.opt} ${o.value === value ? s.on : ""} ${i === hi ? s.hi : ""} t-compact`}
+              onMouseEnter={() => setHi(i)} onMouseDown={(e) => e.preventDefault()} onClick={() => pick(o)}>
+              <span>{o.label}</span>
+              {o.meta && <span className={`${s.meta} t-label`}>{o.meta}</span>}
+            </button>
+          ))}
+          {!list.length && <span className={`${s.none} t-label`}>{empty}</span>}
         </div>
       )}
     </div>
