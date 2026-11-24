@@ -124,6 +124,10 @@
 :global([data-portal="admin"]) .shActs > .row { gap: var(--s06); }
 /* The candidate's heading actions sit at 36 (Phase 1 .sec-h-act). */
 :global([data-portal="candidate"]) .shActs > * { height: var(--filter-h); }
+/* ...but a <Stack row> of buttons (Discard / Save) wraps to two lines on a phone, and a fixed
+   36 let the second line hang over the field below (24 Nov 2026). The row grows; its buttons
+   keep their own height. */
+:global([data-portal="candidate"]) .shActs > .row { height: auto; }
 
 /* ---- <Stack> / <Grid> ---- */
 .stack { display: flex; flex-direction: column; }

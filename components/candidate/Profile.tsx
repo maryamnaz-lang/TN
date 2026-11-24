@@ -18,6 +18,7 @@ import { levelCard } from "@/data/level";
 import { SCENE_STILL } from "@/data/interviews";
 import { PEOPLE } from "@/data/seed";
 import { ShareMenu } from "./Interviews";
+import { TimeZoneSection } from "./TimeZone";
 import s from "./profile.module.css";
 import t from "./interviews.module.css";
 
@@ -54,6 +55,8 @@ function MyProfile() {
   const [edit, setEdit] = useState<null | "general" | "work" | "edu" | "cert" | "skill">(null);
   const [photo, setPhoto] = useState(PEOPLE.maryam.img);
   const [photoOpen, setPhotoOpen] = useState(false);
+  /* The candidate's own zone (24 Nov 2026), New York as the seed (AUTHORED PLACEHOLDER). */
+  const [tz, setTz] = useState("America/New_York");
   const lc = levelCard(stage);
   const track = "Explorer track";
   const level = lc.kind === "level" ? lc.level : "Not set yet";
@@ -112,6 +115,8 @@ function MyProfile() {
         <SectionHeader title="About Me" />
         <Text role="body" ink="secondary">{g.about}</Text>
       </Section>
+
+      <TimeZoneSection tz={tz} onChange={setTz} />
 
       <ScenesCarousel />
 
