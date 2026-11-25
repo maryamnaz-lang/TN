@@ -119,9 +119,9 @@ export const ymLabel = (v: string) => {
   const [y, m] = v.split("-");
   return m ? `${SHORT[Number(m) - 1]} ${y}` : y;
 };
-export function MonthInput({ value, onChange, label, mode = "month", min, future, placeholder, error }: {
+export function MonthInput({ value, onChange, label, mode = "month", min, future, placeholder, error, disabled }: {
   value: string; onChange: (v: string) => void; label: string; mode?: "month" | "year";
-  min?: string; future?: boolean; placeholder?: string; error?: boolean;
+  min?: string; future?: boolean; placeholder?: string; error?: boolean; disabled?: boolean;
 }) {
   const now = new Date();
   const max = future ? undefined : mode === "year" ? String(now.getFullYear()) : `${now.getFullYear()}-${pad(now.getMonth() + 1)}`;
@@ -139,13 +139,13 @@ export function MonthInput({ value, onChange, label, mode = "month", min, future
   const step = mode === "year" ? 12 : 1;
   const head = mode === "year" ? `${at} – ${at + 11}` : String(at);
   return (
-    <div ref={ref} className={s.di}>
-      <button type="button" className={`${s.diInp} ${s.miT} ${error ? s.miErr : ""} ${value ? "" : s.miPh}`} aria-haspopup="dialog" aria-expanded={open}
+    <div ref={ref} className={`${s.di} ${disabled ? s.miOff : ""}`}>
+      <button type="button" disabled={disabled} className={`${s.diInp} ${s.miT} ${error ? s.miErr : ""} ${value ? "" : s.miPh}`} aria-haspopup="dialog" aria-expanded={open && !disabled}
         aria-label={`${label}${value ? `: ${ymLabel(value)}` : ""}`} onClick={() => setOpen((o) => !o)}>
         {value ? ymLabel(value) : placeholder ?? (mode === "year" ? "Select year" : "Select month")}
       </button>
       <span className={s.diBtn} aria-hidden="true"><Icon name="calendar" /></span>
-      {open && (
+      {open && !disabled && (
         <div className={`${s.pop} ${s.popL}`} role="dialog" aria-label={`${label} picker`}>
           <div className={s.h}>
             <button type="button" className={s.nav} aria-label={mode === "year" ? "Earlier years" : "Previous year"}

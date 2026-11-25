@@ -33,7 +33,7 @@
 /* ---- An in-place edit form's block (one per entry) ---- */
 .entry { padding: var(--s05); border: var(--hairline) solid var(--rule); }
 .entry + .entry { margin-top: var(--s05); }
-.entryH { display: flex; justify-content: flex-end; margin-bottom: var(--s04); }
+.entryH { display: flex; align-items: center; justify-content: space-between; gap: var(--s04); margin-bottom: var(--s05); }
 .g3 { display: grid; gap: var(--field-gap); grid-template-columns: minmax(0, 1fr); }
 @container page (min-width: 700px) { .g3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 
@@ -92,9 +92,19 @@
 .closeB > :last-child { margin-left: auto; }
 
 /* ---- A CV entry's logo row (24 Nov 2026): the row's own logo square, then Upload / Remove ---- */
-.logoF { display: flex; align-items: center; gap: var(--s04); flex-wrap: wrap; }
+.logoF { position: relative; align-self: flex-start; display: inline-flex; }
+/* The pencil on a logo square: the photo's badge one step smaller, to suit the 48px square. */
+.pencilSm { width: var(--s06); height: var(--s06); right: calc(var(--s02) * -1); bottom: calc(var(--s02) * -1); }
+.pencilSm svg { width: var(--s04); height: var(--s04); }
+/* The logo preview: the photo preview's size, square, the logo contained on a hairline. */
+.bigSq { width: var(--avatar-pick); height: var(--avatar-pick); border: var(--hairline) solid var(--rule); background: transparent var(--art, none) center / contain no-repeat; display: grid; place-items: center; color: var(--text-secondary); }
+.bigSq svg { width: var(--s08); height: var(--s08); }
 /* "I currently work here": the table's row-select box (Phase 1 .tbl-cb) with a label. */
 .chk { display: inline-flex; align-items: center; gap: var(--s03); align-self: flex-start; color: var(--text-primary); text-align: left; }
 .cb { width: var(--s05); height: var(--s05); flex: none; display: grid; place-items: center; border: var(--cb-edge) solid var(--gray-30); border-radius: var(--radius-cb); background: var(--layer-01); color: var(--on-accent); }
 .cb svg { width: var(--s04); height: var(--s04); }
 .cbOn { background: var(--accent); border-color: var(--accent); }
+
+/* An uploaded logo is a disc with no frame (Maryam 25 Nov 2026), in the edit field and its preview,
+   so it is cropped to fill rather than contained; the empty state keeps the framed square + icon. */
+.logoImg { border: 0; border-radius: var(--radius-pill); background-size: cover; }

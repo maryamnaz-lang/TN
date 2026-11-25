@@ -47,3 +47,8 @@
 .mo:hover { background: var(--overlay-hover); }
 .mo.on { background: var(--accent); color: var(--on-accent); }
 .mo.off, .mo.off:hover { color: var(--text-disabled); background: transparent; cursor: not-allowed; }
+
+/* A disabled month field (the job's End while "I currently work here" is ticked, 25 Nov 2026):
+   it reads as unavailable and does not open. */
+.miOff .miT { cursor: not-allowed; color: var(--text-placeholder); }
+.miOff .diBtn { color: var(--text-placeholder); }

@@ -136,9 +136,18 @@ function MyProfile() {
     if (k === "skill") setDSkill(skills);
     setEdit(k);
   };
+  /* EVERY SWITCH ASKS FIRST (Maryam 25 Nov 2026): while one section is in edit, opening another
+     always confirms, changed or not, so no section ever closes silently. Add on the section that
+     is already open just puts a new blank entry on top of the draft, keeping what was typed. */
   const open = (k: Sec, add = false) => {
-    if (edit === k && !add) return;
-    if (edit && edit !== k && dirty()) setPending({ k, add });
+    if (edit === k) {
+      if (!add) return;
+      if (k === "work") setDExp((d) => [{ ...BLANK_EXP }, ...d]);
+      if (k === "edu") setDEdu((d) => [{ ...BLANK_EDU }, ...d]);
+      if (k === "cert") setDCert((d) => [{ ...BLANK_CERT }, ...d]);
+      return;
+    }
+    if (edit) setPending({ k, add });
     else start(k, add);
   };
 
@@ -177,7 +186,11 @@ function MyProfile() {
   const patch = <T,>(set: React.Dispatch<React.SetStateAction<T[]>>, i: number, p: Partial<T>) =>
     set((l) => l.map((x, j) => (j === i ? { ...x, ...p } : x)));
   const drop = <T,>(set: React.Dispatch<React.SetStateAction<T[]>>, i: number) => set((l) => l.filter((_, j) => j !== i));
-  const removeBtn = (onClick: () => void) => <div className={s.entryH}><Button kind="link" size="sm" icon="delete" onClick={onClick}>Remove</Button></div>;
+  /* An entry's head row: its logo on the left, Remove on the right, one line (Maryam 25 Nov 2026:
+     the logo had a row of its own under an empty Remove row). */
+  const entryHead = (logo: React.ReactNode, onRemove: () => void) => (
+    <div className={s.entryH}>{logo}<Button kind="link" size="sm" icon="delete" onClick={onRemove}>Remove</Button></div>
+  );
   const empty = (what: string) => <Text role="desc" as="p">No {what} yet. Use Add to put one here.</Text>;
 
   return (
@@ -232,9 +245,8 @@ function MyProfile() {
           sub={[e.kind, `${ymLabel(e.from)} – ${e.to ? ymLabel(e.to) : "Present"}`, span(e.from, e.to)].filter(Boolean).join(" · ")} />) : empty("roles")}
         form={dExp.length ? dExp.map((e, i) => (
           <div key={i} className={s.entry}>
-            {removeBtn(() => drop(setDExp, i))}
+            {entryHead(<LogoField art={e.art} icon="work" what="company" onChange={(art) => patch(setDExp, i, { art })} />, () => drop(setDExp, i))}
             <Form>
-              <LogoField art={e.art} icon="work" what="company" onChange={(art) => patch(setDExp, i, { art })} />
               <FormRow>
                 <Field label="Title" required error={req(e.role, "Enter a title")}><Input value={e.role} placeholder="e.g. Operations Lead" onChange={(x) => patch(setDExp, i, { role: x.target.value })} /></Field>
                 <Field label="Company" required error={req(e.org, "Enter a company")}><Input value={e.org} placeholder="e.g. Tkxel" onChange={(x) => patch(setDExp, i, { org: x.target.value })} /></Field>
@@ -245,7 +257,7 @@ function MyProfile() {
                   <MonthInput label="Start" value={e.from} error={tried && !e.from} onChange={(from) => patch(setDExp, i, { from, to: e.to && e.to < from ? "" : e.to })} />
                 </Field>
                 <Field label="End">
-                  <MonthInput label="End" value={e.to} min={e.from} placeholder="Present" onChange={(to) => patch(setDExp, i, { to })} />
+                  <MonthInput label="End" value={e.to} min={e.from} placeholder="Present" disabled={!e.to} onChange={(to) => patch(setDExp, i, { to })} />
                 </Field>
               </div>
               <CheckRow on={!e.to} label="I currently work here" onChange={(on) => patch(setDExp, i, { to: on ? "" : thisMonth() })} />
@@ -258,22 +270,22 @@ function MyProfile() {
           sub={[[e.degree, e.field].filter(Boolean).join(", "), `${ymLabel(e.from)} – ${e.to ? ymLabel(e.to) : "Present"}`].filter(Boolean).join(" · ")} />) : empty("schools")}
         form={dEdu.length ? dEdu.map((e, i) => (
           <div key={i} className={s.entry}>
-            {removeBtn(() => drop(setDEdu, i))}
+            {entryHead(<LogoField art={e.art} icon="book" what="school" onChange={(art) => patch(setDEdu, i, { art })} />, () => drop(setDEdu, i))}
             <Form>
-              <LogoField art={e.art} icon="book" what="school" onChange={(art) => patch(setDEdu, i, { art })} />
-              <Field label="School" required error={req(e.school, "Enter a school")}><Input value={e.school} placeholder="e.g. COMSATS University" onChange={(x) => patch(setDEdu, i, { school: x.target.value })} /></Field>
+              {/* School + Degree, then Field of study + the two years (Maryam 25 Nov 2026). */}
               <FormRow>
+                <Field label="School" required error={req(e.school, "Enter a school")}><Input value={e.school} placeholder="e.g. COMSATS University" onChange={(x) => patch(setDEdu, i, { school: x.target.value })} /></Field>
                 <Field label="Degree"><Input placeholder="BS" value={e.degree} onChange={(x) => patch(setDEdu, i, { degree: x.target.value })} /></Field>
-                <Field label="Field of study"><Input placeholder="Computer Science" value={e.field} onChange={(x) => patch(setDEdu, i, { field: x.target.value })} /></Field>
               </FormRow>
-              <FormRow>
+              <div className={s.g3}>
+                <Field label="Field of study"><Input placeholder="Computer Science" value={e.field} onChange={(x) => patch(setDEdu, i, { field: x.target.value })} /></Field>
                 <Field label="Start year" required error={tried && !e.from ? "Choose a start year" : undefined}>
                   <MonthInput mode="year" label="Start year" value={e.from} error={tried && !e.from} onChange={(from) => patch(setDEdu, i, { from, to: e.to && e.to < from ? "" : e.to })} />
                 </Field>
                 <Field label="End year (or expected)">
                   <MonthInput mode="year" label="End year" value={e.to} min={e.from} future placeholder="Select year" onChange={(to) => patch(setDEdu, i, { to })} />
                 </Field>
-              </FormRow>
+              </div>
             </Form>
           </div>
         )) : empty("schools")} />
@@ -282,9 +294,8 @@ function MyProfile() {
         view={certs.length ? certs.map((c, i) => <CvRow key={i} icon="certificate" art={c.art} title={c.name} sub={`${c.org} · issued ${ymLabel(c.issued)}`} sub2={c.cred} />) : empty("certifications")}
         form={dCert.length ? dCert.map((c, i) => (
           <div key={i} className={s.entry}>
-            {removeBtn(() => drop(setDCert, i))}
+            {entryHead(<LogoField art={c.art} icon="certificate" what="issuer" onChange={(art) => patch(setDCert, i, { art })} />, () => drop(setDCert, i))}
             <Form>
-              <LogoField art={c.art} icon="certificate" what="issuer" onChange={(art) => patch(setDCert, i, { art })} />
               <FormRow>
                 <Field label="Name" required error={req(c.name, "Enter the certification name")}><Input value={c.name} onChange={(x) => patch(setDCert, i, { name: x.target.value })} /></Field>
                 <Field label="Issuing organisation" required error={req(c.org, "Enter the issuing organisation")}><Input value={c.org} onChange={(x) => patch(setDCert, i, { org: x.target.value })} /></Field>
@@ -307,9 +318,11 @@ function MyProfile() {
 
       {photoOpen && <PhotoSheet current={photo} onClose={() => setPhotoOpen(false)} onSave={(p) => { setPhoto(p); setPhotoOpen(false); }} />}
       {pending && edit && (
-        <Confirm icon="edit" title="Discard your changes?"
-          desc={<>You have unsaved changes in <b>{SEC_NAME[edit]}</b>. Opening {SEC_NAME[pending.k]} discards them.</>}
-          ok="Discard Changes" onCancel={() => setPending(null)}
+        <Confirm icon="edit" title={dirty() ? "Discard your changes?" : `Close ${SEC_NAME[edit]}?`}
+          desc={dirty()
+            ? <>You have unsaved changes in <b>{SEC_NAME[edit]}</b>. Opening {SEC_NAME[pending.k]} discards them.</>
+            : <>You are editing <b>{SEC_NAME[edit]}</b>. Opening {SEC_NAME[pending.k]} closes it.</>}
+          ok={dirty() ? "Discard Changes" : "Continue"} onCancel={() => setPending(null)}
           onOk={() => { const p = pending; setPending(null); start(p.k, p.add); }} />
       )}
     </>
@@ -344,18 +357,42 @@ function GeneralForm({ g, onChange, nameError }: { g: typeof PF.general; onChang
   );
 }
 
-/* An entry's logo (24 Nov 2026: the CV rows show logos but there was no way to add one): the same
-   square the row draws, then Upload (and Remove once there is one). Empty, the section's icon stands in. */
+/* An entry's logo, edited the way the profile photo is (Maryam 25 Nov 2026: "keep this consistent
+   with how we allow the profile image edit"): the logo square carries the same blue pencil badge,
+   and the badge opens a preview with Upload and Remove. Empty, the section's icon stands in.
+   Logos are artwork, so the preview stays square (DESIGN.md: only a person's photo is a disc). */
 function LogoField({ art, icon, what, onChange }: { art: string; icon: "work" | "book" | "certificate"; what: string; onChange: (art: string) => void }) {
-  const file = useRef<HTMLInputElement>(null);
+  const [open, setOpen] = useState(false);
   return (
     <div className={s.logoF}>
-      <span className={s.cvArt} style={art ? ({ "--art": `url(${art})` } as CSSProperties) : undefined}>{!art && <Icon name={icon} />}</span>
-      <input ref={file} className={s.upload} type="file" accept="image/*" aria-label={`Upload a ${what} logo`}
-        onChange={(e) => { const f = e.target.files?.[0]; if (f) onChange(URL.createObjectURL(f)); e.target.value = ""; }} />
-      <Button kind="ghost" size="sm" icon="upload" onClick={() => file.current?.click()}>{art ? "Change Logo" : "Upload Logo"}</Button>
-      {art && <Button kind="ghost" size="sm" icon="close" onClick={() => onChange("")}>Remove</Button>}
+      <span className={`${s.cvArt} ${art ? s.logoImg : ""}`} style={art ? ({ "--art": `url(${art})` } as CSSProperties) : undefined}>{!art && <Icon name={icon} />}</span>
+      <button type="button" className={`${s.pencil} ${s.pencilSm}`} aria-label={`Change ${what} logo`} onClick={() => setOpen(true)}><Icon name="edit" /></button>
+      {open && <LogoSheet current={art} icon={icon} what={what} onClose={() => setOpen(false)} onSave={(v) => { onChange(v); setOpen(false); }} />}
     </div>
+  );
+}
+
+/* The logo picker: the PhotoSheet's Profile Image pane, square, with no avatar tab. */
+function LogoSheet({ current, icon, what, onClose, onSave }: {
+  current: string; icon: "work" | "book" | "certificate"; what: string; onClose: () => void; onSave: (v: string) => void;
+}) {
+  const [img, setImg] = useState(current);
+  const file = useRef<HTMLInputElement>(null);
+  return (
+    <Modal label={`Change ${what} logo`} onClose={onClose} footer={<>
+      <Button kind="secondary" onClick={onClose}>Cancel</Button>
+      <Button kind="primary" onClick={() => onSave(img)}>Update Logo</Button>
+    </>}>
+      <div className={s.pick}>
+        <span className={`${s.bigSq} ${img ? s.logoImg : ""}`} style={img ? ({ "--art": `url(${img})` } as CSSProperties) : undefined}>{!img && <Icon name={icon} />}</span>
+        <Stack row gap={3}>
+          <input ref={file} className={s.upload} type="file" accept="image/*" aria-label={`Upload a ${what} logo`}
+            onChange={(e) => { const f = e.target.files?.[0]; if (f) setImg(URL.createObjectURL(f)); e.target.value = ""; }} />
+          <Button kind="ghost" icon="upload" onClick={() => file.current?.click()}>Upload</Button>
+          <Button kind="ghost" icon="close" onClick={() => setImg("")}>Remove</Button>
+        </Stack>
+      </div>
+    </Modal>
   );
 }
 
