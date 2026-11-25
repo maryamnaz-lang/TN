@@ -6,17 +6,20 @@
 export const PF = {
   general: {
     name: "Maryam Naz", nickname: "@maryamsss", email: "maryam.naz@tkxel.io",
-    role: "Operations Lead", industry: "Software", years: "5 years", intent: "Develop in my current role",
+    role: "Operations Lead", industry: "Software", years: 5, intent: "Develop in my current role",
     about: "Senior UX/UI Designer with experience delivering user-centered designs across SaaS platforms, dashboards, mobile apps, and web experiences. Skilled in design systems, user journeys, and collaborating with cross-functional teams to turn ideas into polished digital products.",
   },
+  /* CV dates are stored "YYYY-MM" (education "YYYY"), shown "Jan 2024" by ymLabel; an experience with
+     no `to` is current ("Present") and its length is worked out from the dates (24 Nov 2026). `art`
+     is the entry logo; empty means the section icon stands in. */
   experience: [
-    { role: "Operations Lead", org: "Tkxel", kind: "Full-time", from: "Jan 2024", to: "Present", span: "2 yrs 8 mos" },
-    { role: "Business Operations Analyst", org: "TechmateTech LLC", kind: "Full-time", from: "Mar 2021", to: "Dec 2023", span: "2 yrs 10 mos" },
+    { role: "Operations Lead", org: "Tkxel", kind: "Full-time", from: "2024-01", to: "", art: "" },
+    { role: "Business Operations Analyst", org: "TechmateTech LLC", kind: "Full-time", from: "2021-03", to: "2023-12", art: "" },
   ],
   education: [{ school: "COMSATS Institute of Information and Technology", art: "/images/logos/pf-art-comsats.jpg", degree: "", field: "", from: "2018", to: "2022" }],
   certs: [
-    { name: "Enterprise Design Thinking Co-Creator", org: "IBM", art: "/images/logos/pf-art-ibmco.webp", issued: "Jan 2023", cred: "User Experience Design (UXD)" },
-    { name: "Enterprise Design Thinking Practitioner", org: "IBM", art: "/images/logos/pf-art-ibmpr.webp", issued: "Dec 2022", cred: "Enterprise Design Thinking" },
+    { name: "Enterprise Design Thinking Co-Creator", org: "IBM", art: "/images/logos/pf-art-ibmco.webp", issued: "2023-01", cred: "User Experience Design (UXD)" },
+    { name: "Enterprise Design Thinking Practitioner", org: "IBM", art: "/images/logos/pf-art-ibmpr.webp", issued: "2022-12", cred: "Enterprise Design Thinking" },
   ],
   skills: ["Mockups", "Low-fidelity designs", "User Experience Design (UXD)", "Interaction Design", "Visual Design", "Web Design", "Brand Design", "Logo Design", "UX Research", "Wireframing", "Prototyping", "Adobe Photoshop"],
 };

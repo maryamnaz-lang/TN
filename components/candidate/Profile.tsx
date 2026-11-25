@@ -7,6 +7,7 @@ import { Button } from "../ui/Button";
 import { Facts, Fact, Stats, Stat } from "../ui/Figures";
 import { Field, Input, TextArea, Form, FormRow } from "../ui/Field";
 import { Dropdown } from "../ui/Dropdown";
+import { MonthInput, ymLabel } from "../ui/DateFilter";
 import { Accordion } from "../ui/Accordion";
 import { ToggleRow } from "../ui/Toggle";
 import { Modal } from "../ui/Modal";
@@ -49,34 +50,135 @@ export function ProfilePage() {
 }
 
 /* ---------------- My Profile ---------------- */
+/* ============================================================
+   MY PROFILE'S EDITING MODEL (dev-team review, 24 Nov 2026).
+   - ONE SECTION IN EDIT AT A TIME. `edit` names the open section (Details, Time Zone, Experience,
+     Education, Certifications, Skills). Opening another while the open one has unsaved changes asks
+     first ("Discard your changes?"); with nothing changed it simply switches.
+   - EVERY SECTION EDITS A DRAFT. Save writes the draft back, Discard throws it away. Before this the
+     Details and Skills forms wrote straight into the page, so Discard kept the edits, and the CV forms
+     were uncontrolled, so Save kept nothing.
+   - ADD opens the section with a new empty entry at the top; REMOVE takes an entry out of the draft.
+   - A CV entry carries a logo (upload / remove), and its dates are month/year pickers.
+   ============================================================ */
+type Sec = "general" | "tz" | "work" | "edu" | "cert" | "skill";
+const SEC_NAME: Record<Sec, string> = { general: "Details", tz: "Time Zone", work: "Experience", edu: "Education", cert: "Licenses & certifications", skill: "Skills" };
+type Exp = (typeof PF.experience)[number];
+type Edu = (typeof PF.education)[number];
+type Cert = (typeof PF.certs)[number];
+const BLANK_EXP: Exp = { role: "", org: "", kind: "Full-time", from: "", to: "", art: "" };
+const BLANK_EDU: Edu = { school: "", art: "", degree: "", field: "", from: "", to: "" };
+const BLANK_CERT: Cert = { name: "", org: "", art: "", issued: "", cred: "" };
+const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
+
+/* How long a role ran, "2 yrs 8 mos", from "YYYY-MM" to "YYYY-MM" (or to this month when current). */
+function span(from: string, to: string) {
+  if (!from) return "";
+  const now = new Date();
+  const [fy, fm] = from.split("-").map(Number);
+  const [ty, tm] = to ? to.split("-").map(Number) : [now.getFullYear(), now.getMonth() + 1];
+  const n = (ty - fy) * 12 + (tm - fm) + 1;
+  if (n <= 0) return "";
+  const y = Math.floor(n / 12), m = n % 12;
+  return [y && `${y} yr${y > 1 ? "s" : ""}`, m && `${m} mo${m > 1 ? "s" : ""}`].filter(Boolean).join(" ");
+}
+const yearsLabel = (n: number) => `${n} ${n === 1 ? "year" : "years"}`;
+
 function MyProfile() {
   const { stage, setUi } = useDemo();
   const [g, setG] = useState(PF.general);
-  const [edit, setEdit] = useState<null | "general" | "work" | "edu" | "cert" | "skill">(null);
-  const [photo, setPhoto] = useState(PEOPLE.maryam.img);
-  const [photoOpen, setPhotoOpen] = useState(false);
+  const [exp, setExp] = useState<Exp[]>(PF.experience);
+  const [edu, setEdu] = useState<Edu[]>(PF.education);
+  const [certs, setCerts] = useState<Cert[]>(PF.certs);
+  const [skills, setSkills] = useState(PF.skills);
   /* The candidate's own zone (24 Nov 2026), New York as the seed (AUTHORED PLACEHOLDER). */
   const [tz, setTz] = useState("America/New_York");
+
+  const [edit, setEdit] = useState<Sec | null>(null);
+  const [dG, setDG] = useState(g);
+  const [dTz, setDTz] = useState<string | null>(null);
+  const [dExp, setDExp] = useState<Exp[]>([]);
+  const [dEdu, setDEdu] = useState<Edu[]>([]);
+  const [dCert, setDCert] = useState<Cert[]>([]);
+  const [dSkill, setDSkill] = useState<string[]>([]);
+  /* Set after a Save that found a required field empty: the form then shows its errors. */
+  const [tried, setTried] = useState(false);
+  const [pending, setPending] = useState<{ k: Sec; add: boolean } | null>(null);
+
+  const [photo, setPhoto] = useState(PEOPLE.maryam.img);
+  const [photoOpen, setPhotoOpen] = useState(false);
   const lc = levelCard(stage);
   const track = "Explorer track";
   const level = lc.kind === "level" ? lc.level : "Not set yet";
   /* Phase 1 counts COMPLETED courses only: one once the 90 days are done. */
   const courses = stage === "day90" || stage === "promoted" ? 1 : 0;
-  const editActs = (onSave?: () => void) => (
+
+  const dirty = () => {
+    switch (edit) {
+      case "general": return !same(dG, g);
+      case "tz": return dTz !== null && dTz !== tz;
+      case "work": return !same(dExp, exp);
+      case "edu": return !same(dEdu, edu);
+      case "cert": return !same(dCert, certs);
+      case "skill": return !same(dSkill, skills);
+      default: return false;
+    }
+  };
+  const close = () => { setEdit(null); setDTz(null); setTried(false); };
+  /* Opens a section with a fresh draft; `add` puts a new empty entry at the top. */
+  const start = (k: Sec, add: boolean) => {
+    setTried(false);
+    setDTz(k === "tz" ? tz : null);
+    if (k === "general") setDG(g);
+    if (k === "work") setDExp(add ? [{ ...BLANK_EXP }, ...exp] : exp);
+    if (k === "edu") setDEdu(add ? [{ ...BLANK_EDU }, ...edu] : edu);
+    if (k === "cert") setDCert(add ? [{ ...BLANK_CERT }, ...certs] : certs);
+    if (k === "skill") setDSkill(skills);
+    setEdit(k);
+  };
+  const open = (k: Sec, add = false) => {
+    if (edit === k && !add) return;
+    if (edit && edit !== k && dirty()) setPending({ k, add });
+    else start(k, add);
+  };
+
+  /* Save: refuses while a required field is empty (the fields then say which), else writes the draft. */
+  const save = () => {
+    if (edit === "general") {
+      if (!dG.name.trim()) return setTried(true);
+      setG(dG);
+    } else if (edit === "work") {
+      if (dExp.some((e) => !e.role.trim() || !e.org.trim() || !e.from)) return setTried(true);
+      setExp(dExp);
+    } else if (edit === "edu") {
+      if (dEdu.some((e) => !e.school.trim() || !e.from)) return setTried(true);
+      setEdu(dEdu);
+    } else if (edit === "cert") {
+      if (dCert.some((c) => !c.name.trim() || !c.org.trim() || !c.issued)) return setTried(true);
+      setCerts(dCert);
+    } else if (edit === "skill") setSkills(dSkill);
+    close();
+  };
+  const editActs = (
     <Stack row gap={3}>
-      <Button kind="secondary" icon="delete" onClick={() => setEdit(null)}>Discard Changes</Button>
-      <Button kind="primary" icon="check" onClick={() => { onSave?.(); setEdit(null); }}>Save Changes</Button>
+      <Button kind="secondary" icon="delete" onClick={close}>Discard Changes</Button>
+      <Button kind="primary" icon="check" onClick={save}>Save Changes</Button>
     </Stack>
   );
-  const pen = (k: typeof edit, label: string) => <Button kind="ghost" icon="edit" size="sm" onClick={() => setEdit(k)}>{label}</Button>;
   /* A CV section's heading carries icon-only controls (Phase 1, 4 Sep 2026): Add (where the
-     section takes entries) to the left of Edit. Both open the section's form. */
-  const icons = (k: typeof edit, edit_: string, add?: string) => (
+     section takes entries) to the left of Edit. */
+  const icons = (k: Sec, edit_: string, add?: string) => (
     <Stack row gap={3}>
-      {add && <Button kind="ghost" size="sm" icon="add" label={add} onClick={() => setEdit(k)} />}
-      <Button kind="ghost" size="sm" icon="edit" label={edit_} onClick={() => setEdit(k)} />
+      {add && <Button kind="ghost" size="sm" icon="add" label={add} onClick={() => open(k, true)} />}
+      <Button kind="ghost" size="sm" icon="edit" label={edit_} onClick={() => open(k)} />
     </Stack>
   );
+  const req = (v: string, msg: string) => (tried && !v.trim() ? msg : undefined);
+  const patch = <T,>(set: React.Dispatch<React.SetStateAction<T[]>>, i: number, p: Partial<T>) =>
+    set((l) => l.map((x, j) => (j === i ? { ...x, ...p } : x)));
+  const drop = <T,>(set: React.Dispatch<React.SetStateAction<T[]>>, i: number) => set((l) => l.filter((_, j) => j !== i));
+  const removeBtn = (onClick: () => void) => <div className={s.entryH}><Button kind="link" size="sm" icon="delete" onClick={onClick}>Remove</Button></div>;
+  const empty = (what: string) => <Text role="desc" as="p">No {what} yet. Use Add to put one here.</Text>;
 
   return (
     <>
@@ -91,12 +193,12 @@ function MyProfile() {
             <Text role="h2" as="span">{g.name}</Text>
             <Text role="desc" as="span">{g.nickname}</Text>
           </span>
-          <span className={s.idAct}>{edit === "general" ? editActs() : pen("general", "Edit Details")}</span>
+          <span className={s.idAct}>{edit === "general" ? editActs : <Button kind="ghost" icon="edit" size="sm" onClick={() => open("general")}>Edit Details</Button>}</span>
         </div>
       </Section>
 
       {edit === "general" ? (
-        <Section kind="block"><GeneralForm g={g} onChange={setG} /></Section>
+        <Section kind="block"><GeneralForm g={dG} onChange={setDG} nameError={req(dG.name, "Enter your name")} /></Section>
       ) : (
         <Section kind="block">
           <Facts>
@@ -105,101 +207,134 @@ function MyProfile() {
             <Fact icon="book" label="Total courses taken" value={String(courses)} />
             <Fact icon="user" label="Current role" value={g.role} />
             <Fact icon="skill" label="Industry" value={g.industry} />
-            <Fact icon="time" label="Years of experience" value={g.years} />
+            <Fact icon="time" label="Years of experience" value={yearsLabel(g.years)} />
             <Fact icon="flag" label="Aspiration" value={g.intent} />
           </Facts>
         </Section>
       )}
 
-      <Section>
-        <SectionHeader title="About Me" />
-        <Text role="body" ink="secondary">{g.about}</Text>
-      </Section>
+      {/* About is edited inside the Details form, so while that form is open this section is not
+          drawn: the paragraph would otherwise show twice, once in the form and once here. */}
+      {edit !== "general" && (
+        <Section>
+          <SectionHeader title="About Me" />
+          <Text role="body" ink="secondary">{g.about}</Text>
+        </Section>
+      )}
 
-      <TimeZoneSection tz={tz} onChange={setTz} />
+      <TimeZoneSection tz={tz} onChange={setTz} draft={edit === "tz" ? dTz : null}
+        setDraft={(z) => (z === null ? close() : setDTz(z))} onEdit={() => open("tz")} />
 
       <ScenesCarousel />
 
-      <CvSection title="Experience" editing={edit === "work"} acts={editActs()} pen={icons("work", "Edit Experience", "Add a role")}
-        view={PF.experience.map((e) => <CvRow key={e.role} icon="work" title={`${e.role} · ${e.org}`} sub={`${e.kind} · ${e.from} – ${e.to} · ${e.span}`} />)}
-        form={PF.experience.map((e) => (
-          <div key={e.role} className={s.entry}>
-            <div className={s.entryH}><Button kind="link" size="sm" icon="delete">Remove</Button></div>
+      <CvSection title="Experience" editing={edit === "work"} acts={editActs} pen={icons("work", "Edit Experience", "Add a role")}
+        view={exp.length ? exp.map((e, i) => <CvRow key={i} icon="work" art={e.art} title={`${e.role} · ${e.org}`}
+          sub={[e.kind, `${ymLabel(e.from)} – ${e.to ? ymLabel(e.to) : "Present"}`, span(e.from, e.to)].filter(Boolean).join(" · ")} />) : empty("roles")}
+        form={dExp.length ? dExp.map((e, i) => (
+          <div key={i} className={s.entry}>
+            {removeBtn(() => drop(setDExp, i))}
             <Form>
+              <LogoField art={e.art} icon="work" what="company" onChange={(art) => patch(setDExp, i, { art })} />
               <FormRow>
-                <Field label="Title"><Input defaultValue={e.role} /></Field>
-                <Field label="Company"><Input defaultValue={e.org} /></Field>
+                <Field label="Title" required error={req(e.role, "Enter a title")}><Input value={e.role} placeholder="e.g. Operations Lead" onChange={(x) => patch(setDExp, i, { role: x.target.value })} /></Field>
+                <Field label="Company" required error={req(e.org, "Enter a company")}><Input value={e.org} placeholder="e.g. Tkxel" onChange={(x) => patch(setDExp, i, { org: x.target.value })} /></Field>
               </FormRow>
               <div className={s.g3}>
-                <Field label="Employment type"><DdField value={e.kind} options={EMPLOYMENT} /></Field>
-                <Field label="Start"><Input defaultValue={e.from} /></Field>
-                <Field label="End"><Input defaultValue={e.to} /></Field>
+                <Field label="Employment type"><Dropdown variant="form" value={e.kind} onChange={(kind) => patch(setDExp, i, { kind })} options={EMPLOYMENT.map((o) => ({ value: o, label: o }))} /></Field>
+                <Field label="Start" required error={tried && !e.from ? "Choose a start month" : undefined}>
+                  <MonthInput label="Start" value={e.from} error={tried && !e.from} onChange={(from) => patch(setDExp, i, { from, to: e.to && e.to < from ? "" : e.to })} />
+                </Field>
+                <Field label="End">
+                  <MonthInput label="End" value={e.to} min={e.from} placeholder="Present" onChange={(to) => patch(setDExp, i, { to })} />
+                </Field>
               </div>
+              <CheckRow on={!e.to} label="I currently work here" onChange={(on) => patch(setDExp, i, { to: on ? "" : thisMonth() })} />
             </Form>
           </div>
-        ))} />
+        )) : empty("roles")} />
 
-      <CvSection title="Education" editing={edit === "edu"} acts={editActs()} pen={icons("edu", "Edit Education", "Add a school")}
-        view={PF.education.map((e) => <CvRow key={e.school} art={e.art} title={e.school} sub={`${e.from} – ${e.to}`} />)}
-        form={PF.education.map((e) => (
-          <div key={e.school} className={s.entry}>
-            <div className={s.entryH}><Button kind="link" size="sm" icon="delete">Remove</Button></div>
+      <CvSection title="Education" editing={edit === "edu"} acts={editActs} pen={icons("edu", "Edit Education", "Add a school")}
+        view={edu.length ? edu.map((e, i) => <CvRow key={i} icon="book" art={e.art} title={e.school}
+          sub={[[e.degree, e.field].filter(Boolean).join(", "), `${ymLabel(e.from)} – ${e.to ? ymLabel(e.to) : "Present"}`].filter(Boolean).join(" · ")} />) : empty("schools")}
+        form={dEdu.length ? dEdu.map((e, i) => (
+          <div key={i} className={s.entry}>
+            {removeBtn(() => drop(setDEdu, i))}
             <Form>
-              <Field label="School"><Input defaultValue={e.school} /></Field>
+              <LogoField art={e.art} icon="book" what="school" onChange={(art) => patch(setDEdu, i, { art })} />
+              <Field label="School" required error={req(e.school, "Enter a school")}><Input value={e.school} placeholder="e.g. COMSATS University" onChange={(x) => patch(setDEdu, i, { school: x.target.value })} /></Field>
               <FormRow>
-                <Field label="Degree"><Input placeholder="BS" defaultValue={e.degree} /></Field>
-                <Field label="Field of study"><Input placeholder="Computer Science" defaultValue={e.field} /></Field>
+                <Field label="Degree"><Input placeholder="BS" value={e.degree} onChange={(x) => patch(setDEdu, i, { degree: x.target.value })} /></Field>
+                <Field label="Field of study"><Input placeholder="Computer Science" value={e.field} onChange={(x) => patch(setDEdu, i, { field: x.target.value })} /></Field>
               </FormRow>
               <FormRow>
-                <Field label="Start year"><Input defaultValue={e.from} /></Field>
-                <Field label="End year"><Input defaultValue={e.to} /></Field>
+                <Field label="Start year" required error={tried && !e.from ? "Choose a start year" : undefined}>
+                  <MonthInput mode="year" label="Start year" value={e.from} error={tried && !e.from} onChange={(from) => patch(setDEdu, i, { from, to: e.to && e.to < from ? "" : e.to })} />
+                </Field>
+                <Field label="End year (or expected)">
+                  <MonthInput mode="year" label="End year" value={e.to} min={e.from} future placeholder="Select year" onChange={(to) => patch(setDEdu, i, { to })} />
+                </Field>
               </FormRow>
             </Form>
           </div>
-        ))} />
+        )) : empty("schools")} />
 
-      <CvSection title="Licenses & certifications" editing={edit === "cert"} acts={editActs()} pen={icons("cert", "Edit Licenses & Certifications", "Add a certification")}
-        view={PF.certs.map((c) => <CvRow key={c.name} art={c.art} title={c.name} sub={`${c.org} · issued ${c.issued}`} sub2={c.cred} />)}
-        form={PF.certs.map((c) => (
-          <div key={c.name} className={s.entry}>
-            <div className={s.entryH}><Button kind="link" size="sm" icon="delete">Remove</Button></div>
+      <CvSection title="Licenses & certifications" editing={edit === "cert"} acts={editActs} pen={icons("cert", "Edit Licenses & Certifications", "Add a certification")}
+        view={certs.length ? certs.map((c, i) => <CvRow key={i} icon="certificate" art={c.art} title={c.name} sub={`${c.org} · issued ${ymLabel(c.issued)}`} sub2={c.cred} />) : empty("certifications")}
+        form={dCert.length ? dCert.map((c, i) => (
+          <div key={i} className={s.entry}>
+            {removeBtn(() => drop(setDCert, i))}
             <Form>
+              <LogoField art={c.art} icon="certificate" what="issuer" onChange={(art) => patch(setDCert, i, { art })} />
               <FormRow>
-                <Field label="Name"><Input defaultValue={c.name} /></Field>
-                <Field label="Issuing organisation"><Input defaultValue={c.org} /></Field>
+                <Field label="Name" required error={req(c.name, "Enter the certification name")}><Input value={c.name} onChange={(x) => patch(setDCert, i, { name: x.target.value })} /></Field>
+                <Field label="Issuing organisation" required error={req(c.org, "Enter the issuing organisation")}><Input value={c.org} onChange={(x) => patch(setDCert, i, { org: x.target.value })} /></Field>
               </FormRow>
               <FormRow>
-                <Field label="Issue date"><Input defaultValue={c.issued} /></Field>
-                <Field label="Credential"><Input placeholder="What the credential is in" defaultValue={c.cred} /></Field>
+                <Field label="Issue date" required error={tried && !c.issued ? "Choose the issue month" : undefined}>
+                  <MonthInput label="Issue date" value={c.issued} error={tried && !c.issued} onChange={(issued) => patch(setDCert, i, { issued })} />
+                </Field>
+                <Field label="Credential"><Input placeholder="What the credential is in" value={c.cred} onChange={(x) => patch(setDCert, i, { cred: x.target.value })} /></Field>
               </FormRow>
             </Form>
           </div>
-        ))} />
+        )) : empty("certifications")} />
 
-      <Skills editing={edit === "skill"} acts={editActs()} pen={icons("skill", "Edit Skills")} />
+      <Skills editing={edit === "skill"} list={edit === "skill" ? dSkill : skills} setList={setDSkill} acts={editActs} pen={icons("skill", "Edit Skills")} />
 
       <Section kind="block">
         <Button kind="secondary" icon="logout" onClick={() => setUi({ logout: true })}>Log Out</Button>
       </Section>
 
       {photoOpen && <PhotoSheet current={photo} onClose={() => setPhotoOpen(false)} onSave={(p) => { setPhoto(p); setPhotoOpen(false); }} />}
+      {pending && edit && (
+        <Confirm icon="edit" title="Discard your changes?"
+          desc={<>You have unsaved changes in <b>{SEC_NAME[edit]}</b>. Opening {SEC_NAME[pending.k]} discards them.</>}
+          ok="Discard Changes" onCancel={() => setPending(null)}
+          onOk={() => { const p = pending; setPending(null); start(p.k, p.add); }} />
+      )}
     </>
   );
 }
 
-function GeneralForm({ g, onChange }: { g: typeof PF.general; onChange: (g: typeof PF.general) => void }) {
+const thisMonth = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`; };
+
+function GeneralForm({ g, onChange, nameError }: { g: typeof PF.general; onChange: (g: typeof PF.general) => void; nameError?: string }) {
   const set = (k: keyof typeof PF.general) => (e: { target: { value: string } }) => onChange({ ...g, [k]: e.target.value });
   return (
     <Form>
       <div className={s.g3}>
-        <Field label="Name"><Input value={g.name} onChange={set("name")} /></Field>
+        <Field label="Name" required error={nameError}><Input value={g.name} onChange={set("name")} /></Field>
         <Field label="Nickname"><Input value={g.nickname} placeholder="A short name others can call you" onChange={set("nickname")} /></Field>
         <Field label="Email"><Input value={g.email} readOnly /></Field>
       </div>
       <div className={s.g3}>
         <Field label="Current role"><Input value={g.role} placeholder="e.g. Operations Lead — or Student" onChange={set("role")} /></Field>
         <Field label="Industry"><Input value={g.industry} placeholder="e.g. Software" onChange={set("industry")} /></Field>
-        <Field label="Years of experience"><Input value={g.years} placeholder="e.g. 5 years" onChange={set("years")} /></Field>
+        {/* A whole number of years, 0 to 60 (24 Nov 2026, was free text). */}
+        <Field label="Years of experience">
+          <Input type="number" inputMode="numeric" min={0} max={60} step={1} value={g.years} placeholder="e.g. 5"
+            onChange={(e) => { const n = Math.min(60, Math.max(0, Math.floor(Number(e.target.value.replace(/\D/g, "")) || 0))); onChange({ ...g, years: n }); }} />
+        </Field>
       </div>
       <Field label="Intent aspiration">
         <Dropdown variant="form" value={g.intent} onChange={(v) => onChange({ ...g, intent: v })} options={INTENTS.map((i) => ({ value: i, label: i }))} />
@@ -209,9 +344,29 @@ function GeneralForm({ g, onChange }: { g: typeof PF.general; onChange: (g: type
   );
 }
 
-function DdField({ value, options }: { value: string; options: string[] }) {
-  const [v, setV] = useState(value);
-  return <Dropdown variant="form" value={v} onChange={setV} options={options.map((o) => ({ value: o, label: o }))} />;
+/* An entry's logo (24 Nov 2026: the CV rows show logos but there was no way to add one): the same
+   square the row draws, then Upload (and Remove once there is one). Empty, the section's icon stands in. */
+function LogoField({ art, icon, what, onChange }: { art: string; icon: "work" | "book" | "certificate"; what: string; onChange: (art: string) => void }) {
+  const file = useRef<HTMLInputElement>(null);
+  return (
+    <div className={s.logoF}>
+      <span className={s.cvArt} style={art ? ({ "--art": `url(${art})` } as CSSProperties) : undefined}>{!art && <Icon name={icon} />}</span>
+      <input ref={file} className={s.upload} type="file" accept="image/*" aria-label={`Upload a ${what} logo`}
+        onChange={(e) => { const f = e.target.files?.[0]; if (f) onChange(URL.createObjectURL(f)); e.target.value = ""; }} />
+      <Button kind="ghost" size="sm" icon="upload" onClick={() => file.current?.click()}>{art ? "Change Logo" : "Upload Logo"}</Button>
+      {art && <Button kind="ghost" size="sm" icon="close" onClick={() => onChange("")}>Remove</Button>}
+    </div>
+  );
+}
+
+/* A labelled checkbox (the table's row-select box, Phase 1 .tbl-cb): a button, never a native input. */
+function CheckRow({ on, label, onChange }: { on: boolean; label: string; onChange: (on: boolean) => void }) {
+  return (
+    <button type="button" role="checkbox" aria-checked={on} className={s.chk} onClick={() => onChange(!on)}>
+      <span className={`${s.cb} ${on ? s.cbOn : ""}`}>{on && <Icon name="check" />}</span>
+      <Text role="body" as="span">{label}</Text>
+    </button>
+  );
 }
 
 /* The Profile's "Interview scenes" (Phase 1 .scv-row): a carousel of 240px cards, each a
@@ -262,10 +417,11 @@ function CvSection({ title, editing, acts, pen, view, form }: {
   );
 }
 
-function CvRow({ icon, art, title, sub, sub2 }: { icon?: "work"; art?: string; title: string; sub: string; sub2?: string }) {
+/* A CV row: the entry's logo, or the section's icon when it has none. */
+function CvRow({ icon, art, title, sub, sub2 }: { icon: "work" | "book" | "certificate"; art?: string; title: string; sub: string; sub2?: string }) {
   return (
     <div className={s.cvRow}>
-      <span className={s.cvArt} style={art ? ({ "--art": `url(${art})` } as CSSProperties) : undefined}>{icon && <Icon name={icon} />}</span>
+      <span className={s.cvArt} style={art ? ({ "--art": `url(${art})` } as CSSProperties) : undefined}>{!art && <Icon name={icon} />}</span>
       <span className={s.cvB}>
         <Text role="h4" as="span">{title}</Text>
         <Text role="desc" as="span">{sub}</Text>
@@ -275,9 +431,12 @@ function CvRow({ icon, art, title, sub, sub2 }: { icon?: "work"; art?: string; t
   );
 }
 
-function Skills({ editing, acts, pen }: { editing: boolean; acts: React.ReactNode; pen: React.ReactNode }) {
-  const [list, setList] = useState(PF.skills);
+/* Skills edit the page's draft list (`list` is the draft while editing), so Discard puts them back. */
+function Skills({ editing, list, setList, acts, pen }: {
+  editing: boolean; list: string[]; setList: React.Dispatch<React.SetStateAction<string[]>>; acts: React.ReactNode; pen: React.ReactNode;
+}) {
   const [adding, setAdding] = useState("");
+  const add = () => { const v = adding.trim(); if (v && !list.includes(v)) setList((l) => [...l, v]); setAdding(""); };
   return (
     <Section>
       <SectionHeader title="Skills" actions={editing ? acts : pen} />
@@ -291,8 +450,8 @@ function Skills({ editing, acts, pen }: { editing: boolean; acts: React.ReactNod
       </Chips>
       {editing && (
         <Stack row gap={3}>
-          <Input value={adding} placeholder="Add a skill" onChange={(e) => setAdding(e.target.value)} />
-          <Button kind="link" icon="add" onClick={() => { if (adding.trim()) { setList((l) => [...l, adding.trim()]); setAdding(""); } }}>Add</Button>
+          <Input value={adding} placeholder="Add a skill" onChange={(e) => setAdding(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") add(); }} />
+          <Button kind="link" icon="add" onClick={add}>Add</Button>
         </Stack>
       )}
     </Section>

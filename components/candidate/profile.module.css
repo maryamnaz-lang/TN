@@ -90,3 +90,11 @@
 .closeB { display: flex; flex-wrap: wrap; align-items: flex-start; gap: var(--s05) var(--s06); }
 .closeX { flex: 1 1 calc(var(--s12) * 4); max-width: var(--qa-max); }
 .closeB > :last-child { margin-left: auto; }
+
+/* ---- A CV entry's logo row (24 Nov 2026): the row's own logo square, then Upload / Remove ---- */
+.logoF { display: flex; align-items: center; gap: var(--s04); flex-wrap: wrap; }
+/* "I currently work here": the table's row-select box (Phase 1 .tbl-cb) with a label. */
+.chk { display: inline-flex; align-items: center; gap: var(--s03); align-self: flex-start; color: var(--text-primary); text-align: left; }
+.cb { width: var(--s05); height: var(--s05); flex: none; display: grid; place-items: center; border: var(--cb-edge) solid var(--gray-30); border-radius: var(--radius-cb); background: var(--layer-01); color: var(--on-accent); }
+.cb svg { width: var(--s04); height: var(--s04); }
+.cbOn { background: var(--accent); border-color: var(--accent); }

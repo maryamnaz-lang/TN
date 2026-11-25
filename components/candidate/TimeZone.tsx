@@ -20,8 +20,11 @@ import { zoneOptions, tzLabel, tzOffsetMin, deviceTz } from "@/data/agent";
      non-blocking confirmation naming both. The candidate can keep any zone.
    Agents' open times and every booking are shown to the candidate in this zone.
    ============================================================ */
-export function TimeZoneSection({ tz, onChange }: { tz: string; onChange: (tz: string) => void }) {
-  const [draft, setDraft] = useState<string | null>(null);
+/* The page owns the edit state (24 Nov 2026): only one profile section is in edit at a time, so
+   `draft` is null when this section is shut and the zone being chosen while it is open. */
+export function TimeZoneSection({ tz, onChange, draft, setDraft, onEdit }: {
+  tz: string; onChange: (tz: string) => void; draft: string | null; setDraft: (z: string | null) => void; onEdit: () => void;
+}) {
   const zones = useMemo(() => zoneOptions(), []);
   const [ask, setAsk] = useState<{ device: string } | null>(null);
 
@@ -42,7 +45,7 @@ export function TimeZoneSection({ tz, onChange }: { tz: string; onChange: (tz: s
             <Button kind="secondary" icon="delete" onClick={() => setDraft(null)}>Discard Changes</Button>
             <Button kind="primary" icon="check" onClick={save}>Save Changes</Button>
           </Stack>
-        ) : <Button kind="ghost" size="sm" icon="edit" label="Edit time zone" onClick={() => setDraft(tz)} />} />
+        ) : <Button kind="ghost" size="sm" icon="edit" label="Edit time zone" onClick={onEdit} />} />
       {draft !== null ? (
         <Form>
           <Field label="Time zone"><SearchDropdown label="Time zone" value={draft} onChange={setDraft} options={zones}

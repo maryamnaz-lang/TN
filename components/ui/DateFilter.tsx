@@ -106,3 +106,63 @@ export function DateInput({ value, onChange, label = "Date", example = "11/30/20
     </div>
   );
 }
+
+/* <MonthInput> — a month-and-year (or year-only) field for a CV entry (24 Nov 2026: "calendar fields
+   should be displayed for experience period selections"). A day grid is the wrong grain for "Jan 2024",
+   so this opens a 12-cell grid: the twelve months of the shown year, or twelve years at a time in
+   `year` mode. Values are "YYYY-MM" (month) or "YYYY" (year), "" for none. `min` and `max` (same
+   format) grey out what cannot be picked; `max` defaults to this month, so a past date cannot be
+   in the future unless the field says so (an expected graduation passes `future`). */
+const SHORT = MONTHS.map((m) => m.slice(0, 3));
+export const ymLabel = (v: string) => {
+  if (!v) return "";
+  const [y, m] = v.split("-");
+  return m ? `${SHORT[Number(m) - 1]} ${y}` : y;
+};
+export function MonthInput({ value, onChange, label, mode = "month", min, future, placeholder, error }: {
+  value: string; onChange: (v: string) => void; label: string; mode?: "month" | "year";
+  min?: string; future?: boolean; placeholder?: string; error?: boolean;
+}) {
+  const now = new Date();
+  const max = future ? undefined : mode === "year" ? String(now.getFullYear()) : `${now.getFullYear()}-${pad(now.getMonth() + 1)}`;
+  const [open, setOpen] = useState(false);
+  const seed = Number((value || max || String(now.getFullYear())).slice(0, 4));
+  /* month mode: the year shown; year mode: the first year of the page of twelve. */
+  const [at, setAt] = useState(mode === "year" ? seed - 11 : seed);
+  useEffect(() => { if (open) setAt(mode === "year" ? seed - 11 : seed); }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
+  const ref = useOutside(open, () => setOpen(false));
+  const minCut = min ? (mode === "year" ? min.slice(0, 4) : min) : "";
+  const cells = Array.from({ length: 12 }, (_, i) => mode === "year"
+    ? { v: String(at + i), t: String(at + i) }
+    : { v: `${at}-${pad(i + 1)}`, t: SHORT[i] });
+  const off = (v: string) => (!!minCut && v < minCut) || (!!max && v > max);
+  const step = mode === "year" ? 12 : 1;
+  const head = mode === "year" ? `${at} – ${at + 11}` : String(at);
+  return (
+    <div ref={ref} className={s.di}>
+      <button type="button" className={`${s.diInp} ${s.miT} ${error ? s.miErr : ""} ${value ? "" : s.miPh}`} aria-haspopup="dialog" aria-expanded={open}
+        aria-label={`${label}${value ? `: ${ymLabel(value)}` : ""}`} onClick={() => setOpen((o) => !o)}>
+        {value ? ymLabel(value) : placeholder ?? (mode === "year" ? "Select year" : "Select month")}
+      </button>
+      <span className={s.diBtn} aria-hidden="true"><Icon name="calendar" /></span>
+      {open && (
+        <div className={`${s.pop} ${s.popL}`} role="dialog" aria-label={`${label} picker`}>
+          <div className={s.h}>
+            <button type="button" className={s.nav} aria-label={mode === "year" ? "Earlier years" : "Previous year"}
+              disabled={!!minCut && String(at - 1) < minCut.slice(0, 4)} onClick={() => setAt((a) => a - step)}><Icon name="chevLeft" /></button>
+            <span className={`${s.m} t-compact w-strong`}>{head}</span>
+            <button type="button" className={s.nav} aria-label={mode === "year" ? "Later years" : "Next year"}
+              disabled={!!max && String(at + (mode === "year" ? 12 : 1)) > max.slice(0, 4)} onClick={() => setAt((a) => a + step)}><Icon name="chevRight" /></button>
+          </div>
+          <div className={s.mGrid}>
+            {cells.map((c) => (
+              <button key={c.v} type="button" disabled={off(c.v)} aria-disabled={off(c.v)} aria-pressed={c.v === value}
+                className={`${s.mo} ${c.v === value ? s.on : ""} ${off(c.v) ? s.off : ""} t-compact`}
+                onClick={() => { onChange(c.v); setOpen(false); }}>{c.t}</button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

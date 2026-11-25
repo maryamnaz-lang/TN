@@ -35,3 +35,15 @@
 /* A day before the field's earliest allowed date: greyed and not pickable (Maryam 11 Nov 2026). */
 .d.off, .d.off:hover { color: var(--text-disabled); background: transparent; cursor: not-allowed; }
 .nav:disabled, .nav:disabled:hover { color: var(--text-disabled); background: transparent; cursor: not-allowed; }
+/* <MonthInput> (24 Nov 2026): the trigger is the field's own underline, a button rather than a typed
+   input, and the 12-cell grid uses the day grid's states (accent pick, greyed out-of-range). */
+.miT { display: flex; align-items: center; text-align: left; cursor: pointer; }
+.miPh { color: var(--text-placeholder); }
+.miErr { border-bottom-color: var(--support-error); }
+.miT[aria-expanded="true"] { border-bottom-color: var(--focus); box-shadow: inset 0 calc(var(--hairline) * -1) 0 var(--focus); }
+.diBtn[aria-hidden="true"] { pointer-events: none; }
+.mGrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s02); }
+.mo { height: var(--s08); display: grid; place-items: center; color: var(--text-primary); }
+.mo:hover { background: var(--overlay-hover); }
+.mo.on { background: var(--accent); color: var(--on-accent); }
+.mo.off, .mo.off:hover { color: var(--text-disabled); background: transparent; cursor: not-allowed; }
